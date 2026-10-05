@@ -1,0 +1,243 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Download Create Fly
+        shell: bash
+        run: |
+          mkdir -p libs
+          curl -fsSL -o libs/create-fly-26.3.jar https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
+          ls -l libs
+      - name: Build
+        shell: bash
+        run: |
+          set -o pipefail
+          chmod +x gradlew
+          cat > /tmp/maxerrs.gradle <<'GRADLE'
+          allprojects {
+            tasks.withType(JavaCompile).configureEach {
+              options.compilerArgs += ["-Xmaxerrs", "20000", "-Xmaxwarns", "0"]
+            }
+            tasks.register("dumpCompileClasspath") {
+              doLast {
+                def files = new LinkedHashSet()
+                project.sourceSets.each { files.addAll(it.compileClasspath.files) }
+                new File("/tmp/compile-cp.txt").text = files.join("\n")
+              }
+            }
+          }
+          GRADLE
+          ./gradlew build --no-daemon --continue -Dorg.gradle.console=plain -I /tmp/maxerrs.gradle 2>&1 | tee build.log
+      - name: Dump game signatures, bytecode and data on request
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p /tmp/ci
+          mcjars=$(find ~/.gradle/caches/fabric-loom .gradle/loom-cache -name '*.jar' 2>/dev/null | grep -iE 'minecraft' | grep -v sources || true)
+          # exactly the jars the mod compiles against (the gradle cache also holds other versions pulled in by dependencies)
+          ./gradlew dumpCompileClasspath --no-daemon -q -I /tmp/maxerrs.gradle >/dev/null 2>&1 || true
+          fabricjars=$(grep -E '/fabric-[^/]*\.jar$' /tmp/compile-cp.txt 2>/dev/null | grep -v sources | tr '\n' ' ')
+          cp /tmp/compile-cp.txt /tmp/ci/compile-cp.txt 2>/dev/null || true
+          if [ -f .github/dump-signatures ]; then
+            jars="$mcjars $fabricjars"
+            cp=$(echo $jars | tr ' ' ':')
+            for j in $jars; do unzip -Z1 "$j" | grep '\.class$' ; done | sed 's/\.class$//' | sort -u > /tmp/ci/classes.txt || true
+            sed 's#/#.#g' /tmp/ci/classes.txt | grep -v 'package-info\|module-info' > /tmp/all-classes.txt
+            (xargs -a /tmp/all-classes.txt -n 300 javap -p -cp "$cp" 2>/dev/null || true) | gzip -9 > /tmp/ci/javap-all.txt.gz
+          fi
+          if [ -f .github/dump-bytecode ]; then
+            # a list of classes, or the single word ALL for every game class
+            cp=$(echo $mcjars | tr ' ' ':')
+            if [ "$(head -1 .github/dump-bytecode)" = "ALL" ]; then
+              for j in $mcjars; do unzip -Z1 "$j" | grep '\.class$' ; done | sed 's/\.class$//' | sort -u | sed 's#/#.#g' | grep -v 'package-info\|module-info' > /tmp/bc-classes.txt
+            else
+              cp .github/dump-bytecode /tmp/bc-classes.txt
+            fi
+            (xargs -a /tmp/bc-classes.txt -n 300 javap -p -s -c -cp "$cp" 2>/dev/null || true) | gzip -9 > /tmp/ci/bytecode.txt.gz
+          fi
+          if [ -f .github/dump-bytecode-old ]; then
+            # same dump for an older (unobfuscated) game version named in the file, straight from the official client jar
+            old=$(head -1 .github/dump-bytecode-old)
+            vurl=$(curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | python3 -c "import json,sys; print([v['url'] for v in json.load(sys.stdin)['versions'] if v['id']=='$old'][0])")
+            curl -fsSL -o /tmp/old-client.jar "$(curl -fsSL "$vurl" | python3 -c "import json,sys; print(json.load(sys.stdin)['downloads']['client']['url'])")"
+            unzip -Z1 /tmp/old-client.jar | grep '\.class$' | sed 's/\.class$//' | sort -u | sed 's#/#.#g' | grep -E '^(net\.minecraft|com\.mojang)' | grep -v 'package-info\|module-info' > /tmp/old-classes.txt
+            (xargs -a /tmp/old-classes.txt -n 300 javap -p -s -c -cp /tmp/old-client.jar 2>/dev/null || true) | gzip -9 > /tmp/ci/bytecode-old.txt.gz
+          fi
+          if [ -f .github/dump-data ]; then
+            mkdir -p /tmp/ci-data
+            for j in $mcjars; do
+              while read -r pattern; do
+                [ -z "$pattern" ] && continue
+                unzip -o -q "$j" "$pattern" -d /tmp/ci-data 2>/dev/null || true
+              done < .github/dump-data
+            done
+            (cd /tmp/ci-data && tar czf /tmp/ci/data.tar.gz . ) || true
+          fi
+      - name: Smoke test (dedicated server, then a client that joins it)
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          # Only runs when .github/smoke-test exists. Starts a production Fabric server with the built jar, feeds it
+          # .github/smoke-commands.txt, and (when .github/smoke-client exists) joins it with a dev client under Xvfb,
+          # driven by .github/smoke-script.txt. Then restarts the server on the saved world
+          # (.github/smoke-commands-restart.txt). Logs and screenshots go to the ci-logs branch.
+          set +e
+          mkdir -p /tmp/ci
+          if [ -f .github/smoke-test ] && ls build/libs/*.jar >/dev/null 2>&1; then
+            exec > >(tee /tmp/ci/smoke.txt) 2>&1
+            root=$PWD
+            mc=$(grep '^minecraft_version' gradle.properties | sed 's/.*= *//')
+            loader=$(grep '^loader_version' gradle.properties | sed 's/.*= *//')
+            fapi=$(grep '^fabric_version' gradle.properties | sed 's/.*= *//')
+            mkdir -p server/mods && cd server
+            inst=$(curl -fsSL https://meta.fabricmc.net/v2/versions/installer | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['version'])")
+            curl -fsSL -o server.jar "https://meta.fabricmc.net/v2/versions/loader/$mc/$loader/$inst/server/jar"
+            fapiurl=$(curl -fsSL "https://api.modrinth.com/v2/project/fabric-api/version" | python3 -c "import json,sys; v=[x for x in json.load(sys.stdin) if x['version_number']=='$fapi']; print(v[0]['files'][0]['url'])")
+            echo "fabric api: $fapiurl"
+            if [ ! -f $root/.github/smoke-no-fabric-api ]; then curl -fsSL -o mods/fabric-api.jar "$fapiurl"; fi
+            cp ../libs/create-fly-26.3.jar mods/
+            jar=$(ls ../build/libs/*.jar | grep -v -e sources -e server | head -1)
+            cp "$jar" mods/
+            ls -l mods
+            echo "eula=true" > eula.txt
+            printf 'level-seed=12345\nwhite-list=false\nenforce-whitelist=false\nonline-mode=false\nmax-tick-time=-1\nview-distance=6\ngamemode=creative\ndifficulty=peaceful\nspawn-protection=0\n' > server.properties
+            mkfifo in.fifo
+            (java -Xmx3G -Dcreate.mixin.audit=true -jar server.jar --nogui < in.fifo > server.log 2>&1; echo "EXIT $?" >> server.log) &
+            exec 3> in.fifo
+            for i in $(seq 1 120); do
+              if grep -q 'Done (' server.log || grep -q '^EXIT' server.log; then break; fi
+              sleep 5
+            done
+            if grep -q 'Done (' server.log; then
+              if [ -f $root/.github/smoke-commands.txt ]; then
+                while read -r line; do echo "$line" >&3; sleep 0.3; done < $root/.github/smoke-commands.txt
+                sleep 10
+              fi
+              if [ -f $root/.github/smoke-client ]; then
+                cd $root
+                sudo apt-get update -q >/dev/null 2>&1
+                sudo apt-get install -y -q xvfb xdotool imagemagick libgl1-mesa-dri libglx-mesa0 libegl1 libegl-mesa0 libgles2 mesa-vulkan-drivers libvulkan1 mesa-utils >/dev/null 2>&1
+                mkdir -p run/mods
+                cp libs/create-fly-26.3.jar run/mods/
+                # no version line: the file is datafixed from the oldest layout, where key codes are LWJGL2 numbers (22 = U)
+                printf 'pauseOnLostFocus:false\nonboardAccessibility:false\ntutorialStep:none\nnarrator:0\nrenderDistance:6\nguiScale:2\nmaxFps:30\nsoundCategory_master:0.0\nkey_key.use:22\n' > run/options.txt
+                export LIBGL_ALWAYS_SOFTWARE=1
+                # MC 26.3 (SDL3) asks for an sRGB-capable framebuffer; Xvfb's GLX visuals have none, EGL does
+                if [ ! -f .github/smoke-glx ]; then export SDL_VIDEO_FORCE_EGL=1; fi
+                Xvfb :99 -screen 0 1280x720x24 >/dev/null 2>&1 &
+                export DISPLAY=:99
+                sleep 2
+                (glxinfo -B; eglinfo -B 2>/dev/null | head -40; vulkaninfo --summary 2>/dev/null | head -40) > /tmp/ci/gfx.txt 2>&1
+                (env -u CI JAVA_TOOL_OPTIONS=-Dcreate.mixin.audit=true timeout 1500 ./gradlew runClient --no-daemon -Dorg.gradle.console=plain --args="--quickPlayMultiplayer localhost --width 1280 --height 720" > client-gradle.log 2>&1; echo "EXIT $?" >> client-gradle.log) &
+                for i in $(seq 1 130); do
+                  if grep -q 'joined the game' server/server.log || grep -q '^EXIT' client-gradle.log || grep -q -e 'Failed to create backend Vulkan' -e 'Caught error loading resourcepacks' run/logs/latest.log 2>/dev/null; then break; fi
+                  sleep 5
+                done
+                n=0
+                shot() { n=$((n+1)); import -window root /tmp/ci/client-$(printf '%02d' $n).png; }
+                if grep -q 'joined the game' server/server.log; then
+                  sleep 40
+                  xdotool mousemove 640 360
+                  if [ -f .github/smoke-script.txt ]; then
+                    while read -r kind arg; do
+                      case "$kind" in
+                        cmd) echo "$arg" >&3;;
+                        key) xdotool key "$arg";;
+                        keydown) xdotool keydown "$arg";;
+                        keyup) xdotool keyup "$arg";;
+                        type) xdotool type --delay 40 "$arg";;
+                        sleep) sleep "$arg";;
+                        shot) shot;;
+                        move) xdotool mousemove $arg;;
+                        click) xdotool mousemove $arg; sleep 0.3; xdotool click 1; sleep 0.4;;
+                        rclick) xdotool mousemove $arg; sleep 0.3; xdotool click 3; sleep 0.4;;
+                        scroll) xdotool click --repeat 3 "$arg";;
+                      esac
+                    done < .github/smoke-script.txt
+                  else
+                    shot
+                  fi
+                else
+                  shot
+                fi
+                pkill -f KnotClient; sleep 5
+                tail -c 400000 client-gradle.log > /tmp/ci/client-gradle.log
+                cp run/logs/latest.log /tmp/ci/client.log 2>/dev/null
+                cp -r run/crash-reports /tmp/ci/client-crash-reports 2>/dev/null
+                cd server
+              fi
+              echo "stop" >&3
+              for i in $(seq 1 60); do grep -q '^EXIT' server.log && break; sleep 2; done
+            fi
+            exec 3>&-
+            cp server.log /tmp/ci/server.log
+            if [ -f $root/.github/smoke-commands-restart.txt ] && grep -q 'Done (' server.log; then
+              # second start on the saved world: checks that everything written above loads again
+              rm -f in.fifo; mkfifo in.fifo
+              (java -Xmx3G -Dcreate.mixin.audit=true -jar server.jar --nogui < in.fifo > server2.log 2>&1; echo "EXIT $?" >> server2.log) &
+              exec 3> in.fifo
+              for i in $(seq 1 120); do
+                if grep -q 'Done (' server2.log || grep -q '^EXIT' server2.log; then break; fi
+                sleep 5
+              done
+              if grep -q 'Done (' server2.log; then
+                while read -r line; do case "$line" in "#sleep "*) sleep "${line#\#sleep }";; *) echo "$line" >&3; sleep 0.3;; esac; done < $root/.github/smoke-commands-restart.txt
+                sleep 10
+                echo "stop" >&3
+                for i in $(seq 1 60); do grep -q '^EXIT' server2.log && break; sleep 2; done
+              fi
+              exec 3>&-
+              cp server2.log /tmp/ci/server2.log
+            fi
+            cp -r crash-reports /tmp/ci/ 2>/dev/null || true
+            cd $root
+          fi
+      - name: Publish build log to the ci-logs branch
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p /tmp/ci && cp build.log /tmp/ci/build.log || echo "no log" > /tmp/ci/build.log
+          sed -i "s#${GITHUB_WORKSPACE}/##g" /tmp/ci/build.log
+          ls -l build/libs > /tmp/ci/jars.txt 2>&1 || true
+          echo "${GITHUB_SHA}" > /tmp/ci/commit.txt
+          cd /tmp/ci
+          git init -q -b ci-logs
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A && git commit -q -m "Build log for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs
+      - name: Upload jars
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: siftec-26.3
+          path: build/libs/*.jar
+      - name: Publish the jar as a release
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release delete latest -y --cleanup-tag -R "${{ github.repository }}" || true
+          sleep 3
+          jar=$(ls build/libs/*.jar | grep -v sources | head -1)
+          cp "$jar" siftec-26.3.jar
+          gh release create latest siftec-26.3.jar -R "${{ github.repository }}" --target "${GITHUB_SHA}" --title "SIFTEC (latest build)" --notes "Built from main at ${GITHUB_SHA}. Needs Create Fly and Fabric API."

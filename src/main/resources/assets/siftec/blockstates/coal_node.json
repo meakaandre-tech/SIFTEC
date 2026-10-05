@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/coal_node"
+    },
+    "core=true": {
+      "model": "siftec:block/coal_node_core"
+    }
+  }
+}

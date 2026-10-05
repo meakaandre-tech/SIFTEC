@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/bauxite_node"
+    },
+    "core=true": {
+      "model": "siftec:block/bauxite_node_core"
+    }
+  }
+}

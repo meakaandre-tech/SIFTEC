@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/limestone_node"
+    },
+    "core=true": {
+      "model": "siftec:block/limestone_node_core"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+package com.meakaandre.siftec.registry;
+
+import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.block.MinerBlockEntity;
+import com.meakaandre.siftec.block.PortableMinerBlockEntity;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Set;
+import java.util.function.Supplier;
+
+public class ModBlockEntities {
+    @FunctionalInterface
+    private interface Factory<T extends BlockEntity> {
+        T create(BlockEntityType<?> type, BlockPos pos, BlockState state);
+    }
+
+    /** Filled in right after registration; the type has to exist before its factory can hand it out. */
+    public static final class Entry<T extends BlockEntity> implements Supplier<BlockEntityType<T>> {
+        private BlockEntityType<T> type;
+
+        @Override
+        public BlockEntityType<T> get() {
+            return type;
+        }
+    }
+
+    public static final Entry<PortableMinerBlockEntity> PORTABLE_MINER = register("portable_miner", PortableMinerBlockEntity::new, ModBlocks.PORTABLE_MINER.get());
+    public static final Entry<MinerBlockEntity> MINER = register("miner", MinerBlockEntity::new, ModBlocks.MINER_MK1.get());
+
+    private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
+        Entry<T> entry = new Entry<>();
+        BlockEntityType<T> type = new BlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state), Set.of(blocks));
+        entry.type = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Siftec.id(name), type);
+        return entry;
+    }
+
+    public static void register() {
+        // belts, funnels, chutes and hoppers can take a powered miner's output
+        ItemStorage.SIDED.registerForBlockEntity((miner, side) -> ContainerStorage.of(miner.output, side), MINER.get());
+    }
+}

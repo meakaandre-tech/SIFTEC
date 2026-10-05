@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/zinc_node"
+    },
+    "core=true": {
+      "model": "siftec:block/zinc_node_core"
+    }
+  }
+}

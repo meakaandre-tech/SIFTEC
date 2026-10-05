@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/iron_node"
+    },
+    "core=true": {
+      "model": "siftec:block/iron_node_core"
+    }
+  }
+}

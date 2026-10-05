@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/sam_node"
+    },
+    "core=true": {
+      "model": "siftec:block/sam_node_core"
+    }
+  }
+}

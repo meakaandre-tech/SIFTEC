@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/copper_node"
+    },
+    "core=true": {
+      "model": "siftec:block/copper_node_core"
+    }
+  }
+}
