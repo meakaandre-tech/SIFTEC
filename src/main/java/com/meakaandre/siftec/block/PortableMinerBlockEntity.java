@@ -2,7 +2,7 @@ package com.meakaandre.siftec.block;
 
 import com.meakaandre.siftec.node.Node;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;

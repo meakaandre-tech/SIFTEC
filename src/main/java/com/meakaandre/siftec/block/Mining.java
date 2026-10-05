@@ -50,6 +50,6 @@ public final class Mining {
         ItemStack stack = output.get();
         if (stack.isEmpty()) return;
         output.set(ItemStack.EMPTY);
-        player.getInventory().placeItemBackInInventory(stack);
+        player.getInventory().placeItemBackInInventory(stack, net.minecraft.util.Prediction.SERVER_ONLY);
     }
 }
