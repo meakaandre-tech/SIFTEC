@@ -32,7 +32,7 @@ public final class NodePlacer {
     }
 
     public static void register() {
-        ServerChunkEvents.CHUNK_LOAD.register((level, chunk) -> {
+        ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
             if (!NodeMap.hasNodes(level)) return;
             ChunkPos pos = chunk.getPos();
             if (touchesNode(level, pos.x(), pos.z())) {

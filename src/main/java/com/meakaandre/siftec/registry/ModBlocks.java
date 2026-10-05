@@ -33,7 +33,7 @@ public class ModBlocks {
     /** Node blocks cannot be broken, pushed or blown up. */
     private static BlockBehaviour.Properties node() {
         return BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable()
-            .sound(SoundType.DEEPSLATE).pushReaction(PushReaction.BLOCK);
+            .sound(SoundType.DEEPSLATE).pushReaction(PushReaction.IMMOVEABLE);
     }
 
     private static BlockBehaviour.Properties machine() {

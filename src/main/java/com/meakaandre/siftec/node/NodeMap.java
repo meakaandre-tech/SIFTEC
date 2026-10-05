@@ -167,9 +167,8 @@ public final class NodeMap {
     }
 
     private static Holder<Biome> biomeAt(ServerLevel level, int x, int z) {
-        return level.getChunkSource().getGenerator().getBiomeSource().getNoiseBiome(
-            QuartPos.fromBlock(x), QuartPos.fromBlock(level.getSeaLevel() + 8), QuartPos.fromBlock(z),
-            level.getChunkSource().randomState().sampler()
+        return level.getUncachedNoiseBiome(
+            QuartPos.fromBlock(x), QuartPos.fromBlock(level.getSeaLevel() + 8), QuartPos.fromBlock(z)
         );
     }
 
