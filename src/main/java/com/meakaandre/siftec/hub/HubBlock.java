@@ -39,6 +39,11 @@ public class HubBlock extends Block implements EntityBlock {
         if (placer instanceof ServerPlayer player && level.getBlockEntity(pos) instanceof HubBlockEntity hub) {
             hub.companyId = Companies.of(player).id;
             hub.setChanged();
+            // a HUB claims the land around it; the Gateway does not
+            if (!gateway && level instanceof net.minecraft.server.level.ServerLevel server) {
+                int chunks = com.meakaandre.siftec.claim.Claims.claim(server, Companies.of(player), pos, com.meakaandre.siftec.claim.Claims.HUB_RADIUS, false);
+                player.sendOverlayMessage(Component.translatable("siftec.claim.hub", chunks));
+            }
         }
     }
 

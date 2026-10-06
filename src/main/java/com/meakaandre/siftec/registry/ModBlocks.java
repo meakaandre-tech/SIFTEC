@@ -3,6 +3,7 @@ package com.meakaandre.siftec.registry;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlock;
 import com.meakaandre.siftec.block.MinerBlock;
+import com.meakaandre.siftec.claim.ClaimMarkerBlock;
 import com.meakaandre.siftec.collect.Collectible;
 import com.meakaandre.siftec.collect.CollectibleBlock;
 import com.meakaandre.siftec.depot.DepotBlock;
@@ -90,6 +91,8 @@ public class ModBlocks {
             COLLECTIBLES.put(type, () -> block);
         }
     }
+
+    public static final Supplier<ClaimMarkerBlock> CLAIM_MARKER = block("claim_marker", ClaimMarkerBlock::new, ModBlocks::machine);
 
     private static <T extends Block> Supplier<T> block(
         String name, Function<BlockBehaviour.Properties, T> factory, Supplier<BlockBehaviour.Properties> properties

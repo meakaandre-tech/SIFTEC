@@ -101,7 +101,11 @@ for b, name in (("power_pole", "Power Pole"), ("power_tower", "Power Tower")):
                        {"from": [2, 12, 7], "to": [14, 14, 9], "faces": {f: {"texture": "#all"} for f in ("north", "south", "east", "west", "up", "down")}}]})
     item_def(b, f"siftec:block/{b}")
 
-MACHINES = {"dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"), "power_storage": ("Power Storage", "create:block/copper_casing"), "miner_mk1": ("Miner Mk.1", "create:block/andesite_casing"), "miner_mk2": ("Miner Mk.2", "create:block/copper_casing"),
+lang.update({"siftec.claim.denied": "This land belongs to %s", "siftec.claim.budget": "Your company has used all %s of its Claim Markers",
+             "siftec.claim.too_close": "Too close: markers must be more than %s chunks from another company's HUB",
+             "siftec.claim.nothing": "Every chunk here is already claimed", "siftec.claim.claimed": "Claim Markers: %s of %s",
+             "siftec.claim.hub": "HUB placed: %s chunks claimed"})
+MACHINES = {"claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"), "power_storage": ("Power Storage", "create:block/copper_casing"), "miner_mk1": ("Miner Mk.1", "create:block/andesite_casing"), "miner_mk2": ("Miner Mk.2", "create:block/copper_casing"),
             "miner_mk3": ("Miner Mk.3", "create:block/brass_casing"), "resource_well_extractor": ("Resource Well Extractor", "create:block/railway_casing")}
 for b, (name, casing) in MACHINES.items():
     lang[f"block.siftec.{b}"] = name
@@ -267,7 +271,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # miners drop themselves
-for b in ("portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage"):
+for b in ("claim_marker", "portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -275,4 +279,4 @@ for b in ("portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_wel
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:mam", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:mam", "siftec:claim_marker", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})

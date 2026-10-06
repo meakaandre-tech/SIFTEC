@@ -2980,6 +2980,19 @@
       ]
     },
     {
+      "item": "siftec:claim_marker",
+      "cost": [
+        {
+          "item": "siftec:iron_rod",
+          "count": 5
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 5
+        }
+      ]
+    },
+    {
       "item": "siftec:mam",
       "cost": [
         {

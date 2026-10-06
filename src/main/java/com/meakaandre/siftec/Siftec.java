@@ -1,6 +1,7 @@
 package com.meakaandre.siftec;
 
 import com.meakaandre.siftec.backpack.Backpack;
+import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.command.SiftecCommands;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.fluid.ModFluids;
@@ -43,6 +44,7 @@ public class Siftec implements ModInitializer {
         Food.register();
         Locks.register();
         Companies.register();
+        Claims.register();
     }
 
     public static Identifier id(String path) {
