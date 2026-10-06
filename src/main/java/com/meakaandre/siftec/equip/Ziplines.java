@@ -70,10 +70,11 @@ public final class Ziplines {
         // any line roughly ahead of where the player is looking will do to set off on
         BlockPos to = next(level, pole, heading.normalize(), null, -0.2);
         if (to == null) return false;
-        Display carrier = EntityType.BLOCK_DISPLAY.create(level, EntitySpawnReason.TRIGGERED);
+        Display carrier = net.minecraft.world.entity.EntityTypes.BLOCK_DISPLAY.create(level, EntitySpawnReason.TRIGGERED);
         if (carrier == null) return false;
         Vec3 at = top(pole);
         carrier.setPos(at.x, at.y, at.z);
+        ((com.meakaandre.siftec.mixin.DisplayInvoker) carrier).siftec$glide(2);
         level.addFreshEntity(carrier);
         carrier.addTag(TAG);
         if (!player.startRiding(carrier, true, true)) {

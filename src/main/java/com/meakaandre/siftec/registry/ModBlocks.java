@@ -83,6 +83,9 @@ public class ModBlocks {
     public static final Supplier<com.meakaandre.siftec.engine.EngineBlock> HUB_ENGINE = block("hub_engine", properties -> new com.meakaandre.siftec.engine.EngineBlock(true, properties), ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.equip.LandingPadBlock> LANDING_PAD = block("landing_pad", com.meakaandre.siftec.equip.LandingPadBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.equip.RadarBlock> RADAR_TOWER = block("radar_tower", com.meakaandre.siftec.equip.RadarBlock::new, ModBlocks::machine);
+    public static final Supplier<com.meakaandre.siftec.drone.DronePortBlock> DRONE_PORT = block("drone_port", com.meakaandre.siftec.drone.DronePortBlock::new, ModBlocks::machine);
+    public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> MAIN_PORTAL = block("main_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(true, properties), ModBlocks::machine);
+    public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> SATELLITE_PORTAL = block("satellite_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(false, properties), ModBlocks::machine);
     public static final Supplier<StorageBlock> POWER_STORAGE = block("power_storage", StorageBlock::new, ModBlocks::machine);
 
     public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);

@@ -4256,6 +4256,106 @@
       ]
     },
     {
+      "item": "siftec:drone_port",
+      "cost": [
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 20
+        },
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 10
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 50
+        },
+        {
+          "item": "siftec:aluminum_casing",
+          "count": 50
+        },
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:cardboard_drone",
+      "cost": [
+        {
+          "item": "create:cardboard",
+          "count": 8
+        },
+        {
+          "item": "siftec:motor",
+          "count": 4
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 10
+        },
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 1
+        },
+        {
+          "item": "siftec:ai_limiter",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "item": "siftec:main_portal",
+      "cost": [
+        {
+          "item": "siftec:turbo_motor",
+          "count": 25
+        },
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 25
+        },
+        {
+          "item": "siftec:superposition_oscillator",
+          "count": 15
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 20
+        },
+        {
+          "item": "siftec:ficsite_trigon",
+          "count": 200
+        }
+      ]
+    },
+    {
+      "item": "siftec:satellite_portal",
+      "cost": [
+        {
+          "item": "siftec:turbo_motor",
+          "count": 5
+        },
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 10
+        },
+        {
+          "item": "siftec:superposition_oscillator",
+          "count": 5
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 10
+        },
+        {
+          "item": "siftec:ficsite_trigon",
+          "count": 50
+        }
+      ]
+    },
+    {
       "item": "siftec:dimensional_depot",
       "cost": [
         {

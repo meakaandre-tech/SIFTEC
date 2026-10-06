@@ -31,6 +31,7 @@ public class ModItems {
     public static final Supplier<Item> GAS_MASK = item("gas_mask", properties -> new Item(properties.stacksTo(1).equippable(net.minecraft.world.entity.EquipmentSlot.HEAD)));
     public static final Supplier<Item> BLADE_RUNNERS = item("blade_runners", properties -> new Item(properties.stacksTo(1).equippable(net.minecraft.world.entity.EquipmentSlot.FEET)));
     public static final Supplier<com.meakaandre.siftec.equip.ZiplineItem> ZIPLINE = item("zipline", properties -> new com.meakaandre.siftec.equip.ZiplineItem(properties.stacksTo(1)));
+    public static final Supplier<Item> CARDBOARD_DRONE = item("cardboard_drone", properties -> new Item(properties.stacksTo(1)));
     public static final Supplier<Item> RAW_BAUXITE = item("raw_bauxite", Item::new);
     public static final Supplier<Item> SAM = item("sam", Item::new);
 

@@ -24,7 +24,7 @@ public final class JetpackClient {
             sent = false;
             return;
         }
-        boolean want = client.screen == null && client.options.keyJump.isDown() && !player.onGround() && !player.getAbilities().flying
+        boolean want = client.gui.screen() == null && client.options.keyJump.isDown() && !player.onGround() && !player.getAbilities().flying
             && !player.isPassenger() && player.getItemBySlot(EquipmentSlot.CHEST).is(ModItems.JETPACK.get());
         if (want && ClientState.jetFuel) {
             Vec3 v = player.getDeltaMovement();

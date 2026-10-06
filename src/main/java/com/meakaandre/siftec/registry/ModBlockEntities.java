@@ -50,6 +50,7 @@ public class ModBlockEntities {
     public static final Entry<PoleBlockEntity> POLE = register("power_pole", PoleBlockEntity::new, ModBlocks.POWER_POLE.get(), ModBlocks.POWER_TOWER.get());
     public static final Entry<com.meakaandre.siftec.governor.GovernorBlockEntity> GOVERNOR = register("speed_governor", com.meakaandre.siftec.governor.GovernorBlockEntity::new, ModBlocks.SPEED_GOVERNOR.get());
     public static final Entry<com.meakaandre.siftec.engine.EngineBlockEntity> ENGINE = register("engine", com.meakaandre.siftec.engine.EngineBlockEntity::new, ModBlocks.FURNACE_ENGINE.get(), ModBlocks.HUB_ENGINE.get());
+    public static final Entry<com.meakaandre.siftec.drone.DronePortBlockEntity> DRONE_PORT = register("drone_port", com.meakaandre.siftec.drone.DronePortBlockEntity::new, ModBlocks.DRONE_PORT.get());
     public static final Entry<StorageBlockEntity> POWER_STORAGE = register("power_storage", StorageBlockEntity::new, ModBlocks.POWER_STORAGE.get());
 
     public static final Entry<GeyserEngineBlockEntity> GEYSER_ENGINE = register("geyser_engine", GeyserEngineBlockEntity::new, ModBlocks.GEYSER_ENGINE.get());
@@ -70,6 +71,7 @@ public class ModBlockEntities {
         // parts pushed into a HUB or Gateway go toward the company's active milestone
         ItemStorage.SIDED.registerForBlockEntity((hub, side) -> ContainerStorage.of(hub.intake, side), HUB.get());
         ItemStorage.SIDED.registerForBlockEntity((engine, side) -> ContainerStorage.of(engine.fuel, side), ENGINE.get());
+        ItemStorage.SIDED.registerForBlockEntity((port, side) -> ContainerStorage.of(port.items, side), DRONE_PORT.get());
         ItemStorage.SIDED.registerForBlockEntity((sink, side) -> ContainerStorage.of(sink.intake, side), SINK.get());
         ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());
     }

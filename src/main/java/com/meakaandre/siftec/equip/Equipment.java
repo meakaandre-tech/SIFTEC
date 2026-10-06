@@ -57,6 +57,10 @@ public final class Equipment {
         ServerPlayNetworking.registerGlobalReceiver(JetThrustPayload.TYPE, (payload, context) ->
             context.server().execute(() -> thrust(context.server(), context.player(), payload.on())));
         ServerTickEvents.END_SERVER_TICK.register(Equipment::tick);
+        // carriers and drones are only ever drawn for something in flight; one read back from disk is left over from a restart
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+            if (entity.entityTags().contains(Ziplines.TAG)) level.getServer().execute(entity::discard);
+        });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             THRUSTING.clear();
             JET_TICKS.clear();

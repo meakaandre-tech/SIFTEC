@@ -90,6 +90,7 @@ public final class SiftecCommands {
             BlockPos miner = pos.above().immutable();
             if (type == NodeType.IRON) powerTest(source, level, miner.above(8), setup);
             if (type == NodeType.IRON) ownerTest(source, level, miner.above(16), setup);
+            if (type == NodeType.IRON) droneTest(source, level, miner.above(24), setup);
             if (setup) {
                 if (type == NodeType.IRON) {
                     level.setBlockAndUpdate(miner, ModBlocks.PORTABLE_MINER.get().defaultBlockState());
@@ -258,6 +259,29 @@ public final class SiftecCommands {
                 + holder.id().identifier() + " needs " + lock + "; blocked before " + before + ", after unlocking " + after);
             break;
         }
+    }
+
+    /** Used by the automated test: two Drone Ports 20 blocks apart; the first sends five iron ingots to the second. */
+    private static void droneTest(CommandSourceStack source, ServerLevel level, BlockPos at, boolean setup) {
+        BlockPos far = at.east(20);
+        if (setup) {
+            level.setBlockAndUpdate(at, ModBlocks.DRONE_PORT.get().defaultBlockState());
+            level.setBlockAndUpdate(far, ModBlocks.DRONE_PORT.get().defaultBlockState());
+            if (level.getBlockEntity(at) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port) {
+                port.companyId = "selftest_fast";
+                port.hasDrone = true;
+                port.destination = far;
+                port.items.setItem(com.meakaandre.siftec.drone.PortContainer.FUEL, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.FIRE_CHARGE, 3));
+                port.items.setItem(com.meakaandre.siftec.drone.PortContainer.OUT, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 5));
+                report(source, "SELFTEST drone setup: a trip needs " + port.chargesNeeded() + " fire charge(s)");
+            }
+            return;
+        }
+        String home = level.getBlockEntity(at) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port
+            ? "state " + port.state + ", fire charges left " + port.fuel().getCount() + ", still waiting " + port.items.getItem(com.meakaandre.siftec.drone.PortContainer.OUT) : "missing";
+        String there = level.getBlockEntity(far) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port
+            ? "arrived " + port.items.getItem(com.meakaandre.siftec.drone.PortContainer.IN) : "missing";
+        report(source, "SELFTEST drone: home port " + home + "; far port " + there);
     }
 
     private static void report(CommandSourceStack source, String text) {

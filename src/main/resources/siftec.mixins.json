@@ -16,6 +16,8 @@
     "PumpMixin",
     "PumpBehaviourMixin",
     "ConnectionAccessor",
+    "DisplayInvoker",
+    "BlockDisplayInvoker",
     "KineticCapacityMixin",
     "BeltInventoryAccessor",
     "TunnelMixin",
