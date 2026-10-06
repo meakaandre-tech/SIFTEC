@@ -79,9 +79,8 @@ public final class HubBuilding {
         new Family("stone_wood", 0, HubBuilding::stoneOrWood),
         new Family("andesite", 1, ids("create:andesite_casing", "create:andesite_alloy_block")),
         new Family("copper", 2, HubBuilding::copper),
-        // the old mod had brass at Tier 2; here brass needs Crushing Wheels, which arrive in Tier 4
-        new Family("brass", 4, ids("create:brass_casing", "create:brass_block")),
-        new Family("steel", 5, ids("siftec:steel_casing", "cgs:steel_block")));
+        new Family("steel", 4, ids("siftec:steel_casing", "cgs:steel_block")),
+        new Family("brass", 5, ids("create:brass_casing", "create:brass_block")));
 
     public static final class Result {
         public final int[] counts = new int[FAMILIES.size()];
