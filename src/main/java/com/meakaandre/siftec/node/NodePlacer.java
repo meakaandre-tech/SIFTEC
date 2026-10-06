@@ -75,7 +75,7 @@ public final class NodePlacer {
         return !nodesTouching(level, chunkX, chunkZ).isEmpty();
     }
 
-    private static void placeChunk(ServerLevel level, int chunkX, int chunkZ) {
+    public static void placeChunk(ServerLevel level, int chunkX, int chunkZ) {
         if (!level.hasChunk(chunkX, chunkZ)) return;
         NodeSavedData data = NodeSavedData.get(level.getServer());
         long key = ChunkPos.pack(chunkX, chunkZ);

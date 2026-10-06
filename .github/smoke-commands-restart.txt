@@ -1,0 +1,3 @@
+#sleep 3
+siftec selftest check
+siftec node find zinc

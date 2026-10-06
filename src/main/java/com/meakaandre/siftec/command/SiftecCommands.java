@@ -1,6 +1,18 @@
 package com.meakaandre.siftec.command;
 
+import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.block.MinerBlockEntity;
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.block.PortableMinerBlockEntity;
+import com.meakaandre.siftec.node.NodePlacer;
+import com.meakaandre.siftec.registry.ModBlocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodeType;
@@ -31,12 +43,68 @@ public final class SiftecCommands {
                 .then(Commands.literal("node")
                     .then(Commands.literal("find").then(type().executes(context -> find(context, false))))
                     .then(Commands.literal("tp").then(type().executes(context -> find(context, true)))))
+                .then(Commands.literal("selftest")
+                    .then(Commands.literal("setup").executes(context -> selfTest(context, true)))
+                    .then(Commands.literal("check").executes(context -> selfTest(context, false))))
         ));
     }
 
     private static com.mojang.brigadier.builder.RequiredArgumentBuilder<CommandSourceStack, String> type() {
         return Commands.argument("type", StringArgumentType.word()).suggests((context, builder) ->
             SharedSuggestionProvider.suggest(Arrays.stream(NodeType.values()).map(NodeType::id), builder));
+    }
+
+    /**
+     * Used by the automated test: puts a Portable Miner on the nearest iron node and a Miner Mk.1 with a
+     * creative motor on the nearest copper node, then (check) reports what they made.
+     */
+    private static int selfTest(CommandContext<CommandSourceStack> context, boolean setup) {
+        CommandSourceStack source = context.getSource();
+        ServerLevel level = source.getServer().overworld();
+        for (NodeType type : new NodeType[]{NodeType.IRON, NodeType.COPPER}) {
+            Optional<Node> found = NodeMap.nearest(level, 0, 0, type, 64);
+            if (found.isEmpty()) {
+                report(source, "SELFTEST " + type.id() + ": no node found");
+                continue;
+            }
+            Node node = found.get();
+            level.setChunkForced(node.x() >> 4, node.z() >> 4, true);
+            level.getChunk(node.x() >> 4, node.z() >> 4);
+            NodePlacer.placeChunk(level, node.x() >> 4, node.z() >> 4);
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(node.x(), level.getMaxY(), node.z());
+            while (pos.getY() > level.getMinY()) {
+                BlockState state = level.getBlockState(pos);
+                if (state.getBlock() instanceof NodeBlock && state.getValue(NodeBlock.CORE)) break;
+                pos.move(0, -1, 0);
+            }
+            if (pos.getY() <= level.getMinY()) {
+                report(source, "SELFTEST " + type.id() + ": node " + node + " has no core block");
+                continue;
+            }
+            BlockPos miner = pos.above().immutable();
+            if (setup) {
+                if (type == NodeType.IRON) {
+                    level.setBlockAndUpdate(miner, ModBlocks.PORTABLE_MINER.get().defaultBlockState());
+                } else {
+                    level.setBlockAndUpdate(miner, ModBlocks.MINER_MK1.get().defaultBlockState());
+                    BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
+                    if (motor.hasProperty(BlockStateProperties.FACING)) motor = motor.setValue(BlockStateProperties.FACING, Direction.DOWN);
+                    level.setBlockAndUpdate(miner.above(), motor);
+                }
+                report(source, "SELFTEST setup " + node + " core at " + pos.toShortString());
+            } else {
+                BlockEntity be = level.getBlockEntity(miner);
+                String made = be instanceof MinerBlockEntity m ? m.output.get() + " speed " + m.getSpeed()
+                    : be instanceof PortableMinerBlockEntity m ? m.output.get().toString() : "no block entity (" + level.getBlockState(miner) + ")";
+                report(source, "SELFTEST check " + node + ": " + made);
+            }
+        }
+        return 1;
+    }
+
+    private static void report(CommandSourceStack source, String text) {
+        Siftec.LOGGER.info(text);
+        source.sendSuccess(() -> Component.literal(text), false);
     }
 
     private static int find(CommandContext<CommandSourceStack> context, boolean teleport) {
