@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 40500,
+      "fluid": "siftec:sulfuric_acid"
+    }
+  ],
+  "results": [
+    {
+      "id": "cgs:sulfur"
+    },
+    {
+      "id": "siftec:toxic_residue"
+    }
+  ]
+}

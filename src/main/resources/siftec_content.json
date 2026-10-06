@@ -3104,6 +3104,27 @@
       ]
     },
     {
+      "item": "siftec:geyser_engine",
+      "cost": [
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 20
+        },
+        {
+          "item": "siftec:supercomputer",
+          "count": 10
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 50
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 20
+        }
+      ]
+    },
+    {
       "item": "siftec:miner_mk2",
       "cost": [
         {

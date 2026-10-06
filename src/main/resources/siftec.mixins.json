@@ -12,7 +12,8 @@
     "RecipeMapMixin",
     "MenuInvoker",
     "InventoryMenuMixin",
-    "FoodPropertiesMixin"
+    "FoodPropertiesMixin",
+    "PotentSulfurMixin"
   ],
   "client": [
     "client.ScreenAccessor",

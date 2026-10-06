@@ -263,6 +263,13 @@ def build():
     mix("lava_from_magma_block", items=["minecraft:magma_block"], fluid_results=[("lava", 250)], heated=True)
     compact("compacted_coal", items=["Coal", "Sulfur"], results=["Compacted Coal"])
     mix("turbofuel", items=["Compacted Coal"], fluids=[("diesel", 250)], fluid_results=[("turbofuel", 250)], heated=True)
+    # the sulfuric acid loop: neutralise it, or use it and deal with the residue
+    for stone in ("Limestone", "minecraft:calcite"):
+        mix("gypsum_from_" + slug(stone), items=[stone], fluids=[("sulfuric acid", 250)], results=["siftec:gypsum"], fluid_results=[("water", 250)])
+    for ore, ingot in (("iron", "minecraft:iron_ingot"), ("copper", "minecraft:copper_ingot"), ("zinc", "create:zinc_ingot")):
+        mix("acid_leached_" + ore, items=["create:crushed_raw_" + ore], fluids=[("sulfuric acid", 250)],
+            results=[(ingot, 2), "siftec:toxic_residue"], heated=True)
+    mix("sulfur_from_acid", fluids=[("sulfuric acid", 500)], results=["Sulfur", "siftec:toxic_residue"], heated=True)
     # Block of Sulfur (vanilla's sulfur block) packs four Gunsmithing sulfur
     shaped("minecraft:sulfur", ["SS", "SS"], {"S": "Sulfur"}, name="block_of_sulfur")
     hand("Sulfur", [(1, "minecraft:sulfur")], 4, name="sulfur_from_block")
@@ -293,6 +300,7 @@ WORKSHOP = [
     ("siftec:power_tower", "5 Steel Beam, 10 Concrete, 10 Wire"),
     ("siftec:power_storage", "20 Wire, 10 Modular Frame, 5 Stator"),
     ("siftec:dimensional_depot", "1 Mercer Sphere, 5 Modular Frame, 20 Cable"),
+    ("siftec:geyser_engine", "20 Heavy Modular Frame, 10 Supercomputer, 50 Steel Pipe, 20 Rubber"),
     ("siftec:miner_mk2", "2 siftec:portable_miner, 10 Encased Industrial Beam, 20 Steel Pipe, 10 Modular Frame"),
     ("siftec:miner_mk3", "3 siftec:portable_miner, 50 Steel Pipe, 5 Supercomputer, 10 Fused Modular Frame, 3 Turbo Motor"),
     ("siftec:resource_well_extractor", "20 Aluminum Casing, 20 Encased Industrial Beam, 10 Motor, 50 Rubber"),

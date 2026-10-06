@@ -7,6 +7,7 @@ import com.meakaandre.siftec.claim.ClaimMarkerBlock;
 import com.meakaandre.siftec.collect.Collectible;
 import com.meakaandre.siftec.collect.CollectibleBlock;
 import com.meakaandre.siftec.depot.DepotBlock;
+import com.meakaandre.siftec.geyser.GeyserEngineBlock;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.mam.MamBlock;
 import com.meakaandre.siftec.power.PoleBlock;
@@ -92,6 +93,7 @@ public class ModBlocks {
         }
     }
 
+    public static final Supplier<GeyserEngineBlock> GEYSER_ENGINE = block("geyser_engine", GeyserEngineBlock::new, ModBlocks::machine);
     public static final Supplier<ClaimMarkerBlock> CLAIM_MARKER = block("claim_marker", ClaimMarkerBlock::new, ModBlocks::machine);
 
     private static <T extends Block> Supplier<T> block(
