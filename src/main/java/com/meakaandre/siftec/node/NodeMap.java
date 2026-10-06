@@ -135,16 +135,23 @@ public final class NodeMap {
         if (cellX == spawnCellX + 1 && cellZ == spawnCellZ) forced = NodeType.IRON;
         else if (cellX == spawnCellX && cellZ == spawnCellZ + 1) forced = NodeType.COPPER;
         else if (cellX == spawnCellX - 1 && cellZ == spawnCellZ) forced = NodeType.LIMESTONE;
-        if (forced != null) return Optional.of(new Node(x, z, forced, Purity.NORMAL));
+        if (forced != null) {
+            // keep the starter nodes out of the sea: try other spots in the cell until one is on land
+            for (int attempt = 0; attempt < 24 && isWater(biomeAt(level, x, z)); attempt++) {
+                x = cellX * CELL + MARGIN + (int) Long.remainderUnsigned(h, span);
+                h = mix(h);
+                z = cellZ * CELL + MARGIN + (int) Long.remainderUnsigned(h, span);
+                h = mix(h);
+            }
+            return Optional.of(new Node(x, z, forced, Purity.NORMAL));
+        }
 
         float chance = (h >>> 40) / (float) (1 << 24);
         h = mix(h);
         if (chance >= NODE_CHANCE) return Optional.empty();
 
         Holder<Biome> biome = biomeAt(level, x, z);
-        if (biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_RIVER) || biome.is(BiomeTags.IS_DEEP_OCEAN)) {
-            return Optional.empty();
-        }
+        if (isWater(biome)) return Optional.empty();
         boolean hills = biome.is(BiomeTags.IS_MOUNTAIN) || biome.is(BiomeTags.IS_HILL);
         boolean hot = biome.is(BiomeTags.IS_JUNGLE) || biome.is(BiomeTags.IS_SAVANNA) || biome.is(BiomeTags.IS_BADLANDS);
         double distance = Math.sqrt(Math.pow(x - originX, 2) + Math.pow(z - originZ, 2));
@@ -172,6 +179,10 @@ public final class NodeMap {
         float p = (h >>> 40) / (float) (1 << 24);
         Purity purity = p < impure ? Purity.IMPURE : p < impure + pure ? Purity.PURE : Purity.NORMAL;
         return Optional.of(new Node(x, z, picked, purity));
+    }
+
+    private static boolean isWater(Holder<Biome> biome) {
+        return biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_RIVER) || biome.is(BiomeTags.IS_DEEP_OCEAN);
     }
 
     private static boolean allowed(NodeType type, boolean hills, boolean hot, double distance) {
