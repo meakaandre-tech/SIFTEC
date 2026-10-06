@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class HubMenu extends ChestMenu {
     private static final int SIZE = 54;
-    private static final int INFO_SLOT = 13, LOCK_SLOT = 17, FIRST_MILESTONE = 28;
+    private static final int INFO_SLOT = 13, LOCK_SLOT = 17, FIRST_MILESTONE = 28, SIFT_SLOT = 49;
 
     private final SimpleContainer view;
     private final ServerPlayer player;
@@ -91,6 +91,10 @@ public class HubMenu extends ChestMenu {
             "siftec.hub.company", company.name, company.members.size(), company.costMultiplier()), List.of(), false));
         List<Milestone> list = shown();
         for (int i = 0; i < list.size() && i < 7; i++) view.setItem(FIRST_MILESTONE + i, milestoneButton(list.get(i)));
+        // the finished wormhole: the only way into The Sift
+        if (gateway && company.has("phase_5")) {
+            view.setItem(SIFT_SLOT, button(Items.ENDER_EYE, Component.translatable("siftec.sift.enter").withStyle(ChatFormatting.LIGHT_PURPLE), List.of(), true));
+        }
     }
 
     private ItemStack tierTab(int t) {
@@ -156,6 +160,11 @@ public class HubMenu extends ChestMenu {
         if (!gateway && slot < Milestones.TIERS) {
             tier = slot;
             refresh();
+            return;
+        }
+        if (gateway && slot == SIFT_SLOT && company.has("phase_5")) {
+            player.closeContainer();
+            com.meakaandre.siftec.compat.SiftGate.enter(player);
             return;
         }
         int index = slot - FIRST_MILESTONE;

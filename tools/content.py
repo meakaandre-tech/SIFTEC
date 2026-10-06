@@ -341,3 +341,40 @@ MAM = [
         ("Alien Energy Harvesting", "2 Somersloop, 10 Supercomputer", "5:00", "A machine can hold a Somersloop and Power Shards together", [6], [], ["amplifier:shards"]),
     ]),
 ]
+
+
+# ---------------------------------------------------------------------------------------------------
+# The pack's own late-game machines. Each recipe: (name of what it makes, items in, fluid in, result, seconds at 32 RPM).
+# A result is "2 Part Name" or a fluid as ("fluid name", mB). The machine makes whichever recipe is selected on it.
+PROCESSORS = {
+    "converter": ("Converter", [
+        ("4 Aluminum Ingot, 2 Reanimated SAM", None, "1 Ficsite Ingot", 6),
+        ("8 Coal", None, "1 Diamond", 4),
+        ("2 Diamond", None, "1 Time Crystal", 10),
+        ("1 Reanimated SAM", None, "2 Excited Photonic Matter", 3),
+        ("1 Reanimated SAM", None, ("dark matter residue", 250), 3),
+    ]),
+    "particle_accelerator": ("Particle Accelerator", [
+        ("8 Copper Powder, 1 Pressure Conversion Cube", None, "1 Nuclear Pasta", 12),
+        ("1 Diamond", ("dark matter residue", 250), "1 Dark Matter Crystal", 4),
+    ]),
+}
+
+# AWESOME Sink: points for one of each item. Anything not listed is worth 1.
+SINK_POINTS = {
+    "Iron Sheet": 6, "Iron Rod": 4, "Screw": 2, "Wire": 6, "Cable": 24, "Concrete": 12, "Copper Sheet": 24, "Reinforced Iron Plate": 120,
+    "Rotor": 140, "Modular Frame": 408, "Smart Plating": 520, "Steel Beam": 64, "Steel Pipe": 24, "Versatile Framework": 1176,
+    "Encased Industrial Beam": 632, "Stator": 240, "Motor": 1520, "Automated Wiring": 1440, "Plastic": 75, "Rubber": 60, "Circuit Board": 696,
+    "Computer": 8352, "Heavy Modular Frame": 10800, "Modular Engine": 9960, "Adaptive Control Unit": 76368, "Aluminum Casing": 393,
+    "Alclad Aluminum Sheet": 266, "Radio Control Unit": 32352, "Supercomputer": 97352, "Cooling System": 12006, "Fused Modular Frame": 62840,
+    "Turbo Motor": 240496, "Quickwire": 17, "AI Limiter": 920, "High-Speed Connector": 3776, "Crystal Oscillator": 3072, "DNA Capsule": 1000,
+    "Hard Drive": 5000, "Power Shard": 5000,
+}
+# AWESOME Shop: (item id, how many, price in points)
+SHOP = [
+    (C + "potato_cannon", 1, 3000), (C + "extendo_grip", 1, 3000), (C + "wand_of_symmetry", 1, 5000), (C + "linked_controller", 1, 3000),
+    (C + "cuckoo_clock", 1, 500), (C + "steam_whistle", 1, 500), (C + "peculiar_bell", 1, 1000), (C + "clipboard", 1, 200), (C + "placard", 4, 200),
+    (C + "turntable", 1, 500), (C + "crafting_blueprint", 1, 500), (C + "valve_handle", 4, 200), (C + "andesite_table_cloth", 4, 200),
+    ("minecraft:white_dye", 16, 100), ("minecraft:red_dye", 16, 100), ("minecraft:blue_dye", 16, 100), ("minecraft:yellow_dye", 16, 100),
+    ("minecraft:green_dye", 16, 100), ("minecraft:black_dye", 16, 100), ("minecraft:orange_dye", 16, 100), ("minecraft:light_blue_dye", 16, 100),
+]

@@ -13,6 +13,10 @@
     "siftec:mam",
     "siftec:claim_marker",
     "siftec:geyser_engine",
+    "siftec:converter",
+    "siftec:particle_accelerator",
+    "siftec:awesome_sink",
+    "siftec:awesome_shop",
     "siftec:hub",
     "siftec:wormhole_gateway",
     "siftec:equipment_workshop"

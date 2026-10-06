@@ -28,6 +28,8 @@ public class Company {
     /** The MAM node being researched, and the game time it finishes. Empty when nothing is running. */
     /** Slugs and artefacts already picked up, as "x,z". */
     public Set<String> collected = new LinkedHashSet<>();
+    /** AWESOME Sink points. */
+    public long points;
     public String research = "";
     public long researchEnd;
     /** The Dimensional Depot cloud: item id -> count. */

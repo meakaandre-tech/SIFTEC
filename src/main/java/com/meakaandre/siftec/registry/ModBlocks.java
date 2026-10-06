@@ -9,6 +9,8 @@ import com.meakaandre.siftec.collect.CollectibleBlock;
 import com.meakaandre.siftec.depot.DepotBlock;
 import com.meakaandre.siftec.geyser.GeyserEngineBlock;
 import com.meakaandre.siftec.hub.HubBlock;
+import com.meakaandre.siftec.machine.ProcessorBlock;
+import com.meakaandre.siftec.sink.SinkBlock;
 import com.meakaandre.siftec.mam.MamBlock;
 import com.meakaandre.siftec.power.PoleBlock;
 import com.meakaandre.siftec.power.StorageBlock;
@@ -94,6 +96,10 @@ public class ModBlocks {
     }
 
     public static final Supplier<GeyserEngineBlock> GEYSER_ENGINE = block("geyser_engine", GeyserEngineBlock::new, ModBlocks::machine);
+    public static final Supplier<ProcessorBlock> CONVERTER = block("converter", properties -> new ProcessorBlock("converter", properties), ModBlocks::machine);
+    public static final Supplier<ProcessorBlock> PARTICLE_ACCELERATOR = block("particle_accelerator", properties -> new ProcessorBlock("particle_accelerator", properties), ModBlocks::machine);
+    public static final Supplier<SinkBlock> AWESOME_SINK = block("awesome_sink", properties -> new SinkBlock(false, properties), ModBlocks::machine);
+    public static final Supplier<SinkBlock> AWESOME_SHOP = block("awesome_shop", properties -> new SinkBlock(true, properties), ModBlocks::machine);
     public static final Supplier<ClaimMarkerBlock> CLAIM_MARKER = block("claim_marker", ClaimMarkerBlock::new, ModBlocks::machine);
 
     private static <T extends Block> Supplier<T> block(

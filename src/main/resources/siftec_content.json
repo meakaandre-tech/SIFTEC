@@ -2855,6 +2855,263 @@
       ]
     }
   ],
+  "processors": {
+    "converter": [
+      {
+        "in": [
+          {
+            "item": "siftec:aluminum_ingot",
+            "count": 4
+          },
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 2
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "siftec:ficsite_ingot",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "minecraft:coal",
+            "count": 8
+          }
+        ],
+        "seconds": 4,
+        "out": {
+          "item": "minecraft:diamond",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "minecraft:diamond",
+            "count": 2
+          }
+        ],
+        "seconds": 10,
+        "out": {
+          "item": "siftec:time_crystal",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          }
+        ],
+        "seconds": 3,
+        "out": {
+          "item": "siftec:excited_photonic_matter",
+          "count": 2
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          }
+        ],
+        "seconds": 3,
+        "fluid_out": {
+          "fluid": "siftec:dark_matter_residue",
+          "mb": 250
+        }
+      }
+    ],
+    "particle_accelerator": [
+      {
+        "in": [
+          {
+            "item": "siftec:copper_powder",
+            "count": 8
+          },
+          {
+            "item": "siftec:pressure_conversion_cube",
+            "count": 1
+          }
+        ],
+        "seconds": 12,
+        "out": {
+          "item": "siftec:nuclear_pasta",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ],
+        "seconds": 4,
+        "fluid_in": {
+          "fluid": "siftec:dark_matter_residue",
+          "mb": 250
+        },
+        "out": {
+          "item": "siftec:dark_matter_crystal",
+          "count": 1
+        }
+      }
+    ]
+  },
+  "sink_points": {
+    "create:iron_sheet": 6,
+    "siftec:iron_rod": 4,
+    "siftec:screw": 2,
+    "siftec:wire": 6,
+    "siftec:cable": 24,
+    "minecraft:light_gray_concrete": 12,
+    "create:copper_sheet": 24,
+    "siftec:reinforced_iron_plate": 120,
+    "siftec:rotor": 140,
+    "siftec:modular_frame": 408,
+    "siftec:smart_plating": 520,
+    "siftec:steel_beam": 64,
+    "siftec:steel_pipe": 24,
+    "siftec:versatile_framework": 1176,
+    "siftec:encased_industrial_beam": 632,
+    "siftec:stator": 240,
+    "siftec:motor": 1520,
+    "siftec:automated_wiring": 1440,
+    "siftec:plastic": 75,
+    "siftec:rubber": 60,
+    "siftec:circuit_board": 696,
+    "siftec:computer": 8352,
+    "siftec:heavy_modular_frame": 10800,
+    "siftec:modular_engine": 9960,
+    "siftec:adaptive_control_unit": 76368,
+    "siftec:aluminum_casing": 393,
+    "siftec:alclad_aluminum_sheet": 266,
+    "siftec:radio_control_unit": 32352,
+    "siftec:supercomputer": 97352,
+    "siftec:cooling_system": 12006,
+    "siftec:fused_modular_frame": 62840,
+    "siftec:turbo_motor": 240496,
+    "siftec:quickwire": 17,
+    "siftec:ai_limiter": 920,
+    "siftec:high_speed_connector": 3776,
+    "siftec:crystal_oscillator": 3072,
+    "siftec:dna_capsule": 1000,
+    "siftec:hard_drive": 5000,
+    "siftec:power_shard": 5000
+  },
+  "shop": [
+    {
+      "item": "create:potato_cannon",
+      "count": 1,
+      "price": 3000
+    },
+    {
+      "item": "create:extendo_grip",
+      "count": 1,
+      "price": 3000
+    },
+    {
+      "item": "create:wand_of_symmetry",
+      "count": 1,
+      "price": 5000
+    },
+    {
+      "item": "create:linked_controller",
+      "count": 1,
+      "price": 3000
+    },
+    {
+      "item": "create:cuckoo_clock",
+      "count": 1,
+      "price": 500
+    },
+    {
+      "item": "create:steam_whistle",
+      "count": 1,
+      "price": 500
+    },
+    {
+      "item": "create:peculiar_bell",
+      "count": 1,
+      "price": 1000
+    },
+    {
+      "item": "create:clipboard",
+      "count": 1,
+      "price": 200
+    },
+    {
+      "item": "create:placard",
+      "count": 4,
+      "price": 200
+    },
+    {
+      "item": "create:turntable",
+      "count": 1,
+      "price": 500
+    },
+    {
+      "item": "create:crafting_blueprint",
+      "count": 1,
+      "price": 500
+    },
+    {
+      "item": "create:valve_handle",
+      "count": 4,
+      "price": 200
+    },
+    {
+      "item": "create:andesite_table_cloth",
+      "count": 4,
+      "price": 200
+    },
+    {
+      "item": "minecraft:white_dye",
+      "count": 16,
+      "price": 100
+    },
+    {
+      "item": "minecraft:red_dye",
+      "count": 16,
+      "price": 100
+    },
+    {
+      "item": "minecraft:blue_dye",
+      "count": 16,
+      "price": 100
+    },
+    {
+      "item": "minecraft:yellow_dye",
+      "count": 16,
+      "price": 100
+    },
+    {
+      "item": "minecraft:green_dye",
+      "count": 16,
+      "price": 100
+    },
+    {
+      "item": "minecraft:black_dye",
+      "count": 16,
+      "price": 100
+    },
+    {
+      "item": "minecraft:orange_dye",
+      "count": 16,
+      "price": 100
+    },
+    {
+      "item": "minecraft:light_blue_dye",
+      "count": 16,
+      "price": 100
+    }
+  ],
   "fluids": [
     {
       "id": "heavy_oil_residue",
@@ -3121,6 +3378,90 @@
         {
           "item": "siftec:rubber",
           "count": 20
+        }
+      ]
+    },
+    {
+      "item": "siftec:awesome_sink",
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 15
+        },
+        {
+          "item": "siftec:cable",
+          "count": 30
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 45
+        }
+      ]
+    },
+    {
+      "item": "siftec:awesome_shop",
+      "cost": [
+        {
+          "item": "siftec:screw",
+          "count": 200
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 5
+        },
+        {
+          "item": "siftec:cable",
+          "count": 30
+        }
+      ]
+    },
+    {
+      "item": "siftec:particle_accelerator",
+      "cost": [
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 25
+        },
+        {
+          "item": "siftec:electromagnetic_control_rod",
+          "count": 100
+        },
+        {
+          "item": "siftec:supercomputer",
+          "count": 10
+        },
+        {
+          "item": "siftec:cooling_system",
+          "count": 50
+        },
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 20
+        },
+        {
+          "item": "siftec:turbo_motor",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:converter",
+      "cost": [
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:cooling_system",
+          "count": 10
+        },
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 25
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 50
         }
       ]
     },

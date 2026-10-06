@@ -27,6 +27,12 @@ public final class Milestones {
     private static final List<FluidDef> FLUIDS = new ArrayList<>();
     private static final List<Build> WORKSHOP = new ArrayList<>();
     private static final List<Tree> TREES = new ArrayList<>();
+    private static JsonObject raw;
+
+    /** The whole content file, for the smaller tables other classes read themselves. */
+    public static JsonObject raw() {
+        return raw;
+    }
 
     /** A MAM research tree. */
     public record Tree(String id, Identifier icon, List<Milestone> nodes) {
@@ -46,6 +52,7 @@ public final class Milestones {
         for (int i = 0; i < TIERS; i++) BY_TIER.add(new ArrayList<>());
         try (var in = Siftec.class.getResourceAsStream("/siftec_content.json")) {
             JsonObject root = new Gson().fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), JsonObject.class);
+            raw = root;
             for (JsonElement e : root.getAsJsonArray("parts")) PART_IDS.add(e.getAsJsonObject().get("id").getAsString());
             for (JsonElement e : root.getAsJsonArray("removed_recipes")) REMOVED_RECIPES.add(Identifier.parse(e.getAsString()));
             for (JsonElement e : root.getAsJsonArray("fluids")) {

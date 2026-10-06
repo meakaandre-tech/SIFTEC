@@ -210,6 +210,42 @@ for cid, (tex, name) in COLLECT.items():
     write(f"{A}/blockstates/{cid}_block.json", {"variants": {"": {"model": f"siftec:block/{cid}_block"}}})
     write(f"{A}/models/block/{cid}_block.json", {"parent": "minecraft:block/block", "textures": {"particle": tex, "all": tex},
           "elements": [{"from": [4, 0, 4], "to": [12, 8, 12], "faces": {f: {"texture": "#all"} for f in ("north", "south", "east", "west", "up", "down")}}]})
+# ---- Converter and Particle Accelerator
+data["processors"] = {}
+names_table = content.names()
+for pid, (pname, recipe_list) in content.PROCESSORS.items():
+    out = []
+    for items, fluid_in, result, seconds in recipe_list:
+        r = {"in": [{"item": i, "count": c} for i, c in content.parse_cost(items)], "seconds": seconds}
+        if fluid_in: r["fluid_in"] = {"fluid": recipes.FLUID_IDS[fluid_in[0]], "mb": fluid_in[1]}
+        if isinstance(result, tuple): r["fluid_out"] = {"fluid": recipes.FLUID_IDS[result[0]], "mb": result[1]}
+        else:
+            (rid, rc), = content.parse_cost(result)
+            r["out"] = {"item": rid, "count": rc}
+        out.append(r)
+    data["processors"][pid] = out
+    lang[f"block.siftec.{pid}"] = pname
+    casing = "create:block/brass_casing" if pid == "converter" else "create:block/railway_casing"
+    write(f"{A}/blockstates/{pid}.json", {"variants": {"": {"model": f"siftec:block/{pid}"}}})
+    write(f"{A}/models/block/{pid}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
+        "top": "create:block/gearbox_top", "side": casing, "bottom": casing}})
+    item_def(pid, f"siftec:block/{pid}")
+    write(f"{D}/loot_table/blocks/{pid}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{pid}"}]}]})
+lang.update({"siftec.processor.selected": "Making: %s", "siftec.processor.fluid": "%s mB of %s"})
+
+# ---- AWESOME Sink and Shop
+data["sink_points"] = {names_table[n]: p for n, p in content.SINK_POINTS.items()}
+data["shop"] = [{"item": i, "count": c, "price": p} for i, c, p in content.SHOP]
+for i, c, p in content.SHOP: check(i)
+lang.update({"block.siftec.awesome_sink": "AWESOME Sink", "block.siftec.awesome_shop": "AWESOME Shop", "siftec.sink.points": "AWESOME points: %s",
+             "siftec.shop.title": "AWESOME Shop: %s points", "siftec.shop.price": "%s points", "siftec.shop.poor": "Not enough points",
+             "siftec.sift.enter": "Enter The Sift", "siftec.sift.missing": "The Sift is not installed on this server"})
+for b, top in (("awesome_sink", "minecraft:block/hopper_top"), ("awesome_shop", "minecraft:block/barrel_top")):
+    write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
+    write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
+        "top": top, "side": "create:block/andesite_casing", "bottom": "create:block/andesite_casing"}})
+    item_def(b, f"siftec:block/{b}")
+    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}]}]})
 for i in content.ALIAS.values(): check(i)
 # ---- fluids
 data["fluids"] = []
@@ -285,4 +321,4 @@ for b in ("geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})

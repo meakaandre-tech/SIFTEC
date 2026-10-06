@@ -6,6 +6,8 @@ import com.meakaandre.siftec.block.MinerBlockEntity;
 import com.meakaandre.siftec.depot.DepotBlockEntity;
 import com.meakaandre.siftec.geyser.GeyserEngineBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
+import com.meakaandre.siftec.machine.ProcessorBlockEntity;
+import com.meakaandre.siftec.sink.SinkBlockEntity;
 import com.meakaandre.siftec.power.PoleBlockEntity;
 import com.meakaandre.siftec.power.StorageBlockEntity;
 import com.meakaandre.siftec.block.PortableMinerBlockEntity;
@@ -50,6 +52,9 @@ public class ModBlockEntities {
 
     public static final Entry<GeyserEngineBlockEntity> GEYSER_ENGINE = register("geyser_engine", GeyserEngineBlockEntity::new, ModBlocks.GEYSER_ENGINE.get());
 
+    public static final Entry<ProcessorBlockEntity> PROCESSOR = register("processor", ProcessorBlockEntity::new, ModBlocks.CONVERTER.get(), ModBlocks.PARTICLE_ACCELERATOR.get());
+    public static final Entry<SinkBlockEntity> SINK = register("awesome_sink", SinkBlockEntity::new, ModBlocks.AWESOME_SINK.get());
+
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
         Entry<T> entry = new Entry<>();
         BlockEntityType<T> type = new BlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state), Set.of(blocks));
@@ -62,5 +67,7 @@ public class ModBlockEntities {
         ItemStorage.SIDED.registerForBlockEntity((miner, side) -> ContainerStorage.of(miner.output, side), MINER.get());
         // parts pushed into a HUB or Gateway go toward the company's active milestone
         ItemStorage.SIDED.registerForBlockEntity((hub, side) -> ContainerStorage.of(hub.intake, side), HUB.get());
+        ItemStorage.SIDED.registerForBlockEntity((sink, side) -> ContainerStorage.of(sink.intake, side), SINK.get());
+        ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());
     }
 }
