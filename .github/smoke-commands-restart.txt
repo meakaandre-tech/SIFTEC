@@ -1,10 +1,4 @@
 #sleep 3
 siftec selftest check
-siftec node find zinc
 siftec node find oil
-siftec node find nitrogen
-siftec node find sulfur
-execute in minecraft:the_nether run siftec node find quartz
-execute in minecraft:the_nether run forceload add 0 0 300 300
-#sleep 20
 execute in minecraft:the_nether run siftec selftest nether
