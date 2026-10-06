@@ -7,7 +7,7 @@ cmd give @a siftec:iron_rod 64
 cmd give @a create:iron_sheet 5
 sleep 4
 shot
-rclick 640 360
+key u
 sleep 3
 shot
 click 532 298
