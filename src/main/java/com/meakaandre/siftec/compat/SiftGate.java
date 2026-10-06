@@ -21,6 +21,15 @@ public final class SiftGate {
     private SiftGate() {
     }
 
+    /** True (with a message to the player) if they may not go to that level: The Sift before their company's Wormhole Phase 5. */
+    public static boolean refuses(ServerPlayer player, ServerLevel to) {
+        if (to == null || to.dimension() != SIFT || player.level().dimension() == SIFT) return false;
+        if (player.hasInfiniteMaterials() || player.isSpectator()) return false;
+        if (com.meakaandre.siftec.company.Companies.of(player).has("phase_5")) return false;
+        player.sendOverlayMessage(Component.translatable("siftec.sift.closed"));
+        return true;
+    }
+
     public static void enter(ServerPlayer player) {
         ServerLevel sift = player.level().getServer().getLevel(SIFT);
         if (sift == null) {

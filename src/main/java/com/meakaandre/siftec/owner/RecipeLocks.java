@@ -48,6 +48,24 @@ public final class RecipeLocks {
             }
             if (locks.has(key)) map.put(holder.value(), locks.get(key).getAsString());
         }
+        // any other recipe, from any mod, that makes an item a milestone unlocks is locked to that milestone too
+        net.minecraft.util.context.ContextMap context = net.minecraft.world.item.crafting.display.SlotDisplayContext.fromLevel(server.overworld());
+        for (RecipeHolder<?> holder : server.getRecipeManager().getRecipes()) {
+            if (map.containsKey(holder.value())) continue;
+            try {
+                search:
+                for (net.minecraft.world.item.crafting.display.RecipeDisplay display : holder.value().display()) {
+                    for (net.minecraft.world.item.ItemStack made : display.result().resolveForStacks(context)) {
+                        com.meakaandre.siftec.hub.Milestone lock = made.isEmpty() ? null : com.meakaandre.siftec.hub.Locks.lockOf(made.getItem());
+                        if (lock == null) continue;
+                        map.put(holder.value(), lock.id());
+                        break search;
+                    }
+                }
+            } catch (RuntimeException ignored) {
+                // a recipe that cannot say what it makes this way is left unlocked
+            }
+        }
         table = map;
         return map;
     }

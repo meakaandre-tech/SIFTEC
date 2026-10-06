@@ -20,8 +20,13 @@ public abstract class BoundTickerMixin {
         Ownership.ticking(blockEntity);
     }
 
+    @Shadow @Final
+    private net.minecraft.world.level.block.entity.BlockEntityTicker<?> ticker;
+
     @Inject(method = "tick", at = @At("RETURN"))
     private void siftec$leave(CallbackInfo ci) {
+        // Power Shards: a boosted machine ticks again, still as the machine that is asking
+        com.meakaandre.siftec.owner.Boosts.extraTicks(blockEntity, ticker);
         Ownership.ticking(null);
     }
 }

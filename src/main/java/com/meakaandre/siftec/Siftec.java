@@ -40,6 +40,7 @@ public class Siftec implements ModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(StatePayload.TYPE, StatePayload.STREAM_CODEC);
         ServerLifecycleEvents.SERVER_STARTED.register(SpeedCap::recompute);
         com.meakaandre.siftec.owner.Ownership.register();
+        com.meakaandre.siftec.owner.Boosts.register();
         ServerLifecycleEvents.SERVER_STARTED.register(server -> com.meakaandre.siftec.owner.RecipeLocks.forget());
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> com.meakaandre.siftec.owner.RecipeLocks.forget());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.owner.RecipeLocks.forget());

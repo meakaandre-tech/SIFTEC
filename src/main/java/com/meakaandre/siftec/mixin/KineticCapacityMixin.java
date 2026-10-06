@@ -14,6 +14,20 @@ public abstract class KineticCapacityMixin {
     @Shadow
     protected float lastCapacityProvided;
 
+    @Shadow
+    protected float lastStressApplied;
+
+    /** Power Shards and a Somersloop make a Create machine ask for more stress. */
+    @Inject(method = "calculateStressApplied", at = @At("RETURN"), cancellable = true)
+    private void siftec$boostStress(CallbackInfoReturnable<Float> cir) {
+        float factor = com.meakaandre.siftec.owner.Boosts.stressFactor((KineticBlockEntity) (Object) this);
+        if (factor != 1f) {
+            float boosted = cir.getReturnValue() * factor;
+            lastStressApplied = boosted;
+            cir.setReturnValue(boosted);
+        }
+    }
+
     @Inject(method = "calculateAddedStressCapacity", at = @At("RETURN"), cancellable = true)
     private void siftec$doubleWindmills(CallbackInfoReturnable<Float> cir) {
         if ((Object) this instanceof WindmillBearingBlockEntity) {

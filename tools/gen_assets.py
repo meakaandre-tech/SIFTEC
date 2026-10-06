@@ -174,6 +174,7 @@ lang.update({"siftec.planner.first": "First corner set. Now click the opposite c
              "siftec.building.family.andesite": "Andesite Casing or Block of Andesite Alloy",
              "siftec.building.family.steel": "Block of Steel, Block of Industrial Iron or Block of Iron",
              "siftec.building.family.copper": "Copper Casing or copper blocks", "siftec.building.family.brass": "Brass Casing, Block of Brass or Train Casing"})
+lang["siftec.sift.closed"] = "The Sift is closed to you until your company finishes Wormhole Phase 5"
 # Speed Governor: borrows the Gearshift's model until it has its own
 lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (your company's limit is %s)",
              "siftec.governor.set": "Set to %s RPM", "siftec.governor.over": "%s RPM: above your company's limit", "siftec.governor.step": "%s RPM"})

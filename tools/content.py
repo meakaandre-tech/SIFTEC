@@ -337,7 +337,7 @@ MAM = [
         ("Depot Expansion", "3 Mercer Sphere, 25 Computer", "5:00", "Cloud stack size doubled", [2], [], ["depot:expansion"]),
         ("Upload Upgrade", "3 Mercer Sphere, 25 Motor", "5:00", "Upload speed doubled", [2], [], ["depot:upload"]),
         ("Somersloop Analysis", "1 Somersloop", "1:00", "The Object Scanner can find Somersloops", [], [], ["object:somersloop"]),
-        ("Production Amplifier", "1 Somersloop, 25 Circuit Board, 10 Motor", "5:00", "Miners take one Somersloop: double output at four times the stress", [5], [], ["amplifier"]),
+        ("Production Amplifier", "1 Somersloop, 25 Circuit Board, 10 Motor", "5:00", "Miners, the Press, Mixer, Saw, Millstone and Deployer take one Somersloop: double output at four times the stress", [5], [], ["amplifier"]),
         ("Alien Energy Harvesting", "2 Somersloop, 10 Supercomputer", "5:00", "A machine can hold a Somersloop and Power Shards together", [6], [], ["amplifier:shards"]),
     ]),
 ]
