@@ -111,7 +111,7 @@ lang.update({"item.siftec.gypsum": "Gypsum", "item.siftec.toxic_residue": "Toxic
 for name, tex, tint in (("gypsum", "minecraft:item/bone_meal", None), ("toxic_residue", "minecraft:item/slime_ball", 0x90C020)):
     write(f"{A}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
     item_def(name, f"siftec:item/{name}", tint)
-MACHINES = {"geyser_engine": ("Geyser Engine", "create:block/copper_casing"), "claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"), "power_storage": ("Power Storage", "create:block/copper_casing"), "miner_mk1": ("Miner Mk.1", "create:block/andesite_casing"), "miner_mk2": ("Miner Mk.2", "create:block/copper_casing"),
+MACHINES = {"furnace_engine": ("Furnace Engine", "minecraft:block/furnace_side"), "hub_engine": ("HUB Engine", "minecraft:block/blast_furnace_side"), "geyser_engine": ("Geyser Engine", "create:block/copper_casing"), "claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"), "power_storage": ("Power Storage", "create:block/copper_casing"), "miner_mk1": ("Miner Mk.1", "create:block/andesite_casing"), "miner_mk2": ("Miner Mk.2", "create:block/copper_casing"),
             "miner_mk3": ("Miner Mk.3", "create:block/brass_casing"), "resource_well_extractor": ("Resource Well Extractor", "create:block/railway_casing")}
 for b, (name, casing) in MACHINES.items():
     lang[f"block.siftec.{b}"] = name
@@ -120,6 +120,10 @@ for b, (name, casing) in MACHINES.items():
         "top": "create:block/gearbox_top", "side": casing, "bottom": casing}})
     item_def(b, f"siftec:block/{b}")
 
+lang.update({"siftec.engine.running": "Furnace Engine: running", "siftec.engine.running_hub": "HUB Engine: running (%s fuel left)",
+             "siftec.engine.no_furnace": "Furnace Engine: needs a burning furnace beside or under it",
+             "siftec.engine.no_hub": "HUB Engine: has to touch a HUB", "siftec.engine.no_fuel": "HUB Engine: out of fuel. Click it with coal or any furnace fuel",
+             "siftec.engine.too_many": "HUB Engine: this HUB cannot run that many engines yet"})
 # Speed Governor: borrows the Gearshift's model until it has its own
 lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (your company's limit is %s)",
              "siftec.governor.set": "Set to %s RPM", "siftec.governor.over": "%s RPM: above your company's limit", "siftec.governor.step": "%s RPM"})
@@ -339,7 +343,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # miners drop themselves
-for b in ("geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage", "speed_governor"):
+for b in ("furnace_engine", "hub_engine", "geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage", "speed_governor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -347,4 +351,4 @@ for b in ("geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:furnace_engine", "siftec:hub_engine", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})

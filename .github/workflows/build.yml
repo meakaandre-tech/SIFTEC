@@ -114,6 +114,18 @@ jobs:
             echo "fabric api: $fapiurl"
             if [ ! -f $root/.github/smoke-no-fabric-api ]; then curl -fsSL -o mods/fabric-api.jar "$fapiurl"; fi
             cp ../libs/create-fly-26.3.jar mods/
+            # what the pack's other ported mods have published (listed only; see .github/smoke-pack-mods)
+            for r in createhypertubes creategunmod create-diesel-generators Create-Fly; do
+              echo "releases of $r:"
+              curl -fsSL "https://api.github.com/repos/meakaandre-tech/$r/releases?per_page=4" | python3 -c "import json,sys; [print('  ', x['tag_name'], a['browser_download_url']) for x in json.load(sys.stdin) for a in x['assets']]" || echo "  (could not list)"
+            done
+            for q in farmers-delight-refabricated farmers-delight the-sift; do
+              echo "modrinth $q for $mc:"
+              curl -fsSL "https://api.modrinth.com/v2/project/$q/version" | python3 -c "import json,sys; [print('  ', v['version_number'], v['game_versions'], v['loaders'], v['files'][0]['url']) for v in json.load(sys.stdin)[:60] if '$mc' in v['game_versions'] or '26.2' in v['game_versions']]" || echo "  (not found)"
+            done
+            if [ -f $root/.github/smoke-pack-mods ]; then
+              while read -r url; do case "$url" in http*) curl -fsSL -o "mods/$(basename "$url")" "$url" || echo "could not fetch $url";; esac; done < $root/.github/smoke-pack-mods
+            fi
             jar=$(ls ../build/libs/*.jar | grep -v -e sources -e server | head -1)
             cp "$jar" mods/
             ls -l mods

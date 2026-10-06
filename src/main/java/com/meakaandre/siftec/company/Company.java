@@ -70,6 +70,18 @@ public class Company {
 
     /** How many finished milestones carry a token, such as "backpack". */
     public int count(String token) {
+        // asked for by machines every tick, so the answers are kept until the company finishes something else
+        if (countsFor != done.size()) {
+            counts.clear();
+            countsFor = done.size();
+        }
+        return counts.computeIfAbsent(token, this::countNow);
+    }
+
+    private transient Map<String, Integer> counts = new HashMap<>();
+    private transient int countsFor = -1;
+
+    private int countNow(String token) {
         int n = 0;
         for (String id : done) {
             Milestone m = com.meakaandre.siftec.hub.Milestones.get(id);

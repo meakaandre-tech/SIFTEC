@@ -11,6 +11,8 @@
     "siftec:power_tower",
     "siftec:power_storage",
     "siftec:speed_governor",
+    "siftec:furnace_engine",
+    "siftec:hub_engine",
     "siftec:mam",
     "siftec:claim_marker",
     "siftec:geyser_engine",

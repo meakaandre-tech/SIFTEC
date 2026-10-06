@@ -281,7 +281,8 @@
         "create:nozzle",
         "siftec:wire",
         "siftec:cable",
-        "siftec:power_line"
+        "siftec:power_line",
+        "siftec:hub_engine"
       ],
       "tokens": [
         "scanner:copper"
@@ -395,6 +396,7 @@
       "seconds": 0,
       "items": [
         "siftec:wormhole_gateway",
+        "siftec:furnace_engine",
         "create:flywheel",
         "siftec:biomass"
       ],
@@ -3397,6 +3399,19 @@
       ]
     },
     {
+      "item": "siftec:hub_engine",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 5
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 5
+        }
+      ]
+    },
+    {
       "item": "siftec:power_pole",
       "cost": [
         {
@@ -3410,6 +3425,23 @@
         {
           "item": "minecraft:light_gray_concrete",
           "count": 1
+        }
+      ]
+    },
+    {
+      "item": "siftec:furnace_engine",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 15
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 15
+        },
+        {
+          "item": "siftec:wire",
+          "count": 25
         }
       ]
     },

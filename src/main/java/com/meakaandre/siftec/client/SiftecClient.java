@@ -29,6 +29,7 @@ public class SiftecClient implements ClientModInitializer {
         BlockEntityRendererRegistry.register(ModBlockEntities.PROCESSOR.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.GEYSER_ENGINE.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.POWER_STORAGE.get(), shaft);
+        BlockEntityRendererRegistry.register(ModBlockEntities.ENGINE.get(), shaft);
         // the Speed Governor's two shaft halves turn at different speeds, like a Gearshift's
         BlockEntityRendererProvider<com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity,
             com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer.SplitShaftRenderState> split =

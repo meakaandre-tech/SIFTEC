@@ -13,6 +13,8 @@
     "RecipeTrieFinderMixin",
     "RecipeTrieMixin",
     "PropagatorMixin",
+    "PumpMixin",
+    "PumpBehaviourMixin",
     "KineticCapacityMixin",
     "BeltInventoryAccessor",
     "TunnelMixin",
