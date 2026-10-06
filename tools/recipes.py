@@ -440,6 +440,12 @@ def build():
     for ore, ingot in (("iron", "minecraft:iron_ingot"), ("copper", "minecraft:copper_ingot"), ("zinc", "create:zinc_ingot")):
         mix("acid_leached_" + ore, items=["create:crushed_raw_" + ore], fluids=[("sulfuric acid", 250)],
             results=[(ingot, 2), "siftec:toxic_residue"], heated=True)
+    # Steel Casing: steel on a stripped log, by hand or by Deployer, like Create's own casings
+    for wood in ("stripped_logs", "stripped_woods"):
+        add("item_application", "steel_casing_from_" + wood, {"type": "create:item_application", "target": "#c:" + wood, "ingredient": item("Steel Ingot"),
+            "results": [{"id": "siftec:steel_casing"}]})
+        add("deploying", "steel_casing_from_" + wood, {"type": "create:deploying", "target": "#c:" + wood, "ingredient": item("Steel Ingot"),
+            "results": [{"id": "siftec:steel_casing"}]})
     # Toxic Residue packed into paper shot, for a gun with the Blunderbuss Barrel
     hand("siftec:toxic_shot", [(1, "cgs:paper_shot"), (1, "siftec:toxic_residue")], name="toxic_shot")
     deploy("cgs:paper_shot", "siftec:toxic_residue", "siftec:toxic_shot", name="toxic_shot")
@@ -483,7 +489,6 @@ WORKSHOP = [
     ("siftec:hazmat_suit", "50 Rubber, 50 Plastic, 50 Alclad Aluminum Sheet, 50 Fabric"),
     ("siftec:hover_pack", "8 Motor, 4 Heavy Modular Frame, 8 Computer, 40 Alclad Aluminum Sheet"),
     ("siftec:blade_runners", "20 Silica, 3 Modular Frame, 3 Rotor"),
-    ("siftec:zipline", "30 Quickwire, 3 Iron Rod, 10 Cable"),
     ("siftec:parachute", "10 Fabric, 5 Cable"),
     ("siftec:gas_mask", "50 Rubber, 100 Plastic, 50 Fabric"),
     ("siftec:radar_tower", "10 Heavy Modular Frame, 10 Crystal Oscillator, 50 Cable"),

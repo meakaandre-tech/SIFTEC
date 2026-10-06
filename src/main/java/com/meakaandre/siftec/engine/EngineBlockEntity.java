@@ -120,6 +120,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         super.tick();
         if (level == null || level.isClientSide()) return;
         if (burn > 0) burn--;
+        if (capacity > 0 && (level.getGameTime() + worldPosition.hashCode()) % 20 == 0) com.meakaandre.siftec.tweak.Pollution.burning(level, worldPosition);
         if (++clock < 10 && !(hubKind() && burn == 0 && capacity > 0)) return;
         clock = 0;
         float target;

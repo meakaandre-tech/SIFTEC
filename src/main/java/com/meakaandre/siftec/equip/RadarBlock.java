@@ -24,7 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import java.util.Optional;
 
 /**
- * Radar Tower: one click lists the nearest node of every resource the company's scanner knows, and the
+ * Radar Tower: one click lists (and offers as Xaero waypoints) the nearest node of every resource the company's scanner knows, and the
  * nearest slug, artefact and crash site the company has not collected, measured from the tower.
  */
 public class RadarBlock extends Block {
@@ -32,6 +32,17 @@ public class RadarBlock extends Block {
 
     public RadarBlock(Properties properties) {
         super(properties);
+    }
+
+    /**
+     * A waypoint in the form Xaero's Minimap and World Map share over chat. With either mod installed the
+     * player sees the name with an [Add] button; without them it is a line of text.
+     */
+    private static Component waypoint(Level level, Component what, int x, int z) {
+        String name = what.getString().replace(':', ' ').replace(',', ' ').trim();
+        String initial = name.isEmpty() ? "S" : name.substring(0, 1).toUpperCase(java.util.Locale.ROOT);
+        return Component.literal("xaero-waypoint:" + name + ":" + initial + ":" + x + ":~:" + z + ":11:false:0:Internal_"
+            + level.dimension().identifier().getPath() + "_waypoints");
     }
 
     private static Component line(Component what, double dx, double dz, int x, int z) {
@@ -50,6 +61,7 @@ public class RadarBlock extends Block {
             Optional<Node> node = NodeMap.nearest(server, pos.getX(), pos.getZ(), type, NODE_CELLS);
             if (node.isEmpty()) continue;
             player.sendSystemMessage(line(NodeBlock.label(type, node), node.get().x() - pos.getX(), node.get().z() - pos.getZ(), node.get().x(), node.get().z()));
+            player.sendSystemMessage(waypoint(level, NodeBlock.label(type, node), node.get().x(), node.get().z()));
             found++;
         }
         for (Collectible type : Collectible.values()) {
@@ -58,6 +70,7 @@ public class RadarBlock extends Block {
             if (spot.isEmpty()) continue;
             player.sendSystemMessage(line(Component.translatable("item.siftec." + type.id()), spot.get().x() - pos.getX(), spot.get().z() - pos.getZ(),
                 spot.get().x(), spot.get().z()).copy().withStyle(ChatFormatting.AQUA));
+            player.sendSystemMessage(waypoint(level, Component.translatable("item.siftec." + type.id()), spot.get().x(), spot.get().z()));
             found++;
         }
         if (found == 0) player.sendSystemMessage(Component.translatable("siftec.radar.nothing"));

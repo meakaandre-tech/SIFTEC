@@ -127,14 +127,15 @@ lang.update({"siftec.engine.running": "Furnace Engine: running", "siftec.engine.
 # ---- equipment: stand-in icons from vanilla items
 EQUIPMENT = {"jetpack": ("Jetpack", "minecraft:item/firework_rocket"), "hover_pack": ("Hover Pack", "minecraft:item/elytra"),
              "parachute": ("Parachute", "minecraft:item/phantom_membrane"), "hazmat_suit": ("Hazmat Suit", "minecraft:item/leather_chestplate"),
-             "gas_mask": ("Gas Mask", "minecraft:item/leather_helmet"), "blade_runners": ("Blade Runners", "minecraft:item/iron_boots"),
-             "zipline": ("Zipline", "minecraft:item/lead")}
+             "gas_mask": ("Gas Mask", "minecraft:item/leather_helmet"), "blade_runners": ("Blade Runners", "minecraft:item/iron_boots")
+             }
 for eid, (ename, etex) in EQUIPMENT.items():
     lang[f"item.siftec.{eid}"] = ename
     write(f"{A}/models/item/{eid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": etex}})
     item_def(eid, f"siftec:item/{eid}")
 lang.update({"siftec.jetpack.empty": "Jetpack: out of fuel. It burns Solid Biofuel, Compacted Coal, diesel or Turbofuel",
-             "siftec.zipline.no_line": "No Power Line leads that way from this pole",
+             "siftec.zipline.no_line": "No Power Line leads that way from this pole", "siftec.zipline.locked": "Riding Power Lines needs the Zipline research (MAM, Caterium)",
+             "siftec.crash.somersloop": "There was a Somersloop in the wreckage too", "siftec.boost.shards_only": "This machine takes Power Shards only",
              "siftec.radar.title": "Radar Tower: nearest of each, from here", "siftec.radar.line": "%s: %s blocks %s (x %s, z %s)",
              "siftec.radar.nothing": "Nothing in range"})
 lang["item.siftec.cardboard_drone"] = "Cardboard Drone"
@@ -170,10 +171,10 @@ lang.update({"siftec.planner.first": "First corner set. Now click the opposite c
              "siftec.building.blocks": "For Tier %s: %s of %s building blocks", "siftec.building.newest": "Newest material (%s): %s of %s",
              "siftec.building.shelter": "Walls: %s of 2. Roof: %s", "siftec.building.ok": "Ready for Tier %s", "siftec.building.not_ok": "Not ready for Tier %s yet",
              "siftec.building.needed": "The HUB building is too small for Tier %s. Build it up, then click the HUB with the HUB Planner",
-             "siftec.building.family.stone_wood": "logs, planks, stone bricks, polished stone, deepslate bricks, and any stairs, slabs, fences, walls and doors",
+             "siftec.building.family.stone_wood": "logs, planks, stone bricks, polished stone, deepslate bricks, Twigs blocks, and any stairs, slabs, fences, walls and doors",
              "siftec.building.family.andesite": "Andesite Casing or Block of Andesite Alloy",
-             "siftec.building.family.steel": "Block of Steel, Block of Industrial Iron or Block of Iron",
-             "siftec.building.family.copper": "Copper Casing or copper blocks", "siftec.building.family.brass": "Brass Casing, Block of Brass or Train Casing"})
+             "siftec.building.family.steel": "Steel Casing or Block of Steel",
+             "siftec.building.family.copper": "Copper Casing or copper blocks", "siftec.building.family.brass": "Brass Casing or Block of Brass"})
 lang["siftec.sift.closed"] = "The Sift is closed to you until your company finishes Wormhole Phase 5"
 PRESERVE_ICONS = {"pickled_tomato": ("Pickled Tomato", 0xC84030), "pickled_onion": ("Pickled Onion", 0xD8C8A8), "pickled_cabbage": ("Pickled Cabbage", 0x90B850),
                   "pickled_pumpkin": ("Pickled Pumpkin", 0xE08828), "pickled_carrot": ("Pickled Carrot", 0xF09030), "pickled_beetroot": ("Pickled Beetroot", 0x902848),
@@ -189,6 +190,10 @@ lang.update({"siftec.season.locked": "Your company has not researched Seasoning 
 lang["item.siftec.toxic_shot"] = "Toxic Shot"
 write(f"{A}/models/item/toxic_shot.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/slime_ball"}})
 item_def("toxic_shot", "siftec:item/toxic_shot", 0x607018)
+lang["block.siftec.steel_casing"] = "Steel Casing"
+write(f"{A}/blockstates/steel_casing.json", {"variants": {"": {"model": "siftec:block/steel_casing"}}})
+write(f"{A}/models/block/steel_casing.json", {"parent": "minecraft:block/cube_all", "textures": {"all": "create:block/railway_casing"}})
+item_def("steel_casing", "siftec:block/steel_casing")
 # Speed Governor: borrows the Gearshift's model until it has its own
 lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (your company's limit is %s)",
              "siftec.governor.set": "Set to %s RPM", "siftec.governor.over": "%s RPM: above your company's limit", "siftec.governor.step": "%s RPM"})
@@ -474,7 +479,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # miners drop themselves
-for b in ("blueprint_designer", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "radar_tower", "furnace_engine", "hub_engine", "geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage", "speed_governor"):
+for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "radar_tower", "furnace_engine", "hub_engine", "geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage", "speed_governor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -482,4 +487,4 @@ for b in ("blueprint_designer", "blueprint_designer_mk3", "drone_port", "main_po
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:furnace_engine", "siftec:hub_engine", "siftec:landing_pad", "siftec:radar_tower", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:furnace_engine", "siftec:hub_engine", "siftec:landing_pad", "siftec:radar_tower", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})

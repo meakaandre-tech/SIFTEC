@@ -43,6 +43,13 @@ public final class CrashSites {
         return new Milestone.Cost(want[0], Integer.parseInt(want[1]));
     }
 
+    /** One pod in five that landed well away from spawn also carries a Somersloop. */
+    public static boolean hasSomersloop(ServerLevel level, BlockPos pos) {
+        NodeSavedData data = NodeSavedData.get(level.getServer());
+        double distance = Math.sqrt(Math.pow(pos.getX() - data.originX(), 2) + Math.pow(pos.getZ() - data.originZ(), 2));
+        return distance >= 1000 && Long.remainderUnsigned(hash(pos) >>> 20, 5) == 0;
+    }
+
     /** A few broken pieces of casing and scorched ground next to the pod. */
     public static void wreckage(ServerLevel level, BlockPos pod) {
         Block casing = BuiltInRegistries.BLOCK.getOptional(Identifier.parse("create:andesite_casing")).orElse(Blocks.IRON_BLOCK);

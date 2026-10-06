@@ -68,6 +68,8 @@ public final class Equipment {
             SUIT_UNTIL.clear();
             Poles.clear();
             Ziplines.clear();
+            com.meakaandre.siftec.blueprint.Blueprints.clear();
+            com.meakaandre.siftec.tweak.Pollution.clear();
             com.meakaandre.siftec.blueprint.DesignerBlockEntity.clear();
         });
         FLIGHT_ZONES.add(com.meakaandre.siftec.blueprint.DesignerBlockEntity::inside);
@@ -166,6 +168,8 @@ public final class Equipment {
     private static void tick(MinecraftServer server) {
         tickJetpacks(server);
         Ziplines.tick(server);
+        com.meakaandre.siftec.blueprint.Blueprints.tick(server);
+        com.meakaandre.siftec.tweak.Pollution.tick(server);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if ((server.getTickCount() + player.getId()) % 10 != 0) continue;
             if (wearing(player, EquipmentSlot.FEET, ModItems.BLADE_RUNNERS.get())) {

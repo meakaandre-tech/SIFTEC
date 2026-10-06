@@ -26,7 +26,8 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * Power Shards and Somersloops in Create's own machines. Click a Press, Mixer, Saw, Millstone or Deployer with
+ * Power Shards and Somersloops in Create's own machines. Click a Press, Mixer, Saw, Millstone, Deployer, Crushing
+ * Wheel, Encased Fan, Mechanical Crafter or Spout with
  * one to slot it in; sneak-click it empty-handed to take them out. Shards make the machine work faster for
  * more stress; a Somersloop doubles what each recipe gives for four times the stress.
  */
@@ -35,7 +36,11 @@ public final class Boosts {
     public static final AttachmentType<Integer> BOOST = AttachmentRegistry.create(Siftec.id("boost"), builder -> builder.persistent(Codec.INT));
     private static final int SLOOP = 10;
     private static final float[] SPEED = {1f, 1.5f, 2f, 2.5f}, STRESS = {1f, 1.7f, 2.5f, 3.4f};
-    private static final Set<String> MACHINES = Set.of("create:mechanical_press", "create:mechanical_mixer", "create:mechanical_saw", "create:millstone", "create:deployer");
+    private static final Set<String> MACHINES = Set.of("create:mechanical_press", "create:mechanical_mixer", "create:mechanical_saw", "create:millstone", "create:deployer",
+        "create:crushing_wheel", "create:encased_fan", "create:mechanical_crafter", "create:spout");
+    /** These make their results in a way a Somersloop cannot double, so they take shards only. */
+    private static final Set<String> SHARDS_ONLY = Set.of("create:mechanical_crafter", "create:spout");
+    private static final String CONTROLLER = "create:crushing_wheel_controller";
     /** The part of an extra tick each boosted machine is still owed. */
     private static final Map<BlockEntity, float[]> OWED = new WeakHashMap<>();
     private static boolean running;
@@ -43,9 +48,26 @@ public final class Boosts {
     private Boosts() {
     }
 
-    private static int boost(BlockEntity be) {
+    private static int own(BlockEntity be) {
         Integer value = be.getAttached(BOOST);
         return value == null ? 0 : value;
+    }
+
+    /**
+     * What a machine is boosted by. Crushing is done by an unseen block between the two wheels, which goes by
+     * whichever wheel beside it holds more.
+     */
+    private static int boost(BlockEntity be) {
+        int boost = own(be);
+        if (boost != 0 || be.getLevel() == null || !BuiltInRegistries.BLOCK.getKey(be.getBlockState().getBlock()).toString().equals(CONTROLLER)) return boost;
+        for (net.minecraft.core.Direction side : net.minecraft.core.Direction.values()) {
+            BlockEntity wheel = be.getLevel().getBlockEntity(be.getBlockPos().relative(side));
+            if (wheel != null && BuiltInRegistries.BLOCK.getKey(wheel.getBlockState().getBlock()).toString().equals("create:crushing_wheel")) {
+                int theirs = own(wheel);
+                if (theirs % SLOOP > boost % SLOOP || (theirs >= SLOOP && boost < SLOOP)) boost = Math.max(boost % SLOOP, theirs % SLOOP) + (boost >= SLOOP || theirs >= SLOOP ? SLOOP : 0);
+            }
+        }
+        return boost;
     }
 
     public static int shards(BlockEntity be) {
@@ -79,7 +101,7 @@ public final class Boosts {
     public static void extraTicks(BlockEntity be, BlockEntityTicker<?> ticker) {
         if (running || !(be.getLevel() instanceof ServerLevel level)) return;
         int shards = shards(be);
-        if (shards == 0 || !(be instanceof KineticBlockEntity kinetic) || kinetic.getSpeed() == 0) return;
+        if (shards == 0 || (be instanceof KineticBlockEntity kinetic && kinetic.getSpeed() == 0)) return;
         float[] owed = OWED.computeIfAbsent(be, k -> new float[1]);
         owed[0] += SPEED[shards] - 1f;
         running = true;
@@ -96,8 +118,8 @@ public final class Boosts {
     public static void register() {
         // breaking a boosted machine gives its shards and Somersloop back
         net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, be) -> {
-            if (be != null && !level.isClientSide() && boost(be) > 0) {
-                int boost = boost(be);
+            if (be != null && !level.isClientSide() && own(be) > 0) {
+                int boost = own(be);
                 if (boost % SLOOP > 0) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.PARTS.get("power_shard"), boost % SLOOP));
                 if (boost >= SLOOP) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.PARTS.get("somersloop")));
                 be.removeAttached(BOOST);
@@ -113,9 +135,14 @@ public final class Boosts {
             boolean eject = stack.isEmpty() && player.isShiftKeyDown();
             if (!shard && !loop && !eject) return InteractionResult.PASS;
             BlockEntity be = level.getBlockEntity(pos);
-            if (be == null || (eject && boost(be) == 0)) return InteractionResult.PASS;
+            if (be == null || (eject && own(be) == 0)) return InteractionResult.PASS;
+            boolean shardsOnly = SHARDS_ONLY.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()).toString());
+            if (loop && shardsOnly) {
+                if (player instanceof ServerPlayer told) told.sendOverlayMessage(Component.translatable("siftec.boost.shards_only"));
+                return InteractionResult.SUCCESS;
+            }
             if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
-            int boost = boost(be), shards = boost % SLOOP;
+            int boost = own(be), shards = boost % SLOOP;
             boolean amplified = boost >= SLOOP;
             if (eject) {
                 if (shards > 0) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, new ItemStack(ModItems.PARTS.get("power_shard"), shards));

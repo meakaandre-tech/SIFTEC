@@ -40,6 +40,19 @@ public class PoleBlock extends KineticBlock implements IBE<PoleBlockEntity> {
         return Axis.Y;
     }
 
+    /** A wrench on a pole rides the Power Line you are facing, the way a wrench rides a Chain Conveyor. */
+    @Override
+    public net.minecraft.world.InteractionResult onWrenched(BlockState state, net.minecraft.world.item.context.UseOnContext context) {
+        if (context.getPlayer() instanceof net.minecraft.server.level.ServerPlayer player) {
+            if (!player.hasInfiniteMaterials() && !com.meakaandre.siftec.company.Companies.of(player).hasToken("zipline")) {
+                player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.zipline.locked"));
+            } else if (!com.meakaandre.siftec.equip.Ziplines.start(player, context.getClickedPos())) {
+                player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.zipline.no_line"));
+            }
+        }
+        return net.minecraft.world.InteractionResult.SUCCESS;
+    }
+
     @Override
     public Class<PoleBlockEntity> getBlockEntityClass() {
         return PoleBlockEntity.class;

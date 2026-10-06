@@ -726,6 +726,7 @@
       "items": [
         "create:mechanical_mixer",
         "cgs:steel_ingot",
+        "siftec:steel_casing",
         "siftec:steel_beam",
         "siftec:steel_pipe",
         "siftec:versatile_framework"
@@ -1989,10 +1990,10 @@
         }
       ],
       "seconds": 120,
-      "items": [
-        "siftec:zipline"
+      "items": [],
+      "tokens": [
+        "zipline"
       ],
-      "tokens": [],
       "needs": [
         "mam_caterium_2"
       ]
@@ -3407,6 +3408,10 @@
     "siftec:mixing/ignimbrite": "mam_sulfur_2",
     "siftec:compacting/compacted_coal": "mam_sulfur_6",
     "siftec:mixing/turbofuel": "mam_sulfur_7",
+    "siftec:item_application/steel_casing_from_stripped_logs": "basic_steel_production",
+    "siftec:deploying/steel_casing_from_stripped_logs": "basic_steel_production",
+    "siftec:item_application/steel_casing_from_stripped_woods": "basic_steel_production",
+    "siftec:deploying/steel_casing_from_stripped_woods": "basic_steel_production",
     "siftec:mixing/kitchen_apple_cider": "mam_nutrients_5",
     "siftec:mixing/kitchen_baked_cod_stew": "mam_nutrients_5",
     "siftec:mixing/kitchen_beef_stew": "mam_nutrients_5",
@@ -4292,23 +4297,6 @@
         {
           "item": "siftec:rotor",
           "count": 3
-        }
-      ]
-    },
-    {
-      "item": "siftec:zipline",
-      "cost": [
-        {
-          "item": "siftec:quickwire",
-          "count": 30
-        },
-        {
-          "item": "siftec:iron_rod",
-          "count": 3
-        },
-        {
-          "item": "siftec:cable",
-          "count": 10
         }
       ]
     },

@@ -53,6 +53,7 @@ public final class HubBuilding {
         if (shape(b)) return true;
         if (state.is(BlockTags.LOGS) || state.is(BlockTags.PLANKS)) return true;
         Identifier id = BuiltInRegistries.BLOCK.getKey(b);
+        if (id.getNamespace().equals("twigs")) return true;
         if (!id.getNamespace().equals("minecraft")) return false;
         String path = id.getPath();
         for (String prefix : new String[]{"stone_brick", "mossy_stone_brick", "cracked_stone_brick", "chiseled_stone_brick", "smooth_stone",
@@ -70,13 +71,17 @@ public final class HubBuilding {
             && (id.getPath().endsWith("copper_block") || id.getPath().endsWith("cut_copper") || id.getPath().endsWith("chiseled_copper") || id.getPath().equals("waxed_copper"));
     }
 
-    /** Oldest first. A family counts from the tier it is introduced at. */
+    /**
+     * Oldest first. A family counts from the tier it is introduced at. These are the old Tweaker mod's families
+     * with copper added ahead of steel.
+     */
     public static final List<Family> FAMILIES = List.of(
         new Family("stone_wood", 0, HubBuilding::stoneOrWood),
         new Family("andesite", 1, ids("create:andesite_casing", "create:andesite_alloy_block")),
-        new Family("steel", 3, ids("cgs:steel_block", "create:industrial_iron_block", "minecraft:iron_block")),
-        new Family("copper", 5, HubBuilding::copper),
-        new Family("brass", 7, ids("create:brass_casing", "create:brass_block", "create:railway_casing")));
+        new Family("copper", 2, HubBuilding::copper),
+        // the old mod had brass at Tier 2; here brass needs Crushing Wheels, which arrive in Tier 4
+        new Family("brass", 4, ids("create:brass_casing", "create:brass_block")),
+        new Family("steel", 5, ids("siftec:steel_casing", "cgs:steel_block")));
 
     public static final class Result {
         public final int[] counts = new int[FAMILIES.size()];

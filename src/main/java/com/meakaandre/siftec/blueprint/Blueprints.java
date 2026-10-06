@@ -118,9 +118,58 @@ public final class Blueprints {
         }
     }
 
+    /** The ghost blocks each player is being shown, and the game time they vanish. */
+    private static final Map<UUID, List<net.minecraft.world.entity.Display>> GHOSTS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> GHOSTS_UNTIL = new ConcurrentHashMap<>();
+    private static final int MAX_GHOSTS = 1500;
+    private static final float GHOST_SCALE = 0.8f;
+
+    private static void clearGhosts(UUID player) {
+        List<net.minecraft.world.entity.Display> old = GHOSTS.remove(player);
+        if (old != null) for (net.minecraft.world.entity.Display ghost : old) ghost.discard();
+        GHOSTS_UNTIL.remove(player);
+    }
+
+    /** The hologram: every block of the blueprint drawn a little small, where it would go. It fades after half a minute. */
+    private static void showGhosts(ServerLevel level, ServerPlayer player, Map<BlockPos, BlockState> layout) {
+        clearGhosts(player.getUUID());
+        List<net.minecraft.world.entity.Display> ghosts = new ArrayList<>();
+        float inset = (1f - GHOST_SCALE) / 2f;
+        com.mojang.math.Transformation shape = new com.mojang.math.Transformation(new org.joml.Vector3f(inset, inset, inset), new org.joml.Quaternionf(),
+            new org.joml.Vector3f(GHOST_SCALE, GHOST_SCALE, GHOST_SCALE), new org.joml.Quaternionf());
+        for (Map.Entry<BlockPos, BlockState> entry : layout.entrySet()) {
+            if (ghosts.size() >= MAX_GHOSTS) break;
+            net.minecraft.world.entity.Display.BlockDisplay ghost = net.minecraft.world.entity.EntityTypes.BLOCK_DISPLAY.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
+            if (ghost == null) break;
+            ((com.meakaandre.siftec.mixin.BlockDisplayInvoker) ghost).siftec$show(entry.getValue());
+            ((com.meakaandre.siftec.mixin.DisplayInvoker) ghost).siftec$shape(shape);
+            ghost.setPos(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ());
+            level.addFreshEntity(ghost);
+            ghost.addTag(com.meakaandre.siftec.equip.Ziplines.TAG);
+            ghosts.add(ghost);
+        }
+        GHOSTS.put(player.getUUID(), ghosts);
+        GHOSTS_UNTIL.put(player.getUUID(), level.getGameTime() + CONFIRM_TICKS);
+    }
+
+    /** Called every server tick: holograms whose time is up, or whose player has gone, are taken down. */
+    public static void tick(net.minecraft.server.MinecraftServer server) {
+        if (GHOSTS.isEmpty() || server.getTickCount() % 20 != 0) return;
+        long now = server.overworld().getGameTime();
+        for (UUID id : List.copyOf(GHOSTS.keySet())) {
+            if (server.getPlayerList().getPlayer(id) == null || GHOSTS_UNTIL.getOrDefault(id, 0L) <= now) clearGhosts(id);
+        }
+    }
+
+    public static void clear() {
+        GHOSTS.clear();
+        GHOSTS_UNTIL.clear();
+        PREVIEW.clear();
+    }
+
     /**
-     * Used on a block: the first use shows where the blueprint would stand and what is missing; a second use on
-     * the same spot builds it, taking every block from the player's inventory.
+     * Used on a block: the first use puts up a hologram of the blueprint where it would stand and says what is
+     * missing; a second use on the same spot builds it, taking every block from the player's inventory.
      */
     public static void use(ServerPlayer player, ItemStack stack, BlockPos base) {
         ServerLevel level = player.level();
@@ -129,7 +178,14 @@ public final class Blueprints {
             player.sendOverlayMessage(Component.translatable("siftec.blueprint.blank"));
             return;
         }
-        outline(level, player, base, data(stack).getIntOr("side", 1));
+        long[] last = PREVIEW.get(player.getUUID());
+        long now = level.getGameTime();
+        boolean second = last != null && last[0] == base.asLong() && now - last[1] <= CONFIRM_TICKS;
+        if (!second) {
+            outline(level, player, base, data(stack).getIntOr("side", 1));
+            showGhosts(level, player, layout);
+            PREVIEW.put(player.getUUID(), new long[]{base.asLong(), now});
+        }
         Map<Item, Integer> need = new LinkedHashMap<>();
         for (Map.Entry<BlockPos, BlockState> entry : layout.entrySet()) {
             if (!level.getBlockState(entry.getKey()).canBeReplaced() || !Claims.allowed(player, level, entry.getKey())) {
@@ -139,25 +195,24 @@ public final class Blueprints {
             need.merge(entry.getValue().getBlock().asItem(), 1, Integer::sum);
         }
         Inventory inventory = player.getInventory();
+        boolean missing = false;
         if (!player.hasInfiniteMaterials()) {
             for (Map.Entry<Item, Integer> entry : need.entrySet()) {
                 int have = 0;
                 for (int i = 0; i < inventory.getContainerSize(); i++) if (inventory.getItem(i).is(entry.getKey())) have += inventory.getItem(i).getCount();
                 if (have < entry.getValue()) {
                     player.sendSystemMessage(Component.translatable("siftec.blueprint.missing", entry.getValue() - have, new ItemStack(entry.getKey()).getItemName()));
-                    PREVIEW.remove(player.getUUID());
-                    return;
+                    missing = true;
                 }
             }
         }
-        long[] last = PREVIEW.get(player.getUUID());
-        long now = level.getGameTime();
-        if (last == null || last[0] != base.asLong() || now - last[1] > CONFIRM_TICKS) {
-            PREVIEW.put(player.getUUID(), new long[]{base.asLong(), now});
+        if (missing) return;
+        if (!second) {
             player.sendOverlayMessage(Component.translatable("siftec.blueprint.confirm", layout.size()));
             return;
         }
         PREVIEW.remove(player.getUUID());
+        clearGhosts(player.getUUID());
         if (!player.hasInfiniteMaterials()) {
             for (Map.Entry<Item, Integer> entry : need.entrySet()) {
                 int left = entry.getValue();

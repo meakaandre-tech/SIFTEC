@@ -143,7 +143,7 @@ MILESTONES = [
      [C + "cart_assembler", C + "rope_pulley", C + "controller_rail", C + "minecart_coupling"], ["backpack"]),
     (3, "basic_steel_production", "Basic Steel Production", "50 Modular Frame, 150 Rotor, 500 Concrete, 1000 Wire", "8:00",
      "Foundry (Mechanical Mixer), Steel Ingot, Steel Beam, Steel Pipe, Versatile Framework",
-     [C + "mechanical_mixer", "cgs:steel_ingot", "siftec:steel_beam", "siftec:steel_pipe", "siftec:versatile_framework"], []),
+     [C + "mechanical_mixer", "cgs:steel_ingot", "siftec:steel_casing", "siftec:steel_beam", "siftec:steel_pipe", "siftec:versatile_framework"], []),
     (3, "enhanced_asset_security", "Enhanced Asset Security", "100 Reinforced Iron Plate, 600 Iron Rod, 1500 Wire", "3:00",
      "Xeno-Basher (Pneumatic Hammer), +3 backpack slots", ["cgs:hammer"], ["backpack"]),
 
@@ -284,7 +284,7 @@ MAM = [
         ("AI Limiter", "100 Quickwire, 50 Copper Sheet", "3:00", "AI Limiter, Mechanical Arm", [3], ["siftec:ai_limiter", C + "mechanical_arm"], []),
         ("Power Switch", "50 Quickwire, 25 Rotor", "2:00", "Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Speed Governor", [2],
          [C + "clutch", C + "gearshift", C + "sequenced_gearshift", C + "adjustable_chain_gearshift", "siftec:speed_governor"], []),
-        ("Zipline", "100 Quickwire, 50 Cable", "2:00", "Zipline", [2], ["siftec:zipline"], []),
+        ("Zipline", "100 Quickwire, 50 Cable", "2:00", "Use a Wrench on a Power Pole or Tower to ride its Power Lines", [2], [], ["zipline"]),
         ("High-Speed Connector", "500 Quickwire, 25 Plastic", "5:00", "High-Speed Connector", [4], ["siftec:high_speed_connector"], []),
     ]),
     ("mycelia", "Mycelia", M + "brown_mushroom", [
@@ -337,7 +337,7 @@ MAM = [
         ("Depot Expansion", "3 Mercer Sphere, 25 Computer", "5:00", "Cloud stack size doubled", [2], [], ["depot:expansion"]),
         ("Upload Upgrade", "3 Mercer Sphere, 25 Motor", "5:00", "Upload speed doubled", [2], [], ["depot:upload"]),
         ("Somersloop Analysis", "1 Somersloop", "1:00", "The Object Scanner can find Somersloops", [], [], ["object:somersloop"]),
-        ("Production Amplifier", "1 Somersloop, 25 Circuit Board, 10 Motor", "5:00", "Miners, the Press, Mixer, Saw, Millstone and Deployer take one Somersloop: double output at four times the stress", [5], [], ["amplifier"]),
+        ("Production Amplifier", "1 Somersloop, 25 Circuit Board, 10 Motor", "5:00", "Miners, the Press, Mixer, Saw, Millstone, Deployer, Crushing Wheels and Encased Fan take one Somersloop: double output at four times the stress", [5], [], ["amplifier"]),
         ("Alien Energy Harvesting", "2 Somersloop, 10 Supercomputer", "5:00", "A machine can hold a Somersloop and Power Shards together", [6], [], ["amplifier:shards"]),
     ]),
 ]

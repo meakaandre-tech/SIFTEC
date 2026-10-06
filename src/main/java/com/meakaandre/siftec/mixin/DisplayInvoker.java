@@ -9,4 +9,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface DisplayInvoker {
     @Invoker("setPosRotInterpolationDuration")
     void siftec$glide(int ticks);
+
+    @Invoker("setTransformation")
+    void siftec$shape(com.mojang.math.Transformation transformation);
 }

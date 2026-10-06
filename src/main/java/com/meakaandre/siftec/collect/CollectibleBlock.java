@@ -61,6 +61,10 @@ public class CollectibleBlock extends Block {
         ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(com.meakaandre.siftec.Siftec.id(type.itemId())));
         server.sendOverlayMessage(Component.translatable("siftec.collect.got", stack.getItemName()));
         server.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
+        if (type == Collectible.CRASH_SITE && CrashSites.hasSomersloop(server.level(), pos)) {
+            server.getInventory().placeItemBackInInventory(new ItemStack(com.meakaandre.siftec.registry.ModItems.PARTS.get("somersloop")), Prediction.SERVER_ONLY);
+            server.sendSystemMessage(Component.translatable("siftec.crash.somersloop"));
+        }
         return InteractionResult.SUCCESS;
     }
 }

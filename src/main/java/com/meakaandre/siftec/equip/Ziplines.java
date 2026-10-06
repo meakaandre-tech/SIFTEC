@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Zipline rides along Power Lines. The rider sits on an invisible carrier that the server slides from pole to
+ * Riding Power Lines: use a wrench on a pole (after the Zipline research). The rider sits on an invisible carrier that the server slides from pole to
  * pole; at each pole it carries on down the line that runs straightest, and stops where there is none.
  * Sneak to drop off.
  */
