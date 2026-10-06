@@ -4,6 +4,7 @@ import com.meakaandre.siftec.backpack.Backpack;
 import com.meakaandre.siftec.command.SiftecCommands;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.fluid.ModFluids;
+import com.meakaandre.siftec.food.Food;
 import com.meakaandre.siftec.hub.Locks;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.node.NodePlacer;
@@ -39,6 +40,7 @@ public class Siftec implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(SpeedCap::recompute);
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> SpeedCap.value = 256);
         Backpack.register();
+        Food.register();
         Locks.register();
         Companies.register();
     }

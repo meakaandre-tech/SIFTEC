@@ -148,6 +148,9 @@ public final class SiftecCommands {
         }
         report(source, "SELFTEST recipes: " + ours + " SIFTEC recipes loaded; removed recipes gone " + steelGone
             + "; fluids " + com.meakaandre.siftec.fluid.ModFluids.ALL.keySet());
+        report(source, "SELFTEST food: " + com.meakaandre.siftec.food.Food.describe(source.getLevel(), net.minecraft.world.item.Items.GOLDEN_CARROT)
+            + "; " + com.meakaandre.siftec.food.Food.describe(source.getLevel(), net.minecraft.world.item.Items.PUMPKIN_PIE)
+            + "; " + com.meakaandre.siftec.food.Food.describe(source.getLevel(), net.minecraft.world.item.Items.BREAD));
         report(source, "SELFTEST hub: Create's speed limit now reads " + com.zurrtum.create.infrastructure.config.AllConfigs.server().kinetics.maxRotationSpeed.get());
         return 1;
     }

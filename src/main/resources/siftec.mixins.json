@@ -11,7 +11,8 @@
     "TunnelMixin",
     "RecipeMapMixin",
     "MenuInvoker",
-    "InventoryMenuMixin"
+    "InventoryMenuMixin",
+    "FoodPropertiesMixin"
   ],
   "client": [
     "client.ScreenAccessor",
