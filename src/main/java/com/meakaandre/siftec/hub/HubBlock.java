@@ -47,6 +47,28 @@ public class HubBlock extends Block implements EntityBlock {
         }
     }
 
+    /** The HUB Planner, used on the HUB, sets the building's box and reports on it. */
+    @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        if (gateway || !(stack.getItem() instanceof HubPlannerItem)) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!(player instanceof ServerPlayer server) || !(level.getBlockEntity(pos) instanceof HubBlockEntity hub)) return InteractionResult.SUCCESS;
+        BlockPos[] box = HubPlannerItem.box(stack);
+        if (box == null) {
+            server.sendOverlayMessage(Component.translatable("siftec.planner.how"));
+            return InteractionResult.SUCCESS;
+        }
+        hub.boxMin = box[0];
+        hub.boxMax = box[1];
+        hub.setChanged();
+        HubBuilding.Result result = hub.measure();
+        Company company = Companies.of(server);
+        int tier = Math.min(Milestones.TIERS - 1, Math.max(0, result.builtTier() + 1));
+        if (result.builtTier() == Milestones.TIERS - 1) tier = Milestones.TIERS - 1;
+        server.sendSystemMessage(Component.translatable("siftec.building.title", result.builtTier() < 0 ? Component.translatable("siftec.building.none") : Component.literal("Tier " + result.builtTier())));
+        for (Component line : result.report(tier)) server.sendSystemMessage(line);
+        return InteractionResult.SUCCESS;
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
@@ -63,7 +85,7 @@ public class HubBlock extends Block implements EntityBlock {
             server.sendOverlayMessage(Component.translatable("siftec.hub.not_yours", owner.name));
             return InteractionResult.SUCCESS;
         }
-        HubMenu.open(server, mine, gateway);
+        HubMenu.open(server, mine, gateway, gateway || server.hasInfiniteMaterials() ? Milestones.TIERS : hub.builtTier());
         return InteractionResult.SUCCESS;
     }
 }

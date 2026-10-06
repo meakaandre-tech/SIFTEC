@@ -33,6 +33,7 @@ public class ModItems {
     public static final Supplier<com.meakaandre.siftec.equip.ZiplineItem> ZIPLINE = item("zipline", properties -> new com.meakaandre.siftec.equip.ZiplineItem(properties.stacksTo(1)));
     public static final Supplier<Item> CARDBOARD_DRONE = item("cardboard_drone", properties -> new Item(properties.stacksTo(1)));
     public static final Supplier<com.meakaandre.siftec.blueprint.BlueprintItem> BLUEPRINT = item("blueprint", properties -> new com.meakaandre.siftec.blueprint.BlueprintItem(properties.stacksTo(1)));
+    public static final Supplier<com.meakaandre.siftec.hub.HubPlannerItem> HUB_PLANNER = item("hub_planner", properties -> new com.meakaandre.siftec.hub.HubPlannerItem(properties.stacksTo(1)));
     public static final Supplier<Item> RAW_BAUXITE = item("raw_bauxite", Item::new);
     public static final Supplier<Item> SAM = item("sam", Item::new);
 

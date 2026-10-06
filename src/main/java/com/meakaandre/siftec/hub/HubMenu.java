@@ -38,23 +38,26 @@ public class HubMenu extends ChestMenu {
     private final ServerPlayer player;
     private final Company company;
     private final boolean gateway;
+    /** The highest tier the HUB's building is good for. */
+    private final int built;
     private int tier;
     private int ticks;
 
-    private HubMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, boolean gateway) {
+    private HubMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, boolean gateway, int built) {
         super(MenuType.GENERIC_9x6, id, inventory, view, 6);
         this.view = view;
         this.player = player;
         this.company = company;
         this.gateway = gateway;
+        this.built = built;
         this.tier = firstUnfinishedTier();
         refresh();
     }
 
-    public static void open(ServerPlayer player, Company company, boolean gateway) {
+    public static void open(ServerPlayer player, Company company, boolean gateway, int built) {
         Component title = Component.translatable(gateway ? "siftec.gateway.title" : "siftec.hub.title", company.name);
         player.openMenu(new SimpleMenuProvider(
-            (id, inventory, p) -> new HubMenu(id, inventory, new SimpleContainer(SIZE), player, company, gateway), title));
+            (id, inventory, p) -> new HubMenu(id, inventory, new SimpleContainer(SIZE), player, company, gateway, built), title));
     }
 
     private int firstUnfinishedTier() {
@@ -180,6 +183,10 @@ public class HubMenu extends ChestMenu {
         }
         if (!m.isPhase() && lockTicks() > 0) {
             player.sendOverlayMessage(Component.translatable("siftec.hub.busy", clock(lockTicks())));
+            return;
+        }
+        if (!m.isPhase() && m.tier() > built) {
+            player.sendOverlayMessage(Component.translatable("siftec.building.needed", m.tier()));
             return;
         }
         company.active = m.id();

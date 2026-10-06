@@ -160,6 +160,20 @@ lang.update({"siftec.blueprint.how": "Build inside the frame above (%s blocks ea
              "siftec.blueprint.blocked": "Something is in the way at x %s, y %s, z %s", "siftec.blueprint.missing": "The blueprint needs %s more %s",
              "siftec.blueprint.confirm": "%s blocks would go in the green frame. Use the blueprint here again to build",
              "siftec.blueprint.built": "Built %s blocks"})
+lang["item.siftec.hub_planner"] = "HUB Planner"
+write(f"{A}/models/item/hub_planner.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/brush"}})
+item_def("hub_planner", "siftec:item/hub_planner")
+lang.update({"siftec.planner.first": "First corner set. Now click the opposite corner", "siftec.planner.second": "Area %s x %s x %s. Click the HUB with the planner to measure it",
+             "siftec.planner.cleared": "Planner cleared", "siftec.planner.how": "Click two opposite corners of the HUB building first, then the HUB",
+             "siftec.building.title": "HUB building: good for %s", "siftec.building.none": "no tier yet",
+             "siftec.building.hub_outside": "The HUB has to be inside the marked area", "siftec.building.too_big": "The marked area is too big: %s blocks, the limit is %s",
+             "siftec.building.blocks": "For Tier %s: %s of %s building blocks", "siftec.building.newest": "Newest material (%s): %s of %s",
+             "siftec.building.shelter": "Walls: %s of 2. Roof: %s", "siftec.building.ok": "Ready for Tier %s", "siftec.building.not_ok": "Not ready for Tier %s yet",
+             "siftec.building.needed": "The HUB building is too small for Tier %s. Build it up, then click the HUB with the HUB Planner",
+             "siftec.building.family.stone_wood": "logs, planks, stone bricks, polished stone, deepslate bricks, and any stairs, slabs, fences, walls and doors",
+             "siftec.building.family.andesite": "Andesite Casing or Block of Andesite Alloy",
+             "siftec.building.family.steel": "Block of Steel, Block of Industrial Iron or Block of Iron",
+             "siftec.building.family.copper": "Copper Casing or copper blocks", "siftec.building.family.brass": "Brass Casing, Block of Brass or Train Casing"})
 # Speed Governor: borrows the Gearshift's model until it has its own
 lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (your company's limit is %s)",
              "siftec.governor.set": "Set to %s RPM", "siftec.governor.over": "%s RPM: above your company's limit", "siftec.governor.step": "%s RPM"})

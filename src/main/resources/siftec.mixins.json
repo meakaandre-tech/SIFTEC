@@ -16,6 +16,8 @@
     "PumpMixin",
     "PumpBehaviourMixin",
     "ConnectionAccessor",
+    "SmartTankMixin",
+    "FluidTankMixin",
     "DisplayInvoker",
     "BlockDisplayInvoker",
     "KineticCapacityMixin",

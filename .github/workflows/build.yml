@@ -133,6 +133,16 @@ jobs:
                 case "$url" in http*) curl -fsSL -o "mods/$(basename "$url")" "$url" || echo "could not fetch $url";; esac
               done < $root/.github/smoke-pack-mods
             fi
+            # what is inside the pack's other mods: ids to write recipes against, and worldgen to switch off
+            mkdir -p /tmp/ci/pack
+            for j in mods/*.jar; do
+              case "$j" in *create-fly*|*fabric-api*) continue;; esac
+              b=$(basename "$j" .jar | tr -c 'A-Za-z0-9._-' '_')
+              unzip -Z1 "$j" | grep -E '^(data/|fabric.mod.json|[^/]*mixins.json|META-INF/jars/)' | grep -v '/advancement/\|/loot_table/' > "/tmp/ci/pack/$b.files.txt" || true
+              unzip -p "$j" fabric.mod.json > "/tmp/ci/pack/$b.mod.json" 2>/dev/null || true
+              unzip -p "$j" 'assets/*/lang/en_us.json' > "/tmp/ci/pack/$b.lang.json" 2>/dev/null || true
+              mkdir -p "/tmp/ci/pack/$b" && unzip -o -q "$j" 'data/*/worldgen/*' 'data/*/tags/worldgen/*' 'data/*/dimension/*' 'data/*/dimension_type/*' -d "/tmp/ci/pack/$b" 2>/dev/null || true
+            done
             jar=$(ls ../build/libs/*.jar | grep -v -e sources -e server | head -1)
             cp "$jar" mods/
             ls -l mods
