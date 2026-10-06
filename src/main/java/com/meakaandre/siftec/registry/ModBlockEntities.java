@@ -3,7 +3,10 @@ package com.meakaandre.siftec.registry;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlockEntity;
 import com.meakaandre.siftec.block.MinerBlockEntity;
+import com.meakaandre.siftec.depot.DepotBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
+import com.meakaandre.siftec.power.PoleBlockEntity;
+import com.meakaandre.siftec.power.StorageBlockEntity;
 import com.meakaandre.siftec.block.PortableMinerBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -39,6 +42,10 @@ public class ModBlockEntities {
     public static final Entry<ExtractorBlockEntity> EXTRACTOR = register("resource_well_extractor", ExtractorBlockEntity::new, ModBlocks.RESOURCE_WELL_EXTRACTOR.get());
 
     public static final Entry<HubBlockEntity> HUB = register("hub", HubBlockEntity::new, ModBlocks.HUB.get(), ModBlocks.WORMHOLE_GATEWAY.get());
+
+    public static final Entry<DepotBlockEntity> DEPOT = register("dimensional_depot", DepotBlockEntity::new, ModBlocks.DIMENSIONAL_DEPOT.get());
+    public static final Entry<PoleBlockEntity> POLE = register("power_pole", PoleBlockEntity::new, ModBlocks.POWER_POLE.get(), ModBlocks.POWER_TOWER.get());
+    public static final Entry<StorageBlockEntity> POWER_STORAGE = register("power_storage", StorageBlockEntity::new, ModBlocks.POWER_STORAGE.get());
 
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
         Entry<T> entry = new Entry<>();

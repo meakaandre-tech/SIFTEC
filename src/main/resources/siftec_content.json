@@ -280,7 +280,8 @@
         "create:encased_fan",
         "create:nozzle",
         "siftec:wire",
-        "siftec:cable"
+        "siftec:cable",
+        "siftec:power_line"
       ],
       "tokens": [
         "scanner:copper"
@@ -311,7 +312,8 @@
         "create:millstone",
         "create:basin",
         "siftec:screw",
-        "siftec:reinforced_iron_plate"
+        "siftec:reinforced_iron_plate",
+        "siftec:power_pole"
       ],
       "tokens": [
         "scanner:limestone"
@@ -1808,6 +1810,83 @@
         {
           "item": "siftec:iron_rod",
           "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:power_line",
+      "cost": [
+        {
+          "item": "siftec:cable",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "item": "siftec:power_pole",
+      "cost": [
+        {
+          "item": "siftec:wire",
+          "count": 1
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 1
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "item": "siftec:power_tower",
+      "cost": [
+        {
+          "item": "siftec:steel_beam",
+          "count": 5
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 10
+        },
+        {
+          "item": "siftec:wire",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:power_storage",
+      "cost": [
+        {
+          "item": "siftec:wire",
+          "count": 20
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:stator",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "item": "siftec:dimensional_depot",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 1
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 5
+        },
+        {
+          "item": "siftec:cable",
+          "count": 20
         }
       ]
     },

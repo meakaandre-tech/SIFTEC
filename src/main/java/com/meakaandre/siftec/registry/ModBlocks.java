@@ -3,7 +3,10 @@ package com.meakaandre.siftec.registry;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlock;
 import com.meakaandre.siftec.block.MinerBlock;
+import com.meakaandre.siftec.depot.DepotBlock;
 import com.meakaandre.siftec.hub.HubBlock;
+import com.meakaandre.siftec.power.PoleBlock;
+import com.meakaandre.siftec.power.StorageBlock;
 import com.meakaandre.siftec.workshop.WorkshopBlock;
 import com.meakaandre.siftec.block.MinerTier;
 import com.meakaandre.siftec.block.NodeBlock;
@@ -64,6 +67,11 @@ public class ModBlocks {
     public static final Supplier<HubBlock> WORMHOLE_GATEWAY = block("wormhole_gateway", properties -> new HubBlock(true, properties), ModBlocks::machine);
 
     public static final Supplier<WorkshopBlock> EQUIPMENT_WORKSHOP = block("equipment_workshop", WorkshopBlock::new, ModBlocks::machine);
+
+    public static final Supplier<DepotBlock> DIMENSIONAL_DEPOT = block("dimensional_depot", DepotBlock::new, ModBlocks::machine);
+    public static final Supplier<PoleBlock> POWER_POLE = block("power_pole", properties -> new PoleBlock(24, properties), ModBlocks::machine);
+    public static final Supplier<PoleBlock> POWER_TOWER = block("power_tower", properties -> new PoleBlock(64, properties), ModBlocks::machine);
+    public static final Supplier<StorageBlock> POWER_STORAGE = block("power_storage", StorageBlock::new, ModBlocks::machine);
 
     private static <T extends Block> Supplier<T> block(
         String name, Function<BlockBehaviour.Properties, T> factory, Supplier<BlockBehaviour.Properties> properties

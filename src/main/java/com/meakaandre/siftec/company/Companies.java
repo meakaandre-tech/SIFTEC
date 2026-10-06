@@ -47,6 +47,14 @@ public final class Companies {
                     .executes(context -> accept(context.getSource(), EntityArgument.getPlayer(context, "player")))))
                 .then(Commands.literal("leave").executes(context -> leave(context.getSource())))
         ));
+        // the cloud inventory can be opened from anywhere
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
+            Commands.literal("depot").executes(context -> {
+                ServerPlayer player = context.getSource().getPlayerOrException();
+                com.meakaandre.siftec.depot.DepotMenu.open(player, of(player));
+                return 1;
+            })
+        ));
     }
 
     /** The player's company; a one-person company is made the first time it is asked for. */

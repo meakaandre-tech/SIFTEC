@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "siftec:block/dimensional_depot"
+    }
+  }
+}

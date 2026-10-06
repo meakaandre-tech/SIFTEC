@@ -26,6 +26,8 @@ public class SiftecClient implements ClientModInitializer {
         BlockEntityRendererProvider<KineticBlockEntity, SingleKineticRenderState> shaft = ShaftRenderer::new;
         BlockEntityRendererRegistry.register(ModBlockEntities.MINER.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.EXTRACTOR.get(), shaft);
+        BlockEntityRendererRegistry.register(ModBlockEntities.POLE.get(), shaft);
+        BlockEntityRendererRegistry.register(ModBlockEntities.POWER_STORAGE.get(), shaft);
         // custom fluids borrow water's textures and are told apart by colour
         for (FluidEntry fluid : ModFluids.ALL.values()) {
             AllFluidConfigs.MODEL.put(fluid.still, new FluidModel.Unbaked(

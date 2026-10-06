@@ -2,6 +2,7 @@ package com.meakaandre.siftec.registry;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.item.NodeScannerItem;
+import com.meakaandre.siftec.power.PowerLineItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -17,6 +18,7 @@ import java.util.function.Supplier;
 
 public class ModItems {
     public static final Supplier<NodeScannerItem> NODE_SCANNER = item("node_scanner", properties -> new NodeScannerItem(properties.stacksTo(1)));
+    public static final Supplier<PowerLineItem> POWER_LINE = item("power_line", PowerLineItem::new);
     public static final Supplier<Item> RAW_BAUXITE = item("raw_bauxite", Item::new);
     public static final Supplier<Item> SAM = item("sam", Item::new);
 

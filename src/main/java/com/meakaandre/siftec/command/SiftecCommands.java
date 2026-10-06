@@ -88,6 +88,7 @@ public final class SiftecCommands {
                 continue;
             }
             BlockPos miner = pos.above().immutable();
+            if (type == NodeType.IRON) powerTest(source, level, miner.above(8), setup);
             if (setup) {
                 if (type == NodeType.IRON) {
                     level.setBlockAndUpdate(miner, ModBlocks.PORTABLE_MINER.get().defaultBlockState());
@@ -167,6 +168,29 @@ public final class SiftecCommands {
         report(source, "SELFTEST nether: " + node + " height " + y + " block "
             + (y == com.meakaandre.siftec.node.NodeSavedData.NO_HEIGHT ? "not placed" : level.getBlockState(new BlockPos(node.x(), y, node.z())).toString()));
         return 1;
+    }
+
+    /** A creative motor under one pole, a Power Line to a second pole, and a Power Storage under that one. */
+    private static void powerTest(CommandSourceStack source, ServerLevel level, BlockPos at, boolean setup) {
+        BlockPos poleA = at.above(), poleB = poleA.east(5), store = poleB.below();
+        if (setup) {
+            BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
+            if (motor.hasProperty(BlockStateProperties.FACING)) motor = motor.setValue(BlockStateProperties.FACING, Direction.UP);
+            level.setBlockAndUpdate(at, motor);
+            level.setBlockAndUpdate(poleA, ModBlocks.POWER_POLE.get().defaultBlockState());
+            level.setBlockAndUpdate(poleB, ModBlocks.POWER_POLE.get().defaultBlockState());
+            level.setBlockAndUpdate(store, ModBlocks.POWER_STORAGE.get().defaultBlockState());
+            if (level.getBlockEntity(poleA) instanceof com.meakaandre.siftec.power.PoleBlockEntity a
+                && level.getBlockEntity(poleB) instanceof com.meakaandre.siftec.power.PoleBlockEntity b) {
+                a.link(poleB);
+                b.link(poleA);
+            }
+            return;
+        }
+        String a = level.getBlockEntity(poleA) instanceof com.meakaandre.siftec.power.PoleBlockEntity p ? "speed " + p.getSpeed() + " lines " + p.lines.size() : "missing";
+        String b = level.getBlockEntity(poleB) instanceof com.meakaandre.siftec.power.PoleBlockEntity p ? "speed " + p.getSpeed() + " lines " + p.lines.size() : "missing";
+        String st = level.getBlockEntity(store) instanceof com.meakaandre.siftec.power.StorageBlockEntity e ? "speed " + e.getSpeed() + " stored " + e.stored + " mode " + e.mode : "missing";
+        report(source, "SELFTEST power: pole A " + a + "; pole B " + b + "; storage " + st);
     }
 
     private static void report(CommandSourceStack source, String text) {

@@ -25,6 +25,8 @@ public class Company {
     public String active = "";
     /** Overworld game time at which the HUB unlocks again. */
     public long lockUntil;
+    /** The Dimensional Depot cloud: item id -> count. */
+    public Map<String, Integer> cloud = new HashMap<>();
 
     public boolean has(String id) {
         return done.contains(id);
