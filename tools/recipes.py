@@ -226,11 +226,11 @@ def build():
     crafter("SAM Fluctuator", [(3, "Reanimated SAM"), (3, "Wire"), (2, "Steel Pipe")])
     saw("Ficsite Ingot", "Ficsite Trigon", 3)
     mix("biochemical_sculptor", items=["Assembly Director System"] + ["Ficsite Trigon"] * 4, fluids=[("water", 250)], results=["Biochemical Sculptor"], heated=True)
-    sequence("Crystal Oscillator", "Superposition Oscillator", ["Shadow Steel", "Alclad Aluminum Sheet", "Refined Radiance"], 2)
-    sequence("Supercomputer", "Neural-Quantum Processor", ["Time Crystal", "Ficsite Trigon", "Refined Radiance"], 3)
-    sequence("Magnetic Field Generator", "AI Expansion Server", ["Neural-Quantum Processor", "Superposition Oscillator", "Refined Radiance", "press"], 1)
-    crafter("Singularity Cell", [(1, "Nuclear Pasta"), (2, "Shadow Steel"), (3, "Iron Sheet"), (3, "Concrete")])
-    crafter("Ballistic Warp Drive", [(1, "Thermal Propulsion Rocket"), (3, "Singularity Cell"), (2, "Superposition Oscillator"), (3, "Shadow Steel")])
+    sequence("Crystal Oscillator", "Superposition Oscillator", ["Dark Matter Crystal", "Alclad Aluminum Sheet", "Excited Photonic Matter"], 2)
+    sequence("Supercomputer", "Neural-Quantum Processor", ["Time Crystal", "Ficsite Trigon", "Excited Photonic Matter"], 3)
+    sequence("Magnetic Field Generator", "AI Expansion Server", ["Neural-Quantum Processor", "Superposition Oscillator", "Excited Photonic Matter", "press"], 1)
+    crafter("Singularity Cell", [(1, "Nuclear Pasta"), (2, "Dark Matter Crystal"), (3, "Iron Sheet"), (3, "Concrete")])
+    crafter("Ballistic Warp Drive", [(1, "Thermal Propulsion Rocket"), (3, "Singularity Cell"), (2, "Superposition Oscillator"), (3, "Dark Matter Crystal")])
 
     # ---- MAM parts ----------------------------------------------------------------------------
     for drop in ("rotten_flesh", "bone", "string", "spider_eye"):
@@ -249,7 +249,7 @@ def build():
     crafter("Gas Filter", [(2, "Coal"), (1, "Rubber"), (1, "Fabric")])
     for colour, n in (("Blue", 1), ("Yellow", 2), ("Purple", 5)):
         press(colour + " Power Slug", "Power Shard", n, name="power_shard_from_" + colour.lower() + "_slug")
-    deploy("Time Crystal", "Shadow Steel", "Power Shard", name="synthetic_power_shard")
+    deploy("Time Crystal", "Dark Matter Crystal", "Power Shard", name="synthetic_power_shard")
     crush("Nether Quartz", "Silica", 2)
     add("sandpaper_polishing", "quartz_crystal", {"type": "create:sandpaper_polishing", "ingredient": item("Nether Quartz"), "result": res("Quartz Crystal")})
     crafter("Crystal Oscillator", [(4, "Quartz Crystal"), (3, "Cable"), (1, "Reinforced Iron Plate")])

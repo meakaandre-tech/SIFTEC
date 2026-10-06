@@ -28,7 +28,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "create:refined_radiance",
+      "ingredient": "siftec:excited_photonic_matter",
       "results": [
         "$result"
       ]

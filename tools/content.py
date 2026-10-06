@@ -10,7 +10,6 @@ ALIAS = {
     "Steel Ingot": "cgs:steel_ingot", "Sulfur": "cgs:sulfur",
     "Brass Ingot": "create:brass_ingot", "Brass Sheet": "create:brass_sheet",
     "Electron Tube": "create:electron_tube", "Precision Mechanism": "create:precision_mechanism",
-    "Refined Radiance": "create:refined_radiance", "Shadow Steel": "create:shadow_steel",
     "Diamond": "minecraft:diamond", "Nether Quartz": "minecraft:quartz",
     "Limestone": "create:limestone", "Raw Iron": "minecraft:raw_iron", "Raw Copper": "minecraft:raw_copper",
     "Raw Zinc": "create:raw_zinc", "Gunpowder": "minecraft:gunpowder", "Cardboard": "create:cardboard",
@@ -72,6 +71,8 @@ PARTS = [
     ("purple_power_slug", "Purple Power Slug", "minecraft:item/slime_ball", 0xC060FF),
     ("mercer_sphere", "Mercer Sphere", "minecraft:item/ender_pearl", 0xFF80C0), ("somersloop", "Somersloop", "minecraft:item/nautilus_shell", 0xFF6060),
     ("hard_drive", "Hard Drive", "minecraft:item/music_disc_11", None),
+    ("excited_photonic_matter", "Excited Photonic Matter", "minecraft:item/glowstone_dust", 0xFFFFFF),
+    ("dark_matter_crystal", "Dark Matter Crystal", "minecraft:item/amethyst_shard", 0x402060),
     # half-built parts on a Quantum Encoder line
     ("incomplete_superposition_oscillator", "Incomplete Superposition Oscillator", "minecraft:item/clock_00", 0x808080),
     ("incomplete_neural_quantum_processor", "Incomplete Neural-Quantum Processor", "minecraft:item/ender_eye", 0x808080),

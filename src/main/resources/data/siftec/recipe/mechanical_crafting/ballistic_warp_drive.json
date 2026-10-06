@@ -4,7 +4,7 @@
     "A": "siftec:thermal_propulsion_rocket",
     "B": "siftec:singularity_cell",
     "C": "siftec:superposition_oscillator",
-    "D": "create:shadow_steel"
+    "D": "siftec:dark_matter_crystal"
   },
   "pattern": [
     "ABB",

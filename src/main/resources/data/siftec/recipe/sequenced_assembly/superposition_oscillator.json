@@ -12,7 +12,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "create:shadow_steel",
+      "ingredient": "siftec:dark_matter_crystal",
       "results": [
         "$result"
       ]
@@ -28,7 +28,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "create:refined_radiance",
+      "ingredient": "siftec:excited_photonic_matter",
       "results": [
         "$result"
       ]

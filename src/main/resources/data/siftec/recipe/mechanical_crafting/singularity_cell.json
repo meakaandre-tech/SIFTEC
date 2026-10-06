@@ -2,7 +2,7 @@
   "type": "create:mechanical_crafting",
   "key": {
     "A": "siftec:nuclear_pasta",
-    "B": "create:shadow_steel",
+    "B": "siftec:dark_matter_crystal",
     "C": "create:iron_sheet",
     "D": "minecraft:light_gray_concrete"
   },
