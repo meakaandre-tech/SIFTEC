@@ -426,6 +426,8 @@ WORKSHOP = [
     ("siftec:parachute", "10 Fabric, 5 Cable"),
     ("siftec:gas_mask", "50 Rubber, 100 Plastic, 50 Fabric"),
     ("siftec:radar_tower", "10 Heavy Modular Frame, 10 Crystal Oscillator, 50 Cable"),
+    ("siftec:blueprint_designer", "4 Modular Frame, 25 Cable, 100 Concrete"),
+    ("siftec:blueprint_designer_mk3", "10 Fused Modular Frame, 5 Neural-Quantum Processor, 100 Concrete"),
     ("siftec:drone_port", "20 Heavy Modular Frame, 10 High-Speed Connector, 50 Alclad Aluminum Sheet, 50 Aluminum Casing, 10 Radio Control Unit"),
     ("siftec:cardboard_drone", "8 Cardboard, 4 Motor, 10 Alclad Aluminum Sheet, 1 Radio Control Unit, 2 AI Limiter"),
     ("siftec:main_portal", "25 Turbo Motor, 25 Radio Control Unit, 15 Superposition Oscillator, 20 SAM Fluctuator, 200 Ficsite Trigon"),

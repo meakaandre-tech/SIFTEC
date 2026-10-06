@@ -4256,6 +4256,40 @@
       ]
     },
     {
+      "item": "siftec:blueprint_designer",
+      "cost": [
+        {
+          "item": "siftec:modular_frame",
+          "count": 4
+        },
+        {
+          "item": "siftec:cable",
+          "count": 25
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 100
+        }
+      ]
+    },
+    {
+      "item": "siftec:blueprint_designer_mk3",
+      "cost": [
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:neural_quantum_processor",
+          "count": 5
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 100
+        }
+      ]
+    },
+    {
       "item": "siftec:drone_port",
       "cost": [
         {

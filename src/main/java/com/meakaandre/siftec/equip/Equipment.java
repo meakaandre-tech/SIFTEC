@@ -68,7 +68,9 @@ public final class Equipment {
             SUIT_UNTIL.clear();
             Poles.clear();
             Ziplines.clear();
+            com.meakaandre.siftec.blueprint.DesignerBlockEntity.clear();
         });
+        FLIGHT_ZONES.add(com.meakaandre.siftec.blueprint.DesignerBlockEntity::inside);
         FLIGHT_ZONES.add(player -> wearing(player, EquipmentSlot.CHEST, ModItems.HOVER_PACK.get())
             && Poles.near(player.level(), player.getX(), player.getY(), player.getZ(), HOVER_RANGE));
     }

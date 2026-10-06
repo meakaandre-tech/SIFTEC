@@ -120,7 +120,7 @@ public class DronePortBlockEntity extends BlockEntity {
         if (shown == null || shown.isRemoved()) {
             Display.BlockDisplay display = net.minecraft.world.entity.EntityTypes.BLOCK_DISPLAY.create(server, EntitySpawnReason.TRIGGERED);
             if (display == null) return;
-            ((BlockDisplayInvoker) display).siftec$show(BuiltInRegistries.BLOCK.getOptional(Identifier.parse("create:cardboard_block")).orElse(Blocks.BROWN_WOOL).defaultBlockState());
+            ((BlockDisplayInvoker) display).siftec$show(BuiltInRegistries.BLOCK.getOptional(Identifier.parse("create:cardboard_block")).orElse(Blocks.OAK_PLANKS).defaultBlockState());
             ((DisplayInvoker) display).siftec$glide(2);
             display.setPos(x, y, z);
             server.addFreshEntity(display);
