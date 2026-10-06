@@ -7,6 +7,8 @@ import java.util.Set;
 public final class ClientState {
     public static volatile Set<String> done;
     public static volatile int backpackSlots;
+    /** The company's speed limit in RPM. */
+    public static volatile int speedLimit = 32;
 
     private ClientState() {
     }
@@ -14,6 +16,6 @@ public final class ClientState {
     public static void accept(StatePayload payload) {
         done = new HashSet<>(payload.done());
         backpackSlots = com.meakaandre.siftec.backpack.Backpack.unlocked(done);
-        com.meakaandre.siftec.tweak.SpeedCap.value = payload.speedCap();
+        speedLimit = payload.speedCap();
     }
 }

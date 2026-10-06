@@ -32,7 +32,7 @@ import java.util.List;
  * nodes. Clicking a node delivers parts; once it is paid for, its research time starts. One node at a time.
  */
 public class MamMenu extends ChestMenu {
-    private static final int SIZE = 54, STATUS_SLOT = 17, FIRST_NODE = 28;
+    private static final int SIZE = 54, STATUS_SLOT = 17, FIRST_NODE = 27;
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final Company company;
@@ -91,7 +91,7 @@ public class MamMenu extends ChestMenu {
             : Component.translatable("siftec.mam.running", running.name(), clock(company.researchEnd - now())).withStyle(ChatFormatting.GOLD), List.of(), false));
         if (tree >= trees.size()) return;
         List<Milestone> nodes = trees.get(tree).nodes();
-        for (int i = 0; i < nodes.size() && i < 7; i++) view.setItem(FIRST_NODE + i, nodeButton(nodes.get(i)));
+        for (int i = 0; i < nodes.size() && i < 9; i++) view.setItem(FIRST_NODE + i, nodeButton(nodes.get(i)));
     }
 
     private ItemStack nodeButton(Milestone m) {

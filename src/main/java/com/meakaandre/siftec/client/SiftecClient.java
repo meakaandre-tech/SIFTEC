@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.resources.Identifier;
 import com.meakaandre.siftec.net.StatePayload;
-import com.meakaandre.siftec.tweak.SpeedCap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -30,6 +29,11 @@ public class SiftecClient implements ClientModInitializer {
         BlockEntityRendererRegistry.register(ModBlockEntities.PROCESSOR.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.GEYSER_ENGINE.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.POWER_STORAGE.get(), shaft);
+        // the Speed Governor's two shaft halves turn at different speeds, like a Gearshift's
+        BlockEntityRendererProvider<com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity,
+            com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer.SplitShaftRenderState> split =
+            com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer::new;
+        BlockEntityRendererRegistry.register(ModBlockEntities.GOVERNOR.get(), split);
         // custom fluids borrow water's textures and are told apart by colour
         for (FluidEntry fluid : ModFluids.ALL.values()) {
             AllFluidConfigs.MODEL.put(fluid.still, new FluidModel.Unbaked(
@@ -41,7 +45,6 @@ public class SiftecClient implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
             ClientState.backpackSlots = 0;
-            SpeedCap.value = 256;
         });
     }
 }

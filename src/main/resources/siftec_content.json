@@ -1309,35 +1309,6 @@
       ]
     },
     {
-      "id": "geothermal_power",
-      "tier": 8,
-      "cost": [
-        {
-          "item": "siftec:supercomputer",
-          "count": 50
-        },
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 200
-        },
-        {
-          "item": "siftec:cable",
-          "count": 1000
-        },
-        {
-          "item": "minecraft:light_gray_concrete",
-          "count": 2000
-        }
-      ],
-      "seconds": 600,
-      "items": [
-        "siftec:geyser_engine",
-        "siftec:electromagnetic_control_rod",
-        "siftec:magnetic_field_generator"
-      ],
-      "tokens": []
-    },
-    {
       "id": "advanced_aluminum_production",
       "tier": 8,
       "cost": [
@@ -1364,7 +1335,8 @@
         "siftec:empty_fluid_tank",
         "siftec:heat_sink",
         "siftec:cooling_system",
-        "siftec:fused_modular_frame"
+        "siftec:fused_modular_frame",
+        "siftec:electromagnetic_control_rod"
       ],
       "tokens": [
         "scanner:nitrogen"
@@ -1391,7 +1363,8 @@
       "items": [
         "siftec:miner_mk3",
         "siftec:turbo_motor",
-        "siftec:thermal_propulsion_rocket"
+        "siftec:thermal_propulsion_rocket",
+        "siftec:magnetic_field_generator"
       ],
       "tokens": []
     },
@@ -1684,6 +1657,7 @@
     "create:blaze_cake_base",
     "create:creative_blaze_cake",
     "create:chromatic_compound",
+    "create:rotation_speed_controller",
     "create:schematic_table",
     "create:schematicannon",
     "create:empty_schematic",
@@ -1770,7 +1744,8 @@
         "mam_sulfur_4",
         "mam_sulfur_5",
         "mam_sulfur_6",
-        "mam_sulfur_7"
+        "mam_sulfur_7",
+        "mam_sulfur_8"
       ]
     },
     {
@@ -2005,7 +1980,7 @@
         "create:gearshift",
         "create:sequenced_gearshift",
         "create:adjustable_chain_gearshift",
-        "create:rotation_speed_controller"
+        "siftec:speed_governor"
       ],
       "tokens": [],
       "needs": [
@@ -2705,6 +2680,32 @@
       ]
     },
     {
+      "id": "mam_sulfur_8",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "cgs:sulfur",
+          "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:supercomputer",
+          "count": 5
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:geyser_engine"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_2"
+      ]
+    },
+    {
       "id": "mam_alien_1",
       "tree": "alien",
       "cost": [
@@ -3146,6 +3147,109 @@
       "color": 13643824
     }
   ],
+  "recipe_locks": {
+    "siftec:cutting/wire": "hub_upgrade_2",
+    "siftec:compacting/cable": "hub_upgrade_2",
+    "siftec:cutting/screw": "hub_upgrade_3",
+    "siftec:deploying/reinforced_iron_plate": "hub_upgrade_3",
+    "siftec:milling/biomass_from_leaves": "hub_upgrade_6",
+    "siftec:milling/biomass_from_logs": "hub_upgrade_6",
+    "siftec:milling/biomass_from_wheat_seeds": "hub_upgrade_6",
+    "siftec:milling/biomass_from_beetroot_seeds": "hub_upgrade_6",
+    "siftec:milling/biomass_from_melon_seeds": "hub_upgrade_6",
+    "siftec:milling/biomass_from_pumpkin_seeds": "hub_upgrade_6",
+    "siftec:milling/biomass_from_kelp": "hub_upgrade_6",
+    "siftec:milling/biomass_from_sugar_cane": "hub_upgrade_6",
+    "siftec:milling/biomass_from_cactus": "hub_upgrade_6",
+    "siftec:milling/biomass_from_short_grass": "hub_upgrade_6",
+    "siftec:deploying/rotor": "part_assembly",
+    "siftec:deploying/modular_frame": "part_assembly",
+    "siftec:deploying/smart_plating": "part_assembly",
+    "siftec:compacting/solid_biofuel": "obstacle_clearing",
+    "siftec:crafting/wire_by_hand": "hub_upgrade_2",
+    "siftec:crafting/cable_by_hand": "hub_upgrade_2",
+    "siftec:crafting/screw_by_hand": "hub_upgrade_3",
+    "siftec:crafting/reinforced_iron_plate_by_hand": "hub_upgrade_3",
+    "siftec:crafting/rotor_by_hand": "part_assembly",
+    "siftec:crafting/modular_frame_by_hand": "part_assembly",
+    "siftec:crafting/smart_plating_by_hand": "part_assembly",
+    "siftec:crafting/solid_biofuel_by_hand": "obstacle_clearing",
+    "siftec:mixing/steel_ingot": "basic_steel_production",
+    "siftec:pressing/steel_beam": "basic_steel_production",
+    "siftec:cutting/steel_pipe": "basic_steel_production",
+    "siftec:deploying/versatile_framework": "basic_steel_production",
+    "siftec:deploying/encased_industrial_beam": "advanced_steel_production",
+    "siftec:deploying/stator": "advanced_steel_production",
+    "siftec:deploying/motor": "advanced_steel_production",
+    "siftec:deploying/automated_wiring": "advanced_steel_production",
+    "siftec:mixing/plastic": "oil_processing",
+    "siftec:mixing/rubber": "oil_processing",
+    "siftec:compacting/petroleum_coke": "oil_processing",
+    "siftec:deploying/circuit_board": "oil_processing",
+    "siftec:pressing/canister": "fluid_packaging",
+    "siftec:mechanical_crafting/computer": "industrial_manufacturing",
+    "siftec:mechanical_crafting/heavy_modular_frame": "industrial_manufacturing",
+    "siftec:mechanical_crafting/modular_engine": "industrial_manufacturing",
+    "siftec:mechanical_crafting/adaptive_control_unit": "industrial_manufacturing",
+    "siftec:crushing/crushed_bauxite": "bauxite_refinement",
+    "siftec:mixing/alumina_solution": "mam_quartz_2",
+    "siftec:mixing/aluminum_scrap": "bauxite_refinement",
+    "siftec:mixing/aluminum_ingot": "bauxite_refinement",
+    "siftec:deploying/alclad_aluminum_sheet": "bauxite_refinement",
+    "siftec:pressing/aluminum_casing": "bauxite_refinement",
+    "siftec:mechanical_crafting/radio_control_unit": "bauxite_refinement",
+    "siftec:mechanical_crafting/iodine_infused_filter": "hazmat_suit",
+    "siftec:mechanical_crafting/supercomputer": "aeronautical_engineering",
+    "siftec:deploying/assembly_director_system": "aeronautical_engineering",
+    "siftec:deploying/electromagnetic_control_rod": "advanced_aluminum_production",
+    "siftec:deploying/magnetic_field_generator": "leading_edge_production",
+    "siftec:cutting/empty_fluid_tank": "advanced_aluminum_production",
+    "siftec:deploying/heat_sink": "advanced_aluminum_production",
+    "siftec:mixing/cooling_system": "advanced_aluminum_production",
+    "siftec:mixing/fused_modular_frame": "advanced_aluminum_production",
+    "siftec:mechanical_crafting/turbo_motor": "leading_edge_production",
+    "siftec:mechanical_crafting/thermal_propulsion_rocket": "leading_edge_production",
+    "siftec:crushing/copper_powder": "particle_enrichment",
+    "siftec:compacting/pressure_conversion_cube": "particle_enrichment",
+    "siftec:haunting/reanimated_sam": "matter_conversion",
+    "siftec:mechanical_crafting/sam_fluctuator": "matter_conversion",
+    "siftec:cutting/ficsite_trigon": "matter_conversion",
+    "siftec:mixing/biochemical_sculptor": "matter_conversion",
+    "seq:superposition_oscillator": "quantum_encoding",
+    "seq:neural_quantum_processor": "quantum_encoding",
+    "seq:ai_expansion_server": "quantum_encoding",
+    "siftec:mechanical_crafting/singularity_cell": "spatial_energy_regulation",
+    "siftec:mechanical_crafting/ballistic_warp_drive": "spatial_energy_regulation",
+    "siftec:milling/biomass_from_rotten_flesh": "hub_upgrade_6",
+    "siftec:compacting/dna_capsule_from_rotten_flesh": "mam_megafauna_2",
+    "siftec:milling/biomass_from_bone": "hub_upgrade_6",
+    "siftec:compacting/dna_capsule_from_bone": "mam_megafauna_2",
+    "siftec:milling/biomass_from_string": "hub_upgrade_6",
+    "siftec:compacting/dna_capsule_from_string": "mam_megafauna_2",
+    "siftec:milling/biomass_from_spider_eye": "hub_upgrade_6",
+    "siftec:compacting/dna_capsule_from_spider_eye": "mam_megafauna_2",
+    "siftec:mixing/brass_blend_with_sand": "mam_caterium_1",
+    "siftec:mixing/brass_blend_with_coal": "mam_caterium_1",
+    "siftec:mixing/brass_blend_with_sulfur": "mam_caterium_1",
+    "siftec:smelting/brass_ingot_from_blend": "mam_caterium_1",
+    "siftec:blasting/brass_ingot_from_blend": "mam_caterium_1",
+    "siftec:cutting/quickwire": "mam_caterium_2",
+    "siftec:deploying/ai_limiter": "mam_caterium_4",
+    "siftec:mechanical_crafting/high_speed_connector": "mam_caterium_7",
+    "siftec:deploying/fabric_from_brown_mushroom": "mam_mycelia_2",
+    "siftec:milling/biomass_from_brown_mushroom": "hub_upgrade_6",
+    "siftec:deploying/fabric_from_red_mushroom": "mam_mycelia_2",
+    "siftec:milling/biomass_from_red_mushroom": "hub_upgrade_6",
+    "siftec:mechanical_crafting/gas_filter": "mam_mycelia_5",
+    "siftec:pressing/power_shard_from_blue_slug": "mam_slugs_1",
+    "siftec:pressing/power_shard_from_yellow_slug": "mam_slugs_1",
+    "siftec:pressing/power_shard_from_purple_slug": "mam_slugs_1",
+    "siftec:deploying/synthetic_power_shard": "mam_slugs_1",
+    "siftec:crushing/silica": "mam_quartz_2",
+    "siftec:sandpaper_polishing/quartz_crystal": "mam_quartz_1",
+    "siftec:mechanical_crafting/crystal_oscillator": "mam_quartz_4",
+    "siftec:compacting/compacted_coal": "mam_sulfur_6"
+  },
   "removed_recipes": [
     "cgs:mixing/steel_ingot",
     "create:mixing/brass_ingot",
@@ -3340,6 +3444,23 @@
         {
           "item": "siftec:stator",
           "count": 5
+        }
+      ]
+    },
+    {
+      "item": "siftec:speed_governor",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 25
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 2
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 2
         }
       ]
     },

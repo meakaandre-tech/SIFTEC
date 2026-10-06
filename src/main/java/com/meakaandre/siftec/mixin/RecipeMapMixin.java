@@ -40,4 +40,11 @@ public abstract class RecipeMapMixin {
         map.byType = types.build();
         map.byKey = keys.build();
     }
+
+    /** A machine is only offered the recipes its company has unlocked. */
+    @Inject(method = "getRecipesFor", at = @At("RETURN"), cancellable = true)
+    private void siftec$locked(CallbackInfoReturnable<java.util.stream.Stream<RecipeHolder<?>>> cir) {
+        if (com.meakaandre.siftec.owner.Ownership.ticking() == null) return;
+        cir.setReturnValue(cir.getReturnValue().filter(holder -> !com.meakaandre.siftec.owner.RecipeLocks.blocked(holder)));
+    }
 }

@@ -77,7 +77,8 @@ public class ModBlocks {
 
     public static final Supplier<DepotBlock> DIMENSIONAL_DEPOT = block("dimensional_depot", DepotBlock::new, ModBlocks::machine);
     public static final Supplier<PoleBlock> POWER_POLE = block("power_pole", properties -> new PoleBlock(24, properties), ModBlocks::machine);
-    public static final Supplier<PoleBlock> POWER_TOWER = block("power_tower", properties -> new PoleBlock(64, properties), ModBlocks::machine);
+    public static final Supplier<PoleBlock> POWER_TOWER = block("power_tower", properties -> new PoleBlock(256, properties), ModBlocks::machine);
+    public static final Supplier<com.meakaandre.siftec.governor.GovernorBlock> SPEED_GOVERNOR = block("speed_governor", com.meakaandre.siftec.governor.GovernorBlock::new, ModBlocks::machine);
     public static final Supplier<StorageBlock> POWER_STORAGE = block("power_storage", StorageBlock::new, ModBlocks::machine);
 
     public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);

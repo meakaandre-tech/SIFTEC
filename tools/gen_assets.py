@@ -120,6 +120,14 @@ for b, (name, casing) in MACHINES.items():
         "top": "create:block/gearbox_top", "side": casing, "bottom": casing}})
     item_def(b, f"siftec:block/{b}")
 
+# Speed Governor: borrows the Gearshift's model until it has its own
+lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (your company's limit is %s)",
+             "siftec.governor.set": "Set to %s RPM", "siftec.governor.over": "%s RPM: above your company's limit", "siftec.governor.step": "%s RPM"})
+write(f"{A}/blockstates/speed_governor.json", {"variants": {
+    "axis=x": {"model": "create:block/gearshift/block", "x": 90, "y": 90}, "axis=y": {"model": "create:block/gearshift/block"},
+    "axis=z": {"model": "create:block/gearshift/block", "x": 90, "y": 180}}})
+item_def("speed_governor", "create:block/gearshift/item")
+
 write(f"{A}/blockstates/portable_miner.json", {"variants": {"": {"model": "siftec:block/portable_miner"}}})
 def box(frm, to, tex):
     return {"from": frm, "to": to, "faces": {f: {"texture": tex} for f in ("north", "south", "east", "west", "up", "down")}}
@@ -269,6 +277,24 @@ for path, body in recipes.build().items():
     if mods:
         body = {"fabric:load_conditions": [{"condition": "fabric:all_mods_loaded", "values": mods}], **body}
     write(f"{D}/recipe/{path}.json", body)
+# ---- which milestone a machine's company needs before the machine will run each recipe
+lock_of = {}
+for m in data["milestones"] + data["milestones_mam"]:
+    for i in m["items"]:
+        lock_of.setdefault(i, m["id"])
+data["recipe_locks"] = {}
+for path, body in recipes.build().items():
+    made = list(body.get("results", []))
+    if "result" in body: made.append(body["result"])
+    for r in made:
+        rid = r if isinstance(r, str) else r.get("id", "")
+        mid = lock_of.get(rid) or lock_of.get(rid + "_bucket")
+        if mid:
+            # the steps of a sequenced assembly get ids of their own, built from the result's name
+            key = "seq:" + rid.split(":")[1] if body["type"] == "create:sequenced_assembly" else "siftec:" + path
+            data["recipe_locks"][key] = mid
+            break
+print("recipes locked to a milestone:", len(data["recipe_locks"]), "of", len(recipes.build()))
 data["removed_recipes"] = recipes.REMOVED
 data["workshop"] = [{"item": i, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]} for i, cost in recipes.WORKSHOP]
 lang.update({"block.siftec.equipment_workshop": "Equipment Workshop", "siftec.workshop.title": "Equipment Workshop",
@@ -313,7 +339,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # miners drop themselves
-for b in ("geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage"):
+for b in ("geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage", "speed_governor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -321,4 +347,4 @@ for b in ("geyser_engine", "claim_marker", "portable_miner", "miner_mk1", "miner
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})

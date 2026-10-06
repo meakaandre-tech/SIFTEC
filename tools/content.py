@@ -132,7 +132,7 @@ MILESTONES = [
     (2, "resource_sink_bonus_program", "Resource Sink Bonus Program", "400 Concrete, 500 Wire, 200 Iron Rod, 200 Iron Sheet", "5:00",
      "AWESOME Sink and AWESOME Shop", ["siftec:awesome_sink", "siftec:awesome_shop"], []),
     (2, "logistics_mk2", "Logistics Mk.2", "50 Reinforced Iron Plate, 200 Concrete, 300 Iron Rod, 300 Iron Sheet", "6:00",
-     "Speed cap raised from 32 to 64 RPM", [], ["cap:64"]),
+     "Company speed limit raised from 32 to 64 RPM", [], ["cap:64"]),
 
     (3, "coal_power", "Coal Power", "150 Reinforced Iron Plate, 50 Rotor, 500 Cable", "8:00",
      "Steam Engine, Blaze Burner, pipes, pumps and tanks, coal nodes on the scanner",
@@ -150,7 +150,7 @@ MILESTONES = [
     (4, "ficsit_blueprints", "FICSIT Blueprints", "100 Modular Frame, 200 Steel Beam, 500 Cable, 1000 Concrete", "5:00",
      "Blueprint Designer Mk.1", ["siftec:blueprint_designer"], []),
     (4, "logistics_mk3", "Logistics Mk.3", "200 Steel Beam, 200 Steel Pipe, 400 Reinforced Iron Plate", "5:00",
-     "Speed cap raised to 96 RPM", [], ["cap:96"]),
+     "Company speed limit raised to 96 RPM", [], ["cap:96"]),
     (4, "advanced_steel_production", "Advanced Steel Production", "100 Steel Pipe, 200 Rotor, 100 Modular Frame, 500 Concrete", "10:00",
      "Miner Mk.2, Crushing Wheels, Encased Industrial Beam, Stator, Motor, Automated Wiring",
      ["siftec:miner_mk2", C + "crushing_wheel", "siftec:encased_industrial_beam", "siftec:stator", "siftec:motor", "siftec:automated_wiring"], []),
@@ -170,7 +170,7 @@ MILESTONES = [
       "createdieselgenerators:pumpjack_hole", "createdieselgenerators:distillation_controller", "createdieselgenerators:distillation_tank",
       C + "fluid_valve", "siftec:plastic", "siftec:rubber", "siftec:petroleum_coke", "siftec:circuit_board"], ["scanner:oil"]),
     (5, "logistics_mk4", "Logistics Mk.4", "50 Heavy Modular Frame, 100 Computer, 200 Encased Industrial Beam, 400 Rubber", "15:00",
-     "Speed cap raised to 128 RPM", [], ["cap:128"]),
+     "Company speed limit raised to 128 RPM", [], ["cap:128"]),
     (5, "fluid_packaging", "Fluid Packaging", "200 Plastic, 400 Steel Beam, 1000 Copper Sheet", "8:00",
      "Packager (Spout and Item Drain), canisters, Liquid Biofuel",
      [C + "spout", C + "item_drain", C + "portable_fluid_interface", "createdieselgenerators:canister"], []),
@@ -193,7 +193,7 @@ MILESTONES = [
      ["siftec:crushed_bauxite", "siftec:aluminum_scrap", "siftec:aluminum_ingot", "siftec:alclad_aluminum_sheet", "siftec:aluminum_casing",
       "siftec:radio_control_unit"], ["scanner:bauxite"]),
     (7, "logistics_mk5", "Logistics Mk.5", "100 Alclad Aluminum Sheet, 200 Encased Industrial Beam, 300 Reinforced Iron Plate", "1:00",
-     "Speed cap raised to 192 RPM", [], ["cap:192"]),
+     "Company speed limit raised to 192 RPM", [], ["cap:192"]),
     (7, "hazmat_suit", "Hazmat Suit", "50 Aluminum Casing, 500 Quickwire, 50 Gas Filter", "5:00",
      "Iodine Infused Filter, +3 backpack slots", ["siftec:iodine_infused_filter"], ["backpack"]),
     (7, "hover_pack", "Hover Pack", "200 Motor, 100 Heavy Modular Frame, 100 Computer, 200 Alclad Aluminum Sheet", "5:00",
@@ -203,14 +203,13 @@ MILESTONES = [
      "Drone Port and Cardboard Drone, Create's package network, Supercomputer, Assembly Director System, sulfur nodes on the scanner",
      ["siftec:drone_port", "siftec:cardboard_drone", C + "packager", C + "package_frogport", C + "repackager", C + "stock_link", C + "stock_ticker",
       C + "redstone_requester", C + "factory_gauge", C + "chain_conveyor", "siftec:supercomputer", "siftec:assembly_director_system"], ["scanner:sulfur"]),
-    (8, "geothermal_power", "Geothermal Power", "50 Supercomputer, 200 Heavy Modular Frame, 1000 Cable, 2000 Concrete", "10:00",
-     "Geyser Engine, Electromagnetic Control Rod, Magnetic Field Generator",
-     ["siftec:geyser_engine", "siftec:electromagnetic_control_rod", "siftec:magnetic_field_generator"], []),
     (8, "advanced_aluminum_production", "Advanced Aluminum Production", "50 Radio Control Unit, 200 Aluminum Casing, 200 Alclad Aluminum Sheet, 300 Wire", "15:00",
-     "Resource Well extractor, Heat Sink, Cooling System, Fused Modular Frame, nitrogen nodes on the scanner",
-     ["siftec:resource_well_extractor", "siftec:empty_fluid_tank", "siftec:heat_sink", "siftec:cooling_system", "siftec:fused_modular_frame"], ["scanner:nitrogen"]),
+     "Resource Well extractor, Heat Sink, Cooling System, Fused Modular Frame, Electromagnetic Control Rod, nitrogen nodes on the scanner",
+     ["siftec:resource_well_extractor", "siftec:empty_fluid_tank", "siftec:heat_sink", "siftec:cooling_system", "siftec:fused_modular_frame",
+      "siftec:electromagnetic_control_rod"], ["scanner:nitrogen"]),
     (8, "leading_edge_production", "Leading-edge Production", "50 Fused Modular Frame, 100 Supercomputer, 1000 Steel Pipe", "5:00",
-     "Miner Mk.3, Turbo Motor, Thermal Propulsion Rocket", ["siftec:miner_mk3", "siftec:turbo_motor", "siftec:thermal_propulsion_rocket"], []),
+     "Miner Mk.3, Turbo Motor, Thermal Propulsion Rocket, Magnetic Field Generator",
+     ["siftec:miner_mk3", "siftec:turbo_motor", "siftec:thermal_propulsion_rocket", "siftec:magnetic_field_generator"], []),
     (8, "particle_enrichment", "Particle Enrichment", "400 Electromagnetic Control Rod, 400 Cooling System, 200 Fused Modular Frame, 100 Turbo Motor", "20:00",
      "Particle Accelerator, Copper Powder, Pressure Conversion Cube, Nuclear Pasta",
      ["siftec:particle_accelerator", "siftec:copper_powder", "siftec:pressure_conversion_cube", "siftec:nuclear_pasta"], []),
@@ -228,12 +227,12 @@ MILESTONES = [
      "Main Portal and Satellite Portal, Singularity Cell, Ballistic Warp Drive",
      ["siftec:main_portal", "siftec:satellite_portal", "siftec:singularity_cell", "siftec:ballistic_warp_drive"], []),
     (9, "peak_efficiency", "Peak Efficiency", "250 Time Crystal, 250 Ficsite Trigon, 1000 Alclad Aluminum Sheet, 2000 Iron Sheet", "20:00",
-     "Speed cap raised to 256 RPM", [], ["cap:256"]),
+     "Company speed limit raised to 256 RPM", [], ["cap:256"]),
 ]
 
 # Switched off for good: they can be neither crafted nor placed.
 DISABLED = [C + "water_wheel", C + "large_water_wheel", C + "blaze_cake", C + "blaze_cake_base", C + "creative_blaze_cake",
-            C + "chromatic_compound", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill"]
+            C + "chromatic_compound", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill"]
 
 # Wormhole phases, delivered at the Wormhole Gateway. Phase n opens the tiers listed.
 PHASES = [
@@ -283,8 +282,8 @@ MAM = [
         ("Caterium Electronics", "50 Quickwire", "2:00", "Electron Tube, Precision Mechanism, Brass Funnel, Brass Tunnel, Smart Chute, filters", [2],
          [C + "electron_tube", C + "precision_mechanism", C + "brass_funnel", C + "brass_tunnel", C + "smart_chute", C + "filter", C + "attribute_filter"], []),
         ("AI Limiter", "100 Quickwire, 50 Copper Sheet", "3:00", "AI Limiter, Mechanical Arm", [3], ["siftec:ai_limiter", C + "mechanical_arm"], []),
-        ("Power Switch", "50 Quickwire, 25 Rotor", "2:00", "Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Rotation Speed Controller", [2],
-         [C + "clutch", C + "gearshift", C + "sequenced_gearshift", C + "adjustable_chain_gearshift", C + "rotation_speed_controller"], []),
+        ("Power Switch", "50 Quickwire, 25 Rotor", "2:00", "Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Speed Governor", [2],
+         [C + "clutch", C + "gearshift", C + "sequenced_gearshift", C + "adjustable_chain_gearshift", "siftec:speed_governor"], []),
         ("Zipline", "100 Quickwire, 50 Cable", "2:00", "Zipline", [2], ["siftec:zipline"], []),
         ("High-Speed Connector", "500 Quickwire, 25 Plastic", "5:00", "High-Speed Connector", [4], ["siftec:high_speed_connector"], []),
     ]),
@@ -330,6 +329,7 @@ MAM = [
         ("Heavy Weapons", "100 Gunpowder, 25 Motor, 10 Encased Industrial Beam", "5:00", "Gatling and Launcher", [4], ["cgs:gatling", "cgs:launcher"], []),
         ("Compacted Coal", "25 Coal, 25 Sulfur", "2:00", "Compacted Coal", [1], ["siftec:compacted_coal"], []),
         ("Turbofuel", "15 Compacted Coal, 20 createdieselgenerators:diesel_bucket", "5:00", "Turbofuel", [6], ["siftec:turbofuel_bucket"], []),
+        ("Geothermal Power", "50 Sulfur, 10 Heavy Modular Frame, 5 Supercomputer", "5:00", "Geyser Engine", [2], ["siftec:geyser_engine"], []),
     ]),
     ("alien", "Alien Technology", "siftec:mercer_sphere", [
         ("Mercer Sphere Analysis", "1 Mercer Sphere", "1:00", "The Object Scanner can find Mercer Spheres", [], [], ["object:mercer_sphere"]),

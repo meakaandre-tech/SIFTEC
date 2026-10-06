@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import java.util.ArrayList;
 import java.util.List;
 
-/** What a client needs to know about its player's company: the speed cap and what is unlocked. */
+/** What a client needs to know about its player's company: its speed limit and what is unlocked. */
 public record StatePayload(int speedCap, List<String> done) implements CustomPacketPayload {
     public static final Type<StatePayload> TYPE = new Type<>(Siftec.id("state"));
     public static final StreamCodec<RegistryFriendlyByteBuf, StatePayload> STREAM_CODEC =

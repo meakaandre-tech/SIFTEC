@@ -299,6 +299,7 @@ WORKSHOP = [
     ("siftec:power_pole", "1 Wire, 1 Iron Rod, 1 Concrete"),
     ("siftec:power_tower", "5 Steel Beam, 10 Concrete, 10 Wire"),
     ("siftec:power_storage", "20 Wire, 10 Modular Frame, 5 Stator"),
+    ("siftec:speed_governor", "25 Quickwire, 2 Rotor, 2 Reinforced Iron Plate"),
     ("siftec:dimensional_depot", "1 Mercer Sphere, 5 Modular Frame, 20 Cable"),
     ("siftec:geyser_engine", "20 Heavy Modular Frame, 10 Supercomputer, 50 Steel Pipe, 20 Rubber"),
     ("siftec:awesome_sink", "15 Reinforced Iron Plate, 30 Cable, 45 Concrete"),

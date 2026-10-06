@@ -89,6 +89,7 @@ public final class SiftecCommands {
             }
             BlockPos miner = pos.above().immutable();
             if (type == NodeType.IRON) powerTest(source, level, miner.above(8), setup);
+            if (type == NodeType.IRON) ownerTest(source, level, miner.above(16), setup);
             if (setup) {
                 if (type == NodeType.IRON) {
                     level.setBlockAndUpdate(miner, ModBlocks.PORTABLE_MINER.get().defaultBlockState());
@@ -194,6 +195,67 @@ public final class SiftecCommands {
         String b = level.getBlockEntity(poleB) instanceof com.meakaandre.siftec.power.PoleBlockEntity p ? "speed " + p.getSpeed() + " lines " + p.lines.size() : "missing";
         String st = level.getBlockEntity(store) instanceof com.meakaandre.siftec.power.StorageBlockEntity e ? "speed " + e.getSpeed() + " stored " + e.stored + " mode " + e.mode : "missing";
         report(source, "SELFTEST power: pole A " + a + "; pole B " + b + "; storage " + st);
+    }
+
+    /**
+     * Used by the automated test. Two columns, each a creative motor over a Speed Governor over a shaft. In the
+     * first everything belongs to a company whose limit is 64 RPM; in the second the shaft belongs to a company
+     * still at 32, so the governor feeding it 64 should break.
+     */
+    private static void ownerTest(CommandSourceStack source, ServerLevel level, BlockPos at, boolean setup) {
+        var data = com.meakaandre.siftec.company.CompanyData.get(source.getServer());
+        BlockPos[] governors = {at, at.east(3)};
+        if (setup) {
+            Company fast = new Company(), slow = new Company();
+            fast.id = "selftest_fast";
+            slow.id = "selftest_slow";
+            for (Milestone m : Milestones.all()) if (m.tokens().contains("cap:64")) fast.done.add(m.id());
+            data.companies().put(fast.id, fast);
+            data.companies().put(slow.id, slow);
+            BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
+            if (motor.hasProperty(BlockStateProperties.FACING)) motor = motor.setValue(BlockStateProperties.FACING, Direction.DOWN);
+            BlockState shaft = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:shaft")).defaultBlockState();
+            if (shaft.hasProperty(BlockStateProperties.AXIS)) shaft = shaft.setValue(BlockStateProperties.AXIS, Direction.Axis.Y);
+            StringBuilder said = new StringBuilder();
+            for (int i = 0; i < 2; i++) {
+                BlockPos pos = governors[i];
+                level.setBlockAndUpdate(pos.above(), motor);
+                level.setBlockAndUpdate(pos, ModBlocks.SPEED_GOVERNOR.get().defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.Y));
+                level.setBlockAndUpdate(pos.below(), shaft);
+                BlockEntity below = level.getBlockEntity(pos.below());
+                if (below != null) below.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, i == 0 ? fast.id : slow.id);
+                if (level.getBlockEntity(pos) instanceof com.meakaandre.siftec.governor.GovernorBlockEntity governor) {
+                    governor.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, fast.id);
+                    governor.setTarget(48);
+                    said.append(" set 48 -> ").append(governor.target());
+                    governor.setTarget(200);
+                    said.append(", set 200 -> ").append(governor.target()).append(" (limit ").append(governor.limit()).append(");");
+                }
+            }
+            report(source, "SELFTEST owner setup:" + said);
+            return;
+        }
+        for (int i = 0; i < 2; i++) {
+            BlockPos pos = governors[i];
+            String shaft = level.getBlockEntity(pos.below()) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k
+                ? "shaft speed " + k.getSpeed() + " owner " + k.getAttached(com.meakaandre.siftec.owner.Ownership.OWNER) : "shaft missing";
+            report(source, "SELFTEST owner " + (i == 0 ? "same company" : "slower company below") + ": governor is "
+                + BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()) + "; " + shaft);
+        }
+        // a locked recipe: refused for the company with nothing, allowed once the milestone is done
+        BlockEntity machine = level.getBlockEntity(governors[0].below());
+        Company fast = data.byId("selftest_fast");
+        for (var holder : source.getServer().getRecipeManager().getRecipes()) {
+            String lock = com.meakaandre.siftec.owner.RecipeLocks.lockOf(source.getServer(), holder.value());
+            if (lock == null || machine == null || fast == null) continue;
+            boolean before = com.meakaandre.siftec.owner.RecipeLocks.blocked(machine, holder.value());
+            fast.done.add(lock);
+            boolean after = com.meakaandre.siftec.owner.RecipeLocks.blocked(machine, holder.value());
+            fast.done.remove(lock);
+            report(source, "SELFTEST owner recipes: " + com.meakaandre.siftec.owner.RecipeLocks.count(source.getServer()) + " locked; "
+                + holder.id().identifier() + " needs " + lock + "; blocked before " + before + ", after unlocking " + after);
+            break;
+        }
     }
 
     private static void report(CommandSourceStack source, String text) {
