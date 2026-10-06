@@ -9,7 +9,8 @@
   "environment": "*",
   "entrypoints": {
     "main": ["com.meakaandre.siftec.Siftec"],
-    "client": ["com.meakaandre.siftec.client.SiftecClient"]
+    "client": ["com.meakaandre.siftec.client.SiftecClient"],
+    "jei_mod_plugin": ["com.meakaandre.siftec.client.jei.SiftecJeiPlugin"]
   },
   "mixins": ["siftec.mixins.json", "siftec.cdg.mixins.json"],
   "depends": {

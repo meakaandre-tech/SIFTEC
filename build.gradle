@@ -11,6 +11,11 @@ base {
 
 repositories {
     mavenCentral()
+    // JEI's API, for the plugin that marks locked recipes
+    exclusiveContent {
+        forRepository { maven { url = "https://maven.blamejared.com" } }
+        filter { includeGroup "mezz.jei" }
+    }
 }
 
 dependencies {
@@ -20,6 +25,8 @@ dependencies {
 
     // Create Fly, built from the pack-26.3 branch of the fork and downloaded by CI into libs/
     compileOnly files("libs/create-fly-26.3.jar")
+    // the same JEI build Create Fly compiles against; only needed to compile, JEI itself is optional in game
+    compileOnly("mezz.jei:jei-26.1.2-fabric:29.6.2.31") { transitive = false }
 
 }
 

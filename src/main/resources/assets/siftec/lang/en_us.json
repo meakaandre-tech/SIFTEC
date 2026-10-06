@@ -431,6 +431,7 @@
   "siftec.line.full": "A pole takes at most %s lines",
   "siftec.line.joined": "Poles joined",
   "siftec.line.too_far": "Too far: these poles reach %s blocks",
+  "siftec.lock.alt": "Locked: an alternate recipe from a Hard Drive (%s)",
   "siftec.lock.disabled": "Switched off in this pack",
   "siftec.lock.item": "Locked: needs %s",
   "siftec.mam.busy": "Already researching %s",
