@@ -103,6 +103,13 @@ public final class NodePlacer {
 
                 int y = ground(level, x, z, pos);
                 if (y == Integer.MIN_VALUE) continue;
+                // in a lake or the sea: build rock up from the bed so the node stands just above the water
+                int filled = 0;
+                while (filled < 48 && !level.getFluidState(pos.set(x, y + 1, z)).isEmpty()) {
+                    level.setBlock(pos.set(x, y, z), rock, Block.UPDATE_CLIENTS);
+                    y++;
+                    filled++;
+                }
                 boolean core = dx == 0 && dz == 0;
                 boolean centre = r < 1.5;
                 int roll = (int) ((h >>> 8) % 100);
