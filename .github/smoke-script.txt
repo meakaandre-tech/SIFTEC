@@ -1,0 +1,20 @@
+cmd time set noon
+cmd weather clear
+cmd tp @a 150.5 140 -80.5 -90 35
+sleep 8
+shot
+cmd tp @a 153.5 138.2 -80.5 -90 20
+sleep 4
+shot
+cmd tp @a 83.5 50 55.5 -90 30
+sleep 8
+shot
+cmd give @a siftec:node_scanner
+cmd give @a siftec:miner_mk1
+cmd give @a siftec:portable_miner
+cmd give @a siftec:iron_node
+sleep 2
+key e
+sleep 2
+shot
+key Escape
