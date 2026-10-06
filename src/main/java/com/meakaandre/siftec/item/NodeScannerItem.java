@@ -49,8 +49,9 @@ public class NodeScannerItem extends Item {
             player.sendOverlayMessage(Component.translatable("siftec.scanner.selected", Component.translatable(type.key())));
             return InteractionResult.SUCCESS;
         }
-        if (!NodeMap.hasNodes(level)) {
-            player.sendOverlayMessage(Component.translatable("siftec.scanner.no_nodes"));
+        if (type.dimension() != level.dimension()) {
+            player.sendOverlayMessage(Component.translatable("siftec.scanner.elsewhere", Component.translatable(type.key()),
+                Component.translatable(type.dimension() == Level.NETHER ? "siftec.dimension.nether" : "siftec.dimension.overworld")));
             return InteractionResult.SUCCESS;
         }
         Optional<Node> found = NodeMap.nearest(server, player.getX(), player.getZ(), type, RANGE);
@@ -61,7 +62,7 @@ public class NodeScannerItem extends Item {
         Node node = found.get();
         int distance = (int) Math.round(node.distanceTo(player.getX(), player.getZ()));
         player.sendOverlayMessage(Component.translatable(
-            "siftec.scanner.found", NodeBlock.label(type, found), distance,
+            node.y() == Node.SURFACE ? "siftec.scanner.found" : "siftec.scanner.found_cave", NodeBlock.label(type, found), distance,
             Component.translatable("siftec.direction." + direction(node.x() - player.getX(), node.z() - player.getZ())),
             node.x(), node.z()
         ));

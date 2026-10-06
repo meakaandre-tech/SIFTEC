@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.registry;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.block.ExtractorBlock;
 import com.meakaandre.siftec.block.MinerBlock;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.workshop.WorkshopBlock;
@@ -52,7 +53,12 @@ public class ModBlocks {
     }
 
     public static final Supplier<PortableMinerBlock> PORTABLE_MINER = block("portable_miner", PortableMinerBlock::new, ModBlocks::machine);
+    /** The middle of an oil pool: the one block a Pumpjack can stand on. */
+    public static final Supplier<NodeBlock> OIL_WELL = block("oil_well", properties -> new NodeBlock(NodeType.OIL, properties), ModBlocks::node);
     public static final Supplier<MinerBlock> MINER_MK1 = block("miner_mk1", properties -> new MinerBlock(MinerTier.MK1, properties), ModBlocks::machine);
+    public static final Supplier<MinerBlock> MINER_MK2 = block("miner_mk2", properties -> new MinerBlock(MinerTier.MK2, properties), ModBlocks::machine);
+    public static final Supplier<MinerBlock> MINER_MK3 = block("miner_mk3", properties -> new MinerBlock(MinerTier.MK3, properties), ModBlocks::machine);
+    public static final Supplier<ExtractorBlock> RESOURCE_WELL_EXTRACTOR = block("resource_well_extractor", ExtractorBlock::new, ModBlocks::machine);
 
     public static final Supplier<HubBlock> HUB = block("hub", properties -> new HubBlock(false, properties), ModBlocks::machine);
     public static final Supplier<HubBlock> WORMHOLE_GATEWAY = block("wormhole_gateway", properties -> new HubBlock(true, properties), ModBlocks::machine);

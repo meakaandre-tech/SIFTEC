@@ -49,7 +49,7 @@ public class NodeBlock extends Block {
         BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit
     ) {
         if (level instanceof ServerLevel server) {
-            Optional<Node> node = NodeMap.near(server, pos.getX(), pos.getZ(), NodePlacer.RADIUS);
+            Optional<Node> node = NodeMap.near(server, pos.getX(), pos.getZ(), NodePlacer.RADIUS, type);
             player.sendOverlayMessage(label(type, node));
         }
         return InteractionResult.SUCCESS;

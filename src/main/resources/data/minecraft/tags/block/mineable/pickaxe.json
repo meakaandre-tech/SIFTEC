@@ -3,6 +3,9 @@
   "values": [
     "siftec:portable_miner",
     "siftec:miner_mk1",
+    "siftec:miner_mk2",
+    "siftec:miner_mk3",
+    "siftec:resource_well_extractor",
     "siftec:hub",
     "siftec:wormhole_gateway",
     "siftec:equipment_workshop"

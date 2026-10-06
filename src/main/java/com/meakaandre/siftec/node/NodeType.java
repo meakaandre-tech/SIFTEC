@@ -1,27 +1,33 @@
 package com.meakaandre.siftec.node;
 
+import com.meakaandre.siftec.company.Company;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 import java.util.Locale;
 
-/**
- * The ore nodes. Oil, nitrogen, quartz and sulfur are not in this list yet: they need their own extractors
- * and (for the last two) rules for the Nether and the sulfur caves.
- */
+/** Every kind of node, where it appears, and what comes out of it. */
 public enum NodeType {
-    //       weight, where,            output item,                   distance from spawn before it can appear
+    //       weight, where,     what a miner makes ("" for fluids),  how far from spawn before it can appear
     IRON(30, Where.ANY, "minecraft:raw_iron", 0),
     COPPER(30, Where.ANY, "minecraft:raw_copper", 0),
     LIMESTONE(30, Where.ANY, "create:limestone", 0),
     COAL(20, Where.ANY, "minecraft:coal", 0),
     ZINC(10, Where.HILLS, "create:raw_zinc", 0),
+    OIL(10, Where.OILY, "", 0),
     BAUXITE(6, Where.HOT, "siftec:raw_bauxite", 0),
-    SAM(2, Where.ANY, "siftec:sam", 3000);
+    NITROGEN(6, Where.COLD, "", 0),
+    SAM(2, Where.ANY, "siftec:sam", 3000),
+    /** The Nether's only node. */
+    QUARTZ(1, Where.NETHER, "minecraft:quartz", 0),
+    /** Only inside sulfur caves, underground. */
+    SULFUR(1, Where.SULFUR_CAVE, "cgs:sulfur", 0);
 
-    public enum Where {ANY, HILLS, HOT}
+    public enum Where {ANY, HILLS, HOT, COLD, OILY, NETHER, SULFUR_CAVE}
 
     public final int weight;
     public final Where where;
@@ -32,7 +38,7 @@ public enum NodeType {
     NodeType(int weight, Where where, String output, int minDistance) {
         this.weight = weight;
         this.where = where;
-        this.outputId = Identifier.parse(output);
+        this.outputId = output.isEmpty() ? null : Identifier.parse(output);
         this.minDistance = minDistance;
     }
 
@@ -44,16 +50,25 @@ public enum NodeType {
         return "siftec.node." + id();
     }
 
-    /** The item a miner produces. Air if the mod that owns it is missing. */
+    public ResourceKey<Level> dimension() {
+        return where == Where.NETHER ? Level.NETHER : Level.OVERWORLD;
+    }
+
+    /** Oil and nitrogen come out as fluid, through a Pumpjack or a Resource Well Extractor. */
+    public boolean isFluid() {
+        return outputId == null;
+    }
+
+    /** The item a miner produces. Air for fluid nodes, or if the mod that owns the item is missing. */
     public Item output() {
         if (output == null) {
-            output = BuiltInRegistries.ITEM.getOptional(outputId).orElse(Items.AIR);
+            output = outputId == null ? Items.AIR : BuiltInRegistries.ITEM.getOptional(outputId).orElse(Items.AIR);
         }
         return output;
     }
 
     /** Iron is on the scanner from the start; the others are added by milestones. */
-    public boolean onScanner(com.meakaandre.siftec.company.Company company) {
+    public boolean onScanner(Company company) {
         return this == IRON || company == null || company.hasToken("scanner:" + id());
     }
 

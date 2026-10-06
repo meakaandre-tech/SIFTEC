@@ -25,6 +25,7 @@ public class SiftecClient implements ClientModInitializer {
         // the miner's input: a vertical shaft through the block, turning with the network
         BlockEntityRendererProvider<KineticBlockEntity, SingleKineticRenderState> shaft = ShaftRenderer::new;
         BlockEntityRendererRegistry.register(ModBlockEntities.MINER.get(), shaft);
+        BlockEntityRendererRegistry.register(ModBlockEntities.EXTRACTOR.get(), shaft);
         // custom fluids borrow water's textures and are told apart by colour
         for (FluidEntry fluid : ModFluids.ALL.values()) {
             AllFluidConfigs.MODEL.put(fluid.still, new FluidModel.Unbaked(

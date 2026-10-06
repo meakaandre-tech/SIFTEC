@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/quartz_node"
+    },
+    "core=true": {
+      "model": "siftec:block/quartz_node_core"
+    }
+  }
+}

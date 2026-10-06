@@ -1186,8 +1186,7 @@
         "siftec:radio_control_unit"
       ],
       "tokens": [
-        "scanner:bauxite",
-        "scanner:quartz"
+        "scanner:bauxite"
       ]
     },
     {
@@ -1809,6 +1808,73 @@
         {
           "item": "siftec:iron_rod",
           "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:miner_mk2",
+      "cost": [
+        {
+          "item": "siftec:portable_miner",
+          "count": 2
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 10
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 20
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:miner_mk3",
+      "cost": [
+        {
+          "item": "siftec:portable_miner",
+          "count": 3
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 50
+        },
+        {
+          "item": "siftec:supercomputer",
+          "count": 5
+        },
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:turbo_motor",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "item": "siftec:resource_well_extractor",
+      "cost": [
+        {
+          "item": "siftec:aluminum_casing",
+          "count": 20
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 20
+        },
+        {
+          "item": "siftec:motor",
+          "count": 10
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 50
         }
       ]
     }

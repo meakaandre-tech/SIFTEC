@@ -49,7 +49,8 @@ public final class SiftecCommands {
                 .then(Commands.literal("selftest")
                     .then(Commands.literal("setup").executes(context -> selfTest(context, true)))
                     .then(Commands.literal("check").executes(context -> selfTest(context, false)))
-                    .then(Commands.literal("hub").executes(SiftecCommands::hubTest)))
+                    .then(Commands.literal("hub").executes(SiftecCommands::hubTest))
+                    .then(Commands.literal("nether").executes(SiftecCommands::netherTest)))
         ));
     }
 
@@ -147,6 +148,22 @@ public final class SiftecCommands {
         report(source, "SELFTEST recipes: " + ours + " SIFTEC recipes loaded; removed recipes gone " + steelGone
             + "; fluids " + com.meakaandre.siftec.fluid.ModFluids.ALL.keySet());
         report(source, "SELFTEST hub: Create's speed limit now reads " + com.zurrtum.create.infrastructure.config.AllConfigs.server().kinetics.maxRotationSpeed.get());
+        return 1;
+    }
+
+    /** Used by the automated test: reports the block at the middle of the nearest quartz node. */
+    private static int netherTest(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ServerLevel level = source.getLevel();
+        Optional<Node> found = NodeMap.nearest(level, 150, 150, NodeType.QUARTZ, 8);
+        if (found.isEmpty()) {
+            report(source, "SELFTEST nether: no quartz node");
+            return 0;
+        }
+        Node node = found.get();
+        int y = com.meakaandre.siftec.node.NodeSavedData.get(source.getServer()).height(node.key());
+        report(source, "SELFTEST nether: " + node + " height " + y + " block "
+            + (y == com.meakaandre.siftec.node.NodeSavedData.NO_HEIGHT ? "not placed" : level.getBlockState(new BlockPos(node.x(), y, node.z())).toString()));
         return 1;
     }
 

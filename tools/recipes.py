@@ -285,4 +285,7 @@ WORKSHOP = [
     ("siftec:miner_mk1", "1 siftec:portable_miner, 10 Iron Sheet, 10 Concrete"),
     ("siftec:wormhole_gateway", "500 Concrete, 250 Iron Sheet, 400 Iron Rod, 1500 Wire"),
     ("siftec:hub", "10 Iron Sheet, 10 Iron Rod"),
+    ("siftec:miner_mk2", "2 siftec:portable_miner, 10 Encased Industrial Beam, 20 Steel Pipe, 10 Modular Frame"),
+    ("siftec:miner_mk3", "3 siftec:portable_miner, 50 Steel Pipe, 5 Supercomputer, 10 Fused Modular Frame, 3 Turbo Motor"),
+    ("siftec:resource_well_extractor", "20 Aluminum Casing, 20 Encased Industrial Beam, 10 Motor, 50 Rubber"),
 ]

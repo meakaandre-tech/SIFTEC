@@ -23,8 +23,7 @@ public final class Mining {
         if (!(level instanceof ServerLevel server)) return Optional.empty();
         BlockState below = level.getBlockState(pos.below());
         if (!(below.getBlock() instanceof NodeBlock node) || !below.getValue(NodeBlock.CORE)) return Optional.empty();
-        Optional<Node> found = NodeMap.near(server, pos.getX(), pos.getZ(), 0);
-        return found.filter(n -> n.type() == node.type);
+        return NodeMap.near(server, pos.getX(), pos.getZ(), 0, node.type);
     }
 
     /** Adds one item to the output slot. False if it is full. */

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/oil_node"
+    },
+    "core=true": {
+      "model": "siftec:block/oil_node_core"
+    }
+  }
+}

@@ -28,8 +28,12 @@ NODES = {  # id: (display name, texture)
     "limestone": ("Limestone", "create:block/palettes/stone_types/limestone"),
     "coal": ("Coal", "minecraft:block/coal_block"),
     "zinc": ("Zinc Ore", "create:block/raw_zinc_block"),
+    "oil": ("Crude Oil", "minecraft:block/black_concrete"),
     "bauxite": ("Bauxite", "minecraft:block/granite"),
+    "nitrogen": ("Nitrogen Gas", "minecraft:block/calcite"),
     "sam": ("SAM", "minecraft:block/amethyst_block"),
+    "quartz": ("Nether Quartz", "minecraft:block/quartz_block_side"),
+    "sulfur": ("Sulfur", "minecraft:block/yellow_concrete_powder"),
 }
 lang = {
     "itemGroup.siftec": "SIFTEC",
@@ -46,7 +50,9 @@ lang = {
     "siftec.scanner.selected": "Scanning for: %s",
     "siftec.scanner.found": "%s: %s blocks %s (x %s, z %s)",
     "siftec.scanner.none": "No %s node in range",
-    "siftec.scanner.no_nodes": "There are no nodes in this dimension",
+    "siftec.scanner.elsewhere": "%s nodes are in %s",
+    "siftec.scanner.found_cave": "%s: %s blocks %s, underground (x %s, z %s)",
+    "siftec.dimension.nether": "the Nether", "siftec.dimension.overworld": "the Overworld",
     "siftec.command.found": "%s at x %s, z %s (%s blocks away)",
     "siftec.command.unknown_type": "Unknown node type",
 }
@@ -72,11 +78,20 @@ for id, (name, tex) in NODES.items():
           "textures": {"top": "minecraft:block/lodestone_top", "side": tex, "bottom": tex}})
     item_def(b, f"siftec:block/{b}")
 
-# miners
-write(f"{A}/blockstates/miner_mk1.json", {"variants": {"": {"model": "siftec:block/miner_mk1"}}})
-write(f"{A}/models/block/miner_mk1.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
-    "top": "create:block/gearbox_top", "side": "create:block/andesite_casing", "bottom": "create:block/andesite_casing"}})
-item_def("miner_mk1", "siftec:block/miner_mk1")
+# the middle of an oil pool
+write(f"{A}/blockstates/oil_well.json", {"variants": {"": {"model": "siftec:block/oil_node_core"}}})
+item_def("oil_well", "siftec:block/oil_node_core")
+lang["block.siftec.oil_well"] = "Oil Well"
+
+# miners and the extractor: Create casings until real models are picked
+MACHINES = {"miner_mk1": ("Miner Mk.1", "create:block/andesite_casing"), "miner_mk2": ("Miner Mk.2", "create:block/copper_casing"),
+            "miner_mk3": ("Miner Mk.3", "create:block/brass_casing"), "resource_well_extractor": ("Resource Well Extractor", "create:block/railway_casing")}
+for b, (name, casing) in MACHINES.items():
+    lang[f"block.siftec.{b}"] = name
+    write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
+    write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
+        "top": "create:block/gearbox_top", "side": casing, "bottom": casing}})
+    item_def(b, f"siftec:block/{b}")
 
 write(f"{A}/blockstates/portable_miner.json", {"variants": {"": {"model": "siftec:block/portable_miner"}}})
 def box(frm, to, tex):
@@ -196,10 +211,12 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # miners drop themselves
-for b in ("portable_miner", "miner_mk1"):
+for b in ("portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 # pickaxe is the right tool for the miners
+# a Pumpjack hole only counts an Oil Well as the bottom of its pipe
+write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})

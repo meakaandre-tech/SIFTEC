@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/sulfur_node"
+    },
+    "core=true": {
+      "model": "siftec:block/sulfur_node_core"
+    }
+  }
+}

@@ -2,7 +2,7 @@ package com.meakaandre.siftec.block;
 
 /** Miner marks. A higher mark gets more out of the same rotation. */
 public enum MinerTier {
-    MK1(1280, 4f);
+    MK1(1280, 4f), MK2(640, 8f), MK3(320, 16f);
 
     /**
      * Rotation needed per item on a normal node: every tick adds the shaft's RPM.

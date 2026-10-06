@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "core=false": {
+      "model": "siftec:block/nitrogen_node"
+    },
+    "core=true": {
+      "model": "siftec:block/nitrogen_node_core"
+    }
+  }
+}

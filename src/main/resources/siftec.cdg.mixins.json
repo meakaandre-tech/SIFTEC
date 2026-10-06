@@ -1,0 +1,8 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.meakaandre.siftec.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": ["OilChunksMixin"],
+  "injectors": {"defaultRequire": 0}
+}

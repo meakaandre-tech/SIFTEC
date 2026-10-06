@@ -191,7 +191,7 @@ MILESTONES = [
     (7, "bauxite_refinement", "Bauxite Refinement", "50 Computer, 100 Heavy Modular Frame, 200 Motor, 500 Rubber", "10:00",
      "Aluminium chain and Radio Control Unit, bauxite nodes on the scanner",
      ["siftec:crushed_bauxite", "siftec:aluminum_scrap", "siftec:aluminum_ingot", "siftec:alclad_aluminum_sheet", "siftec:aluminum_casing",
-      "siftec:radio_control_unit"], ["scanner:bauxite", "scanner:quartz"]),
+      "siftec:radio_control_unit"], ["scanner:bauxite"]),
     (7, "logistics_mk5", "Logistics Mk.5", "100 Alclad Aluminum Sheet, 200 Encased Industrial Beam, 300 Reinforced Iron Plate", "1:00",
      "Speed cap raised to 192 RPM", [], ["cap:192"]),
     (7, "hazmat_suit", "Hazmat Suit", "50 Aluminum Casing, 500 Quickwire, 50 Gas Filter", "5:00",
