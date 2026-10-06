@@ -232,7 +232,7 @@ MILESTONES = [
 
 # Switched off for good: they can be neither crafted nor placed.
 DISABLED = [C + "water_wheel", C + "large_water_wheel", C + "blaze_cake", C + "blaze_cake_base", C + "creative_blaze_cake",
-            C + "chromatic_compound", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill"]
+            "the_sift:sift_portal", "the_sift:sift_rift", C + "chromatic_compound", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill"]
 
 # Wormhole phases, delivered at the Wormhole Gateway. Phase n opens the tiers listed.
 PHASES = [

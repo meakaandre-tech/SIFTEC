@@ -1645,6 +1645,8 @@
     "create:blaze_cake",
     "create:blaze_cake_base",
     "create:creative_blaze_cake",
+    "the_sift:sift_portal",
+    "the_sift:sift_rift",
     "create:chromatic_compound",
     "create:rotation_speed_controller",
     "create:schematic_table",

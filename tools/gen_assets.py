@@ -194,6 +194,7 @@ lang["block.siftec.steel_casing"] = "Steel Casing"
 write(f"{A}/blockstates/steel_casing.json", {"variants": {"": {"model": "siftec:block/steel_casing"}}})
 write(f"{A}/models/block/steel_casing.json", {"parent": "minecraft:block/cube_all", "textures": {"all": "create:block/railway_casing"}})
 item_def("steel_casing", "siftec:block/steel_casing")
+lang.update({"siftec.lock.disabled": "Switched off in this pack", "siftec.blueprint.turned": "Blueprint turned to %s degrees"})
 # Speed Governor: borrows the Gearshift's model until it has its own
 lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (your company's limit is %s)",
              "siftec.governor.set": "Set to %s RPM", "siftec.governor.over": "%s RPM: above your company's limit", "siftec.governor.step": "%s RPM"})

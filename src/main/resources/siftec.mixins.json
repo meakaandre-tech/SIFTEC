@@ -16,7 +16,6 @@
     "PumpMixin",
     "PumpBehaviourMixin",
     "ConnectionAccessor",
-    "BlazeBurnerMixin",
     "CrafterMixin",
     "ProcessingOutputMixin",
     "SiftEntryMixin",

@@ -42,6 +42,15 @@ public class SiftecClient implements ClientModInitializer {
             int color = 0xFF000000 | fluid.color;
             AllFluidConfigs.tint(fluid.still, (f, components) -> color);
         }
+        // every locked item says, in red, what unlocks it: in the inventory and in recipe viewers alike
+        net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {
+            com.meakaandre.siftec.hub.Milestone lock = com.meakaandre.siftec.hub.Locks.lockOf(stack.getItem());
+            java.util.Set<String> done = ClientState.done;
+            if (lock == null || (done != null && done.contains(lock.id()))) return;
+            lines.add(lock == com.meakaandre.siftec.hub.Locks.DISABLED
+                ? net.minecraft.network.chat.Component.translatable("siftec.lock.disabled").withStyle(net.minecraft.ChatFormatting.RED)
+                : net.minecraft.network.chat.Component.translatable("siftec.lock.item", lock.name()).withStyle(net.minecraft.ChatFormatting.RED));
+        });
         ClientPlayNetworking.registerGlobalReceiver(StatePayload.TYPE, (payload, context) -> ClientState.accept(payload));
         ClientPlayNetworking.registerGlobalReceiver(com.meakaandre.siftec.equip.JetFuelPayload.TYPE, (payload, context) -> ClientState.jetFuel = payload.ok());
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(JetpackClient::tick);

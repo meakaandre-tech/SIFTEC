@@ -60,6 +60,8 @@ public final class Equipment {
         // carriers and drones are only ever drawn for something in flight; one read back from disk is left over from a restart
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
             if (entity.entityTags().contains(Ziplines.TAG)) level.getServer().execute(entity::discard);
+            // The Sift's own rifts are switched off outside The Sift: the wormhole is the only way in
+            if (level.dimension() != com.meakaandre.siftec.compat.SiftGate.SIFT && com.meakaandre.siftec.compat.SiftGate.isRift(entity)) level.getServer().execute(entity::discard);
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             THRUSTING.clear();
@@ -69,7 +71,6 @@ public final class Equipment {
             Poles.clear();
             Ziplines.clear();
             com.meakaandre.siftec.blueprint.Blueprints.clear();
-            com.meakaandre.siftec.tweak.Pollution.clear();
             com.meakaandre.siftec.blueprint.DesignerBlockEntity.clear();
         });
         FLIGHT_ZONES.add(com.meakaandre.siftec.blueprint.DesignerBlockEntity::inside);
@@ -169,7 +170,6 @@ public final class Equipment {
         tickJetpacks(server);
         Ziplines.tick(server);
         com.meakaandre.siftec.blueprint.Blueprints.tick(server);
-        com.meakaandre.siftec.tweak.Pollution.tick(server);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if ((server.getTickCount() + player.getId()) % 10 != 0) continue;
             if (wearing(player, EquipmentSlot.FEET, ModItems.BLADE_RUNNERS.get())) {

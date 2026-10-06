@@ -30,6 +30,23 @@ public final class SiftGate {
         return true;
     }
 
+    private static net.minecraft.world.level.block.Block portalBlock;
+    private static boolean portalLooked;
+
+    /** True for The Sift's own portal block, which the pack does not let form outside The Sift. */
+    public static boolean isPortal(net.minecraft.world.level.block.state.BlockState state) {
+        if (!portalLooked) {
+            portalBlock = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(Identifier.fromNamespaceAndPath("the_sift", "sift_portal")).orElse(null);
+            portalLooked = true;
+        }
+        return portalBlock != null && state.getBlock() == portalBlock;
+    }
+
+    public static boolean isRift(net.minecraft.world.entity.Entity entity) {
+        Identifier id = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+        return id.getNamespace().equals("the_sift") && (id.getPath().equals("rift") || id.getPath().equals("mini_rift"));
+    }
+
     public static void enter(ServerPlayer player) {
         ServerLevel sift = player.level().getServer().getLevel(SIFT);
         if (sift == null) {

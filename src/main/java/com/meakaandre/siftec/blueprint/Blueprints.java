@@ -81,6 +81,19 @@ public final class Blueprints {
         return data == null ? new CompoundTag() : data.copyTag().getCompoundOrEmpty("siftec_blueprint");
     }
 
+    /** Turns the blueprint a quarter turn clockwise and says which way it now faces (0 to 3 quarter turns). */
+    public static int rotate(ServerPlayer player, ItemStack stack) {
+        int turns = (data(stack).getIntOr("turns", 0) + 1) % 4;
+        CustomData.update(DataComponents.CUSTOM_DATA, stack, root -> {
+            CompoundTag tag = root.getCompoundOrEmpty("siftec_blueprint");
+            tag.putInt("turns", turns);
+            root.put("siftec_blueprint", tag);
+        });
+        PREVIEW.remove(player.getUUID());
+        clearGhosts(player.getUUID());
+        return turns;
+    }
+
     public static int count(ItemStack stack) {
         return data(stack).getIntOr("blocks", 0);
     }
@@ -97,10 +110,19 @@ public final class Blueprints {
         List<BlockState> palette = new ArrayList<>();
         for (int i = 0; i < states.size(); i++) palette.add(NbtUtils.readBlockState(blocks, states.getCompoundOrEmpty(i)));
         int half = side / 2;
+        int turns = tag.getIntOr("turns", 0) & 3;
+        net.minecraft.world.level.block.Rotation rotation = net.minecraft.world.level.block.Rotation.values()[turns];
         for (int y = 0; y < side; y++) for (int z = 0; z < side; z++) for (int x = 0; x < side; x++) {
             int index = cells[(y * side + z) * side + x];
             if (index <= 0 || index > palette.size() || palette.get(index - 1).isAir()) continue;
-            out.put(base.offset(x - half, y, z - half), palette.get(index - 1));
+            // each quarter turn clockwise sends (x, z) to (-z, x) about the centre column
+            int dx = x - half, dz = z - half;
+            for (int t = 0; t < turns; t++) {
+                int was = dx;
+                dx = -dz;
+                dz = was;
+            }
+            out.put(base.offset(dx, y, dz), palette.get(index - 1).rotate(rotation));
         }
         return out;
     }
