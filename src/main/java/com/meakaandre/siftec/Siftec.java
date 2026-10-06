@@ -1,5 +1,6 @@
 package com.meakaandre.siftec;
 
+import com.meakaandre.siftec.backpack.Backpack;
 import com.meakaandre.siftec.command.SiftecCommands;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.fluid.ModFluids;
@@ -37,6 +38,7 @@ public class Siftec implements ModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(StatePayload.TYPE, StatePayload.STREAM_CODEC);
         ServerLifecycleEvents.SERVER_STARTED.register(SpeedCap::recompute);
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> SpeedCap.value = 256);
+        Backpack.register();
         Locks.register();
         Companies.register();
     }

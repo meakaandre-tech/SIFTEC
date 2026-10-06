@@ -120,11 +120,17 @@ public final class NodePlacer {
     private static int chooseHeight(ServerLevel level, Node node) {
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         boolean nether = node.type().where == NodeType.Where.NETHER;
-        int from = nether ? 100 : node.y() + 24, to = nether ? 34 : node.y() - 24;
-        for (int y = from; y >= to; y--) {
+        if (nether) {
+            // the lowest floor above the lava sea, so nodes are on the ground and not up on a ledge
+            for (int y = 32; y <= 110; y++) {
+                if (isFloor(level, pos, node.x(), y, node.z())) return y;
+            }
+            return 64;
+        }
+        for (int y = node.y() + 24; y >= node.y() - 24; y--) {
             if (isFloor(level, pos, node.x(), y, node.z())) return y;
         }
-        return nether ? 64 : node.y();
+        return node.y();
     }
 
     private static boolean isFloor(ServerLevel level, BlockPos.MutableBlockPos pos, int x, int y, int z) {

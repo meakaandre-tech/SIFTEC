@@ -1,28 +1,30 @@
 cmd time set noon
 cmd execute as @a at @s run tp @s ~ ~ ~ 0 0
 cmd execute at @a run setblock ~ ~1 ~2 siftec:hub
-cmd execute at @a run setblock ~1 ~1 ~2 siftec:wormhole_gateway
 cmd gamemode survival @a
 cmd give @a siftec:iron_rod 64
-cmd give @a create:iron_sheet 5
+cmd give @a create:iron_sheet 64
 sleep 4
-shot
 key u
 sleep 3
-shot
 click 532 298
 sleep 2
-move 568 298
-sleep 2
-shot
 click 568 298
 sleep 2
-move 568 298
+move 604 298
 sleep 2
 shot
 key Escape
 sleep 1
 key e
 sleep 2
+shot
+key Escape
+cmd execute at @a run setblock ~ ~1 ~2 siftec:equipment_workshop
+sleep 2
+key u
+sleep 2
+move 500 190
+sleep 1
 shot
 key Escape

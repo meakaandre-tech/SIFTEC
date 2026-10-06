@@ -36,6 +36,7 @@ public class SiftecClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(StatePayload.TYPE, (payload, context) -> ClientState.accept(payload));
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
+            ClientState.backpackSlots = 0;
             SpeedCap.value = 256;
         });
     }
