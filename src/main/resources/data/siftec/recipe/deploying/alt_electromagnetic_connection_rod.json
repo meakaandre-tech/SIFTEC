@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:stator",
+  "ingredient": "siftec:high_speed_connector",
+  "results": [
+    {
+      "id": "siftec:electromagnetic_control_rod",
+      "count": 2
+    }
+  ]
+}

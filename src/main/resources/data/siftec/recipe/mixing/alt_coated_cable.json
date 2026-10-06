@@ -1,0 +1,20 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:wire",
+    "siftec:wire"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "siftec:heavy_oil_residue"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:cable",
+      "count": 4
+    }
+  ]
+}

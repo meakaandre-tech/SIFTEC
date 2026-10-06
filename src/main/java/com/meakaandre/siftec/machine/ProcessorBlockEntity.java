@@ -65,7 +65,10 @@ public class ProcessorBlockEntity extends KineticBlockEntity {
             return;
         }
         if (player.isShiftKeyDown() && !recipes().isEmpty()) {
-            selected = Math.floorMod(selected + 1, recipes().size());
+            for (int tries = 0; tries < recipes().size(); tries++) {
+                selected = Math.floorMod(selected + 1, recipes().size());
+                if (unlocked(recipes().get(selected))) break;
+            }
             progress = 0;
             // what was waiting for the old recipe comes back out
             for (int i = 0; i < INPUTS; i++) {
@@ -105,7 +108,15 @@ public class ProcessorBlockEntity extends KineticBlockEntity {
         return n;
     }
 
+    /** An alternate only runs once the company this machine belongs to has picked it from a Hard Drive. */
+    private boolean unlocked(ProcessorRecipe recipe) {
+        if (recipe.alt() == null) return true;
+        com.meakaandre.siftec.company.Company company = com.meakaandre.siftec.owner.Ownership.of(this);
+        return company != null && company.has(recipe.alt());
+    }
+
     private boolean ready(ProcessorRecipe recipe) {
+        if (!unlocked(recipe)) return false;
         for (Milestone.Cost cost : recipe.inputs()) if (have(cost) < cost.count()) return false;
         FluidStack held = tank.getPrimaryHandler().getFluid();
         if (recipe.fluidIn() != null) {

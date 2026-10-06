@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:quartz_crystal",
+    "B": "siftec:rubber",
+    "C": "siftec:ai_limiter"
+  },
+  "pattern": [
+    "AAA",
+    "BBC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:crystal_oscillator"
+  }
+}

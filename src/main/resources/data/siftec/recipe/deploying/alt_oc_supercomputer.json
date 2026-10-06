@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:radio_control_unit",
+  "ingredient": "siftec:cooling_system",
+  "results": [
+    {
+      "id": "siftec:supercomputer"
+    }
+  ]
+}

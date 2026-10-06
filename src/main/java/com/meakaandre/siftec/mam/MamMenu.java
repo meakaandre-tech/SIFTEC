@@ -2,6 +2,7 @@ package com.meakaandre.siftec.mam;
 
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.hub.Alternates;
 import com.meakaandre.siftec.hub.HubMenu;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
@@ -32,7 +33,7 @@ import java.util.List;
  * nodes. Clicking a node delivers parts; once it is paid for, its research time starts. One node at a time.
  */
 public class MamMenu extends ChestMenu {
-    private static final int SIZE = 54, STATUS_SLOT = 17, FIRST_NODE = 27;
+    private static final int SIZE = 54, STATUS_SLOT = 17, FIRST_NODE = 27, DRIVE_SLOT = 28, OFFER_SLOT = 31;
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final Company company;
@@ -85,13 +86,75 @@ public class MamMenu extends ChestMenu {
             Item icon = BuiltInRegistries.ITEM.getOptional(trees.get(t).icon()).orElse(Items.BOOK);
             view.setItem(t, button(icon, Component.translatable("siftec.tree." + trees.get(t).id()), List.of(), t == tree));
         }
-        Milestone running = Milestones.get(company.research);
-        view.setItem(STATUS_SLOT, button(Items.CLOCK, running == null
+        view.setItem(trees.size(), button(item("siftec:hard_drive"), Component.translatable("siftec.tree.hard_drives"), List.of(), tree == trees.size()));
+        view.setItem(STATUS_SLOT, button(Items.CLOCK, company.research.isEmpty()
             ? Component.translatable("siftec.mam.idle").withStyle(ChatFormatting.GREEN)
-            : Component.translatable("siftec.mam.running", running.name(), clock(company.researchEnd - now())).withStyle(ChatFormatting.GOLD), List.of(), false));
+            : Component.translatable("siftec.mam.running", runningName(), clock(company.researchEnd - now())).withStyle(ChatFormatting.GOLD), List.of(), false));
+        if (tree == trees.size()) {
+            hardDrives();
+            return;
+        }
         if (tree >= trees.size()) return;
         List<Milestone> nodes = trees.get(tree).nodes();
         for (int i = 0; i < nodes.size() && i < 9; i++) view.setItem(FIRST_NODE + i, nodeButton(nodes.get(i)));
+    }
+
+    private Component runningName() {
+        Milestone running = Milestones.get(company.research);
+        return running != null ? running.name() : Component.translatable("siftec.mam.hard_drive");
+    }
+
+    /** The Hard Drives page: one button to research a drive, and the alternates a finished drive is offering. */
+    private void hardDrives() {
+        boolean researching = company.research.equals(Alternates.RESEARCH);
+        List<Component> lore = new ArrayList<>();
+        lore.add(Component.translatable("siftec.alt.owned", Alternates.owned(company), Alternates.total()).withStyle(ChatFormatting.GRAY));
+        if (researching) {
+            lore.add(Component.translatable("siftec.mam.running", runningName(), clock(company.researchEnd - now())).withStyle(ChatFormatting.GOLD));
+        } else if (!company.offer.isEmpty()) {
+            lore.add(Component.translatable("siftec.alt.choose_first").withStyle(ChatFormatting.RED));
+        } else if (Alternates.eligible(company).isEmpty()) {
+            lore.add(Component.translatable("siftec.alt.none").withStyle(ChatFormatting.RED));
+        } else {
+            lore.add(Component.translatable("siftec.alt.cost").withStyle(ChatFormatting.WHITE));
+            lore.add(Component.translatable("siftec.mam.research", clock(Alternates.SECONDS * 20L)).withStyle(ChatFormatting.GRAY));
+            lore.add(Component.translatable("siftec.mam.click").withStyle(ChatFormatting.YELLOW));
+        }
+        view.setItem(DRIVE_SLOT, button(researching ? Items.CLOCK : item("siftec:hard_drive"), Component.translatable("siftec.alt.research"), lore, researching));
+        for (int i = 0; i < company.offer.size() && i < 2; i++) {
+            String id = company.offer.get(i);
+            view.setItem(OFFER_SLOT + 2 * i, button(Items.PAPER, Alternates.name(id), List.of(
+                Alternates.text(id).copy().withStyle(ChatFormatting.AQUA), Component.translatable("siftec.alt.pick").withStyle(ChatFormatting.YELLOW)), true));
+        }
+    }
+
+    private void pressHardDrives(int slot) {
+        MinecraftServer server = player.level().getServer();
+        for (int i = 0; i < company.offer.size() && i < 2; i++) {
+            if (slot == OFFER_SLOT + 2 * i) {
+                Alternates.choose(server, company, company.offer.get(i));
+                refresh();
+                return;
+            }
+        }
+        if (slot != DRIVE_SLOT) return;
+        Milestone.Cost drive = new Milestone.Cost("siftec:hard_drive", 1);
+        if (!company.research.isEmpty()) {
+            player.sendOverlayMessage(Component.translatable("siftec.mam.busy", runningName()));
+        } else if (!company.offer.isEmpty()) {
+            player.sendOverlayMessage(Component.translatable("siftec.alt.choose_first"));
+        } else if (Alternates.eligible(company).isEmpty()) {
+            player.sendOverlayMessage(Component.translatable("siftec.alt.none"));
+        } else if (drive.carried(player.getInventory()) < 1) {
+            player.sendOverlayMessage(Component.translatable("siftec.alt.no_drive"));
+        } else {
+            drive.take(player.getInventory(), 1);
+            company.research = Alternates.RESEARCH;
+            company.researchEnd = now() + Alternates.SECONDS * 20L;
+            Companies.tell(server, company, Component.translatable("siftec.mam.started", runningName()).withStyle(ChatFormatting.GOLD));
+            Companies.save(server);
+        }
+        refresh();
     }
 
     private ItemStack nodeButton(Milestone m) {
@@ -124,6 +187,15 @@ public class MamMenu extends ChestMenu {
             refresh();
             return;
         }
+        if (slot == trees.size()) {
+            tree = slot;
+            refresh();
+            return;
+        }
+        if (tree == trees.size()) {
+            pressHardDrives(slot);
+            return;
+        }
         int index = slot - FIRST_NODE;
         if (tree >= trees.size() || index < 0 || index >= trees.get(tree).nodes().size()) return;
         Milestone m = trees.get(tree).nodes().get(index);
@@ -136,9 +208,8 @@ public class MamMenu extends ChestMenu {
         }
         int delivered = HubMenu.deliver(player, company, m);
         if (company.fullyPaid(m)) {
-            Milestone running = Milestones.get(company.research);
-            if (running != null) {
-                player.sendOverlayMessage(Component.translatable("siftec.mam.busy", running.name()));
+            if (!company.research.isEmpty()) {
+                player.sendOverlayMessage(Component.translatable("siftec.mam.busy", runningName()));
             } else {
                 company.research = m.id();
                 company.researchEnd = now() + m.seconds() * 20L;

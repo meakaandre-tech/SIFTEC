@@ -216,7 +216,14 @@ write(f"{A}/models/item/object_scanner.json", {"parent": "minecraft:item/generat
 item_def("object_scanner", "siftec:item/object_scanner")
 COLLECT = {"blue_power_slug": ("minecraft:block/blue_concrete", "Blue Power Slug"), "yellow_power_slug": ("minecraft:block/yellow_concrete", "Yellow Power Slug"),
            "purple_power_slug": ("minecraft:block/purple_concrete", "Purple Power Slug"), "mercer_sphere": ("minecraft:block/pink_concrete", "Mercer Sphere"),
-           "somersloop": ("minecraft:block/red_concrete", "Somersloop")}
+           "somersloop": ("minecraft:block/red_concrete", "Somersloop"), "crash_site": ("create:block/railway_casing", "Crash Site Pod")}
+lang.update({"item.siftec.crash_site": "Crash Site", "siftec.crash.needs": "The pod is sealed. It opens for %s %s",
+             "siftec.tree.hard_drives": "Hard Drives", "siftec.mam.hard_drive": "Hard Drive", "siftec.alt.research": "Research a Hard Drive",
+             "siftec.alt.cost": "Takes one Hard Drive from your inventory", "siftec.alt.owned": "Alternate recipes: %s of %s",
+             "siftec.alt.choose_first": "Choose one of the offered alternates first", "siftec.alt.none": "No alternate fits what your company has unlocked. Keep the drive for later, or sink it",
+             "siftec.alt.no_drive": "You are not carrying a Hard Drive", "siftec.alt.pick": "Click to take this one",
+             "siftec.alt.ready": "The Hard Drive is decoded. Choose an alternate recipe at the MAM",
+             "siftec.alt.chosen": "Alternate recipe unlocked: %s. %s"})
 for cid, (tex, name) in COLLECT.items():
     lang[f"block.siftec.{cid}_block"] = name
     write(f"{A}/blockstates/{cid}_block.json", {"variants": {"": {"model": f"siftec:block/{cid}_block"}}})
@@ -234,6 +241,12 @@ for pid, (pname, recipe_list) in content.PROCESSORS.items():
         else:
             (rid, rc), = content.parse_cost(result)
             r["out"] = {"item": rid, "count": rc}
+        out.append(r)
+    for aid, aname, machine, items, fluid_in, result, seconds, text in content.ALT_PROCESSORS:
+        if machine != pid: continue
+        (rid, rc), = content.parse_cost(result)
+        r = {"in": [{"item": i, "count": c} for i, c in content.parse_cost(items)], "seconds": seconds, "out": {"item": rid, "count": rc}, "alt": "alt_" + aid}
+        if fluid_in: r["fluid_in"] = {"fluid": recipes.FLUID_IDS[fluid_in[0]], "mb": fluid_in[1]}
         out.append(r)
     data["processors"][pid] = out
     lang[f"block.siftec.{pid}"] = pname
@@ -298,6 +311,52 @@ for path, body in recipes.build().items():
             key = "seq:" + rid.split(":")[1] if body["type"] == "create:sequenced_assembly" else "siftec:" + path
             data["recipe_locks"][key] = mid
             break
+# ---- alternates: each has its own lock, and is only offered once everything it uses is unlocked
+C = "create:"
+MACHINE_OF = {"create:cutting": [C + "mechanical_saw"], "create:deploying": [C + "deployer"], "create:mixing": [C + "mechanical_mixer"],
+              "create:compacting": [C + "mechanical_press", C + "basin"], "create:splashing": [C + "encased_fan"], "create:mechanical_crafting": [C + "mechanical_crafter"],
+              "minecraft:smelting": [], "minecraft:blasting": []}
+FLUID_NEEDS = {"createdieselgenerators:diesel": "oil_processing", "createdieselgenerators:crude_oil": "oil_processing"}
+built = recipes.build()
+
+
+def ids_in(node, found):
+    if isinstance(node, str):
+        if ":" in node and not node.startswith("#") and " " not in node: found.add(node)
+    elif isinstance(node, dict):
+        for k, v in node.items():
+            if k != "type": ids_in(v, found)
+    elif isinstance(node, list):
+        for v in node: ids_in(v, found)
+
+
+def needs_of(things):
+    out = []
+    for t in things:
+        mid = FLUID_NEEDS.get(t) or lock_of.get(t) or lock_of.get(t + "_bucket")
+        if mid and mid not in out: out.append(mid)
+    return out
+
+
+data["alternates"] = []
+for aid, info in recipes.ALTS.items():
+    used = set()
+    for path in info["paths"]:
+        body = built[path]
+        ids_in(body, used)
+        used.update(MACHINE_OF[body["type"]])
+        if body.get("heat_requirement"): used.add(C + "blaze_burner")
+        data["recipe_locks"]["siftec:" + path] = "alt_" + aid
+    data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(sorted(used))})
+    lang[f"siftec.alt.alt_{aid}"] = info["name"]
+    lang[f"siftec.alt.alt_{aid}.text"] = info["text"]
+for aid, aname, machine, items, fluid_in, result, seconds, text in content.ALT_PROCESSORS:
+    used = {i for i, c in content.parse_cost(items)} | {i for i, c in content.parse_cost(result)} | {"siftec:" + machine}
+    if fluid_in: used.add(recipes.FLUID_IDS[fluid_in[0]])
+    data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(sorted(used))})
+    lang[f"siftec.alt.alt_{aid}"] = aname
+    lang[f"siftec.alt.alt_{aid}.text"] = text
+print("alternates:", len(data["alternates"]), "; with nothing required:", [a["id"] for a in data["alternates"] if not a["requires"]])
 print("recipes locked to a milestone:", len(data["recipe_locks"]), "of", len(recipes.build()))
 data["removed_recipes"] = recipes.REMOVED
 data["workshop"] = [{"item": i, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]} for i, cost in recipes.WORKSHOP]

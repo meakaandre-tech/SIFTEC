@@ -41,6 +41,11 @@ public final class Companies {
             long now = server.overworld().getGameTime();
             for (Company company : new java.util.ArrayList<>(CompanyData.get(server).companies().values())) {
                 if (company.research.isEmpty() || now < company.researchEnd) continue;
+                if (company.research.equals(com.meakaandre.siftec.hub.Alternates.RESEARCH)) {
+                    company.research = "";
+                    com.meakaandre.siftec.hub.Alternates.makeOffer(server, company);
+                    continue;
+                }
                 Milestone m = Milestones.get(company.research);
                 company.research = "";
                 if (m != null) complete(server, company, m, Component.literal(company.name));

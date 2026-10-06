@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "create:iron_sheet",
+  "ingredient": "siftec:rubber",
+  "results": [
+    {
+      "id": "siftec:reinforced_iron_plate",
+      "count": 2
+    }
+  ]
+}

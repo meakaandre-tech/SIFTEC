@@ -1,0 +1,11 @@
+{
+  "type": "create:cutting",
+  "ingredient": "siftec:steel_pipe",
+  "results": [
+    {
+      "id": "siftec:screw",
+      "count": 8
+    }
+  ],
+  "processing_time": 100
+}

@@ -41,12 +41,24 @@ public class CollectibleBlock extends Block {
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
         Company company = Companies.of(server);
         String key = pos.getX() + "," + pos.getZ();
-        if (!company.collected.add(key)) {
+        if (company.collected.contains(key)) {
             server.sendOverlayMessage(Component.translatable("siftec.collect.already"));
             return InteractionResult.SUCCESS;
         }
+        if (type == Collectible.CRASH_SITE) {
+            // some pods open freely; the rest want parts, and want more the further they landed from spawn
+            com.meakaandre.siftec.hub.Milestone.Cost cost = CrashSites.requirement(server.level(), pos);
+            if (cost != null && !server.hasInfiniteMaterials()) {
+                if (cost.carried(server.getInventory()) < cost.count()) {
+                    server.sendOverlayMessage(Component.translatable("siftec.crash.needs", cost.count(), cost.label()));
+                    return InteractionResult.SUCCESS;
+                }
+                cost.take(server.getInventory(), cost.count());
+            }
+        }
+        company.collected.add(key);
         Companies.save(server.level().getServer());
-        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(com.meakaandre.siftec.Siftec.id(type.id())));
+        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(com.meakaandre.siftec.Siftec.id(type.itemId())));
         server.sendOverlayMessage(Component.translatable("siftec.collect.got", stack.getItemName()));
         server.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
         return InteractionResult.SUCCESS;

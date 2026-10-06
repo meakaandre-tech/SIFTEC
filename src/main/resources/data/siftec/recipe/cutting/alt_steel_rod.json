@@ -1,0 +1,11 @@
+{
+  "type": "create:cutting",
+  "ingredient": "siftec:steel_beam",
+  "results": [
+    {
+      "id": "siftec:iron_rod",
+      "count": 4
+    }
+  ],
+  "processing_time": 100
+}

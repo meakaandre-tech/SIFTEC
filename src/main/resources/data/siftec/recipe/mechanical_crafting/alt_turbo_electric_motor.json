@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:motor",
+    "B": "siftec:radio_control_unit",
+    "C": "siftec:electromagnetic_control_rod",
+    "D": "siftec:rotor"
+  },
+  "pattern": [
+    "AAB",
+    "BCC",
+    "DD "
+  ],
+  "result": {
+    "count": 2,
+    "id": "siftec:turbo_motor"
+  }
+}

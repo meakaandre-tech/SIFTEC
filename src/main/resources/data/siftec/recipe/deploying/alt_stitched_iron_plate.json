@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "create:iron_sheet",
+  "ingredient": "siftec:wire",
+  "results": [
+    {
+      "id": "siftec:reinforced_iron_plate"
+    }
+  ]
+}

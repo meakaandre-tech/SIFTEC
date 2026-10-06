@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:steel_pipe",
+  "ingredient": "siftec:quickwire",
+  "results": [
+    {
+      "id": "siftec:stator",
+      "count": 2
+    }
+  ]
+}

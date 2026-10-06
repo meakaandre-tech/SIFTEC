@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:reinforced_iron_plate",
+  "ingredient": "siftec:steel_pipe",
+  "results": [
+    {
+      "id": "siftec:modular_frame",
+      "count": 2
+    }
+  ]
+}

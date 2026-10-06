@@ -1,0 +1,20 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:compacted_coal"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "siftec:heavy_oil_residue"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:turbofuel",
+      "amount": 20250
+    }
+  ]
+}

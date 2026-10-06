@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:rotor",
+    "B": "siftec:stator",
+    "C": "siftec:crystal_oscillator"
+  },
+  "pattern": [
+    "AAB",
+    "BC "
+  ],
+  "result": {
+    "count": 3,
+    "id": "siftec:motor"
+  }
+}

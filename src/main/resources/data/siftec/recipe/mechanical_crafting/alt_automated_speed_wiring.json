@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:stator",
+    "B": "siftec:wire",
+    "C": "siftec:high_speed_connector"
+  },
+  "pattern": [
+    "AAB",
+    "BBB",
+    "C  "
+  ],
+  "result": {
+    "count": 4,
+    "id": "siftec:automated_wiring"
+  }
+}

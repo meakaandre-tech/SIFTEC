@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:quickwire",
+  "ingredient": "siftec:rubber",
+  "results": [
+    {
+      "id": "siftec:cable",
+      "count": 3
+    }
+  ]
+}

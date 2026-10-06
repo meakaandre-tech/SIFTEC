@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:plastic",
+  "ingredient": "siftec:quickwire",
+  "results": [
+    {
+      "id": "siftec:circuit_board",
+      "count": 2
+    }
+  ]
+}

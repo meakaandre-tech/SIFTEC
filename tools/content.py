@@ -360,6 +360,16 @@ PROCESSORS = {
     ]),
 }
 
+# Alternates made in the pack's own machines: (id, name, machine, items in, fluid in, result, seconds, text).
+ALT_PROCESSORS = [
+    ("petroleum_diamond", "Petroleum Diamond", "converter", "4 Petroleum Coke", None, "1 Diamond", 4, "4 Petroleum Coke makes 1 Diamond (Converter)"),
+    ("pink_diamond", "Pink Diamond", "converter", "4 Coal, 1 Quartz Crystal", None, "1 Diamond", 4, "4 Coal + 1 Quartz Crystal makes 1 Diamond (Converter)"),
+    ("iron_ficsite_ingot", "Iron Ficsite Ingot", "converter", "8 Iron Ingot, 4 Reanimated SAM", None, "1 Ficsite Ingot", 6, "8 Iron Ingot + 4 Reanimated SAM makes 1 Ficsite Ingot (Converter)"),
+    ("brass_ficsite_ingot", "Brass Ficsite Ingot", "converter", "4 Brass Ingot, 3 Reanimated SAM", None, "1 Ficsite Ingot", 6, "4 Brass Ingot + 3 Reanimated SAM makes 1 Ficsite Ingot (Converter)"),
+    ("dark_matter_trap", "Dark Matter Trap", "particle_accelerator", "1 Time Crystal", ("dark matter residue", 250), "2 Dark Matter Crystal", 4,
+     "1 Time Crystal + 250 mB Dark Matter Residue makes 2 Dark Matter Crystal (Particle Accelerator)"),
+]
+
 # AWESOME Sink: points for one of each item. Anything not listed is worth 1.
 SINK_POINTS = {
     "Iron Sheet": 6, "Iron Rod": 4, "Screw": 2, "Wire": 6, "Cable": 24, "Concrete": 12, "Copper Sheet": 24, "Reinforced Iron Plate": 120,

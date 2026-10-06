@@ -30,6 +30,8 @@ public class Company {
     public Set<String> collected = new LinkedHashSet<>();
     /** AWESOME Sink points. */
     public long points;
+    /** The alternates a finished Hard Drive is offering; empty when there is nothing to choose. */
+    public java.util.List<String> offer = new java.util.ArrayList<>();
     public String research = "";
     public long researchEnd;
     /** The Dimensional Depot cloud: item id -> count. */

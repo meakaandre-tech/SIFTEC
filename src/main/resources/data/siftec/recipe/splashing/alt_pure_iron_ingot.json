@@ -1,0 +1,10 @@
+{
+  "type": "create:splashing",
+  "ingredient": "create:crushed_raw_iron",
+  "results": [
+    {
+      "id": "minecraft:iron_ingot",
+      "count": 2
+    }
+  ]
+}

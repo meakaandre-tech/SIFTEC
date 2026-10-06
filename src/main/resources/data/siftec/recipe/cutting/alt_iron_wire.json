@@ -1,0 +1,11 @@
+{
+  "type": "create:cutting",
+  "ingredient": "create:iron_sheet",
+  "results": [
+    {
+      "id": "siftec:wire",
+      "count": 3
+    }
+  ],
+  "processing_time": 100
+}

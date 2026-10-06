@@ -123,6 +123,7 @@ public final class Collectibles {
         }
         if (y <= level.getMinY() || !level.getFluidState(pos.set(spot.x(), y, spot.z())).isEmpty()) return false;
         level.setBlock(pos.set(spot.x(), y, spot.z()), ModBlocks.COLLECTIBLES.get(spot.type()).get().defaultBlockState(), Block.UPDATE_CLIENTS);
+        if (spot.type() == Collectible.CRASH_SITE) CrashSites.wreckage(level, new BlockPos(spot.x(), y, spot.z()));
         return true;
     }
 

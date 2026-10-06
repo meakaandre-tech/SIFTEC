@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:electromagnetic_control_rod",
+  "ingredient": "siftec:rotor",
+  "results": [
+    {
+      "id": "siftec:motor",
+      "count": 2
+    }
+  ]
+}

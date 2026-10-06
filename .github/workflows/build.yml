@@ -119,10 +119,8 @@ jobs:
               echo "releases of $r:"
               curl -fsSL "https://api.github.com/repos/meakaandre-tech/$r/releases?per_page=4" | python3 -c "import json,sys; [print('  ', x['tag_name'], a['browser_download_url']) for x in json.load(sys.stdin) for a in x['assets']]" || echo "  (could not list)"
             done
-            for q in farmers-delight-refabricated farmers-delight the-sift; do
-              echo "modrinth $q for $mc:"
-              curl -fsSL "https://api.modrinth.com/v2/project/$q/version" | python3 -c "import json,sys; [print('  ', v['version_number'], v['game_versions'], v['loaders'], v['files'][0]['url']) for v in json.load(sys.stdin)[:60] if '$mc' in v['game_versions'] or '26.2' in v['game_versions']]" || echo "  (not found)"
-            done
+            echo "modrinth search for The Sift:"
+            curl -fsSL -G "https://api.modrinth.com/v2/search" --data-urlencode "query=the sift" --data-urlencode "limit=8" | python3 -c "import json,sys; [print('  ', h['slug'], '|', h['title'], '|', h['author'], '|', h['versions'][-4:]) for h in json.load(sys.stdin)['hits']]" || echo "  (search failed)"
             if [ -f $root/.github/smoke-pack-mods ]; then
               while read -r url; do case "$url" in http*) curl -fsSL -o "mods/$(basename "$url")" "$url" || echo "could not fetch $url";; esac; done < $root/.github/smoke-pack-mods
             fi

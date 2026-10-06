@@ -2928,6 +2928,74 @@
           "fluid": "siftec:dark_matter_residue",
           "mb": 250
         }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:petroleum_coke",
+            "count": 4
+          }
+        ],
+        "seconds": 4,
+        "out": {
+          "item": "minecraft:diamond",
+          "count": 1
+        },
+        "alt": "alt_petroleum_diamond"
+      },
+      {
+        "in": [
+          {
+            "item": "minecraft:coal",
+            "count": 4
+          },
+          {
+            "item": "siftec:quartz_crystal",
+            "count": 1
+          }
+        ],
+        "seconds": 4,
+        "out": {
+          "item": "minecraft:diamond",
+          "count": 1
+        },
+        "alt": "alt_pink_diamond"
+      },
+      {
+        "in": [
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 8
+          },
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 4
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "siftec:ficsite_ingot",
+          "count": 1
+        },
+        "alt": "alt_iron_ficsite_ingot"
+      },
+      {
+        "in": [
+          {
+            "item": "create:brass_ingot",
+            "count": 4
+          },
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 3
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "siftec:ficsite_ingot",
+          "count": 1
+        },
+        "alt": "alt_brass_ficsite_ingot"
       }
     ],
     "particle_accelerator": [
@@ -2963,6 +3031,24 @@
         "out": {
           "item": "siftec:dark_matter_crystal",
           "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:time_crystal",
+            "count": 1
+          }
+        ],
+        "seconds": 4,
+        "out": {
+          "item": "siftec:dark_matter_crystal",
+          "count": 2
+        },
+        "alt": "alt_dark_matter_trap",
+        "fluid_in": {
+          "fluid": "siftec:dark_matter_residue",
+          "mb": 250
         }
       }
     ]
@@ -3150,6 +3236,47 @@
     }
   ],
   "recipe_locks": {
+    "siftec:cutting/alt_iron_wire": "alt_iron_wire",
+    "siftec:deploying/alt_stitched_iron_plate": "alt_stitched_iron_plate",
+    "siftec:deploying/alt_bolted_frame": "alt_bolted_frame",
+    "siftec:deploying/alt_copper_rotor": "alt_copper_rotor",
+    "siftec:mixing/alt_solid_steel_ingot": "alt_solid_steel_ingot",
+    "siftec:compacting/alt_cast_screw": "alt_cast_screw",
+    "siftec:cutting/alt_steel_screw": "alt_steel_screw",
+    "siftec:deploying/alt_steel_rotor": "alt_steel_rotor",
+    "siftec:deploying/alt_steeled_frame": "alt_steeled_frame",
+    "siftec:deploying/alt_encased_industrial_pipe": "alt_encased_industrial_pipe",
+    "siftec:mixing/alt_coke_steel_ingot": "alt_coke_steel_ingot",
+    "siftec:mixing/alt_recycled_plastic": "alt_recycled_plastic",
+    "siftec:mixing/alt_recycled_rubber": "alt_recycled_rubber",
+    "siftec:mixing/alt_residual_rubber": "alt_residual_rubber",
+    "siftec:deploying/alt_adhered_iron_plate": "alt_adhered_iron_plate",
+    "siftec:mixing/alt_coated_cable": "alt_coated_cable",
+    "siftec:mixing/alt_insulated_cable": "alt_insulated_cable",
+    "siftec:mechanical_crafting/alt_plastic_smart_plating": "alt_plastic_smart_plating",
+    "siftec:mechanical_crafting/alt_flexible_framework": "alt_flexible_framework",
+    "siftec:mechanical_crafting/alt_heavy_encased_frame": "alt_heavy_encased_frame",
+    "siftec:mixing/alt_fused_quickwire": "alt_fused_quickwire",
+    "siftec:deploying/alt_quickwire_cable": "alt_quickwire_cable",
+    "siftec:deploying/alt_quickwire_stator": "alt_quickwire_stator",
+    "siftec:deploying/alt_caterium_circuit_board": "alt_caterium_circuit_board",
+    "siftec:mechanical_crafting/alt_caterium_computer": "alt_caterium_computer",
+    "siftec:mechanical_crafting/alt_automated_speed_wiring": "alt_automated_speed_wiring",
+    "siftec:deploying/alt_silicon_circuit_board": "alt_silicon_circuit_board",
+    "siftec:deploying/alt_crystal_computer": "alt_crystal_computer",
+    "siftec:mechanical_crafting/alt_rigor_motor": "alt_rigor_motor",
+    "siftec:mechanical_crafting/alt_insulated_crystal_oscillator": "alt_insulated_crystal_oscillator",
+    "siftec:mixing/alt_compacted_steel_ingot": "alt_compacted_steel_ingot",
+    "siftec:mixing/alt_electrode_aluminum_scrap": "alt_electrode_aluminum_scrap",
+    "siftec:compacting/alt_pure_aluminum_ingot": "alt_pure_aluminum_ingot",
+    "siftec:deploying/alt_heat_exchanger": "alt_heat_exchanger",
+    "siftec:mixing/alt_cooling_device": "alt_cooling_device",
+    "siftec:mechanical_crafting/alt_radio_control_system": "alt_radio_control_system",
+    "siftec:deploying/alt_electric_motor": "alt_electric_motor",
+    "siftec:deploying/alt_electromagnetic_connection_rod": "alt_electromagnetic_connection_rod",
+    "siftec:deploying/alt_oc_supercomputer": "alt_oc_supercomputer",
+    "siftec:mechanical_crafting/alt_turbo_electric_motor": "alt_turbo_electric_motor",
+    "siftec:mixing/alt_heat_fused_frame": "alt_heat_fused_frame",
     "siftec:cutting/wire": "hub_upgrade_2",
     "siftec:compacting/cable": "hub_upgrade_2",
     "siftec:cutting/screw": "hub_upgrade_3",
@@ -3250,15 +3377,484 @@
     "siftec:crushing/silica": "mam_quartz_2",
     "siftec:sandpaper_polishing/quartz_crystal": "mam_quartz_1",
     "siftec:mechanical_crafting/crystal_oscillator": "mam_quartz_4",
-    "siftec:compacting/compacted_coal": "mam_sulfur_6"
+    "siftec:compacting/compacted_coal": "mam_sulfur_6",
+    "siftec:mixing/alt_iron_alloy_ingot": "alt_iron_alloy_ingot",
+    "siftec:mixing/alt_wet_concrete": "alt_wet_concrete",
+    "siftec:cutting/alt_steel_rod": "alt_steel_rod",
+    "siftec:splashing/alt_pure_iron_ingot": "alt_pure_iron_ingot",
+    "siftec:splashing/alt_pure_copper_ingot": "alt_pure_copper_ingot",
+    "siftec:smelting/alt_biocoal": "alt_biocoal",
+    "siftec:blasting/alt_biocoal": "alt_biocoal",
+    "siftec:deploying/alt_coated_iron_plate": "alt_coated_iron_plate",
+    "siftec:compacting/alt_fine_concrete": "alt_fine_concrete",
+    "siftec:mixing/alt_turbo_heavy_fuel": "alt_turbo_heavy_fuel",
+    "siftec:mixing/alt_sloppy_alumina": "alt_sloppy_alumina",
+    "siftec:mixing/alt_diluted_fuel": "alt_diluted_fuel"
   },
+  "alternates": [
+    {
+      "id": "alt_iron_wire",
+      "requires": [
+        "hub_upgrade_3",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_stitched_iron_plate",
+      "requires": [
+        "part_assembly",
+        "hub_upgrade_3",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_bolted_frame",
+      "requires": [
+        "part_assembly",
+        "hub_upgrade_3"
+      ]
+    },
+    {
+      "id": "alt_copper_rotor",
+      "requires": [
+        "part_assembly",
+        "hub_upgrade_3"
+      ]
+    },
+    {
+      "id": "alt_iron_alloy_ingot",
+      "requires": [
+        "coal_power",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_solid_steel_ingot",
+      "requires": [
+        "basic_steel_production",
+        "coal_power"
+      ]
+    },
+    {
+      "id": "alt_cast_screw",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power"
+      ]
+    },
+    {
+      "id": "alt_wet_concrete",
+      "requires": [
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_steel_rod",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_steel_screw",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_steel_rotor",
+      "requires": [
+        "part_assembly",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_steeled_frame",
+      "requires": [
+        "part_assembly",
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_encased_industrial_pipe",
+      "requires": [
+        "part_assembly",
+        "advanced_steel_production",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_pure_iron_ingot",
+      "requires": [
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_pure_copper_ingot",
+      "requires": [
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_biocoal",
+      "requires": [
+        "obstacle_clearing"
+      ]
+    },
+    {
+      "id": "alt_coke_steel_ingot",
+      "requires": [
+        "basic_steel_production",
+        "coal_power",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_recycled_plastic",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_recycled_rubber",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_residual_rubber",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_coated_iron_plate",
+      "requires": [
+        "part_assembly",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_adhered_iron_plate",
+      "requires": [
+        "part_assembly",
+        "hub_upgrade_3",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_coated_cable",
+      "requires": [
+        "basic_steel_production",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_insulated_cable",
+      "requires": [
+        "basic_steel_production",
+        "hub_upgrade_2",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_plastic_smart_plating",
+      "requires": [
+        "industrial_manufacturing",
+        "oil_processing",
+        "hub_upgrade_3",
+        "part_assembly"
+      ]
+    },
+    {
+      "id": "alt_flexible_framework",
+      "requires": [
+        "industrial_manufacturing",
+        "part_assembly",
+        "oil_processing",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_heavy_encased_frame",
+      "requires": [
+        "industrial_manufacturing",
+        "advanced_steel_production",
+        "part_assembly",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_fused_quickwire",
+      "requires": [
+        "mam_caterium_1",
+        "basic_steel_production",
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "alt_quickwire_cable",
+      "requires": [
+        "part_assembly",
+        "hub_upgrade_2",
+        "mam_caterium_2",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_quickwire_stator",
+      "requires": [
+        "part_assembly",
+        "mam_caterium_2",
+        "advanced_steel_production",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_caterium_circuit_board",
+      "requires": [
+        "part_assembly",
+        "oil_processing",
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "alt_caterium_computer",
+      "requires": [
+        "industrial_manufacturing",
+        "oil_processing",
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "alt_automated_speed_wiring",
+      "requires": [
+        "industrial_manufacturing",
+        "advanced_steel_production",
+        "mam_caterium_7",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_fine_concrete",
+      "requires": [
+        "hub_upgrade_3",
+        "mam_quartz_2"
+      ]
+    },
+    {
+      "id": "alt_silicon_circuit_board",
+      "requires": [
+        "part_assembly",
+        "oil_processing",
+        "mam_quartz_2"
+      ]
+    },
+    {
+      "id": "alt_crystal_computer",
+      "requires": [
+        "part_assembly",
+        "oil_processing",
+        "industrial_manufacturing",
+        "mam_quartz_4"
+      ]
+    },
+    {
+      "id": "alt_rigor_motor",
+      "requires": [
+        "industrial_manufacturing",
+        "mam_quartz_4",
+        "advanced_steel_production",
+        "part_assembly"
+      ]
+    },
+    {
+      "id": "alt_insulated_crystal_oscillator",
+      "requires": [
+        "industrial_manufacturing",
+        "mam_caterium_4",
+        "mam_quartz_4",
+        "mam_quartz_1",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_compacted_steel_ingot",
+      "requires": [
+        "basic_steel_production",
+        "coal_power",
+        "mam_sulfur_6"
+      ]
+    },
+    {
+      "id": "alt_turbo_heavy_fuel",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "mam_sulfur_6",
+        "mam_sulfur_7"
+      ]
+    },
+    {
+      "id": "alt_sloppy_alumina",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "bauxite_refinement"
+      ]
+    },
+    {
+      "id": "alt_electrode_aluminum_scrap",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "bauxite_refinement",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_pure_aluminum_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "bauxite_refinement"
+      ]
+    },
+    {
+      "id": "alt_diluted_fuel",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_heat_exchanger",
+      "requires": [
+        "part_assembly",
+        "bauxite_refinement",
+        "advanced_aluminum_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_cooling_device",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "advanced_aluminum_production",
+        "advanced_steel_production"
+      ]
+    },
+    {
+      "id": "alt_radio_control_system",
+      "requires": [
+        "industrial_manufacturing",
+        "bauxite_refinement",
+        "oil_processing",
+        "mam_quartz_4"
+      ]
+    },
+    {
+      "id": "alt_electric_motor",
+      "requires": [
+        "part_assembly",
+        "advanced_aluminum_production",
+        "advanced_steel_production"
+      ]
+    },
+    {
+      "id": "alt_electromagnetic_connection_rod",
+      "requires": [
+        "part_assembly",
+        "advanced_aluminum_production",
+        "mam_caterium_7",
+        "advanced_steel_production"
+      ]
+    },
+    {
+      "id": "alt_oc_supercomputer",
+      "requires": [
+        "part_assembly",
+        "advanced_aluminum_production",
+        "bauxite_refinement",
+        "aeronautical_engineering"
+      ]
+    },
+    {
+      "id": "alt_turbo_electric_motor",
+      "requires": [
+        "industrial_manufacturing",
+        "advanced_aluminum_production",
+        "advanced_steel_production",
+        "bauxite_refinement",
+        "part_assembly",
+        "leading_edge_production"
+      ]
+    },
+    {
+      "id": "alt_heat_fused_frame",
+      "requires": [
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing",
+        "bauxite_refinement",
+        "advanced_aluminum_production",
+        "industrial_manufacturing"
+      ]
+    },
+    {
+      "id": "alt_petroleum_diamond",
+      "requires": [
+        "matter_conversion",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_pink_diamond",
+      "requires": [
+        "matter_conversion",
+        "mam_quartz_1"
+      ]
+    },
+    {
+      "id": "alt_iron_ficsite_ingot",
+      "requires": [
+        "matter_conversion"
+      ]
+    },
+    {
+      "id": "alt_brass_ficsite_ingot",
+      "requires": [
+        "mam_caterium_1",
+        "matter_conversion"
+      ]
+    },
+    {
+      "id": "alt_dark_matter_trap",
+      "requires": [
+        "particle_enrichment",
+        "matter_conversion"
+      ]
+    }
+  ],
   "removed_recipes": [
     "cgs:mixing/steel_ingot",
     "create:mixing/brass_ingot",
     "create:mixing/lava_from_cobble",
     "createdieselgenerators:distillation/superheated_crude_oil",
     "create:crafting/kinetics/water_wheel",
-    "create:crafting/kinetics/large_water_wheel"
+    "create:crafting/kinetics/large_water_wheel",
+    "create:splashing/crushed_raw_iron",
+    "create:splashing/crushed_raw_copper"
   ],
   "workshop": [
     {

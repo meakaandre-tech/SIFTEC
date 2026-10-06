@@ -1,0 +1,15 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_copper"
+  ],
+  "results": [
+    {
+      "id": "minecraft:iron_ingot",
+      "count": 5
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:steel_pipe",
+  "ingredient": "siftec:iron_rod",
+  "results": [
+    {
+      "id": "siftec:rotor",
+      "count": 2
+    }
+  ]
+}

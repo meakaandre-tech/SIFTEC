@@ -152,6 +152,8 @@ public final class SiftecCommands {
         report(source, "SELFTEST food: " + com.meakaandre.siftec.food.Food.describe(source.getLevel(), net.minecraft.world.item.Items.GOLDEN_CARROT)
             + "; " + com.meakaandre.siftec.food.Food.describe(source.getLevel(), net.minecraft.world.item.Items.PUMPKIN_PIE)
             + "; " + com.meakaandre.siftec.food.Food.describe(source.getLevel(), net.minecraft.world.item.Items.BREAD));
+        report(source, "SELFTEST alternates: " + com.meakaandre.siftec.hub.Alternates.total() + " in the pool; a company that has only done Tier 0 could be offered "
+            + com.meakaandre.siftec.hub.Alternates.eligible(company));
         report(source, "SELFTEST hub: Create's speed limit now reads " + com.zurrtum.create.infrastructure.config.AllConfigs.server().kinetics.maxRotationSpeed.get());
         return 1;
     }

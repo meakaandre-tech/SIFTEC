@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:circuit_board",
+    "B": "siftec:quickwire",
+    "C": "siftec:rubber"
+  },
+  "pattern": [
+    "AAB",
+    "BBB",
+    "BCC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:computer"
+  }
+}

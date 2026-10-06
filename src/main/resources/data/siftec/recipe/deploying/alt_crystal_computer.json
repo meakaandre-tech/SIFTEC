@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:circuit_board",
+  "ingredient": "siftec:crystal_oscillator",
+  "results": [
+    {
+      "id": "siftec:computer",
+      "count": 2
+    }
+  ]
+}

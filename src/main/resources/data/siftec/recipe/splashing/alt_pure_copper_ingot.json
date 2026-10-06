@@ -1,0 +1,10 @@
+{
+  "type": "create:splashing",
+  "ingredient": "create:crushed_raw_copper",
+  "results": [
+    {
+      "id": "minecraft:copper_ingot",
+      "count": 2
+    }
+  ]
+}

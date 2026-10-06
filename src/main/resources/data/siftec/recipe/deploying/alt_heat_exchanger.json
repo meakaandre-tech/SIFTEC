@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:aluminum_casing",
+  "ingredient": "siftec:rubber",
+  "results": [
+    {
+      "id": "siftec:heat_sink"
+    }
+  ]
+}

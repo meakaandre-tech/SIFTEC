@@ -46,11 +46,30 @@ def slug(name):
     return item(name).split(":")[-1].replace("/", "_")
 
 
+ALTS = {}    # alternate id -> {"name", "text", "paths"}: the Hard Drive pool
+_alt = None
+
+
 def add(kind, name, body):
     path = f"{kind}/{name}"
     if path in OUT:
         raise SystemExit(f"recipes: duplicate {path}")
     OUT[path] = body
+    if _alt:
+        ALTS[_alt]["paths"].append(path)
+
+
+def alt(aid, name, text):
+    """Everything added until the next alt() or end_alts() belongs to this alternate. Returns the recipe name to use."""
+    global _alt
+    _alt = aid
+    ALTS[aid] = {"name": name, "text": text, "paths": []}
+    return "alt_" + aid
+
+
+def end_alts():
+    global _alt
+    _alt = None
 
 
 def simple(kind, inp, out, n=1, time=None, name=None):
@@ -140,8 +159,102 @@ def sequence(base, out, steps, loops, name=None):
         "transitional_item": {"id": "siftec:incomplete_" + slug(out)}, "result": {"id": item(out)}, "loops": loops, "sequence": seq})
 
 
+def alternates():
+    """The Hard Drive pool. Each is a second way to make a part; a machine runs it once its company has picked it."""
+    R, FR, MF, SP = "Reinforced Iron Plate", "Iron Rod", "Modular Frame", "Steel Pipe"
+    HOR = "heavy oil residue"
+    # tiers 0 to 2
+    saw("Iron Sheet", "Wire", 3, alt("iron_wire", "Iron Wire", "1 Iron Sheet makes 3 Wire (Mechanical Saw)"))
+    deploy("Iron Sheet", "Wire", R, 1, alt("stitched_iron_plate", "Stitched Iron Plate", "Iron Sheet + Wire makes 1 Reinforced Iron Plate (Deployer)"))
+    deploy(R, "Screw", MF, 1, alt("bolted_frame", "Bolted Frame", "Reinforced Iron Plate + Screw makes 1 Modular Frame (Deployer)"))
+    deploy("Copper Sheet", "Screw", "Rotor", 1, alt("copper_rotor", "Copper Rotor", "Copper Sheet + Screw makes 1 Rotor (Deployer)"))
+    # tiers 3 and 4
+    mix(alt("iron_alloy_ingot", "Iron Alloy Ingot", "2 Raw Iron + 1 Raw Copper makes 5 Iron Ingot (heated Mixer)"),
+        items=["Raw Iron", "Raw Iron", "Raw Copper"], results=[("Iron Ingot", 5)], heated=True)
+    mix(alt("solid_steel_ingot", "Solid Steel Ingot", "1 Iron Ingot + 1 Coal makes 2 Steel Ingot (heated Mixer)"),
+        items=["Iron Ingot", "Coal"], results=[("Steel Ingot", 2)], heated=True)
+    compact(alt("cast_screw", "Cast Screw", "1 Iron Ingot makes 5 Screw (heated Press over a Basin)"), items=["Iron Ingot"], results=[("Screw", 5)], heated=True)
+    mix(alt("wet_concrete", "Wet Concrete", "2 Limestone + 250 mB water makes 2 Concrete (Mixer)"),
+        items=["Limestone", "Limestone"], fluids=[("water", 250)], results=[("Concrete", 2)])
+    saw("Steel Beam", FR, 4, alt("steel_rod", "Steel Rod", "1 Steel Beam makes 4 Iron Rod (Mechanical Saw)"))
+    saw(SP, "Screw", 8, alt("steel_screw", "Steel Screw", "1 Steel Pipe makes 8 Screw (Mechanical Saw)"))
+    deploy(SP, FR, "Rotor", 2, alt("steel_rotor", "Steel Rotor", "Steel Pipe + Iron Rod makes 2 Rotor (Deployer)"))
+    deploy(R, SP, MF, 2, alt("steeled_frame", "Steeled Frame", "Reinforced Iron Plate + Steel Pipe makes 2 Modular Frame (Deployer)"))
+    deploy(SP, "Concrete", "Encased Industrial Beam", 1, alt("encased_industrial_pipe", "Encased Industrial Pipe", "Steel Pipe + Concrete makes 1 Encased Industrial Beam (Deployer)"))
+    wash("create:crushed_raw_iron", "Iron Ingot", 2, alt("pure_iron_ingot", "Pure Iron Ingot", "1 crushed raw iron makes 2 Iron Ingot (Fan washing)"))
+    wash("create:crushed_raw_copper", "Copper Ingot", 2, alt("pure_copper_ingot", "Pure Copper Ingot", "1 crushed raw copper makes 2 Copper Ingot (Fan washing)"))
+    smelt("Solid Biofuel", "Coal", alt("biocoal", "Biocoal", "1 Solid Biofuel makes 1 Coal (Fan smelting or a furnace)"))
+    # tiers 5 and 6
+    mix(alt("coke_steel_ingot", "Coke Steel Ingot", "2 Raw Iron + 1 Petroleum Coke makes 3 Steel Ingot (heated Mixer)"),
+        items=["Raw Iron", "Raw Iron", "Petroleum Coke"], results=[("Steel Ingot", 3)], heated=True)
+    mix(alt("recycled_plastic", "Recycled Plastic", "1 Rubber + 250 mB diesel makes 2 Plastic (heated Mixer)"),
+        items=["Rubber"], fluids=[("diesel", 250)], results=[("Plastic", 2)], heated=True)
+    mix(alt("recycled_rubber", "Recycled Rubber", "1 Plastic + 250 mB diesel makes 2 Rubber (heated Mixer)"),
+        items=["Plastic"], fluids=[("diesel", 250)], results=[("Rubber", 2)], heated=True)
+    mix(alt("residual_rubber", "Residual Rubber", "250 mB Heavy Oil Residue + 250 mB water makes 2 Rubber (heated Mixer)"),
+        fluids=[(HOR, 250), ("water", 250)], results=[("Rubber", 2)], heated=True)
+    deploy("Iron Ingot", "Plastic", "Iron Sheet", 3, alt("coated_iron_plate", "Coated Iron Plate", "Iron Ingot + Plastic makes 3 Iron Sheet (Deployer)"))
+    deploy("Iron Sheet", "Rubber", R, 2, alt("adhered_iron_plate", "Adhered Iron Plate", "Iron Sheet + Rubber makes 2 Reinforced Iron Plate (Deployer)"))
+    mix(alt("coated_cable", "Coated Cable", "2 Wire + 250 mB Heavy Oil Residue makes 4 Cable (Mixer)"),
+        items=["Wire", "Wire"], fluids=[(HOR, 250)], results=[("Cable", 4)])
+    mix(alt("insulated_cable", "Insulated Cable", "2 Wire + 1 Rubber makes 4 Cable (Mixer)"), items=["Wire", "Wire", "Rubber"], results=[("Cable", 4)])
+    crafter("Smart Plating", [(1, R), (1, "Rotor"), (2, "Plastic")], 2,
+            alt("plastic_smart_plating", "Plastic Smart Plating", "1 Reinforced Iron Plate, 1 Rotor, 2 Plastic makes 2 Smart Plating (Mechanical Crafter)"))
+    crafter("Versatile Framework", [(1, MF), (3, "Steel Beam"), (2, "Rubber")], 2,
+            alt("flexible_framework", "Flexible Framework", "1 Modular Frame, 3 Steel Beam, 2 Rubber makes 2 Versatile Framework (Mechanical Crafter)"))
+    crafter("Heavy Modular Frame", [(3, MF), (2, "Encased Industrial Beam"), (2, SP), (2, "Concrete")], 2,
+            alt("heavy_encased_frame", "Heavy Encased Frame", "3 Modular Frame, 2 Encased Industrial Beam, 2 Steel Pipe, 2 Concrete makes 2 Heavy Modular Frame (Mechanical Crafter)"))
+    # needing a MAM tree
+    mix(alt("fused_quickwire", "Fused Quickwire", "1 Brass Ingot + 2 Copper Ingot makes 12 Quickwire (Mixer)"),
+        items=["Brass Ingot", "Copper Ingot", "Copper Ingot"], results=[("Quickwire", 12)])
+    deploy("Quickwire", "Rubber", "Cable", 3, alt("quickwire_cable", "Quickwire Cable", "Quickwire + Rubber makes 3 Cable (Deployer)"))
+    deploy(SP, "Quickwire", "Stator", 2, alt("quickwire_stator", "Quickwire Stator", "Steel Pipe + Quickwire makes 2 Stator (Deployer)"))
+    deploy("Plastic", "Quickwire", "Circuit Board", 2, alt("caterium_circuit_board", "Caterium Circuit Board", "Plastic + Quickwire makes 2 Circuit Board (Deployer)"))
+    crafter("Computer", [(2, "Circuit Board"), (5, "Quickwire"), (2, "Rubber")], 1,
+            alt("caterium_computer", "Caterium Computer", "2 Circuit Board, 5 Quickwire, 2 Rubber makes 1 Computer (Mechanical Crafter)"))
+    crafter("Automated Wiring", [(2, "Stator"), (4, "Wire"), (1, "High-Speed Connector")], 4,
+            alt("automated_speed_wiring", "Automated Speed Wiring", "2 Stator, 4 Wire, 1 High-Speed Connector makes 4 Automated Wiring (Mechanical Crafter)"))
+    compact(alt("fine_concrete", "Fine Concrete", "1 Silica + 2 Limestone makes 2 Concrete (Press over a Basin)"),
+            items=["Silica", "Limestone", "Limestone"], results=[("Concrete", 2)])
+    deploy("Copper Sheet", "Silica", "Circuit Board", 2, alt("silicon_circuit_board", "Silicon Circuit Board", "Copper Sheet + Silica makes 2 Circuit Board (Deployer)"))
+    deploy("Circuit Board", "Crystal Oscillator", "Computer", 2, alt("crystal_computer", "Crystal Computer", "Circuit Board + Crystal Oscillator makes 2 Computer (Deployer)"))
+    crafter("Motor", [(2, "Rotor"), (2, "Stator"), (1, "Crystal Oscillator")], 3,
+            alt("rigor_motor", "Rigor Motor", "2 Rotor, 2 Stator, 1 Crystal Oscillator makes 3 Motor (Mechanical Crafter)"))
+    crafter("Crystal Oscillator", [(3, "Quartz Crystal"), (2, "Rubber"), (1, "AI Limiter")], 1,
+            alt("insulated_crystal_oscillator", "Insulated Crystal Oscillator", "3 Quartz Crystal, 2 Rubber, 1 AI Limiter makes 1 Crystal Oscillator (Mechanical Crafter)"))
+    mix(alt("compacted_steel_ingot", "Compacted Steel Ingot", "2 Raw Iron + 1 Compacted Coal makes 4 Steel Ingot (heated Mixer)"),
+        items=["Raw Iron", "Raw Iron", "Compacted Coal"], results=[("Steel Ingot", 4)], heated=True)
+    mix(alt("turbo_heavy_fuel", "Turbo Heavy Fuel", "250 mB Heavy Oil Residue + 1 Compacted Coal makes 250 mB Turbofuel (heated Mixer)"),
+        items=["Compacted Coal"], fluids=[(HOR, 250)], fluid_results=[("turbofuel", 250)], heated=True)
+    # tiers 7 and 8
+    mix(alt("sloppy_alumina", "Sloppy Alumina", "1 Crushed Bauxite + 500 mB water makes 500 mB Alumina Solution (heated Mixer)"),
+        items=["Crushed Bauxite"], fluids=[("water", 500)], fluid_results=[("alumina solution", 500)], heated=True)
+    mix(alt("electrode_aluminum_scrap", "Electrode Aluminum Scrap", "250 mB Alumina Solution + 1 Petroleum Coke makes 4 Aluminum Scrap (heated Mixer)"),
+        items=["Petroleum Coke"], fluids=[("alumina solution", 250)], results=[("Aluminum Scrap", 4)], heated=True)
+    compact(alt("pure_aluminum_ingot", "Pure Aluminum Ingot", "2 Aluminum Scrap makes 1 Aluminum Ingot, no Silica (heated Press over a Basin)"),
+            items=["Aluminum Scrap", "Aluminum Scrap"], results=["Aluminum Ingot"], heated=True)
+    mix(alt("diluted_fuel", "Diluted Fuel", "250 mB Heavy Oil Residue + 500 mB water makes 500 mB diesel (heated Mixer)"),
+        fluids=[(HOR, 250), ("water", 500)], fluid_results=[("diesel", 500)], heated=True)
+    deploy("Aluminum Casing", "Rubber", "Heat Sink", 1, alt("heat_exchanger", "Heat Exchanger", "Aluminum Casing + Rubber makes 1 Heat Sink (Deployer)"))
+    mix(alt("cooling_device", "Cooling Device", "1 Heat Sink, 1 Motor, 250 mB Nitrogen makes 2 Cooling System (heated Mixer)"),
+        items=["Heat Sink", "Motor"], fluids=[("nitrogen", 250)], results=[("Cooling System", 2)], heated=True)
+    crafter("Radio Control Unit", [(1, "Crystal Oscillator"), (2, "Circuit Board"), (3, "Aluminum Casing"), (2, "Rubber")], 2,
+            alt("radio_control_system", "Radio Control System", "1 Crystal Oscillator, 2 Circuit Board, 3 Aluminum Casing, 2 Rubber makes 2 Radio Control Unit (Mechanical Crafter)"))
+    deploy("Electromagnetic Control Rod", "Rotor", "Motor", 2, alt("electric_motor", "Electric Motor", "Electromagnetic Control Rod + Rotor makes 2 Motor (Deployer)"))
+    deploy("Stator", "High-Speed Connector", "Electromagnetic Control Rod", 2,
+           alt("electromagnetic_connection_rod", "Electromagnetic Connection Rod", "Stator + High-Speed Connector makes 2 Electromagnetic Control Rod (Deployer)"))
+    deploy("Radio Control Unit", "Cooling System", "Supercomputer", 1, alt("oc_supercomputer", "OC Supercomputer", "Radio Control Unit + Cooling System makes 1 Supercomputer (Deployer)"))
+    crafter("Turbo Motor", [(2, "Motor"), (2, "Radio Control Unit"), (2, "Electromagnetic Control Rod"), (2, "Rotor")], 2,
+            alt("turbo_electric_motor", "Turbo Electric Motor", "2 Motor, 2 Radio Control Unit, 2 Electromagnetic Control Rod, 2 Rotor makes 2 Turbo Motor (Mechanical Crafter)"))
+    mix(alt("heat_fused_frame", "Heat-Fused Frame", "1 Heavy Modular Frame, 4 Aluminum Ingot, 250 mB Nitric Acid, 250 mB diesel makes 1 Fused Modular Frame (heated Mixer)"),
+        items=["Heavy Modular Frame"] + ["Aluminum Ingot"] * 4, fluids=[("nitric acid", 250), ("diesel", 250)], results=["Fused Modular Frame"], heated=True)
+    end_alts()
+
+
 def build():
     OUT.clear()
+    ALTS.clear()
+    alternates()
     # ---- tiers 0 to 2 -------------------------------------------------------------------------
     saw("Iron Ingot", "Iron Rod")
     saw("Copper Ingot", "Wire", 2)
@@ -283,6 +396,8 @@ REMOVED = [
     "create:mixing/lava_from_cobble",                           # superheated; lava comes from Ignimbrite
     "createdieselgenerators:distillation/superheated_crude_oil",
     "create:crafting/kinetics/water_wheel", "create:crafting/kinetics/large_water_wheel",
+    # washing crushed ore now belongs to the Pure Iron Ingot and Pure Copper Ingot alternates
+    "create:splashing/crushed_raw_iron", "create:splashing/crushed_raw_copper",
 ]
 
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked.

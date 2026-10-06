@@ -1,0 +1,14 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:silica",
+    "create:limestone",
+    "create:limestone"
+  ],
+  "results": [
+    {
+      "id": "minecraft:light_gray_concrete",
+      "count": 2
+    }
+  ]
+}

@@ -20,7 +20,7 @@ import java.util.Map;
 
 /** One recipe of the Converter or the Particle Accelerator. Fluid amounts are in mB. */
 public record ProcessorRecipe(List<Milestone.Cost> inputs, Identifier fluidIn, int fluidInMb, Identifier outItem, int outCount,
-                              Identifier fluidOut, int fluidOutMb, int seconds) {
+                              Identifier fluidOut, int fluidOutMb, int seconds, String alt) {
     private static final Map<String, List<ProcessorRecipe>> BY_MACHINE = new HashMap<>();
 
     public static List<ProcessorRecipe> of(String machine) {
@@ -44,7 +44,7 @@ public record ProcessorRecipe(List<Milestone.Cost> inputs, Identifier fluidIn, i
                     fin == null ? null : Identifier.parse(fin.get("fluid").getAsString()), fin == null ? 0 : fin.get("mb").getAsInt(),
                     out == null ? null : Identifier.parse(out.get("item").getAsString()), out == null ? 0 : out.get("count").getAsInt(),
                     fout == null ? null : Identifier.parse(fout.get("fluid").getAsString()), fout == null ? 0 : fout.get("mb").getAsInt(),
-                    o.get("seconds").getAsInt()));
+                    o.get("seconds").getAsInt(), o.has("alt") ? o.get("alt").getAsString() : null));
             }
             BY_MACHINE.put(machine, list);
         }

@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:iron_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:screw",
+      "count": 5
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:heavy_modular_frame",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "siftec:nitric_acid"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "createdieselgenerators:diesel"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:fused_modular_frame"
+    }
+  ]
+}

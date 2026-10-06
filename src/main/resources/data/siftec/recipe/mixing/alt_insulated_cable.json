@@ -1,0 +1,14 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:rubber"
+  ],
+  "results": [
+    {
+      "id": "siftec:cable",
+      "count": 4
+    }
+  ]
+}

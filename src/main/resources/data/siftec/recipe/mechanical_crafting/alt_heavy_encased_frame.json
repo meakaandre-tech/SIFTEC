@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:modular_frame",
+    "B": "siftec:encased_industrial_beam",
+    "C": "siftec:steel_pipe",
+    "D": "minecraft:light_gray_concrete"
+  },
+  "pattern": [
+    "AAA",
+    "BBC",
+    "CDD"
+  ],
+  "result": {
+    "count": 2,
+    "id": "siftec:heavy_modular_frame"
+  }
+}

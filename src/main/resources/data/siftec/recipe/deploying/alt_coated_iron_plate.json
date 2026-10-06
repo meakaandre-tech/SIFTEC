@@ -1,0 +1,11 @@
+{
+  "type": "create:deploying",
+  "target": "minecraft:iron_ingot",
+  "ingredient": "siftec:plastic",
+  "results": [
+    {
+      "id": "create:iron_sheet",
+      "count": 3
+    }
+  ]
+}
