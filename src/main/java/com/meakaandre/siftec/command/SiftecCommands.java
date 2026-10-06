@@ -117,7 +117,7 @@ public final class SiftecCommands {
         for (Milestone m : Milestones.all()) {
             count++;
             for (Milestone.Cost cost : m.cost()) {
-                if (cost.item() == net.minecraft.world.item.Items.AIR) missing.add(cost.itemId().toString());
+                if (!cost.present()) missing.add(cost.key());
             }
             for (Identifier item : m.items()) {
                 if (BuiltInRegistries.ITEM.getOptional(item).isEmpty()) missing.add(item.toString());

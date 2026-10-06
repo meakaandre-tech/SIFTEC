@@ -260,5 +260,84 @@ def parse_cost(text):
         count, name = piece.strip().split(" ", 1)
         if ":" not in name and name not in table:
             raise SystemExit(f"unknown part in cost: {name!r}")
-        out.append((name if ":" in name else table[name], int(count)))
+        out.append((name if ":" in name else table[name], int(count)))  # ids and #tags pass straight through
     return out
+
+
+# ---------------------------------------------------------------------------------------------------
+# MAM research. Tree: (id, name, icon item, [nodes]); node: (name, cost, time, unlock text, needs, items, tokens).
+# "needs" lists the node numbers (1-based) that must be done first; None means the node above.
+# A cost may name a tag ("#c:mushrooms") for "any of these".
+M = "minecraft:"
+MAM = [
+    ("megafauna", "Alien Megafauna", M + "rotten_flesh", [
+        ("Hostile Remains", "5 minecraft:rotten_flesh", "0:30", "Biomass from mob drops in the Millstone", [], [], []),
+        ("Bio-Organic Properties", "10 minecraft:bone, 10 minecraft:string", "1:00", "DNA Capsule, for AWESOME Sink points", None, ["siftec:dna_capsule"], []),
+        ("The Rebar Gun", "10 Reinforced Iron Plate, 25 Iron Rod, 50 Screw", "2:00", "Nailgun and Copper Backtank", None, ["cgs:nailgun", C + "copper_backtank"], []),
+        ("Hostile Organism Detection", "10 minecraft:spider_eye, 10 Gunpowder, 25 Wire", "2:00", "The Object Scanner can find hostile mobs", None, [], ["object:mobs"]),
+        ("Inflated Pocket Dimension", "5 DNA Capsule, 3 minecraft:ender_pearl, 25 Cable", "3:00", "+3 backpack slots", None, [], ["backpack"]),
+    ]),
+    ("caterium", "Caterium", C + "raw_zinc", [
+        ("Caterium", "10 Raw Zinc", "0:30", "Brass blend, Brass Ingot, Brass Sheet", [], ["siftec:brass_blend", C + "brass_ingot", C + "brass_sheet"], []),
+        ("Quickwire", "10 Brass Ingot", "1:00", "Quickwire", [1], ["siftec:quickwire"], []),
+        ("Caterium Electronics", "50 Quickwire", "2:00", "Electron Tube, Precision Mechanism, Brass Funnel, Brass Tunnel, Smart Chute, filters", [2],
+         [C + "electron_tube", C + "precision_mechanism", C + "brass_funnel", C + "brass_tunnel", C + "smart_chute", C + "filter", C + "attribute_filter"], []),
+        ("AI Limiter", "100 Quickwire, 50 Copper Sheet", "3:00", "AI Limiter, Mechanical Arm", [3], ["siftec:ai_limiter", C + "mechanical_arm"], []),
+        ("Power Switch", "50 Quickwire, 25 Rotor", "2:00", "Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Rotation Speed Controller", [2],
+         [C + "clutch", C + "gearshift", C + "sequenced_gearshift", C + "adjustable_chain_gearshift", C + "rotation_speed_controller"], []),
+        ("Zipline", "100 Quickwire, 50 Cable", "2:00", "Zipline", [2], ["siftec:zipline"], []),
+        ("High-Speed Connector", "500 Quickwire, 25 Plastic", "5:00", "High-Speed Connector", [4], ["siftec:high_speed_connector"], []),
+    ]),
+    ("mycelia", "Mycelia", M + "brown_mushroom", [
+        ("Mycelia", "5 #c:mushrooms", "0:30", "Biomass from mushrooms in the Millstone", [], [], []),
+        ("Fabric", "25 #c:mushrooms, 100 Biomass", "1:00", "Fabric", [1], ["siftec:fabric"], []),
+        ("Parachute", "10 Fabric, 10 Cable", "2:00", "Parachute", [2], ["siftec:parachute"], []),
+        ("Diving Gear", "10 Fabric, 10 Copper Sheet", "2:00", "Diving Helmet and Diving Boots, then the netherite backtank and diving gear", [2],
+         [C + "copper_diving_helmet", C + "copper_diving_boots", C + "netherite_diving_helmet", C + "netherite_diving_boots", C + "netherite_backtank"], []),
+        ("Toxic Cellular Modification", "50 Fabric, 25 Rubber", "3:00", "Gas Filter and Gas Mask", [2], ["siftec:gas_filter", "siftec:gas_mask"], []),
+    ]),
+    ("nutrients", "Nutrients", M + "sweet_berries", [
+        ("Fermentation", "20 #c:crops, 10 minecraft:sugar", "1:00", "Bulk fermenter and vinegar", [], ["createdieselgenerators:bulk_fermenter"], ["food:vinegar"]),
+        ("Preserves", "10 minecraft:glass_bottle, 20 minecraft:sweet_berries", "2:00", "Pickles and jams", [1], [], ["food:preserves"]),
+        ("Brewing", "20 minecraft:apple, 10 minecraft:honey_bottle", "2:00", "Cider and mead", [1], [], ["food:brewing"]),
+        ("Seasoning", "10 minecraft:glowstone_dust, 10 minecraft:blaze_powder, 10 minecraft:nether_wart", "2:00", "Secret ingredients work in meals", [2], [], ["food:seasoning"]),
+        ("Automated Kitchen", "10 minecraft:bread, 10 Rotor", "3:00", "Cutting board recipes on the Deployer, cooking pot meals in the heated Mixer", [2], [], ["food:kitchen"]),
+    ]),
+    ("slugs", "Power Slugs", "siftec:blue_power_slug", [
+        ("Blue Power Slugs", "1 Blue Power Slug", "0:30", "Power Shards from blue slugs", [], ["siftec:power_shard"], []),
+        ("Overclock Production", "1 Power Shard, 50 Iron Sheet, 50 Wire", "1:00", "Machines take one shard", None, [], ["shards:1"]),
+        ("Yellow Power Shards", "1 Yellow Power Slug, 25 Rotor, 100 Cable", "2:00", "Shards from yellow slugs, and a second shard slot", None, [], ["shards:2"]),
+        ("Purple Power Shards", "1 Purple Power Slug, 25 Modular Frame, 25 Copper Sheet", "3:00", "Shards from purple slugs, and a third shard slot", None, [], ["shards:3"]),
+        ("Synthetic Power Shards", "10 Time Crystal, 10 Dark Matter Crystal", "5:00", "Time Crystal + Dark Matter Crystal makes a Power Shard on the Deployer", None, [], []),
+    ]),
+    ("quartz", "Quartz", M + "quartz", [
+        ("Quartz Crystals", "10 Nether Quartz", "0:30", "Quartz Crystal and Sand Paper", [], ["siftec:quartz_crystal", C + "sand_paper", C + "red_sand_paper"], []),
+        ("Silica", "10 Nether Quartz", "0:30", "Silica", [], ["siftec:silica"], []),
+        ("Radio Signal Scanning", "25 Quartz Crystal, 50 minecraft:redstone", "2:00", "Rose quartz and Create's redstone components", [1],
+         [C + "rose_quartz", C + "pulse_repeater", C + "pulse_extender", C + "pulse_timer", C + "powered_latch", C + "powered_toggle_latch",
+          C + "threshold_switch", C + "smart_observer", C + "analog_lever", C + "redstone_contact"], []),
+        ("Crystal Oscillator", "100 Quartz Crystal, 50 Reinforced Iron Plate", "3:00", "Crystal Oscillator", [1], ["siftec:crystal_oscillator"], []),
+        ("Frequency Mapping", "5 Crystal Oscillator, 50 minecraft:redstone", "3:00", "Redstone Link, Display Link, Display Board, Nixie Tube", [3, 4],
+         [C + "redstone_link", C + "display_link", C + "display_board", C + "nixie_tube"], []),
+        ("Blade Runners", "50 Silica, 10 Modular Frame", "2:00", "Blade Runners", [2], ["siftec:blade_runners"], []),
+        ("Radar Technology", "10 Crystal Oscillator, 25 Heavy Modular Frame", "5:00", "Radar Tower", [5], ["siftec:radar_tower"], []),
+    ]),
+    ("sulfur", "Sulfur", "cgs:sulfur", [
+        ("Black Powder", "10 Sulfur", "0:30", "Gunpowder from sulfur, coal or charcoal, and bone meal", [], [], []),
+        ("Ignimbrite", "20 Sulfur, 20 minecraft:cobblestone", "1:00", "Ignimbrite, fire charges, magma blocks and lava", [1], ["siftec:ignimbrite_bucket"], []),
+        ("Explosives", "50 Gunpowder, 10 Steel Pipe", "2:00", "TNT from the Spout, Frag Grenade", [2], ["cgs:frag_grenade"], []),
+        ("The Rifle", "50 Gunpowder, 25 Steel Pipe, 10 Motor", "3:00", "Revolver and Shotgun", [1], ["cgs:revolver", "cgs:shotgun"], []),
+        ("Heavy Weapons", "100 Gunpowder, 25 Motor, 10 Encased Industrial Beam", "5:00", "Gatling and Launcher", [4], ["cgs:gatling", "cgs:launcher"], []),
+        ("Compacted Coal", "25 Coal, 25 Sulfur", "2:00", "Compacted Coal", [1], ["siftec:compacted_coal"], []),
+        ("Turbofuel", "15 Compacted Coal, 20 createdieselgenerators:diesel_bucket", "5:00", "Turbofuel", [6], ["siftec:turbofuel_bucket"], []),
+    ]),
+    ("alien", "Alien Technology", "siftec:mercer_sphere", [
+        ("Mercer Sphere Analysis", "1 Mercer Sphere", "1:00", "The Object Scanner can find Mercer Spheres", [], [], ["object:mercer_sphere"]),
+        ("Dimensional Depot", "2 Mercer Sphere, 10 Modular Frame, 50 Cable", "3:00", "Dimensional Depot", [1], ["siftec:dimensional_depot"], []),
+        ("Depot Expansion", "3 Mercer Sphere, 25 Computer", "5:00", "Cloud stack size doubled", [2], [], ["depot:expansion"]),
+        ("Upload Upgrade", "3 Mercer Sphere, 25 Motor", "5:00", "Upload speed doubled", [2], [], ["depot:upload"]),
+        ("Somersloop Analysis", "1 Somersloop", "1:00", "The Object Scanner can find Somersloops", [], [], ["object:somersloop"]),
+        ("Production Amplifier", "1 Somersloop, 25 Circuit Board, 10 Motor", "5:00", "Miners take one Somersloop: double output at four times the stress", [5], [], ["amplifier"]),
+        ("Alien Energy Harvesting", "2 Somersloop, 10 Supercomputer", "5:00", "A machine can hold a Somersloop and Power Shards together", [6], [], ["amplifier:shards"]),
+    ]),
+]

@@ -57,7 +57,9 @@ public final class NodePlacer {
                 }
                 if (next == null) return;
                 ServerLevel level = server.getLevel(next.dimension());
-                if (level != null && placeChunk(level, next.x(), next.z())) placed++;
+                if (level == null) continue;
+                if (placeChunk(level, next.x(), next.z())) placed++;
+                if (NodeMap.ready(level) && level.hasChunk(next.x(), next.z())) com.meakaandre.siftec.collect.Collectibles.placeChunk(level, next.x(), next.z());
             }
         });
     }

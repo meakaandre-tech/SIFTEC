@@ -118,10 +118,9 @@ public class HubMenu extends ChestMenu {
             lore.add(Component.translatable("siftec.hub.done").withStyle(ChatFormatting.GREEN));
         } else {
             for (Milestone.Cost cost : m.cost()) {
-                Item item = cost.item();
-                if (item == Items.AIR) continue;
+                if (!cost.present()) continue;
                 int need = company.cost(cost), have = company.paid(m, cost);
-                lore.add(Component.translatable("siftec.hub.cost", new ItemStack(item).getItemName(), have, need)
+                lore.add(Component.translatable("siftec.hub.cost", cost.label(), have, need)
                     .withStyle(have >= need ? ChatFormatting.GREEN : ChatFormatting.WHITE));
             }
             if (m.seconds() > 0) lore.add(Component.translatable("siftec.hub.time", clock(m.seconds() * 20L)).withStyle(ChatFormatting.GRAY));
@@ -189,21 +188,16 @@ public class HubMenu extends ChestMenu {
 
     /** Takes what the milestone still needs out of the player's inventory. */
     private int deliver(Milestone m) {
-        Inventory inventory = player.getInventory();
+        return deliver(player, company, m);
+    }
+
+    public static int deliver(ServerPlayer player, Company company, Milestone m) {
         int total = 0;
         for (Milestone.Cost cost : m.cost()) {
-            Item item = cost.item();
-            if (item == Items.AIR) continue;
-            int need = company.needed(m, cost);
-            for (int i = 0; i < inventory.getContainerSize() && need > 0; i++) {
-                ItemStack stack = inventory.getItem(i);
-                if (!stack.is(item)) continue;
-                int take = Math.min(need, stack.getCount());
-                inventory.removeItem(i, take);
-                company.pay(m, cost, take);
-                need -= take;
-                total += take;
-            }
+            if (!cost.present()) continue;
+            int took = cost.take(player.getInventory(), company.needed(m, cost));
+            company.pay(m, cost, took);
+            total += took;
         }
         return total;
     }

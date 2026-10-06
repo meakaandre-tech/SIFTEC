@@ -1,6 +1,13 @@
 package com.meakaandre.siftec.block;
 
+import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.registry.ModBlockEntities;
+import com.meakaandre.siftec.registry.ModItems;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import com.zurrtum.create.content.kinetics.base.KineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
@@ -42,7 +49,40 @@ public class MinerBlock extends KineticBlock implements IBE<MinerBlockEntity>, I
         BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit
     ) {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
-        withBlockEntityDo(level, pos, miner -> miner.giveTo(player));
+        withBlockEntityDo(level, pos, miner -> {
+            if (player.isShiftKeyDown()) miner.ejectBoosts();
+            else miner.giveTo(player);
+        });
+        return InteractionResult.SUCCESS;
+    }
+
+    /** Power Shards and a Somersloop are slotted in by clicking the miner with them. */
+    @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        boolean shard = stack.is(ModItems.PARTS.get("power_shard")), loop = stack.is(ModItems.PARTS.get("somersloop"));
+        if (!shard && !loop) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
+        Company company = Companies.of(server);
+        withBlockEntityDo(level, pos, miner -> {
+            boolean both = company.hasToken("amplifier:shards") || server.hasInfiniteMaterials();
+            if (shard) {
+                int slots = server.hasInfiniteMaterials() ? 3 : company.best("shards:", 0);
+                if (miner.shards >= slots || miner.amplified && !both) {
+                    server.sendOverlayMessage(Component.translatable("siftec.boost.no_slot"));
+                    return;
+                }
+                miner.shards++;
+            } else {
+                if (miner.amplified || !(company.hasToken("amplifier") || server.hasInfiniteMaterials()) || miner.shards > 0 && !both) {
+                    server.sendOverlayMessage(Component.translatable("siftec.boost.no_slot"));
+                    return;
+                }
+                miner.amplified = true;
+            }
+            if (!server.hasInfiniteMaterials()) stack.shrink(1);
+            miner.boostChanged();
+            server.sendOverlayMessage(Component.translatable("siftec.boost.status", miner.shards, Component.translatable(miner.amplified ? "siftec.boost.yes" : "siftec.boost.no")));
+        });
         return InteractionResult.SUCCESS;
     }
 

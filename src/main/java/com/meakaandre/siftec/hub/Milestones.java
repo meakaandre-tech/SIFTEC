@@ -26,6 +26,11 @@ public final class Milestones {
     private static final java.util.Set<Identifier> REMOVED_RECIPES = new java.util.HashSet<>();
     private static final List<FluidDef> FLUIDS = new ArrayList<>();
     private static final List<Build> WORKSHOP = new ArrayList<>();
+    private static final List<Tree> TREES = new ArrayList<>();
+
+    /** A MAM research tree. */
+    public record Tree(String id, Identifier icon, List<Milestone> nodes) {
+    }
 
     public record FluidDef(String id, int color) {
     }
@@ -50,7 +55,7 @@ public final class Milestones {
                 JsonObject o = e.getAsJsonObject();
                 List<Milestone.Cost> cost = new ArrayList<>();
                 for (JsonElement c : o.getAsJsonArray("cost")) {
-                    cost.add(new Milestone.Cost(Identifier.parse(c.getAsJsonObject().get("item").getAsString()), c.getAsJsonObject().get("count").getAsInt()));
+                    cost.add(new Milestone.Cost(c.getAsJsonObject().get("item").getAsString(), c.getAsJsonObject().get("count").getAsInt()));
                 }
                 WORKSHOP.add(new Build(Identifier.parse(o.get("item").getAsString()), cost));
             }
@@ -67,6 +72,21 @@ public final class Milestones {
                 PHASES.add(m);
                 BY_ID.put(m.id(), m);
             }
+            java.util.Map<String, List<Milestone>> byTree = new java.util.HashMap<>();
+            for (JsonElement e : root.getAsJsonArray("milestones_mam")) {
+                JsonObject o = e.getAsJsonObject();
+                List<Milestone> nodes = byTree.computeIfAbsent(o.get("tree").getAsString(), k -> new ArrayList<>());
+                Milestone base = read(o, nodes.size());
+                List<String> needs = new ArrayList<>();
+                for (JsonElement n : o.getAsJsonArray("needs")) needs.add(n.getAsString());
+                Milestone m = new Milestone(base.id(), 100, base.index(), base.cost(), base.seconds(), base.items(), base.tokens(), o.get("tree").getAsString(), needs);
+                nodes.add(m);
+                BY_ID.put(m.id(), m);
+            }
+            for (JsonElement e : root.getAsJsonArray("trees")) {
+                JsonObject o = e.getAsJsonObject();
+                TREES.add(new Tree(o.get("id").getAsString(), Identifier.parse(o.get("icon").getAsString()), byTree.getOrDefault(o.get("id").getAsString(), List.of())));
+            }
         } catch (Exception e) {
             throw new IllegalStateException("SIFTEC could not read siftec_content.json", e);
         }
@@ -76,14 +96,14 @@ public final class Milestones {
         List<Milestone.Cost> cost = new ArrayList<>();
         for (JsonElement c : o.getAsJsonArray("cost")) {
             JsonObject co = c.getAsJsonObject();
-            cost.add(new Milestone.Cost(Identifier.parse(co.get("item").getAsString()), co.get("count").getAsInt()));
+            cost.add(new Milestone.Cost(co.get("item").getAsString(), co.get("count").getAsInt()));
         }
         List<Identifier> items = new ArrayList<>();
         for (JsonElement i : o.getAsJsonArray("items")) items.add(Identifier.parse(i.getAsString()));
         List<String> tokens = new ArrayList<>();
         JsonArray t = o.getAsJsonArray("tokens");
         for (JsonElement i : t) tokens.add(i.getAsString());
-        return new Milestone(o.get("id").getAsString(), o.get("tier").getAsInt(), index, cost, o.get("seconds").getAsInt(), items, tokens);
+        return new Milestone(o.get("id").getAsString(), o.has("tier") ? o.get("tier").getAsInt() : 100, index, cost, o.get("seconds").getAsInt(), items, tokens);
     }
 
     public static java.util.Set<Identifier> removedRecipes() {
@@ -118,6 +138,10 @@ public final class Milestones {
         return BY_TIER.get(tier);
     }
 
+    public static List<Tree> trees() {
+        return TREES;
+    }
+
     public static List<Milestone> phases() {
         return PHASES;
     }
@@ -136,6 +160,10 @@ public final class Milestones {
 
     /** What still has to be done before this one can be paid for, or null when it is open. */
     public static Milestone blocker(Company company, Milestone m) {
+        if (m.isResearch()) {
+            for (String need : m.needs()) if (!company.has(need)) return get(need);
+            return null;
+        }
         if (m.isPhase()) {
             if (!company.has("hub_upgrade_6")) return get("hub_upgrade_6");
             return m.index() > 0 && !company.has(PHASES.get(m.index() - 1).id()) ? PHASES.get(m.index() - 1) : null;

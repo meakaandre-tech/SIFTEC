@@ -44,8 +44,8 @@ public class DepotBlockEntity extends BlockEntity {
         cooldown = 0;
         Company company = CompanyData.get(level.getServer()).byId(companyId);
         if (company == null) return;
-        int budget = UPLOAD_PER_SECOND * (company.has("upload_upgrade") ? 2 : 1);
-        int limit = CLOUD_LIMIT * (company.has("depot_expansion") ? 2 : 1);
+        int budget = UPLOAD_PER_SECOND * (company.hasToken("depot:upload") ? 2 : 1);
+        int limit = CLOUD_LIMIT * (company.hasToken("depot:expansion") ? 2 : 1);
         for (Direction side : Direction.values()) {
             BlockPos next = worldPosition.relative(side);
             if (level.getBlockEntity(next) instanceof DepotBlockEntity) continue;

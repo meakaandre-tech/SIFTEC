@@ -25,6 +25,11 @@ public class Company {
     public String active = "";
     /** Overworld game time at which the HUB unlocks again. */
     public long lockUntil;
+    /** The MAM node being researched, and the game time it finishes. Empty when nothing is running. */
+    /** Slugs and artefacts already picked up, as "x,z". */
+    public Set<String> collected = new LinkedHashSet<>();
+    public String research = "";
+    public long researchEnd;
     /** The Dimensional Depot cloud: item id -> count. */
     public Map<String, Integer> cloud = new HashMap<>();
 
@@ -43,7 +48,7 @@ public class Company {
 
     public int paid(Milestone m, Milestone.Cost cost) {
         Map<String, Integer> map = paid.get(m.id());
-        return map == null ? 0 : Math.min(cost(cost), map.getOrDefault(cost.itemId().toString(), 0));
+        return map == null ? 0 : Math.min(cost(cost), map.getOrDefault(cost.key(), 0));
     }
 
     public int needed(Milestone m, Milestone.Cost cost) {
@@ -51,12 +56,12 @@ public class Company {
     }
 
     public void pay(Milestone m, Milestone.Cost cost, int amount) {
-        paid.computeIfAbsent(m.id(), k -> new HashMap<>()).merge(cost.itemId().toString(), amount, Integer::sum);
+        paid.computeIfAbsent(m.id(), k -> new HashMap<>()).merge(cost.key(), amount, Integer::sum);
     }
 
     public boolean fullyPaid(Milestone m) {
         for (Milestone.Cost cost : m.cost()) {
-            if (cost.item() != net.minecraft.world.item.Items.AIR && needed(m, cost) > 0) return false;
+            if (cost.present() && needed(m, cost) > 0) return false;
         }
         return true;
     }

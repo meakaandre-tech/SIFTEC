@@ -161,6 +161,45 @@ for mid, name, cost, text in content.PHASES:
                            "seconds": 0, "items": [], "tokens": []})
     lang[f"siftec.milestone.{mid}"] = name
     lang[f"siftec.milestone.{mid}.unlocks"] = text
+# ---- MAM research: every node is stored like a milestone, with its tree and what it needs first
+data["trees"] = []
+for tree_id, tree_name, icon, nodes in content.MAM:
+    check(icon)
+    ids = [f"mam_{tree_id}_{n + 1}" for n in range(len(nodes))]
+    data["trees"].append({"id": tree_id, "icon": icon, "nodes": ids})
+    lang[f"siftec.tree.{tree_id}"] = tree_name
+    for n, (name, cost, time, text, needs, items, tokens) in enumerate(nodes):
+        for i in items: check(i)
+        if needs is None:
+            needs = [n] if n > 0 else []
+        data["milestones_mam"] = data.get("milestones_mam", [])
+        data["milestones_mam"].append({"id": ids[n], "tree": tree_id, "cost": [{"item": i, "count": c} for i, c in content.parse_cost(cost)],
+                                       "seconds": secs(time), "items": items, "tokens": tokens, "needs": [ids[k - 1] for k in needs]})
+        lang[f"siftec.milestone.{ids[n]}"] = name
+        lang[f"siftec.milestone.{ids[n]}.unlocks"] = text
+lang.update({"block.siftec.mam": "MAM", "siftec.mam.title": "MAM: %s", "siftec.mam.research": "Research time: %s",
+             "siftec.mam.busy": "Already researching %s", "siftec.mam.running": "Researching %s: %s left", "siftec.mam.idle": "No research running",
+             "siftec.mam.started": "Research started: %s", "siftec.mam.click": "Click to deliver parts from your inventory",
+             "siftec.tag.mushrooms": "any mushroom", "siftec.tag.crops": "any crop"})
+write(f"{A}/blockstates/mam.json", {"variants": {"": {"model": "siftec:block/mam"}}})
+write(f"{A}/models/block/mam.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
+    "top": "minecraft:block/lodestone_top", "side": "create:block/copper_casing", "bottom": "create:block/copper_casing"}})
+item_def("mam", "siftec:block/mam")
+write(f"{D}/loot_table/blocks/mam.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": "siftec:mam"}]}]})
+# ---- slugs and artefacts in the world
+lang.update({"item.siftec.object_scanner": "Object Scanner", "siftec.boost.no_slot": "No free slot for that: research more at the MAM", "siftec.boost.status": "Power Shards: %s, Somersloop: %s",
+             "siftec.boost.yes": "yes", "siftec.boost.no": "no", "siftec.collect.already": "Your company already collected this one",
+             "siftec.collect.got": "Collected: %s", "siftec.scanner.none_object": "No %s left in range"})
+write(f"{A}/models/item/object_scanner.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/compass_16"}})
+item_def("object_scanner", "siftec:item/object_scanner")
+COLLECT = {"blue_power_slug": ("minecraft:block/blue_concrete", "Blue Power Slug"), "yellow_power_slug": ("minecraft:block/yellow_concrete", "Yellow Power Slug"),
+           "purple_power_slug": ("minecraft:block/purple_concrete", "Purple Power Slug"), "mercer_sphere": ("minecraft:block/pink_concrete", "Mercer Sphere"),
+           "somersloop": ("minecraft:block/red_concrete", "Somersloop")}
+for cid, (tex, name) in COLLECT.items():
+    lang[f"block.siftec.{cid}_block"] = name
+    write(f"{A}/blockstates/{cid}_block.json", {"variants": {"": {"model": f"siftec:block/{cid}_block"}}})
+    write(f"{A}/models/block/{cid}_block.json", {"parent": "minecraft:block/block", "textures": {"particle": tex, "all": tex},
+          "elements": [{"from": [4, 0, 4], "to": [12, 8, 12], "faces": {f: {"texture": "#all"} for f in ("north", "south", "east", "west", "up", "down")}}]})
 for i in content.ALIAS.values(): check(i)
 # ---- fluids
 data["fluids"] = []
@@ -236,4 +275,4 @@ for b in ("portable_miner", "miner_mk1", "miner_mk2", "miner_mk3", "resource_wel
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:mam", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})

@@ -3,8 +3,11 @@ package com.meakaandre.siftec.registry;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlock;
 import com.meakaandre.siftec.block.MinerBlock;
+import com.meakaandre.siftec.collect.Collectible;
+import com.meakaandre.siftec.collect.CollectibleBlock;
 import com.meakaandre.siftec.depot.DepotBlock;
 import com.meakaandre.siftec.hub.HubBlock;
+import com.meakaandre.siftec.mam.MamBlock;
 import com.meakaandre.siftec.power.PoleBlock;
 import com.meakaandre.siftec.power.StorageBlock;
 import com.meakaandre.siftec.workshop.WorkshopBlock;
@@ -72,6 +75,21 @@ public class ModBlocks {
     public static final Supplier<PoleBlock> POWER_POLE = block("power_pole", properties -> new PoleBlock(24, properties), ModBlocks::machine);
     public static final Supplier<PoleBlock> POWER_TOWER = block("power_tower", properties -> new PoleBlock(64, properties), ModBlocks::machine);
     public static final Supplier<StorageBlock> POWER_STORAGE = block("power_storage", StorageBlock::new, ModBlocks::machine);
+
+    public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);
+
+    /** Slugs and artefacts: small, glowing, and impossible to break. */
+    public static final Map<Collectible, Supplier<CollectibleBlock>> COLLECTIBLES = new EnumMap<>(Collectible.class);
+
+    static {
+        for (Collectible type : Collectible.values()) {
+            Identifier id = Siftec.id(type.id() + "_block");
+            ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, id);
+            CollectibleBlock block = Registry.register(BuiltInRegistries.BLOCK, key, new CollectibleBlock(type,
+                node().noOcclusion().lightLevel(state -> 10).sound(SoundType.SLIME_BLOCK).setId(key)));
+            COLLECTIBLES.put(type, () -> block);
+        }
+    }
 
     private static <T extends Block> Supplier<T> block(
         String name, Function<BlockBehaviour.Properties, T> factory, Supplier<BlockBehaviour.Properties> properties

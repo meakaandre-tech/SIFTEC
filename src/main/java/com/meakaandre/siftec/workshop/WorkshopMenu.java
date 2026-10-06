@@ -47,15 +47,6 @@ public class WorkshopMenu extends ChestMenu {
             Component.translatable("siftec.workshop.title")));
     }
 
-    private int carried(Item item) {
-        Inventory inventory = player.getInventory();
-        int n = 0;
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            if (inventory.getItem(i).is(item)) n += inventory.getItem(i).getCount();
-        }
-        return n;
-    }
-
     private void refresh() {
         shown.clear();
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
@@ -67,10 +58,9 @@ public class WorkshopMenu extends ChestMenu {
             ItemStack icon = new ItemStack(result);
             List<Component> lore = new ArrayList<>();
             for (Milestone.Cost cost : build.cost()) {
-                Item item = cost.item();
-                if (item == Items.AIR) continue;
-                int have = Math.min(carried(item), cost.count());
-                lore.add(Component.empty().append(Component.translatable("siftec.hub.cost", new ItemStack(item).getItemName(), have, cost.count()))
+                if (!cost.present()) continue;
+                int have = Math.min(cost.carried(player.getInventory()), cost.count());
+                lore.add(Component.empty().append(Component.translatable("siftec.hub.cost", cost.label(), have, cost.count()))
                     .withStyle(style -> style.withItalic(false).withColor(have >= cost.count() ? ChatFormatting.GREEN : ChatFormatting.WHITE)));
             }
             lore.add(Component.empty().append(Component.translatable("siftec.workshop.click"))
@@ -84,22 +74,15 @@ public class WorkshopMenu extends ChestMenu {
     private void press(int slot) {
         if (slot >= shown.size()) return;
         Milestones.Build build = shown.get(slot);
+        Inventory inventory = player.getInventory();
         for (Milestone.Cost cost : build.cost()) {
-            if (cost.item() != Items.AIR && carried(cost.item()) < cost.count()) {
+            if (cost.present() && cost.carried(inventory) < cost.count()) {
                 player.sendOverlayMessage(Component.translatable("siftec.workshop.missing"));
                 return;
             }
         }
-        Inventory inventory = player.getInventory();
         for (Milestone.Cost cost : build.cost()) {
-            int need = cost.item() == Items.AIR ? 0 : cost.count();
-            for (int i = 0; i < inventory.getContainerSize() && need > 0; i++) {
-                ItemStack stack = inventory.getItem(i);
-                if (!stack.is(cost.item())) continue;
-                int take = Math.min(need, stack.getCount());
-                inventory.removeItem(i, take);
-                need -= take;
-            }
+            if (cost.present()) cost.take(inventory, cost.count());
         }
         ItemStack made = new ItemStack(BuiltInRegistries.ITEM.getValue(build.item()));
         player.sendOverlayMessage(Component.translatable("siftec.workshop.built", made.getItemName()));

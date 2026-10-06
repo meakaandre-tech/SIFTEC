@@ -35,6 +35,17 @@ public final class Companies {
                 player.getInventory().placeItemBackInInventory(new ItemStack(ModBlocks.HUB.get()), Prediction.SERVER_ONLY);
             }
         });
+        // once a second: finish any research whose time is up
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (server.getTickCount() % 20 != 0) return;
+            long now = server.overworld().getGameTime();
+            for (Company company : new java.util.ArrayList<>(CompanyData.get(server).companies().values())) {
+                if (company.research.isEmpty() || now < company.researchEnd) continue;
+                Milestone m = Milestones.get(company.research);
+                company.research = "";
+                if (m != null) complete(server, company, m, Component.literal(company.name));
+            }
+        });
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("company")
                 .executes(context -> info(context.getSource()))
@@ -95,7 +106,7 @@ public final class Companies {
         company.done.add(m.id());
         company.paid.remove(m.id());
         if (company.active.equals(m.id())) company.active = "";
-        if (!m.isPhase() && m.seconds() > 0) {
+        if (!m.isPhase() && !m.isResearch() && m.seconds() > 0) {
             company.lockUntil = server.overworld().getGameTime() + m.seconds() * 20L;
         }
         save(server);

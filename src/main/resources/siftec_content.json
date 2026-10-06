@@ -1689,6 +1689,1172 @@
     "create:empty_schematic",
     "create:schematic_and_quill"
   ],
+  "trees": [
+    {
+      "id": "megafauna",
+      "icon": "minecraft:rotten_flesh",
+      "nodes": [
+        "mam_megafauna_1",
+        "mam_megafauna_2",
+        "mam_megafauna_3",
+        "mam_megafauna_4",
+        "mam_megafauna_5"
+      ]
+    },
+    {
+      "id": "caterium",
+      "icon": "create:raw_zinc",
+      "nodes": [
+        "mam_caterium_1",
+        "mam_caterium_2",
+        "mam_caterium_3",
+        "mam_caterium_4",
+        "mam_caterium_5",
+        "mam_caterium_6",
+        "mam_caterium_7"
+      ]
+    },
+    {
+      "id": "mycelia",
+      "icon": "minecraft:brown_mushroom",
+      "nodes": [
+        "mam_mycelia_1",
+        "mam_mycelia_2",
+        "mam_mycelia_3",
+        "mam_mycelia_4",
+        "mam_mycelia_5"
+      ]
+    },
+    {
+      "id": "nutrients",
+      "icon": "minecraft:sweet_berries",
+      "nodes": [
+        "mam_nutrients_1",
+        "mam_nutrients_2",
+        "mam_nutrients_3",
+        "mam_nutrients_4",
+        "mam_nutrients_5"
+      ]
+    },
+    {
+      "id": "slugs",
+      "icon": "siftec:blue_power_slug",
+      "nodes": [
+        "mam_slugs_1",
+        "mam_slugs_2",
+        "mam_slugs_3",
+        "mam_slugs_4",
+        "mam_slugs_5"
+      ]
+    },
+    {
+      "id": "quartz",
+      "icon": "minecraft:quartz",
+      "nodes": [
+        "mam_quartz_1",
+        "mam_quartz_2",
+        "mam_quartz_3",
+        "mam_quartz_4",
+        "mam_quartz_5",
+        "mam_quartz_6",
+        "mam_quartz_7"
+      ]
+    },
+    {
+      "id": "sulfur",
+      "icon": "cgs:sulfur",
+      "nodes": [
+        "mam_sulfur_1",
+        "mam_sulfur_2",
+        "mam_sulfur_3",
+        "mam_sulfur_4",
+        "mam_sulfur_5",
+        "mam_sulfur_6",
+        "mam_sulfur_7"
+      ]
+    },
+    {
+      "id": "alien",
+      "icon": "siftec:mercer_sphere",
+      "nodes": [
+        "mam_alien_1",
+        "mam_alien_2",
+        "mam_alien_3",
+        "mam_alien_4",
+        "mam_alien_5",
+        "mam_alien_6",
+        "mam_alien_7"
+      ]
+    }
+  ],
+  "milestones_mam": [
+    {
+      "id": "mam_megafauna_1",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "minecraft:rotten_flesh",
+          "count": 5
+        }
+      ],
+      "seconds": 30,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_megafauna_2",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "minecraft:bone",
+          "count": 10
+        },
+        {
+          "item": "minecraft:string",
+          "count": 10
+        }
+      ],
+      "seconds": 60,
+      "items": [
+        "siftec:dna_capsule"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_megafauna_1"
+      ]
+    },
+    {
+      "id": "mam_megafauna_3",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 10
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 25
+        },
+        {
+          "item": "siftec:screw",
+          "count": 50
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "cgs:nailgun",
+        "create:copper_backtank"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_megafauna_2"
+      ]
+    },
+    {
+      "id": "mam_megafauna_4",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "minecraft:spider_eye",
+          "count": 10
+        },
+        {
+          "item": "minecraft:gunpowder",
+          "count": 10
+        },
+        {
+          "item": "siftec:wire",
+          "count": 25
+        }
+      ],
+      "seconds": 120,
+      "items": [],
+      "tokens": [
+        "object:mobs"
+      ],
+      "needs": [
+        "mam_megafauna_3"
+      ]
+    },
+    {
+      "id": "mam_megafauna_5",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "siftec:dna_capsule",
+          "count": 5
+        },
+        {
+          "item": "minecraft:ender_pearl",
+          "count": 3
+        },
+        {
+          "item": "siftec:cable",
+          "count": 25
+        }
+      ],
+      "seconds": 180,
+      "items": [],
+      "tokens": [
+        "backpack"
+      ],
+      "needs": [
+        "mam_megafauna_4"
+      ]
+    },
+    {
+      "id": "mam_caterium_1",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "create:raw_zinc",
+          "count": 10
+        }
+      ],
+      "seconds": 30,
+      "items": [
+        "siftec:brass_blend",
+        "create:brass_ingot",
+        "create:brass_sheet"
+      ],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_caterium_2",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "create:brass_ingot",
+          "count": 10
+        }
+      ],
+      "seconds": 60,
+      "items": [
+        "siftec:quickwire"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_1"
+      ]
+    },
+    {
+      "id": "mam_caterium_3",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 50
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "create:electron_tube",
+        "create:precision_mechanism",
+        "create:brass_funnel",
+        "create:brass_tunnel",
+        "create:smart_chute",
+        "create:filter",
+        "create:attribute_filter"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "mam_caterium_4",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 100
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 50
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "siftec:ai_limiter",
+        "create:mechanical_arm"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_3"
+      ]
+    },
+    {
+      "id": "mam_caterium_5",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 50
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 25
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "create:clutch",
+        "create:gearshift",
+        "create:sequenced_gearshift",
+        "create:adjustable_chain_gearshift",
+        "create:rotation_speed_controller"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "mam_caterium_6",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 100
+        },
+        {
+          "item": "siftec:cable",
+          "count": 50
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "siftec:zipline"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "mam_caterium_7",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 500
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 25
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:high_speed_connector"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_4"
+      ]
+    },
+    {
+      "id": "mam_mycelia_1",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "#c:mushrooms",
+          "count": 5
+        }
+      ],
+      "seconds": 30,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_mycelia_2",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "#c:mushrooms",
+          "count": 25
+        },
+        {
+          "item": "siftec:biomass",
+          "count": 100
+        }
+      ],
+      "seconds": 60,
+      "items": [
+        "siftec:fabric"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_1"
+      ]
+    },
+    {
+      "id": "mam_mycelia_3",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "siftec:fabric",
+          "count": 10
+        },
+        {
+          "item": "siftec:cable",
+          "count": 10
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "siftec:parachute"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_2"
+      ]
+    },
+    {
+      "id": "mam_mycelia_4",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "siftec:fabric",
+          "count": 10
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 10
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "create:copper_diving_helmet",
+        "create:copper_diving_boots",
+        "create:netherite_diving_helmet",
+        "create:netherite_diving_boots",
+        "create:netherite_backtank"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_2"
+      ]
+    },
+    {
+      "id": "mam_mycelia_5",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "siftec:fabric",
+          "count": 50
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 25
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "siftec:gas_filter",
+        "siftec:gas_mask"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_2"
+      ]
+    },
+    {
+      "id": "mam_nutrients_1",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "#c:crops",
+          "count": 20
+        },
+        {
+          "item": "minecraft:sugar",
+          "count": 10
+        }
+      ],
+      "seconds": 60,
+      "items": [
+        "createdieselgenerators:bulk_fermenter"
+      ],
+      "tokens": [
+        "food:vinegar"
+      ],
+      "needs": []
+    },
+    {
+      "id": "mam_nutrients_2",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "minecraft:glass_bottle",
+          "count": 10
+        },
+        {
+          "item": "minecraft:sweet_berries",
+          "count": 20
+        }
+      ],
+      "seconds": 120,
+      "items": [],
+      "tokens": [
+        "food:preserves"
+      ],
+      "needs": [
+        "mam_nutrients_1"
+      ]
+    },
+    {
+      "id": "mam_nutrients_3",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "minecraft:apple",
+          "count": 20
+        },
+        {
+          "item": "minecraft:honey_bottle",
+          "count": 10
+        }
+      ],
+      "seconds": 120,
+      "items": [],
+      "tokens": [
+        "food:brewing"
+      ],
+      "needs": [
+        "mam_nutrients_1"
+      ]
+    },
+    {
+      "id": "mam_nutrients_4",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "minecraft:glowstone_dust",
+          "count": 10
+        },
+        {
+          "item": "minecraft:blaze_powder",
+          "count": 10
+        },
+        {
+          "item": "minecraft:nether_wart",
+          "count": 10
+        }
+      ],
+      "seconds": 120,
+      "items": [],
+      "tokens": [
+        "food:seasoning"
+      ],
+      "needs": [
+        "mam_nutrients_2"
+      ]
+    },
+    {
+      "id": "mam_nutrients_5",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "minecraft:bread",
+          "count": 10
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 10
+        }
+      ],
+      "seconds": 180,
+      "items": [],
+      "tokens": [
+        "food:kitchen"
+      ],
+      "needs": [
+        "mam_nutrients_2"
+      ]
+    },
+    {
+      "id": "mam_slugs_1",
+      "tree": "slugs",
+      "cost": [
+        {
+          "item": "siftec:blue_power_slug",
+          "count": 1
+        }
+      ],
+      "seconds": 30,
+      "items": [
+        "siftec:power_shard"
+      ],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_slugs_2",
+      "tree": "slugs",
+      "cost": [
+        {
+          "item": "siftec:power_shard",
+          "count": 1
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 50
+        },
+        {
+          "item": "siftec:wire",
+          "count": 50
+        }
+      ],
+      "seconds": 60,
+      "items": [],
+      "tokens": [
+        "shards:1"
+      ],
+      "needs": [
+        "mam_slugs_1"
+      ]
+    },
+    {
+      "id": "mam_slugs_3",
+      "tree": "slugs",
+      "cost": [
+        {
+          "item": "siftec:yellow_power_slug",
+          "count": 1
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 25
+        },
+        {
+          "item": "siftec:cable",
+          "count": 100
+        }
+      ],
+      "seconds": 120,
+      "items": [],
+      "tokens": [
+        "shards:2"
+      ],
+      "needs": [
+        "mam_slugs_2"
+      ]
+    },
+    {
+      "id": "mam_slugs_4",
+      "tree": "slugs",
+      "cost": [
+        {
+          "item": "siftec:purple_power_slug",
+          "count": 1
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 25
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 25
+        }
+      ],
+      "seconds": 180,
+      "items": [],
+      "tokens": [
+        "shards:3"
+      ],
+      "needs": [
+        "mam_slugs_3"
+      ]
+    },
+    {
+      "id": "mam_slugs_5",
+      "tree": "slugs",
+      "cost": [
+        {
+          "item": "siftec:time_crystal",
+          "count": 10
+        },
+        {
+          "item": "siftec:dark_matter_crystal",
+          "count": 10
+        }
+      ],
+      "seconds": 300,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_slugs_4"
+      ]
+    },
+    {
+      "id": "mam_quartz_1",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "minecraft:quartz",
+          "count": 10
+        }
+      ],
+      "seconds": 30,
+      "items": [
+        "siftec:quartz_crystal",
+        "create:sand_paper",
+        "create:red_sand_paper"
+      ],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_quartz_2",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "minecraft:quartz",
+          "count": 10
+        }
+      ],
+      "seconds": 30,
+      "items": [
+        "siftec:silica"
+      ],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_quartz_3",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:quartz_crystal",
+          "count": 25
+        },
+        {
+          "item": "minecraft:redstone",
+          "count": 50
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "create:rose_quartz",
+        "create:pulse_repeater",
+        "create:pulse_extender",
+        "create:pulse_timer",
+        "create:powered_latch",
+        "create:powered_toggle_latch",
+        "create:threshold_switch",
+        "create:smart_observer",
+        "create:analog_lever",
+        "create:redstone_contact"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_1"
+      ]
+    },
+    {
+      "id": "mam_quartz_4",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:quartz_crystal",
+          "count": 100
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 50
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "siftec:crystal_oscillator"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_1"
+      ]
+    },
+    {
+      "id": "mam_quartz_5",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 5
+        },
+        {
+          "item": "minecraft:redstone",
+          "count": 50
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "create:redstone_link",
+        "create:display_link",
+        "create:display_board",
+        "create:nixie_tube"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_3",
+        "mam_quartz_4"
+      ]
+    },
+    {
+      "id": "mam_quartz_6",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:silica",
+          "count": 50
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 10
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "siftec:blade_runners"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_2"
+      ]
+    },
+    {
+      "id": "mam_quartz_7",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 10
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 25
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:radar_tower"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_5"
+      ]
+    },
+    {
+      "id": "mam_sulfur_1",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "cgs:sulfur",
+          "count": 10
+        }
+      ],
+      "seconds": 30,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_sulfur_2",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "cgs:sulfur",
+          "count": 20
+        },
+        {
+          "item": "minecraft:cobblestone",
+          "count": 20
+        }
+      ],
+      "seconds": 60,
+      "items": [
+        "siftec:ignimbrite_bucket"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_1"
+      ]
+    },
+    {
+      "id": "mam_sulfur_3",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "minecraft:gunpowder",
+          "count": 50
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 10
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "cgs:frag_grenade"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_2"
+      ]
+    },
+    {
+      "id": "mam_sulfur_4",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "minecraft:gunpowder",
+          "count": 50
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 25
+        },
+        {
+          "item": "siftec:motor",
+          "count": 10
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "cgs:revolver",
+        "cgs:shotgun"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_1"
+      ]
+    },
+    {
+      "id": "mam_sulfur_5",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "minecraft:gunpowder",
+          "count": 100
+        },
+        {
+          "item": "siftec:motor",
+          "count": 25
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 10
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "cgs:gatling",
+        "cgs:launcher"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_4"
+      ]
+    },
+    {
+      "id": "mam_sulfur_6",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "minecraft:coal",
+          "count": 25
+        },
+        {
+          "item": "cgs:sulfur",
+          "count": 25
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "siftec:compacted_coal"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_1"
+      ]
+    },
+    {
+      "id": "mam_sulfur_7",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "siftec:compacted_coal",
+          "count": 15
+        },
+        {
+          "item": "createdieselgenerators:diesel_bucket",
+          "count": 20
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:turbofuel_bucket"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_6"
+      ]
+    },
+    {
+      "id": "mam_alien_1",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 1
+        }
+      ],
+      "seconds": 60,
+      "items": [],
+      "tokens": [
+        "object:mercer_sphere"
+      ],
+      "needs": []
+    },
+    {
+      "id": "mam_alien_2",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 2
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:cable",
+          "count": 50
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "siftec:dimensional_depot"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_alien_1"
+      ]
+    },
+    {
+      "id": "mam_alien_3",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 3
+        },
+        {
+          "item": "siftec:computer",
+          "count": 25
+        }
+      ],
+      "seconds": 300,
+      "items": [],
+      "tokens": [
+        "depot:expansion"
+      ],
+      "needs": [
+        "mam_alien_2"
+      ]
+    },
+    {
+      "id": "mam_alien_4",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 3
+        },
+        {
+          "item": "siftec:motor",
+          "count": 25
+        }
+      ],
+      "seconds": 300,
+      "items": [],
+      "tokens": [
+        "depot:upload"
+      ],
+      "needs": [
+        "mam_alien_2"
+      ]
+    },
+    {
+      "id": "mam_alien_5",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:somersloop",
+          "count": 1
+        }
+      ],
+      "seconds": 60,
+      "items": [],
+      "tokens": [
+        "object:somersloop"
+      ],
+      "needs": []
+    },
+    {
+      "id": "mam_alien_6",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:somersloop",
+          "count": 1
+        },
+        {
+          "item": "siftec:circuit_board",
+          "count": 25
+        },
+        {
+          "item": "siftec:motor",
+          "count": 10
+        }
+      ],
+      "seconds": 300,
+      "items": [],
+      "tokens": [
+        "amplifier"
+      ],
+      "needs": [
+        "mam_alien_5"
+      ]
+    },
+    {
+      "id": "mam_alien_7",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:somersloop",
+          "count": 2
+        },
+        {
+          "item": "siftec:supercomputer",
+          "count": 10
+        }
+      ],
+      "seconds": 300,
+      "items": [],
+      "tokens": [
+        "amplifier:shards"
+      ],
+      "needs": [
+        "mam_alien_6"
+      ]
+    }
+  ],
   "fluids": [
     {
       "id": "heavy_oil_residue",
@@ -1810,6 +2976,40 @@
         {
           "item": "siftec:iron_rod",
           "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:mam",
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 5
+        },
+        {
+          "item": "siftec:cable",
+          "count": 15
+        },
+        {
+          "item": "siftec:wire",
+          "count": 45
+        }
+      ]
+    },
+    {
+      "item": "siftec:object_scanner",
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 4
+        },
+        {
+          "item": "siftec:wire",
+          "count": 20
+        },
+        {
+          "item": "siftec:screw",
+          "count": 50
         }
       ]
     },

@@ -62,7 +62,7 @@ public class HubBlockEntity extends BlockEntity {
         Milestone m = target(company);
         if (m == null) return 0;
         for (Milestone.Cost cost : m.cost()) {
-            if (stack.is(cost.item())) return company.needed(m, cost);
+            if (cost.matches(stack)) return company.needed(m, cost);
         }
         return 0;
     }
@@ -74,7 +74,7 @@ public class HubBlockEntity extends BlockEntity {
         if (m == null) return;
         MinecraftServer server = level.getServer();
         for (Milestone.Cost cost : m.cost()) {
-            if (!stack.is(cost.item())) continue;
+            if (!cost.matches(stack)) continue;
             company.pay(m, cost, Math.min(stack.getCount(), company.needed(m, cost)));
             Companies.save(server);
             if (company.fullyPaid(m)) Companies.complete(server, company, m, Component.literal(company.name));
