@@ -1,0 +1,24 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#c:crops/tomato",
+    "#c:crops/onion",
+    "#c:crops/beetroot",
+    "#c:foods/vegetable",
+    "minecraft:bowl"
+  ],
+  "results": [
+    {
+      "id": "farmersdelight:ratatouille"
+    }
+  ]
+}

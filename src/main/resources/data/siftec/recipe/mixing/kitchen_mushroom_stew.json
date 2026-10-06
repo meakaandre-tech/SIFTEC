@@ -1,0 +1,22 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#minecraft:mushrooms",
+    "#minecraft:mushrooms",
+    "minecraft:bowl"
+  ],
+  "results": [
+    {
+      "id": "minecraft:mushroom_stew"
+    }
+  ]
+}

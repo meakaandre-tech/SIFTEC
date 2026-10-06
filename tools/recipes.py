@@ -251,10 +251,67 @@ def alternates():
     end_alts()
 
 
+KITCHEN = []   # recipe paths converted from Farmer's Delight; they need the Automated Kitchen research
+
+
+def kitchen():
+    """Farmer's Delight on Create machines. Every cooking pot recipe becomes a heated Mixer recipe with its bowl or
+    bottle as an ingredient, and every cutting board recipe that uses a knife becomes a Deployer recipe with the
+    knife held (and kept). Converted from the recipes shipped in Farmer's Delight (tools/pack/farmersdelight.json)."""
+    import json, os
+    path = os.path.join(os.path.dirname(__file__), "pack", "farmersdelight.json")
+    if not os.path.exists(path):
+        return
+    bottles = {"apple_cider", "hot_cocoa", "glow_berry_custard"}
+    plain = {"cabbage_rolls", "dumplings", "dog_food"}
+    for key, body in sorted(json.load(open(path)).items()):
+        if not key.startswith("data/farmersdelight/recipe/"):
+            continue
+        name = key.split("/")[-1][:-5]
+        if body.get("type") == "farmersdelight:cooking" and name != "tomato_sauce":
+            extra = body.get("container", {}).get("id") if body.get("container") else ("minecraft:glass_bottle" if name in bottles else None if name in plain else "minecraft:bowl")
+            result = dict(body["result"])
+            add("mixing", "kitchen_" + name, {"type": "create:mixing", "heat_requirement": "heated",
+                "ingredients": list(body["ingredients"]) + ([extra] if extra else []), "results": [result]})
+            KITCHEN.append("mixing/kitchen_" + name)
+        elif body.get("type") == "farmersdelight:cutting" and body.get("tool") == "#c:tools/knife":
+            results = []
+            for r in body["result"]:
+                out = dict(r["item"])
+                if "chance" in r: out["chance"] = r["chance"]
+                results.append(out)
+            add("deploying", "kitchen_" + name, {"type": "create:deploying", "target": body["ingredients"][0], "ingredient": "#c:tools/knife",
+                "keep_held_item": True, "results": results})
+            KITCHEN.append("deploying/kitchen_" + name)
+
+
+def food():
+    """Vinegar, pickles, jams and mead (the Nutrients research)."""
+    FD = "farmersdelight:"
+    add("bulk_fermenting", "vinegar", {"type": "createdieselgenerators:bulk_fermenting", "processing_time": 400,
+        "ingredients": ["minecraft:sugar", "minecraft:sugar"], "fluid_ingredients": [fl_in("water", 250)], "fluid_results": [fl_out("vinegar", 250)]})
+    add("bulk_fermenting", "mead", {"type": "createdieselgenerators:bulk_fermenting", "processing_time": 400,
+        "ingredients": ["minecraft:honey_bottle", "minecraft:honey_bottle"], "fluid_ingredients": [fl_in("water", 250)], "fluid_results": [fl_out("mead", 500)],
+        "results": [{"id": "minecraft:glass_bottle", "count": 2}]})
+    spout("minecraft:glass_bottle", "mead", 250, "siftec:mead", name="mead")
+    for what, source in (("tomato", FD + "tomato"), ("onion", FD + "onion"), ("cabbage", FD + "cabbage"), ("pumpkin", FD + "pumpkin_slice"),
+                         ("carrot", "minecraft:carrot"), ("beetroot", "minecraft:beetroot"), ("kelp", "minecraft:kelp")):
+        spout(source, "vinegar", 250, "siftec:pickled_" + what, name="pickled_" + what)
+    for jam, fruit in (("sweet_berry_jam", "minecraft:sweet_berries"), ("glow_berry_jam", "minecraft:glow_berries"), ("apple_jam", "minecraft:apple"),
+                       ("melon_jam", "minecraft:melon_slice")):
+        mix(jam, items=[fruit, fruit, fruit, "minecraft:sugar"], results=["siftec:" + jam], heated=True)
+    # crop waste into Biomass
+    mill(FD + "straw", "Biomass", name="biomass_from_straw")
+    mill(FD + "tree_bark", "Biomass", name="biomass_from_bark")
+
+
 def build():
     OUT.clear()
     ALTS.clear()
+    KITCHEN.clear()
     alternates()
+    kitchen()
+    food()
     hand("siftec:hub_planner", [(1, "minecraft:stick"), (1, "#minecraft:planks")], name="hub_planner")
     # ---- tiers 0 to 2 -------------------------------------------------------------------------
     saw("Iron Ingot", "Iron Rod")
@@ -383,6 +440,9 @@ def build():
     for ore, ingot in (("iron", "minecraft:iron_ingot"), ("copper", "minecraft:copper_ingot"), ("zinc", "create:zinc_ingot")):
         mix("acid_leached_" + ore, items=["create:crushed_raw_" + ore], fluids=[("sulfuric acid", 250)],
             results=[(ingot, 2), "siftec:toxic_residue"], heated=True)
+    # Toxic Residue packed into paper shot, for a gun with the Blunderbuss Barrel
+    hand("siftec:toxic_shot", [(1, "cgs:paper_shot"), (1, "siftec:toxic_residue")], name="toxic_shot")
+    deploy("cgs:paper_shot", "siftec:toxic_residue", "siftec:toxic_shot", name="toxic_shot")
     mix("sulfur_from_acid", fluids=[("sulfuric acid", 500)], results=["Sulfur", "siftec:toxic_residue"], heated=True)
     # Block of Sulfur (vanilla's sulfur block) packs four Gunsmithing sulfur
     shaped("minecraft:sulfur", ["SS", "SS"], {"S": "Sulfur"}, name="block_of_sulfur")

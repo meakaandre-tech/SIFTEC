@@ -1,0 +1,26 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#c:crops/rice",
+    "#c:crops/onion",
+    "minecraft:brown_mushroom",
+    "#c:crops/potato",
+    "#c:foods/berry",
+    "#c:foods/vegetable",
+    "minecraft:pumpkin"
+  ],
+  "results": [
+    {
+      "id": "farmersdelight:stuffed_pumpkin_block"
+    }
+  ]
+}

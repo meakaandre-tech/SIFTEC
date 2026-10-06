@@ -1,0 +1,24 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#c:crops/potato",
+    "minecraft:rabbit",
+    "#c:crops/carrot",
+    "#minecraft:mushrooms",
+    "minecraft:bowl"
+  ],
+  "results": [
+    {
+      "id": "minecraft:rabbit_stew"
+    }
+  ]
+}

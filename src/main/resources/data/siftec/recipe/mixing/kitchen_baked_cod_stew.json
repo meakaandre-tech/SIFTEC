@@ -1,0 +1,24 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#c:foods/raw_cod",
+    "#c:crops/potato",
+    "#minecraft:eggs",
+    "#c:crops/tomato",
+    "minecraft:bowl"
+  ],
+  "results": [
+    {
+      "id": "farmersdelight:baked_cod_stew"
+    }
+  ]
+}

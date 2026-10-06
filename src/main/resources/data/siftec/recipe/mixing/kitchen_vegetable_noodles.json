@@ -1,0 +1,25 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#c:crops/carrot",
+    "#c:mushrooms",
+    "#c:foods/pasta",
+    "#c:foods/leafy_green",
+    "#c:foods/vegetable",
+    "minecraft:bowl"
+  ],
+  "results": [
+    {
+      "id": "farmersdelight:vegetable_noodles"
+    }
+  ]
+}

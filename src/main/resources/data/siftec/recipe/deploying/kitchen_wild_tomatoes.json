@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:deploying",
+  "target": "farmersdelight:wild_tomatoes",
+  "ingredient": "#c:tools/knife",
+  "keep_held_item": true,
+  "results": [
+    {
+      "id": "farmersdelight:tomato_seeds"
+    },
+    {
+      "id": "farmersdelight:tomato",
+      "chance": 0.2
+    },
+    {
+      "id": "minecraft:green_dye",
+      "chance": 0.1
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:deploying",
+  "target": "farmersdelight:wild_onions",
+  "ingredient": "#c:tools/knife",
+  "keep_held_item": true,
+  "results": [
+    {
+      "id": "farmersdelight:onion"
+    },
+    {
+      "count": 2,
+      "id": "minecraft:magenta_dye"
+    },
+    {
+      "id": "minecraft:lime_dye",
+      "chance": 0.1
+    }
+  ]
+}

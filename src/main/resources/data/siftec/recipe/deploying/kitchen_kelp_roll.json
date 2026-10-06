@@ -1,0 +1,20 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:deploying",
+  "target": "farmersdelight:kelp_roll",
+  "ingredient": "#c:tools/knife",
+  "keep_held_item": true,
+  "results": [
+    {
+      "count": 3,
+      "id": "farmersdelight:kelp_roll_slice"
+    }
+  ]
+}

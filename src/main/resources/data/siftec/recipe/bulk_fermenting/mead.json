@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "createdieselgenerators:bulk_fermenting",
+  "processing_time": 400,
+  "ingredients": [
+    "minecraft:honey_bottle",
+    "minecraft:honey_bottle"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:mead",
+      "amount": 40500
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:glass_bottle",
+      "count": 2
+    }
+  ]
+}

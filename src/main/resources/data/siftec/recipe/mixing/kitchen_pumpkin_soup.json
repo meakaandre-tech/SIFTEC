@@ -1,0 +1,24 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "farmersdelight:pumpkin_slice",
+    "#c:foods/leafy_green",
+    "#c:foods/raw_pork",
+    "#c:drinks/milk",
+    "minecraft:bowl"
+  ],
+  "results": [
+    {
+      "id": "farmersdelight:pumpkin_soup"
+    }
+  ]
+}

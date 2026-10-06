@@ -51,6 +51,7 @@ public class Siftec implements ModInitializer {
         Companies.register();
         Claims.register();
         com.meakaandre.siftec.geyser.Radiation.register();
+        com.meakaandre.siftec.compat.ToxicShot.register();
     }
 
     public static Identifier id(String path) {

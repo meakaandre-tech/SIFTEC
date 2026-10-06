@@ -1,0 +1,19 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:deploying",
+  "target": "#c:foods/dough",
+  "ingredient": "#c:tools/knife",
+  "keep_held_item": true,
+  "results": [
+    {
+      "id": "farmersdelight:raw_pasta"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "create:filling",
+  "ingredient": "minecraft:kelp",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 20250,
+    "fluid": "siftec:vinegar"
+  },
+  "result": {
+    "id": "siftec:pickled_kelp"
+  }
+}

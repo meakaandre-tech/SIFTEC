@@ -1,0 +1,22 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:deploying",
+  "target": "farmersdelight:wild_beetroots",
+  "ingredient": "#c:tools/knife",
+  "keep_held_item": true,
+  "results": [
+    {
+      "id": "minecraft:beetroot_seeds"
+    },
+    {
+      "id": "minecraft:red_dye"
+    }
+  ]
+}

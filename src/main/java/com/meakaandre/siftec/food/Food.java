@@ -84,6 +84,60 @@ public final class Food {
         public static final Profile NONE = new Profile(Set.of(), Prep.RAW);
     }
 
+    /** Pickles, jams and mead: each keeps the effect of what it was made from, at the Preserved level. */
+    public static final Map<String, Intrinsic> PRESERVES = new java.util.LinkedHashMap<>();
+
+    static {
+        PRESERVES.put("pickled_tomato", Intrinsic.TOMATO);
+        PRESERVES.put("pickled_onion", Intrinsic.ONION);
+        PRESERVES.put("pickled_cabbage", Intrinsic.CABBAGE);
+        PRESERVES.put("pickled_pumpkin", Intrinsic.PUMPKIN);
+        PRESERVES.put("pickled_carrot", Intrinsic.CARROT);
+        PRESERVES.put("pickled_beetroot", Intrinsic.BEETROOT);
+        PRESERVES.put("pickled_kelp", Intrinsic.KELP);
+        PRESERVES.put("sweet_berry_jam", Intrinsic.SWEET_BERRIES);
+        PRESERVES.put("glow_berry_jam", Intrinsic.GLOW_BERRIES);
+        PRESERVES.put("apple_jam", Intrinsic.APPLE);
+        PRESERVES.put("melon_jam", Intrinsic.MELON);
+        PRESERVES.put("mead", Intrinsic.HONEY);
+    }
+
+    /** Secret ingredients, and the mark each leaves on a food stack. */
+    private static final String SEASON = "siftec_season";
+    private static final Map<String, String> SEASONINGS = Map.of("minecraft:glowstone_dust", "long", "minecraft:blaze_powder", "strong", "minecraft:nether_wart", "bonus");
+
+    private static String seasonOf(ItemStack stack) {
+        net.minecraft.world.item.component.CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        return data == null ? "" : data.copyTag().getStringOr(SEASON, "");
+    }
+
+    /**
+     * Seasoning: hold glowstone dust, blaze powder or nether wart in the main hand and food in the off hand,
+     * and use. One of the ingredient goes on each item of food. Glowstone makes its effects last twice as
+     * long, blaze powder makes them one level stronger, nether wart adds one more effect at random.
+     */
+    private static net.minecraft.world.InteractionResult season(Player player, Level level, net.minecraft.world.InteractionHand hand) {
+        if (hand != net.minecraft.world.InteractionHand.MAIN_HAND) return net.minecraft.world.InteractionResult.PASS;
+        ItemStack spice = player.getMainHandItem(), food = player.getOffhandItem();
+        String kind = SEASONINGS.get(BuiltInRegistries.ITEM.getKey(spice.getItem()).toString());
+        if (kind == null || food.isEmpty() || !food.has(DataComponents.FOOD)) return net.minecraft.world.InteractionResult.PASS;
+        if (!(player instanceof ServerPlayer server)) return net.minecraft.world.InteractionResult.SUCCESS;
+        if (!server.hasInfiniteMaterials() && !com.meakaandre.siftec.company.Companies.of(server).hasToken("food:seasoning")) {
+            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.season.locked"));
+        } else if (!seasonOf(food).isEmpty()) {
+            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.season.already"));
+        } else if (spice.getCount() < food.getCount()) {
+            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.season.short", food.getCount()));
+        } else {
+            if (!server.hasInfiniteMaterials()) spice.shrink(food.getCount());
+            net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, food, tag -> tag.putString(SEASON, kind));
+            food.set(DataComponents.LORE, new net.minecraft.world.item.component.ItemLore(List.of(
+                net.minecraft.network.chat.Component.translatable("siftec.season." + kind).withStyle(style -> style.withItalic(false).withColor(net.minecraft.ChatFormatting.GOLD)))));
+            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.season." + kind));
+        }
+        return net.minecraft.world.InteractionResult.SUCCESS;
+    }
+
     private static RecipeManager cachedFor;
     private static Map<Item, Profile> cache = Map.of();
 
@@ -92,6 +146,7 @@ public final class Food {
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(Food::holdFoodLevel);
+        net.fabricmc.fabric.api.event.player.UseItemCallback.EVENT.register(Food::season);
     }
 
     private static void holdFoodLevel(MinecraftServer server) {
@@ -107,15 +162,21 @@ public final class Food {
         if (!(eater instanceof Player player) || player.level().isClientSide() || !(player.level() instanceof net.minecraft.server.level.ServerLevel level)) return;
         Profile profile = of(level, stack);
         player.heal(food.nutrition() * profile.prep().healMultiplier);
-        if (profile.prep() == Prep.RAW) return;
+        String season = seasonOf(stack);
+        if (profile.prep() == Prep.RAW && !season.equals("bonus")) return;
         for (Intrinsic i : profile.intrinsics()) {
             if (i == Intrinsic.HONEY) {
                 for (MobEffectInstance e : List.copyOf(player.getActiveEffects())) {
                     if (e.getEffect().value().getCategory() == MobEffectCategory.HARMFUL) player.removeEffect(e.getEffect());
                 }
             } else {
-                player.addEffect(new MobEffectInstance(i.effect, profile.prep().duration, profile.prep().amplifier));
+                player.addEffect(new MobEffectInstance(i.effect, profile.prep().duration * (season.equals("long") ? 2 : 1), profile.prep().amplifier + (season.equals("strong") ? 1 : 0)));
             }
+        }
+        if (season.equals("bonus")) {
+            List<Intrinsic> spare = new ArrayList<>();
+            for (Intrinsic i : Intrinsic.values()) if (i.effect != null && !profile.intrinsics().contains(i)) spare.add(i);
+            if (!spare.isEmpty()) player.addEffect(new MobEffectInstance(spare.get(player.getRandom().nextInt(spare.size())).effect, Math.max(30 * 20, profile.prep().duration), 0));
         }
     }
 
@@ -152,6 +213,13 @@ public final class Food {
             if (in.item() == Items.AIR) continue;
             carries.computeIfAbsent(in.item(), k -> EnumSet.noneOf(Intrinsic.class)).add(in);
             bases.add(in.item());
+        }
+        for (Map.Entry<String, Intrinsic> preserve : PRESERVES.entrySet()) {
+            Item item = BuiltInRegistries.ITEM.getOptional(Siftec.id(preserve.getKey())).orElse(Items.AIR);
+            if (item == Items.AIR) continue;
+            carries.computeIfAbsent(item, k -> EnumSet.noneOf(Intrinsic.class)).add(preserve.getValue());
+            prep.put(item, Prep.PRESERVED);
+            bases.add(item);
         }
         ContextMap context = SlotDisplayContext.fromLevel(level);
         record Parsed(List<Item> results, List<List<Item>> slots, boolean cookingPot) {

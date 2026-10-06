@@ -175,6 +175,20 @@ lang.update({"siftec.planner.first": "First corner set. Now click the opposite c
              "siftec.building.family.steel": "Block of Steel, Block of Industrial Iron or Block of Iron",
              "siftec.building.family.copper": "Copper Casing or copper blocks", "siftec.building.family.brass": "Brass Casing, Block of Brass or Train Casing"})
 lang["siftec.sift.closed"] = "The Sift is closed to you until your company finishes Wormhole Phase 5"
+PRESERVE_ICONS = {"pickled_tomato": ("Pickled Tomato", 0xC84030), "pickled_onion": ("Pickled Onion", 0xD8C8A8), "pickled_cabbage": ("Pickled Cabbage", 0x90B850),
+                  "pickled_pumpkin": ("Pickled Pumpkin", 0xE08828), "pickled_carrot": ("Pickled Carrot", 0xF09030), "pickled_beetroot": ("Pickled Beetroot", 0x902848),
+                  "pickled_kelp": ("Pickled Kelp", 0x4C7A3A), "sweet_berry_jam": ("Sweet Berry Jam", 0xB01838), "glow_berry_jam": ("Glow Berry Jam", 0xF0B040),
+                  "apple_jam": ("Apple Jam", 0xD86048), "melon_jam": ("Melon Jam", 0xE85868), "mead": ("Mead", 0xE0A030)}
+for fid, (fname, tint) in PRESERVE_ICONS.items():
+    lang[f"item.siftec.{fid}"] = fname
+    write(f"{A}/models/item/{fid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/honey_bottle" if fid == "mead" else "minecraft:item/potion"}})
+    item_def(fid, f"siftec:item/{fid}", tint)
+lang.update({"siftec.season.locked": "Your company has not researched Seasoning yet", "siftec.season.already": "That food is already seasoned",
+             "siftec.season.short": "You need %s of the ingredient: one for each item of food", "siftec.season.long": "Seasoned with glowstone: effects last twice as long",
+             "siftec.season.strong": "Seasoned with blaze powder: effects one level stronger", "siftec.season.bonus": "Seasoned with nether wart: one more effect at random"})
+lang["item.siftec.toxic_shot"] = "Toxic Shot"
+write(f"{A}/models/item/toxic_shot.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/slime_ball"}})
+item_def("toxic_shot", "siftec:item/toxic_shot", 0x607018)
 # Speed Governor: borrows the Gearshift's model until it has its own
 lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (your company's limit is %s)",
              "siftec.governor.set": "Set to %s RPM", "siftec.governor.over": "%s RPM: above your company's limit", "siftec.governor.step": "%s RPM"})
@@ -341,7 +355,9 @@ shutil.rmtree(f"{D}/recipe", ignore_errors=True)
 for path, body in recipes.build().items():
     # a recipe that names another mod's item or fluid only loads when that mod is installed
     text = json.dumps(body)
-    mods = [m for m in ("cgs", "createdieselgenerators", "create_hypertube") if f'"{m}:' in text or f'"#{m}:' in text]
+    mods = [m for m in ("cgs", "createdieselgenerators", "create_hypertube", "farmersdelight") if f'"{m}:' in text or f'"#{m}:' in text]
+    if "#c:tools/knife" in text or path.split("/")[-1].startswith("kitchen_"):
+        mods = sorted(set(mods) | {"farmersdelight"})
     if mods:
         body = {"fabric:load_conditions": [{"condition": "fabric:all_mods_loaded", "values": mods}], **body}
     write(f"{D}/recipe/{path}.json", body)
@@ -352,7 +368,7 @@ for m in data["milestones"] + data["milestones_mam"]:
         lock_of.setdefault(i, m["id"])
 data["recipe_locks"] = {}
 for path, body in recipes.build().items():
-    made = list(body.get("results", []))
+    made = list(body.get("results", [])) + list(body.get("fluid_results", []))
     if "result" in body: made.append(body["result"])
     for r in made:
         rid = r if isinstance(r, str) else r.get("id", "")
@@ -362,6 +378,11 @@ for path, body in recipes.build().items():
             key = "seq:" + rid.split(":")[1] if body["type"] == "create:sequenced_assembly" else "siftec:" + path
             data["recipe_locks"][key] = mid
             break
+# Farmer's Delight recipes moved onto Create machines need the Automated Kitchen research
+kitchen_node = next(m["id"] for m in data["milestones_mam"] if "food:kitchen" in m["tokens"])
+for path in recipes.KITCHEN:
+    data["recipe_locks"]["siftec:" + path] = kitchen_node
+print("kitchen recipes:", len(recipes.KITCHEN), "locked to", kitchen_node)
 # ---- alternates: each has its own lock, and is only offered once everything it uses is unlocked
 C = "create:"
 MACHINE_OF = {"create:cutting": [C + "mechanical_saw"], "create:deploying": [C + "deployer"], "create:mixing": [C + "mechanical_mixer"],

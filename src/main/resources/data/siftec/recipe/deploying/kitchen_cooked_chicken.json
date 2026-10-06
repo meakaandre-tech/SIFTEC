@@ -1,0 +1,23 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:deploying",
+  "target": "minecraft:cooked_chicken",
+  "ingredient": "#c:tools/knife",
+  "keep_held_item": true,
+  "results": [
+    {
+      "count": 2,
+      "id": "farmersdelight:cooked_chicken_cuts"
+    },
+    {
+      "id": "minecraft:bone_meal"
+    }
+  ]
+}

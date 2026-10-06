@@ -1,0 +1,30 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#c:bones",
+    {
+      "fabric:type": "fabric:any",
+      "ingredients": [
+        "minecraft:glow_berries",
+        "#c:mushrooms",
+        "minecraft:hanging_roots",
+        "minecraft:glow_lichen"
+      ]
+    },
+    "minecraft:bowl"
+  ],
+  "results": [
+    {
+      "id": "farmersdelight:bone_broth"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#c:foods/safe_raw_fish",
+    "farmersdelight:tomato_sauce",
+    "#c:crops/onion",
+    "minecraft:bowl"
+  ],
+  "results": [
+    {
+      "id": "farmersdelight:fish_stew"
+    }
+  ]
+}

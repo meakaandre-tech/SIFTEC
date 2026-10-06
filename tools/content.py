@@ -83,7 +83,7 @@ PARTS = [
 FLUIDS = [
     ("heavy_oil_residue", "Heavy Oil Residue", 0x6A3A8A), ("alumina_solution", "Alumina Solution", 0xD8E0E8),
     ("sulfuric_acid", "Sulfuric Acid", 0xE8E040), ("nitrogen", "Nitrogen", 0xC8E8FF), ("nitric_acid", "Nitric Acid", 0xD8F0A0),
-    ("dark_matter_residue", "Dark Matter Residue", 0x301848), ("ignimbrite", "Ignimbrite", 0xF08020), ("turbofuel", "Turbofuel", 0xD03030),
+    ("dark_matter_residue", "Dark Matter Residue", 0x301848), ("ignimbrite", "Ignimbrite", 0xF08020), ("turbofuel", "Turbofuel", 0xD03030), ("vinegar", "Vinegar", 0xE8D8A0), ("mead", "Mead", 0xE0A030),
 ]
 
 # ---------------------------------------------------------------------------------------------------
@@ -296,10 +296,10 @@ MAM = [
         ("Toxic Cellular Modification", "50 Fabric, 25 Rubber", "3:00", "Gas Filter and Gas Mask", [2], ["siftec:gas_filter", "siftec:gas_mask"], []),
     ]),
     ("nutrients", "Nutrients", M + "sweet_berries", [
-        ("Fermentation", "20 #c:crops, 10 minecraft:sugar", "1:00", "Bulk fermenter and vinegar", [], ["createdieselgenerators:bulk_fermenter"], ["food:vinegar"]),
-        ("Preserves", "10 minecraft:glass_bottle, 20 minecraft:sweet_berries", "2:00", "Pickles and jams", [1], [], ["food:preserves"]),
-        ("Brewing", "20 minecraft:apple, 10 minecraft:honey_bottle", "2:00", "Cider and mead", [1], [], ["food:brewing"]),
-        ("Seasoning", "10 minecraft:glowstone_dust, 10 minecraft:blaze_powder, 10 minecraft:nether_wart", "2:00", "Secret ingredients work in meals", [2], [], ["food:seasoning"]),
+        ("Fermentation", "20 #c:crops, 10 minecraft:sugar", "1:00", "Bulk fermenter and vinegar", [], ["createdieselgenerators:bulk_fermenter", "siftec:vinegar_bucket"], ["food:vinegar"]),
+        ("Preserves", "10 minecraft:glass_bottle, 20 minecraft:sweet_berries", "2:00", "Pickles from the Spout and jams from the heated Mixer. Sneak and use one to throw it", [1], ["siftec:pickled_tomato", "siftec:pickled_onion", "siftec:pickled_cabbage", "siftec:pickled_pumpkin", "siftec:pickled_carrot", "siftec:pickled_beetroot", "siftec:pickled_kelp", "siftec:sweet_berry_jam", "siftec:glow_berry_jam", "siftec:apple_jam", "siftec:melon_jam"], ["food:preserves"]),
+        ("Brewing", "20 minecraft:apple, 10 minecraft:honey_bottle", "2:00", "Mead from the bulk fermenter, bottled at the Spout", [1], ["siftec:mead_bucket", "siftec:mead"], ["food:brewing"]),
+        ("Seasoning", "10 minecraft:glowstone_dust, 10 minecraft:blaze_powder, 10 minecraft:nether_wart", "2:00", "Secret ingredients: hold glowstone dust, blaze powder or nether wart in your main hand and food in your off hand, and use", [2], [], ["food:seasoning"]),
         ("Automated Kitchen", "10 minecraft:bread, 10 Rotor", "3:00", "Cutting board recipes on the Deployer, cooking pot meals in the heated Mixer", [2], [], ["food:kitchen"]),
     ]),
     ("slugs", "Power Slugs", "siftec:blue_power_slug", [
