@@ -91,7 +91,7 @@ FLUIDS = [
 # "items" are the things nobody in the company can craft or place until the milestone is done.
 # "tokens" are switches other systems read: scanner:<node>, cap:<rpm>, backpack (+3 slots each time).
 C = "create:"
-SAILS = [C + c + "_sail" for c in "white orange magenta light_blue yellow lime pink gray light_gray cyan purple blue brown green red black".split()]
+SAILS = [C + "white_sail"]   # the dyed sails are blocks only; they have no item to lock
 TOOLBOXES = [C + c + "_toolbox" for c in "white orange magenta light_blue yellow lime pink gray light_gray cyan purple blue brown green red black".split()]
 MILESTONES = [
     (0, "hub_upgrade_1", "HUB Upgrade 1", "10 Iron Rod", "0:00",
@@ -167,7 +167,7 @@ MILESTONES = [
     (5, "oil_processing", "Oil Processing", "50 Motor, 100 Encased Industrial Beam, 500 Steel Pipe, 500 Copper Sheet", "12:00",
      "Pumpjack (oil nodes only), distillation, Fluid Valve, Plastic, Rubber, Petroleum Coke, Circuit Board, oil nodes on the scanner",
      ["createdieselgenerators:pumpjack_bearing", "createdieselgenerators:pumpjack_crank", "createdieselgenerators:pumpjack_head",
-      "createdieselgenerators:pumpjack_hole", "createdieselgenerators:distillation_controller", "createdieselgenerators:distillation_tank",
+      "createdieselgenerators:pumpjack_hole", "createdieselgenerators:distillation_controller",
       C + "fluid_valve", "siftec:plastic", "siftec:rubber", "siftec:petroleum_coke", "siftec:circuit_board"], ["scanner:oil"]),
     (5, "logistics_mk4", "Logistics Mk.4", "50 Heavy Modular Frame, 100 Computer, 200 Encased Industrial Beam, 400 Rubber", "15:00",
      "Company speed limit raised to 128 RPM", [], ["cap:128"]),
@@ -314,7 +314,7 @@ MAM = [
         ("Silica", "10 Nether Quartz", "0:30", "Silica", [], ["siftec:silica"], []),
         ("Radio Signal Scanning", "25 Quartz Crystal, 50 minecraft:redstone", "2:00", "Rose quartz and Create's redstone components", [1],
          [C + "rose_quartz", C + "pulse_repeater", C + "pulse_extender", C + "pulse_timer", C + "powered_latch", C + "powered_toggle_latch",
-          C + "threshold_switch", C + "smart_observer", C + "analog_lever", C + "redstone_contact"], []),
+          C + "stockpile_switch", C + "content_observer", C + "analog_lever", C + "redstone_contact"], []),
         ("Crystal Oscillator", "100 Quartz Crystal, 50 Reinforced Iron Plate", "3:00", "Crystal Oscillator", [1], ["siftec:crystal_oscillator"], []),
         ("Frequency Mapping", "5 Crystal Oscillator, 50 minecraft:redstone", "3:00", "Redstone Link, Display Link, Display Board, Nixie Tube", [3, 4],
          [C + "redstone_link", C + "display_link", C + "display_board", C + "nixie_tube"], []),
