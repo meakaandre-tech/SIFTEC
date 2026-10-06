@@ -1,19 +1,27 @@
 cmd time set noon
-cmd weather clear
-cmd tp @a 150.5 140 -80.5 -90 35
-sleep 8
-shot
-cmd tp @a 153.5 138.2 -80.5 -90 20
+cmd execute as @a at @s run tp @s ~ ~ ~ 0 0
+cmd execute at @a run setblock ~ ~1 ~2 siftec:hub
+cmd execute at @a run setblock ~1 ~1 ~2 siftec:wormhole_gateway
+cmd gamemode survival @a
+cmd give @a siftec:iron_rod 64
+cmd give @a create:iron_sheet 5
 sleep 4
 shot
-cmd tp @a 83.5 50 55.5 -90 30
-sleep 8
+rclick 640 360
+sleep 3
 shot
-cmd give @a siftec:node_scanner
-cmd give @a siftec:miner_mk1
-cmd give @a siftec:portable_miner
-cmd give @a siftec:iron_node
+click 532 298
 sleep 2
+move 568 298
+sleep 2
+shot
+click 568 298
+sleep 2
+move 568 298
+sleep 2
+shot
+key Escape
+sleep 1
 key e
 sleep 2
 shot

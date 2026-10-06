@@ -2,6 +2,7 @@ package com.meakaandre.siftec.registry;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.MinerBlockEntity;
+import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.block.PortableMinerBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -35,6 +36,8 @@ public class ModBlockEntities {
     public static final Entry<PortableMinerBlockEntity> PORTABLE_MINER = register("portable_miner", PortableMinerBlockEntity::new, ModBlocks.PORTABLE_MINER.get());
     public static final Entry<MinerBlockEntity> MINER = register("miner", MinerBlockEntity::new, ModBlocks.MINER_MK1.get());
 
+    public static final Entry<HubBlockEntity> HUB = register("hub", HubBlockEntity::new, ModBlocks.HUB.get(), ModBlocks.WORMHOLE_GATEWAY.get());
+
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
         Entry<T> entry = new Entry<>();
         BlockEntityType<T> type = new BlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state), Set.of(blocks));
@@ -45,5 +48,7 @@ public class ModBlockEntities {
     public static void register() {
         // belts, funnels, chutes and hoppers can take a powered miner's output
         ItemStorage.SIDED.registerForBlockEntity((miner, side) -> ContainerStorage.of(miner.output, side), MINER.get());
+        // parts pushed into a HUB or Gateway go toward the company's active milestone
+        ItemStorage.SIDED.registerForBlockEntity((hub, side) -> ContainerStorage.of(hub.intake, side), HUB.get());
     }
 }

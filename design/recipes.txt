@@ -1,0 +1,1262 @@
+
+# Recipes
+## How recipes work
+Every part follows Satisfactory's recipe: the same ingredients, on the machine that stands in for Satisfactory's. Amounts are cut down, because a Create line moves far fewer items per minute and milestone costs keep Satisfactory's counts.
+Satisfactory machine
+ | In the pack
+ | What it can take
+ | 
+Smelter
+ | Furnace, or Encased Fan over lava
+ | One item
+ | 
+Constructor
+ | Mechanical Press, Mechanical Saw, Millstone, Crushing Wheels, or Press over a Basin (compacting)
+ | One kind of item
+ | 
+Assembler
+ | Deployer
+ | One base item on a belt or Depot, plus one item the Deployer holds
+ | 
+Foundry
+ | Mechanical Mixer on a heated Basin
+ | Two kinds of item
+ | 
+Refinery
+ | Distillation, or a heated Mixer with fluids
+ | Items and fluids
+ | 
+Packager
+ | Spout to fill, Item Drain to empty
+ | One container and 250 mB
+ | 
+Manufacturer
+ | Mechanical Crafter, 3 by 3
+ | Three or four kinds, up to nine items
+ | 
+Blender
+ | Mechanical Mixer on a heated Basin
+ | Items and two fluids
+ | 
+Particle Accelerator, Converter
+ | Custom machines
+ | Listed per recipe
+ | 
+Quantum Encoder
+ | Sequenced assembly line
+ | A base item and a fixed order of steps
+ | 
+Nodes give raw materials: raw iron, raw copper, raw zinc, coal, limestone, Nether quartz, bauxite, sulfur, raw uranium, SAM, and the fluids crude oil and nitrogen.
+Hand crafting: until its machine unlocks, a part is crafted at a crafting table from the same ingredients.
+Create's blocks keep Create's own crafting recipes. The milestone or MAM node is what locks them.
+Custom blocks and equipment are built at the Equipment Workshop, which takes a list of parts and has no grid.
+## Tiers 0 to 2
+The starting parts are all iron, copper and limestone, made on single-item machines until the Deployer arrives.
+Part
+ | Ingredients
+ | Makes
+ | Machine
+ | Unlocks at
+ | 
+Iron Ingot
+ | 1 raw iron
+ | 1
+ | Smelter
+ | Start
+ | 
+Iron Sheet
+ | 1 Iron Ingot
+ | 1
+ | Mechanical Press
+ | Start
+ | 
+Iron Rod
+ | 1 Iron Ingot
+ | 1
+ | Mechanical Saw
+ | Start
+ | 
+Copper Ingot
+ | 1 raw copper
+ | 1
+ | Smelter
+ | HUB Upgrade 2
+ | 
+Wire
+ | 1 Copper Ingot
+ | 2
+ | Mechanical Saw
+ | HUB Upgrade 2
+ | 
+Cable
+ | 2 Wire
+ | 1
+ | Compacting
+ | HUB Upgrade 2
+ | 
+Concrete
+ | 3 limestone
+ | 1
+ | Compacting
+ | HUB Upgrade 3
+ | 
+Screw
+ | 1 Iron Rod
+ | 4
+ | Mechanical Saw
+ | HUB Upgrade 3
+ | 
+Reinforced Iron Plate
+ | Iron Sheet + Screw
+ | 1
+ | Deployer
+ | HUB Upgrade 3
+ | 
+Biomass
+ | 2 leaves, 1 log or 4 crop waste
+ | 1, 4 or 1
+ | Millstone
+ | HUB Upgrade 6
+ | 
+Copper Sheet
+ | 1 Copper Ingot
+ | 1
+ | Mechanical Press
+ | Part Assembly
+ | 
+Rotor
+ | Iron Rod + Screw
+ | 1
+ | Deployer
+ | Part Assembly
+ | 
+Modular Frame
+ | Reinforced Iron Plate + Iron Rod
+ | 1
+ | Deployer
+ | Part Assembly
+ | 
+Smart Plating
+ | Reinforced Iron Plate + Rotor
+ | 1
+ | Deployer
+ | Part Assembly
+ | 
+Solid Biofuel
+ | 2 Biomass
+ | 1
+ | Compacting
+ | Obstacle Clearing
+ | 
+Concrete is vanilla light gray concrete; the dyes from Resource Sink Bonus Program recolour it. Before their machines unlock, the Press, Saw and compacting recipes are crafted by hand, and Reinforced Iron Plate stays hand-crafted until Part Assembly.
+## Tiers 3 and 4
+Steel is the new material, and it needs heat from a Blaze Burner.
+Part
+ | Ingredients
+ | Makes
+ | Machine
+ | Unlocks at
+ | 
+Steel Ingot
+ | 1 raw iron + 1 coal
+ | 1
+ | Heated Mixer
+ | Basic Steel Production
+ | 
+Steel Beam
+ | 1 Steel Ingot
+ | 1
+ | Mechanical Press
+ | Basic Steel Production
+ | 
+Steel Pipe
+ | 1 Steel Ingot
+ | 1
+ | Mechanical Saw
+ | Basic Steel Production
+ | 
+Versatile Framework
+ | Modular Frame + Steel Beam
+ | 1
+ | Deployer
+ | Basic Steel Production
+ | 
+Encased Industrial Beam
+ | Steel Beam + Concrete
+ | 1
+ | Deployer
+ | Advanced Steel Production
+ | 
+Stator
+ | Steel Pipe + Wire
+ | 1
+ | Deployer
+ | Advanced Steel Production
+ | 
+Motor
+ | Rotor + Stator
+ | 1
+ | Deployer
+ | Advanced Steel Production
+ | 
+Automated Wiring
+ | Stator + Cable
+ | 1
+ | Deployer
+ | Advanced Steel Production
+ | 
+Coal Power's boiler runs on water and Blaze Burners fed with coal or Solid Biofuel.
+## Tiers 5 and 6
+Oil brings fluids into recipes, and the Mechanical Crafter takes the first parts with three or four ingredients.
+Part
+ | Ingredients
+ | Makes
+ | Machine
+ | Unlocks at
+ | 
+Diesel and gasoline (Fuel)
+ | Crude oil
+ | The mod's own yields
+ | Distillation
+ | Oil Processing
+ | 
+Plastic
+ | 250 mB crude oil
+ | 2, plus 100 mB Heavy Oil Residue
+ | Heated Mixer
+ | Oil Processing
+ | 
+Rubber
+ | 250 mB crude oil
+ | 2, plus 150 mB Heavy Oil Residue
+ | Heated Mixer
+ | Oil Processing
+ | 
+Petroleum Coke
+ | 250 mB Heavy Oil Residue
+ | 3
+ | Heated compacting
+ | Oil Processing
+ | 
+Circuit Board
+ | Copper Sheet + Plastic
+ | 1
+ | Deployer
+ | Oil Processing
+ | 
+Empty Canister
+ | 1 Plastic
+ | 2
+ | Mechanical Press
+ | Fluid Packaging
+ | 
+Packaged fluid
+ | Empty Canister + 250 mB of the fluid
+ | 1
+ | Spout; Item Drain reverses it
+ | Fluid Packaging
+ | 
+Liquid Biofuel
+ | 1 Solid Biofuel + 250 mB water
+ | 250 mB
+ | Heated Mixer
+ | Fluid Packaging
+ | 
+Computer
+ | 2 Circuit Board, 2 Cable, 4 Plastic
+ | 1
+ | Mechanical Crafter
+ | Industrial Manufacturing
+ | 
+Heavy Modular Frame
+ | 2 Modular Frame, 3 Steel Pipe, 2 Encased Industrial Beam, 2 Screw
+ | 1
+ | Mechanical Crafter
+ | Industrial Manufacturing
+ | 
+Modular Engine
+ | 2 Motor, 4 Rubber, 2 Smart Plating
+ | 1
+ | Mechanical Crafter
+ | Industrial Manufacturing
+ | 
+Adaptive Control Unit
+ | 3 Automated Wiring, 3 Circuit Board, 1 Heavy Modular Frame, 2 Computer
+ | 1
+ | Mechanical Crafter
+ | Industrial Manufacturing
+ | 
+Heavy Oil Residue is a custom fluid. Liquid Biofuel uses the biodiesel fluid from Create: Diesel Generators, so it burns in the same engines as diesel.
+## Tiers 7 and 8
+Aluminium, nitrogen and uranium each add a multi-step chain, and the Particle Accelerator takes the densest recipes.
+### Aluminium and Tier 7
+Part
+ | Ingredients
+ | Makes
+ | Machine
+ | Unlocks at
+ | 
+Crushed Bauxite
+ | 1 bauxite
+ | 1
+ | Crushing Wheels
+ | Bauxite Refinement
+ | 
+Alumina Solution
+ | 1 Crushed Bauxite + 250 mB water
+ | 250 mB, plus 1 Silica
+ | Heated Mixer
+ | Bauxite Refinement
+ | 
+Aluminum Scrap
+ | 250 mB Alumina Solution + 1 coal
+ | 3
+ | Heated Mixer
+ | Bauxite Refinement
+ | 
+Aluminum Ingot
+ | 3 Aluminum Scrap + 2 Silica
+ | 2
+ | Heated Mixer
+ | Bauxite Refinement
+ | 
+Alclad Aluminum Sheet
+ | Aluminum Ingot + Copper Ingot
+ | 1
+ | Deployer
+ | Bauxite Refinement
+ | 
+Aluminum Casing
+ | 1 Aluminum Ingot
+ | 1
+ | Mechanical Press
+ | Bauxite Refinement
+ | 
+Radio Control Unit
+ | 4 Aluminum Casing, 1 Crystal Oscillator, 1 Computer
+ | 1
+ | Mechanical Crafter
+ | Bauxite Refinement
+ | 
+Iodine Infused Filter
+ | 1 Gas Filter, 2 Quickwire, 1 Aluminum Casing
+ | 1
+ | Mechanical Crafter
+ | Hazmat Suit
+ | 
+### Tier 8
+Part
+ | Ingredients
+ | Makes
+ | Machine
+ | Unlocks at
+ | 
+Sulfuric Acid
+ | 1 sulfur + 250 mB water
+ | 250 mB
+ | Heated Mixer
+ | Aeronautical Engineering
+ | 
+Supercomputer
+ | 2 Computer, 2 AI Limiter, 2 High-Speed Connector, 3 Plastic
+ | 1
+ | Mechanical Crafter
+ | Aeronautical Engineering
+ | 
+Assembly Director System
+ | Adaptive Control Unit + Supercomputer
+ | 1
+ | Deployer
+ | Aeronautical Engineering
+ | 
+Encased Uranium Cell
+ | 1 raw uranium, 1 Concrete, 250 mB Sulfuric Acid
+ | 1
+ | Heated Mixer
+ | Nuclear Power
+ | 
+Electromagnetic Control Rod
+ | Stator + AI Limiter
+ | 1
+ | Deployer
+ | Nuclear Power
+ | 
+Uranium Fuel Rod
+ | 5 Encased Uranium Cell, 2 Encased Industrial Beam, 2 Electromagnetic Control Rod
+ | 1
+ | Mechanical Crafter
+ | Nuclear Power
+ | 
+Magnetic Field Generator
+ | Versatile Framework + Electromagnetic Control Rod
+ | 1
+ | Deployer
+ | Nuclear Power
+ | 
+Empty Fluid Tank
+ | 1 Aluminum Ingot
+ | 1
+ | Mechanical Press
+ | Advanced Aluminum Production
+ | 
+Packaged Nitrogen Gas
+ | Empty Fluid Tank + 250 mB nitrogen
+ | 1
+ | Spout
+ | Advanced Aluminum Production
+ | 
+Heat Sink
+ | Alclad Aluminum Sheet + Copper Sheet
+ | 1
+ | Deployer
+ | Advanced Aluminum Production
+ | 
+Cooling System
+ | 1 Heat Sink, 1 Rubber, 250 mB water, 250 mB nitrogen
+ | 1
+ | Heated Mixer
+ | Advanced Aluminum Production
+ | 
+Fused Modular Frame
+ | 1 Heavy Modular Frame, 4 Aluminum Casing, 250 mB nitrogen
+ | 1
+ | Heated Mixer
+ | Advanced Aluminum Production
+ | 
+Turbo Motor
+ | 2 Cooling System, 1 Radio Control Unit, 2 Motor, 4 Rubber
+ | 1
+ | Mechanical Crafter
+ | Leading-edge Production
+ | 
+Thermal Propulsion Rocket
+ | 3 Modular Engine, 2 Turbo Motor, 3 Cooling System, 1 Fused Modular Frame
+ | 1
+ | Mechanical Crafter
+ | Leading-edge Production
+ | 
+Nitric Acid
+ | 1 Iron Sheet, 250 mB nitrogen, 250 mB water
+ | 250 mB
+ | Heated Mixer
+ | Particle Enrichment
+ | 
+Non-fissile Uranium
+ | 1 Uranium Waste, 1 Silica, 250 mB Nitric Acid, 250 mB Sulfuric Acid
+ | 1
+ | Heated Mixer
+ | Particle Enrichment
+ | 
+Plutonium Pellet
+ | 3 Non-fissile Uranium + 1 Uranium Waste
+ | 1
+ | Particle Accelerator
+ | Particle Enrichment
+ | 
+Encased Plutonium Cell
+ | Plutonium Pellet + Concrete
+ | 1
+ | Deployer
+ | Particle Enrichment
+ | 
+Plutonium Fuel Rod
+ | 4 Encased Plutonium Cell, 2 Steel Beam, 2 Electromagnetic Control Rod, 1 Heat Sink
+ | 1
+ | Mechanical Crafter
+ | Particle Enrichment
+ | 
+Copper Powder
+ | 1 Copper Ingot
+ | 1
+ | Crushing Wheels
+ | Particle Enrichment
+ | 
+Pressure Conversion Cube
+ | 1 Fused Modular Frame + 2 Radio Control Unit
+ | 1
+ | Compacting
+ | Particle Enrichment
+ | 
+Nuclear Pasta
+ | 8 Copper Powder + 1 Pressure Conversion Cube
+ | 1
+ | Particle Accelerator
+ | Particle Enrichment
+ | 
+A Uranium Fuel Rod leaves Uranium Waste in the reactor and a Plutonium Fuel Rod leaves Plutonium Waste. Each Uranium Fuel Rod leaves 5 and each Plutonium Fuel Rod leaves 1, so one Plutonium Fuel Rod uses up the waste of about three Uranium Fuel Rods.
+## Tier 9
+Everything here starts from SAM. The Converter and the Quantum Encoder line make the parts for Wormhole Phase 5.
+Part
+ | Ingredients
+ | Makes
+ | Machine
+ | Unlocks at
+ | 
+Reanimated SAM
+ | 1 SAM
+ | 1
+ | Fan haunting
+ | Matter Conversion
+ | 
+SAM Fluctuator
+ | 3 Reanimated SAM, 3 Wire, 2 Steel Pipe
+ | 1
+ | Mechanical Crafter
+ | Matter Conversion
+ | 
+Ficsite Ingot
+ | 4 Aluminum Ingot + 2 Reanimated SAM
+ | 1
+ | Converter
+ | Matter Conversion
+ | 
+Ficsite Trigon
+ | 1 Ficsite Ingot
+ | 3
+ | Mechanical Saw
+ | Matter Conversion
+ | 
+Diamond
+ | 8 coal
+ | 1
+ | Converter
+ | Matter Conversion
+ | 
+Time Crystal
+ | 2 Diamond
+ | 1
+ | Converter
+ | Matter Conversion
+ | 
+Biochemical Sculptor
+ | 1 Assembly Director System, 4 Ficsite Trigon, 250 mB water
+ | 1
+ | Heated Mixer
+ | Matter Conversion
+ | 
+Refined Radiance (Excited Photonic Matter)
+ | 1 Reanimated SAM
+ | 2
+ | Converter
+ | Quantum Encoding
+ | 
+Dark Matter Residue
+ | 1 Reanimated SAM
+ | 250 mB
+ | Converter
+ | Quantum Encoding
+ | 
+Shadow Steel (Dark Matter Crystal)
+ | 1 Diamond + 250 mB Dark Matter Residue
+ | 1
+ | Particle Accelerator
+ | Quantum Encoding
+ | 
+Superposition Oscillator
+ | Crystal Oscillator base; apply Shadow Steel, Alclad Aluminum Sheet, Refined Radiance; 2 loops
+ | 1
+ | Quantum Encoder
+ | Quantum Encoding
+ | 
+Neural-Quantum Processor
+ | Supercomputer base; apply Time Crystal, Ficsite Trigon, Refined Radiance; 3 loops
+ | 1
+ | Quantum Encoder
+ | Quantum Encoding
+ | 
+AI Expansion Server
+ | Magnetic Field Generator base; apply Neural-Quantum Processor, Superposition Oscillator, Refined Radiance; then press
+ | 1
+ | Quantum Encoder
+ | Quantum Encoding
+ | 
+Singularity Cell
+ | 1 Nuclear Pasta, 2 Shadow Steel, 3 Iron Sheet, 3 Concrete
+ | 1
+ | Mechanical Crafter
+ | Spatial Energy Regulation
+ | 
+Ballistic Warp Drive
+ | 1 Thermal Propulsion Rocket, 3 Singularity Cell, 2 Superposition Oscillator, 3 Shadow Steel
+ | 1
+ | Mechanical Crafter
+ | Spatial Energy Regulation
+ | 
+Ficsonium
+ | 1 Plutonium Waste, 1 Singularity Cell, 250 mB Dark Matter Residue
+ | 1
+ | Particle Accelerator
+ | Peak Efficiency
+ | 
+Ficsonium Fuel Rod
+ | Ficsonium base; apply Electromagnetic Control Rod, Ficsite Trigon, Refined Radiance; 2 loops
+ | 1
+ | Quantum Encoder
+ | Peak Efficiency
+ | 
+In a Quantum Encoder line, each "apply" is a Deployer step in Create's sequenced assembly, and a loop repeats the whole order.
+## MAM parts
+These unlock through research, not milestones. Brass and food have their own sections on the main tab.
+Part
+ | Ingredients
+ | Makes
+ | Machine
+ | Tree
+ | 
+Biomass
+ | 1 rotten flesh, bone, string or spider eye
+ | 2
+ | Millstone
+ | Alien Megafauna
+ | 
+DNA Capsule
+ | 2 mob drops of one kind
+ | 1
+ | Compacting
+ | Alien Megafauna
+ | 
+Brass Ingot
+ | 1 brass blend
+ | 1
+ | Smelter
+ | Caterium
+ | 
+Brass Sheet
+ | 1 Brass Ingot
+ | 1
+ | Mechanical Press
+ | Caterium
+ | 
+Quickwire
+ | 1 Brass Ingot
+ | 4
+ | Mechanical Saw
+ | Caterium
+ | 
+AI Limiter
+ | Copper Sheet + Quickwire
+ | 1
+ | Deployer
+ | Caterium
+ | 
+High-Speed Connector
+ | 5 Quickwire, 3 Cable, 1 Circuit Board
+ | 1
+ | Mechanical Crafter
+ | Caterium
+ | 
+Electron Tube
+ | Iron Sheet + Quickwire
+ | 1
+ | Deployer
+ | Caterium
+ | 
+Precision Mechanism
+ | Brass Sheet + Rotor
+ | 1
+ | Deployer
+ | Caterium
+ | 
+Fabric
+ | Mushroom + Biomass
+ | 1
+ | Deployer
+ | Mycelia
+ | 
+Gas Filter
+ | 2 coal, 1 Rubber, 1 Fabric
+ | 1
+ | Mechanical Crafter
+ | Mycelia
+ | 
+Power Shard
+ | 1 blue, yellow or purple slug
+ | 1, 2 or 5
+ | Mechanical Press
+ | Power Slugs
+ | 
+Silica
+ | 1 Nether quartz
+ | 2
+ | Crushing Wheels
+ | Quartz
+ | 
+Quartz Crystal
+ | Nether quartz, polished
+ | 1
+ | Deployer holding Sand Paper
+ | Quartz
+ | 
+Crystal Oscillator
+ | 4 Quartz Crystal, 3 Cable, 1 Reinforced Iron Plate
+ | 1
+ | Mechanical Crafter
+ | Quartz
+ | 
+Sulfur
+ | 1 magma block
+ | 1
+ | Crushing Wheels
+ | Start, with Crushing Wheels
+ | 
+Black Powder (gunpowder)
+ | 1 sulfur, 1 coal or charcoal, 1 bone meal
+ | 3
+ | Mechanical Mixer
+ | Sulfur
+ | 
+Ignimbrite
+ | 1 cobblestone + 1 sulfur
+ | 500 mB
+ | Heated Mixer
+ | Sulfur
+ | 
+TNT
+ | Barrel + 250 mB Ignimbrite
+ | 1
+ | Spout
+ | Sulfur
+ | 
+Fire charge
+ | Clay ball + 250 mB Ignimbrite
+ | 1
+ | Spout
+ | Sulfur
+ | 
+Magma block
+ | 250 mB Ignimbrite
+ | 1
+ | Compacting
+ | Sulfur
+ | 
+Lava
+ | 1 magma block
+ | 250 mB
+ | Heated Mixer
+ | Sulfur
+ | 
+Compacted Coal
+ | 1 coal + 1 sulfur
+ | 1
+ | Compacting
+ | Sulfur
+ | 
+Turbofuel
+ | 1 Compacted Coal + 250 mB diesel
+ | 250 mB
+ | Heated Mixer
+ | Sulfur
+ | 
+Electron Tubes and Precision Mechanisms are only used in Create's own brass-tier recipes, which stay as Create has them.
+Magma blocks make sulfur, and sulfur makes Ignimbrite, which makes magma blocks. With these amounts one sulfur returns two, so sulfur is infinite once the Sulfur tree is researched. The loop is kept on purpose, as it was in the tweaks pack.
+## Custom blocks and equipment
+These are built at the Equipment Workshop from a list of parts. Costs follow Satisfactory's build costs as I recall them where the building exists there, and are set for the pack otherwise.
+Block or item
+ | Cost
+ | Unlocks at
+ | 
+Equipment Workshop
+ | 6 Iron Sheet, 4 Iron Rod (crafting table)
+ | HUB Upgrade 1
+ | 
+Portable Miner
+ | 1 Mechanical Drill, 2 Iron Sheet, 4 Iron Rod
+ | HUB Upgrade 1
+ | 
+Power Line
+ | 1 Cable
+ | HUB Upgrade 2
+ | 
+Power Pole
+ | 1 Wire, 1 Iron Rod, 1 Concrete
+ | HUB Upgrade 3
+ | 
+Miner Mk.1
+ | 1 Portable Miner, 10 Iron Sheet, 10 Concrete
+ | HUB Upgrade 5
+ | 
+Furnace Engine
+ | 15 Iron Sheet, 15 Iron Rod, 25 Wire
+ | HUB Upgrade 6
+ | 
+Wormhole Gateway
+ | 500 Concrete, 250 Iron Sheet, 400 Iron Rod, 1,500 Wire
+ | HUB Upgrade 6
+ | 
+MAM
+ | 5 Reinforced Iron Plate, 15 Cable, 45 Wire
+ | Field Research
+ | 
+Object Scanner
+ | 4 Reinforced Iron Plate, 20 Wire, 50 Screw
+ | Field Research
+ | 
+Beacon
+ | 3 Iron Sheet, 1 Iron Rod, 15 Wire, 2 Cable
+ | Field Research
+ | 
+Chainsaw
+ | 5 Reinforced Iron Plate, 25 Iron Rod, 160 Screw, 15 Cable
+ | Obstacle Clearing
+ | 
+Landing pad
+ | 20 Rotor, 30 Cable, 200 Biomass
+ | Jump Pads
+ | 
+AWESOME Sink
+ | 15 Reinforced Iron Plate, 30 Cable, 45 Concrete
+ | Resource Sink Bonus Program
+ | 
+AWESOME Shop
+ | 200 Screw, 5 Iron Sheet, 30 Cable
+ | Resource Sink Bonus Program
+ | 
+Blueprint Designer Mk.1
+ | 4 Modular Frame, 25 Cable, 100 Concrete
+ | FICSIT Blueprints
+ | 
+Miner Mk.2
+ | 2 Portable Miner, 10 Encased Industrial Beam, 20 Steel Pipe, 10 Modular Frame
+ | Advanced Steel Production
+ | 
+Power Tower
+ | 5 Steel Beam, 10 Concrete, 10 Wire
+ | Expanded Power Infrastructure
+ | 
+Power Storage
+ | 20 Wire, 10 Modular Frame, 5 Stator
+ | Expanded Power Infrastructure
+ | 
+Jetpack
+ | 50 Plastic, 50 Rubber, 5 Circuit Board, 5 Motor
+ | Jetpack
+ | 
+Hazmat Suit
+ | 50 Rubber, 50 Plastic, 50 Alclad Aluminum Sheet, 50 Fabric
+ | Hazmat Suit
+ | 
+Hover Pack
+ | 8 Motor, 4 Heavy Modular Frame, 8 Computer, 40 Alclad Aluminum Sheet
+ | Hover Pack
+ | 
+Drone Port
+ | 20 Heavy Modular Frame, 10 High-Speed Connector, 50 Alclad Aluminum Sheet, 50 Aluminum Casing, 10 Radio Control Unit
+ | Aeronautical Engineering
+ | 
+Cardboard Drone
+ | 8 cardboard, 4 Motor, 10 Alclad Aluminum Sheet, 1 Radio Control Unit, 2 AI Limiter
+ | Aeronautical Engineering
+ | 
+Resource Well extractor
+ | 20 Aluminum Casing, 20 Encased Industrial Beam, 10 Motor, 50 Rubber
+ | Advanced Aluminum Production
+ | 
+Miner Mk.3
+ | 3 Portable Miner, 50 Steel Pipe, 5 Supercomputer, 10 Fused Modular Frame, 3 Turbo Motor
+ | Leading-edge Production
+ | 
+Particle Accelerator
+ | 25 Radio Control Unit, 100 Electromagnetic Control Rod, 10 Supercomputer, 50 Cooling System, 20 Fused Modular Frame, 10 Turbo Motor
+ | Particle Enrichment
+ | 
+Converter
+ | 10 Fused Modular Frame, 10 Cooling System, 25 Radio Control Unit, 50 SAM Fluctuator
+ | Matter Conversion
+ | 
+Blueprint Designer Mk.3
+ | 10 Fused Modular Frame, 5 Neural-Quantum Processor, 100 Concrete
+ | FICSIT Blueprints Mk.3
+ | 
+Main Portal
+ | 25 Turbo Motor, 25 Radio Control Unit, 15 Superposition Oscillator, 20 SAM Fluctuator, 200 Ficsite Trigon
+ | Spatial Energy Regulation
+ | 
+Satellite Portal
+ | 5 Turbo Motor, 10 Radio Control Unit, 5 Superposition Oscillator, 10 SAM Fluctuator, 50 Ficsite Trigon
+ | Spatial Energy Regulation
+ | 
+Blade Runners
+ | 20 Silica, 3 Modular Frame, 3 Rotor
+ | MAM: Quartz
+ | 
+Zipline
+ | 30 Quickwire, 3 Iron Rod, 10 Cable
+ | MAM: Caterium
+ | 
+Parachute
+ | 10 Fabric, 5 Cable
+ | MAM: Mycelia
+ | 
+Gas Mask
+ | 50 Rubber, 100 Plastic, 50 Fabric
+ | MAM: Mycelia
+ | 
+Radar Tower
+ | 10 Heavy Modular Frame, 10 Crystal Oscillator, 50 Cable
+ | MAM: Quartz
+ | 
+Dimensional Depot
+ | 1 Mercer Sphere, 5 Modular Frame, 20 Cable
+ | MAM: Alien Technology
+ | 
+Not listed because they keep their own mod's recipes: Create's blocks, hypertubes, pumpjacks and diesel engines, the reactor, and the Gunsmithing weapons. A Production Amplifier is a Somersloop slotted into a machine, so it has no build cost.
+## Alternate recipes
+The Hard Drive pool has 61 alternates, adapted from Satisfactory's. Each one is a second way to make a part the company already has; none replaces the standard recipe.
+Offer: a researched drive shows two alternates the company does not own yet.
+Eligibility: an alternate is only offered once its machine and every ingredient are unlocked, MAM trees included.
+Yield: where "Makes" is higher than the standard recipe, that is the reward.
+### Tiers 0 to 2
+Alternate
+ | Ingredients
+ | Makes
+ | Machine
+ | 
+Iron Wire
+ | 1 Iron Sheet
+ | 3 Wire
+ | Mechanical Saw
+ | 
+Stitched Iron Plate
+ | Iron Sheet + Wire
+ | 1 Reinforced Iron Plate
+ | Deployer
+ | 
+Bolted Frame
+ | Reinforced Iron Plate + Screw
+ | 1 Modular Frame
+ | Deployer
+ | 
+Copper Rotor
+ | Copper Sheet + Screw
+ | 1 Rotor
+ | Deployer
+ | 
+### Tiers 3 and 4
+Alternate
+ | Ingredients
+ | Makes
+ | Machine
+ | 
+Iron Alloy Ingot
+ | 2 raw iron + 1 raw copper
+ | 5 Iron Ingot
+ | Heated Mixer
+ | 
+Solid Steel Ingot
+ | 1 Iron Ingot + 1 coal
+ | 2 Steel Ingot
+ | Heated Mixer
+ | 
+Cast Screw
+ | 1 Iron Ingot
+ | 5 Screw
+ | Heated compacting
+ | 
+Wet Concrete
+ | 2 limestone + 250 mB water
+ | 2 Concrete
+ | Mechanical Mixer
+ | 
+Steel Rod
+ | 1 Steel Beam
+ | 4 Iron Rod
+ | Mechanical Saw
+ | 
+Steel Screw
+ | 1 Steel Pipe
+ | 8 Screw
+ | Mechanical Saw
+ | 
+Steel Rotor
+ | Steel Pipe + Iron Rod
+ | 2 Rotor
+ | Deployer
+ | 
+Steeled Frame
+ | Reinforced Iron Plate + Steel Pipe
+ | 2 Modular Frame
+ | Deployer
+ | 
+Encased Industrial Pipe
+ | Steel Pipe + Concrete
+ | 1 Encased Industrial Beam
+ | Deployer
+ | 
+Pure Iron Ingot
+ | 1 crushed raw iron
+ | 2 Iron Ingot
+ | Fan washing
+ | 
+Pure Copper Ingot
+ | 1 crushed raw copper
+ | 2 Copper Ingot
+ | Fan washing
+ | 
+Biocoal
+ | 1 Solid Biofuel
+ | 1 coal
+ | Fan smelting
+ | 
+### Tiers 5 and 6
+Alternate
+ | Ingredients
+ | Makes
+ | Machine
+ | 
+Coke Steel Ingot
+ | 2 raw iron + 1 Petroleum Coke
+ | 3 Steel Ingot
+ | Heated Mixer
+ | 
+Recycled Plastic
+ | 1 Rubber + 250 mB diesel
+ | 2 Plastic
+ | Heated Mixer
+ | 
+Recycled Rubber
+ | 1 Plastic + 250 mB diesel
+ | 2 Rubber
+ | Heated Mixer
+ | 
+Residual Rubber
+ | 250 mB Heavy Oil Residue + 250 mB water
+ | 2 Rubber
+ | Heated Mixer
+ | 
+Coated Iron Plate
+ | Iron Ingot + Plastic
+ | 3 Iron Sheet
+ | Deployer
+ | 
+Adhered Iron Plate
+ | Iron Sheet + Rubber
+ | 2 Reinforced Iron Plate
+ | Deployer
+ | 
+Coated Cable
+ | 2 Wire + 250 mB Heavy Oil Residue
+ | 4 Cable
+ | Mechanical Mixer
+ | 
+Insulated Cable
+ | 2 Wire + 1 Rubber
+ | 4 Cable
+ | Mechanical Mixer
+ | 
+Plastic Smart Plating
+ | 1 Reinforced Iron Plate, 1 Rotor, 2 Plastic
+ | 2 Smart Plating
+ | Mechanical Crafter
+ | 
+Flexible Framework
+ | 1 Modular Frame, 3 Steel Beam, 2 Rubber
+ | 2 Versatile Framework
+ | Mechanical Crafter
+ | 
+Heavy Encased Frame
+ | 3 Modular Frame, 2 Encased Industrial Beam, 2 Steel Pipe, 2 Concrete
+ | 2 Heavy Modular Frame
+ | Mechanical Crafter
+ | 
+### Needing a MAM tree
+Alternate
+ | Ingredients
+ | Makes
+ | Machine
+ | Tree
+ | 
+Fused Quickwire
+ | 1 Brass Ingot + 2 Copper Ingot
+ | 12 Quickwire
+ | Mechanical Mixer
+ | Caterium
+ | 
+Quickwire Cable
+ | Quickwire + Rubber
+ | 3 Cable
+ | Deployer
+ | Caterium
+ | 
+Quickwire Stator
+ | Steel Pipe + Quickwire
+ | 2 Stator
+ | Deployer
+ | Caterium
+ | 
+Caterium Circuit Board
+ | Plastic + Quickwire
+ | 2 Circuit Board
+ | Deployer
+ | Caterium
+ | 
+Caterium Computer
+ | 2 Circuit Board, 5 Quickwire, 2 Rubber
+ | 1 Computer
+ | Mechanical Crafter
+ | Caterium
+ | 
+Automated Speed Wiring
+ | 2 Stator, 4 Wire, 1 High-Speed Connector
+ | 4 Automated Wiring
+ | Mechanical Crafter
+ | Caterium
+ | 
+Fine Concrete
+ | 1 Silica + 2 limestone
+ | 2 Concrete
+ | Compacting
+ | Quartz
+ | 
+Silicon Circuit Board
+ | Copper Sheet + Silica
+ | 2 Circuit Board
+ | Deployer
+ | Quartz
+ | 
+Crystal Computer
+ | Circuit Board + Crystal Oscillator
+ | 2 Computer
+ | Deployer
+ | Quartz
+ | 
+Rigor Motor
+ | 2 Rotor, 2 Stator, 1 Crystal Oscillator
+ | 3 Motor
+ | Mechanical Crafter
+ | Quartz
+ | 
+Insulated Crystal Oscillator
+ | 3 Quartz Crystal, 2 Rubber, 1 AI Limiter
+ | 1 Crystal Oscillator
+ | Mechanical Crafter
+ | Quartz and Caterium
+ | 
+Compacted Steel Ingot
+ | 2 raw iron + 1 Compacted Coal
+ | 4 Steel Ingot
+ | Heated Mixer
+ | Sulfur
+ | 
+Turbo Heavy Fuel
+ | 250 mB Heavy Oil Residue + 1 Compacted Coal
+ | 250 mB Turbofuel
+ | Heated Mixer
+ | Sulfur
+ | 
+### Tiers 7 and 8
+Alternate
+ | Ingredients
+ | Makes
+ | Machine
+ | 
+Sloppy Alumina
+ | 1 Crushed Bauxite + 500 mB water
+ | 500 mB Alumina Solution, no Silica
+ | Heated Mixer
+ | 
+Electrode Aluminum Scrap
+ | 250 mB Alumina Solution + 1 Petroleum Coke
+ | 4 Aluminum Scrap
+ | Heated Mixer
+ | 
+Pure Aluminum Ingot
+ | 2 Aluminum Scrap
+ | 1 Aluminum Ingot, no Silica needed
+ | Smelter
+ | 
+Diluted Fuel
+ | 250 mB Heavy Oil Residue + 500 mB water
+ | 500 mB diesel
+ | Heated Mixer
+ | 
+Heat Exchanger
+ | Aluminum Casing + Rubber
+ | 1 Heat Sink
+ | Deployer
+ | 
+Cooling Device
+ | 1 Heat Sink, 1 Motor, 250 mB nitrogen
+ | 2 Cooling System
+ | Heated Mixer
+ | 
+Radio Control System
+ | 1 Crystal Oscillator, 2 Circuit Board, 3 Aluminum Casing, 2 Rubber
+ | 2 Radio Control Unit
+ | Mechanical Crafter
+ | 
+Electric Motor
+ | Electromagnetic Control Rod + Rotor
+ | 2 Motor
+ | Deployer
+ | 
+Electromagnetic Connection Rod
+ | Stator + High-Speed Connector
+ | 2 Electromagnetic Control Rod
+ | Deployer
+ | 
+OC Supercomputer
+ | Radio Control Unit + Cooling System
+ | 1 Supercomputer
+ | Deployer
+ | 
+Turbo Electric Motor
+ | 2 Motor, 2 Radio Control Unit, 2 Electromagnetic Control Rod, 2 Rotor
+ | 2 Turbo Motor
+ | Mechanical Crafter
+ | 
+Heat-Fused Frame
+ | 1 Heavy Modular Frame, 4 Aluminum Ingot, 250 mB Nitric Acid, 250 mB diesel
+ | 1 Fused Modular Frame
+ | Heated Mixer
+ | 
+Infused Uranium Cell
+ | 1 raw uranium, 1 Silica, 1 sulfur, 1 Quickwire
+ | 2 Encased Uranium Cell, no acid
+ | Mechanical Crafter
+ | 
+Uranium Fuel Unit
+ | 4 Encased Uranium Cell, 1 Electromagnetic Control Rod, 1 Crystal Oscillator, 2 Rotor
+ | 1 Uranium Fuel Rod
+ | Mechanical Crafter
+ | 
+Instant Plutonium Cell
+ | 4 Non-fissile Uranium + 1 Aluminum Casing
+ | 1 Encased Plutonium Cell
+ | Particle Accelerator
+ | 
+Plutonium Fuel Unit
+ | Encased Plutonium Cell + Pressure Conversion Cube
+ | 1 Plutonium Fuel Rod
+ | Deployer
+ | 
+### Tier 9
+Alternate
+ | Ingredients
+ | Makes
+ | Machine
+ | 
+Petroleum Diamond
+ | 4 Petroleum Coke
+ | 1 Diamond
+ | Converter
+ | 
+Pink Diamond
+ | 4 coal + 1 Quartz Crystal
+ | 1 Diamond
+ | Converter
+ | 
+Iron Ficsite Ingot
+ | 8 Iron Ingot + 4 Reanimated SAM
+ | 1 Ficsite Ingot
+ | Converter
+ | 
+Brass Ficsite Ingot
+ | 4 Brass Ingot + 3 Reanimated SAM
+ | 1 Ficsite Ingot
+ | Converter
+ | 
+Dark Matter Trap
+ | 1 Time Crystal + 250 mB Dark Matter Residue
+ | 2 Shadow Steel
+ | Particle Accelerator
+ | 

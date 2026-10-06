@@ -8,6 +8,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 
+import com.meakaandre.siftec.hub.Milestones;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -23,6 +27,12 @@ public class ModItems {
         return () -> item;
     }
 
+    /** The plain parts (Iron Rod, Rotor, Computer and so on), by id. Listed in siftec_content.json. */
+    public static final Map<String, Item> PARTS = new LinkedHashMap<>();
+
     public static void register() {
+        for (String id : Milestones.partIds()) {
+            PARTS.put(id, item(id, Item::new).get());
+        }
     }
 }

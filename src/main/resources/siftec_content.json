@@ -1,0 +1,1664 @@
+{
+  "parts": [
+    {
+      "id": "iron_rod"
+    },
+    {
+      "id": "wire"
+    },
+    {
+      "id": "cable"
+    },
+    {
+      "id": "screw"
+    },
+    {
+      "id": "reinforced_iron_plate"
+    },
+    {
+      "id": "biomass"
+    },
+    {
+      "id": "solid_biofuel"
+    },
+    {
+      "id": "rotor"
+    },
+    {
+      "id": "modular_frame"
+    },
+    {
+      "id": "smart_plating"
+    },
+    {
+      "id": "steel_beam"
+    },
+    {
+      "id": "steel_pipe"
+    },
+    {
+      "id": "versatile_framework"
+    },
+    {
+      "id": "encased_industrial_beam"
+    },
+    {
+      "id": "stator"
+    },
+    {
+      "id": "motor"
+    },
+    {
+      "id": "automated_wiring"
+    },
+    {
+      "id": "plastic"
+    },
+    {
+      "id": "rubber"
+    },
+    {
+      "id": "petroleum_coke"
+    },
+    {
+      "id": "circuit_board"
+    },
+    {
+      "id": "computer"
+    },
+    {
+      "id": "heavy_modular_frame"
+    },
+    {
+      "id": "modular_engine"
+    },
+    {
+      "id": "adaptive_control_unit"
+    },
+    {
+      "id": "crushed_bauxite"
+    },
+    {
+      "id": "aluminum_scrap"
+    },
+    {
+      "id": "aluminum_ingot"
+    },
+    {
+      "id": "alclad_aluminum_sheet"
+    },
+    {
+      "id": "aluminum_casing"
+    },
+    {
+      "id": "radio_control_unit"
+    },
+    {
+      "id": "iodine_infused_filter"
+    },
+    {
+      "id": "supercomputer"
+    },
+    {
+      "id": "assembly_director_system"
+    },
+    {
+      "id": "electromagnetic_control_rod"
+    },
+    {
+      "id": "magnetic_field_generator"
+    },
+    {
+      "id": "empty_fluid_tank"
+    },
+    {
+      "id": "packaged_nitrogen_gas"
+    },
+    {
+      "id": "heat_sink"
+    },
+    {
+      "id": "cooling_system"
+    },
+    {
+      "id": "fused_modular_frame"
+    },
+    {
+      "id": "turbo_motor"
+    },
+    {
+      "id": "thermal_propulsion_rocket"
+    },
+    {
+      "id": "copper_powder"
+    },
+    {
+      "id": "pressure_conversion_cube"
+    },
+    {
+      "id": "nuclear_pasta"
+    },
+    {
+      "id": "reanimated_sam"
+    },
+    {
+      "id": "sam_fluctuator"
+    },
+    {
+      "id": "ficsite_ingot"
+    },
+    {
+      "id": "ficsite_trigon"
+    },
+    {
+      "id": "time_crystal"
+    },
+    {
+      "id": "biochemical_sculptor"
+    },
+    {
+      "id": "superposition_oscillator"
+    },
+    {
+      "id": "neural_quantum_processor"
+    },
+    {
+      "id": "ai_expansion_server"
+    },
+    {
+      "id": "singularity_cell"
+    },
+    {
+      "id": "ballistic_warp_drive"
+    },
+    {
+      "id": "dna_capsule"
+    },
+    {
+      "id": "quickwire"
+    },
+    {
+      "id": "ai_limiter"
+    },
+    {
+      "id": "high_speed_connector"
+    },
+    {
+      "id": "fabric"
+    },
+    {
+      "id": "gas_filter"
+    },
+    {
+      "id": "power_shard"
+    },
+    {
+      "id": "silica"
+    },
+    {
+      "id": "quartz_crystal"
+    },
+    {
+      "id": "crystal_oscillator"
+    },
+    {
+      "id": "compacted_coal"
+    },
+    {
+      "id": "brass_blend"
+    },
+    {
+      "id": "blue_power_slug"
+    },
+    {
+      "id": "yellow_power_slug"
+    },
+    {
+      "id": "purple_power_slug"
+    },
+    {
+      "id": "mercer_sphere"
+    },
+    {
+      "id": "somersloop"
+    },
+    {
+      "id": "hard_drive"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "hub_upgrade_1",
+      "tier": 0,
+      "cost": [
+        {
+          "item": "siftec:iron_rod",
+          "count": 10
+        }
+      ],
+      "seconds": 0,
+      "items": [
+        "siftec:portable_miner",
+        "create:wrench",
+        "create:goggles",
+        "create:mechanical_drill"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "hub_upgrade_2",
+      "tier": 0,
+      "cost": [
+        {
+          "item": "siftec:iron_rod",
+          "count": 20
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 10
+        }
+      ],
+      "seconds": 0,
+      "items": [
+        "create:encased_fan",
+        "create:nozzle",
+        "siftec:wire",
+        "siftec:cable"
+      ],
+      "tokens": [
+        "scanner:copper"
+      ]
+    },
+    {
+      "id": "hub_upgrade_3",
+      "tier": 0,
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 20
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 20
+        },
+        {
+          "item": "siftec:wire",
+          "count": 20
+        }
+      ],
+      "seconds": 0,
+      "items": [
+        "create:mechanical_press",
+        "create:mechanical_saw",
+        "create:depot",
+        "create:millstone",
+        "create:basin",
+        "siftec:screw",
+        "siftec:reinforced_iron_plate"
+      ],
+      "tokens": [
+        "scanner:limestone"
+      ]
+    },
+    {
+      "id": "hub_upgrade_4",
+      "tier": 0,
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 75
+        },
+        {
+          "item": "siftec:cable",
+          "count": 20
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 10
+        }
+      ],
+      "seconds": 0,
+      "items": [
+        "create:belt_connector",
+        "create:andesite_funnel"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "hub_upgrade_5",
+      "tier": 0,
+      "cost": [
+        {
+          "item": "siftec:iron_rod",
+          "count": 75
+        },
+        {
+          "item": "siftec:cable",
+          "count": 50
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 20
+        }
+      ],
+      "seconds": 0,
+      "items": [
+        "siftec:miner_mk1",
+        "create:item_vault"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "hub_upgrade_6",
+      "tier": 0,
+      "cost": [
+        {
+          "item": "siftec:iron_rod",
+          "count": 100
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 100
+        },
+        {
+          "item": "siftec:wire",
+          "count": 100
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 50
+        }
+      ],
+      "seconds": 0,
+      "items": [
+        "siftec:wormhole_gateway",
+        "create:flywheel",
+        "siftec:biomass"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "base_building",
+      "tier": 1,
+      "cost": [
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 200
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 100
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 100
+        }
+      ],
+      "seconds": 120,
+      "items": [
+        "create:metal_girder",
+        "create:andesite_scaffolding",
+        "create:andesite_ladder",
+        "create:copper_ladder",
+        "create:copper_scaffolding",
+        "create:copycat_panel",
+        "create:copycat_step"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "logistics",
+      "tier": 1,
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 150
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 150
+        },
+        {
+          "item": "siftec:wire",
+          "count": 300
+        }
+      ],
+      "seconds": 240,
+      "items": [
+        "create:andesite_tunnel",
+        "create:chute",
+        "create:item_hatch",
+        "create:speedometer",
+        "create:stressometer"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "field_research",
+      "tier": 1,
+      "cost": [
+        {
+          "item": "siftec:wire",
+          "count": 300
+        },
+        {
+          "item": "siftec:screw",
+          "count": 300
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 100
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "siftec:mam",
+        "siftec:object_scanner",
+        "create:white_toolbox",
+        "create:orange_toolbox",
+        "create:magenta_toolbox",
+        "create:light_blue_toolbox",
+        "create:yellow_toolbox",
+        "create:lime_toolbox",
+        "create:pink_toolbox",
+        "create:gray_toolbox",
+        "create:light_gray_toolbox",
+        "create:cyan_toolbox",
+        "create:purple_toolbox",
+        "create:blue_toolbox",
+        "create:brown_toolbox",
+        "create:green_toolbox",
+        "create:red_toolbox",
+        "create:black_toolbox"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "part_assembly",
+      "tier": 2,
+      "cost": [
+        {
+          "item": "siftec:cable",
+          "count": 200
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 200
+        },
+        {
+          "item": "siftec:screw",
+          "count": 500
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 300
+        }
+      ],
+      "seconds": 360,
+      "items": [
+        "create:deployer",
+        "siftec:rotor",
+        "siftec:modular_frame",
+        "siftec:smart_plating"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "obstacle_clearing",
+      "tier": 2,
+      "cost": [
+        {
+          "item": "siftec:screw",
+          "count": 500
+        },
+        {
+          "item": "siftec:cable",
+          "count": 100
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 100
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "siftec:solid_biofuel",
+        "create:mechanical_harvester",
+        "create:mechanical_plough",
+        "create:tree_fertilizer"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "jump_pads",
+      "tier": 2,
+      "cost": [
+        {
+          "item": "siftec:rotor",
+          "count": 50
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 300
+        },
+        {
+          "item": "siftec:cable",
+          "count": 150
+        }
+      ],
+      "seconds": 240,
+      "items": [
+        "create:weighted_ejector"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "resource_sink_bonus_program",
+      "tier": 2,
+      "cost": [
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 400
+        },
+        {
+          "item": "siftec:wire",
+          "count": 500
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 200
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 200
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:awesome_sink",
+        "siftec:awesome_shop"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "logistics_mk2",
+      "tier": 2,
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 50
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 200
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 300
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 300
+        }
+      ],
+      "seconds": 360,
+      "items": [],
+      "tokens": [
+        "cap:64"
+      ]
+    },
+    {
+      "id": "coal_power",
+      "tier": 3,
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 150
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 50
+        },
+        {
+          "item": "siftec:cable",
+          "count": 500
+        }
+      ],
+      "seconds": 480,
+      "items": [
+        "create:steam_engine",
+        "create:blaze_burner",
+        "create:empty_blaze_burner",
+        "create:fluid_pipe",
+        "create:smart_fluid_pipe",
+        "create:mechanical_pump",
+        "create:fluid_tank",
+        "create:hose_pulley"
+      ],
+      "tokens": [
+        "scanner:coal"
+      ]
+    },
+    {
+      "id": "vehicular_transport",
+      "tier": 3,
+      "cost": [
+        {
+          "item": "siftec:modular_frame",
+          "count": 25
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 100
+        },
+        {
+          "item": "siftec:cable",
+          "count": 200
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 400
+        }
+      ],
+      "seconds": 240,
+      "items": [
+        "create:cart_assembler",
+        "create:rope_pulley",
+        "create:controller_rail",
+        "create:minecart_coupling"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "basic_steel_production",
+      "tier": 3,
+      "cost": [
+        {
+          "item": "siftec:modular_frame",
+          "count": 50
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 150
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 500
+        },
+        {
+          "item": "siftec:wire",
+          "count": 1000
+        }
+      ],
+      "seconds": 480,
+      "items": [
+        "create:mechanical_mixer",
+        "cgs:steel_ingot",
+        "siftec:steel_beam",
+        "siftec:steel_pipe",
+        "siftec:versatile_framework"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "enhanced_asset_security",
+      "tier": 3,
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 100
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 600
+        },
+        {
+          "item": "siftec:wire",
+          "count": 1500
+        }
+      ],
+      "seconds": 180,
+      "items": [
+        "cgs:hammer"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "ficsit_blueprints",
+      "tier": 4,
+      "cost": [
+        {
+          "item": "siftec:modular_frame",
+          "count": 100
+        },
+        {
+          "item": "siftec:steel_beam",
+          "count": 200
+        },
+        {
+          "item": "siftec:cable",
+          "count": 500
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 1000
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:blueprint_designer"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "logistics_mk3",
+      "tier": 4,
+      "cost": [
+        {
+          "item": "siftec:steel_beam",
+          "count": 200
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 200
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 400
+        }
+      ],
+      "seconds": 300,
+      "items": [],
+      "tokens": [
+        "cap:96"
+      ]
+    },
+    {
+      "id": "advanced_steel_production",
+      "tier": 4,
+      "cost": [
+        {
+          "item": "siftec:steel_pipe",
+          "count": 100
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 200
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 100
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 500
+        }
+      ],
+      "seconds": 600,
+      "items": [
+        "siftec:miner_mk2",
+        "create:crushing_wheel",
+        "siftec:encased_industrial_beam",
+        "siftec:stator",
+        "siftec:motor",
+        "siftec:automated_wiring"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "expanded_power_infrastructure",
+      "tier": 4,
+      "cost": [
+        {
+          "item": "siftec:steel_beam",
+          "count": 100
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 50
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 200
+        },
+        {
+          "item": "siftec:wire",
+          "count": 2000
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:power_tower",
+        "siftec:power_storage",
+        "create:windmill_bearing",
+        "create:sail_frame",
+        "create:mechanical_piston",
+        "create:sticky_mechanical_piston",
+        "create:mechanical_bearing",
+        "create:clockwork_bearing",
+        "create:gantry_carriage",
+        "create:gantry_shaft",
+        "create:elevator_pulley",
+        "create:linear_chassis",
+        "create:radial_chassis",
+        "create:super_glue",
+        "create:sticker",
+        "create:contraption_controls",
+        "create:white_sail",
+        "create:orange_sail",
+        "create:magenta_sail",
+        "create:light_blue_sail",
+        "create:yellow_sail",
+        "create:lime_sail",
+        "create:pink_sail",
+        "create:gray_sail",
+        "create:light_gray_sail",
+        "create:cyan_sail",
+        "create:purple_sail",
+        "create:blue_sail",
+        "create:brown_sail",
+        "create:green_sail",
+        "create:red_sail",
+        "create:black_sail"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "hypertubes",
+      "tier": 4,
+      "cost": [
+        {
+          "item": "create:copper_sheet",
+          "count": 500
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 300
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 50
+        }
+      ],
+      "seconds": 600,
+      "items": [
+        "create_hypertube:hypertube",
+        "create_hypertube:hypertube_entrance",
+        "create_hypertube:hypertube_accelerator",
+        "create_hypertube:hypertube_junction"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "jetpack",
+      "tier": 5,
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 50
+        },
+        {
+          "item": "siftec:cable",
+          "count": 1000
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 1000
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:jetpack"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "oil_processing",
+      "tier": 5,
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 50
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 100
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 500
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 500
+        }
+      ],
+      "seconds": 720,
+      "items": [
+        "createdieselgenerators:pumpjack_bearing",
+        "createdieselgenerators:pumpjack_crank",
+        "createdieselgenerators:pumpjack_head",
+        "createdieselgenerators:pumpjack_hole",
+        "createdieselgenerators:distillation_controller",
+        "createdieselgenerators:distillation_tank",
+        "create:fluid_valve",
+        "siftec:plastic",
+        "siftec:rubber",
+        "siftec:petroleum_coke",
+        "siftec:circuit_board"
+      ],
+      "tokens": [
+        "scanner:oil"
+      ]
+    },
+    {
+      "id": "logistics_mk4",
+      "tier": 5,
+      "cost": [
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 50
+        },
+        {
+          "item": "siftec:computer",
+          "count": 100
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 200
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 400
+        }
+      ],
+      "seconds": 900,
+      "items": [],
+      "tokens": [
+        "cap:128"
+      ]
+    },
+    {
+      "id": "fluid_packaging",
+      "tier": 5,
+      "cost": [
+        {
+          "item": "siftec:plastic",
+          "count": 200
+        },
+        {
+          "item": "siftec:steel_beam",
+          "count": 400
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 1000
+        }
+      ],
+      "seconds": 480,
+      "items": [
+        "create:spout",
+        "create:item_drain",
+        "create:portable_fluid_interface",
+        "createdieselgenerators:canister"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "petroleum_power",
+      "tier": 5,
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 100
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 100
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 200
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 200
+        }
+      ],
+      "seconds": 480,
+      "items": [
+        "createdieselgenerators:diesel_engine",
+        "createdieselgenerators:large_diesel_engine",
+        "createdieselgenerators:huge_diesel_engine"
+      ],
+      "tokens": [
+        "scanner:zinc"
+      ]
+    },
+    {
+      "id": "industrial_manufacturing",
+      "tier": 6,
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 100
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 200
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 200
+        },
+        {
+          "item": "siftec:cable",
+          "count": 1000
+        }
+      ],
+      "seconds": 720,
+      "items": [
+        "create:mechanical_crafter",
+        "siftec:computer",
+        "siftec:heavy_modular_frame",
+        "siftec:modular_engine",
+        "siftec:adaptive_control_unit"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "monorail_train_technology",
+      "tier": 6,
+      "cost": [
+        {
+          "item": "siftec:computer",
+          "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 100
+        },
+        {
+          "item": "siftec:steel_beam",
+          "count": 500
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 600
+        }
+      ],
+      "seconds": 900,
+      "items": [
+        "create:track",
+        "create:track_station",
+        "create:track_signal",
+        "create:track_observer",
+        "create:controls",
+        "create:schedule",
+        "create:portable_storage_interface",
+        "create:mechanical_roller",
+        "create:railway_casing"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "pipeline_engineering_mk2",
+      "tier": 6,
+      "cost": [
+        {
+          "item": "siftec:plastic",
+          "count": 1000
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 1000
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 50
+        }
+      ],
+      "seconds": 600,
+      "items": [],
+      "tokens": [
+        "pumps:2"
+      ]
+    },
+    {
+      "id": "bauxite_refinement",
+      "tier": 7,
+      "cost": [
+        {
+          "item": "siftec:computer",
+          "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 100
+        },
+        {
+          "item": "siftec:motor",
+          "count": 200
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 500
+        }
+      ],
+      "seconds": 600,
+      "items": [
+        "siftec:crushed_bauxite",
+        "siftec:aluminum_scrap",
+        "siftec:aluminum_ingot",
+        "siftec:alclad_aluminum_sheet",
+        "siftec:aluminum_casing",
+        "siftec:radio_control_unit"
+      ],
+      "tokens": [
+        "scanner:bauxite",
+        "scanner:quartz"
+      ]
+    },
+    {
+      "id": "logistics_mk5",
+      "tier": 7,
+      "cost": [
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 100
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 200
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 300
+        }
+      ],
+      "seconds": 60,
+      "items": [],
+      "tokens": [
+        "cap:192"
+      ]
+    },
+    {
+      "id": "hazmat_suit",
+      "tier": 7,
+      "cost": [
+        {
+          "item": "siftec:aluminum_casing",
+          "count": 50
+        },
+        {
+          "item": "siftec:quickwire",
+          "count": 500
+        },
+        {
+          "item": "siftec:gas_filter",
+          "count": 50
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:iodine_infused_filter"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "hover_pack",
+      "tier": 7,
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 200
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 100
+        },
+        {
+          "item": "siftec:computer",
+          "count": 100
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 200
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:hover_pack"
+      ],
+      "tokens": [
+        "backpack"
+      ]
+    },
+    {
+      "id": "aeronautical_engineering",
+      "tier": 8,
+      "cost": [
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 50
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 100
+        },
+        {
+          "item": "siftec:aluminum_casing",
+          "count": 200
+        },
+        {
+          "item": "siftec:motor",
+          "count": 300
+        }
+      ],
+      "seconds": 900,
+      "items": [
+        "siftec:drone_port",
+        "siftec:cardboard_drone",
+        "create:packager",
+        "create:package_frogport",
+        "create:repackager",
+        "create:stock_link",
+        "create:stock_ticker",
+        "create:redstone_requester",
+        "create:factory_gauge",
+        "create:chain_conveyor",
+        "siftec:supercomputer",
+        "siftec:assembly_director_system"
+      ],
+      "tokens": [
+        "scanner:sulfur"
+      ]
+    },
+    {
+      "id": "geothermal_power",
+      "tier": 8,
+      "cost": [
+        {
+          "item": "siftec:supercomputer",
+          "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 200
+        },
+        {
+          "item": "siftec:cable",
+          "count": 1000
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 2000
+        }
+      ],
+      "seconds": 600,
+      "items": [
+        "siftec:geyser_engine",
+        "siftec:electromagnetic_control_rod",
+        "siftec:magnetic_field_generator"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "advanced_aluminum_production",
+      "tier": 8,
+      "cost": [
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 50
+        },
+        {
+          "item": "siftec:aluminum_casing",
+          "count": 200
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 200
+        },
+        {
+          "item": "siftec:wire",
+          "count": 300
+        }
+      ],
+      "seconds": 900,
+      "items": [
+        "siftec:resource_well_extractor",
+        "siftec:empty_fluid_tank",
+        "siftec:heat_sink",
+        "siftec:cooling_system",
+        "siftec:fused_modular_frame"
+      ],
+      "tokens": [
+        "scanner:nitrogen"
+      ]
+    },
+    {
+      "id": "leading_edge_production",
+      "tier": 8,
+      "cost": [
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 50
+        },
+        {
+          "item": "siftec:supercomputer",
+          "count": 100
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 1000
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:miner_mk3",
+        "siftec:turbo_motor",
+        "siftec:thermal_propulsion_rocket"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "particle_enrichment",
+      "tier": 8,
+      "cost": [
+        {
+          "item": "siftec:electromagnetic_control_rod",
+          "count": 400
+        },
+        {
+          "item": "siftec:cooling_system",
+          "count": 400
+        },
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 200
+        },
+        {
+          "item": "siftec:turbo_motor",
+          "count": 100
+        }
+      ],
+      "seconds": 1200,
+      "items": [
+        "siftec:particle_accelerator",
+        "siftec:copper_powder",
+        "siftec:pressure_conversion_cube",
+        "siftec:nuclear_pasta"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "matter_conversion",
+      "tier": 9,
+      "cost": [
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 100
+        },
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 250
+        },
+        {
+          "item": "siftec:cooling_system",
+          "count": 500
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "siftec:converter",
+        "siftec:reanimated_sam",
+        "siftec:sam_fluctuator",
+        "siftec:ficsite_ingot",
+        "siftec:ficsite_trigon",
+        "siftec:time_crystal",
+        "siftec:biochemical_sculptor"
+      ],
+      "tokens": [
+        "scanner:sam"
+      ]
+    },
+    {
+      "id": "quantum_encoding",
+      "tier": 9,
+      "cost": [
+        {
+          "item": "siftec:time_crystal",
+          "count": 50
+        },
+        {
+          "item": "siftec:ficsite_trigon",
+          "count": 10
+        },
+        {
+          "item": "siftec:turbo_motor",
+          "count": 200
+        },
+        {
+          "item": "siftec:supercomputer",
+          "count": 400
+        }
+      ],
+      "seconds": 900,
+      "items": [
+        "siftec:superposition_oscillator",
+        "siftec:neural_quantum_processor",
+        "siftec:ai_expansion_server"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "ficsit_blueprints_mk3",
+      "tier": 9,
+      "cost": [
+        {
+          "item": "siftec:neural_quantum_processor",
+          "count": 100
+        },
+        {
+          "item": "siftec:time_crystal",
+          "count": 250
+        },
+        {
+          "item": "siftec:ficsite_trigon",
+          "count": 500
+        },
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 500
+        }
+      ],
+      "seconds": 1200,
+      "items": [
+        "siftec:blueprint_designer_mk3"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "spatial_energy_regulation",
+      "tier": 9,
+      "cost": [
+        {
+          "item": "siftec:superposition_oscillator",
+          "count": 100
+        },
+        {
+          "item": "siftec:turbo_motor",
+          "count": 250
+        },
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 500
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 1000
+        }
+      ],
+      "seconds": 1200,
+      "items": [
+        "siftec:main_portal",
+        "siftec:satellite_portal",
+        "siftec:singularity_cell",
+        "siftec:ballistic_warp_drive"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "peak_efficiency",
+      "tier": 9,
+      "cost": [
+        {
+          "item": "siftec:time_crystal",
+          "count": 250
+        },
+        {
+          "item": "siftec:ficsite_trigon",
+          "count": 250
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 1000
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 2000
+        }
+      ],
+      "seconds": 1200,
+      "items": [],
+      "tokens": [
+        "cap:256"
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "id": "phase_1",
+      "tier": -1,
+      "cost": [
+        {
+          "item": "siftec:smart_plating",
+          "count": 50
+        }
+      ],
+      "seconds": 0,
+      "items": [],
+      "tokens": []
+    },
+    {
+      "id": "phase_2",
+      "tier": -1,
+      "cost": [
+        {
+          "item": "siftec:smart_plating",
+          "count": 1000
+        },
+        {
+          "item": "siftec:versatile_framework",
+          "count": 1000
+        },
+        {
+          "item": "siftec:automated_wiring",
+          "count": 100
+        }
+      ],
+      "seconds": 0,
+      "items": [],
+      "tokens": []
+    },
+    {
+      "id": "phase_3",
+      "tier": -1,
+      "cost": [
+        {
+          "item": "siftec:versatile_framework",
+          "count": 2500
+        },
+        {
+          "item": "siftec:modular_engine",
+          "count": 500
+        },
+        {
+          "item": "siftec:adaptive_control_unit",
+          "count": 100
+        }
+      ],
+      "seconds": 0,
+      "items": [],
+      "tokens": []
+    },
+    {
+      "id": "phase_4",
+      "tier": -1,
+      "cost": [
+        {
+          "item": "siftec:assembly_director_system",
+          "count": 500
+        },
+        {
+          "item": "siftec:magnetic_field_generator",
+          "count": 500
+        },
+        {
+          "item": "siftec:nuclear_pasta",
+          "count": 100
+        },
+        {
+          "item": "siftec:thermal_propulsion_rocket",
+          "count": 250
+        }
+      ],
+      "seconds": 0,
+      "items": [],
+      "tokens": []
+    },
+    {
+      "id": "phase_5",
+      "tier": -1,
+      "cost": [
+        {
+          "item": "siftec:nuclear_pasta",
+          "count": 1000
+        },
+        {
+          "item": "siftec:biochemical_sculptor",
+          "count": 1000
+        },
+        {
+          "item": "siftec:ai_expansion_server",
+          "count": 256
+        },
+        {
+          "item": "siftec:ballistic_warp_drive",
+          "count": 200
+        }
+      ],
+      "seconds": 0,
+      "items": [],
+      "tokens": []
+    }
+  ]
+}

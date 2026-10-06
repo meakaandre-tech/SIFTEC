@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.item;
 
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodeType;
@@ -37,8 +39,12 @@ public class NodeScannerItem extends Item {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (!(level instanceof ServerLevel server)) return InteractionResult.SUCCESS;
         NodeType type = SELECTED.getOrDefault(player.getUUID(), NodeType.IRON);
+        Company company = player.hasInfiniteMaterials() ? null : Companies.of(player);
+        if (!type.onScanner(company)) type = NodeType.IRON;
         if (player.isShiftKeyDown()) {
-            type = NodeType.values()[(type.ordinal() + 1) % NodeType.values().length];
+            do {
+                type = NodeType.values()[(type.ordinal() + 1) % NodeType.values().length];
+            } while (!type.onScanner(company));
             SELECTED.put(player.getUUID(), type);
             player.sendOverlayMessage(Component.translatable("siftec.scanner.selected", Component.translatable(type.key())));
             return InteractionResult.SUCCESS;

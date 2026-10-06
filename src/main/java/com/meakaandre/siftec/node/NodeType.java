@@ -52,6 +52,11 @@ public enum NodeType {
         return output;
     }
 
+    /** Iron is on the scanner from the start; the others are added by milestones. */
+    public boolean onScanner(com.meakaandre.siftec.company.Company company) {
+        return this == IRON || company == null || company.hasToken("scanner:" + id());
+    }
+
     public static NodeType byId(String id) {
         for (NodeType type : values()) {
             if (type.id().equals(id)) return type;

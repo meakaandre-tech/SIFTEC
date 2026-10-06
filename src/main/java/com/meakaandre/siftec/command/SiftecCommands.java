@@ -3,6 +3,9 @@ package com.meakaandre.siftec.command;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.MinerBlockEntity;
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.block.PortableMinerBlockEntity;
 import com.meakaandre.siftec.node.NodePlacer;
 import com.meakaandre.siftec.registry.ModBlocks;
@@ -45,7 +48,8 @@ public final class SiftecCommands {
                     .then(Commands.literal("tp").then(type().executes(context -> find(context, true)))))
                 .then(Commands.literal("selftest")
                     .then(Commands.literal("setup").executes(context -> selfTest(context, true)))
-                    .then(Commands.literal("check").executes(context -> selfTest(context, false))))
+                    .then(Commands.literal("check").executes(context -> selfTest(context, false)))
+                    .then(Commands.literal("hub").executes(SiftecCommands::hubTest)))
         ));
     }
 
@@ -100,6 +104,39 @@ public final class SiftecCommands {
                 report(source, "SELFTEST check " + node + ": " + made);
             }
         }
+        return 1;
+    }
+
+    /** Used by the automated test: checks the milestone tables and runs one company through Tier 0. */
+    private static int hubTest(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        int count = 0;
+        java.util.Set<String> missing = new java.util.TreeSet<>();
+        for (Milestone m : Milestones.all()) {
+            count++;
+            for (Milestone.Cost cost : m.cost()) {
+                if (cost.item() == net.minecraft.world.item.Items.AIR) missing.add(cost.itemId().toString());
+            }
+            for (Identifier item : m.items()) {
+                if (BuiltInRegistries.ITEM.getOptional(item).isEmpty()) missing.add(item.toString());
+            }
+        }
+        report(source, "SELFTEST hub: " + count + " milestones and phases, " + Milestones.partIds().size() + " parts");
+        report(source, "SELFTEST hub: ids not present in this install: " + missing);
+        Company company = new Company();
+        company.members.add("a");
+        company.members.add("b");
+        for (Milestone m : Milestones.tier(0)) {
+            if (Milestones.blocker(company, m) != null) report(source, "SELFTEST hub: " + m.id() + " blocked, which is wrong");
+            for (Milestone.Cost cost : m.cost()) company.pay(m, cost, company.needed(m, cost));
+            if (!company.fullyPaid(m)) report(source, "SELFTEST hub: " + m.id() + " not paid, which is wrong");
+            company.done.add(m.id());
+        }
+        Milestone coal = Milestones.get("coal_power");
+        report(source, "SELFTEST hub: two members pay x" + company.costMultiplier() + "; tier 1 open " + Milestones.tierOpen(company, 1)
+            + "; tier 3 open " + Milestones.tierOpen(company, 3) + "; coal power needs " + Milestones.blocker(company, coal).id()
+            + "; backpack rewards " + company.count("backpack") + "; scanner copper " + company.hasToken("scanner:copper")
+            + "; speed cap " + company.best("cap:", 32));
         return 1;
     }
 

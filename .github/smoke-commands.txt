@@ -1,1 +1,2 @@
 siftec selftest setup
+siftec selftest hub

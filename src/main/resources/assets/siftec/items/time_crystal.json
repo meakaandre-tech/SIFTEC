@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/time_crystal",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 15761648
+      }
+    ]
+  }
+}

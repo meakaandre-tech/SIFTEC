@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "siftec:portable_miner",
-    "siftec:miner_mk1"
+    "siftec:miner_mk1",
+    "siftec:hub",
+    "siftec:wormhole_gateway"
   ]
 }

@@ -11,6 +11,7 @@
     "main": ["com.meakaandre.siftec.Siftec"],
     "client": ["com.meakaandre.siftec.client.SiftecClient"]
   },
+  "mixins": ["siftec.mixins.json"],
   "depends": {
     "fabricloader": "*",
     "fabric-api": "*",
