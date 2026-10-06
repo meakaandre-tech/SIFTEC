@@ -169,6 +169,10 @@ jobs:
                 sudo apt-get install -y -q xvfb xdotool imagemagick libgl1-mesa-dri libglx-mesa0 libegl1 libegl-mesa0 libgles2 mesa-vulkan-drivers libvulkan1 mesa-utils >/dev/null 2>&1
                 mkdir -p run/mods
                 cp libs/create-fly-26.3.jar run/mods/
+                # the client needs the same pack mods as the server, or it cannot join
+                cp server/mods/*.jar run/mods/ 2>/dev/null || true
+                rm -f run/mods/siftec-*.jar run/mods/fabric-api.jar
+                ls -l run/mods
                 # no version line: the file is datafixed from the oldest layout, where key codes are LWJGL2 numbers (22 = U)
                 printf 'pauseOnLostFocus:false\nonboardAccessibility:false\ntutorialStep:none\nnarrator:0\nrenderDistance:6\nguiScale:2\nmaxFps:30\nsoundCategory_master:0.0\nkey_key.use:22\n' > run/options.txt
                 export LIBGL_ALWAYS_SOFTWARE=1

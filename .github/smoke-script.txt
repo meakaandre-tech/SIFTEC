@@ -1,18 +1,44 @@
 cmd time set noon
 cmd weather clear
 cmd gamemode creative @a
-cmd tp @a 149.5 141 -80.5 -90 30
+cmd execute as @a run siftec node tp iron
 sleep 8
+cmd execute as @a at @s run tp @s ~7 ~3 ~ 90 25
+sleep 4
 shot
 cmd execute as @a at @s run tp @s ~ ~ ~ 0 0
-cmd execute at @a run setblock ~ ~1 ~2 siftec:mam
-cmd gamemode survival @a
+cmd execute at @a run setblock ~ ~1 ~2 siftec:speed_governor
 sleep 3
 key u
 sleep 3
-click 532 190
+shot
+key Escape
+cmd execute at @a run setblock ~ ~1 ~2 siftec:mam
 sleep 2
-move 532 298
+key u
+sleep 3
+click 784 190
 sleep 2
+shot
+key Escape
+cmd execute at @a run setblock ~ ~1 ~2 siftec:drone_port
+sleep 2
+key u
+sleep 3
+shot
+key Escape
+cmd execute at @a run setblock ~ ~1 ~2 siftec:hub
+sleep 2
+key u
+sleep 3
+shot
+key Escape
+cmd give @a siftec:pickled_tomato 4
+cmd give @a siftec:jetpack
+cmd give @a siftec:blueprint
+cmd give @a siftec:hard_drive
+sleep 2
+key e
+sleep 3
 shot
 key Escape
