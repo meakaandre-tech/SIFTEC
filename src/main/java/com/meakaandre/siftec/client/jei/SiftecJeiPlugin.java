@@ -49,7 +49,7 @@ public class SiftecJeiPlugin implements IModPlugin {
             for (IRecipeSlotView slot : slots.getSlotViews(RecipeIngredientRole.OUTPUT)) slot.getItemStacks().findFirst().ifPresent(results::add);
             Component why = ClientLocks.recipe(recipe, results);
             if (why == null) return;
-            Font font = graphics.minecraft.font;
+            Font font = net.minecraft.client.Minecraft.getInstance().font;
             int y = category.getHeight() - 9;
             graphics.fill(0, y - 1, Math.min(category.getWidth(), font.width(why) + 3), y + 9, 0xD0000000);
             graphics.text(font, why, 1, y, 0xFFFF5555, false);
