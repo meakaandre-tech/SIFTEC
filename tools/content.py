@@ -128,7 +128,7 @@ MILESTONES = [
      "Solid Biofuel, harvesters and ploughs, +3 backpack slots",
      ["siftec:solid_biofuel", C + "mechanical_harvester", C + "mechanical_plough", C + "tree_fertilizer"], ["backpack"]),
     (2, "jump_pads", "Jump Pads", "50 Rotor, 300 Iron Sheet, 150 Cable", "4:00",
-     "Jump Pad (Weighted Ejector)", [C + "weighted_ejector"], []),
+     "Jump Pad (Weighted Ejector), landing pad that cancels fall damage", [C + "weighted_ejector", "siftec:landing_pad"], []),
     (2, "resource_sink_bonus_program", "Resource Sink Bonus Program", "400 Concrete, 500 Wire, 200 Iron Rod, 200 Iron Sheet", "5:00",
      "AWESOME Sink and AWESOME Shop", ["siftec:awesome_sink", "siftec:awesome_shop"], []),
     (2, "logistics_mk2", "Logistics Mk.2", "50 Reinforced Iron Plate, 200 Concrete, 300 Iron Rod, 300 Iron Sheet", "6:00",
@@ -195,7 +195,7 @@ MILESTONES = [
     (7, "logistics_mk5", "Logistics Mk.5", "100 Alclad Aluminum Sheet, 200 Encased Industrial Beam, 300 Reinforced Iron Plate", "1:00",
      "Company speed limit raised to 192 RPM", [], ["cap:192"]),
     (7, "hazmat_suit", "Hazmat Suit", "50 Aluminum Casing, 500 Quickwire, 50 Gas Filter", "5:00",
-     "Iodine Infused Filter, +3 backpack slots", ["siftec:iodine_infused_filter"], ["backpack"]),
+     "Hazmat Suit, Iodine Infused Filter, +3 backpack slots", ["siftec:hazmat_suit", "siftec:iodine_infused_filter"], ["backpack"]),
     (7, "hover_pack", "Hover Pack", "200 Motor, 100 Heavy Modular Frame, 100 Computer, 200 Alclad Aluminum Sheet", "5:00",
      "Hover Pack, +3 backpack slots", ["siftec:hover_pack"], ["backpack"]),
 

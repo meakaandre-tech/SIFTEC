@@ -66,6 +66,7 @@ public class PoleBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
+        if (level != null && !level.isClientSide() && (level.getGameTime() + worldPosition.hashCode()) % 20 == 0) Poles.mark(level, worldPosition, getSpeed() != 0);
         if (!(level instanceof ServerLevel server) || lines.isEmpty() || ++sparkle < 30) return;
         sparkle = 0;
         // until the lines get a proper model, sparks drift along them so you can see where they go
@@ -82,6 +83,12 @@ public class PoleBlockEntity extends KineticBlockEntity {
                     worldPosition.getZ() + 0.5 + offset.getZ() * t, 1, 0, 0, 0, 0);
             }
         }
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (level != null && !level.isClientSide()) Poles.mark(level, worldPosition, false);
     }
 
     @Override

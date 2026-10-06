@@ -7,6 +7,8 @@ import java.util.Set;
 public final class ClientState {
     public static volatile Set<String> done;
     public static volatile int backpackSlots;
+    /** False once the server has said the Jetpack is out of fuel. */
+    public static volatile boolean jetFuel = true;
     /** The company's speed limit in RPM. */
     public static volatile int speedLimit = 32;
 

@@ -44,6 +44,7 @@ public class Siftec implements ModInitializer {
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> com.meakaandre.siftec.owner.RecipeLocks.forget());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.owner.RecipeLocks.forget());
         Backpack.register();
+        com.meakaandre.siftec.equip.Equipment.register();
         Food.register();
         Locks.register();
         Companies.register();

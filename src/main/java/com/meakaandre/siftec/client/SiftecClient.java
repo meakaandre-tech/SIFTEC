@@ -43,9 +43,12 @@ public class SiftecClient implements ClientModInitializer {
             AllFluidConfigs.tint(fluid.still, (f, components) -> color);
         }
         ClientPlayNetworking.registerGlobalReceiver(StatePayload.TYPE, (payload, context) -> ClientState.accept(payload));
+        ClientPlayNetworking.registerGlobalReceiver(com.meakaandre.siftec.equip.JetFuelPayload.TYPE, (payload, context) -> ClientState.jetFuel = payload.ok());
+        net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(JetpackClient::tick);
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
             ClientState.backpackSlots = 0;
+            ClientState.jetFuel = true;
         });
     }
 }

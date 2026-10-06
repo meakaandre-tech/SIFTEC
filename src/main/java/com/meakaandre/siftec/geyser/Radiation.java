@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * Toxic Residue gives off radiation: carrying it, or standing within a few blocks of some lying on the
- * ground, hurts. Nothing shields it.
+ * ground, hurts. Only a Hazmat Suit with an Iodine Infused Filter shields it.
  */
 public final class Radiation {
     private static final double RANGE = 4;
@@ -35,7 +35,7 @@ public final class Radiation {
                 if (!exposed) {
                     exposed = !level.getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(RANGE), e -> e.getItem().is(residue)).isEmpty();
                 }
-                if (exposed) player.hurtServer(level, level.damageSources().magic(), 1.0f);
+                if (exposed && !com.meakaandre.siftec.equip.Equipment.shieldsRadiation(player)) player.hurtServer(level, level.damageSources().magic(), 1.0f);
             }
         });
     }

@@ -15,6 +15,7 @@
     "PropagatorMixin",
     "PumpMixin",
     "PumpBehaviourMixin",
+    "ConnectionAccessor",
     "KineticCapacityMixin",
     "BeltInventoryAccessor",
     "TunnelMixin",

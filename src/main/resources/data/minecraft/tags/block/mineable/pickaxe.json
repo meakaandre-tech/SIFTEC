@@ -13,6 +13,8 @@
     "siftec:speed_governor",
     "siftec:furnace_engine",
     "siftec:hub_engine",
+    "siftec:landing_pad",
+    "siftec:radar_tower",
     "siftec:mam",
     "siftec:claim_marker",
     "siftec:geyser_engine",

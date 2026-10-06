@@ -577,7 +577,8 @@
       ],
       "seconds": 240,
       "items": [
-        "create:weighted_ejector"
+        "create:weighted_ejector",
+        "siftec:landing_pad"
       ],
       "tokens": []
     },
@@ -1235,6 +1236,7 @@
       ],
       "seconds": 300,
       "items": [
+        "siftec:hazmat_suit",
         "siftec:iodine_infused_filter"
       ],
       "tokens": [
@@ -4089,6 +4091,167 @@
         {
           "item": "siftec:reinforced_iron_plate",
           "count": 2
+        }
+      ]
+    },
+    {
+      "item": "siftec:landing_pad",
+      "cost": [
+        {
+          "item": "siftec:rotor",
+          "count": 20
+        },
+        {
+          "item": "siftec:cable",
+          "count": 30
+        },
+        {
+          "item": "siftec:biomass",
+          "count": 200
+        }
+      ]
+    },
+    {
+      "item": "siftec:jetpack",
+      "cost": [
+        {
+          "item": "siftec:plastic",
+          "count": 50
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 50
+        },
+        {
+          "item": "siftec:circuit_board",
+          "count": 5
+        },
+        {
+          "item": "siftec:motor",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "item": "siftec:hazmat_suit",
+      "cost": [
+        {
+          "item": "siftec:rubber",
+          "count": 50
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 50
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 50
+        },
+        {
+          "item": "siftec:fabric",
+          "count": 50
+        }
+      ]
+    },
+    {
+      "item": "siftec:hover_pack",
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 8
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 4
+        },
+        {
+          "item": "siftec:computer",
+          "count": 8
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 40
+        }
+      ]
+    },
+    {
+      "item": "siftec:blade_runners",
+      "cost": [
+        {
+          "item": "siftec:silica",
+          "count": 20
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 3
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "item": "siftec:zipline",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 30
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 3
+        },
+        {
+          "item": "siftec:cable",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:parachute",
+      "cost": [
+        {
+          "item": "siftec:fabric",
+          "count": 10
+        },
+        {
+          "item": "siftec:cable",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "item": "siftec:gas_mask",
+      "cost": [
+        {
+          "item": "siftec:rubber",
+          "count": 50
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 100
+        },
+        {
+          "item": "siftec:fabric",
+          "count": 50
+        }
+      ]
+    },
+    {
+      "item": "siftec:radar_tower",
+      "cost": [
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 10
+        },
+        {
+          "item": "siftec:cable",
+          "count": 50
         }
       ]
     },

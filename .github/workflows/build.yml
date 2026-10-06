@@ -122,7 +122,16 @@ jobs:
             echo "modrinth search for The Sift:"
             curl -fsSL -G "https://api.modrinth.com/v2/search" --data-urlencode "query=the sift" --data-urlencode "limit=8" | python3 -c "import json,sys; [print('  ', h['slug'], '|', h['title'], '|', h['author'], '|', h['versions'][-4:]) for h in json.load(sys.stdin)['hits']]" || echo "  (search failed)"
             if [ -f $root/.github/smoke-pack-mods ]; then
-              while read -r url; do case "$url" in http*) curl -fsSL -o "mods/$(basename "$url")" "$url" || echo "could not fetch $url";; esac; done < $root/.github/smoke-pack-mods
+              while read -r url; do
+                case "$url" in
+                  modrinth:*)
+                    # the newest Fabric build of that project for this game version
+                    found=$(curl -fsSL "https://api.modrinth.com/v2/project/${url#modrinth:}/version" | python3 -c "import json,sys; v=[x for x in json.load(sys.stdin) if '$mc' in x['game_versions'] and 'fabric' in x['loaders']]; print(v[0]['files'][0]['url'] if v else ''); [print('  needs', d) for d in (v[0]['dependencies'] if v else [])]" || true)
+                    echo "$url -> $found"
+                    url=$(echo "$found" | head -1);;
+                esac
+                case "$url" in http*) curl -fsSL -o "mods/$(basename "$url")" "$url" || echo "could not fetch $url";; esac
+              done < $root/.github/smoke-pack-mods
             fi
             jar=$(ls ../build/libs/*.jar | grep -v -e sources -e server | head -1)
             cp "$jar" mods/
