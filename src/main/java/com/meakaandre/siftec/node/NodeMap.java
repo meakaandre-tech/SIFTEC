@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.node;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.server.level.ServerLevel;
@@ -40,9 +39,26 @@ public final class NodeMap {
         return level.dimension() == Level.OVERWORLD;
     }
 
+    /**
+     * False for the first moments of a new world, until its spawn point is settled and recorded. Nothing
+     * may be looked up before that, or the map would be measured from the wrong place.
+     */
+    public static boolean ready(ServerLevel level) {
+        return NodeSavedData.get(level.getServer()).hasOrigin();
+    }
+
+    /** Called on the first tick of a world: fixes the point the map is measured from. */
+    public static void settle(ServerLevel level) {
+        NodeSavedData data = NodeSavedData.get(level.getServer());
+        if (data.hasOrigin()) return;
+        var spawn = level.getRespawnData().pos();
+        data.setOrigin(spawn.getX(), spawn.getZ());
+        CACHE.clear();
+    }
+
     /** The node in a cell, if it has one. */
     public static Optional<Node> inCell(ServerLevel level, int cellX, int cellZ) {
-        if (!hasNodes(level)) return Optional.empty();
+        if (!hasNodes(level) || !ready(level)) return Optional.empty();
         long seed = level.getSeed();
         if (seed != cacheSeed) {
             CACHE.clear();
@@ -102,9 +118,10 @@ public final class NodeMap {
     }
 
     private static Optional<Node> compute(ServerLevel level, long seed, int cellX, int cellZ) {
-        BlockPos spawn = level.getRespawnData().pos();
-        int spawnCellX = Math.floorDiv(spawn.getX(), CELL);
-        int spawnCellZ = Math.floorDiv(spawn.getZ(), CELL);
+        NodeSavedData data = NodeSavedData.get(level.getServer());
+        int originX = data.originX(), originZ = data.originZ();
+        int spawnCellX = Math.floorDiv(originX, CELL);
+        int spawnCellZ = Math.floorDiv(originZ, CELL);
 
         long h = mix(seed ^ mix(cellX * 0x9E3779B97F4A7C15L + cellZ * 0xC2B2AE3D27D4EB4FL + 0x51F7EC));
         int span = CELL - 2 * MARGIN;
@@ -130,7 +147,7 @@ public final class NodeMap {
         }
         boolean hills = biome.is(BiomeTags.IS_MOUNTAIN) || biome.is(BiomeTags.IS_HILL);
         boolean hot = biome.is(BiomeTags.IS_JUNGLE) || biome.is(BiomeTags.IS_SAVANNA) || biome.is(BiomeTags.IS_BADLANDS);
-        double distance = Math.sqrt(Math.pow(x - spawn.getX(), 2) + Math.pow(z - spawn.getZ(), 2));
+        double distance = Math.sqrt(Math.pow(x - originX, 2) + Math.pow(z - originZ, 2));
 
         int total = 0;
         for (NodeType type : NodeType.values()) {

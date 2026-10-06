@@ -32,24 +32,25 @@ public final class NodePlacer {
     }
 
     public static void register() {
+        // only note the chunk here: blocks are placed from the tick, when the chunk is fully in the world
         ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
             if (!NodeMap.hasNodes(level)) return;
             ChunkPos pos = chunk.getPos();
-            if (touchesNode(level, pos.x(), pos.z())) {
-                synchronized (QUEUE) {
-                    QUEUE.add(new long[]{pos.x(), pos.z()});
-                }
+            synchronized (QUEUE) {
+                QUEUE.add(new long[]{pos.x(), pos.z()});
             }
         });
         ServerTickEvents.END_LEVEL_TICK.register(level -> {
             if (!NodeMap.hasNodes(level)) return;
-            for (int i = 0; i < 8; i++) {
+            NodeMap.settle(level);
+            int placed = 0;
+            for (int i = 0; i < 512 && placed < 8; i++) {
                 long[] next;
                 synchronized (QUEUE) {
                     next = QUEUE.poll();
                 }
                 if (next == null) return;
-                placeChunk(level, (int) next[0], (int) next[1]);
+                if (placeChunk(level, (int) next[0], (int) next[1])) placed++;
             }
         });
     }
@@ -71,19 +72,19 @@ public final class NodePlacer {
         return nodes;
     }
 
-    private static boolean touchesNode(ServerLevel level, int chunkX, int chunkZ) {
-        return !nodesTouching(level, chunkX, chunkZ).isEmpty();
-    }
-
-    public static void placeChunk(ServerLevel level, int chunkX, int chunkZ) {
-        if (!level.hasChunk(chunkX, chunkZ)) return;
+    /** Places the node blocks that belong in this chunk, once. True if it placed any. */
+    public static boolean placeChunk(ServerLevel level, int chunkX, int chunkZ) {
+        if (!NodeMap.ready(level) || !level.hasChunk(chunkX, chunkZ)) return false;
+        Set<Node> nodes = nodesTouching(level, chunkX, chunkZ);
+        if (nodes.isEmpty()) return false;
         NodeSavedData data = NodeSavedData.get(level.getServer());
         long key = ChunkPos.pack(chunkX, chunkZ);
-        if (data.isDone(key)) return;
-        for (Node node : nodesTouching(level, chunkX, chunkZ)) {
+        if (data.isDone(key)) return false;
+        for (Node node : nodes) {
             placeColumns(level, node, chunkX, chunkZ);
         }
         data.markDone(key);
+        return true;
     }
 
     private static void placeColumns(ServerLevel level, Node node, int chunkX, int chunkZ) {

@@ -61,6 +61,7 @@ public final class SiftecCommands {
     private static int selfTest(CommandContext<CommandSourceStack> context, boolean setup) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
+        NodeMap.settle(level);
         for (NodeType type : new NodeType[]{NodeType.IRON, NodeType.COPPER}) {
             Optional<Node> found = NodeMap.nearest(level, 0, 0, type, 64);
             if (found.isEmpty()) {
