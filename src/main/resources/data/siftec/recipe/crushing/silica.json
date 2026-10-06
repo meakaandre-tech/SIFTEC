@@ -1,0 +1,11 @@
+{
+  "type": "create:crushing",
+  "ingredient": "minecraft:quartz",
+  "results": [
+    {
+      "id": "siftec:silica",
+      "count": 2
+    }
+  ],
+  "processing_time": 200
+}

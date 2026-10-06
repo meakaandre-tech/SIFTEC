@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:versatile_framework",
+  "ingredient": "siftec:electromagnetic_control_rod",
+  "results": [
+    {
+      "id": "siftec:magnetic_field_generator"
+    }
+  ]
+}

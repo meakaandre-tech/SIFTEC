@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:alclad_aluminum_sheet",
+  "ingredient": "create:copper_sheet",
+  "results": [
+    {
+      "id": "siftec:heat_sink"
+    }
+  ]
+}

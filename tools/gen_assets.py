@@ -4,6 +4,7 @@ Every texture is borrowed from vanilla or Create for now; nothing is drawn here.
 import json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import content
+import recipes
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "src", "main", "resources")
 A = os.path.join(ROOT, "assets", "siftec")
@@ -129,6 +130,39 @@ for mid, name, cost, text in content.PHASES:
     lang[f"siftec.milestone.{mid}"] = name
     lang[f"siftec.milestone.{mid}.unlocks"] = text
 for i in content.ALIAS.values(): check(i)
+# ---- fluids
+data["fluids"] = []
+for fid, name, colour in content.FLUIDS:
+    data["fluids"].append({"id": fid, "color": colour})
+    lang[f"block.siftec.{fid}"] = name
+    lang[f"fluid.siftec.{fid}"] = name
+    lang[f"item.siftec.{fid}_bucket"] = name + " Bucket"
+    write(f"{A}/blockstates/{fid}.json", {"variants": {"": {"model": "siftec:block/fluid"}}})
+    write(f"{A}/models/item/{fid}_bucket.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/milk_bucket"}})
+    item_def(f"{fid}_bucket", f"siftec:item/{fid}_bucket", colour)
+write(f"{A}/models/block/fluid.json", {"textures": {"particle": "minecraft:block/water_still"}})
+
+# ---- recipes
+import shutil
+shutil.rmtree(f"{D}/recipe", ignore_errors=True)
+for path, body in recipes.build().items():
+    # a recipe that names another mod's item or fluid only loads when that mod is installed
+    text = json.dumps(body)
+    mods = [m for m in ("cgs", "createdieselgenerators", "create_hypertube") if f'"{m}:' in text or f'"#{m}:' in text]
+    if mods:
+        body = {"fabric:load_conditions": [{"condition": "fabric:all_mods_loaded", "values": mods}], **body}
+    write(f"{D}/recipe/{path}.json", body)
+data["removed_recipes"] = recipes.REMOVED
+data["workshop"] = [{"item": i, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]} for i, cost in recipes.WORKSHOP]
+lang.update({"block.siftec.equipment_workshop": "Equipment Workshop", "siftec.workshop.title": "Equipment Workshop",
+             "siftec.workshop.click": "Click to build from the parts in your inventory", "siftec.workshop.missing": "You are missing parts for that",
+             "siftec.workshop.built": "Built %s"})
+write(f"{A}/blockstates/equipment_workshop.json", {"variants": {"": {"model": "siftec:block/equipment_workshop"}}})
+write(f"{A}/models/block/equipment_workshop.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
+    "top": "minecraft:block/smithing_table_top", "side": "create:block/andesite_casing", "bottom": "create:block/andesite_casing"}})
+item_def("equipment_workshop", "siftec:block/equipment_workshop")
+write(f"{D}/loot_table/blocks/equipment_workshop.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
+      "entries": [{"type": "minecraft:item", "name": "siftec:equipment_workshop"}]}]})
 write(os.path.join(ROOT, "siftec_content.json"), data)
 
 # ---- HUB and Wormhole Gateway
@@ -168,4 +202,4 @@ for b in ("portable_miner", "miner_mk1"):
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
 # pickaxe is the right tool for the miners
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:hub", "siftec:wormhole_gateway"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})

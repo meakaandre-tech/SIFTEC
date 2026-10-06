@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:reinforced_iron_plate",
+  "ingredient": "siftec:iron_rod",
+  "results": [
+    {
+      "id": "siftec:modular_frame"
+    }
+  ]
+}

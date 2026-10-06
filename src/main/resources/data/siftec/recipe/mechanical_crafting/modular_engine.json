@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:motor",
+    "B": "siftec:rubber",
+    "C": "siftec:smart_plating"
+  },
+  "pattern": [
+    "AAB",
+    "BBB",
+    "CC "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:modular_engine"
+  }
+}

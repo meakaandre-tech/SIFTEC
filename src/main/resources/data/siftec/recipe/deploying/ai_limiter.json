@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "create:copper_sheet",
+  "ingredient": "siftec:quickwire",
+  "results": [
+    {
+      "id": "siftec:ai_limiter"
+    }
+  ]
+}

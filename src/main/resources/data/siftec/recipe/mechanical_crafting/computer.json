@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:circuit_board",
+    "B": "siftec:cable",
+    "C": "siftec:plastic"
+  },
+  "pattern": [
+    "AAB",
+    "BCC",
+    "CC "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:computer"
+  }
+}

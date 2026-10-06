@@ -23,6 +23,16 @@ public final class Milestones {
     private static final List<Milestone> PHASES = new ArrayList<>();
     private static final List<String> PART_IDS = new ArrayList<>();
     private static final List<Identifier> DISABLED = new ArrayList<>();
+    private static final java.util.Set<Identifier> REMOVED_RECIPES = new java.util.HashSet<>();
+    private static final List<FluidDef> FLUIDS = new ArrayList<>();
+    private static final List<Build> WORKSHOP = new ArrayList<>();
+
+    public record FluidDef(String id, int color) {
+    }
+
+    /** Something the Equipment Workshop builds. */
+    public record Build(Identifier item, List<Milestone.Cost> cost) {
+    }
 
     private Milestones() {
     }
@@ -32,6 +42,18 @@ public final class Milestones {
         try (var in = Siftec.class.getResourceAsStream("/siftec_content.json")) {
             JsonObject root = new Gson().fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), JsonObject.class);
             for (JsonElement e : root.getAsJsonArray("parts")) PART_IDS.add(e.getAsJsonObject().get("id").getAsString());
+            for (JsonElement e : root.getAsJsonArray("removed_recipes")) REMOVED_RECIPES.add(Identifier.parse(e.getAsString()));
+            for (JsonElement e : root.getAsJsonArray("fluids")) {
+                FLUIDS.add(new FluidDef(e.getAsJsonObject().get("id").getAsString(), e.getAsJsonObject().get("color").getAsInt()));
+            }
+            for (JsonElement e : root.getAsJsonArray("workshop")) {
+                JsonObject o = e.getAsJsonObject();
+                List<Milestone.Cost> cost = new ArrayList<>();
+                for (JsonElement c : o.getAsJsonArray("cost")) {
+                    cost.add(new Milestone.Cost(Identifier.parse(c.getAsJsonObject().get("item").getAsString()), c.getAsJsonObject().get("count").getAsInt()));
+                }
+                WORKSHOP.add(new Build(Identifier.parse(o.get("item").getAsString()), cost));
+            }
             for (JsonElement e : root.getAsJsonArray("disabled")) DISABLED.add(Identifier.parse(e.getAsString()));
             for (JsonElement e : root.getAsJsonArray("milestones")) {
                 JsonObject o = e.getAsJsonObject();
@@ -62,6 +84,18 @@ public final class Milestones {
         JsonArray t = o.getAsJsonArray("tokens");
         for (JsonElement i : t) tokens.add(i.getAsString());
         return new Milestone(o.get("id").getAsString(), o.get("tier").getAsInt(), index, cost, o.get("seconds").getAsInt(), items, tokens);
+    }
+
+    public static java.util.Set<Identifier> removedRecipes() {
+        return REMOVED_RECIPES;
+    }
+
+    public static List<FluidDef> fluids() {
+        return FLUIDS;
+    }
+
+    public static List<Build> workshop() {
+        return WORKSHOP;
     }
 
     public static List<Identifier> disabled() {

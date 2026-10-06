@@ -137,6 +137,15 @@ public final class SiftecCommands {
             + "; tier 3 open " + Milestones.tierOpen(company, 3) + "; coal power needs " + Milestones.blocker(company, coal).id()
             + "; backpack rewards " + company.count("backpack") + "; scanner copper " + company.hasToken("scanner:copper")
             + "; speed cap " + company.best("cap:", 32));
+        int ours = 0;
+        boolean steelGone = true;
+        for (var holder : source.getServer().getRecipeManager().getRecipes()) {
+            Identifier rid = holder.id().identifier();
+            if (rid.getNamespace().equals("siftec")) ours++;
+            if (Milestones.removedRecipes().contains(rid)) steelGone = false;
+        }
+        report(source, "SELFTEST recipes: " + ours + " SIFTEC recipes loaded; removed recipes gone " + steelGone
+            + "; fluids " + com.meakaandre.siftec.fluid.ModFluids.ALL.keySet());
         report(source, "SELFTEST hub: Create's speed limit now reads " + com.zurrtum.create.infrastructure.config.AllConfigs.server().kinetics.maxRotationSpeed.get());
         return 1;
     }

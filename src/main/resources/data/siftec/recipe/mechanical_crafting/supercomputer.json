@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:computer",
+    "B": "siftec:ai_limiter",
+    "C": "siftec:high_speed_connector",
+    "D": "siftec:plastic"
+  },
+  "pattern": [
+    "AAB",
+    "BCC",
+    "DDD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:supercomputer"
+  }
+}

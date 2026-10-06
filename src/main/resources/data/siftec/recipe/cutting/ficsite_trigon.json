@@ -1,0 +1,11 @@
+{
+  "type": "create:cutting",
+  "ingredient": "siftec:ficsite_ingot",
+  "results": [
+    {
+      "id": "siftec:ficsite_trigon",
+      "count": 3
+    }
+  ],
+  "processing_time": 100
+}

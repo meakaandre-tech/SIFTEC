@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:modular_frame",
+  "ingredient": "siftec:steel_beam",
+  "results": [
+    {
+      "id": "siftec:versatile_framework"
+    }
+  ]
+}

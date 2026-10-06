@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:modular_frame",
+    "B": "siftec:steel_pipe",
+    "C": "siftec:encased_industrial_beam",
+    "D": "siftec:screw"
+  },
+  "pattern": [
+    "AAB",
+    "BBC",
+    "CDD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:heavy_modular_frame"
+  }
+}

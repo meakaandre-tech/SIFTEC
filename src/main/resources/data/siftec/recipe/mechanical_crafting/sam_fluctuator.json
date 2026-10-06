@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:reanimated_sam",
+    "B": "siftec:wire",
+    "C": "siftec:steel_pipe"
+  },
+  "pattern": [
+    "AAA",
+    "BBB",
+    "CC "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:sam_fluctuator"
+  }
+}

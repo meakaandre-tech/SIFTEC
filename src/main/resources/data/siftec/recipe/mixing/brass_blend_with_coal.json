@@ -1,0 +1,14 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:crushed_raw_copper",
+    "create:crushed_raw_zinc",
+    "minecraft:coal"
+  ],
+  "results": [
+    {
+      "id": "siftec:brass_blend",
+      "count": 2
+    }
+  ]
+}

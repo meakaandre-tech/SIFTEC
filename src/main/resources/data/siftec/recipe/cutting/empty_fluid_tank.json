@@ -1,0 +1,10 @@
+{
+  "type": "create:cutting",
+  "ingredient": "siftec:aluminum_ingot",
+  "results": [
+    {
+      "id": "siftec:empty_fluid_tank"
+    }
+  ],
+  "processing_time": 100
+}

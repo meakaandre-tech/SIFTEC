@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "create:limestone",
+    "create:limestone",
+    "create:limestone"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:light_gray_concrete"
+  }
+}

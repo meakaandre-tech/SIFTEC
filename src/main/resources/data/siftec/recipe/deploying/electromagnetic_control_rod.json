@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:stator",
+  "ingredient": "siftec:ai_limiter",
+  "results": [
+    {
+      "id": "siftec:electromagnetic_control_rod"
+    }
+  ]
+}

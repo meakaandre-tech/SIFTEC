@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "minecraft:coal",
+    "B": "siftec:rubber",
+    "C": "siftec:fabric"
+  },
+  "pattern": [
+    "AA",
+    "BC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:gas_filter"
+  }
+}

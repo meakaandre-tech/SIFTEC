@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:aluminum_ingot",
+  "ingredient": "minecraft:copper_ingot",
+  "results": [
+    {
+      "id": "siftec:alclad_aluminum_sheet"
+    }
+  ]
+}

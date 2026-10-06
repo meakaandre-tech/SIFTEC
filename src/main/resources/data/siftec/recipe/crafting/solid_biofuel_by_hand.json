@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "siftec:biomass",
+    "siftec:biomass"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:solid_biofuel"
+  }
+}

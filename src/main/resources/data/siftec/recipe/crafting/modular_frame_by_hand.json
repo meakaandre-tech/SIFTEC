@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "siftec:reinforced_iron_plate",
+    "siftec:iron_rod"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:modular_frame"
+  }
+}

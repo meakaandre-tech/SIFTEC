@@ -1,0 +1,11 @@
+{
+  "type": "create:milling",
+  "ingredient": "minecraft:string",
+  "processing_time": 100,
+  "results": [
+    {
+      "id": "siftec:biomass",
+      "count": 2
+    }
+  ]
+}

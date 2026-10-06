@@ -1,0 +1,37 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:supercomputer",
+  "transitional_item": {
+    "id": "siftec:incomplete_neural_quantum_processor"
+  },
+  "result": {
+    "id": "siftec:neural_quantum_processor"
+  },
+  "loops": 3,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:time_crystal",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:ficsite_trigon",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "create:refined_radiance",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

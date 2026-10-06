@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:stator",
+  "ingredient": "siftec:cable",
+  "results": [
+    {
+      "id": "siftec:automated_wiring"
+    }
+  ]
+}

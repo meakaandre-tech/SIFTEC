@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:automated_wiring",
+    "B": "siftec:circuit_board",
+    "C": "siftec:heavy_modular_frame",
+    "D": "siftec:computer"
+  },
+  "pattern": [
+    "AAA",
+    "BBB",
+    "CDD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:adaptive_control_unit"
+  }
+}

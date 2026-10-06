@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:thermal_propulsion_rocket",
+    "B": "siftec:singularity_cell",
+    "C": "siftec:superposition_oscillator",
+    "D": "create:shadow_steel"
+  },
+  "pattern": [
+    "ABB",
+    "BCC",
+    "DDD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:ballistic_warp_drive"
+  }
+}

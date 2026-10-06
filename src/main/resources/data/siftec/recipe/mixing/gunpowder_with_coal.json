@@ -1,0 +1,22 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "cgs:sulfur",
+    "minecraft:coal",
+    "minecraft:bone_meal"
+  ],
+  "results": [
+    {
+      "id": "minecraft:gunpowder",
+      "count": 3
+    }
+  ]
+}

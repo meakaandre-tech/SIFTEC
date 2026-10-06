@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:reinforced_iron_plate",
+  "ingredient": "siftec:rotor",
+  "results": [
+    {
+      "id": "siftec:smart_plating"
+    }
+  ]
+}

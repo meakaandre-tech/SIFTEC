@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:aluminum_casing",
+    "B": "siftec:crystal_oscillator",
+    "C": "siftec:computer"
+  },
+  "pattern": [
+    "AAA",
+    "ABC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:radio_control_unit"
+  }
+}

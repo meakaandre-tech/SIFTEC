@@ -1,0 +1,9 @@
+{
+  "type": "create:pressing",
+  "ingredient": "siftec:blue_power_slug",
+  "results": [
+    {
+      "id": "siftec:power_shard"
+    }
+  ]
+}

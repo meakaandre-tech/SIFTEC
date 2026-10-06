@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:adaptive_control_unit",
+  "ingredient": "siftec:supercomputer",
+  "results": [
+    {
+      "id": "siftec:assembly_director_system"
+    }
+  ]
+}

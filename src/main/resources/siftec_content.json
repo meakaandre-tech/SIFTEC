@@ -224,6 +224,15 @@
     },
     {
       "id": "hard_drive"
+    },
+    {
+      "id": "incomplete_superposition_oscillator"
+    },
+    {
+      "id": "incomplete_neural_quantum_processor"
+    },
+    {
+      "id": "incomplete_ai_expansion_server"
     }
   ],
   "milestones": [
@@ -1672,5 +1681,130 @@
     "create:schematicannon",
     "create:empty_schematic",
     "create:schematic_and_quill"
+  ],
+  "fluids": [
+    {
+      "id": "heavy_oil_residue",
+      "color": 6961802
+    },
+    {
+      "id": "alumina_solution",
+      "color": 14213352
+    },
+    {
+      "id": "sulfuric_acid",
+      "color": 15261760
+    },
+    {
+      "id": "nitrogen",
+      "color": 13166847
+    },
+    {
+      "id": "nitric_acid",
+      "color": 14217376
+    },
+    {
+      "id": "dark_matter_residue",
+      "color": 3151944
+    },
+    {
+      "id": "ignimbrite",
+      "color": 15761440
+    },
+    {
+      "id": "turbofuel",
+      "color": 13643824
+    }
+  ],
+  "removed_recipes": [
+    "cgs:mixing/steel_ingot",
+    "create:mixing/brass_ingot",
+    "create:mixing/lava_from_cobble",
+    "createdieselgenerators:distillation/superheated_crude_oil",
+    "create:crafting/kinetics/water_wheel",
+    "create:crafting/kinetics/large_water_wheel"
+  ],
+  "workshop": [
+    {
+      "item": "siftec:portable_miner",
+      "cost": [
+        {
+          "item": "create:mechanical_drill",
+          "count": 1
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "item": "siftec:node_scanner",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        },
+        {
+          "item": "siftec:wire",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "item": "siftec:miner_mk1",
+      "cost": [
+        {
+          "item": "siftec:portable_miner",
+          "count": 1
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 10
+        },
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:wormhole_gateway",
+      "cost": [
+        {
+          "item": "minecraft:light_gray_concrete",
+          "count": 500
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 250
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 400
+        },
+        {
+          "item": "siftec:wire",
+          "count": 1500
+        }
+      ]
+    },
+    {
+      "item": "siftec:hub",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 10
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 10
+        }
+      ]
+    }
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:biomass",
+  "ingredient": "minecraft:brown_mushroom",
+  "results": [
+    {
+      "id": "siftec:fabric"
+    }
+  ]
+}

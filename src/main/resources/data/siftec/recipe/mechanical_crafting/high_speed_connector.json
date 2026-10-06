@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:quickwire",
+    "B": "siftec:cable",
+    "C": "siftec:circuit_board"
+  },
+  "pattern": [
+    "AAA",
+    "AAB",
+    "BBC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:high_speed_connector"
+  }
+}

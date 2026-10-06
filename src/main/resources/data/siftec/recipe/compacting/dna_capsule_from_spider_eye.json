@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:spider_eye",
+    "minecraft:spider_eye"
+  ],
+  "results": [
+    {
+      "id": "siftec:dna_capsule"
+    }
+  ]
+}

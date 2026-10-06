@@ -1,0 +1,7 @@
+{
+  "type": "create:sandpaper_polishing",
+  "ingredient": "minecraft:quartz",
+  "result": {
+    "id": "siftec:quartz_crystal"
+  }
+}

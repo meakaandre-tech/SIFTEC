@@ -4,7 +4,13 @@ import com.meakaandre.siftec.registry.ModBlockEntities;
 import com.zurrtum.create.client.content.kinetics.base.ShaftRenderer;
 import com.zurrtum.create.client.content.kinetics.base.SingleKineticRenderState;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import com.meakaandre.siftec.fluid.FluidEntry;
+import com.meakaandre.siftec.fluid.ModFluids;
 import com.meakaandre.siftec.net.ClientState;
+import com.zurrtum.create.client.AllFluidConfigs;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.resources.Identifier;
 import com.meakaandre.siftec.net.StatePayload;
 import com.meakaandre.siftec.tweak.SpeedCap;
 import net.fabricmc.api.ClientModInitializer;
@@ -19,6 +25,13 @@ public class SiftecClient implements ClientModInitializer {
         // the miner's input: a vertical shaft through the block, turning with the network
         BlockEntityRendererProvider<KineticBlockEntity, SingleKineticRenderState> shaft = ShaftRenderer::new;
         BlockEntityRendererRegistry.register(ModBlockEntities.MINER.get(), shaft);
+        // custom fluids borrow water's textures and are told apart by colour
+        for (FluidEntry fluid : ModFluids.ALL.values()) {
+            AllFluidConfigs.MODEL.put(fluid.still, new FluidModel.Unbaked(
+                new Material(Identifier.withDefaultNamespace("block/water_still")), new Material(Identifier.withDefaultNamespace("block/water_flow")), null, null));
+            int color = 0xFF000000 | fluid.color;
+            AllFluidConfigs.tint(fluid.still, (f, components) -> color);
+        }
         ClientPlayNetworking.registerGlobalReceiver(StatePayload.TYPE, (payload, context) -> ClientState.accept(payload));
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;

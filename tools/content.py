@@ -72,6 +72,17 @@ PARTS = [
     ("purple_power_slug", "Purple Power Slug", "minecraft:item/slime_ball", 0xC060FF),
     ("mercer_sphere", "Mercer Sphere", "minecraft:item/ender_pearl", 0xFF80C0), ("somersloop", "Somersloop", "minecraft:item/nautilus_shell", 0xFF6060),
     ("hard_drive", "Hard Drive", "minecraft:item/music_disc_11", None),
+    # half-built parts on a Quantum Encoder line
+    ("incomplete_superposition_oscillator", "Incomplete Superposition Oscillator", "minecraft:item/clock_00", 0x808080),
+    ("incomplete_neural_quantum_processor", "Incomplete Neural-Quantum Processor", "minecraft:item/ender_eye", 0x808080),
+    ("incomplete_ai_expansion_server", "Incomplete AI Expansion Server", "minecraft:item/music_disc_5", 0x808080),
+]
+
+# Custom fluids: id, name, colour. They look like tinted water until real textures are picked.
+FLUIDS = [
+    ("heavy_oil_residue", "Heavy Oil Residue", 0x6A3A8A), ("alumina_solution", "Alumina Solution", 0xD8E0E8),
+    ("sulfuric_acid", "Sulfuric Acid", 0xE8E040), ("nitrogen", "Nitrogen", 0xC8E8FF), ("nitric_acid", "Nitric Acid", 0xD8F0A0),
+    ("dark_matter_residue", "Dark Matter Residue", 0x301848), ("ignimbrite", "Ignimbrite", 0xF08020), ("turbofuel", "Turbofuel", 0xD03030),
 ]
 
 # ---------------------------------------------------------------------------------------------------
@@ -246,7 +257,7 @@ def parse_cost(text):
     out = []
     for piece in text.split(","):
         count, name = piece.strip().split(" ", 1)
-        if name not in table:
+        if ":" not in name and name not in table:
             raise SystemExit(f"unknown part in cost: {name!r}")
-        out.append((table[name], int(count)))
+        out.append((name if ":" in name else table[name], int(count)))
     return out

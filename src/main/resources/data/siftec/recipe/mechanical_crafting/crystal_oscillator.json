@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:quartz_crystal",
+    "B": "siftec:cable",
+    "C": "siftec:reinforced_iron_plate"
+  },
+  "pattern": [
+    "AAA",
+    "ABB",
+    "BC "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:crystal_oscillator"
+  }
+}

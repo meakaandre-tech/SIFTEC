@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:modular_engine",
+    "B": "siftec:turbo_motor",
+    "C": "siftec:cooling_system",
+    "D": "siftec:fused_modular_frame"
+  },
+  "pattern": [
+    "AAA",
+    "BBC",
+    "CCD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:thermal_propulsion_rocket"
+  }
+}

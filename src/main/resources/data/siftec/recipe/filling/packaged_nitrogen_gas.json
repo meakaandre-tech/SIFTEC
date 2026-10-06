@@ -1,0 +1,12 @@
+{
+  "type": "create:filling",
+  "ingredient": "siftec:empty_fluid_tank",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 20250,
+    "fluid": "siftec:nitrogen"
+  },
+  "result": {
+    "id": "siftec:packaged_nitrogen_gas"
+  }
+}

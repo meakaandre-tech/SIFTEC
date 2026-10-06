@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "create:iron_sheet",
+    "siftec:screw"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:reinforced_iron_plate"
+  }
+}

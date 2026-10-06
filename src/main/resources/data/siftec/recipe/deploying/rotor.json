@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:iron_rod",
+  "ingredient": "siftec:screw",
+  "results": [
+    {
+      "id": "siftec:rotor"
+    }
+  ]
+}

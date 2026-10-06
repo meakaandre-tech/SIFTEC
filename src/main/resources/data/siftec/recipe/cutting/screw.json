@@ -1,0 +1,11 @@
+{
+  "type": "create:cutting",
+  "ingredient": "siftec:iron_rod",
+  "results": [
+    {
+      "id": "siftec:screw",
+      "count": 4
+    }
+  ],
+  "processing_time": 100
+}

@@ -1,0 +1,10 @@
+{
+  "type": "create:crushing",
+  "ingredient": "siftec:raw_bauxite",
+  "results": [
+    {
+      "id": "siftec:crushed_bauxite"
+    }
+  ],
+  "processing_time": 200
+}

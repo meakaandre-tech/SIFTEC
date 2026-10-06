@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:nuclear_pasta",
+    "B": "create:shadow_steel",
+    "C": "create:iron_sheet",
+    "D": "minecraft:light_gray_concrete"
+  },
+  "pattern": [
+    "ABB",
+    "CCC",
+    "DDD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:singularity_cell"
+  }
+}

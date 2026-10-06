@@ -1,0 +1,13 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:magma_block"
+  ],
+  "fluid_results": [
+    {
+      "id": "minecraft:lava",
+      "amount": 20250
+    }
+  ]
+}

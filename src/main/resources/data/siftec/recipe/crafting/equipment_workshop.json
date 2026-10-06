@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": "create:iron_sheet",
+    "R": "siftec:iron_rod"
+  },
+  "pattern": [
+    "SSS",
+    "RRR",
+    "R R"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:equipment_workshop"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "create:crushed_raw_copper",
+    "create:crushed_raw_zinc",
+    "cgs:sulfur"
+  ],
+  "results": [
+    {
+      "id": "siftec:brass_blend",
+      "count": 3
+    }
+  ]
+}

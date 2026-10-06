@@ -1,0 +1,44 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:magnetic_field_generator",
+  "transitional_item": {
+    "id": "siftec:incomplete_ai_expansion_server"
+  },
+  "result": {
+    "id": "siftec:ai_expansion_server"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:neural_quantum_processor",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:superposition_oscillator",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "create:refined_radiance",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredient": "$ingredient",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

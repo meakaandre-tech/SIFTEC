@@ -1,0 +1,31 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "createdieselgenerators:crude_oil"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:rubber",
+      "count": 2
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:heavy_oil_residue",
+      "amount": 12150
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:steel_pipe",
+  "ingredient": "siftec:wire",
+  "results": [
+    {
+      "id": "siftec:stator"
+    }
+  ]
+}

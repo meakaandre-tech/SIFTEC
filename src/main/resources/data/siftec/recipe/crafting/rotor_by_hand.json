@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "siftec:iron_rod",
+    "siftec:screw"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:rotor"
+  }
+}

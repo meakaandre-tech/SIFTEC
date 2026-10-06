@@ -1,0 +1,25 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:crushed_bauxite"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:silica"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:alumina_solution",
+      "amount": 20250
+    }
+  ]
+}

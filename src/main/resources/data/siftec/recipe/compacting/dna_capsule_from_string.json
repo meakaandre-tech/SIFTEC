@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:string",
+    "minecraft:string"
+  ],
+  "results": [
+    {
+      "id": "siftec:dna_capsule"
+    }
+  ]
+}

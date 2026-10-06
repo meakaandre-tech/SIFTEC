@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "siftec:wire",
+    "siftec:wire"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:cable"
+  }
+}

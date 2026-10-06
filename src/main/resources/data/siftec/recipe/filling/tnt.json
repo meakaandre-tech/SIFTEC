@@ -1,0 +1,12 @@
+{
+  "type": "create:filling",
+  "ingredient": "minecraft:barrel",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 20250,
+    "fluid": "siftec:ignimbrite"
+  },
+  "result": {
+    "id": "minecraft:tnt"
+  }
+}

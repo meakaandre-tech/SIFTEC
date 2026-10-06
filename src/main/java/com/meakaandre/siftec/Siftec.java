@@ -2,6 +2,7 @@ package com.meakaandre.siftec;
 
 import com.meakaandre.siftec.command.SiftecCommands;
 import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.fluid.ModFluids;
 import com.meakaandre.siftec.hub.Locks;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.node.NodePlacer;
@@ -29,6 +30,7 @@ public class Siftec implements ModInitializer {
         ModBlocks.register();
         ModBlockEntities.register();
         ModItems.register();
+        ModFluids.register();
         ModTab.register();
         NodePlacer.register();
         SiftecCommands.register();

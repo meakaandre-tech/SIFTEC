@@ -1,0 +1,23 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:heavy_modular_frame",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "siftec:nitrogen"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:fused_modular_frame"
+    }
+  ]
+}

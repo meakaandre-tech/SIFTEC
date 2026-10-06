@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:gas_filter",
+    "B": "siftec:quickwire",
+    "C": "siftec:aluminum_casing"
+  },
+  "pattern": [
+    "AB",
+    "BC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:iodine_infused_filter"
+  }
+}

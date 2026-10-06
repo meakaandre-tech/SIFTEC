@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:time_crystal",
+  "ingredient": "create:shadow_steel",
+  "results": [
+    {
+      "id": "siftec:power_shard"
+    }
+  ]
+}

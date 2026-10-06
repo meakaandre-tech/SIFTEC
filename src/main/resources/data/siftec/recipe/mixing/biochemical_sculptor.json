@@ -1,0 +1,23 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:assembly_director_system",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:biochemical_sculptor"
+    }
+  ]
+}

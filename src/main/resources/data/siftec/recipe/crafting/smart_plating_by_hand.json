@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "siftec:reinforced_iron_plate",
+    "siftec:rotor"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:smart_plating"
+  }
+}

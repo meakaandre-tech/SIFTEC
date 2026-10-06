@@ -1,0 +1,11 @@
+{
+  "type": "create:cutting",
+  "ingredient": "create:brass_ingot",
+  "results": [
+    {
+      "id": "siftec:quickwire",
+      "count": 4
+    }
+  ],
+  "processing_time": 100
+}

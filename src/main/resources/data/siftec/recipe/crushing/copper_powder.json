@@ -1,0 +1,10 @@
+{
+  "type": "create:crushing",
+  "ingredient": "minecraft:copper_ingot",
+  "results": [
+    {
+      "id": "siftec:copper_powder"
+    }
+  ],
+  "processing_time": 200
+}

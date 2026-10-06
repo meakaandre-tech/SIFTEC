@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:rotor",
+  "ingredient": "siftec:stator",
+  "results": [
+    {
+      "id": "siftec:motor"
+    }
+  ]
+}

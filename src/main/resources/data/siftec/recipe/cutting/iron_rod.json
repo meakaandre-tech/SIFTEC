@@ -1,0 +1,10 @@
+{
+  "type": "create:cutting",
+  "ingredient": "minecraft:iron_ingot",
+  "results": [
+    {
+      "id": "siftec:iron_rod"
+    }
+  ],
+  "processing_time": 100
+}

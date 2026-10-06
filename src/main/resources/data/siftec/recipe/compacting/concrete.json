@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "create:limestone",
+    "create:limestone",
+    "create:limestone"
+  ],
+  "results": [
+    {
+      "id": "minecraft:light_gray_concrete"
+    }
+  ]
+}

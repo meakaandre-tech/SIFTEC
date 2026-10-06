@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:sam",
+  "results": [
+    {
+      "id": "siftec:reanimated_sam"
+    }
+  ]
+}

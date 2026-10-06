@@ -1,0 +1,11 @@
+{
+  "type": "create:milling",
+  "ingredient": "minecraft:melon_seeds",
+  "processing_time": 100,
+  "results": [
+    {
+      "id": "siftec:biomass",
+      "chance": 0.25
+    }
+  ]
+}

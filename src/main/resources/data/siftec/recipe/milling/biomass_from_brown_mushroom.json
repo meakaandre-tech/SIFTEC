@@ -1,0 +1,10 @@
+{
+  "type": "create:milling",
+  "ingredient": "minecraft:brown_mushroom",
+  "processing_time": 100,
+  "results": [
+    {
+      "id": "siftec:biomass"
+    }
+  ]
+}

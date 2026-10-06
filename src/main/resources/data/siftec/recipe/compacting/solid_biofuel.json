@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:biomass",
+    "siftec:biomass"
+  ],
+  "results": [
+    {
+      "id": "siftec:solid_biofuel"
+    }
+  ]
+}

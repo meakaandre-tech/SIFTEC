@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:rotten_flesh",
+    "minecraft:rotten_flesh"
+  ],
+  "results": [
+    {
+      "id": "siftec:dna_capsule"
+    }
+  ]
+}
