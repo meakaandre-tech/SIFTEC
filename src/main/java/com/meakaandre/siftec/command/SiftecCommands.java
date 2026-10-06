@@ -137,6 +137,7 @@ public final class SiftecCommands {
             + "; tier 3 open " + Milestones.tierOpen(company, 3) + "; coal power needs " + Milestones.blocker(company, coal).id()
             + "; backpack rewards " + company.count("backpack") + "; scanner copper " + company.hasToken("scanner:copper")
             + "; speed cap " + company.best("cap:", 32));
+        report(source, "SELFTEST hub: Create's speed limit now reads " + com.zurrtum.create.infrastructure.config.AllConfigs.server().kinetics.maxRotationSpeed.get());
         return 1;
     }
 

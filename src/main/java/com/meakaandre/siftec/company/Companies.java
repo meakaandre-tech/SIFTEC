@@ -3,6 +3,7 @@ package com.meakaandre.siftec.company;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.tweak.SpeedCap;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -28,6 +29,7 @@ public final class Companies {
         ServerPlayerEvents.JOIN.register(player -> {
             CompanyData data = CompanyData.get(player.level().getServer());
             of(player);
+            SpeedCap.recompute(player.level().getServer());
             if (data.gotHub().add(player.getUUID().toString())) {
                 data.setDirty();
                 player.getInventory().placeItemBackInInventory(new ItemStack(ModBlocks.HUB.get()), Prediction.SERVER_ONLY);
@@ -89,6 +91,7 @@ public final class Companies {
             company.lockUntil = server.overworld().getGameTime() + m.seconds() * 20L;
         }
         save(server);
+        SpeedCap.recompute(server);
         tell(server, company, Component.translatable("siftec.hub.complete", who, m.name()).withStyle(ChatFormatting.GOLD));
         tell(server, company, Component.translatable("siftec.hub.unlocks", m.unlockText()).withStyle(ChatFormatting.GRAY));
     }
@@ -140,6 +143,7 @@ public final class Companies {
         removeFromCurrent(data, player);
         target.members.add(player.getUUID().toString());
         data.setDirty();
+        SpeedCap.recompute(source.getServer());
         tell(source.getServer(), target, Component.translatable("siftec.company.joined", player.getGameProfile().name(), target.name));
         return 1;
     }
@@ -149,6 +153,7 @@ public final class Companies {
         CompanyData data = CompanyData.get(source.getServer());
         removeFromCurrent(data, player);
         Company fresh = create(data, player);
+        SpeedCap.recompute(source.getServer());
         source.sendSuccess(() -> Component.translatable("siftec.company.left", fresh.name), false);
         return 1;
     }

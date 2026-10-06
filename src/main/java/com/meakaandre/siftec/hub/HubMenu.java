@@ -97,7 +97,7 @@ public class HubMenu extends ChestMenu {
         boolean open = Milestones.tierOpen(company, t);
         boolean all = true;
         for (Milestone m : Milestones.tier(t)) all &= company.has(m.id());
-        Item icon = !open ? icon("gray_stained_glass_pane") : all ? icon("lime_stained_glass_pane") : icon("yellow_stained_glass_pane");
+        Item icon = !open ? icon("red_stained_glass_pane") : all ? icon("lime_stained_glass_pane") : icon("yellow_stained_glass_pane");
         List<Component> lore = new ArrayList<>();
         if (!open) {
             int phase = Milestones.phaseFor(t);
@@ -105,7 +105,9 @@ public class HubMenu extends ChestMenu {
                 ? Component.translatable("siftec.hub.tier.locked0")
                 : Component.translatable("siftec.hub.tier.locked", Milestones.phases().get(phase - 1).name()));
         }
-        return button(icon, Component.translatable("siftec.hub.tier", t), lore, t == tier);
+        ItemStack tab = button(icon, Component.translatable("siftec.hub.tier", t), lore, t == tier);
+        tab.setCount(Math.max(1, t));
+        return tab;
     }
 
     private ItemStack milestoneButton(Milestone m) {

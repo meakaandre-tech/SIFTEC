@@ -1660,5 +1660,17 @@
       "items": [],
       "tokens": []
     }
+  ],
+  "disabled": [
+    "create:water_wheel",
+    "create:large_water_wheel",
+    "create:blaze_cake",
+    "create:blaze_cake_base",
+    "create:creative_blaze_cake",
+    "create:chromatic_compound",
+    "create:schematic_table",
+    "create:schematicannon",
+    "create:empty_schematic",
+    "create:schematic_and_quill"
   ]
 }

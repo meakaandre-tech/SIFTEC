@@ -22,6 +22,7 @@ public final class Milestones {
     private static final List<List<Milestone>> BY_TIER = new ArrayList<>();
     private static final List<Milestone> PHASES = new ArrayList<>();
     private static final List<String> PART_IDS = new ArrayList<>();
+    private static final List<Identifier> DISABLED = new ArrayList<>();
 
     private Milestones() {
     }
@@ -31,6 +32,7 @@ public final class Milestones {
         try (var in = Siftec.class.getResourceAsStream("/siftec_content.json")) {
             JsonObject root = new Gson().fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), JsonObject.class);
             for (JsonElement e : root.getAsJsonArray("parts")) PART_IDS.add(e.getAsJsonObject().get("id").getAsString());
+            for (JsonElement e : root.getAsJsonArray("disabled")) DISABLED.add(Identifier.parse(e.getAsString()));
             for (JsonElement e : root.getAsJsonArray("milestones")) {
                 JsonObject o = e.getAsJsonObject();
                 List<Milestone> tier = BY_TIER.get(o.get("tier").getAsInt());
@@ -60,6 +62,10 @@ public final class Milestones {
         JsonArray t = o.getAsJsonArray("tokens");
         for (JsonElement i : t) tokens.add(i.getAsString());
         return new Milestone(o.get("id").getAsString(), o.get("tier").getAsInt(), index, cost, o.get("seconds").getAsInt(), items, tokens);
+    }
+
+    public static List<Identifier> disabled() {
+        return DISABLED;
     }
 
     public static List<String> partIds() {

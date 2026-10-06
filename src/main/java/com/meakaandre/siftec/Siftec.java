@@ -9,7 +9,11 @@ import com.meakaandre.siftec.registry.ModBlockEntities;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.registry.ModItems;
 import com.meakaandre.siftec.registry.ModTab;
+import com.meakaandre.siftec.net.StatePayload;
+import com.meakaandre.siftec.tweak.SpeedCap;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +32,9 @@ public class Siftec implements ModInitializer {
         ModTab.register();
         NodePlacer.register();
         SiftecCommands.register();
+        PayloadTypeRegistry.clientboundPlay().register(StatePayload.TYPE, StatePayload.STREAM_CODEC);
+        ServerLifecycleEvents.SERVER_STARTED.register(SpeedCap::recompute);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> SpeedCap.value = 256);
         Locks.register();
         Companies.register();
     }

@@ -3,7 +3,15 @@
   "minVersion": "0.8",
   "package": "com.meakaandre.siftec.mixin",
   "compatibilityLevel": "JAVA_25",
-  "mixins": ["SlotMixin"],
+  "mixins": [
+    "SlotMixin",
+    "CValueMixin",
+    "KineticCapacityMixin",
+    "BeltInventoryAccessor",
+    "TunnelMixin"
+  ],
   "client": [],
-  "injectors": {"defaultRequire": 1}
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

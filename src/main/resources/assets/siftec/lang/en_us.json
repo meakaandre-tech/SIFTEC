@@ -142,6 +142,7 @@
   "siftec.milestone.bauxite_refinement.unlocks": "Aluminium chain and Radio Control Unit, bauxite nodes on the scanner",
   "siftec.milestone.coal_power": "Coal Power",
   "siftec.milestone.coal_power.unlocks": "Steam Engine, Blaze Burner, pipes, pumps and tanks, coal nodes on the scanner",
+  "siftec.milestone.disabled": "nothing: it is switched off in this pack",
   "siftec.milestone.enhanced_asset_security": "Enhanced Asset Security",
   "siftec.milestone.enhanced_asset_security.unlocks": "Xeno-Basher (Pneumatic Hammer), +3 backpack slots",
   "siftec.milestone.expanded_power_infrastructure": "Expanded Power Infrastructure",

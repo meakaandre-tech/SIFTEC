@@ -109,12 +109,14 @@ def check(item):
     if KNOWN and ns in ("create", "cgs", "createdieselgenerators", "create_hypertube") and item not in KNOWN:
         print("warning: unknown item id", item)
 
-data = {"parts": [], "milestones": [], "phases": []}
+data = {"parts": [], "milestones": [], "phases": [], "disabled": content.DISABLED}
+for i in content.DISABLED: check(i)
 for pid, name, tex, tint in content.PARTS:
     data["parts"].append({"id": pid})
     lang[f"item.siftec.{pid}"] = name
     write(f"{A}/models/item/{pid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
     item_def(pid, f"siftec:item/{pid}", tint)
+# the tier tabs show the tier's first milestones in their tooltip
 for tier, mid, name, cost, time, text, items, tokens in content.MILESTONES:
     for i in items: check(i)
     data["milestones"].append({"id": mid, "tier": tier, "cost": [{"item": i, "count": c} for i, c in content.parse_cost(cost)],
@@ -142,6 +144,7 @@ lang.update({
     "siftec.hub.delivered": "Delivered %s parts", "siftec.hub.nothing": "You are not carrying any of the parts it needs",
     "siftec.hub.complete": "%s completed %s", "siftec.hub.busy": "The HUB is locked for another %s",
     "siftec.lock.item": "Locked: needs %s",
+    "siftec.milestone.disabled": "nothing: it is switched off in this pack",
     "siftec.company.default_name": "%s's Company", "siftec.company.info": "%s: %s",
     "siftec.company.renamed": "Company renamed to %s", "siftec.company.invited": "Invited %s. They join with /company accept %s",
     "siftec.company.invite": "%s invited you to %s. Join with /company accept %s (you leave your own company)",

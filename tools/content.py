@@ -219,6 +219,10 @@ MILESTONES = [
      "Speed cap raised to 256 RPM", [], ["cap:256"]),
 ]
 
+# Switched off for good: they can be neither crafted nor placed.
+DISABLED = [C + "water_wheel", C + "large_water_wheel", C + "blaze_cake", C + "blaze_cake_base", C + "creative_blaze_cake",
+            C + "chromatic_compound", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill"]
+
 # Wormhole phases, delivered at the Wormhole Gateway. Phase n opens the tiers listed.
 PHASES = [
     ("phase_1", "Wormhole Phase 1", "50 Smart Plating", "Tiers 3 and 4"),

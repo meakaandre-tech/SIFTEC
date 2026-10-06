@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.hub;
 
-import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.Companies;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -23,6 +22,8 @@ import java.util.Map;
  */
 public final class Locks {
     private static final Map<Identifier, Milestone> BY_ITEM = new HashMap<>();
+    /** Things the pack switches off for good. No company can ever finish this one. */
+    public static final Milestone DISABLED = new Milestone("disabled", 99, 0, java.util.List.of(), 0, java.util.List.of(), java.util.List.of());
 
     private Locks() {
     }
@@ -31,6 +32,7 @@ public final class Locks {
         for (Milestone m : Milestones.all()) {
             for (Identifier item : m.items()) BY_ITEM.putIfAbsent(item, m);
         }
+        for (Identifier item : Milestones.disabled()) BY_ITEM.put(item, DISABLED);
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             ItemStack stack = player.getItemInHand(hand);
             if (!(stack.getItem() instanceof BlockItem) || allowed(player, stack)) return InteractionResult.PASS;
@@ -47,12 +49,13 @@ public final class Locks {
         return BY_ITEM.get(BuiltInRegistries.ITEM.getKey(item));
     }
 
-    /** The client does not know company progress, so it always says yes and the server has the last word. */
+    /** Checked on both sides; the client uses the copy of its company's progress the server sent. */
     public static boolean allowed(Player player, ItemStack stack) {
-        if (stack.isEmpty() || !(player instanceof ServerPlayer server) || server.hasInfiniteMaterials()) return true;
+        if (stack.isEmpty() || player.hasInfiniteMaterials()) return true;
         Milestone lock = lockOf(stack.getItem());
         if (lock == null) return true;
-        Company company = Companies.of(server);
-        return company.has(lock.id());
+        if (player instanceof ServerPlayer server) return Companies.of(server).has(lock.id());
+        java.util.Set<String> done = com.meakaandre.siftec.net.ClientState.done;
+        return done == null || done.contains(lock.id());
     }
 }
