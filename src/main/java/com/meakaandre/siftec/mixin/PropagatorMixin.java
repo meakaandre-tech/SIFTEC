@@ -16,4 +16,12 @@ public abstract class PropagatorMixin {
                                                @Local(name = "newSpeed") float newSpeed, @Local(name = "oppositeSpeed") float oppositeSpeed) {
         return tooFast || SpeedCap.tooFast(currentTE, neighbourTE, newSpeed, oppositeSpeed);
     }
+
+    /** A Speed Governor hands on exactly the speed it is set to, and takes exactly its own speed back. */
+    @org.spongepowered.asm.mixin.injection.Inject(method = "getConveyedSpeed", at = @At("RETURN"), cancellable = true)
+    private static void siftec$governor(KineticBlockEntity from, KineticBlockEntity to, org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Float> cir) {
+        float worked = cir.getReturnValueF();
+        if (from instanceof com.meakaandre.siftec.governor.GovernorBlockEntity governor) cir.setReturnValue(governor.exact(from, to, worked));
+        else if (to instanceof com.meakaandre.siftec.governor.GovernorBlockEntity governor) cir.setReturnValue(governor.exact(from, to, worked));
+    }
 }

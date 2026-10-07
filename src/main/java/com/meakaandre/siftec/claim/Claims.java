@@ -74,6 +74,13 @@ public final class Claims {
         return dimension.identifier() + "|" + ChunkPos.pack(chunkX, chunkZ);
     }
 
+    /** Hands every claim of one company to another. */
+    public static void reassign(MinecraftServer server, String from, String to) {
+        Data data = Data.get(server);
+        for (Claim claim : data.stored.chunks.values()) if (claim.company.equals(from)) claim.company = to;
+        data.setDirty();
+    }
+
     public static Claim at(Level level, BlockPos pos) {
         if (level.getServer() == null) return null;
         return Data.get(level.getServer()).stored.chunks.get(key(level.dimension(), pos.getX() >> 4, pos.getZ() >> 4));

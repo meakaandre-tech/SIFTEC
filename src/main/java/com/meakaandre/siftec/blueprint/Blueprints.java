@@ -51,7 +51,8 @@ public final class Blueprints {
         for (int y = 0; y < side; y++) for (int z = 0; z < side; z++) for (int x = 0; x < side; x++) {
             BlockState state = level.getBlockState(new BlockPos((int) box.minX + x, (int) box.minY + y, (int) box.minZ + z));
             int index = 0;
-            if (!state.isAir() && state.getBlock().asItem() != Items.AIR && state.getDestroySpeed(level, designer) >= 0) {
+            if (!state.isAir() && state.getBlock().asItem() != Items.AIR && state.getDestroySpeed(level, designer) >= 0 && copyable(state)) {
+                state = tidy(state);
                 index = palette.indexOf(state) + 1;
                 if (index == 0) {
                     palette.add(state);
@@ -74,6 +75,47 @@ public final class Blueprints {
         root.put("siftec_blueprint", tag);
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(root));
         return stack;
+    }
+
+    /** Blocks that claim land or are a designer themselves are left out of a blueprint. */
+    private static boolean copyable(BlockState state) {
+        Block block = state.getBlock();
+        return !(block instanceof com.meakaandre.siftec.hub.HubBlock || block instanceof com.meakaandre.siftec.claim.ClaimMarkerBlock || block instanceof DesignerBlock);
+    }
+
+    private static final java.util.Set<String> FRESH = java.util.Set.of("age", "level", "honey_level", "charges", "moisture", "stage", "berries",
+        "has_bottle_0", "has_bottle_1", "has_bottle_2", "has_book", "has_record", "dusted", "hatch", "bites", "extended");
+    private static final java.util.Set<String> COUNTS = java.util.Set.of("candles", "pickles", "eggs", "flower_amount", "segment_amount", "layers");
+
+    private static <T extends Comparable<T>> BlockState fresh(BlockState state, net.minecraft.world.level.block.state.properties.Property<T> property) {
+        return state.setValue(property, state.getBlock().defaultBlockState().getValue(property));
+    }
+
+    /**
+     * A blueprint keeps the shape and the way a block faces, not what has grown or been put in it: crops go
+     * back to seedlings, cauldrons and composters are empty, nothing holds water.
+     */
+    private static BlockState tidy(BlockState state) {
+        if (state.getBlock() instanceof net.minecraft.world.level.block.AbstractCauldronBlock) return net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState();
+        for (net.minecraft.world.level.block.state.properties.Property<?> property : state.getProperties()) {
+            if (FRESH.contains(property.getName())) state = fresh(state, property);
+        }
+        if (state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED)) {
+            state = state.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED, false);
+        }
+        return state;
+    }
+
+    /** How many of its item a block costs: none for the top of a door or the head of a bed, two for a double slab, one per candle. */
+    private static int price(BlockState state) {
+        int count = 1;
+        for (net.minecraft.world.level.block.state.properties.Property<?> property : state.getProperties()) {
+            Object value = state.getValue(property);
+            if (value == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER || value == net.minecraft.world.level.block.state.properties.BedPart.HEAD) return 0;
+            if (value == net.minecraft.world.level.block.state.properties.SlabType.DOUBLE) count = 2;
+            if (value instanceof Integer amount && COUNTS.contains(property.getName())) count = amount;
+        }
+        return count;
     }
 
     private static CompoundTag data(ItemStack stack) {
@@ -122,7 +164,7 @@ public final class Blueprints {
                 dx = -dz;
                 dz = was;
             }
-            out.put(base.offset(dx, y, dz), palette.get(index - 1).rotate(rotation));
+            out.put(base.offset(dx, y, dz), tidy(palette.get(index - 1)).rotate(rotation));
         }
         return out;
     }
@@ -214,7 +256,14 @@ public final class Blueprints {
                 player.sendOverlayMessage(Component.translatable("siftec.blueprint.blocked", entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ()));
                 return;
             }
-            need.merge(entry.getValue().getBlock().asItem(), 1, Integer::sum);
+            int price = price(entry.getValue());
+            if (price > 0) need.merge(entry.getValue().getBlock().asItem(), price, Integer::sum);
+        }
+        for (Item item : need.keySet()) {
+            if (com.meakaandre.siftec.hub.Locks.allowed(player, new ItemStack(item))) continue;
+            com.meakaandre.siftec.hub.Milestone lock = com.meakaandre.siftec.hub.Locks.lockOf(item);
+            player.sendOverlayMessage(Component.translatable("siftec.lock.item", lock == null ? "?" : lock.name()));
+            return;
         }
         Inventory inventory = player.getInventory();
         boolean missing = false;
@@ -247,6 +296,13 @@ public final class Blueprints {
             }
         }
         for (Map.Entry<BlockPos, BlockState> entry : layout.entrySet()) level.setBlock(entry.getKey(), entry.getValue(), Block.UPDATE_ALL);
+        // machines, ports and portals learn whose they are, the same as when placed by hand
+        for (Map.Entry<BlockPos, BlockState> entry : layout.entrySet()) {
+            BlockState state = entry.getValue();
+            if (state.hasBlockEntity() && level.getBlockState(entry.getKey()) == state) {
+                state.getBlock().setPlacedBy(level, entry.getKey(), state, player, new ItemStack(state.getBlock().asItem()));
+            }
+        }
         player.sendOverlayMessage(Component.translatable("siftec.blueprint.built", layout.size()));
     }
 }

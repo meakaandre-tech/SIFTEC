@@ -43,8 +43,18 @@ public final class Equipment {
         {"siftec:compacted_coal", "600"}, {"siftec:solid_biofuel", "300"}};
 
     private static final Map<UUID, Integer> THRUSTING = new HashMap<>();
-    private static final Map<UUID, Integer> JET_TICKS = new HashMap<>();
-    private static final Map<UUID, Long> MASK_UNTIL = new HashMap<>(), SUIT_UNTIL = new HashMap<>();
+    /** Thrust left in the tank, and when the running filters give out. Kept with the player. */
+    private static final net.fabricmc.fabric.api.attachment.v1.AttachmentType<Integer> JET_TICKS = net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.create(
+        com.meakaandre.siftec.Siftec.id("jet_fuel"), builder -> builder.persistent(com.mojang.serialization.Codec.INT).copyOnDeath());
+    private static final net.fabricmc.fabric.api.attachment.v1.AttachmentType<Long> MASK_UNTIL = net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.create(
+        com.meakaandre.siftec.Siftec.id("mask_filter"), builder -> builder.persistent(com.mojang.serialization.Codec.LONG).copyOnDeath());
+    private static final net.fabricmc.fabric.api.attachment.v1.AttachmentType<Long> SUIT_UNTIL = net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.create(
+        com.meakaandre.siftec.Siftec.id("suit_filter"), builder -> builder.persistent(com.mojang.serialization.Codec.LONG).copyOnDeath());
+
+    private static int jet(ServerPlayer player) {
+        Integer left = player.getAttached(JET_TICKS);
+        return left == null ? 0 : left;
+    }
     /** Other things that let a player fly, such as standing inside a Blueprint Designer. */
     public static final List<Predicate<ServerPlayer>> FLIGHT_ZONES = new ArrayList<>();
 
@@ -95,12 +105,14 @@ public final class Equipment {
     }
 
     /** True while a filter is running, starting a new one from the inventory when the last has run out. */
-    private static boolean filtered(ServerPlayer player, Map<UUID, Long> until, Item filter) {
+    private static boolean filtered(ServerPlayer player, net.fabricmc.fabric.api.attachment.v1.AttachmentType<Long> until, Item filter) {
         if (player.hasInfiniteMaterials()) return true;
         long now = player.level().getGameTime();
-        if (until.getOrDefault(player.getUUID(), 0L) > now) return true;
+        Long end = player.getAttached(until);
+        // a filter never has more than its full time left, whatever the clock did
+        if (end != null && end > now && end <= now + FILTER_TICKS) return true;
         if (!take(player, filter)) return false;
-        until.put(player.getUUID(), now + FILTER_TICKS);
+        player.setAttached(until, now + FILTER_TICKS);
         return true;
     }
 
@@ -113,13 +125,13 @@ public final class Equipment {
 
     private static boolean refuel(ServerPlayer player) {
         if (player.hasInfiniteMaterials()) {
-            JET_TICKS.put(player.getUUID(), 1200);
+            player.setAttached(JET_TICKS, 1200);
             return true;
         }
         for (String[] fuel : JET_FUEL) {
             Item item = BuiltInRegistries.ITEM.getOptional(Identifier.parse(fuel[0])).orElse(Items.AIR);
             if (item == Items.AIR || !take(player, item)) continue;
-            JET_TICKS.put(player.getUUID(), Integer.parseInt(fuel[1]));
+            player.setAttached(JET_TICKS, Integer.parseInt(fuel[1]));
             if (fuel[0].endsWith("_bucket")) player.getInventory().placeItemBackInInventory(new ItemStack(Items.BUCKET), Prediction.SERVER_ONLY);
             return true;
         }
@@ -132,7 +144,7 @@ public final class Equipment {
             THRUSTING.remove(id);
             return;
         }
-        if (JET_TICKS.getOrDefault(id, 0) <= 0 && !refuel(player)) {
+        if (jet(player) <= 0 && !refuel(player)) {
             THRUSTING.remove(id);
             ServerPlayNetworking.send(player, new JetFuelPayload(false));
             player.sendOverlayMessage(Component.translatable("siftec.jetpack.empty"));
@@ -151,8 +163,8 @@ public final class Equipment {
                 it.remove();
                 continue;
             }
-            int left = JET_TICKS.getOrDefault(entry.getKey(), 0) - 1;
-            JET_TICKS.put(entry.getKey(), left);
+            int left = jet(player) - 1;
+            player.setAttached(JET_TICKS, left);
             if (left <= 0 && !refuel(player)) {
                 it.remove();
                 ServerPlayNetworking.send(player, new JetFuelPayload(false));

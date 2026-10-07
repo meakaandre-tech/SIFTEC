@@ -159,35 +159,49 @@ public final class Companies {
 
     private static int accept(CommandSourceStack source, ServerPlayer inviter) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
-        CompanyData data = CompanyData.get(source.getServer());
+        MinecraftServer server = source.getServer();
+        CompanyData data = CompanyData.get(server);
         Company target = of(inviter);
-        if (!target.invites.remove(player.getUUID().toString())) {
+        String me = player.getUUID().toString();
+        if (target.members.contains(me) || !target.invites.remove(me)) {
             source.sendFailure(Component.translatable("siftec.company.no_invite"));
             return 0;
         }
-        removeFromCurrent(data, player);
-        target.members.add(player.getUUID().toString());
+        Company old = data.ofMember(me);
+        if (old != null) {
+            old.members.remove(me);
+            // nothing can be picked up a second time by changing company
+            target.collected.addAll(old.collected);
+            if (old.members.isEmpty()) {
+                // the last one out brings the base along: claims, machines, the cloud and the points
+                target.points += old.points;
+                old.cloud.forEach((item, count) -> target.cloud.merge(item, count, Integer::sum));
+                data.fold(old.id, target.id);
+                com.meakaandre.siftec.claim.Claims.reassign(server, old.id, target.id);
+                com.meakaandre.siftec.place.Places.reassign(server, old.id, target.id);
+            }
+        }
+        target.members.add(me);
         data.setDirty();
-        SpeedCap.recompute(source.getServer());
-        tell(source.getServer(), target, Component.translatable("siftec.company.joined", player.getGameProfile().name(), target.name));
+        SpeedCap.recompute(server);
+        tell(server, target, Component.translatable("siftec.company.joined", player.getGameProfile().name(), target.name));
         return 1;
     }
 
     private static int leave(CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         CompanyData data = CompanyData.get(source.getServer());
-        removeFromCurrent(data, player);
+        Company old = of(player);
+        if (old.members.size() < 2) {
+            source.sendFailure(Component.translatable("siftec.company.alone"));
+            return 0;
+        }
+        old.members.remove(player.getUUID().toString());
         Company fresh = create(data, player);
+        fresh.collected.addAll(old.collected);
+        data.setDirty();
         SpeedCap.recompute(source.getServer());
         source.sendSuccess(() -> Component.translatable("siftec.company.left", fresh.name), false);
         return 1;
-    }
-
-    private static void removeFromCurrent(CompanyData data, ServerPlayer player) {
-        Company old = data.ofMember(player.getUUID().toString());
-        if (old == null) return;
-        old.members.remove(player.getUUID().toString());
-        if (old.members.isEmpty()) data.companies().remove(old.id);
-        data.setDirty();
     }
 }

@@ -20,6 +20,8 @@ public class CompanyData extends SavedData {
         Map<String, Company> companies = new HashMap<>();
         /** Players who already got their starting HUB. */
         Set<String> gotHub = new HashSet<>();
+        /** Companies that were folded into another one: old id -> the company that took it over. */
+        Map<String, String> moved = new HashMap<>();
     }
 
     public static final Codec<CompanyData> CODEC = Codec.STRING.xmap(
@@ -49,8 +51,21 @@ public class CompanyData extends SavedData {
         return stored.gotHub;
     }
 
+    /** Follows a company that was folded into another, so what it built keeps working. */
     public Company byId(String id) {
-        return stored.companies.get(id);
+        for (int hops = 0; hops < 8 && id != null; hops++) {
+            Company company = stored.companies.get(id);
+            if (company != null) return company;
+            id = stored.moved.get(id);
+        }
+        return null;
+    }
+
+    /** Everything the old company owned now answers to the new one. */
+    public void fold(String oldId, String newId) {
+        stored.companies.remove(oldId);
+        stored.moved.put(oldId, newId);
+        setDirty();
     }
 
     public Company ofMember(String playerId) {

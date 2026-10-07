@@ -127,7 +127,10 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
             boolean allowed = hubAllows();
             if (allowed && burn == 0 && !fuel.getItem(0).isEmpty()) {
                 burn = FuelUtil.burnDuration(level, fuel.getItem(0));
+                net.minecraft.world.item.ItemStackTemplate left = fuel.getItem(0).getCraftingRemainder();
                 fuel.removeItem(0, 1);
+                // a lava bucket gives its bucket back
+                if (left != null) net.minecraft.world.Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.1, worldPosition.getZ() + 0.5, left.create());
             }
             if (allowed && burn == 0) status = NO_FUEL;
             target = allowed && burn > 0 ? HUB_SU : 0;
@@ -138,6 +141,14 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
             capacity = target;
             updateGeneratedRotation();
             notifyUpdate();
+        }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (level != null && !fuel.getItem(0).isEmpty()) {
+            net.minecraft.world.Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5, fuel.removeItemNoUpdate(0));
         }
     }
 

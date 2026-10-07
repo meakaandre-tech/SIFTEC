@@ -70,10 +70,10 @@ public class ModBlockEntities {
         // belts, funnels, chutes and hoppers can take a powered miner's output
         ItemStorage.SIDED.registerForBlockEntity((miner, side) -> ContainerStorage.of(miner.output, side), MINER.get());
         // parts pushed into a HUB or Gateway go toward the company's active milestone
-        ItemStorage.SIDED.registerForBlockEntity((hub, side) -> ContainerStorage.of(hub.intake, side), HUB.get());
+        ItemStorage.SIDED.registerForBlockEntity((hub, side) -> hub.intake, HUB.get());
         ItemStorage.SIDED.registerForBlockEntity((engine, side) -> ContainerStorage.of(engine.fuel, side), ENGINE.get());
         ItemStorage.SIDED.registerForBlockEntity((port, side) -> ContainerStorage.of(port.items, side), DRONE_PORT.get());
-        ItemStorage.SIDED.registerForBlockEntity((sink, side) -> ContainerStorage.of(sink.intake, side), SINK.get());
+        ItemStorage.SIDED.registerForBlockEntity((sink, side) -> sink.intake, SINK.get());
         ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());
     }
 }

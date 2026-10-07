@@ -58,7 +58,7 @@ public class DroneMenu extends ChestMenu {
     private void refresh() {
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         shown.clear();
-        for (Places.Place place : Places.of(player.level().getServer(), port.companyId)) {
+        for (Places.Place place : Places.of(player.level().getServer(), com.meakaandre.siftec.company.Companies.of(player).id)) {
             if (!place.kind.equals(Places.DRONE_PORT) || Places.same(place, port.getLevel(), port.getBlockPos())) continue;
             if (!place.dimension.equals(port.getLevel().dimension().identifier().toString()) || shown.size() >= LIST) continue;
             boolean chosen = place.pos().equals(port.destination);
@@ -83,8 +83,12 @@ public class DroneMenu extends ChestMenu {
 
     private void press(int slot) {
         if (slot < shown.size()) {
-            port.destination = shown.get(slot).pos();
-            port.setChanged();
+            if (port.state != DronePortBlockEntity.IDLE) {
+                player.sendOverlayMessage(Component.translatable("siftec.drone.away"));
+            } else {
+                port.destination = shown.get(slot).pos();
+                port.setChanged();
+            }
         } else if (slot == DRONE) {
             ItemStack drone = port.takeDrone();
             if (!drone.isEmpty()) player.getInventory().placeItemBackInInventory(drone, Prediction.SERVER_ONLY);

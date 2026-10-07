@@ -57,7 +57,11 @@ public class PortalMenu extends ChestMenu {
                 Places.Place place = shown.get(slot);
                 ServerLevel level = Places.level(player.level().getServer(), place);
                 player.closeContainer();
-                if (level != null) player.teleportTo(level, place.x + 0.5, place.y + 1.0, place.z + 0.5, Set.of(), player.getYRot(), player.getXRot(), true);
+                if (level == null || !(level.getBlockState(place.pos()).getBlock() instanceof PortalBlock)) {
+                    player.sendOverlayMessage(Component.translatable("siftec.portal.gone"));
+                } else if (level.getBlockState(place.pos().above()).blocksMotion() || level.getBlockState(place.pos().above(2)).blocksMotion()) {
+                    player.sendOverlayMessage(Component.translatable("siftec.portal.blocked"));
+                } else player.teleportTo(level, place.x + 0.5, place.y + 1.0, place.z + 0.5, Set.of(), player.getYRot(), player.getXRot(), true);
             }
             return;
         }

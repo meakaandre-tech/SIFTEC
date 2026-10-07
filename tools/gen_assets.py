@@ -468,6 +468,8 @@ lang.update({
     "siftec.company.invite": "%s invited you to %s. Join with /company accept %s (you leave your own company)",
     "siftec.company.no_invite": "You have no invite from that player", "siftec.company.joined": "%s joined %s",
     "siftec.company.left": "You left and started %s",
+    "siftec.portal.gone": "That portal is not there any more", "siftec.portal.blocked": "Something is standing in that portal's way",
+    "siftec.company.alone": "You are the only one in this company. Accept an invite to move to another",
 })
 for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "create:block/railway_casing")):
     write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})

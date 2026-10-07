@@ -89,20 +89,9 @@ public class DronePortBlock extends Block implements EntityBlock {
                 port.setChanged();
                 Places.add(server.level(), pos, Places.DRONE_PORT, port.companyId, "Port " + pos.getX() + ", " + pos.getZ());
             }
-            if (!port.companyId.equals(Companies.of(server).id)) server.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
+            if (com.meakaandre.siftec.company.CompanyData.get(server.level().getServer()).byId(port.companyId) != Companies.of(server)) server.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
             else DroneMenu.open(server, port);
         }
         return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof DronePortBlockEntity port) {
-            for (ItemStack stack : port.contents()) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-            if (port.hasDrone) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.CARDBOARD_DRONE.get()));
-            port.items.clearContent();
-            port.hasDrone = false;
-        }
-        return super.playerWillDestroy(level, pos, state, player);
     }
 }

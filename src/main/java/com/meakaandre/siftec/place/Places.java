@@ -92,6 +92,13 @@ public final class Places {
     }
 
     /** A company's places. One whose block has been broken drops off the list the first time its chunk is seen loaded. */
+    /** Hands every port and portal of one company to another. */
+    public static void reassign(MinecraftServer server, String from, String to) {
+        Data data = Data.get(server);
+        for (Place place : data.stored.places.values()) if (place.company.equals(from)) place.company = to;
+        data.setDirty();
+    }
+
     public static List<Place> of(MinecraftServer server, String company) {
         Data data = Data.get(server);
         List<Place> out = new ArrayList<>();

@@ -21,6 +21,15 @@ public abstract class LevelChunkMixin {
         }
     }
 
+    /** Whatever takes a machine away, its Power Shards and Somersloop drop. */
+    @com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation(method = "setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Lnet/minecraft/world/level/block/state/BlockState;",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BlockEntity;preRemoveSideEffects(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V"))
+    private void siftec$dropBoosts(BlockEntity blockEntity, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state,
+                                   com.llamalad7.mixinextras.injector.wrapoperation.Operation<Void> original) {
+        com.meakaandre.siftec.owner.Boosts.drop(blockEntity);
+        original.call(blockEntity, pos, state);
+    }
+
     @Inject(method = "setBlockEntity", at = @At("HEAD"))
     private void siftec$owner(BlockEntity blockEntity, CallbackInfo ci) {
         Ownership.stamp(blockEntity);

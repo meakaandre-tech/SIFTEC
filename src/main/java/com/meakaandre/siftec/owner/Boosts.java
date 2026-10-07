@@ -43,7 +43,8 @@ public final class Boosts {
     private static final String CONTROLLER = "create:crushing_wheel_controller";
     /** The part of an extra tick each boosted machine is still owed. */
     private static final Map<BlockEntity, float[]> OWED = new WeakHashMap<>();
-    private static boolean running;
+    private static boolean running, looked;
+    private static net.minecraft.world.level.block.Block controller, wheelBlock;
 
     private Boosts() {
     }
@@ -59,15 +60,31 @@ public final class Boosts {
      */
     private static int boost(BlockEntity be) {
         int boost = own(be);
-        if (boost != 0 || be.getLevel() == null || !BuiltInRegistries.BLOCK.getKey(be.getBlockState().getBlock()).toString().equals(CONTROLLER)) return boost;
+        if (boost != 0 || be.getLevel() == null) return boost;
+        if (!looked) {
+            controller = BuiltInRegistries.BLOCK.getOptional(net.minecraft.resources.Identifier.parse(CONTROLLER)).orElse(null);
+            wheelBlock = BuiltInRegistries.BLOCK.getOptional(net.minecraft.resources.Identifier.parse("create:crushing_wheel")).orElse(null);
+            looked = true;
+        }
+        if (controller == null || be.getBlockState().getBlock() != controller) return 0;
         for (net.minecraft.core.Direction side : net.minecraft.core.Direction.values()) {
             BlockEntity wheel = be.getLevel().getBlockEntity(be.getBlockPos().relative(side));
-            if (wheel != null && BuiltInRegistries.BLOCK.getKey(wheel.getBlockState().getBlock()).toString().equals("create:crushing_wheel")) {
+            if (wheel != null && wheel.getBlockState().getBlock() == wheelBlock) {
                 int theirs = own(wheel);
                 if (theirs % SLOOP > boost % SLOOP || (theirs >= SLOOP && boost < SLOOP)) boost = Math.max(boost % SLOOP, theirs % SLOOP) + (boost >= SLOOP || theirs >= SLOOP ? SLOOP : 0);
             }
         }
         return boost;
+    }
+
+    /** Drops what is slotted into a machine that is going away. */
+    public static void drop(BlockEntity be) {
+        int boost = own(be);
+        if (boost == 0 || be.getLevel() == null || be.getLevel().isClientSide()) return;
+        BlockPos pos = be.getBlockPos();
+        if (boost % SLOOP > 0) Containers.dropItemStack(be.getLevel(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.PARTS.get("power_shard"), boost % SLOOP));
+        if (boost >= SLOOP) Containers.dropItemStack(be.getLevel(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.PARTS.get("somersloop")));
+        be.removeAttached(BOOST);
     }
 
     public static int shards(BlockEntity be) {
@@ -116,16 +133,6 @@ public final class Boosts {
     }
 
     public static void register() {
-        // breaking a boosted machine gives its shards and Somersloop back
-        net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, be) -> {
-            if (be != null && !level.isClientSide() && own(be) > 0) {
-                int boost = own(be);
-                if (boost % SLOOP > 0) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.PARTS.get("power_shard"), boost % SLOOP));
-                if (boost >= SLOOP) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.PARTS.get("somersloop")));
-                be.removeAttached(BOOST);
-            }
-            return true;
-        });
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
             BlockPos pos = hit.getBlockPos();
@@ -136,6 +143,8 @@ public final class Boosts {
             if (!shard && !loop && !eject) return InteractionResult.PASS;
             BlockEntity be = level.getBlockEntity(pos);
             if (be == null || (eject && own(be) == 0)) return InteractionResult.PASS;
+            // someone else's claim: leave it to the claim check to say no
+            if (!com.meakaandre.siftec.claim.Claims.allowed(player, level, pos)) return InteractionResult.PASS;
             boolean shardsOnly = SHARDS_ONLY.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()).toString());
             if (loop && shardsOnly) {
                 if (player instanceof ServerPlayer told) told.sendOverlayMessage(Component.translatable("siftec.boost.shards_only"));

@@ -38,6 +38,19 @@ public class GovernorBlockEntity extends SplitShaftBlockEntity {
         return in == 0 ? 1 : target / in;
     }
 
+    /**
+     * The exact speed passed across the far end, given what Create worked out. Dividing and multiplying back
+     * does not always land on the same number, and Create reads the difference as one side overpowering the other.
+     */
+    public float exact(com.zurrtum.create.content.kinetics.base.KineticBlockEntity from, com.zurrtum.create.content.kinetics.base.KineticBlockEntity to, float worked) {
+        if (worked == 0 || !hasSource()) return worked;
+        float in = getTheoreticalSpeed();
+        BlockPos other = (from == this ? to : from).getBlockPos();
+        if (in == 0 || other.equals(source)) return worked;
+        if (from == this) return Math.copySign(target, worked);
+        return Math.abs(from.getTheoreticalSpeed()) == target ? Math.copySign(Math.abs(in), worked) : worked;
+    }
+
     public void setTarget(int rpm) {
         rpm = Math.clamp(rpm, 1, limit());
         if (rpm == target || level == null || level.isClientSide()) return;

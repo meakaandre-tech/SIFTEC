@@ -58,7 +58,10 @@ public class GovernorMenu extends ChestMenu {
 
     private void press(int slot) {
         int target = governor.target();
-        if (slot < PRESETS.length) target = PRESETS[slot];
+        if (slot < PRESETS.length) {
+            if (PRESETS[slot] > governor.limit()) return;
+            target = PRESETS[slot];
+        }
         for (int[] step : STEPS) if (step[0] == slot) target += step[1];
         governor.setTarget(target);
         refresh();

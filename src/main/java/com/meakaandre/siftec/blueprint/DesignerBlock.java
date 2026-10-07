@@ -76,7 +76,7 @@ public class DesignerBlock extends Block implements EntityBlock {
         AABB box = DesignerBlockEntity.volume(pos, reach);
         int cleared = 0;
         for (BlockPos at : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
-            if (level.getBlockState(at).isAir() || level.getBlockState(at).getDestroySpeed(level, at) < 0) continue;
+            if (level.getBlockState(at).isAir() || level.getBlockState(at).getDestroySpeed(level, at) < 0 || !Claims.allowed(player, level, at)) continue;
             level.destroyBlock(at, true, player, 512);
             cleared++;
         }

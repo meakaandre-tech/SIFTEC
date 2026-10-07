@@ -49,7 +49,8 @@ public class DronePortBlockEntity extends BlockEntity {
 
     public int chargesNeeded() {
         if (destination == null) return 0;
-        return Math.max(1, (int) Math.ceil(Math.sqrt(destination.distSqr(worldPosition)) * 2 / BLOCKS_PER_CHARGE));
+        // never more than the one stack the port can hold
+        return Math.clamp((int) Math.ceil(Math.sqrt(destination.distSqr(worldPosition)) * 2 / BLOCKS_PER_CHARGE), 1, 64);
     }
 
     public String statusKey() {
@@ -139,6 +140,17 @@ public class DronePortBlockEntity extends BlockEntity {
     public void setRemoved() {
         super.setRemoved();
         hide();
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level == null) return;
+        for (ItemStack stack : contents()) net.minecraft.world.Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
+        if (hasDrone) net.minecraft.world.Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(com.meakaandre.siftec.registry.ModItems.CARDBOARD_DRONE.get()));
+        items.clearContent();
+        cargo.clear();
+        hasDrone = false;
     }
 
     /** Everything the port holds, for when it is broken. */
