@@ -59,7 +59,7 @@ public class PortalMenu extends ChestMenu {
                 player.closeContainer();
                 if (level == null || !(level.getBlockState(place.pos()).getBlock() instanceof PortalBlock)) {
                     player.sendOverlayMessage(Component.translatable("siftec.portal.gone"));
-                } else if (level.getBlockState(place.pos().above()).blocksMotion() || level.getBlockState(place.pos().above(2)).blocksMotion()) {
+                } else if (level.getBlockState(place.pos().above()).isSuffocating(level, place.pos().above()) || level.getBlockState(place.pos().above(2)).isSuffocating(level, place.pos().above(2))) {
                     player.sendOverlayMessage(Component.translatable("siftec.portal.blocked"));
                 } else player.teleportTo(level, place.x + 0.5, place.y + 1.0, place.z + 0.5, Set.of(), player.getYRot(), player.getXRot(), true);
             }

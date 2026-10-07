@@ -75,9 +75,6 @@ public final class Equipment {
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             THRUSTING.clear();
-            JET_TICKS.clear();
-            MASK_UNTIL.clear();
-            SUIT_UNTIL.clear();
             Poles.clear();
             Ziplines.clear();
             com.meakaandre.siftec.blueprint.Blueprints.clear();
