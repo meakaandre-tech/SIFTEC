@@ -45,6 +45,11 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         super(type, pos, state);
     }
 
+    /** The stress capacity it gives right now, in SU. */
+    public float providedSu() {
+        return capacity;
+    }
+
     private boolean hubKind() {
         return getBlockState().getBlock() instanceof EngineBlock block && block.hub;
     }
@@ -71,17 +76,50 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         };
     }
 
-    /** What a Furnace Engine can give right now: it needs a lit furnace beside or under it. */
+    /** The furnace this engine runs on; no other Furnace Engine may use it at the same time. */
+    private BlockPos furnace;
+
+    /**
+     * What a Furnace Engine can give right now: it needs a furnace beside or under it that is really burning
+     * fuel (its burn time, not the block's look: a furnace built from a blueprint can show flames with nothing
+     * in it), and that no other Furnace Engine is already running on.
+     */
     private float furnacePower() {
-        float best = 0;
+        BlockPos best = null;
+        float bestPower = 0;
         for (Direction side : Direction.values()) {
             if (side == Direction.UP) continue;
-            BlockState state = level.getBlockState(worldPosition.relative(side));
-            if (!(state.getBlock() instanceof AbstractFurnaceBlock) || !state.getValue(AbstractFurnaceBlock.LIT)) continue;
-            best = Math.max(best, state.is(Blocks.BLAST_FURNACE) ? BLAST_SU : FURNACE_SU);
+            BlockPos at = worldPosition.relative(side);
+            float power = burning(at);
+            if (power <= 0 || usedByAnother(at)) continue;
+            // keep to the furnace it already has, so two engines never swap back and forth
+            if (power > bestPower || power == bestPower && at.equals(furnace)) {
+                best = at;
+                bestPower = power;
+            }
         }
-        status = best > 0 ? OK : NO_FURNACE;
-        return best;
+        furnace = best;
+        status = best != null ? OK : NO_FURNACE;
+        return bestPower;
+    }
+
+    /** What a burning furnace at this spot is worth, or 0. */
+    private float burning(BlockPos at) {
+        BlockState state = level.getBlockState(at);
+        if (!(state.getBlock() instanceof AbstractFurnaceBlock)) return 0;
+        if (!(level.getBlockEntity(at) instanceof net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity entity)
+            || ((com.meakaandre.siftec.mixin.FurnaceAccessor) entity).siftec$litTimeRemaining() <= 0) return 0;
+        return state.is(Blocks.BLAST_FURNACE) ? BLAST_SU : FURNACE_SU;
+    }
+
+    /** True if another Furnace Engine next to that furnace is running on it. */
+    private boolean usedByAnother(BlockPos at) {
+        for (Direction side : Direction.values()) {
+            BlockPos other = at.relative(side);
+            if (other.equals(worldPosition)) continue;
+            if (level.getBlockEntity(other) instanceof EngineBlockEntity engine && !engine.isRemoved() && at.equals(engine.furnace) && engine.capacity > 0) return true;
+        }
+        return false;
     }
 
     /** A HUB Engine has to touch its company's HUB, and the HUB only runs as many as the company has unlocked. */

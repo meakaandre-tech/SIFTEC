@@ -26,6 +26,7 @@
     "DisplayInvoker",
     "FluidTankMixin",
     "FoodPropertiesMixin",
+    "FurnaceAccessor",
     "GameModeMixin",
     "InventoryMenuMixin",
     "ItemCombinerResultMixin",
