@@ -104,43 +104,51 @@ def mbox(frm, to, tex, angle=0, axis="y", origin=None):
         e["rotation"] = {"origin": list(o), "axis": axis, "angle": angle}
     return e
 
-def rock_base(extra=True):
-    """The rock: an octagon of two slabs (one turned 45 degrees), then two smaller tiers, each turned a little."""
-    els = [mbox((-2, 0, -2), (18, 3, 18), "#rock"), mbox((-2, 0, -2), (18, 2, 18), "#rock", 45),
-           mbox((1, 3, 1), (15, 6, 15), "#rock", 22.5), mbox((3, 6, 3), (13, 8, 13), "#rock", -22.5)]
-    if extra:  # loose boulders at the foot, between the miner's legs
-        els += [mbox((-6, 0, 5), (-2, 3, 10), "#rock", 22.5), mbox((18, 0, 6), (22, 2, 11), "#rock", -22.5),
-                mbox((6, 0, -6), (11, 2, -2), "#rock", -22.5), mbox((5, 0, 18), (10, 3, 22), "#rock", 22.5)]
+# a disc is eight long boxes turned in steps of 22.5 degrees (the angles a model allows, used twice over with long
+# sides along x and along z), so its edge is nearly round; each box is a pixel longer or shorter for a rough edge
+ROUGH = [0, 1, -1, 1, 0, -1, 1, 0, -1, 0, 1, -1, 0, 1, 0, -1]
+
+def disc(r, y0, y1, tex, k=0):
+    els = []
+    for i, (angle, along_x) in enumerate([(0, True), (22.5, True), (-22.5, True), (45, True), (0, False), (22.5, False), (-22.5, False), (45, False)]):
+        rr = r + ROUGH[(i + k) % len(ROUGH)]
+        w = round(rr * 0.42)
+        frm, to = ((8 - rr, y0, 8 - w), (8 + rr, y1, 8 + w)) if along_x else ((8 - w, y0, 8 - rr), (8 + w, y1, 8 + rr))
+        els.append(mbox(frm, to, tex, angle, origin=(8, y0, 8)) if angle else mbox(frm, to, tex))
     return els
 
-LUMPS = {  # the deposit on top, by purity: (from, to, angle)
-    "impure": [((5, 7, 5), (10, 11, 10), 22.5), ((9, 7, 8), (12, 10, 11), -22.5), ((1, 3, 6), (4, 6, 9), 22.5)],
-    "normal": [((4, 7, 4), (10, 13, 10), 22.5), ((8, 8, 7), (13, 14, 12), -22.5), ((4, 8, 9), (8, 12, 13), 45),
-               ((0, 3, 6), (3, 7, 10), 22.5), ((13, 3, 5), (16, 6, 9), -22.5), ((6, 3, 13), (10, 6, 16), 22.5)],
-    "pure": [((3, 7, 3), (10, 15, 10), 22.5), ((8, 8, 6), (14, 16, 12), -22.5), ((3, 8, 9), (9, 14, 14), 45),
-             ((6, 10, 6), (11, 16, 11), 0), ((-1, 3, 5), (3, 8, 10), 22.5), ((13, 3, 5), (17, 7, 10), -22.5),
-             ((6, 3, 12), (11, 7, 17), 22.5), ((5, 3, -1), (10, 7, 3), -22.5), ((-5, 0, -1), (-1, 4, 3), 45)],
+def rock_base(tiers=((14, 0, 2), (12, 2, 4), (9, 4, 7), (6, 7, 9))):
+    """The rock: a low rounded mound in rough steps, about 1.75 blocks across, inside the miner's legs."""
+    els = []
+    for k, (r, y0, y1) in enumerate(tiers):
+        els += disc(r, y0, y1, "#rock", k * 3)
+    return els
+
+LUMPS = {  # the deposit on top, by purity: (from, to, angle). The middle one carries the miner's bit (16 px at most).
+    "impure": [((5, 8, 5), (11, 13, 11), 22.5), ((1, 4, 6), (5, 8, 10), -22.5), ((11, 4, 9), (14, 7, 12), 0)],
+    "normal": [((4, 8, 4), (12, 15, 12), 22.5), ((9, 6, 1), (14, 11, 6), -22.5), ((1, 6, 8), (6, 11, 13), 22.5),
+               ((10, 4, 10), (15, 8, 15), 45), ((-2, 2, 3), (3, 6, 8), -22.5)],
+    "pure": [((3, 8, 3), (13, 16, 13), 22.5), ((8, 6, -1), (15, 13, 6), -22.5), ((0, 6, 9), (7, 13, 16), 22.5),
+             ((10, 4, 10), (16, 10, 16), 45), ((-3, 2, 2), (3, 8, 8), -22.5), ((13, 2, 0), (18, 7, 5), 22.5),
+             ((1, 2, 14), (6, 7, 19), -22.5), ((-4, 2, 11), (0, 6, 15), 45)],
 }
 
 def mound(kind, purity):
     lumps = LUMPS[purity]
     if kind == "nitrogen":
-        # a vent: a pale collar round a dark hole, frost crystals round it
-        els = rock_base() + [mbox((4, 8, 4), (12, 12, 5), "#vent"), mbox((4, 8, 11), (12, 12, 12), "#vent"),
-                             mbox((4, 8, 5), (5, 12, 11), "#vent"), mbox((11, 8, 5), (12, 12, 11), "#vent"),
-                             mbox((5, 8, 5), (11, 9, 11), "#hole")]
-        ice = [((0, 3, 1), (4, 7, 5), 22.5), ((12, 3, 11), (16, 8, 15), -22.5), ((12, 3, 1), (15, 6, 4), 45),
-               ((1, 3, 12), (4, 9, 15), 22.5), ((7, 6, -1), (10, 9, 2), 0), ((-1, 3, 7), (2, 7, 10), 0)]
+        # a vent: a pale collar round a dark hole on top of the rock, frost crystals round it
+        els = rock_base() + [mbox((4, 9, 4), (12, 12, 5), "#vent"), mbox((4, 9, 11), (12, 12, 12), "#vent"),
+                             mbox((4, 9, 5), (5, 12, 11), "#vent"), mbox((11, 9, 5), (12, 12, 11), "#vent"),
+                             mbox((5, 9, 5), (11, 10, 11), "#hole")]
+        ice = [((0, 4, 1), (4, 9, 5), 22.5), ((12, 4, 11), (16, 10, 15), -22.5), ((12, 4, 1), (15, 8, 4), 45),
+               ((1, 4, 12), (4, 10, 15), 22.5), ((7, 7, -1), (10, 11, 2), 0), ((-2, 2, 7), (2, 7, 10), 0)]
         n = {"impure": 2, "normal": 4, "pure": 6}[purity]
         return els + [mbox(f, t, "#ore", a) for f, t, a in ice[:n]]
     if kind == "oil":
-        # a tar pool in a rock rim, crude welling up in black lumps
-        els = [mbox((-2, 0, -2), (18, 3, 18), "#rock"), mbox((-2, 0, -2), (18, 2, 18), "#rock", 45),
-               mbox((0, 3, 0), (16, 6, 2), "#rock"), mbox((0, 3, 14), (16, 6, 16), "#rock"),
-               mbox((0, 3, 2), (2, 6, 14), "#rock"), mbox((14, 3, 2), (16, 6, 14), "#rock"),
-               mbox((2, 3, 2), (14, 5, 14), "#pool")]
-        blobs = [((5, 5, 5), (10, 8, 10), 22.5), ((9, 5, 8), (12, 7, 12), -22.5), ((4, 5, 10), (7, 7, 13), 0),
-                 ((6, 7, 6), (9, 10, 9), 45), ((10, 5, 3), (13, 7, 6), 22.5)]
+        # a tar pool on a low rock rim, crude welling up in black lumps
+        els = rock_base(((14, 0, 2), (12, 2, 4), (10, 4, 6))) + disc(8, 6, 7, "#pool", 5)
+        blobs = [((5, 6, 5), (10, 9, 10), 22.5), ((9, 6, 8), (12, 8, 12), -22.5), ((4, 6, 10), (7, 8, 13), 0),
+                 ((6, 8, 6), (9, 11, 9), 45), ((10, 6, 3), (13, 8, 6), 22.5)]
         n = {"impure": 2, "normal": 3, "pure": 5}[purity]
         return els + [mbox(f, t, "#ore", a) for f, t, a in blobs[:n]]
     return rock_base() + [mbox(f, t, "#ore", a) for f, t, a in lumps]
@@ -165,7 +173,7 @@ for id, (name, tex) in NODES.items():
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": tex}})
     rock = ROCK.get(id, "minecraft:block/tuff")
     for p in PURITIES:
-        write(f"{A}/models/block/{b}_mound_{p}.json", {"ambientocclusion": False, "textures": {
+        write(f"{A}/models/block/{b}_mound_{p}.json", {"parent": "minecraft:block/block", "ambientocclusion": False, "textures": {
             "particle": rock, "rock": rock, "ore": DEPOSIT[id], "vent": "minecraft:block/light_gray_concrete",
             "hole": "minecraft:block/black_concrete", "pool": "minecraft:block/black_concrete"}, "elements": mound(id, p)})
     item_def(b, f"siftec:block/{b}_mound_normal")
@@ -233,7 +241,7 @@ def miner_model(casing):
     for x in (-7, 20):
         for z in (-7, 20):
             els.append(mbox((x, -16, z), (x + 3, 15, z + 3), c))
-    return {"ambientocclusion": False, "textures": {"particle": casing, "casing": casing}, "elements": els}
+    return {"parent": "minecraft:block/block", "ambientocclusion": False, "textures": {"particle": casing, "casing": casing}, "elements": els}
 
 for b, casing in MINERS.items():
     write(f"{A}/models/block/{b}.json", miner_model(casing))

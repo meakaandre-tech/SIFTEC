@@ -181,7 +181,8 @@ public final class SiftecCommands {
         NodePlacer.placeChunk(level, node.x() >> 4, node.z() >> 4);
         int y = com.meakaandre.siftec.node.NodeSavedData.get(source.getServer()).height(node.key());
         report(source, "SELFTEST nether: " + node + " height " + y + " block "
-            + (y == com.meakaandre.siftec.node.NodeSavedData.NO_HEIGHT ? "not placed" : level.getBlockState(new BlockPos(node.x(), y, node.z())).toString()));
+            + (y == com.meakaandre.siftec.node.NodeSavedData.NO_HEIGHT ? "not placed" : level.getBlockState(new BlockPos(node.x(), y, node.z())) + " under "
+            + level.getBlockState(new BlockPos(node.x(), y + 1, node.z()))));
         return 1;
     }
 
