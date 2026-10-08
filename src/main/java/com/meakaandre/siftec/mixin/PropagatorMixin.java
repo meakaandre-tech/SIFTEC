@@ -11,9 +11,12 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 /** Create's "too fast, the block breaks" check also counts the speed limit of the company each block belongs to. */
 @Mixin(value = RotationPropagator.class, remap = false)
 public abstract class PropagatorMixin {
-    @ModifyVariable(method = "propagateNewSource", at = @At("STORE"), name = "tooFast")
-    private static boolean siftec$companyLimit(boolean tooFast, KineticBlockEntity currentTE, @Local(name = "neighbourTE") KineticBlockEntity neighbourTE,
-                                               @Local(name = "newSpeed") float newSpeed, @Local(name = "oppositeSpeed") float oppositeSpeed) {
+    // locals by type and order, not by name, so this works on a Create Fly built without local variable names:
+    // booleans: incompatible (0), tooFast (1); block entities: currentTE (0, the parameter), neighbourTE (1);
+    // floats: speedOfCurrent (0), speedOfNeighbour (1), newSpeed (2), oppositeSpeed (3)
+    @ModifyVariable(method = "propagateNewSource", at = @At("STORE"), ordinal = 1)
+    private static boolean siftec$companyLimit(boolean tooFast, KineticBlockEntity currentTE, @Local(ordinal = 1) KineticBlockEntity neighbourTE,
+                                               @Local(ordinal = 2) float newSpeed, @Local(ordinal = 3) float oppositeSpeed) {
         return tooFast || SpeedCap.tooFast(currentTE, neighbourTE, newSpeed, oppositeSpeed);
     }
 
