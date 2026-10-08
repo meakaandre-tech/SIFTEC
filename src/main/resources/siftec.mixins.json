@@ -8,6 +8,18 @@
     "BeltProcessingMixin",
     "BlockDisplayInvoker",
     "BoundTickerMixin",
+    "claim.ClaimAssemblyMixin",
+    "claim.ClaimBlockItemMixin",
+    "claim.ClaimBreakerMixin",
+    "claim.ClaimChunkMixin",
+    "claim.ClaimContraptionDrillMixin",
+    "claim.ClaimDeployerMixin",
+    "claim.ClaimExplosionMixin",
+    "claim.ClaimFireMixin",
+    "claim.ClaimFluidMixin",
+    "claim.ClaimFunnelMixin",
+    "claim.ClaimHopperMixin",
+    "claim.ClaimPistonMixin",
     "ConnectionAccessor",
     "CrafterMixin",
     "DisplayInvoker",
@@ -35,7 +47,9 @@
   ],
   "client": [
     "client.ScreenAccessor",
-    "client.InventoryScreenMixin"
+    "client.InventoryScreenMixin",
+    "client.BackpackClickMixin",
+    "client.CreativeBackpackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

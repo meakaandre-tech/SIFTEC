@@ -1,7 +1,7 @@
 package com.meakaandre.siftec.place;
 
-import com.google.gson.Gson;
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.save.JsonSavedData;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
@@ -12,7 +12,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 import java.util.ArrayList;
@@ -41,21 +40,17 @@ public final class Places {
         }
     }
 
-    public static class Data extends SavedData {
-        private static final Gson GSON = new Gson();
-
-        private static class Stored {
+    public static class Data extends JsonSavedData<Data.Stored> {
+        public static class Stored {
             Map<String, Place> places = new HashMap<>();
         }
 
-        static final Codec<Data> CODEC = Codec.STRING.xmap(json -> {
-            Data data = new Data();
-            Stored stored = GSON.fromJson(json, Stored.class);
-            if (stored != null) data.stored = stored;
-            return data;
-        }, data -> GSON.toJson(data.stored));
+        static final Codec<Data> CODEC = JsonSavedData.codec(Data::new);
         static final SavedDataType<Data> TYPE = new SavedDataType<>(Siftec.id("places"), Data::new, CODEC, null);
-        private Stored stored = new Stored();
+
+        public Data() {
+            super("places", Stored.class, Stored::new);
+        }
 
         static Data get(MinecraftServer server) {
             return server.getDataStorage().computeIfAbsent(TYPE);
@@ -118,5 +113,18 @@ public final class Places {
 
     public static boolean same(Place place, Level level, BlockPos pos) {
         return place.dimension.equals(level.dimension().identifier().toString()) && place.pos().equals(pos);
+    }
+
+    /** For the self-test: how many places a company has, without dropping any. */
+    public static int count(MinecraftServer server, String company) {
+        int n = 0;
+        for (Place place : Data.get(server).stored.places.values()) if (place.company.equals(company)) n++;
+        return n;
+    }
+
+    /** For the self-test: forgets every place of a company. */
+    public static void removeCompany(MinecraftServer server, String company) {
+        Data data = Data.get(server);
+        if (data.stored.places.values().removeIf(place -> place.company.equals(company))) data.setDirty();
     }
 }

@@ -57,4 +57,9 @@ public class ObjectScannerItem extends Item {
         player.getCooldowns().addCooldown(player.getItemInHand(hand), 20);
         return InteractionResult.SUCCESS;
     }
+
+    /** Forgets every player's choice; called when the server stops. */
+    public static void forget() {
+        SELECTED.clear();
+    }
 }

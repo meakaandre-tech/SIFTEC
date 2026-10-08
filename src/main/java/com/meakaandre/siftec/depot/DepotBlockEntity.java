@@ -22,6 +22,8 @@ public class DepotBlockEntity extends BlockEntity {
     public static final int UPLOAD_PER_SECOND = 8, CLOUD_LIMIT = 320;
     public String companyId = "";
     private int cooldown;
+    /** Whether the last upload moved anything, so the company is only saved when it changed. */
+    private boolean moved;
 
     public DepotBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -44,11 +46,15 @@ public class DepotBlockEntity extends BlockEntity {
         cooldown = 0;
         Company company = CompanyData.get(level.getServer()).byId(companyId);
         if (company == null) return;
+        moved = false;
         int budget = UPLOAD_PER_SECOND * (company.hasToken("depot:upload") ? 2 : 1);
         int limit = CLOUD_LIMIT * (company.hasToken("depot:expansion") ? 2 : 1);
         for (Direction side : Direction.values()) {
             BlockPos next = worldPosition.relative(side);
             if (level.getBlockEntity(next) instanceof DepotBlockEntity) continue;
+            // only from containers the depot's company may reach: unclaimed land or its own claim
+            com.meakaandre.siftec.claim.Claims.Claim claim = com.meakaandre.siftec.claim.Claims.at(level, next);
+            if (claim != null && !claim.company.equals(company.id)) continue;
             Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, next, side.getOpposite());
             if (storage == null || !storage.supportsExtraction()) continue;
             try (Transaction tx = Transaction.openOuter()) {
@@ -65,11 +71,12 @@ public class DepotBlockEntity extends BlockEntity {
                     if (moved <= 0) continue;
                     company.cloud.merge(id, moved, Integer::sum);
                     budget -= moved;
+                    this.moved = true;
                 }
                 tx.commit();
             }
             if (budget <= 0) break;
         }
-        Companies.save(level.getServer());
+        if (moved) Companies.save(level.getServer());
     }
 }

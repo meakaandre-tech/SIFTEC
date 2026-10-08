@@ -30,6 +30,8 @@ import java.util.function.Predicate;
 public final class HubBuilding {
     public static final int NEW_MATERIAL = 50, PER_TIER = 50, PER_MEMBER = 25;
     private static final int SHELTER_FROM_TIER = 1, SHELL = 2, VOLUME_FACTOR = 7;
+    /** The longest a side of the box may be, across and up, so a thin box cannot reach out over many chunks. */
+    public static final int MAX_SIDE = 48, MAX_HEIGHT = 32;
     private static final double SHELTER_COVERAGE = 0.6;
 
     public record Family(String key, int fromTier, Predicate<BlockState> test) {
@@ -85,7 +87,9 @@ public final class HubBuilding {
     public static final class Result {
         public final int[] counts = new int[FAMILIES.size()];
         public int walls;
-        public boolean roof, hubInside, tooBig;
+        public boolean roof, hubInside, tooBig, tooLong;
+        /** Chunks inside the box that were not loaded and so not counted. */
+        public int unloaded;
         public long volume;
         public int members = 1;
 
@@ -100,7 +104,7 @@ public final class HubBuilding {
         }
 
         public boolean meets(int tier) {
-            if (!hubInside || tooBig) return false;
+            if (!hubInside || tooBig || tooLong) return false;
             boolean shelter = tier < SHELTER_FROM_TIER || (walls >= 2 && roof);
             return shelter && total(tier) >= required(tier) && counts[newestFamily(tier)] >= NEW_MATERIAL;
         }
@@ -118,6 +122,10 @@ public final class HubBuilding {
                 out.add(Component.translatable("siftec.building.hub_outside"));
                 return out;
             }
+            if (tooLong) {
+                out.add(Component.translatableWithFallback("siftec.building.too_long", "The marked area is too long: at most %s blocks across and %s high", MAX_SIDE, MAX_HEIGHT));
+                return out;
+            }
             if (tooBig) {
                 out.add(Component.translatable("siftec.building.too_big", volume, (long) VOLUME_FACTOR * required(Milestones.TIERS - 1)));
                 return out;
@@ -126,6 +134,7 @@ public final class HubBuilding {
             out.add(Component.translatable("siftec.building.blocks", tier, total(tier), required(tier)));
             out.add(Component.translatable("siftec.building.newest", Component.translatable("siftec.building.family." + FAMILIES.get(newest).key()), counts[newest], NEW_MATERIAL));
             if (tier >= SHELTER_FROM_TIER) out.add(Component.translatable("siftec.building.shelter", walls, Component.translatable(roof ? "siftec.boost.yes" : "siftec.boost.no")));
+            if (unloaded > 0) out.add(Component.translatableWithFallback("siftec.building.unloaded", "%s chunks of the marked area are not loaded and were not counted", unloaded));
             out.add(Component.translatable(meets(tier) ? "siftec.building.ok" : "siftec.building.not_ok", tier));
             return out;
         }
@@ -154,9 +163,15 @@ public final class HubBuilding {
             && hub.getZ() >= min.getZ() && hub.getZ() <= max.getZ();
         result.volume = (long) (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
         result.tooBig = result.volume > (long) VOLUME_FACTOR * result.required(Milestones.TIERS - 1);
-        if (!result.hubInside || result.tooBig) return result;
+        result.tooLong = max.getX() - min.getX() + 1 > MAX_SIDE || max.getZ() - min.getZ() + 1 > MAX_SIDE || max.getY() - min.getY() + 1 > MAX_HEIGHT;
+        if (!result.hubInside || result.tooBig || result.tooLong) return result;
+        // only what is loaded is looked at: measuring must never load or generate chunks
+        for (int cx = min.getX() >> 4; cx <= max.getX() >> 4; cx++) {
+            for (int cz = min.getZ() >> 4; cz <= max.getZ() >> 4; cz++) if (!level.hasChunk(cx, cz)) result.unloaded++;
+        }
         int[] halves = new int[FAMILIES.size()];
         for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+            if (result.unloaded > 0 && !level.isLoaded(pos)) continue;
             BlockState state = level.getBlockState(pos);
             if (state.isAir()) continue;
             for (int i = FAMILIES.size() - 1; i >= 0; i--) {
@@ -172,7 +187,7 @@ public final class HubBuilding {
     }
 
     private static boolean solid(ServerLevel level, BlockPos pos) {
-        return !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
+        return level.isLoaded(pos) && !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
     }
 
     /**
