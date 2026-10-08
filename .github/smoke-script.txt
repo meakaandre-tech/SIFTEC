@@ -2,24 +2,33 @@ cmd time set noon
 cmd weather clear
 cmd gamemode survival @a
 cmd clear @a
-cmd give @a siftec:heavy_oil_residue_bucket
-cmd give @a siftec:alumina_solution_bucket
-cmd give @a siftec:sulfuric_acid_bucket
-cmd give @a siftec:nitrogen_bucket
-cmd give @a siftec:nitric_acid_bucket
-cmd give @a siftec:dark_matter_residue_bucket
-cmd give @a siftec:ignimbrite_bucket
-cmd give @a siftec:turbofuel_bucket
-cmd give @a siftec:vinegar_bucket
-cmd give @a siftec:mead_bucket
-cmd give @a minecraft:water_bucket
-cmd give @a minecraft:lava_bucket
-cmd give @a siftec:mead
-cmd give @a siftec:claim_marker
-cmd give @a siftec:power_pole
-cmd give @a siftec:hub
-cmd give @a siftec:speed_governor
+cmd siftec selftest state backpack
 sleep 3
 key e
 sleep 2
 shot
+click 496 550
+sleep 1
+shot
+click 532 550
+sleep 1
+rclick 532 550
+sleep 1
+click 532 550
+sleep 1
+shot
+move 640 60
+sleep 1
+cmd siftec selftest state backpackcheck
+sleep 2
+key Escape
+sleep 1
+cmd gamemode creative @a
+sleep 2
+key e
+sleep 2
+shot
+click 806 524
+sleep 2
+shot
+key Escape
