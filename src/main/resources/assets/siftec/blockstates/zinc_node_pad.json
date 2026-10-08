@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "siftec:block/zinc_node_pad"
+    }
+  }
+}

@@ -286,8 +286,9 @@ public final class NodePlacer {
      * higher up) and plants cleared; the node on the middle of the pad.
      */
     private static boolean placePad(ServerLevel level, Node node, int chunkX, int chunkZ, int height) {
-        BlockState pad = ModBlocks.NODE_PAD.get().defaultBlockState();
-        BlockState fill = ModBlocks.NODE_PAD_FILL.get().defaultBlockState();
+        // the pad and the fill under it are one block: the node's own natural stone, unbreakable
+        BlockState pad = ModBlocks.NODE_PADS.get(node.type()).get().defaultBlockState();
+        BlockState fill = pad;
         BlockState air = Blocks.AIR.defaultBlockState();
         boolean cave = node.type().where == NodeType.Where.SULFUR_CAVE;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();

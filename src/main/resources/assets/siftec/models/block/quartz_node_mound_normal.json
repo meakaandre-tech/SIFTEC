@@ -2,8 +2,8 @@
   "parent": "minecraft:block/block",
   "ambientocclusion": false,
   "textures": {
-    "particle": "minecraft:block/blackstone",
-    "rock": "minecraft:block/blackstone",
+    "particle": "minecraft:block/netherrack",
+    "rock": "minecraft:block/netherrack",
     "ore": "minecraft:block/quartz_block_bottom",
     "vent": "minecraft:block/light_gray_concrete",
     "hole": "minecraft:block/black_concrete",

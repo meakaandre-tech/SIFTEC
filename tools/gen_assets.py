@@ -69,7 +69,8 @@ write(f"{A}/blockstates/node_rock.json", {"variants": {"": {"model": "siftec:blo
 write(f"{A}/models/block/node_rock.json", {"parent": "minecraft:block/cube_all", "textures": {"all": "minecraft:block/cobbled_deepslate"}})
 item_def("node_rock", "siftec:block/node_rock")
 
-# the flat pad every node stands on, and the fill under it: unbreakable, so they look built, not natural
+# the old flat pad and its fill (sites placed before pads were made of each node's own stone); still registered so
+# those pads keep loading, never placed any more
 lang["block.siftec.node_pad"] = "Node Pad"
 lang["block.siftec.node_pad_fill"] = "Node Pad"
 write(f"{A}/blockstates/node_pad.json", {"variants": {"": {"model": "siftec:block/node_pad"}}})
@@ -153,13 +154,27 @@ def mound(kind, purity):
         return els + [mbox(f, t, "#ore", a) for f, t, a in blobs[:n]]
     return rock_base() + [mbox(f, t, "#ore", a) for f, t, a in lumps]
 
-ROCK = {"sam": "minecraft:block/deepslate", "quartz": "minecraft:block/blackstone"}
+# ---- the one table of each node's stone: its pad, the fill under it and the rock of its mound are all this natural,
+# unpolished stone (vanilla or Create). id: (stone name, side texture, top texture). Change a node's stone here only.
+STONE = {
+    "iron": ("Tuff", "minecraft:block/tuff", "minecraft:block/tuff"),
+    "copper": ("Granite", "minecraft:block/granite", "minecraft:block/granite"),
+    "zinc": ("Andesite", "minecraft:block/andesite", "minecraft:block/andesite"),
+    "limestone": ("Limestone", "create:block/palettes/stone_types/limestone", "create:block/palettes/stone_types/limestone"),
+    "coal": ("Stone", "minecraft:block/stone", "minecraft:block/stone"),
+    "oil": ("Basalt", "minecraft:block/basalt_side", "minecraft:block/basalt_top"),
+    "bauxite": ("Cinnabar", "minecraft:block/cinnabar", "minecraft:block/cinnabar"),
+    "nitrogen": ("Diorite", "minecraft:block/diorite", "minecraft:block/diorite"),
+    "sam": ("Deepslate", "minecraft:block/deepslate", "minecraft:block/deepslate_top"),
+    "quartz": ("Netherrack", "minecraft:block/netherrack", "minecraft:block/netherrack"),
+    "sulfur": ("Sulfur", "minecraft:block/sulfur", "minecraft:block/sulfur"),
+}
 DEPOSIT = {  # the lumps on each node: vanilla and Create textures only
     "iron": "minecraft:block/raw_iron_block", "copper": "minecraft:block/raw_copper_block",
-    "limestone": "create:block/palettes/stone_types/limestone", "coal": "minecraft:block/coal_block",
-    "zinc": "create:block/raw_zinc_block", "oil": "minecraft:block/obsidian", "bauxite": "minecraft:block/cinnabar",
+    "limestone": "minecraft:block/calcite", "coal": "minecraft:block/coal_block",
+    "zinc": "create:block/raw_zinc_block", "oil": "minecraft:block/obsidian", "bauxite": "minecraft:block/terracotta",
     "nitrogen": "minecraft:block/packed_ice", "sam": "minecraft:block/amethyst_block",
-    "quartz": "minecraft:block/quartz_block_bottom", "sulfur": "minecraft:block/sulfur",
+    "quartz": "minecraft:block/quartz_block_bottom", "sulfur": "minecraft:block/potent_sulfur",
 }
 PURITIES = ("impure", "normal", "pure")
 
@@ -171,7 +186,11 @@ for id, (name, tex) in NODES.items():
         **{f"core=false,purity={p}": {"model": f"siftec:block/{b}"} for p in PURITIES},
         **{f"core=true,purity={p}": {"model": f"siftec:block/{b}_mound_{p}"} for p in PURITIES}}})
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": tex}})
-    rock = ROCK.get(id, "minecraft:block/tuff")
+    stone, rock, top = STONE[id]
+    # its pad (and the fill under it): a plain block of the stone, unbreakable; no item, so no item model
+    lang[f"block.siftec.{b}_pad"] = f"{stone} Node Pad"
+    write(f"{A}/blockstates/{b}_pad.json", {"variants": {"": {"model": f"siftec:block/{b}_pad"}}})
+    write(f"{A}/models/block/{b}_pad.json", {"parent": "minecraft:block/cube_column", "textures": {"side": rock, "end": top}})
     for p in PURITIES:
         write(f"{A}/models/block/{b}_mound_{p}.json", {"parent": "minecraft:block/block", "ambientocclusion": False, "textures": {
             "particle": rock, "rock": rock, "ore": DEPOSIT[id], "vent": "minecraft:block/light_gray_concrete",

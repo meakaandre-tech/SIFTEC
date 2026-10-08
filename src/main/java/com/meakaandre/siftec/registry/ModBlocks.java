@@ -73,6 +73,18 @@ public class ModBlocks {
     /** The flat pad a node stands on, and the fill under it: unbreakable, immovable, not in the creative tab (ops can /give it). */
     public static final Supplier<com.meakaandre.siftec.block.NodePadBlock> NODE_PAD = hidden("node_pad", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node);
     public static final Supplier<com.meakaandre.siftec.block.NodePadBlock> NODE_PAD_FILL = hidden("node_pad_fill", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node);
+    /**
+     * Each node type's pad, also used for the fill under it: a plain block of that node's natural stone (the stone is
+     * chosen in tools/gen_assets.py, STONE), unbreakable and immovable like the old pad, with no item and no loot.
+     */
+    public static final Map<NodeType, Supplier<com.meakaandre.siftec.block.NodePadBlock>> NODE_PADS = new EnumMap<>(NodeType.class);
+
+    static {
+        for (NodeType type : NodeType.values()) {
+            NODE_PADS.put(type, blockOnly(type.id() + "_node_pad", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node));
+        }
+    }
+
     public static final Supplier<MinerBlock> MINER_MK1 = block("miner_mk1", properties -> new MinerBlock(MinerTier.MK1, properties), ModBlocks::machine);
     public static final Supplier<MinerBlock> MINER_MK2 = block("miner_mk2", properties -> new MinerBlock(MinerTier.MK2, properties), ModBlocks::machine);
     public static final Supplier<MinerBlock> MINER_MK3 = block("miner_mk3", properties -> new MinerBlock(MinerTier.MK3, properties), ModBlocks::machine);
@@ -129,6 +141,15 @@ public class ModBlocks {
         Supplier<T> block = block(name, factory, properties);
         TAB_ITEMS.removeLast();
         return block;
+    }
+
+    /** A block with no item: it can only be placed by the mod itself. */
+    private static <T extends Block> Supplier<T> blockOnly(
+        String name, Function<BlockBehaviour.Properties, T> factory, Supplier<BlockBehaviour.Properties> properties
+    ) {
+        ResourceKey<Block> blockKey = ResourceKey.create(Registries.BLOCK, Siftec.id(name));
+        T block = Registry.register(BuiltInRegistries.BLOCK, blockKey, factory.apply(properties.get().setId(blockKey)));
+        return () -> block;
     }
 
     private static <T extends Block> Supplier<T> block(

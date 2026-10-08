@@ -5,6 +5,7 @@ import com.meakaandre.siftec.block.MinerBlock;
 import com.meakaandre.siftec.block.MinerBlockEntity;
 import com.meakaandre.siftec.block.MinerTier;
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.block.NodePadBlock;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodePlacer;
@@ -160,6 +161,7 @@ public final class NodeTests {
         if (!NodeSavedData.get(level.getServer()).isFlat(node.key())) return "an old-style mound (placed before pads)";
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         int cells = 0, level0 = 0, offLevel = 0, unsupported = 0, blocked = 0, fill = 0;
+        Block pad = ModBlocks.NODE_PADS.get(node.type()).get();
         List<String> odd = new ArrayList<>();
         for (int dx = -4; dx <= 4; dx++) {
             for (int dz = -4; dz <= 4; dz++) {
@@ -167,12 +169,13 @@ public final class NodeTests {
                 if (dx * dx + dz * dz > NodePlacer.PAD_RADIUS * NodePlacer.PAD_RADIUS) continue;
                 cells++;
                 BlockState at = level.getBlockState(pos.set(x, y, z));
-                if (at.is(ModBlocks.NODE_PAD.get())) level0++;
+                if (at.is(pad)) level0++;
                 else if (odd.size() < 4) odd.add(dx + "," + dz + "=" + BuiltInRegistries.BLOCK.getKey(at.getBlock()).getPath());
-                for (int d = -4; d <= 4; d++) if (d != 0 && level.getBlockState(pos.set(x, y + d, z)).is(ModBlocks.NODE_PAD.get())) offLevel++;
+                // the fill under the pad is the same block, so only the blocks above the pad count as off its level
+                for (int d = 1; d <= 4; d++) if (level.getBlockState(pos.set(x, y + d, z)).getBlock() instanceof NodePadBlock) offLevel++;
                 BlockState under = level.getBlockState(pos.set(x, y - 1, z));
                 if (under.isAir() || !under.getFluidState().isEmpty()) unsupported++;
-                for (int d = 1; level.getBlockState(pos.set(x, y - d, z)).is(ModBlocks.NODE_PAD_FILL.get()) && d < 64; d++) fill++;
+                for (int d = 1; level.getBlockState(pos.set(x, y - d, z)).is(pad) && d < 64; d++) fill++;
                 for (int up = 1; up <= 4; up++) {
                     if (dx == 0 && dz == 0 && up == 1) continue;
                     BlockState above = level.getBlockState(pos.set(x, y + up, z));
@@ -182,7 +185,7 @@ public final class NodeTests {
         }
         BlockState core = level.getBlockState(new BlockPos(node.x(), y + 1, node.z()));
         boolean isCore = core.getBlock() instanceof NodeBlock && core.getValue(NodeBlock.CORE);
-        return "pad at y " + y + ": " + level0 + "/" + cells + " pad blocks level" + (odd.isEmpty() ? "" : " (others " + odd + ")") + ", " + offLevel
+        return "pad at y " + y + ": " + level0 + "/" + cells + " " + BuiltInRegistries.BLOCK.getKey(pad).getPath() + " blocks level" + (odd.isEmpty() ? "" : " (others " + odd + ")") + ", " + offLevel
             + " pad blocks off that level, " + unsupported + " with air or fluid under, " + fill + " fill blocks under it, " + blocked
             + " solid blocks in the 4 above it; node " + (isCore ? BuiltInRegistries.BLOCK.getKey(core.getBlock()).getPath() + " purity "
             + core.getValue(NodeBlock.PURITY).getSerializedName() + " (map says " + node.purity().getSerializedName() + ")" : "MISSING (" + core + ")");
@@ -247,7 +250,7 @@ public final class NodeTests {
     private static int countPad(ServerLevel level, Node node, int y) {
         int n = 0;
         for (int dx = -4; dx <= 4; dx++) for (int dz = -4; dz <= 4; dz++) {
-            if (level.getBlockState(new BlockPos(node.x() + dx, y, node.z() + dz)).is(ModBlocks.NODE_PAD.get())) n++;
+            if (level.getBlockState(new BlockPos(node.x() + dx, y, node.z() + dz)).getBlock() instanceof NodePadBlock) n++;
         }
         return n;
     }
@@ -409,13 +412,14 @@ public final class NodeTests {
                 BlockPos c = showCentre(col, row);
                 if (row == 3 && col >= MinerTier.values().length) continue;
                 level.getChunk(c);
-                for (int dx = -4; dx <= 4; dx++) for (int dz = -4; dz <= 4; dz++) {
-                    if (dx * dx + dz * dz <= NodePlacer.PAD_RADIUS * NodePlacer.PAD_RADIUS) {
-                        level.setBlockAndUpdate(c.offset(dx, 0, dz), ModBlocks.NODE_PAD.get().defaultBlockState());
-                    }
-                }
                 Purity purity = row < 3 ? Purity.values()[row] : Purity.PURE;
                 NodeType type = row < 3 ? types[col] : NodeType.IRON;
+                BlockState padState = ModBlocks.NODE_PADS.get(type).get().defaultBlockState();
+                for (int dx = -4; dx <= 4; dx++) for (int dz = -4; dz <= 4; dz++) {
+                    if (dx * dx + dz * dz <= NodePlacer.PAD_RADIUS * NodePlacer.PAD_RADIUS) {
+                        level.setBlockAndUpdate(c.offset(dx, 0, dz), padState);
+                    }
+                }
                 level.setBlockAndUpdate(c.above(), NodePlacer.coreState(new Node(c.getX(), c.getZ(), type, purity)));
                 // the bottom row: the three miner marks, spinning, on pure iron
                 if (row == 3) build(level, c.above(2), MinerTier.values()[col], company);

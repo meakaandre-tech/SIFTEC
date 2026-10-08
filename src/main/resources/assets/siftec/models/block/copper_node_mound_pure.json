@@ -2,8 +2,8 @@
   "parent": "minecraft:block/block",
   "ambientocclusion": false,
   "textures": {
-    "particle": "minecraft:block/tuff",
-    "rock": "minecraft:block/tuff",
+    "particle": "minecraft:block/granite",
+    "rock": "minecraft:block/granite",
     "ore": "minecraft:block/raw_copper_block",
     "vent": "minecraft:block/light_gray_concrete",
     "hole": "minecraft:block/black_concrete",
