@@ -41,9 +41,10 @@ public class HubBlock extends Block implements EntityBlock {
             Company company = Companies.of(player);
             // a HUB claims the land around it; the Gateway does not
             if (!gateway && level instanceof net.minecraft.server.level.ServerLevel server && !company.id.isEmpty()) {
-                // not right next to another company's land, so two bases never share a border by accident
-                if (com.meakaandre.siftec.claim.Claims.nearForeignHub(server, company, pos)
-                    || com.meakaandre.siftec.claim.Claims.nearForeign(server, company, pos, com.meakaandre.siftec.claim.Claims.HUB_RADIUS + 1, false)) {
+                // a HUB that will claim may not go right next to another company's land
+                boolean claims = !com.meakaandre.siftec.claim.Claims.hasClaimingHub(server, company);
+                if (claims && (com.meakaandre.siftec.claim.Claims.nearForeignHub(server, company, pos)
+                    || com.meakaandre.siftec.claim.Claims.nearForeign(server, company, pos, com.meakaandre.siftec.claim.Claims.HUB_RADIUS + 1, false))) {
                     level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                     if (!player.hasInfiniteMaterials()) player.getInventory().placeItemBackInInventory(new ItemStack(this), net.minecraft.util.Prediction.SERVER_ONLY);
                     player.sendOverlayMessage(Component.translatableWithFallback("siftec.claim.hub_too_close",
