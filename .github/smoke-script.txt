@@ -1,16 +1,44 @@
 cmd time set noon
 cmd weather clear
 cmd gamemode creative @a
-cmd fill -8 199 -14 8 199 0 minecraft:smooth_stone
-cmd tp @a 0 201 -12 0 15
-sleep 6
-cmd setblock -6 200 -6 siftec:hub[facing=north]
-cmd setblock -3 200 -6 siftec:hub[facing=east]
-cmd setblock 0 200 -6 siftec:hub[facing=south]
-cmd setblock 3 200 -6 siftec:hub[facing=west]
-cmd setblock -6 202 -6 siftec:miner_mk1[facing=north]
-cmd setblock -3 202 -6 siftec:furnace_engine[facing=north]
-cmd setblock 0 202 -6 siftec:mam[facing=north]
-cmd setblock 3 202 -6 siftec:awesome_shop[facing=north]
-sleep 5
+cmd execute as @a run siftec node tp iron
+sleep 8
+cmd execute as @a at @s run tp @s ~7 ~3 ~ 90 25
+sleep 4
 shot
+cmd execute as @a at @s run tp @s ~ ~ ~ 0 0
+cmd execute at @a run setblock ~ ~1 ~2 siftec:speed_governor
+sleep 3
+key u
+sleep 3
+shot
+key Escape
+cmd execute at @a run setblock ~ ~1 ~2 siftec:mam
+sleep 2
+key u
+sleep 3
+click 784 190
+sleep 2
+shot
+key Escape
+cmd execute at @a run setblock ~ ~1 ~2 siftec:drone_port
+sleep 2
+key u
+sleep 3
+shot
+key Escape
+cmd execute at @a run setblock ~ ~1 ~2 siftec:hub
+sleep 2
+key u
+sleep 3
+shot
+key Escape
+cmd give @a siftec:pickled_tomato 4
+cmd give @a siftec:jetpack
+cmd give @a siftec:blueprint
+cmd give @a siftec:hard_drive
+sleep 2
+key e
+sleep 3
+shot
+key Escape
