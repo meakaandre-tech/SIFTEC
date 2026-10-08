@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/high_speed_connector",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 15779920
-      }
-    ]
+    "model": "siftec:item/high_speed_connector"
   }
 }

@@ -1,41 +1,12 @@
 {
-  "parent": "minecraft:block/block",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "particle": "create:block/railway_casing",
-    "all": "create:block/railway_casing"
-  },
-  "elements": [
-    {
-      "from": [
-        4,
-        0,
-        4
-      ],
-      "to": [
-        12,
-        8,
-        12
-      ],
-      "faces": {
-        "north": {
-          "texture": "#all"
-        },
-        "south": {
-          "texture": "#all"
-        },
-        "east": {
-          "texture": "#all"
-        },
-        "west": {
-          "texture": "#all"
-        },
-        "up": {
-          "texture": "#all"
-        },
-        "down": {
-          "texture": "#all"
-        }
-      }
-    }
-  ]
+    "particle": "siftec:block/crash_site_block_side",
+    "north": "siftec:block/crash_site_block_front",
+    "south": "siftec:block/crash_site_block_side",
+    "east": "siftec:block/crash_site_block_side",
+    "west": "siftec:block/crash_site_block_side",
+    "up": "siftec:block/crash_site_block_top",
+    "down": "siftec:block/crash_site_block_side"
+  }
 }

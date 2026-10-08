@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/steel_pipe",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 7369852
-      }
-    ]
+    "model": "siftec:item/steel_pipe"
   }
 }

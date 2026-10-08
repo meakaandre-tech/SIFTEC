@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "siftec:block/oil_node_core"
+      "model": "siftec:block/oil_well"
     }
   }
 }

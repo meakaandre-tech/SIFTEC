@@ -1,44 +1,208 @@
 cmd time set noon
 cmd weather clear
+cmd gamerule doDaylightCycle false
 cmd gamemode creative @a
-cmd execute as @a run siftec node tp iron
-sleep 8
-cmd execute as @a at @s run tp @s ~7 ~3 ~ 90 25
+cmd fill -14 199 -20 14 199 0 minecraft:smooth_stone
+cmd tp @a 0 202 -17 0 12
+sleep 6
+cmd setblock -8 200 -8 siftec:hub
+cmd setblock -7 200 -8 siftec:wormhole_gateway
+cmd setblock -6 200 -8 siftec:mam
+cmd setblock -5 200 -8 siftec:awesome_sink
+cmd setblock -4 200 -8 siftec:awesome_shop
+cmd setblock -3 200 -8 siftec:equipment_workshop
+cmd setblock -2 200 -8 siftec:claim_marker
+cmd setblock -1 200 -8 siftec:dimensional_depot
+cmd setblock 0 200 -8 siftec:steel_casing
+cmd setblock 1 200 -8 siftec:drone_port
+cmd setblock 2 200 -8 siftec:landing_pad
+cmd setblock 3 200 -8 siftec:main_portal
+cmd setblock 4 200 -8 siftec:satellite_portal
+cmd setblock 5 200 -8 siftec:blueprint_designer
+cmd setblock 6 200 -8 siftec:blueprint_designer_mk3
+cmd setblock 7 200 -8 siftec:portable_miner
+cmd setblock 8 200 -8 siftec:miner_mk1
+cmd setblock -8 202 -8 siftec:miner_mk2
+cmd setblock -7 202 -8 siftec:miner_mk3
+cmd setblock -6 202 -8 siftec:resource_well_extractor
+cmd setblock -5 202 -8 siftec:converter
+cmd setblock -4 202 -8 siftec:particle_accelerator
+cmd setblock -3 202 -8 siftec:furnace_engine
+cmd setblock -2 202 -8 siftec:hub_engine
+cmd setblock -1 202 -8 siftec:geyser_engine
+cmd setblock 0 202 -8 siftec:power_pole
+cmd setblock 1 202 -8 siftec:power_tower
+cmd setblock 2 202 -8 siftec:power_storage
+cmd setblock 3 202 -8 siftec:speed_governor
+cmd setblock 4 202 -8 siftec:radar_tower
+cmd setblock 5 202 -8 siftec:iron_node
+cmd setblock 6 202 -8 siftec:copper_node
+cmd setblock 7 202 -8 siftec:zinc_node
+cmd setblock 8 202 -8 siftec:coal_node
+cmd setblock -8 204 -8 siftec:limestone_node
+cmd setblock -7 204 -8 siftec:sulfur_node
+cmd setblock -6 204 -8 siftec:bauxite_node
+cmd setblock -5 204 -8 siftec:quartz_node
+cmd setblock -4 204 -8 siftec:sam_node
+cmd setblock -3 204 -8 siftec:oil_node
+cmd setblock -2 204 -8 siftec:oil_well
+cmd setblock -1 204 -8 siftec:nitrogen_node
+cmd setblock 0 204 -8 siftec:node_rock
+cmd setblock 1 204 -8 siftec:blue_power_slug_block
+cmd setblock 2 204 -8 siftec:yellow_power_slug_block
+cmd setblock 3 204 -8 siftec:purple_power_slug_block
+cmd setblock 4 204 -8 siftec:mercer_sphere_block
+cmd setblock 5 204 -8 siftec:somersloop_block
+cmd setblock 6 204 -8 siftec:crash_site_block
+sleep 5
+shot
+cmd tp @a 0 202 1 180 12
 sleep 4
 shot
-cmd execute as @a at @s run tp @s ~ ~ ~ 0 0
-cmd execute at @a run setblock ~ ~1 ~2 siftec:speed_governor
-sleep 3
-key u
-sleep 3
-shot
-key Escape
-cmd execute at @a run setblock ~ ~1 ~2 siftec:mam
-sleep 2
-key u
-sleep 3
-click 784 190
-sleep 2
-shot
-key Escape
-cmd execute at @a run setblock ~ ~1 ~2 siftec:drone_port
-sleep 2
-key u
-sleep 3
-shot
-key Escape
-cmd execute at @a run setblock ~ ~1 ~2 siftec:hub
-sleep 2
-key u
-sleep 3
-shot
-key Escape
-cmd give @a siftec:pickled_tomato 4
-cmd give @a siftec:jetpack
-cmd give @a siftec:blueprint
-cmd give @a siftec:hard_drive
+cmd gamemode survival @a
+cmd clear @a
+cmd give @a siftec:raw_bauxite
+cmd give @a siftec:crushed_bauxite
+cmd give @a siftec:aluminum_scrap
+cmd give @a siftec:aluminum_ingot
+cmd give @a siftec:ficsite_ingot
+cmd give @a siftec:brass_blend
+cmd give @a siftec:copper_powder
+cmd give @a siftec:silica
+cmd give @a siftec:gypsum
+cmd give @a siftec:quartz_crystal
+cmd give @a siftec:compacted_coal
+cmd give @a siftec:petroleum_coke
+cmd give @a siftec:biomass
+cmd give @a siftec:solid_biofuel
+cmd give @a siftec:rubber
+cmd give @a siftec:plastic
+cmd give @a siftec:fabric
+cmd give @a siftec:toxic_residue
+cmd give @a siftec:iron_rod
+cmd give @a siftec:screw
+cmd give @a siftec:wire
+cmd give @a siftec:cable
+cmd give @a siftec:quickwire
+cmd give @a siftec:reinforced_iron_plate
+cmd give @a siftec:steel_beam
+cmd give @a siftec:steel_pipe
+cmd give @a siftec:encased_industrial_beam
+cmd give @a siftec:alclad_aluminum_sheet
+cmd give @a siftec:aluminum_casing
+cmd give @a siftec:modular_frame
+cmd give @a siftec:heavy_modular_frame
+cmd give @a siftec:fused_modular_frame
+cmd give @a siftec:rotor
+cmd give @a siftec:stator
+cmd give @a siftec:motor
+cmd give @a siftec:turbo_motor
 sleep 2
 key e
-sleep 3
+sleep 2
 shot
 key Escape
+sleep 1
+cmd clear @a
+cmd give @a siftec:heat_sink
+cmd give @a siftec:cooling_system
+cmd give @a siftec:empty_fluid_tank
+cmd give @a siftec:packaged_nitrogen_gas
+cmd give @a siftec:pressure_conversion_cube
+cmd give @a siftec:circuit_board
+cmd give @a siftec:ai_limiter
+cmd give @a siftec:high_speed_connector
+cmd give @a siftec:computer
+cmd give @a siftec:supercomputer
+cmd give @a siftec:crystal_oscillator
+cmd give @a siftec:radio_control_unit
+cmd give @a siftec:electromagnetic_control_rod
+cmd give @a siftec:smart_plating
+cmd give @a siftec:versatile_framework
+cmd give @a siftec:automated_wiring
+cmd give @a siftec:modular_engine
+cmd give @a siftec:adaptive_control_unit
+cmd give @a siftec:assembly_director_system
+cmd give @a siftec:magnetic_field_generator
+cmd give @a siftec:thermal_propulsion_rocket
+cmd give @a siftec:nuclear_pasta
+cmd give @a siftec:biochemical_sculptor
+cmd give @a siftec:ballistic_warp_drive
+cmd give @a siftec:ai_expansion_server
+cmd give @a siftec:incomplete_ai_expansion_server
+cmd give @a siftec:blue_power_slug
+cmd give @a siftec:yellow_power_slug
+cmd give @a siftec:purple_power_slug
+cmd give @a siftec:power_shard
+cmd give @a siftec:somersloop
+cmd give @a siftec:mercer_sphere
+cmd give @a siftec:hard_drive
+cmd give @a siftec:dna_capsule
+cmd give @a siftec:sam
+cmd give @a siftec:reanimated_sam
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd clear @a
+cmd give @a siftec:sam_fluctuator
+cmd give @a siftec:ficsite_trigon
+cmd give @a siftec:time_crystal
+cmd give @a siftec:dark_matter_crystal
+cmd give @a siftec:excited_photonic_matter
+cmd give @a siftec:singularity_cell
+cmd give @a siftec:superposition_oscillator
+cmd give @a siftec:incomplete_superposition_oscillator
+cmd give @a siftec:neural_quantum_processor
+cmd give @a siftec:incomplete_neural_quantum_processor
+cmd give @a siftec:jetpack
+cmd give @a siftec:hover_pack
+cmd give @a siftec:parachute
+cmd give @a siftec:hazmat_suit
+cmd give @a siftec:gas_mask
+cmd give @a siftec:blade_runners
+cmd give @a siftec:gas_filter
+cmd give @a siftec:iodine_infused_filter
+cmd give @a siftec:node_scanner
+cmd give @a siftec:object_scanner
+cmd give @a siftec:hub_planner
+cmd give @a siftec:blueprint
+cmd give @a siftec:cardboard_drone
+cmd give @a siftec:power_line
+cmd give @a siftec:toxic_shot
+cmd give @a siftec:apple_jam
+cmd give @a siftec:sweet_berry_jam
+cmd give @a siftec:glow_berry_jam
+cmd give @a siftec:melon_jam
+cmd give @a siftec:pickled_beetroot
+cmd give @a siftec:pickled_cabbage
+cmd give @a siftec:pickled_carrot
+cmd give @a siftec:pickled_kelp
+cmd give @a siftec:pickled_onion
+cmd give @a siftec:pickled_pumpkin
+cmd give @a siftec:pickled_tomato
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd clear @a
+cmd give @a siftec:heavy_oil_residue_bucket
+cmd give @a siftec:alumina_solution_bucket
+cmd give @a siftec:sulfuric_acid_bucket
+cmd give @a siftec:nitrogen_bucket
+cmd give @a siftec:nitric_acid_bucket
+cmd give @a siftec:dark_matter_residue_bucket
+cmd give @a siftec:ignimbrite_bucket
+cmd give @a siftec:turbofuel_bucket
+cmd give @a siftec:vinegar_bucket
+cmd give @a siftec:mead_bucket
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1

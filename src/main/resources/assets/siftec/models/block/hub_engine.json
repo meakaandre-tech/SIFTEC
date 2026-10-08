@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "minecraft:block/blast_furnace_side",
-    "bottom": "minecraft:block/blast_furnace_side"
+    "particle": "siftec:block/hub_engine_side",
+    "north": "siftec:block/hub_engine_front",
+    "south": "siftec:block/hub_engine_side",
+    "east": "siftec:block/hub_engine_side",
+    "west": "siftec:block/hub_engine_side",
+    "up": "siftec:block/hub_engine_top",
+    "down": "siftec:block/hub_engine_side"
   }
 }

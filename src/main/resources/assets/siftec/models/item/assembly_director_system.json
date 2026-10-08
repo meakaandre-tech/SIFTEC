@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "create:item/linked_controller"
+    "layer0": "siftec:item/assembly_director_system"
   }
 }

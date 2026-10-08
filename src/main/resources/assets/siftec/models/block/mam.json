@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "minecraft:block/lodestone_top",
-    "side": "create:block/copper_casing",
-    "bottom": "create:block/copper_casing"
+    "particle": "siftec:block/mam_side",
+    "north": "siftec:block/mam_front",
+    "south": "siftec:block/mam_side",
+    "east": "siftec:block/mam_side",
+    "west": "siftec:block/mam_side",
+    "up": "siftec:block/mam_top",
+    "down": "siftec:block/mam_side"
   }
 }

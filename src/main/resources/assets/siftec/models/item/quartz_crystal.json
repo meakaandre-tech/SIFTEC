@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "create:item/polished_rose_quartz"
+    "layer0": "siftec:item/quartz_crystal"
   }
 }

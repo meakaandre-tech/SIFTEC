@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "create:block/copper_casing",
-    "bottom": "create:block/copper_casing"
+    "particle": "siftec:block/power_storage_side",
+    "north": "siftec:block/power_storage_front",
+    "south": "siftec:block/power_storage_side",
+    "east": "siftec:block/power_storage_side",
+    "west": "siftec:block/power_storage_side",
+    "up": "siftec:block/power_storage_top",
+    "down": "siftec:block/power_storage_side"
   }
 }

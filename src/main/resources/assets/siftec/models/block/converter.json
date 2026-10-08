@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "create:block/brass_casing",
-    "bottom": "create:block/brass_casing"
+    "particle": "siftec:block/converter_side",
+    "north": "siftec:block/converter_front",
+    "south": "siftec:block/converter_side",
+    "east": "siftec:block/converter_side",
+    "west": "siftec:block/converter_side",
+    "up": "siftec:block/converter_top",
+    "down": "siftec:block/converter_side"
   }
 }

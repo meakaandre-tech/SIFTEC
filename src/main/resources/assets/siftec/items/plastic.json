@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/plastic",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 5284072
-      }
-    ]
+    "model": "siftec:item/plastic"
   }
 }

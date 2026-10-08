@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "minecraft:block/barrel_top",
-    "side": "create:block/andesite_casing",
-    "bottom": "create:block/andesite_casing"
+    "particle": "siftec:block/awesome_shop_side",
+    "north": "siftec:block/awesome_shop_front",
+    "south": "siftec:block/awesome_shop_side",
+    "east": "siftec:block/awesome_shop_side",
+    "west": "siftec:block/awesome_shop_side",
+    "up": "siftec:block/awesome_shop_top",
+    "down": "siftec:block/awesome_shop_side"
   }
 }

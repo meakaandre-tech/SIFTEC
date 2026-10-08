@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "create:block/railway_casing",
-    "bottom": "create:block/railway_casing"
+    "particle": "siftec:block/resource_well_extractor_side",
+    "north": "siftec:block/resource_well_extractor_front",
+    "south": "siftec:block/resource_well_extractor_side",
+    "east": "siftec:block/resource_well_extractor_side",
+    "west": "siftec:block/resource_well_extractor_side",
+    "up": "siftec:block/resource_well_extractor_top",
+    "down": "siftec:block/resource_well_extractor_side"
   }
 }

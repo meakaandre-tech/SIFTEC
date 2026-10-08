@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/tnt_minecart"
+    "layer0": "siftec:item/turbo_motor"
   }
 }

@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/sulfuric_acid_bucket",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 15261760
-      }
-    ]
+    "model": "siftec:item/sulfuric_acid_bucket"
   }
 }

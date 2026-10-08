@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/fused_modular_frame",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 10539263
-      }
-    ]
+    "model": "siftec:item/fused_modular_frame"
   }
 }

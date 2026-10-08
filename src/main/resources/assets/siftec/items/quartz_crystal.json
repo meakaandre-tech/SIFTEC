@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/quartz_crystal",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 16316671
-      }
-    ]
+    "model": "siftec:item/quartz_crystal"
   }
 }

@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "create:block/copper_casing",
-    "bottom": "create:block/copper_casing"
+    "particle": "siftec:block/geyser_engine_side",
+    "north": "siftec:block/geyser_engine_front",
+    "south": "siftec:block/geyser_engine_side",
+    "east": "siftec:block/geyser_engine_side",
+    "west": "siftec:block/geyser_engine_side",
+    "up": "siftec:block/geyser_engine_top",
+    "down": "siftec:block/geyser_engine_side"
   }
 }

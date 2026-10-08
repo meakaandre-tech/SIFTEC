@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "create:block/brass_casing",
-    "bottom": "create:block/brass_casing"
+    "top": "siftec:block/radar_tower_top",
+    "side": "siftec:block/radar_tower_side",
+    "bottom": "siftec:block/radar_tower_side"
   }
 }

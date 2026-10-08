@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/turbofuel_bucket",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 13643824
-      }
-    ]
+    "model": "siftec:item/turbofuel_bucket"
   }
 }

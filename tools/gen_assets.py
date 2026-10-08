@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Writes the mod's blockstates, models, item definitions, lang file and loot tables.
-Every texture is borrowed from vanilla or Create for now; nothing is drawn here."""
+Textures come from tools/import_art.py; anything without one borrows a vanilla or Create texture."""
 import json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import content
@@ -491,3 +491,49 @@ for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
       {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:furnace_engine", "siftec:hub_engine", "siftec:landing_pad", "siftec:radar_tower", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+
+# ---------------------------------------------------------------------------------------------------
+# The mod's own art, cut from the sprite sheets by tools/import_art.py. Anything with a texture file
+# drops its borrowed stand-in; anything without one keeps it.
+TEX = os.path.join(A, "textures")
+def has(kind, name):
+    return os.path.exists(os.path.join(TEX, kind, name + ".png"))
+
+FRONTED = {"hub", "mam", "awesome_shop", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "converter",
+           "particle_accelerator", "furnace_engine", "hub_engine", "geyser_engine", "power_storage", "crash_site_block"}
+# drawn as a post or a tripod on a clear background: shown as two crossed planes, like a flower
+CROSSED = {"portable_miner", "power_pole", "power_tower"}
+NODE_IDS = {f"{n}_node" for n in NODES} | {"oil_well"}
+for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "block")) if f.endswith("_side.png")} if os.path.isdir(os.path.join(TEX, "block")) else []):
+    if bid == "speed_governor":
+        continue  # keeps Create's gearshift model
+    t = lambda face: f"siftec:block/{bid}_{face}"
+    if bid in CROSSED:
+        write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/cross", "textures": {"cross": t("side"), "particle": t("side")}})
+        write(f"{A}/models/item/{bid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": t("side")}})
+        item_def(bid, f"siftec:item/{bid}")
+    elif bid == "claim_marker":
+        # a post six pixels wide; the faces take the middle of the drawn textures
+        write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/block", "textures": {"particle": t("side"), "side": t("side"), "top": t("top")},
+              "elements": [{"from": [5, 0, 5], "to": [11, 16, 11], "faces": {
+                  "north": {"texture": "#side"}, "south": {"texture": "#side"}, "east": {"texture": "#side"}, "west": {"texture": "#side"},
+                  "up": {"texture": "#top"}, "down": {"texture": "#side"}}}]})
+    elif bid in FRONTED:
+        write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/cube", "textures": {"particle": t("side"),
+              "north": t("front"), "south": t("side"), "east": t("side"), "west": t("side"), "up": t("top"), "down": t("side")}})
+    else:
+        bottom = "siftec:block/node_rock_side" if bid in NODE_IDS else t("side")
+        model = {"parent": "minecraft:block/cube_bottom_top", "textures": {"top": t("top"), "side": t("side"), "bottom": bottom}}
+        write(f"{A}/models/block/{bid}.json", model)
+        if bid == "oil_well":
+            write(f"{A}/blockstates/{bid}.json", {"variants": {"": {"model": f"siftec:block/{bid}"}}})
+        elif os.path.exists(f"{A}/models/block/{bid}_core.json"):
+            write(f"{A}/models/block/{bid}_core.json", model)
+for f in sorted(os.listdir(os.path.join(TEX, "item"))) if os.path.isdir(os.path.join(TEX, "item")) else []:
+    iid = f[:-4]
+    write(f"{A}/models/item/{iid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"siftec:item/{iid}"}})
+    item_def(iid, f"siftec:item/{iid}")
+# the Zipline item was taken out; its model went with it
+for gone in (f"{A}/models/item/zipline.json", f"{A}/items/zipline.json"):
+    if os.path.exists(gone):
+        os.remove(gone)

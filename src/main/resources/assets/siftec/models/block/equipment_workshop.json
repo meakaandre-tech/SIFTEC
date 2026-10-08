@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "top": "minecraft:block/smithing_table_top",
-    "side": "create:block/andesite_casing",
-    "bottom": "create:block/andesite_casing"
+    "top": "siftec:block/equipment_workshop_top",
+    "side": "siftec:block/equipment_workshop_side",
+    "bottom": "siftec:block/equipment_workshop_side"
   }
 }

@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "create:block/railway_casing",
-    "bottom": "create:block/railway_casing"
+    "particle": "siftec:block/particle_accelerator_side",
+    "north": "siftec:block/particle_accelerator_front",
+    "south": "siftec:block/particle_accelerator_side",
+    "east": "siftec:block/particle_accelerator_side",
+    "west": "siftec:block/particle_accelerator_side",
+    "up": "siftec:block/particle_accelerator_top",
+    "down": "siftec:block/particle_accelerator_side"
   }
 }

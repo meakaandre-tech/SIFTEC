@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/elytra"
+    "layer0": "siftec:item/hover_pack"
   }
 }

@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/supercomputer",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 6340863
-      }
-    ]
+    "model": "siftec:item/supercomputer"
   }
 }

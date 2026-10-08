@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/pickled_onion",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 14207144
-      }
-    ]
+    "model": "siftec:item/pickled_onion"
   }
 }

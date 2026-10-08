@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/repeater"
+    "layer0": "siftec:item/adaptive_control_unit"
   }
 }

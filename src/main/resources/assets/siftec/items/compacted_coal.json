@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/compacted_coal",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 12632160
-      }
-    ]
+    "model": "siftec:item/compacted_coal"
   }
 }

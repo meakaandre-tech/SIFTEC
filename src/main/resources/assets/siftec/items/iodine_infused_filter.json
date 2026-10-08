@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/iodine_infused_filter",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 11567328
-      }
-    ]
+    "model": "siftec:item/iodine_infused_filter"
   }
 }

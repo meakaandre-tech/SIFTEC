@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "create:item/cardboard"
+    "layer0": "siftec:item/cardboard_drone"
   }
 }

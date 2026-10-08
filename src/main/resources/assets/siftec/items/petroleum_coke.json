@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/petroleum_coke",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 9474208
-      }
-    ]
+    "model": "siftec:item/petroleum_coke"
   }
 }

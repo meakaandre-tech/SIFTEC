@@ -1,6 +1,8 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "all": "minecraft:block/raw_iron_block"
+    "top": "siftec:block/iron_node_top",
+    "side": "siftec:block/iron_node_side",
+    "bottom": "siftec:block/node_rock_side"
   }
 }

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/redstone"
+    "layer0": "siftec:item/automated_wiring"
   }
 }

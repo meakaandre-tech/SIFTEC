@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/smart_plating",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 15777888
-      }
-    ]
+    "model": "siftec:item/smart_plating"
   }
 }

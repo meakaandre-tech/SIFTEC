@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/crystal_oscillator",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 16314623
-      }
-    ]
+    "model": "siftec:item/crystal_oscillator"
   }
 }

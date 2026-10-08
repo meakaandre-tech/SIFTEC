@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "create:item/iron_sheet"
+    "layer0": "siftec:item/alclad_aluminum_sheet"
   }
 }

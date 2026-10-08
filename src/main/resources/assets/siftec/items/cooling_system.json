@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/cooling_system",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 9490687
-      }
-    ]
+    "model": "siftec:item/cooling_system"
   }
 }

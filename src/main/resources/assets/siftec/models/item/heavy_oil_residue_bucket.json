@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/milk_bucket"
+    "layer0": "siftec:item/heavy_oil_residue_bucket"
   }
 }

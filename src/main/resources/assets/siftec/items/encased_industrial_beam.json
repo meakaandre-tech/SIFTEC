@@ -1,12 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/encased_industrial_beam",
-    "tints": [
-      {
-        "type": "minecraft:constant",
-        "value": 11053216
-      }
-    ]
+    "model": "siftec:item/encased_industrial_beam"
   }
 }

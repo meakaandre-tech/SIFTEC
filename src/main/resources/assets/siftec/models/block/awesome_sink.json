@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "top": "minecraft:block/hopper_top",
-    "side": "create:block/andesite_casing",
-    "bottom": "create:block/andesite_casing"
+    "top": "siftec:block/awesome_sink_top",
+    "side": "siftec:block/awesome_sink_side",
+    "bottom": "siftec:block/awesome_sink_side"
   }
 }

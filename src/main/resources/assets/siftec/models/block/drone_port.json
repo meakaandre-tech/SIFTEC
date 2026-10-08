@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "create:block/cardboard_block_side",
-    "bottom": "create:block/cardboard_block_side"
+    "top": "siftec:block/drone_port_top",
+    "side": "siftec:block/drone_port_side",
+    "bottom": "siftec:block/drone_port_side"
   }
 }

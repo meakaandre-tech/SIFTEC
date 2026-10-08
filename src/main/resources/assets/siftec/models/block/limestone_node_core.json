@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "top": "minecraft:block/lodestone_top",
-    "side": "create:block/palettes/stone_types/limestone",
-    "bottom": "create:block/palettes/stone_types/limestone"
+    "top": "siftec:block/limestone_node_top",
+    "side": "siftec:block/limestone_node_side",
+    "bottom": "siftec:block/node_rock_side"
   }
 }

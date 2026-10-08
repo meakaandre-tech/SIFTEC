@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/glow_item_frame"
+    "layer0": "siftec:item/heavy_modular_frame"
   }
 }
