@@ -401,6 +401,8 @@
   "siftec.engine.running_hub": "HUB Engine: running (%s fuel left)",
   "siftec.engine.too_many": "HUB Engine: this HUB cannot run that many engines yet",
   "siftec.gateway.title": "Wormhole Gateway: %s",
+  "siftec.geyser.blocked": "Geyser Engine: sitting on the geyser's water shuts its gas in. Leave a block of air between (%s mB acid)",
+  "siftec.geyser.blocked_place": "A Geyser Engine needs a block of air between it and the geyser's water",
   "siftec.geyser.full": "Geyser Engine: acid tank full (%s mB). Pipe it away",
   "siftec.geyser.none": "Geyser Engine: no geyser below (%s mB acid)",
   "siftec.geyser.running": "Geyser Engine: erupting (%s mB acid)",
