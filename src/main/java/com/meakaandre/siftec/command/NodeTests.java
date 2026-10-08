@@ -199,7 +199,8 @@ public final class NodeTests {
         for (Node node : nodes) {
             place(level, node, false);
             report(source, "pad " + node.type().id() + " " + node.purity().getSerializedName() + " at " + node.x() + "," + node.z() + ": " + padReport(level, node));
-            if (first == null && node.y() == Node.SURFACE && core(level, node) != null) first = node;
+            // the blast test keeps off the iron and copper nodes the other selftests put machines on
+            if (first == null && node.y() == Node.SURFACE && node.type() != NodeType.IRON && node.type() != NodeType.COPPER && core(level, node) != null) first = node;
         }
         report(source, "pads: " + nodes.size() + " nodes placed in " + (System.nanoTime() - start) / 1_000_000 + " ms");
         if (first != null) breakTest(source, level, first);
@@ -255,6 +256,17 @@ public final class NodeTests {
 
     private static final int WARM = 20, RUN = 200, SPEED = 64;
 
+    /**
+     * Where the miner test may build: past the 12 nearest nodes (the pad test blows a charge on one of those), never
+     * iron or copper (the other selftests put machines on the nearest of those), only nodes a miner can work.
+     * The same nodes every time, so a restart finds them again.
+     */
+    private static List<Node> minerNodes(ServerLevel level) {
+        List<Node> all = nearest(level, 72, n -> true);
+        return all.subList(Math.min(12, all.size()), all.size()).stream().filter(n -> !n.type().isFluid() && n.y() == Node.SURFACE
+            && n.type() != NodeType.IRON && n.type() != NodeType.COPPER && n.type().output() != net.minecraft.world.item.Items.AIR).toList();
+    }
+
     private static Block minerBlock(MinerTier tier) {
         return switch (tier) {
             case MK1 -> ModBlocks.MINER_MK1.get();
@@ -288,9 +300,7 @@ public final class NodeTests {
         NodeMap.settle(level);
         String company = WorldTests.fastCompany(source);
         Map<Purity, Node> picked = new EnumMap<>(Purity.class);
-        for (Node node : nearest(level, 60, n -> !n.type().isFluid() && n.y() == Node.SURFACE && n.type().output() != net.minecraft.world.item.Items.AIR)) {
-            picked.putIfAbsent(node.purity(), node);
-        }
+        for (Node node : minerNodes(level)) picked.putIfAbsent(node.purity(), node);
         report(source, "miners: nodes " + picked);
         for (Map.Entry<Purity, Node> entry : picked.entrySet()) {
             Node node = entry.getValue();
@@ -354,9 +364,7 @@ public final class NodeTests {
         if (MINERS.isEmpty()) {
             // after a restart: find the same nodes again (the search is the same, so are the nodes)
             Map<Purity, Node> picked = new EnumMap<>(Purity.class);
-            for (Node node : nearest(level, 60, n -> !n.type().isFluid() && n.y() == Node.SURFACE && n.type().output() != net.minecraft.world.item.Items.AIR)) {
-                picked.putIfAbsent(node.purity(), node);
-            }
+            for (Node node : minerNodes(level)) picked.putIfAbsent(node.purity(), node);
             for (Map.Entry<Purity, Node> entry : picked.entrySet()) {
                 place(level, entry.getValue(), false);
                 BlockPos core = core(level, entry.getValue());

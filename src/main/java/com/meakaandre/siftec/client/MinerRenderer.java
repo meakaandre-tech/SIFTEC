@@ -57,12 +57,13 @@ public class MinerRenderer implements BlockEntityRenderer<MinerBlockEntity, Mine
 
     @Override
     public void submit(State state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState camera) {
-        // the bit: 1.4 times Create's drill head, hanging from the casing with its tip at the bottom of the block
+        // the bit: 1.2 times Create's drill head, hanging from the casing with its tip just into the top of the node
+        // (Create's head points 4 px out of its block; here its tip goes to -1 px)
         matrices.pushPose();
         spin(state, matrices);
-        matrices.translate(0.5f, -0.875f, 0.5f);
-        matrices.scale(1.4f, 1.4f, 1.4f);
-        matrices.translate(-0.5f, 0.875f, -0.5f);
+        matrices.translate(0.5f, -1 / 16f, 0.5f);
+        matrices.scale(1.2f, 1.2f, 1.2f);
+        matrices.translate(-0.5f, 0.25f, -0.5f);
         state.head.submit(matrices, queue);
         matrices.popPose();
         // the cog on top of the casing (its middle at 29 px), a little wider than a plain cog
