@@ -62,6 +62,14 @@ public class GeyserEngineBlockEntity extends GeneratingKineticBlockEntity {
         return running;
     }
 
+    /** What the engine sees, for the selftest. */
+    public String describe() {
+        BlockPos vent = level == null ? null : findVent(level, worldPosition);
+        return "vent " + (vent == null ? "none" : vent.toShortString() + " gas escapes " + gasEscapes(level, vent) + " state "
+            + level.getBlockState(vent).getValue(PotentSulfurBlock.STATE).getSerializedName()) + ", armed " + armed + ", erupt ticks " + eruptTicks
+            + ", running " + running + ", speed " + getSpeed() + ", acid " + acidMb();
+    }
+
     public String statusKey() {
         if (acidMb() >= TANK - ACID_PER_SECOND) return "siftec.geyser.full";
         if (running) return "siftec.geyser.running";
