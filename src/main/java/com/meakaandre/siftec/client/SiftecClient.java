@@ -23,7 +23,9 @@ public class SiftecClient implements ClientModInitializer {
     public void onInitializeClient() {
         // the miner's input: a vertical shaft through the block, turning with the network
         BlockEntityRendererProvider<KineticBlockEntity, SingleKineticRenderState> shaft = ShaftRenderer::new;
-        BlockEntityRendererRegistry.register(ModBlockEntities.MINER.get(), shaft);
+        // a miner's drill head, cog and shaft end, turning with the shaft
+        BlockEntityRendererProvider<com.meakaandre.siftec.block.MinerBlockEntity, MinerRenderer.State> miner = MinerRenderer::new;
+        BlockEntityRendererRegistry.register(ModBlockEntities.MINER.get(), miner);
         BlockEntityRendererRegistry.register(ModBlockEntities.EXTRACTOR.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.POLE.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.PROCESSOR.get(), shaft);

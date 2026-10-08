@@ -60,6 +60,8 @@ public final class NodeMap {
     private static final Map<Long, Integer> LAND = new ConcurrentHashMap<>();
     /** Ground height of surface nodes as the generator gives it, for waypoints and teleports. */
     private static final Map<Long, Integer> GROUND = new ConcurrentHashMap<>();
+    /** Height of the pad of surface nodes (see {@link #padHeight}). */
+    private static final Map<Long, Integer> PAD = new ConcurrentHashMap<>();
     private static volatile long cacheSeed = Long.MIN_VALUE;
     /** The point the map is measured from (world spawn when the world was new); null until settled. */
     private static volatile int @Nullable [] origin;
@@ -114,6 +116,7 @@ public final class NodeMap {
         SULFUR.clear();
         LAND.clear();
         GROUND.clear();
+        PAD.clear();
     }
 
     /** Forgets every worked-out cell (the selftest uses it to time a first scan). */
@@ -219,6 +222,32 @@ public final class NodeMap {
     /** The ground height under a node as the generator gives it (the cave height for a sulfur node), if known. */
     public static Optional<Integer> groundOf(Node node) {
         return node.y() != Node.SURFACE ? Optional.of(node.y()) : Optional.ofNullable(GROUND.get(node.key()));
+    }
+
+    /**
+     * The height of a surface node's pad: the middle value of the generator's ground height (water counts as
+     * ground, so a pad in a lake sits level with its surface) at 13 points across the pad. Trees and other
+     * features are not part of it. Worked out with the cell, on the worker thread; here only if that missed it.
+     */
+    public static int padHeight(ServerLevel level, Node node) {
+        Integer known = PAD.get(node.key());
+        if (known != null) return known;
+        int y = padHeight(level, node.x(), node.z());
+        PAD.put(node.key(), y);
+        return y;
+    }
+
+    private static final int[][] PAD_POINTS = {{0, 0}, {2, 0}, {-2, 0}, {0, 2}, {0, -2}, {2, 2}, {2, -2}, {-2, 2}, {-2, -2}, {3, 0}, {-3, 0}, {0, 3}, {0, -3}};
+
+    private static int padHeight(ServerLevel level, int x, int z) {
+        var generator = level.getChunkSource().getGenerator();
+        var random = level.getChunkSource().randomState();
+        int[] ys = new int[PAD_POINTS.length];
+        for (int i = 0; i < ys.length; i++) {
+            ys[i] = generator.getBaseHeight(x + PAD_POINTS[i][0], z + PAD_POINTS[i][1], net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG, level, random) - 1;
+        }
+        Arrays.sort(ys);
+        return Math.max(ys[ys.length / 2], level.getMinY() + 1);
     }
 
     /** The nearest node of a type in this dimension, searched ring by ring. Runs where it is called. */
@@ -359,6 +388,7 @@ public final class NodeMap {
             }
             Node node = new Node(x, z, forced, Purity.NORMAL);
             GROUND.put(node.key(), column.y());
+            PAD.put(node.key(), padHeight(level, x, z));
             return List.of(node);
         }
 
@@ -407,6 +437,7 @@ public final class NodeMap {
         }
         Node node = new Node(x, z, picked, purity(h, distance));
         GROUND.put(node.key(), column.y());
+        PAD.put(node.key(), padHeight(level, x, z));
         return List.of(node);
     }
 

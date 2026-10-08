@@ -97,15 +97,18 @@ public final class SiftecCommands {
                 if (type == NodeType.IRON) {
                     level.setBlockAndUpdate(miner, ModBlocks.PORTABLE_MINER.get().defaultBlockState());
                 } else {
+                    // a Mk.1 is two blocks tall and drills with water: the motor goes on its upper block
                     level.setBlockAndUpdate(miner, ModBlocks.MINER_MK1.get().defaultBlockState());
+                    com.meakaandre.siftec.block.MinerBlock.placeTop(level, miner);
+                    if (level.getBlockEntity(miner) instanceof MinerBlockEntity m) m.fill(net.minecraft.world.level.material.Fluids.WATER, 1000);
                     BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
                     if (motor.hasProperty(BlockStateProperties.FACING)) motor = motor.setValue(BlockStateProperties.FACING, Direction.DOWN);
-                    level.setBlockAndUpdate(miner.above(), motor);
+                    level.setBlockAndUpdate(miner.above(2), motor);
                 }
                 report(source, "SELFTEST setup " + node + " core at " + pos.toShortString());
             } else {
                 BlockEntity be = level.getBlockEntity(miner);
-                String made = be instanceof MinerBlockEntity m ? m.output.get() + " speed " + m.getSpeed()
+                String made = be instanceof MinerBlockEntity m ? m.output.get() + " speed " + m.getSpeed() + " " + m.describe().getString()
                     : be instanceof PortableMinerBlockEntity m ? m.output.get().toString() : "no block entity (" + level.getBlockState(miner) + ")";
                 report(source, "SELFTEST check " + node + ": " + made);
                 // the setup kept this chunk loaded until now; let it go

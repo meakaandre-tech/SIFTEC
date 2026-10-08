@@ -1,10 +1,22 @@
 {
   "variants": {
-    "core=false": {
+    "core=false,purity=impure": {
       "model": "siftec:block/oil_node"
     },
-    "core=true": {
-      "model": "siftec:block/oil_node_core"
+    "core=false,purity=normal": {
+      "model": "siftec:block/oil_node"
+    },
+    "core=false,purity=pure": {
+      "model": "siftec:block/oil_node"
+    },
+    "core=true,purity=impure": {
+      "model": "siftec:block/oil_node_mound_impure"
+    },
+    "core=true,purity=normal": {
+      "model": "siftec:block/oil_node_mound_normal"
+    },
+    "core=true,purity=pure": {
+      "model": "siftec:block/oil_node_mound_pure"
     }
   }
 }

@@ -84,6 +84,8 @@ FLUIDS = [
     ("heavy_oil_residue", "Heavy Oil Residue", 0x6A3A8A), ("alumina_solution", "Alumina Solution", 0xD8E0E8),
     ("sulfuric_acid", "Sulfuric Acid", 0xE8E040), ("nitrogen", "Nitrogen", 0xC8E8FF), ("nitric_acid", "Nitric Acid", 0xD8F0A0),
     ("dark_matter_residue", "Dark Matter Residue", 0x301848), ("ignimbrite", "Ignimbrite", 0xF08020), ("turbofuel", "Turbofuel", 0xD03030), ("vinegar", "Vinegar", 0xE8D8A0), ("mead", "Mead", 0xE0A030),
+    # what the miners drill with: Mk.1 takes water, Mk.2 Drilling Mud, Mk.3 Coolant
+    ("drilling_mud", "Drilling Mud", 0x8A6A4A), ("coolant", "Coolant", 0x40C8D8),
 ]
 
 # ---------------------------------------------------------------------------------------------------

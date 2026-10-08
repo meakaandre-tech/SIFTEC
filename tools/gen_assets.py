@@ -64,27 +64,117 @@ for d, n in {"north": "north", "north_east": "north-east", "east": "east", "sout
              "south": "south", "south_west": "south-west", "west": "west", "north_west": "north-west"}.items():
     lang[f"siftec.direction.{d}"] = n
 
-# node rock
+# node rock (the mounds of nodes placed before pads existed)
 write(f"{A}/blockstates/node_rock.json", {"variants": {"": {"model": "siftec:block/node_rock"}}})
 write(f"{A}/models/block/node_rock.json", {"parent": "minecraft:block/cube_all", "textures": {"all": "minecraft:block/cobbled_deepslate"}})
 item_def("node_rock", "siftec:block/node_rock")
+
+# the flat pad every node stands on, and the fill under it: unbreakable, so they look built, not natural
+lang["block.siftec.node_pad"] = "Node Pad"
+lang["block.siftec.node_pad_fill"] = "Node Pad"
+write(f"{A}/blockstates/node_pad.json", {"variants": {"": {"model": "siftec:block/node_pad"}}})
+write(f"{A}/models/block/node_pad.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
+    "top": "minecraft:block/smooth_stone", "side": "minecraft:block/smooth_stone_slab_side", "bottom": "minecraft:block/smooth_stone"}})
+item_def("node_pad", "siftec:block/node_pad")
+write(f"{A}/blockstates/node_pad_fill.json", {"variants": {"": {"model": "siftec:block/node_pad_fill"}}})
+write(f"{A}/models/block/node_pad_fill.json", {"parent": "minecraft:block/cube_all", "textures": {"all": "minecraft:block/tuff"}})
+item_def("node_pad_fill", "siftec:block/node_pad_fill")
+
+# ---- the node itself: a low, wide rock mound with the resource in chunky lumps on top, like Satisfactory's nodes,
+# built from vanilla and Create textures. It is wider than its block (explicit UVs, no culling) and the deposit
+# grows with purity. A miner's bit rests on top (16 px) and its legs stand on the pad outside the mound.
+FACES = ("north", "south", "east", "west", "up", "down")
+
+def mbox(frm, to, tex, angle=0, axis="y", origin=None):
+    sx, sy, sz = (to[i] - frm[i] for i in range(3))
+    def span(a, size):
+        size = min(size, 16)
+        a0 = a % 16
+        if a0 + size > 16:
+            a0 = 16 - size
+        return a0, a0 + size
+    ux, uy, uz = span(frm[0], sx), span(16 - to[1], sy), span(frm[2], sz)
+    uv = {"north": [ux[0], uy[0], ux[1], uy[1]], "south": [ux[0], uy[0], ux[1], uy[1]],
+          "east": [uz[0], uy[0], uz[1], uy[1]], "west": [uz[0], uy[0], uz[1], uy[1]],
+          "up": [ux[0], uz[0], ux[1], uz[1]], "down": [ux[0], uz[0], ux[1], uz[1]]}
+    e = {"from": list(frm), "to": list(to), "faces": {f: {"texture": tex, "uv": uv[f]} for f in FACES}}
+    if angle:
+        # each piece turns about its own middle, so it stays where it was put
+        o = origin or [(frm[i] + to[i]) / 2 for i in range(3)]
+        e["rotation"] = {"origin": list(o), "axis": axis, "angle": angle}
+    return e
+
+def rock_base(extra=True):
+    """The rock: an octagon of two slabs (one turned 45 degrees), then two smaller tiers, each turned a little."""
+    els = [mbox((-2, 0, -2), (18, 3, 18), "#rock"), mbox((-2, 0, -2), (18, 2, 18), "#rock", 45),
+           mbox((1, 3, 1), (15, 6, 15), "#rock", 22.5), mbox((3, 6, 3), (13, 8, 13), "#rock", -22.5)]
+    if extra:  # loose boulders at the foot, between the miner's legs
+        els += [mbox((-6, 0, 5), (-2, 3, 10), "#rock", 22.5), mbox((18, 0, 6), (22, 2, 11), "#rock", -22.5),
+                mbox((6, 0, -6), (11, 2, -2), "#rock", -22.5), mbox((5, 0, 18), (10, 3, 22), "#rock", 22.5)]
+    return els
+
+LUMPS = {  # the deposit on top, by purity: (from, to, angle)
+    "impure": [((5, 7, 5), (10, 11, 10), 22.5), ((9, 7, 8), (12, 10, 11), -22.5), ((1, 3, 6), (4, 6, 9), 22.5)],
+    "normal": [((4, 7, 4), (10, 13, 10), 22.5), ((8, 8, 7), (13, 14, 12), -22.5), ((4, 8, 9), (8, 12, 13), 45),
+               ((0, 3, 6), (3, 7, 10), 22.5), ((13, 3, 5), (16, 6, 9), -22.5), ((6, 3, 13), (10, 6, 16), 22.5)],
+    "pure": [((3, 7, 3), (10, 15, 10), 22.5), ((8, 8, 6), (14, 16, 12), -22.5), ((3, 8, 9), (9, 14, 14), 45),
+             ((6, 10, 6), (11, 16, 11), 0), ((-1, 3, 5), (3, 8, 10), 22.5), ((13, 3, 5), (17, 7, 10), -22.5),
+             ((6, 3, 12), (11, 7, 17), 22.5), ((5, 3, -1), (10, 7, 3), -22.5), ((-5, 0, -1), (-1, 4, 3), 45)],
+}
+
+def mound(kind, purity):
+    lumps = LUMPS[purity]
+    if kind == "nitrogen":
+        # a vent: a pale collar round a dark hole, frost crystals round it
+        els = rock_base() + [mbox((4, 8, 4), (12, 12, 5), "#vent"), mbox((4, 8, 11), (12, 12, 12), "#vent"),
+                             mbox((4, 8, 5), (5, 12, 11), "#vent"), mbox((11, 8, 5), (12, 12, 11), "#vent"),
+                             mbox((5, 8, 5), (11, 9, 11), "#hole")]
+        ice = [((0, 3, 1), (4, 7, 5), 22.5), ((12, 3, 11), (16, 8, 15), -22.5), ((12, 3, 1), (15, 6, 4), 45),
+               ((1, 3, 12), (4, 9, 15), 22.5), ((7, 6, -1), (10, 9, 2), 0), ((-1, 3, 7), (2, 7, 10), 0)]
+        n = {"impure": 2, "normal": 4, "pure": 6}[purity]
+        return els + [mbox(f, t, "#ore", a) for f, t, a in ice[:n]]
+    if kind == "oil":
+        # a tar pool in a rock rim, crude welling up in black lumps
+        els = [mbox((-2, 0, -2), (18, 3, 18), "#rock"), mbox((-2, 0, -2), (18, 2, 18), "#rock", 45),
+               mbox((0, 3, 0), (16, 6, 2), "#rock"), mbox((0, 3, 14), (16, 6, 16), "#rock"),
+               mbox((0, 3, 2), (2, 6, 14), "#rock"), mbox((14, 3, 2), (16, 6, 14), "#rock"),
+               mbox((2, 3, 2), (14, 5, 14), "#pool")]
+        blobs = [((5, 5, 5), (10, 8, 10), 22.5), ((9, 5, 8), (12, 7, 12), -22.5), ((4, 5, 10), (7, 7, 13), 0),
+                 ((6, 7, 6), (9, 10, 9), 45), ((10, 5, 3), (13, 7, 6), 22.5)]
+        n = {"impure": 2, "normal": 3, "pure": 5}[purity]
+        return els + [mbox(f, t, "#ore", a) for f, t, a in blobs[:n]]
+    return rock_base() + [mbox(f, t, "#ore", a) for f, t, a in lumps]
+
+ROCK = {"sam": "minecraft:block/deepslate", "quartz": "minecraft:block/blackstone"}
+DEPOSIT = {  # the lumps on each node: vanilla and Create textures only
+    "iron": "minecraft:block/raw_iron_block", "copper": "minecraft:block/raw_copper_block",
+    "limestone": "create:block/palettes/stone_types/limestone", "coal": "minecraft:block/coal_block",
+    "zinc": "create:block/raw_zinc_block", "oil": "minecraft:block/obsidian", "bauxite": "minecraft:block/cinnabar",
+    "nitrogen": "minecraft:block/packed_ice", "sam": "minecraft:block/amethyst_block",
+    "quartz": "minecraft:block/quartz_block_bottom", "sulfur": "minecraft:block/sulfur",
+}
+PURITIES = ("impure", "normal", "pure")
 
 for id, (name, tex) in NODES.items():
     b = f"{id}_node"
     lang[f"block.siftec.{b}"] = f"{name} Node"
     lang[f"siftec.node.{id}"] = name
     write(f"{A}/blockstates/{b}.json", {"variants": {
-        "core=false": {"model": f"siftec:block/{b}"},
-        "core=true": {"model": f"siftec:block/{b}_core"}}})
+        **{f"core=false,purity={p}": {"model": f"siftec:block/{b}"} for p in PURITIES},
+        **{f"core=true,purity={p}": {"model": f"siftec:block/{b}_mound_{p}"} for p in PURITIES}}})
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": tex}})
-    # the middle block of the mound, where the miner goes: marked on top
-    write(f"{A}/models/block/{b}_core.json", {"parent": "minecraft:block/cube_bottom_top",
-          "textures": {"top": "minecraft:block/lodestone_top", "side": tex, "bottom": tex}})
-    item_def(b, f"siftec:block/{b}")
+    rock = ROCK.get(id, "minecraft:block/tuff")
+    for p in PURITIES:
+        write(f"{A}/models/block/{b}_mound_{p}.json", {"ambientocclusion": False, "textures": {
+            "particle": rock, "rock": rock, "ore": DEPOSIT[id], "vent": "minecraft:block/light_gray_concrete",
+            "hole": "minecraft:block/black_concrete", "pool": "minecraft:block/black_concrete"}, "elements": mound(id, p)})
+    item_def(b, f"siftec:block/{b}_mound_normal")
 
-# the middle of an oil pool
-write(f"{A}/blockstates/oil_well.json", {"variants": {"": {"model": "siftec:block/oil_node_core"}}})
-item_def("oil_well", "siftec:block/oil_node_core")
+# the middle of an oil node: the block a Pumpjack's pipe reaches down to
+write(f"{A}/blockstates/oil_well.json", {"variants": {
+    **{f"core=false,purity={p}": {"model": "siftec:block/oil_node_mound_normal"} for p in PURITIES},
+    **{f"core=true,purity={p}": {"model": f"siftec:block/oil_node_mound_{p}"} for p in PURITIES}}})
+item_def("oil_well", "siftec:block/oil_node_mound_normal")
 lang["block.siftec.oil_well"] = "Oil Well"
 
 # miners and the extractor: Create casings until real models are picked
@@ -123,6 +213,36 @@ for b, (name, casing) in MACHINES.items():
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
         "top": "create:block/gearbox_top", "side": casing, "bottom": casing}})
     item_def(b, f"siftec:block/{b}")
+
+# ---- powered miners, shaped like the old node drills: two blocks tall. The lower block's model draws the whole
+# casing, running up into the upper block, with a lip and a ring of beams at its foot and four legs reaching down past
+# the node to the pad; the renderer adds the turning drill head, cog and shaft end. One casing texture each (explicit
+# UVs: the model reaches outside its block).
+MINERS = {"miner_mk1": "create:block/andesite_casing", "miner_mk2": "create:block/brass_casing", "miner_mk3": "create:block/railway_casing"}
+
+def miner_model(casing):
+    c = "#casing"
+    els = [mbox((0, 11, 0), (16, 27, 16), c),            # the casing, up into the block above
+           mbox((-1, 11, -1), (17, 14, 17), c),          # the lip at its foot
+           # the ring of beams round it, and the spokes joining it to the lip
+           mbox((-7, 11, -7), (23, 13, -5), c), mbox((-7, 11, 21), (23, 13, 23), c),
+           mbox((-7, 11, -5), (-5, 13, 21), c), mbox((21, 11, -5), (23, 13, 21), c),
+           mbox((-5, 11, 7), (-1, 13, 9), c), mbox((17, 11, 7), (21, 13, 9), c),
+           mbox((7, 11, -5), (9, 13, -1), c), mbox((7, 11, 17), (9, 13, 21), c)]
+    # four legs from the ring down to the pad the node stands on
+    for x in (-7, 20):
+        for z in (-7, 20):
+            els.append(mbox((x, -16, z), (x + 3, 15, z + 3), c))
+    return {"ambientocclusion": False, "textures": {"particle": casing, "casing": casing}, "elements": els}
+
+for b, casing in MINERS.items():
+    write(f"{A}/models/block/{b}.json", miner_model(casing))
+    write(f"{A}/blockstates/{b}.json", {"variants": {f"facing={d}": {"model": f"siftec:block/{b}"} for d in ("north", "east", "south", "west")}})
+    item_def(b, f"siftec:block/{b}")
+lang["block.siftec.miner_top"] = "Miner"
+write(f"{A}/blockstates/miner_top.json", {"variants": {"": {"model": "siftec:block/miner_top"}}})
+write(f"{A}/models/block/miner_top.json", {"textures": {"particle": "create:block/andesite_casing"}})
+item_def("miner_top", "siftec:block/miner_top")
 
 lang.update({"siftec.engine.running": "Furnace Engine: running", "siftec.engine.running_hub": "HUB Engine: running (%s fuel left)",
              "siftec.engine.no_furnace": "Furnace Engine: needs a burning furnace beside or under it",
@@ -576,7 +696,7 @@ for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:furnace_engine", "siftec:hub_engine", "siftec:landing_pad", "siftec:radar_tower", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
+      {"replace": False, "values": ["siftec:portable_miner", "siftec:miner_mk1", "siftec:miner_mk2", "siftec:miner_mk3", "siftec:miner_top", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:furnace_engine", "siftec:hub_engine", "siftec:landing_pad", "siftec:radar_tower", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop"]})
 
 # ---------------------------------------------------------------------------------------------------
 # The mod's own art, cut from the sprite sheets by tools/import_art.py. Anything with a texture file
@@ -585,7 +705,7 @@ TEX = os.path.join(A, "textures")
 def has(kind, name):
     return os.path.exists(os.path.join(TEX, kind, name + ".png"))
 
-FRONTED = {"hub", "mam", "awesome_shop", "miner_mk1", "miner_mk2", "miner_mk3", "resource_well_extractor", "converter",
+FRONTED = {"hub", "mam", "awesome_shop", "resource_well_extractor", "converter",
            "particle_accelerator", "furnace_engine", "hub_engine", "geyser_engine", "power_storage", "crash_site_block"}
 # drawn as a post or a tripod on a clear background: shown as two crossed planes, like a flower
 CROSSED = {"portable_miner", "power_pole", "power_tower"}
@@ -596,8 +716,8 @@ TURNS = FRONTED - {"crash_site_block"}
 for bid in ("wormhole_gateway", "awesome_sink"):
     write(f"{A}/blockstates/{bid}.json", {"variants": {f"facing={d}": {"model": f"siftec:block/{bid}"} for d in ("north", "east", "south", "west")}})
 for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "block")) if f.endswith("_side.png")} if os.path.isdir(os.path.join(TEX, "block")) else []):
-    if bid == "speed_governor":
-        continue  # keeps Create's gearshift model
+    if bid == "speed_governor" or bid in MINERS:
+        continue  # the governor keeps Create's gearshift model; the miners have their own (below)
     t = lambda face: f"siftec:block/{bid}_{face}"
     if bid in CROSSED:
         write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/cross", "textures": {"cross": t("side"), "particle": t("side")}})
@@ -620,9 +740,7 @@ for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "
         model = {"parent": "minecraft:block/cube_bottom_top", "textures": {"top": t("top"), "side": t("side"), "bottom": bottom}}
         write(f"{A}/models/block/{bid}.json", model)
         if bid == "oil_well":
-            write(f"{A}/blockstates/{bid}.json", {"variants": {"": {"model": f"siftec:block/{bid}"}}})
-        elif os.path.exists(f"{A}/models/block/{bid}_core.json"):
-            write(f"{A}/models/block/{bid}_core.json", model)
+            continue  # its blockstate shows the oil node's mound; the drawn texture stays unused
 for f in sorted(os.listdir(os.path.join(TEX, "item"))) if os.path.isdir(os.path.join(TEX, "item")) else []:
     iid = f[:-4]
     if iid == "fluid_in_bucket":

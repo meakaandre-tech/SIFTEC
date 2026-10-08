@@ -15,7 +15,8 @@ import java.util.List;
 
 /**
  * What the node system has to remember about a world: the point the node map is measured from, which
- * pieces of which nodes are already placed, and the height chosen for nodes in caves and the Nether.
+ * pieces of which nodes are already placed, the height chosen for each node's pad (for an old surface mound,
+ * none), and which nodes are flat pads.
  */
 public class NodeSavedData extends SavedData {
     public static final Codec<NodeSavedData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -23,7 +24,8 @@ public class NodeSavedData extends SavedData {
         Codec.INT.optionalFieldOf("origin_x", 0).forGetter(data -> data.originX),
         Codec.INT.optionalFieldOf("origin_z", 0).forGetter(data -> data.originZ),
         Codec.LONG.listOf().optionalFieldOf("placed", List.of()).forGetter(data -> new ArrayList<>(data.placed)),
-        Codec.LONG.listOf().optionalFieldOf("heights", List.of()).forGetter(NodeSavedData::packHeights)
+        Codec.LONG.listOf().optionalFieldOf("heights", List.of()).forGetter(NodeSavedData::packHeights),
+        Codec.LONG.listOf().optionalFieldOf("flat", List.of()).forGetter(data -> new ArrayList<>(data.flat))
     ).apply(instance, NodeSavedData::new));
     private static final SavedDataType<NodeSavedData> TYPE = new SavedDataType<>(
         Siftec.id("nodes"), NodeSavedData::new, CODEC, null
@@ -34,13 +36,16 @@ public class NodeSavedData extends SavedData {
     private int originX, originZ;
     private final LongSet placed = new LongOpenHashSet();
     private final Long2IntOpenHashMap heights = new Long2IntOpenHashMap();
+    /** Nodes placed as a flat pad (all nodes started since pads came in); the others keep their old mound. */
+    private final LongSet flat = new LongOpenHashSet();
 
     public NodeSavedData() {
         heights.defaultReturnValue(NO_HEIGHT);
     }
 
-    private NodeSavedData(boolean hasOrigin, int originX, int originZ, List<Long> placed, List<Long> heights) {
+    private NodeSavedData(boolean hasOrigin, int originX, int originZ, List<Long> placed, List<Long> heights, List<Long> flat) {
         this();
+        this.flat.addAll(flat);
         this.hasOrigin = hasOrigin;
         this.originX = originX;
         this.originZ = originZ;
@@ -106,5 +111,13 @@ public class NodeSavedData extends SavedData {
     public void setHeight(long node, int y) {
         heights.put(node, y);
         setDirty();
+    }
+
+    public boolean isFlat(long node) {
+        return flat.contains(node);
+    }
+
+    public void markFlat(long node) {
+        if (flat.add(node)) setDirty();
     }
 }

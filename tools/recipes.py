@@ -387,6 +387,8 @@ def build():
     deploy("Steel Pipe", "Wire", "Stator")
     deploy("Rotor", "Stator", "Motor")
     deploy("Stator", "Cable", "Automated Wiring")
+    # what Miner Mk.2 drills with (Mk.1 takes water; Mk.3 Coolant, below)
+    mix("drilling_mud", items=["minecraft:clay_ball", "minecraft:gravel"], fluids=[("water", 250)], fluid_results=[("drilling mud", 500)])
 
     # ---- tiers 5 and 6 ------------------------------------------------------------------------
     mix("plastic", fluids=[("crude oil", 250)], results=[("Plastic", 2)], fluid_results=[("heavy oil residue", 100)], heated=True)
@@ -395,6 +397,8 @@ def build():
     # the Pumpjack crank on a crafting table: Diesel Generators' is a 3x5 Mechanical Crafter recipe (Tier 6)
     shaped("createdieselgenerators:pumpjack_crank", ["AIA", "ZSZ", "AIA"],
            {"A": "create:andesite_alloy", "I": "#c:plates/iron", "S": "create:shaft", "Z": "#c:ingots/zinc"}, name="pumpjack_crank")
+    # what Miner Mk.3 drills with
+    mix("coolant", fluids=[("diesel", 250), ("water", 250)], fluid_results=[("coolant", 500)])
     compact("petroleum_coke", fluids=[("heavy oil residue", 250)], results=[("Petroleum Coke", 3)], heated=True)
     deploy("Copper Sheet", "Plastic", "Circuit Board")
     press("Plastic", "Empty Canister", 2)

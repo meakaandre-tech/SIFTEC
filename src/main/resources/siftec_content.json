@@ -3828,6 +3828,14 @@
     {
       "id": "mead",
       "color": 14721072
+    },
+    {
+      "id": "drilling_mud",
+      "color": 9071178
+    },
+    {
+      "id": "coolant",
+      "color": 4245720
     }
   ],
   "recipe_locks": {
