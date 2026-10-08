@@ -5,10 +5,11 @@ siftec worldtest place iron
 siftec worldtest place sulfur
 execute in minecraft:the_nether run siftec worldtest place quartz
 siftec worldtest geyser build 160
+siftec worldtest geyser natural 160
 siftec worldtest processor
 siftec worldtest furnace setup
 siftec worldtest powerline setup
 #sleep 30
 siftec worldtest furnace check
 siftec worldtest powerline check
-#sleep 170
+#sleep 190

@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * What the world generator says about a column, without generating anything: whether there is land at all,
  * where its ground is and which biome that ground has. Works on ordinary worlds and on worlds of floating
- * islands over void (such as The Isles), where most columns are empty and the generator's sea level is the
+ * islands over void, where most columns are empty and the generator's sea level is the
  * bottom of the world. Everything here only asks the biome source and the noise of the generator, which the
  * game itself does from its world generation threads, so it may run off the server thread.
  */
@@ -26,7 +26,7 @@ public final class Terrain {
     private Terrain() {
     }
 
-    /** A void biome: {@code the_isles:void}, {@code minecraft:the_void}, or any other mod's {@code *:void}. */
+    /** A void biome: {@code minecraft:the_void}, or any other mod's {@code *:void}. */
     public static boolean isVoid(Holder<Biome> biome) {
         return biome.unwrapKey().map(key -> {
             String path = key.identifier().getPath();
