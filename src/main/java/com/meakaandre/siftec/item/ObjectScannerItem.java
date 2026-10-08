@@ -45,16 +45,24 @@ public class ObjectScannerItem extends Item {
             player.sendOverlayMessage(Component.translatable("siftec.scanner.selected", Component.translatable("item.siftec." + type.id())));
             return InteractionResult.SUCCESS;
         }
-        Optional<Collectibles.Spot> found = Collectibles.nearest(server, player.getX(), player.getZ(), type, company.collected, 48);
-        if (found.isEmpty()) {
-            player.sendOverlayMessage(Component.translatable("siftec.scanner.none_object", name));
-            return InteractionResult.SUCCESS;
-        }
-        Collectibles.Spot spot = found.get();
-        int distance = (int) Math.round(Math.sqrt(Math.pow(spot.x() - player.getX(), 2) + Math.pow(spot.z() - player.getZ(), 2)));
-        player.sendOverlayMessage(Component.translatable("siftec.scanner.found", name, distance,
-            Component.translatable("siftec.direction." + NodeScannerItem.direction(spot.x() - player.getX(), spot.z() - player.getZ())), spot.x(), spot.z()));
         player.getCooldowns().addCooldown(player.getItemInHand(hand), 20);
+        // searched on the node map's worker thread (it samples the world generator), answered when done
+        Collectible looking = type;
+        java.util.Set<String> collected = java.util.Set.copyOf(company.collected);
+        com.meakaandre.siftec.node.Terrain.Border border = com.meakaandre.siftec.node.Terrain.Border.of(server);
+        double px = player.getX(), pz = player.getZ();
+        com.meakaandre.siftec.node.NodeMap.async(server.getServer(),
+            () -> Collectibles.nearest(server, px, pz, looking, collected, 48, border, com.meakaandre.siftec.node.NodeMap.SEARCH_NANOS), found -> {
+                if (player.isRemoved()) return;
+                if (found == null || found.isEmpty()) {
+                    player.sendOverlayMessage(Component.translatable("siftec.scanner.none_object", name));
+                    return;
+                }
+                Collectibles.Spot spot = found.get();
+                int distance = (int) Math.round(Math.sqrt(Math.pow(spot.x() - player.getX(), 2) + Math.pow(spot.z() - player.getZ(), 2)));
+                player.sendOverlayMessage(Component.translatable("siftec.scanner.found", name, distance,
+                    Component.translatable("siftec.direction." + NodeScannerItem.direction(spot.x() - player.getX(), spot.z() - player.getZ())), spot.x(), spot.z()));
+            });
         return InteractionResult.SUCCESS;
     }
 }
