@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "siftec:block/mam"
+    },
+    "facing=east": {
+      "model": "siftec:block/mam",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "siftec:block/mam",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "siftec:block/mam",
+      "y": 270
     }
   }
 }

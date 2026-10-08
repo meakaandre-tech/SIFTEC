@@ -1,6 +1,15 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
+      "model": "siftec:block/wormhole_gateway"
+    },
+    "facing=east": {
+      "model": "siftec:block/wormhole_gateway"
+    },
+    "facing=south": {
+      "model": "siftec:block/wormhole_gateway"
+    },
+    "facing=west": {
       "model": "siftec:block/wormhole_gateway"
     }
   }

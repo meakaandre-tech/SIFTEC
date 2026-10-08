@@ -1,6 +1,15 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
+      "model": "siftec:block/awesome_sink"
+    },
+    "facing=east": {
+      "model": "siftec:block/awesome_sink"
+    },
+    "facing=south": {
+      "model": "siftec:block/awesome_sink"
+    },
+    "facing=west": {
       "model": "siftec:block/awesome_sink"
     }
   }

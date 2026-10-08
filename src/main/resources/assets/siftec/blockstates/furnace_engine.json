@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "siftec:block/furnace_engine"
+    },
+    "facing=east": {
+      "model": "siftec:block/furnace_engine",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "siftec:block/furnace_engine",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "siftec:block/furnace_engine",
+      "y": 270
     }
   }
 }

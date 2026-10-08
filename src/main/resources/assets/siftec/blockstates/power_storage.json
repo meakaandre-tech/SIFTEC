@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "siftec:block/power_storage"
+    },
+    "facing=east": {
+      "model": "siftec:block/power_storage",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "siftec:block/power_storage",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "siftec:block/power_storage",
+      "y": 270
     }
   }
 }

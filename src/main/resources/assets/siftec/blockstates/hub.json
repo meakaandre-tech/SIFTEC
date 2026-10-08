@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "siftec:block/hub"
+    },
+    "facing=east": {
+      "model": "siftec:block/hub",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "siftec:block/hub",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "siftec:block/hub",
+      "y": 270
     }
   }
 }

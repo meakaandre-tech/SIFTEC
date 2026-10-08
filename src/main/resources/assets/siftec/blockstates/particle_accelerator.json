@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "siftec:block/particle_accelerator"
+    },
+    "facing=east": {
+      "model": "siftec:block/particle_accelerator",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "siftec:block/particle_accelerator",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "siftec:block/particle_accelerator",
+      "y": 270
     }
   }
 }

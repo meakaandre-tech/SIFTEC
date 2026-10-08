@@ -44,4 +44,26 @@ public class ExtractorBlock extends KineticBlock implements IBE<ExtractorBlockEn
     public BlockEntityType<? extends ExtractorBlockEntity> getBlockEntityType() {
         return ModBlockEntities.EXTRACTOR.get();
     }
+
+    // the front looks at whoever placed it
+    @Override
+    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.state.BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(com.meakaandre.siftec.block.Facing.FACING);
+    }
+
+    @Override
+    public net.minecraft.world.level.block.state.BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        return com.meakaandre.siftec.block.Facing.place(super.getStateForPlacement(context), context);
+    }
+
+    @Override
+    protected net.minecraft.world.level.block.state.BlockState rotate(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.Rotation rotation) {
+        return com.meakaandre.siftec.block.Facing.rotate(state, rotation);
+    }
+
+    @Override
+    protected net.minecraft.world.level.block.state.BlockState mirror(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.Mirror mirror) {
+        return com.meakaandre.siftec.block.Facing.mirror(state, mirror);
+    }
 }

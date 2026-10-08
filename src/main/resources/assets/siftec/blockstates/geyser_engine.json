@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "siftec:block/geyser_engine"
+    },
+    "facing=east": {
+      "model": "siftec:block/geyser_engine",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "siftec:block/geyser_engine",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "siftec:block/geyser_engine",
+      "y": 270
     }
   }
 }

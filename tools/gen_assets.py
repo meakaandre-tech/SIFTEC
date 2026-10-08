@@ -504,6 +504,11 @@ FRONTED = {"hub", "mam", "awesome_shop", "miner_mk1", "miner_mk2", "miner_mk3", 
 # drawn as a post or a tripod on a clear background: shown as two crossed planes, like a flower
 CROSSED = {"portable_miner", "power_pole", "power_tower"}
 NODE_IDS = {f"{n}_node" for n in NODES} | {"oil_well"}
+# blocks that turn to face whoever placed them; the Crash Site Pod is set down by world generation, so it does not
+TURNS = FRONTED - {"crash_site_block"}
+# these share a block class with one that turns, so they have the same facing, though nothing on them shows it
+for bid in ("wormhole_gateway", "awesome_sink"):
+    write(f"{A}/blockstates/{bid}.json", {"variants": {f"facing={d}": {"model": f"siftec:block/{bid}"} for d in ("north", "east", "south", "west")}})
 for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "block")) if f.endswith("_side.png")} if os.path.isdir(os.path.join(TEX, "block")) else []):
     if bid == "speed_governor":
         continue  # keeps Create's gearshift model
@@ -519,6 +524,9 @@ for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "
                   "north": {"texture": "#side"}, "south": {"texture": "#side"}, "east": {"texture": "#side"}, "west": {"texture": "#side"},
                   "up": {"texture": "#top"}, "down": {"texture": "#side"}}}]})
     elif bid in FRONTED:
+        if bid in TURNS:
+            write(f"{A}/blockstates/{bid}.json", {"variants": {f"facing={d}": ({"model": f"siftec:block/{bid}", "y": y} if y else {"model": f"siftec:block/{bid}"})
+                                                                for d, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}})
         write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/cube", "textures": {"particle": t("side"),
               "north": t("front"), "south": t("side"), "east": t("side"), "west": t("side"), "up": t("top"), "down": t("side")}})
     else:
