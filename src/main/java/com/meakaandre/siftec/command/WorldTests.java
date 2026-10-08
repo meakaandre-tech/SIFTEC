@@ -52,7 +52,7 @@ import java.util.Optional;
 
 /**
  * Selftests for how the mod fits the world: nodes, scanners, sulfur caves, geysers, Power Storage, Furnace Engines,
- * processors and Power Lines. Run by the automated test on an ordinary world and on The Isles. Every line of
+ * processors and Power Lines. Run by the automated test on an ordinary world. Every line of
  * output starts with "SELFTEST world".
  */
 public final class WorldTests {
@@ -69,9 +69,9 @@ public final class WorldTests {
                             IntegerArgumentType.getInteger(c, "x"), IntegerArgumentType.getInteger(c, "y"), IntegerArgumentType.getInteger(c, "z")))))));
             var worldtest = Commands.literal("worldtest")
                 .then(Commands.literal("nodes").then(Commands.argument("radius", IntegerArgumentType.integer(128, 8000)).executes(WorldTests::nodes)))
-                .then(Commands.literal("pockets").then(Commands.argument("list", StringArgumentType.greedyString()).executes(WorldTests::pockets)))
                 .then(Commands.literal("place").then(Commands.argument("type", StringArgumentType.word()).executes(WorldTests::place)))
-                .then(Commands.literal("geyser").then(Commands.literal("build").then(seconds.executes(c -> geyser(c, null)))).then(geyserAt))
+                .then(Commands.literal("geyser").then(Commands.literal("build").then(seconds.executes(c -> geyser(c, null))))
+                    .then(Commands.literal("natural").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::naturalGeyser))).then(geyserAt))
                 .then(Commands.literal("furnace").then(Commands.literal("setup").executes(c -> furnace(c, true))).then(Commands.literal("check").executes(c -> furnace(c, false))))
                 .then(Commands.literal("processor").executes(WorldTests::processor))
                 .then(Commands.literal("powerline").then(Commands.literal("setup").executes(c -> powerline(c, true))).then(Commands.literal("check").executes(c -> powerline(c, false))));
@@ -203,31 +203,52 @@ public final class WorldTests {
         return column != null && !column.water();
     }
 
-    /** "x,z;x,z;..." of the sulfur cave pockets the world is known to have: how many hold a sulfur node. */
-    private static int pockets(CommandContext<CommandSourceStack> context) {
+    /**
+     * A geyser the world generated itself: the sulfur pools of the sulfur cave under the nearest sulfur node hold
+     * potent sulfur under water. Searches the chunks round that node and watches the first geyser found.
+     */
+    private static int naturalGeyser(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        int found = 0, total = 0;
-        List<String> missing = new ArrayList<>();
+        BlockPos o = origin(level);
+        Optional<Node> sulfur = NodeMap.nearest(level, o.getX(), o.getZ(), NodeType.SULFUR, 64, Terrain.Border.of(level), Long.MAX_VALUE);
+        if (sulfur.isEmpty() || sulfur.get().y() == Node.SURFACE) {
+            report(source, "geyser natural: no sulfur cave found");
+            return 0;
+        }
+        Node node = sulfur.get();
         long start = System.nanoTime();
-        for (String part : StringArgumentType.getString(context, "list").split(";")) {
-            String[] xz = part.trim().split(",");
-            if (xz.length != 2) continue;
-            int x = Integer.parseInt(xz[0].trim()), z = Integer.parseInt(xz[1].trim());
-            total++;
-            boolean hit = false;
-            for (int dx = -1; dx <= 1 && !hit; dx++) {
-                for (int dz = -1; dz <= 1 && !hit; dz++) {
-                    for (Node node : NodeMap.inCell(level, Math.floorDiv(x, NodeMap.CELL) + dx, Math.floorDiv(z, NodeMap.CELL) + dz)) {
-                        if (node.type() == NodeType.SULFUR && node.distanceTo(x, z) <= 48) hit = true;
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        BlockPos best = null;
+        double bestDistance = Double.MAX_VALUE;
+        int chunks = 0;
+        for (int r = 0; r <= 3 && best == null; r++) {
+            for (int cx = (node.x() >> 4) - r; cx <= (node.x() >> 4) + r; cx++) {
+                for (int cz = (node.z() >> 4) - r; cz <= (node.z() >> 4) + r; cz++) {
+                    if (Math.max(Math.abs(cx - (node.x() >> 4)), Math.abs(cz - (node.z() >> 4))) != r) continue;
+                    var chunk = level.getChunk(cx, cz);
+                    chunks++;
+                    for (int y = Math.max(level.getMinY(), node.y() - 48); y <= Math.min(level.getMaxY() - 2, node.y() + 48); y++) {
+                        for (int x = 0; x < 16; x++) {
+                            for (int z = 0; z < 16; z++) {
+                                pos.set((cx << 4) + x, y, (cz << 4) + z);
+                                if (!chunk.getBlockState(pos).is(Blocks.POTENT_SULFUR)) continue;
+                                if (!chunk.getFluidState(pos.above()).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) continue;
+                                double d = pos.distSqr(new BlockPos(node.x(), node.y(), node.z()));
+                                if (d < bestDistance) {
+                                    bestDistance = d;
+                                    best = pos.immutable();
+                                }
+                            }
+                        }
                     }
                 }
             }
-            if (hit) found++;
-            else missing.add(x + "," + z);
         }
-        report(source, "sulfur pockets with a sulfur node: " + found + " of " + total + " (" + (System.nanoTime() - start) / 1_000_000 + " ms); missing " + missing);
-        return 1;
+        report(source, "geyser natural: sulfur node " + node + ", searched " + chunks + " chunks in " + (System.nanoTime() - start) / 1_000_000 + " ms, "
+            + (best == null ? "no geyser under water found" : "world-generated geyser at " + best.toShortString() + " in " + Terrain.biome(level, best.getX(), best.getY(), best.getZ()).unwrapKey().map(k -> k.identifier().toString()).orElse("?")));
+        if (best == null) return 0;
+        return geyser(context, best);
     }
 
     /** Places the nearest node of a type (from spawn, or 150,150 in the Nether) and reports where its core is and what it stands on. */
