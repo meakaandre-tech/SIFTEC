@@ -1,44 +1,25 @@
 cmd time set noon
 cmd weather clear
-cmd gamemode creative @a
-cmd execute as @a run siftec node tp iron
-sleep 8
-cmd execute as @a at @s run tp @s ~7 ~3 ~ 90 25
-sleep 4
-shot
-cmd execute as @a at @s run tp @s ~ ~ ~ 0 0
-cmd execute at @a run setblock ~ ~1 ~2 siftec:speed_governor
+cmd gamemode survival @a
+cmd clear @a
+cmd give @a siftec:heavy_oil_residue_bucket
+cmd give @a siftec:alumina_solution_bucket
+cmd give @a siftec:sulfuric_acid_bucket
+cmd give @a siftec:nitrogen_bucket
+cmd give @a siftec:nitric_acid_bucket
+cmd give @a siftec:dark_matter_residue_bucket
+cmd give @a siftec:ignimbrite_bucket
+cmd give @a siftec:turbofuel_bucket
+cmd give @a siftec:vinegar_bucket
+cmd give @a siftec:mead_bucket
+cmd give @a minecraft:water_bucket
+cmd give @a minecraft:lava_bucket
+cmd give @a siftec:mead
+cmd give @a siftec:claim_marker
+cmd give @a siftec:power_pole
+cmd give @a siftec:hub
+cmd give @a siftec:speed_governor
 sleep 3
-key u
-sleep 3
-shot
-key Escape
-cmd execute at @a run setblock ~ ~1 ~2 siftec:mam
-sleep 2
-key u
-sleep 3
-click 784 190
-sleep 2
-shot
-key Escape
-cmd execute at @a run setblock ~ ~1 ~2 siftec:drone_port
-sleep 2
-key u
-sleep 3
-shot
-key Escape
-cmd execute at @a run setblock ~ ~1 ~2 siftec:hub
-sleep 2
-key u
-sleep 3
-shot
-key Escape
-cmd give @a siftec:pickled_tomato 4
-cmd give @a siftec:jetpack
-cmd give @a siftec:blueprint
-cmd give @a siftec:hard_drive
-sleep 2
 key e
-sleep 3
+sleep 2
 shot
-key Escape
