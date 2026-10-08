@@ -1,0 +1,18 @@
+#sleep 5
+siftec worldtest nodes 4000
+siftec worldtest pockets 236,185;2358,-39;1093,2024;-1084,2028;-1163,-2061;1132,-1935;3312,1395;1457,3396;-3427,1246;-1380,-3435;3301,-3185;-3497,-3335;3478,3437;-3298,3403;2275,-1493;2445,2449;-2275,-2899;3525,205;107,-3525;-3593,-371;-1963,-772;-3663,2385;-2847,2562;-2556,-3739;3754,2177
+siftec worldtest place iron
+siftec worldtest place sulfur
+execute in minecraft:the_nether run siftec worldtest place quartz
+siftec worldtest geyser 234 52 187 160
+siftec worldtest geyser 236 52 183 160
+siftec worldtest processor
+siftec worldtest furnace setup
+siftec worldtest powerline setup
+siftec selftest setup
+#sleep 30
+siftec worldtest furnace check
+siftec worldtest powerline check
+siftec selftest check
+siftec node find zinc
+#sleep 170
