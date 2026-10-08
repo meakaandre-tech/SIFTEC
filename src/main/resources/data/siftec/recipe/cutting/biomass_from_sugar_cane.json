@@ -1,9 +1,9 @@
 {
   "type": "create:cutting",
-  "ingredient": "#c:ingots/steel",
+  "ingredient": "minecraft:sugar_cane",
   "results": [
     {
-      "id": "siftec:steel_pipe"
+      "id": "siftec:biomass"
     }
   ],
   "processing_time": 100

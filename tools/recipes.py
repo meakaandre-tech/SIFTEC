@@ -14,10 +14,19 @@ for fid, name, _ in content.FLUIDS:
 
 NAMES = content.names()
 OUT = {}
+# parts that more than one mod makes: a recipe takes any of them, by their common tag
+INGREDIENT_TAGS = {"Steel Ingot": "#c:ingots/steel"}
 
 
 def item(name):
-    """A part name, a full id, or a #tag."""
+    """What a recipe takes: a part name, a full id, or a #tag."""
+    if name in INGREDIENT_TAGS:
+        return INGREDIENT_TAGS[name]
+    return made(name)
+
+
+def made(name):
+    """What a recipe makes: a part name or a full id (never a tag)."""
     if name.startswith("#") or ":" in name:
         return name
     if name not in NAMES:
@@ -26,7 +35,7 @@ def item(name):
 
 
 def res(name, n=1, chance=None):
-    r = {"id": item(name)}
+    r = {"id": made(name)}
     if n != 1:
         r["count"] = n
     if chance is not None:
@@ -43,11 +52,13 @@ def fl_out(name, mb):
 
 
 def slug(name):
-    return item(name).split(":")[-1].replace("/", "_")
+    return made(name).split(":")[-1].replace("/", "_")
 
 
 ALTS = {}    # alternate id -> {"name", "text", "paths"}: the Hard Drive pool
 _alt = None
+LOCKED = {}  # recipe path -> milestone, for recipes whose result alone does not say what unlocks them
+_under = None
 
 
 def add(kind, name, body):
@@ -57,6 +68,14 @@ def add(kind, name, body):
     OUT[path] = body
     if _alt:
         ALTS[_alt]["paths"].append(path)
+    if _under:
+        LOCKED[path] = _under
+
+
+def under(milestone):
+    """Everything added until the next under() (or under(None)) needs this milestone, whatever it makes."""
+    global _under
+    _under = milestone
 
 
 def alt(aid, name, text):
@@ -123,7 +142,7 @@ def crafter(out, parts, n=1, name=None):
     width = 3 if len(cells) > 4 else 2 if len(cells) > 1 else 1
     rows = ["".join(cells[i:i + width]).ljust(width) for i in range(0, len(cells), width)]
     add("mechanical_crafting", name or slug(out), {"type": "create:mechanical_crafting", "key": keys, "pattern": rows,
-        "result": {"count": n, "id": item(out)}})
+        "result": {"count": n, "id": made(out)}})
 
 
 def spout(inp, fluid, mb, out, name=None):
@@ -133,18 +152,18 @@ def spout(inp, fluid, mb, out, name=None):
 def smelt(inp, out, name=None):
     for kind, time in (("smelting", 200), ("blasting", 100)):
         add(kind, name or slug(out), {"type": f"minecraft:{kind}", "category": "misc", "cookingtime": time, "experience": 0.1,
-            "ingredient": item(inp), "result": {"count": 1, "id": item(out)}})
+            "ingredient": item(inp), "result": {"count": 1, "id": made(out)}})
 
 
 def hand(out, parts, n=1, name=None):
     """A crafting-table version of a machine recipe, for before the machine is unlocked."""
     add("crafting", name or slug(out), {"type": "minecraft:crafting_shapeless", "category": "misc",
-        "ingredients": [item(p) for count, p in parts for _ in range(count)], "result": {"count": n, "id": item(out)}})
+        "ingredients": [item(p) for count, p in parts for _ in range(count)], "result": {"count": n, "id": made(out)}})
 
 
 def shaped(out, pattern, key, n=1, name=None):
     add("crafting", name or slug(out), {"type": "minecraft:crafting_shaped", "category": "misc",
-        "key": {k: item(v) for k, v in key.items()}, "pattern": pattern, "result": {"count": n, "id": item(out)}})
+        "key": {k: item(v) for k, v in key.items()}, "pattern": pattern, "result": {"count": n, "id": made(out)}})
 
 
 def sequence(base, out, steps, loops, name=None):
@@ -156,7 +175,7 @@ def sequence(base, out, steps, loops, name=None):
         else:
             seq.append({"type": "create:deploying", "target": "$ingredient", "ingredient": item(step), "results": ["$result"]})
     add("sequenced_assembly", name or slug(out), {"type": "create:sequenced_assembly", "ingredient": item(base),
-        "transitional_item": {"id": "siftec:incomplete_" + slug(out)}, "result": {"id": item(out)}, "loops": loops, "sequence": seq})
+        "transitional_item": {"id": "siftec:incomplete_" + slug(out)}, "result": {"id": made(out)}, "loops": loops, "sequence": seq})
 
 
 def alternates():
@@ -309,6 +328,7 @@ def build():
     OUT.clear()
     ALTS.clear()
     KITCHEN.clear()
+    LOCKED.clear()
     alternates()
     kitchen()
     food()
@@ -322,14 +342,18 @@ def build():
     deploy("Iron Sheet", "Screw", "Reinforced Iron Plate")
     mill("#minecraft:leaves", "Biomass", name="biomass_from_leaves", chance=0.5)
     mill("#minecraft:logs", "Biomass", 4, name="biomass_from_logs")
-    for crop in ("wheat_seeds", "beetroot_seeds", "melon_seeds", "pumpkin_seeds", "kelp", "sugar_cane", "cactus", "short_grass"):
+    for crop in ("wheat_seeds", "beetroot_seeds", "melon_seeds", "pumpkin_seeds", "kelp"):
         mill("minecraft:" + crop, "Biomass", name="biomass_from_" + crop, chance=0.25)
+    # Create already mills these into sugar, green dye and seeds, so their Biomass comes from the Saw (which picks by filter)
+    for crop in ("sugar_cane", "cactus", "short_grass"):
+        saw("minecraft:" + crop, "Biomass", name="biomass_from_" + crop)
     deploy("Iron Rod", "Screw", "Rotor")
     deploy("Reinforced Iron Plate", "Iron Rod", "Modular Frame")
     deploy("Reinforced Iron Plate", "Rotor", "Smart Plating")
     compact("solid_biofuel", items=["Biomass", "Biomass"], results=["Solid Biofuel"])
-    # by hand, until the machines unlock. Sheets and rods both start from ingots, so they are shaped.
-    shaped("Iron Sheet", ["II"], {"I": "Iron Ingot"}, 2, name="iron_sheet_by_hand")
+    # by hand, until the machines unlock. Sheets and rods both start from ingots, so they are shaped
+    # (three in a row: two side by side is the heavy weighted pressure plate)
+    shaped("Iron Sheet", ["III"], {"I": "Iron Ingot"}, 3, name="iron_sheet_by_hand")
     shaped("Iron Rod", ["I", "I"], {"I": "Iron Ingot"}, 2, name="iron_rod_by_hand")
     shaped("Copper Sheet", ["II"], {"I": "Copper Ingot"}, 2, name="copper_sheet_by_hand")
     shaped("Wire", ["I", "I"], {"I": "Copper Ingot"}, 4, name="wire_by_hand")
@@ -341,11 +365,21 @@ def build():
     hand("Modular Frame", [(1, "Reinforced Iron Plate"), (1, "Iron Rod")], name="modular_frame_by_hand")
     hand("Smart Plating", [(1, "Reinforced Iron Plate"), (1, "Rotor")], name="smart_plating_by_hand")
     hand("Solid Biofuel", [(2, "Biomass")], name="solid_biofuel_by_hand")
-    shaped("siftec:equipment_workshop", ["SSS", "RRR", "R R"], {"S": "Iron Sheet", "R": "Iron Rod"}, name="equipment_workshop")
+    shaped("siftec:equipment_workshop", ["SSS", "RSR", "SRS"], {"S": "Iron Sheet", "R": "Iron Rod"}, name="equipment_workshop")
+    # Create's own machines, rewritten with the pack's parts so each can be built at the tier that unlocks it
+    # (Create's recipes need brass and Electron Tubes, which come later; theirs are in REMOVED)
+    shaped("create:deployer", ["R", "C", "P"], {"R": "Rotor", "C": "create:andesite_casing", "P": "Reinforced Iron Plate"}, name="deployer")
+    # the Rebar Gun: Megafauna research, long before the Mechanical Crafter
+    shaped("cgs:nailgun", ["PPT", "RS "], {"P": "Reinforced Iron Plate", "T": "create:copper_backtank", "R": "Iron Rod", "S": "Screw"}, name="nailgun")
 
     # ---- tiers 3 and 4 ------------------------------------------------------------------------
     mix("steel_ingot", items=["Raw Iron", "Coal"], results=["Steel Ingot"], heated=True)
-    press("Steel Ingot", "Steel Beam")
+    # pressed over a Basin: a plain Press already turns a steel ingot into Gunsmithing's Steel Sheet
+    compact("steel_beam", items=["Steel Ingot", "Steel Ingot"], results=["Steel Beam"])
+    # the Xeno-Basher (Enhanced Asset Security)
+    shaped("cgs:hammer", [" PR", " MP", "F  "], {"P": "Reinforced Iron Plate", "R": "Rotor", "M": "Modular Frame", "F": "Iron Rod"}, name="hammer")
+    # Crushing Wheels (Advanced Steel Production) on a crafting table: Create's is a 5x5 Mechanical Crafter recipe
+    shaped("create:crushing_wheel", ["ASA", "SRS", "ASA"], {"A": "create:andesite_alloy", "S": "Steel Beam", "R": "Rotor"}, 2, name="crushing_wheel")
     saw("Steel Ingot", "Steel Pipe")
     deploy("Modular Frame", "Steel Beam", "Versatile Framework")
     deploy("Steel Beam", "Concrete", "Encased Industrial Beam")
@@ -355,11 +389,20 @@ def build():
 
     # ---- tiers 5 and 6 ------------------------------------------------------------------------
     mix("plastic", fluids=[("crude oil", 250)], results=[("Plastic", 2)], fluid_results=[("heavy oil residue", 100)], heated=True)
-    mix("rubber", fluids=[("crude oil", 250)], results=[("Rubber", 2)], fluid_results=[("heavy oil residue", 150)], heated=True)
+    # coal as carbon black: the Mixer prefers the recipe with more ingredients, so coal in the Basin means rubber
+    mix("rubber", items=["Coal"], fluids=[("crude oil", 250)], results=[("Rubber", 2)], fluid_results=[("heavy oil residue", 150)], heated=True)
+    # the Pumpjack crank on a crafting table: Diesel Generators' is a 3x5 Mechanical Crafter recipe (Tier 6)
+    shaped("createdieselgenerators:pumpjack_crank", ["AIA", "ZSZ", "AIA"],
+           {"A": "create:andesite_alloy", "I": "#c:plates/iron", "S": "create:shaft", "Z": "#c:ingots/zinc"}, name="pumpjack_crank")
     compact("petroleum_coke", fluids=[("heavy oil residue", 250)], results=[("Petroleum Coke", 3)], heated=True)
     deploy("Copper Sheet", "Plastic", "Circuit Board")
     press("Plastic", "Empty Canister", 2)
+    under("fluid_packaging")
     mix("liquid_biofuel", items=["Solid Biofuel"], fluids=[("water", 250)], fluid_results=[("biodiesel", 250)], heated=True)
+    under(None)
+    # the Manufacturer (Industrial Manufacturing): Create's needs brass and Electron Tubes, which are MAM research
+    shaped("create:mechanical_crafter", ["B", "C", "T"], {"B": "Circuit Board", "C": "siftec:steel_casing", "T": "minecraft:crafting_table"}, 3,
+           name="mechanical_crafter")
     crafter("Computer", [(2, "Circuit Board"), (2, "Cable"), (4, "Plastic")])
     crafter("Heavy Modular Frame", [(2, "Modular Frame"), (3, "Steel Pipe"), (2, "Encased Industrial Beam"), (2, "Screw")])
     crafter("Modular Engine", [(2, "Motor"), (4, "Rubber"), (2, "Smart Plating")])
@@ -376,7 +419,9 @@ def build():
     crafter("Iodine Infused Filter", [(1, "Gas Filter"), (2, "Quickwire"), (1, "Aluminum Casing")])
 
     # ---- tier 8 (the uranium and plutonium chain went with Create Nuclear) ----------------------
+    under("aeronautical_engineering")
     mix("sulfuric_acid", items=["Sulfur"], fluids=[("water", 250)], fluid_results=[("sulfuric acid", 250)], heated=True)
+    under(None)
     crafter("Supercomputer", [(2, "Computer"), (2, "AI Limiter"), (2, "High-Speed Connector"), (3, "Plastic")])
     deploy("Adaptive Control Unit", "Supercomputer", "Assembly Director System")
     deploy("Stator", "AI Limiter", "Electromagnetic Control Rod")
@@ -388,7 +433,9 @@ def build():
     mix("fused_modular_frame", items=["Heavy Modular Frame"] + ["Aluminum Casing"] * 4, fluids=[("nitrogen", 250)], results=["Fused Modular Frame"], heated=True)
     crafter("Turbo Motor", [(2, "Cooling System"), (1, "Radio Control Unit"), (2, "Motor"), (4, "Rubber")])
     crafter("Thermal Propulsion Rocket", [(3, "Modular Engine"), (2, "Turbo Motor"), (3, "Cooling System"), (1, "Fused Modular Frame")])
+    under("particle_enrichment")
     mix("nitric_acid", items=["Iron Sheet"], fluids=[("nitrogen", 250), ("water", 250)], fluid_results=[("nitric acid", 250)], heated=True)
+    under(None)
     crush("Copper Ingot", "Copper Powder")
     compact("pressure_conversion_cube", items=["Fused Modular Frame", "Radio Control Unit", "Radio Control Unit"], results=["Pressure Conversion Cube"])
 
@@ -404,8 +451,12 @@ def build():
     crafter("Ballistic Warp Drive", [(1, "Thermal Propulsion Rocket"), (3, "Singularity Cell"), (2, "Superposition Oscillator"), (3, "Dark Matter Crystal")])
 
     # ---- MAM parts ----------------------------------------------------------------------------
-    for drop in ("rotten_flesh", "bone", "string", "spider_eye"):
+    under("mam_megafauna_1")   # Hostile Remains
+    for drop in ("rotten_flesh", "string", "spider_eye"):
         mill("minecraft:" + drop, "Biomass", 2, name="biomass_from_" + drop)
+    saw("minecraft:bone", "Biomass", 2, name="biomass_from_bone")  # the Millstone makes bone meal from bones
+    under(None)
+    for drop in ("rotten_flesh", "bone", "string", "spider_eye"):
         compact("dna_capsule_from_" + drop, items=["minecraft:" + drop] * 2, results=["DNA Capsule"])
     # brass, the pack's Caterium: crushed copper and zinc with a flux, then smelted
     for flux, n in (("minecraft:sand", 1), ("Coal", 2), ("Sulfur", 3)):
@@ -416,7 +467,9 @@ def build():
     crafter("High-Speed Connector", [(5, "Quickwire"), (3, "Cable"), (1, "Circuit Board")])
     for mushroom in ("brown_mushroom", "red_mushroom"):
         deploy("Biomass", "minecraft:" + mushroom, "Fabric", name="fabric_from_" + mushroom)
+        under("mam_mycelia_1")   # Mycelia
         mill("minecraft:" + mushroom, "Biomass", name="biomass_from_" + mushroom)
+        under(None)
     crafter("Gas Filter", [(2, "Coal"), (1, "Rubber"), (1, "Fabric")])
     for colour, n in (("Blue", 1), ("Yellow", 2), ("Purple", 5)):
         press(colour + " Power Slug", "Power Shard", n, name="power_shard_from_" + colour.lower() + "_slug")
@@ -425,13 +478,17 @@ def build():
     add("sandpaper_polishing", "quartz_crystal", {"type": "create:sandpaper_polishing", "ingredient": item("Nether Quartz"), "result": res("Quartz Crystal")})
     crafter("Crystal Oscillator", [(4, "Quartz Crystal"), (3, "Cable"), (1, "Reinforced Iron Plate")])
     # the old tweaks pack: gunpowder, Ignimbrite and what it makes
+    under("mam_sulfur_1")   # Black Powder
     for carbon in ("minecraft:coal", "minecraft:charcoal"):
         mix("gunpowder_with_" + slug(carbon), items=["Sulfur", carbon, "minecraft:bone_meal"], results=[("Gunpowder", 3)])
+    under("mam_sulfur_2")   # Ignimbrite: the only way to lava (Ignimbrite, then magma, then lava)
     mix("ignimbrite", items=["minecraft:cobblestone", "Sulfur"], fluid_results=[("ignimbrite", 500)], heated=True)
-    spout("minecraft:barrel", "ignimbrite", 250, "minecraft:tnt")
     spout("minecraft:clay_ball", "ignimbrite", 250, "minecraft:fire_charge")
     compact("magma_block", fluids=[("ignimbrite", 250)], results=["minecraft:magma_block"])
     mix("lava_from_magma_block", items=["minecraft:magma_block"], fluid_results=[("lava", 250)], heated=True)
+    under("mam_sulfur_3")   # Explosives
+    spout("minecraft:barrel", "ignimbrite", 250, "minecraft:tnt")
+    under(None)
     compact("compacted_coal", items=["Coal", "Sulfur"], results=["Compacted Coal"])
     mix("turbofuel", items=["Compacted Coal"], fluids=[("diesel", 250)], fluid_results=[("turbofuel", 250)], heated=True)
     # the sulfuric acid loop: neutralise it, or use it and deal with the residue
@@ -465,6 +522,21 @@ REMOVED = [
     "create:crafting/kinetics/water_wheel", "create:crafting/kinetics/large_water_wheel",
     # washing crushed ore now belongs to the Pure Iron Ingot and Pure Copper Ingot alternates
     "create:splashing/crushed_raw_iron", "create:splashing/crushed_raw_copper",
+    # rewritten in build() with the pack's parts, so each machine can be built at the tier that unlocks it
+    "create:crafting/kinetics/deployer", "create:crafting/kinetics/mechanical_crafter", "create:mechanical_crafting/crushing_wheel",
+    "createdieselgenerators:mechanical_crafting/pumpjack_crank", "cgs:mechanical_crafting/hammer", "cgs:mechanical_crafting/nailgun",
+    # sulfur and lava come only by the owner's routes: no sulfur from crushing magma (Gunsmithing ships this one under
+    # Create's name), no lava from fermenting cobblestone, and no Potent Sulfur (a geyser) from nine Blocks of Sulfur
+    "create:crushing/magma_block", "createdieselgenerators:bulk_fermenting/lava", "minecraft:potent_sulfur",
+    # Create's dough replaces Farmer's Delight's
+    "farmersdelight:wheat_dough_from_egg", "farmersdelight:wheat_dough_from_water", "farmersdelight:bread_from_smelting",
+    "farmersdelight:bread_from_smoking",
+    # what the AWESOME Shop sells is bought, not crafted
+    "create:crafting/appliances/clipboard", "create:crafting/appliances/crafting_blueprint", "create:crafting/appliances/linked_controller",
+    "create:crafting/curiosities/peculiar_bell", "create:crafting/kinetics/copper_valve_handle", "create:crafting/kinetics/cuckoo_clock",
+    "create:crafting/kinetics/placard", "create:crafting/kinetics/steam_whistle", "create:crafting/kinetics/turntable",
+    "create:mechanical_crafting/extendo_grip", "create:mechanical_crafting/potato_cannon", "create:mechanical_crafting/wand_of_symmetry",
+    "create:andesite_table_cloth_from_andesite_alloy_stonecutting",
 ]
 
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked.

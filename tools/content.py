@@ -123,7 +123,7 @@ MILESTONES = [
 
     (2, "part_assembly", "Part Assembly", "200 Cable, 200 Iron Rod, 500 Screw, 300 Iron Sheet", "6:00",
      "Assembler (Deployer), Copper Sheet, Rotor, Modular Frame, Smart Plating",
-     [C + "deployer", "siftec:rotor", "siftec:modular_frame", "siftec:smart_plating"], []),
+     [C + "deployer", C + "copper_sheet", "siftec:rotor", "siftec:modular_frame", "siftec:smart_plating"], []),
     (2, "obstacle_clearing", "Obstacle Clearing", "500 Screw, 100 Cable, 100 Concrete", "3:00",
      "Solid Biofuel, harvesters and ploughs, +3 backpack slots",
      ["siftec:solid_biofuel", C + "mechanical_harvester", C + "mechanical_plough", C + "tree_fertilizer"], ["backpack"]),
@@ -136,11 +136,11 @@ MILESTONES = [
 
     (3, "coal_power", "Coal Power", "150 Reinforced Iron Plate, 50 Rotor, 500 Cable", "8:00",
      "Steam Engine, Blaze Burner, pipes, pumps and tanks, coal nodes on the scanner",
-     [C + "steam_engine", C + "blaze_burner", C + "empty_blaze_burner", C + "fluid_pipe", C + "smart_fluid_pipe", C + "mechanical_pump", C + "fluid_tank", C + "hose_pulley"],
+     [C + "steam_engine", C + "blaze_burner", C + "empty_blaze_burner", C + "fluid_pipe", C + "mechanical_pump", C + "fluid_tank", C + "hose_pulley"],
      ["scanner:coal"]),
     (3, "vehicular_transport", "Vehicular Transport", "25 Modular Frame, 100 Rotor, 200 Cable, 400 Iron Rod", "4:00",
      "Cart Assembler, Rope Pulley, +3 backpack slots",
-     [C + "cart_assembler", C + "rope_pulley", C + "controller_rail", C + "minecart_coupling"], ["backpack"]),
+     [C + "cart_assembler", C + "rope_pulley", C + "minecart_coupling"], ["backpack"]),
     (3, "basic_steel_production", "Basic Steel Production", "50 Modular Frame, 150 Rotor, 500 Concrete, 1000 Wire", "8:00",
      "Foundry (Mechanical Mixer), Steel Ingot, Steel Beam, Steel Pipe, Versatile Framework",
      [C + "mechanical_mixer", "cgs:steel_ingot", "siftec:steel_casing", "siftec:steel_beam", "siftec:steel_pipe", "siftec:versatile_framework"], []),
@@ -189,9 +189,9 @@ MILESTONES = [
      "Mechanical Pump range and flow rate doubled", [], ["pumps:2"]),
 
     (7, "bauxite_refinement", "Bauxite Refinement", "50 Computer, 100 Heavy Modular Frame, 200 Motor, 500 Rubber", "10:00",
-     "Aluminium chain and Radio Control Unit, bauxite nodes on the scanner",
+     "Aluminium chain and Radio Control Unit, bauxite and quartz nodes on the scanner",
      ["siftec:crushed_bauxite", "siftec:aluminum_scrap", "siftec:aluminum_ingot", "siftec:alclad_aluminum_sheet", "siftec:aluminum_casing",
-      "siftec:radio_control_unit"], ["scanner:bauxite"]),
+      "siftec:radio_control_unit"], ["scanner:bauxite", "scanner:quartz"]),
     (7, "logistics_mk5", "Logistics Mk.5", "100 Alclad Aluminum Sheet, 200 Encased Industrial Beam, 300 Reinforced Iron Plate", "1:00",
      "Company speed limit raised to 192 RPM", [], ["cap:192"]),
     (7, "hazmat_suit", "Hazmat Suit", "50 Aluminum Casing, 500 Quickwire, 50 Gas Filter", "5:00",
@@ -204,8 +204,8 @@ MILESTONES = [
      ["siftec:drone_port", "siftec:cardboard_drone", C + "packager", C + "package_frogport", C + "repackager", C + "stock_link", C + "stock_ticker",
       C + "redstone_requester", C + "factory_gauge", C + "chain_conveyor", "siftec:supercomputer", "siftec:assembly_director_system"], ["scanner:sulfur"]),
     (8, "advanced_aluminum_production", "Advanced Aluminum Production", "50 Radio Control Unit, 200 Aluminum Casing, 200 Alclad Aluminum Sheet, 300 Wire", "15:00",
-     "Resource Well extractor, Heat Sink, Cooling System, Fused Modular Frame, Electromagnetic Control Rod, nitrogen nodes on the scanner",
-     ["siftec:resource_well_extractor", "siftec:empty_fluid_tank", "siftec:heat_sink", "siftec:cooling_system", "siftec:fused_modular_frame",
+     "Resource Well extractor, packaged nitrogen, Heat Sink, Cooling System, Fused Modular Frame, Electromagnetic Control Rod, nitrogen nodes on the scanner",
+     ["siftec:resource_well_extractor", "siftec:empty_fluid_tank", "siftec:packaged_nitrogen_gas", "siftec:heat_sink", "siftec:cooling_system", "siftec:fused_modular_frame",
       "siftec:electromagnetic_control_rod"], ["scanner:nitrogen"]),
     (8, "leading_edge_production", "Leading-edge Production", "50 Fused Modular Frame, 100 Supercomputer, 1000 Steel Pipe", "5:00",
      "Miner Mk.3, Turbo Motor, Thermal Propulsion Rocket, Magnetic Field Generator",
@@ -232,7 +232,8 @@ MILESTONES = [
 
 # Switched off for good: they can be neither crafted nor placed.
 DISABLED = [C + "water_wheel", C + "large_water_wheel", C + "blaze_cake", C + "blaze_cake_base", C + "creative_blaze_cake",
-            "the_sift:sift_portal", "the_sift:sift_rift", C + "chromatic_compound", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill"]
+            "the_sift:sift_portal", "the_sift:sift_rift", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill",
+            C + "schematic", "farmersdelight:wheat_dough"]   # Create's dough replaces Farmer's Delight's
 
 # Wormhole phases, delivered at the Wormhole Gateway. Phase n opens the tiers listed.
 PHASES = [
@@ -279,8 +280,9 @@ MAM = [
     ("caterium", "Caterium", C + "raw_zinc", [
         ("Caterium", "10 Raw Zinc", "0:30", "Brass blend, Brass Ingot, Brass Sheet", [], ["siftec:brass_blend", C + "brass_ingot", C + "brass_sheet"], []),
         ("Quickwire", "10 Brass Ingot", "1:00", "Quickwire", [1], ["siftec:quickwire"], []),
-        ("Caterium Electronics", "50 Quickwire", "2:00", "Electron Tube, Precision Mechanism, Brass Funnel, Brass Tunnel, Smart Chute, filters", [2],
-         [C + "electron_tube", C + "precision_mechanism", C + "brass_funnel", C + "brass_tunnel", C + "smart_chute", C + "filter", C + "attribute_filter"], []),
+        ("Caterium Electronics", "50 Quickwire", "2:00", "Electron Tube, Precision Mechanism, Brass Funnel, Brass Tunnel, Smart Chute, filters, Smart Fluid Pipe, Controller Rail", [2],
+         [C + "electron_tube", C + "precision_mechanism", C + "brass_funnel", C + "brass_tunnel", C + "smart_chute", C + "filter", C + "attribute_filter",
+          C + "smart_fluid_pipe", C + "controller_rail"], []),
         ("AI Limiter", "100 Quickwire, 50 Copper Sheet", "3:00", "AI Limiter, Mechanical Arm", [3], ["siftec:ai_limiter", C + "mechanical_arm"], []),
         ("Power Switch", "50 Quickwire, 25 Rotor", "2:00", "Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Speed Governor", [2],
          [C + "clutch", C + "gearshift", C + "sequenced_gearshift", C + "adjustable_chain_gearshift", "siftec:speed_governor"], []),
@@ -384,7 +386,104 @@ SINK_POINTS = {
 SHOP = [
     (C + "potato_cannon", 1, 3000), (C + "extendo_grip", 1, 3000), (C + "wand_of_symmetry", 1, 5000), (C + "linked_controller", 1, 3000),
     (C + "cuckoo_clock", 1, 500), (C + "steam_whistle", 1, 500), (C + "peculiar_bell", 1, 1000), (C + "clipboard", 1, 200), (C + "placard", 4, 200),
-    (C + "turntable", 1, 500), (C + "crafting_blueprint", 1, 500), (C + "valve_handle", 4, 200), (C + "andesite_table_cloth", 4, 200),
+    (C + "turntable", 1, 500), (C + "crafting_blueprint", 1, 500), (C + "copper_valve_handle", 4, 200), (C + "andesite_table_cloth", 4, 200),
     ("minecraft:white_dye", 16, 100), ("minecraft:red_dye", 16, 100), ("minecraft:blue_dye", 16, 100), ("minecraft:yellow_dye", 16, 100),
     ("minecraft:green_dye", 16, 100), ("minecraft:black_dye", 16, 100), ("minecraft:orange_dye", 16, 100), ("minecraft:light_blue_dye", 16, 100),
 ]
+
+# Furnace burn times, in ticks (coal is 1600), after Satisfactory's energy values. A Blaze Burner burns anything a
+# furnace burns, so these heat boilers too, and the Furnace Engine runs off the furnace they burn in.
+FUELS = {"biomass": 960, "solid_biofuel": 2400, "compacted_coal": 3360, "petroleum_coke": 960}
+
+# ---------------------------------------------------------------------------------------------------
+# Everything else the other mods add. Locked by default: an item from Create, Diesel Generators, Gunsmithing or
+# Hypertubes is unlocked by a milestone above, by one here (MORE_LOCKS), left free on purpose (FREE), switched
+# off (DISABLED) or sold in the AWESOME Shop (SHOP, whose crafting recipes are removed). gen_assets.py stops
+# with a list if any item is in none of these.
+COLOURS = "white orange magenta light_blue yellow lime pink gray light_gray cyan purple blue brown green red black".split()
+WOODS = "oak spruce birch jungle acacia dark_oak mangrove cherry bamboo crimson warped".split()
+STONES = "andesite asurine calcite crimsite deepslate diorite dripstone granite limestone ochrum scorchia scoria tuff veridium".split()
+
+
+def _palette(stone):
+    """Create's cut, polished, brick and pillar blocks for one stone."""
+    out = [f"cut_{stone}", f"polished_cut_{stone}", f"small_{stone}_bricks", f"cut_{stone}_bricks", f"layered_{stone}", f"{stone}_pillar"]
+    for base in (f"cut_{stone}", f"polished_cut_{stone}", f"small_{stone}_brick", f"cut_{stone}_brick"):
+        out += [base + "_slab", base + "_stairs", base + "_wall"]
+    return [C + i for i in out]
+
+
+def _roofs():
+    out = []
+    for wax in ("", "waxed_"):
+        for age in ("", "exposed_", "weathered_", "oxidized_"):
+            for kind in ("shingle", "tile"):
+                out += [f"{C}{wax}{age}copper_{kind}s", f"{C}{wax}{age}copper_{kind}_slab", f"{C}{wax}{age}copper_{kind}_stairs"]
+    return out
+
+
+DG, G, H = "createdieselgenerators:", "cgs:", "create_hypertube:"
+MORE_LOCKS = {
+    # factory building blocks
+    "base_building": [C + "copper_casing", C + "andesite_bars", C + "copper_bars", C + "andesite_door", C + "copper_door",
+                      C + "framed_glass", C + "framed_glass_pane", C + "framed_glass_door", C + "framed_glass_trapdoor",
+                      C + "horizontal_framed_glass", C + "horizontal_framed_glass_pane", C + "vertical_framed_glass", C + "vertical_framed_glass_pane",
+                      C + "tiled_glass", C + "tiled_glass_pane", C + "ornate_iron_window", C + "ornate_iron_window_pane",
+                      C + "industrial_iron_block", C + "industrial_iron_window", C + "industrial_iron_window_pane",
+                      C + "weathered_iron_block", C + "weathered_iron_window", C + "weathered_iron_window_pane",
+                      DG + "andesite_girder", DG + "chip_wood_block", DG + "chip_wood_slab", DG + "chip_wood_stairs", DG + "chip_wood_beam"]
+                     + [f"{C}{w}_window{p}" for w in WOODS for p in ("", "_pane")] + [f"{C}{c}_seat" for c in COLOURS]
+                     + _roofs() + [i for s in STONES for i in _palette(s)],
+    # with the AWESOME Shop: the dyed and haunted versions of what it sells, and the rest of the design's Shop list
+    "resource_sink_bonus_program": [C + "desk_bell", C + "haunted_bell", C + "mysterious_cuckoo_clock", C + "metal_bracket", C + "wooden_bracket",
+                                    C + "copper_table_cloth"] + [f"{C}{c}_table_cloth" for c in COLOURS] + [f"{C}{c}_valve_handle" for c in COLOURS],
+    "basic_steel_production": [G + "steel_nugget", G + "steel_block", G + "steel_sheet"],
+    # melee weapons go with the Xeno-Basher
+    "enhanced_asset_security": [G + "hammer_stone", G + "hammer_iron", G + "hammer_diamond", G + "hammer_netherite", G + "axe_stone", G + "axe_iron",
+                                G + "axe_diamond", G + "axe_netherite", G + "hammer_chamber", G + "spear", G + "bayonet", G + "big_bayonet"],
+    "expanded_power_infrastructure": [C + "piston_extension_pole", C + "secondary_linear_chassis", C + "elevator_contact"],
+    "hypertubes": [H + "hypertube_funnel", H + "redstone_detector_tube_attachment", H + "tube_scanner_attachment"],
+    "oil_processing": [DG + "asphalt_block", DG + "asphalt_slab", DG + "asphalt_stairs", DG + "oil_scanner", DG + "mold", DG + "sheet_metal_panel",
+                       DG + "hammer", DG + "wire_cutters"],
+    "fluid_packaging": [DG + "oil_barrel"],
+    "petroleum_power": [DG + "burner", DG + "engine_piston", DG + "engine_silencer", DG + "engine_turbocharger", DG + "lighter"],
+    "industrial_manufacturing": [C + "crafter_slot_cover"],
+    "monorail_train_technology": [C + "train_door", C + "train_trapdoor", DG + "track_layers_bag"] + [f"{C}{c}_postbox" for c in COLOURS],
+    "aeronautical_engineering": [C + "cardboard", C + "cardboard_block", C + "bound_cardboard_block", C + "cardboard_helmet", C + "cardboard_chestplate",
+                                 C + "cardboard_leggings", C + "cardboard_boots", C + "cardboard_sword", C + "package_filter"],
+    # MAM research
+    "mam_megafauna_3": [G + "nail", G + "nail_steel", G + "nailgun_splitter"],
+    "mam_caterium_1": [C + "zinc_ingot", C + "zinc_nugget", C + "zinc_block", C + "brass_nugget", C + "brass_block", C + "brass_casing", C + "brass_bars",
+                       C + "brass_door", C + "brass_ladder", C + "brass_scaffolding", C + "brass_table_cloth", C + "brass_encased_shaft",
+                       C + "brass_encased_cogwheel", C + "brass_encased_large_cogwheel"],
+    "mam_caterium_3": [DG + "entity_filter"],
+    "mam_nutrients_1": [DG + "basin_lid"],
+    "mam_quartz_3": [C + "polished_rose_quartz", C + "rose_quartz_block", C + "rose_quartz_lamp", C + "rose_quartz_tiles", C + "small_rose_quartz_tiles"],
+    "mam_quartz_5": [C + "transmitter"],
+    # guns: the flintlock with black powder, then the Rifle and Heavy Weapons nodes with their parts and rounds
+    "mam_sulfur_1": [G + "flintlock", G + "flintlock_chambers", G + "flintlock_long_barrel", G + "blunderbuss_barrel",
+                     G + "blunderbuss_barrel_long", G + "stock", G + "scope", G + "paper_cartridge", G + "paper_shot", G + "lead_balls"],
+    "mam_sulfur_4": [G + "long_barrel", G + "auto_fire", G + "round_belt", G + "shotgun_drum", G + "shotgun_long_barrel", G + "shotgun_pump",
+                     G + "shotgun_spread_barrel", G + "press_form_revolver", G + "press_form_shotgun", G + "round_revolver", G + "round_revolver_blank",
+                     G + "round_revolver_piercing", G + "round_shotgun", G + "round_shotgun_blank", G + "round_shotgun_flechette",
+                     G + "round_shotgun_flechette_steel", G + "round_shotgun_incendiary"],
+    "mam_sulfur_5": [G + "gatling_drum", G + "press_form_gatling", G + "round_gatling", G + "round_gatling_blank", G + "round_gatling_piercing",
+                     G + "rocket", G + "rocket_small", G + "launcher_auto", G + "ballistazooka", G + "blazegun", G + "steam_engine", G + "tank_empty",
+                     G + "tank_lava", G + "tank_water", DG + "chemical_sprayer", DG + "chemical_sprayer_lighter", DG + "chemical_turret"],
+}
+# Never locked: the starting kinetics, raw and crushed materials, crafting ingredients, food, fluids in buckets,
+# creative-only and contraption items, and what machines make on their own (packages, half-made parts)
+FREE = [C + i for i in (
+    "shaft cogwheel large_cogwheel gearbox vertical_gearbox encased_chain_drive hand_crank andesite_alloy andesite_alloy_block andesite_casing "
+    "andesite_encased_shaft andesite_encased_cogwheel andesite_encased_large_cogwheel iron_sheet golden_sheet sturdy_sheet brass_hand propeller whisk "
+    "unprocessed_obsidian_sheet powdered_obsidian pulp raw_zinc raw_zinc_block zinc_ore deepslate_zinc_ore limestone asurine crimsite ochrum scorchia "
+    "scoria veridium bar_of_chocolate builders_tea chocolate_glazed_berries dough honeyed_apple sweet_roll wheat_flour cinder_flour chocolate_bucket "
+    "honey_bucket experience_nugget experience_block incomplete_precision_mechanism incomplete_track creative_crate creative_fluid_tank creative_motor "
+    "handheld_worldshaper minecart_contraption chest_minecart_contraption furnace_minecart_contraption refined_radiance_casing shadow_steel_casing "
+    "shopping_list cardboard_package_10x8 cardboard_package_10x12 cardboard_package_12x10 cardboard_package_12x12").split()] \
+    + [f"{C}crushed_raw_{m}" for m in "iron copper gold zinc lead aluminum nickel osmium platinum quicksilver silver tin uranium".split()] \
+    + [f"{C}rare_{n}_package" for n in "creeper darcy evan jinx kryppers simi starlotte thunder up vector".split()] \
+    + [G + i for i in "sulfur sulfur_ore lead_ore deepslate_lead_ore raw_lead raw_lead_block lead_ingot lead_nugget lead_block niter guano charcoal_dust "
+       "shell_gatling shell_revolver shell_shotgun".split()] \
+    + [DG + i for i in "kelp_handle wood_chip crude_oil_bucket diesel_bucket gasoline_bucket biodiesel_bucket ethanol_bucket plant_oil_bucket".split()] \
+    + [f"{DG}{c}_cement_bucket" for c in COLOURS] + [H + "tube_scanner_unfinished"]

@@ -9,6 +9,9 @@
   ],
   "type": "create:mixing",
   "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:coal"
+  ],
   "fluid_ingredients": [
     {
       "type": "fluid_stack",

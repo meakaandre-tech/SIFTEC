@@ -16,10 +16,12 @@
       "id": "reinforced_iron_plate"
     },
     {
-      "id": "biomass"
+      "id": "biomass",
+      "fuel": "cooking/time_biomass"
     },
     {
-      "id": "solid_biofuel"
+      "id": "solid_biofuel",
+      "fuel": "cooking/time_solid_biofuel"
     },
     {
       "id": "rotor"
@@ -58,7 +60,8 @@
       "id": "rubber"
     },
     {
-      "id": "petroleum_coke"
+      "id": "petroleum_coke",
+      "fuel": "cooking/time_petroleum_coke"
     },
     {
       "id": "circuit_board"
@@ -202,7 +205,8 @@
       "id": "crystal_oscillator"
     },
     {
-      "id": "compacted_coal"
+      "id": "compacted_coal",
+      "fuel": "cooking/time_compacted_coal"
     },
     {
       "id": "brass_blend"
@@ -427,7 +431,373 @@
         "create:copper_ladder",
         "create:copper_scaffolding",
         "create:copycat_panel",
-        "create:copycat_step"
+        "create:copycat_step",
+        "create:copper_casing",
+        "create:andesite_bars",
+        "create:copper_bars",
+        "create:andesite_door",
+        "create:copper_door",
+        "create:framed_glass",
+        "create:framed_glass_pane",
+        "create:framed_glass_door",
+        "create:framed_glass_trapdoor",
+        "create:horizontal_framed_glass",
+        "create:horizontal_framed_glass_pane",
+        "create:vertical_framed_glass",
+        "create:vertical_framed_glass_pane",
+        "create:tiled_glass",
+        "create:tiled_glass_pane",
+        "create:ornate_iron_window",
+        "create:ornate_iron_window_pane",
+        "create:industrial_iron_block",
+        "create:industrial_iron_window",
+        "create:industrial_iron_window_pane",
+        "create:weathered_iron_block",
+        "create:weathered_iron_window",
+        "create:weathered_iron_window_pane",
+        "createdieselgenerators:andesite_girder",
+        "createdieselgenerators:chip_wood_block",
+        "createdieselgenerators:chip_wood_slab",
+        "createdieselgenerators:chip_wood_stairs",
+        "createdieselgenerators:chip_wood_beam",
+        "create:oak_window",
+        "create:oak_window_pane",
+        "create:spruce_window",
+        "create:spruce_window_pane",
+        "create:birch_window",
+        "create:birch_window_pane",
+        "create:jungle_window",
+        "create:jungle_window_pane",
+        "create:acacia_window",
+        "create:acacia_window_pane",
+        "create:dark_oak_window",
+        "create:dark_oak_window_pane",
+        "create:mangrove_window",
+        "create:mangrove_window_pane",
+        "create:cherry_window",
+        "create:cherry_window_pane",
+        "create:bamboo_window",
+        "create:bamboo_window_pane",
+        "create:crimson_window",
+        "create:crimson_window_pane",
+        "create:warped_window",
+        "create:warped_window_pane",
+        "create:white_seat",
+        "create:orange_seat",
+        "create:magenta_seat",
+        "create:light_blue_seat",
+        "create:yellow_seat",
+        "create:lime_seat",
+        "create:pink_seat",
+        "create:gray_seat",
+        "create:light_gray_seat",
+        "create:cyan_seat",
+        "create:purple_seat",
+        "create:blue_seat",
+        "create:brown_seat",
+        "create:green_seat",
+        "create:red_seat",
+        "create:black_seat",
+        "create:copper_shingles",
+        "create:copper_shingle_slab",
+        "create:copper_shingle_stairs",
+        "create:copper_tiles",
+        "create:copper_tile_slab",
+        "create:copper_tile_stairs",
+        "create:exposed_copper_shingles",
+        "create:exposed_copper_shingle_slab",
+        "create:exposed_copper_shingle_stairs",
+        "create:exposed_copper_tiles",
+        "create:exposed_copper_tile_slab",
+        "create:exposed_copper_tile_stairs",
+        "create:weathered_copper_shingles",
+        "create:weathered_copper_shingle_slab",
+        "create:weathered_copper_shingle_stairs",
+        "create:weathered_copper_tiles",
+        "create:weathered_copper_tile_slab",
+        "create:weathered_copper_tile_stairs",
+        "create:oxidized_copper_shingles",
+        "create:oxidized_copper_shingle_slab",
+        "create:oxidized_copper_shingle_stairs",
+        "create:oxidized_copper_tiles",
+        "create:oxidized_copper_tile_slab",
+        "create:oxidized_copper_tile_stairs",
+        "create:waxed_copper_shingles",
+        "create:waxed_copper_shingle_slab",
+        "create:waxed_copper_shingle_stairs",
+        "create:waxed_copper_tiles",
+        "create:waxed_copper_tile_slab",
+        "create:waxed_copper_tile_stairs",
+        "create:waxed_exposed_copper_shingles",
+        "create:waxed_exposed_copper_shingle_slab",
+        "create:waxed_exposed_copper_shingle_stairs",
+        "create:waxed_exposed_copper_tiles",
+        "create:waxed_exposed_copper_tile_slab",
+        "create:waxed_exposed_copper_tile_stairs",
+        "create:waxed_weathered_copper_shingles",
+        "create:waxed_weathered_copper_shingle_slab",
+        "create:waxed_weathered_copper_shingle_stairs",
+        "create:waxed_weathered_copper_tiles",
+        "create:waxed_weathered_copper_tile_slab",
+        "create:waxed_weathered_copper_tile_stairs",
+        "create:waxed_oxidized_copper_shingles",
+        "create:waxed_oxidized_copper_shingle_slab",
+        "create:waxed_oxidized_copper_shingle_stairs",
+        "create:waxed_oxidized_copper_tiles",
+        "create:waxed_oxidized_copper_tile_slab",
+        "create:waxed_oxidized_copper_tile_stairs",
+        "create:cut_andesite",
+        "create:polished_cut_andesite",
+        "create:small_andesite_bricks",
+        "create:cut_andesite_bricks",
+        "create:layered_andesite",
+        "create:andesite_pillar",
+        "create:cut_andesite_slab",
+        "create:cut_andesite_stairs",
+        "create:cut_andesite_wall",
+        "create:polished_cut_andesite_slab",
+        "create:polished_cut_andesite_stairs",
+        "create:polished_cut_andesite_wall",
+        "create:small_andesite_brick_slab",
+        "create:small_andesite_brick_stairs",
+        "create:small_andesite_brick_wall",
+        "create:cut_andesite_brick_slab",
+        "create:cut_andesite_brick_stairs",
+        "create:cut_andesite_brick_wall",
+        "create:cut_asurine",
+        "create:polished_cut_asurine",
+        "create:small_asurine_bricks",
+        "create:cut_asurine_bricks",
+        "create:layered_asurine",
+        "create:asurine_pillar",
+        "create:cut_asurine_slab",
+        "create:cut_asurine_stairs",
+        "create:cut_asurine_wall",
+        "create:polished_cut_asurine_slab",
+        "create:polished_cut_asurine_stairs",
+        "create:polished_cut_asurine_wall",
+        "create:small_asurine_brick_slab",
+        "create:small_asurine_brick_stairs",
+        "create:small_asurine_brick_wall",
+        "create:cut_asurine_brick_slab",
+        "create:cut_asurine_brick_stairs",
+        "create:cut_asurine_brick_wall",
+        "create:cut_calcite",
+        "create:polished_cut_calcite",
+        "create:small_calcite_bricks",
+        "create:cut_calcite_bricks",
+        "create:layered_calcite",
+        "create:calcite_pillar",
+        "create:cut_calcite_slab",
+        "create:cut_calcite_stairs",
+        "create:cut_calcite_wall",
+        "create:polished_cut_calcite_slab",
+        "create:polished_cut_calcite_stairs",
+        "create:polished_cut_calcite_wall",
+        "create:small_calcite_brick_slab",
+        "create:small_calcite_brick_stairs",
+        "create:small_calcite_brick_wall",
+        "create:cut_calcite_brick_slab",
+        "create:cut_calcite_brick_stairs",
+        "create:cut_calcite_brick_wall",
+        "create:cut_crimsite",
+        "create:polished_cut_crimsite",
+        "create:small_crimsite_bricks",
+        "create:cut_crimsite_bricks",
+        "create:layered_crimsite",
+        "create:crimsite_pillar",
+        "create:cut_crimsite_slab",
+        "create:cut_crimsite_stairs",
+        "create:cut_crimsite_wall",
+        "create:polished_cut_crimsite_slab",
+        "create:polished_cut_crimsite_stairs",
+        "create:polished_cut_crimsite_wall",
+        "create:small_crimsite_brick_slab",
+        "create:small_crimsite_brick_stairs",
+        "create:small_crimsite_brick_wall",
+        "create:cut_crimsite_brick_slab",
+        "create:cut_crimsite_brick_stairs",
+        "create:cut_crimsite_brick_wall",
+        "create:cut_deepslate",
+        "create:polished_cut_deepslate",
+        "create:small_deepslate_bricks",
+        "create:cut_deepslate_bricks",
+        "create:layered_deepslate",
+        "create:deepslate_pillar",
+        "create:cut_deepslate_slab",
+        "create:cut_deepslate_stairs",
+        "create:cut_deepslate_wall",
+        "create:polished_cut_deepslate_slab",
+        "create:polished_cut_deepslate_stairs",
+        "create:polished_cut_deepslate_wall",
+        "create:small_deepslate_brick_slab",
+        "create:small_deepslate_brick_stairs",
+        "create:small_deepslate_brick_wall",
+        "create:cut_deepslate_brick_slab",
+        "create:cut_deepslate_brick_stairs",
+        "create:cut_deepslate_brick_wall",
+        "create:cut_diorite",
+        "create:polished_cut_diorite",
+        "create:small_diorite_bricks",
+        "create:cut_diorite_bricks",
+        "create:layered_diorite",
+        "create:diorite_pillar",
+        "create:cut_diorite_slab",
+        "create:cut_diorite_stairs",
+        "create:cut_diorite_wall",
+        "create:polished_cut_diorite_slab",
+        "create:polished_cut_diorite_stairs",
+        "create:polished_cut_diorite_wall",
+        "create:small_diorite_brick_slab",
+        "create:small_diorite_brick_stairs",
+        "create:small_diorite_brick_wall",
+        "create:cut_diorite_brick_slab",
+        "create:cut_diorite_brick_stairs",
+        "create:cut_diorite_brick_wall",
+        "create:cut_dripstone",
+        "create:polished_cut_dripstone",
+        "create:small_dripstone_bricks",
+        "create:cut_dripstone_bricks",
+        "create:layered_dripstone",
+        "create:dripstone_pillar",
+        "create:cut_dripstone_slab",
+        "create:cut_dripstone_stairs",
+        "create:cut_dripstone_wall",
+        "create:polished_cut_dripstone_slab",
+        "create:polished_cut_dripstone_stairs",
+        "create:polished_cut_dripstone_wall",
+        "create:small_dripstone_brick_slab",
+        "create:small_dripstone_brick_stairs",
+        "create:small_dripstone_brick_wall",
+        "create:cut_dripstone_brick_slab",
+        "create:cut_dripstone_brick_stairs",
+        "create:cut_dripstone_brick_wall",
+        "create:cut_granite",
+        "create:polished_cut_granite",
+        "create:small_granite_bricks",
+        "create:cut_granite_bricks",
+        "create:layered_granite",
+        "create:granite_pillar",
+        "create:cut_granite_slab",
+        "create:cut_granite_stairs",
+        "create:cut_granite_wall",
+        "create:polished_cut_granite_slab",
+        "create:polished_cut_granite_stairs",
+        "create:polished_cut_granite_wall",
+        "create:small_granite_brick_slab",
+        "create:small_granite_brick_stairs",
+        "create:small_granite_brick_wall",
+        "create:cut_granite_brick_slab",
+        "create:cut_granite_brick_stairs",
+        "create:cut_granite_brick_wall",
+        "create:cut_limestone",
+        "create:polished_cut_limestone",
+        "create:small_limestone_bricks",
+        "create:cut_limestone_bricks",
+        "create:layered_limestone",
+        "create:limestone_pillar",
+        "create:cut_limestone_slab",
+        "create:cut_limestone_stairs",
+        "create:cut_limestone_wall",
+        "create:polished_cut_limestone_slab",
+        "create:polished_cut_limestone_stairs",
+        "create:polished_cut_limestone_wall",
+        "create:small_limestone_brick_slab",
+        "create:small_limestone_brick_stairs",
+        "create:small_limestone_brick_wall",
+        "create:cut_limestone_brick_slab",
+        "create:cut_limestone_brick_stairs",
+        "create:cut_limestone_brick_wall",
+        "create:cut_ochrum",
+        "create:polished_cut_ochrum",
+        "create:small_ochrum_bricks",
+        "create:cut_ochrum_bricks",
+        "create:layered_ochrum",
+        "create:ochrum_pillar",
+        "create:cut_ochrum_slab",
+        "create:cut_ochrum_stairs",
+        "create:cut_ochrum_wall",
+        "create:polished_cut_ochrum_slab",
+        "create:polished_cut_ochrum_stairs",
+        "create:polished_cut_ochrum_wall",
+        "create:small_ochrum_brick_slab",
+        "create:small_ochrum_brick_stairs",
+        "create:small_ochrum_brick_wall",
+        "create:cut_ochrum_brick_slab",
+        "create:cut_ochrum_brick_stairs",
+        "create:cut_ochrum_brick_wall",
+        "create:cut_scorchia",
+        "create:polished_cut_scorchia",
+        "create:small_scorchia_bricks",
+        "create:cut_scorchia_bricks",
+        "create:layered_scorchia",
+        "create:scorchia_pillar",
+        "create:cut_scorchia_slab",
+        "create:cut_scorchia_stairs",
+        "create:cut_scorchia_wall",
+        "create:polished_cut_scorchia_slab",
+        "create:polished_cut_scorchia_stairs",
+        "create:polished_cut_scorchia_wall",
+        "create:small_scorchia_brick_slab",
+        "create:small_scorchia_brick_stairs",
+        "create:small_scorchia_brick_wall",
+        "create:cut_scorchia_brick_slab",
+        "create:cut_scorchia_brick_stairs",
+        "create:cut_scorchia_brick_wall",
+        "create:cut_scoria",
+        "create:polished_cut_scoria",
+        "create:small_scoria_bricks",
+        "create:cut_scoria_bricks",
+        "create:layered_scoria",
+        "create:scoria_pillar",
+        "create:cut_scoria_slab",
+        "create:cut_scoria_stairs",
+        "create:cut_scoria_wall",
+        "create:polished_cut_scoria_slab",
+        "create:polished_cut_scoria_stairs",
+        "create:polished_cut_scoria_wall",
+        "create:small_scoria_brick_slab",
+        "create:small_scoria_brick_stairs",
+        "create:small_scoria_brick_wall",
+        "create:cut_scoria_brick_slab",
+        "create:cut_scoria_brick_stairs",
+        "create:cut_scoria_brick_wall",
+        "create:cut_tuff",
+        "create:polished_cut_tuff",
+        "create:small_tuff_bricks",
+        "create:cut_tuff_bricks",
+        "create:layered_tuff",
+        "create:tuff_pillar",
+        "create:cut_tuff_slab",
+        "create:cut_tuff_stairs",
+        "create:cut_tuff_wall",
+        "create:polished_cut_tuff_slab",
+        "create:polished_cut_tuff_stairs",
+        "create:polished_cut_tuff_wall",
+        "create:small_tuff_brick_slab",
+        "create:small_tuff_brick_stairs",
+        "create:small_tuff_brick_wall",
+        "create:cut_tuff_brick_slab",
+        "create:cut_tuff_brick_stairs",
+        "create:cut_tuff_brick_wall",
+        "create:cut_veridium",
+        "create:polished_cut_veridium",
+        "create:small_veridium_bricks",
+        "create:cut_veridium_bricks",
+        "create:layered_veridium",
+        "create:veridium_pillar",
+        "create:cut_veridium_slab",
+        "create:cut_veridium_stairs",
+        "create:cut_veridium_wall",
+        "create:polished_cut_veridium_slab",
+        "create:polished_cut_veridium_stairs",
+        "create:polished_cut_veridium_wall",
+        "create:small_veridium_brick_slab",
+        "create:small_veridium_brick_stairs",
+        "create:small_veridium_brick_wall",
+        "create:cut_veridium_brick_slab",
+        "create:cut_veridium_brick_stairs",
+        "create:cut_veridium_brick_wall"
       ],
       "tokens": []
     },
@@ -524,6 +894,7 @@
       "seconds": 360,
       "items": [
         "create:deployer",
+        "create:copper_sheet",
         "siftec:rotor",
         "siftec:modular_frame",
         "siftec:smart_plating"
@@ -606,7 +977,45 @@
       "seconds": 300,
       "items": [
         "siftec:awesome_sink",
-        "siftec:awesome_shop"
+        "siftec:awesome_shop",
+        "create:desk_bell",
+        "create:haunted_bell",
+        "create:mysterious_cuckoo_clock",
+        "create:metal_bracket",
+        "create:wooden_bracket",
+        "create:copper_table_cloth",
+        "create:white_table_cloth",
+        "create:orange_table_cloth",
+        "create:magenta_table_cloth",
+        "create:light_blue_table_cloth",
+        "create:yellow_table_cloth",
+        "create:lime_table_cloth",
+        "create:pink_table_cloth",
+        "create:gray_table_cloth",
+        "create:light_gray_table_cloth",
+        "create:cyan_table_cloth",
+        "create:purple_table_cloth",
+        "create:blue_table_cloth",
+        "create:brown_table_cloth",
+        "create:green_table_cloth",
+        "create:red_table_cloth",
+        "create:black_table_cloth",
+        "create:white_valve_handle",
+        "create:orange_valve_handle",
+        "create:magenta_valve_handle",
+        "create:light_blue_valve_handle",
+        "create:yellow_valve_handle",
+        "create:lime_valve_handle",
+        "create:pink_valve_handle",
+        "create:gray_valve_handle",
+        "create:light_gray_valve_handle",
+        "create:cyan_valve_handle",
+        "create:purple_valve_handle",
+        "create:blue_valve_handle",
+        "create:brown_valve_handle",
+        "create:green_valve_handle",
+        "create:red_valve_handle",
+        "create:black_valve_handle"
       ],
       "tokens": []
     },
@@ -660,7 +1069,6 @@
         "create:blaze_burner",
         "create:empty_blaze_burner",
         "create:fluid_pipe",
-        "create:smart_fluid_pipe",
         "create:mechanical_pump",
         "create:fluid_tank",
         "create:hose_pulley"
@@ -694,7 +1102,6 @@
       "items": [
         "create:cart_assembler",
         "create:rope_pulley",
-        "create:controller_rail",
         "create:minecart_coupling"
       ],
       "tokens": [
@@ -729,7 +1136,10 @@
         "siftec:steel_casing",
         "siftec:steel_beam",
         "siftec:steel_pipe",
-        "siftec:versatile_framework"
+        "siftec:versatile_framework",
+        "cgs:steel_nugget",
+        "cgs:steel_block",
+        "cgs:steel_sheet"
       ],
       "tokens": []
     },
@@ -752,7 +1162,19 @@
       ],
       "seconds": 180,
       "items": [
-        "cgs:hammer"
+        "cgs:hammer",
+        "cgs:hammer_stone",
+        "cgs:hammer_iron",
+        "cgs:hammer_diamond",
+        "cgs:hammer_netherite",
+        "cgs:axe_stone",
+        "cgs:axe_iron",
+        "cgs:axe_diamond",
+        "cgs:axe_netherite",
+        "cgs:hammer_chamber",
+        "cgs:spear",
+        "cgs:bayonet",
+        "cgs:big_bayonet"
       ],
       "tokens": [
         "backpack"
@@ -879,7 +1301,10 @@
         "create:super_glue",
         "create:sticker",
         "create:contraption_controls",
-        "create:white_sail"
+        "create:white_sail",
+        "create:piston_extension_pole",
+        "create:secondary_linear_chassis",
+        "create:elevator_contact"
       ],
       "tokens": []
     },
@@ -905,7 +1330,10 @@
         "create_hypertube:hypertube",
         "create_hypertube:hypertube_entrance",
         "create_hypertube:hypertube_accelerator",
-        "create_hypertube:hypertube_junction"
+        "create_hypertube:hypertube_junction",
+        "create_hypertube:hypertube_funnel",
+        "create_hypertube:redstone_detector_tube_attachment",
+        "create_hypertube:tube_scanner_attachment"
       ],
       "tokens": []
     },
@@ -966,7 +1394,15 @@
         "siftec:plastic",
         "siftec:rubber",
         "siftec:petroleum_coke",
-        "siftec:circuit_board"
+        "siftec:circuit_board",
+        "createdieselgenerators:asphalt_block",
+        "createdieselgenerators:asphalt_slab",
+        "createdieselgenerators:asphalt_stairs",
+        "createdieselgenerators:oil_scanner",
+        "createdieselgenerators:mold",
+        "createdieselgenerators:sheet_metal_panel",
+        "createdieselgenerators:hammer",
+        "createdieselgenerators:wire_cutters"
       ],
       "tokens": [
         "scanner:oil"
@@ -1021,7 +1457,8 @@
         "create:spout",
         "create:item_drain",
         "create:portable_fluid_interface",
-        "createdieselgenerators:canister"
+        "createdieselgenerators:canister",
+        "createdieselgenerators:oil_barrel"
       ],
       "tokens": []
     },
@@ -1050,7 +1487,12 @@
       "items": [
         "createdieselgenerators:diesel_engine",
         "createdieselgenerators:large_diesel_engine",
-        "createdieselgenerators:huge_diesel_engine"
+        "createdieselgenerators:huge_diesel_engine",
+        "createdieselgenerators:burner",
+        "createdieselgenerators:engine_piston",
+        "createdieselgenerators:engine_silencer",
+        "createdieselgenerators:engine_turbocharger",
+        "createdieselgenerators:lighter"
       ],
       "tokens": [
         "scanner:zinc"
@@ -1083,7 +1525,8 @@
         "siftec:computer",
         "siftec:heavy_modular_frame",
         "siftec:modular_engine",
-        "siftec:adaptive_control_unit"
+        "siftec:adaptive_control_unit",
+        "create:crafter_slot_cover"
       ],
       "tokens": []
     },
@@ -1118,7 +1561,26 @@
         "create:schedule",
         "create:portable_storage_interface",
         "create:mechanical_roller",
-        "create:railway_casing"
+        "create:railway_casing",
+        "create:train_door",
+        "create:train_trapdoor",
+        "createdieselgenerators:track_layers_bag",
+        "create:white_postbox",
+        "create:orange_postbox",
+        "create:magenta_postbox",
+        "create:light_blue_postbox",
+        "create:yellow_postbox",
+        "create:lime_postbox",
+        "create:pink_postbox",
+        "create:gray_postbox",
+        "create:light_gray_postbox",
+        "create:cyan_postbox",
+        "create:purple_postbox",
+        "create:blue_postbox",
+        "create:brown_postbox",
+        "create:green_postbox",
+        "create:red_postbox",
+        "create:black_postbox"
       ],
       "tokens": []
     },
@@ -1176,7 +1638,8 @@
         "siftec:radio_control_unit"
       ],
       "tokens": [
-        "scanner:bauxite"
+        "scanner:bauxite",
+        "scanner:quartz"
       ]
     },
     {
@@ -1291,7 +1754,16 @@
         "create:factory_gauge",
         "create:chain_conveyor",
         "siftec:supercomputer",
-        "siftec:assembly_director_system"
+        "siftec:assembly_director_system",
+        "create:cardboard",
+        "create:cardboard_block",
+        "create:bound_cardboard_block",
+        "create:cardboard_helmet",
+        "create:cardboard_chestplate",
+        "create:cardboard_leggings",
+        "create:cardboard_boots",
+        "create:cardboard_sword",
+        "create:package_filter"
       ],
       "tokens": [
         "scanner:sulfur"
@@ -1322,6 +1794,7 @@
       "items": [
         "siftec:resource_well_extractor",
         "siftec:empty_fluid_tank",
+        "siftec:packaged_nitrogen_gas",
         "siftec:heat_sink",
         "siftec:cooling_system",
         "siftec:fused_modular_frame",
@@ -1647,12 +2120,13 @@
     "create:creative_blaze_cake",
     "the_sift:sift_portal",
     "the_sift:sift_rift",
-    "create:chromatic_compound",
     "create:rotation_speed_controller",
     "create:schematic_table",
     "create:schematicannon",
     "create:empty_schematic",
-    "create:schematic_and_quill"
+    "create:schematic_and_quill",
+    "create:schematic",
+    "farmersdelight:wheat_dough"
   ],
   "trees": [
     {
@@ -1810,7 +2284,10 @@
       "seconds": 120,
       "items": [
         "cgs:nailgun",
-        "create:copper_backtank"
+        "create:copper_backtank",
+        "cgs:nail",
+        "cgs:nail_steel",
+        "cgs:nailgun_splitter"
       ],
       "tokens": [],
       "needs": [
@@ -1882,7 +2359,21 @@
       "items": [
         "siftec:brass_blend",
         "create:brass_ingot",
-        "create:brass_sheet"
+        "create:brass_sheet",
+        "create:zinc_ingot",
+        "create:zinc_nugget",
+        "create:zinc_block",
+        "create:brass_nugget",
+        "create:brass_block",
+        "create:brass_casing",
+        "create:brass_bars",
+        "create:brass_door",
+        "create:brass_ladder",
+        "create:brass_scaffolding",
+        "create:brass_table_cloth",
+        "create:brass_encased_shaft",
+        "create:brass_encased_cogwheel",
+        "create:brass_encased_large_cogwheel"
       ],
       "tokens": [],
       "needs": []
@@ -1922,7 +2413,10 @@
         "create:brass_tunnel",
         "create:smart_chute",
         "create:filter",
-        "create:attribute_filter"
+        "create:attribute_filter",
+        "create:smart_fluid_pipe",
+        "create:controller_rail",
+        "createdieselgenerators:entity_filter"
       ],
       "tokens": [],
       "needs": [
@@ -2145,7 +2639,8 @@
       "seconds": 60,
       "items": [
         "createdieselgenerators:bulk_fermenter",
-        "siftec:vinegar_bucket"
+        "siftec:vinegar_bucket",
+        "createdieselgenerators:basin_lid"
       ],
       "tokens": [
         "food:vinegar"
@@ -2431,7 +2926,12 @@
         "create:stockpile_switch",
         "create:content_observer",
         "create:analog_lever",
-        "create:redstone_contact"
+        "create:redstone_contact",
+        "create:polished_rose_quartz",
+        "create:rose_quartz_block",
+        "create:rose_quartz_lamp",
+        "create:rose_quartz_tiles",
+        "create:small_rose_quartz_tiles"
       ],
       "tokens": [],
       "needs": [
@@ -2478,7 +2978,8 @@
         "create:redstone_link",
         "create:display_link",
         "create:display_board",
-        "create:nixie_tube"
+        "create:nixie_tube",
+        "create:transmitter"
       ],
       "tokens": [],
       "needs": [
@@ -2540,7 +3041,18 @@
         }
       ],
       "seconds": 30,
-      "items": [],
+      "items": [
+        "cgs:flintlock",
+        "cgs:flintlock_chambers",
+        "cgs:flintlock_long_barrel",
+        "cgs:blunderbuss_barrel",
+        "cgs:blunderbuss_barrel_long",
+        "cgs:stock",
+        "cgs:scope",
+        "cgs:paper_cartridge",
+        "cgs:paper_shot",
+        "cgs:lead_balls"
+      ],
       "tokens": [],
       "needs": []
     },
@@ -2608,7 +3120,24 @@
       "seconds": 180,
       "items": [
         "cgs:revolver",
-        "cgs:shotgun"
+        "cgs:shotgun",
+        "cgs:long_barrel",
+        "cgs:auto_fire",
+        "cgs:round_belt",
+        "cgs:shotgun_drum",
+        "cgs:shotgun_long_barrel",
+        "cgs:shotgun_pump",
+        "cgs:shotgun_spread_barrel",
+        "cgs:press_form_revolver",
+        "cgs:press_form_shotgun",
+        "cgs:round_revolver",
+        "cgs:round_revolver_blank",
+        "cgs:round_revolver_piercing",
+        "cgs:round_shotgun",
+        "cgs:round_shotgun_blank",
+        "cgs:round_shotgun_flechette",
+        "cgs:round_shotgun_flechette_steel",
+        "cgs:round_shotgun_incendiary"
       ],
       "tokens": [],
       "needs": [
@@ -2635,7 +3164,24 @@
       "seconds": 300,
       "items": [
         "cgs:gatling",
-        "cgs:launcher"
+        "cgs:launcher",
+        "cgs:gatling_drum",
+        "cgs:press_form_gatling",
+        "cgs:round_gatling",
+        "cgs:round_gatling_blank",
+        "cgs:round_gatling_piercing",
+        "cgs:rocket",
+        "cgs:rocket_small",
+        "cgs:launcher_auto",
+        "cgs:ballistazooka",
+        "cgs:blazegun",
+        "cgs:steam_engine",
+        "cgs:tank_empty",
+        "cgs:tank_lava",
+        "cgs:tank_water",
+        "createdieselgenerators:chemical_sprayer",
+        "createdieselgenerators:chemical_sprayer_lighter",
+        "createdieselgenerators:chemical_turret"
       ],
       "tokens": [],
       "needs": [
@@ -3156,7 +3702,7 @@
       "price": 500
     },
     {
-      "item": "create:valve_handle",
+      "item": "create:copper_valve_handle",
       "count": 4,
       "price": 200
     },
@@ -3318,13 +3864,14 @@
     "siftec:milling/biomass_from_melon_seeds": "hub_upgrade_6",
     "siftec:milling/biomass_from_pumpkin_seeds": "hub_upgrade_6",
     "siftec:milling/biomass_from_kelp": "hub_upgrade_6",
-    "siftec:milling/biomass_from_sugar_cane": "hub_upgrade_6",
-    "siftec:milling/biomass_from_cactus": "hub_upgrade_6",
-    "siftec:milling/biomass_from_short_grass": "hub_upgrade_6",
+    "siftec:cutting/biomass_from_sugar_cane": "hub_upgrade_6",
+    "siftec:cutting/biomass_from_cactus": "hub_upgrade_6",
+    "siftec:cutting/biomass_from_short_grass": "hub_upgrade_6",
     "siftec:deploying/rotor": "part_assembly",
     "siftec:deploying/modular_frame": "part_assembly",
     "siftec:deploying/smart_plating": "part_assembly",
     "siftec:compacting/solid_biofuel": "obstacle_clearing",
+    "siftec:crafting/copper_sheet_by_hand": "part_assembly",
     "siftec:crafting/wire_by_hand": "hub_upgrade_2",
     "siftec:crafting/cable_by_hand": "hub_upgrade_2",
     "siftec:crafting/screw_by_hand": "hub_upgrade_3",
@@ -3333,8 +3880,12 @@
     "siftec:crafting/modular_frame_by_hand": "part_assembly",
     "siftec:crafting/smart_plating_by_hand": "part_assembly",
     "siftec:crafting/solid_biofuel_by_hand": "obstacle_clearing",
+    "siftec:crafting/deployer": "part_assembly",
+    "siftec:crafting/nailgun": "mam_megafauna_3",
     "siftec:mixing/steel_ingot": "basic_steel_production",
-    "siftec:pressing/steel_beam": "basic_steel_production",
+    "siftec:compacting/steel_beam": "basic_steel_production",
+    "siftec:crafting/hammer": "enhanced_asset_security",
+    "siftec:crafting/crushing_wheel": "advanced_steel_production",
     "siftec:cutting/steel_pipe": "basic_steel_production",
     "siftec:deploying/versatile_framework": "basic_steel_production",
     "siftec:deploying/encased_industrial_beam": "advanced_steel_production",
@@ -3343,9 +3894,11 @@
     "siftec:deploying/automated_wiring": "advanced_steel_production",
     "siftec:mixing/plastic": "oil_processing",
     "siftec:mixing/rubber": "oil_processing",
+    "siftec:crafting/pumpjack_crank": "oil_processing",
     "siftec:compacting/petroleum_coke": "oil_processing",
     "siftec:deploying/circuit_board": "oil_processing",
     "siftec:pressing/canister": "fluid_packaging",
+    "siftec:crafting/mechanical_crafter": "industrial_manufacturing",
     "siftec:mechanical_crafting/computer": "industrial_manufacturing",
     "siftec:mechanical_crafting/heavy_modular_frame": "industrial_manufacturing",
     "siftec:mechanical_crafting/modular_engine": "industrial_manufacturing",
@@ -3363,6 +3916,7 @@
     "siftec:deploying/electromagnetic_control_rod": "advanced_aluminum_production",
     "siftec:deploying/magnetic_field_generator": "leading_edge_production",
     "siftec:cutting/empty_fluid_tank": "advanced_aluminum_production",
+    "siftec:filling/packaged_nitrogen_gas": "advanced_aluminum_production",
     "siftec:deploying/heat_sink": "advanced_aluminum_production",
     "siftec:mixing/cooling_system": "advanced_aluminum_production",
     "siftec:mixing/fused_modular_frame": "advanced_aluminum_production",
@@ -3379,13 +3933,13 @@
     "seq:ai_expansion_server": "quantum_encoding",
     "siftec:mechanical_crafting/singularity_cell": "spatial_energy_regulation",
     "siftec:mechanical_crafting/ballistic_warp_drive": "spatial_energy_regulation",
-    "siftec:milling/biomass_from_rotten_flesh": "hub_upgrade_6",
+    "siftec:milling/biomass_from_rotten_flesh": "mam_megafauna_1",
+    "siftec:milling/biomass_from_string": "mam_megafauna_1",
+    "siftec:milling/biomass_from_spider_eye": "mam_megafauna_1",
+    "siftec:cutting/biomass_from_bone": "mam_megafauna_1",
     "siftec:compacting/dna_capsule_from_rotten_flesh": "mam_megafauna_2",
-    "siftec:milling/biomass_from_bone": "hub_upgrade_6",
     "siftec:compacting/dna_capsule_from_bone": "mam_megafauna_2",
-    "siftec:milling/biomass_from_string": "hub_upgrade_6",
     "siftec:compacting/dna_capsule_from_string": "mam_megafauna_2",
-    "siftec:milling/biomass_from_spider_eye": "hub_upgrade_6",
     "siftec:compacting/dna_capsule_from_spider_eye": "mam_megafauna_2",
     "siftec:mixing/brass_blend_with_sand": "mam_caterium_1",
     "siftec:mixing/brass_blend_with_coal": "mam_caterium_1",
@@ -3396,9 +3950,9 @@
     "siftec:deploying/ai_limiter": "mam_caterium_4",
     "siftec:mechanical_crafting/high_speed_connector": "mam_caterium_7",
     "siftec:deploying/fabric_from_brown_mushroom": "mam_mycelia_2",
-    "siftec:milling/biomass_from_brown_mushroom": "hub_upgrade_6",
+    "siftec:milling/biomass_from_brown_mushroom": "mam_mycelia_1",
     "siftec:deploying/fabric_from_red_mushroom": "mam_mycelia_2",
-    "siftec:milling/biomass_from_red_mushroom": "hub_upgrade_6",
+    "siftec:milling/biomass_from_red_mushroom": "mam_mycelia_1",
     "siftec:mechanical_crafting/gas_filter": "mam_mycelia_5",
     "siftec:pressing/power_shard_from_blue_slug": "mam_slugs_1",
     "siftec:pressing/power_shard_from_yellow_slug": "mam_slugs_1",
@@ -3410,10 +3964,20 @@
     "siftec:mixing/ignimbrite": "mam_sulfur_2",
     "siftec:compacting/compacted_coal": "mam_sulfur_6",
     "siftec:mixing/turbofuel": "mam_sulfur_7",
+    "siftec:mixing/acid_leached_zinc": "mam_caterium_1",
     "siftec:item_application/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:deploying/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:item_application/steel_casing_from_stripped_woods": "basic_steel_production",
     "siftec:deploying/steel_casing_from_stripped_woods": "basic_steel_production",
+    "siftec:mixing/liquid_biofuel": "fluid_packaging",
+    "siftec:mixing/sulfuric_acid": "aeronautical_engineering",
+    "siftec:mixing/nitric_acid": "particle_enrichment",
+    "siftec:mixing/gunpowder_with_coal": "mam_sulfur_1",
+    "siftec:mixing/gunpowder_with_charcoal": "mam_sulfur_1",
+    "siftec:filling/fire_charge": "mam_sulfur_2",
+    "siftec:compacting/magma_block": "mam_sulfur_2",
+    "siftec:mixing/lava_from_magma_block": "mam_sulfur_2",
+    "siftec:filling/tnt": "mam_sulfur_3",
     "siftec:mixing/kitchen_apple_cider": "mam_nutrients_5",
     "siftec:mixing/kitchen_baked_cod_stew": "mam_nutrients_5",
     "siftec:mixing/kitchen_beef_stew": "mam_nutrients_5",
@@ -3508,15 +4072,13 @@
     {
       "id": "alt_iron_wire",
       "requires": [
-        "hub_upgrade_3",
-        "hub_upgrade_2"
+        "hub_upgrade_3"
       ]
     },
     {
       "id": "alt_stitched_iron_plate",
       "requires": [
         "part_assembly",
-        "hub_upgrade_3",
         "hub_upgrade_2"
       ]
     },
@@ -3537,6 +4099,7 @@
     {
       "id": "alt_iron_alloy_ingot",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production"
       ]
@@ -3544,8 +4107,9 @@
     {
       "id": "alt_solid_steel_ingot",
       "requires": [
-        "basic_steel_production",
-        "coal_power"
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production"
       ]
     },
     {
@@ -3558,6 +4122,7 @@
     {
       "id": "alt_wet_concrete",
       "requires": [
+        "hub_upgrade_3",
         "basic_steel_production"
       ]
     },
@@ -3579,6 +4144,7 @@
       "id": "alt_steel_rotor",
       "requires": [
         "part_assembly",
+        "hub_upgrade_3",
         "basic_steel_production"
       ]
     },
@@ -3594,19 +4160,20 @@
       "id": "alt_encased_industrial_pipe",
       "requires": [
         "part_assembly",
-        "advanced_steel_production",
         "basic_steel_production"
       ]
     },
     {
       "id": "alt_pure_iron_ingot",
       "requires": [
+        "advanced_steel_production",
         "hub_upgrade_2"
       ]
     },
     {
       "id": "alt_pure_copper_ingot",
       "requires": [
+        "advanced_steel_production",
         "hub_upgrade_2"
       ]
     },
@@ -3619,14 +4186,16 @@
     {
       "id": "alt_coke_steel_ingot",
       "requires": [
-        "basic_steel_production",
+        "hub_upgrade_3",
         "coal_power",
+        "basic_steel_production",
         "oil_processing"
       ]
     },
     {
       "id": "alt_recycled_plastic",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "oil_processing"
@@ -3635,6 +4204,7 @@
     {
       "id": "alt_recycled_rubber",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "oil_processing"
@@ -3643,6 +4213,7 @@
     {
       "id": "alt_residual_rubber",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "oil_processing"
@@ -3659,23 +4230,26 @@
       "id": "alt_adhered_iron_plate",
       "requires": [
         "part_assembly",
-        "hub_upgrade_3",
         "oil_processing"
       ]
     },
     {
       "id": "alt_coated_cable",
       "requires": [
+        "hub_upgrade_3",
         "basic_steel_production",
+        "coal_power",
+        "oil_processing",
         "hub_upgrade_2"
       ]
     },
     {
       "id": "alt_insulated_cable",
       "requires": [
+        "hub_upgrade_3",
         "basic_steel_production",
-        "hub_upgrade_2",
-        "oil_processing"
+        "oil_processing",
+        "hub_upgrade_2"
       ]
     },
     {
@@ -3708,16 +4282,15 @@
     {
       "id": "alt_fused_quickwire",
       "requires": [
+        "hub_upgrade_3",
         "mam_caterium_1",
-        "basic_steel_production",
-        "mam_caterium_2"
+        "basic_steel_production"
       ]
     },
     {
       "id": "alt_quickwire_cable",
       "requires": [
         "part_assembly",
-        "hub_upgrade_2",
         "mam_caterium_2",
         "oil_processing"
       ]
@@ -3727,7 +4300,6 @@
       "requires": [
         "part_assembly",
         "mam_caterium_2",
-        "advanced_steel_production",
         "basic_steel_production"
       ]
     },
@@ -3751,8 +4323,8 @@
       "id": "alt_automated_speed_wiring",
       "requires": [
         "industrial_manufacturing",
-        "advanced_steel_production",
         "mam_caterium_7",
+        "advanced_steel_production",
         "hub_upgrade_2"
       ]
     },
@@ -3767,7 +4339,6 @@
       "id": "alt_silicon_circuit_board",
       "requires": [
         "part_assembly",
-        "oil_processing",
         "mam_quartz_2"
       ]
     },
@@ -3776,7 +4347,6 @@
       "requires": [
         "part_assembly",
         "oil_processing",
-        "industrial_manufacturing",
         "mam_quartz_4"
       ]
     },
@@ -3785,8 +4355,8 @@
       "requires": [
         "industrial_manufacturing",
         "mam_quartz_4",
-        "advanced_steel_production",
-        "part_assembly"
+        "part_assembly",
+        "advanced_steel_production"
       ]
     },
     {
@@ -3794,7 +4364,6 @@
       "requires": [
         "industrial_manufacturing",
         "mam_caterium_4",
-        "mam_quartz_4",
         "mam_quartz_1",
         "oil_processing"
       ]
@@ -3802,23 +4371,26 @@
     {
       "id": "alt_compacted_steel_ingot",
       "requires": [
-        "basic_steel_production",
+        "hub_upgrade_3",
         "coal_power",
+        "basic_steel_production",
         "mam_sulfur_6"
       ]
     },
     {
       "id": "alt_turbo_heavy_fuel",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "mam_sulfur_6",
-        "mam_sulfur_7"
+        "oil_processing"
       ]
     },
     {
       "id": "alt_sloppy_alumina",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "bauxite_refinement"
@@ -3827,9 +4399,11 @@
     {
       "id": "alt_electrode_aluminum_scrap",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "bauxite_refinement",
+        "mam_quartz_2",
         "oil_processing"
       ]
     },
@@ -3844,6 +4418,7 @@
     {
       "id": "alt_diluted_fuel",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "oil_processing"
@@ -3854,13 +4429,13 @@
       "requires": [
         "part_assembly",
         "bauxite_refinement",
-        "advanced_aluminum_production",
         "oil_processing"
       ]
     },
     {
       "id": "alt_cooling_device",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "advanced_aluminum_production",
@@ -3880,15 +4455,13 @@
       "id": "alt_electric_motor",
       "requires": [
         "part_assembly",
-        "advanced_aluminum_production",
-        "advanced_steel_production"
+        "advanced_aluminum_production"
       ]
     },
     {
       "id": "alt_electromagnetic_connection_rod",
       "requires": [
         "part_assembly",
-        "advanced_aluminum_production",
         "mam_caterium_7",
         "advanced_steel_production"
       ]
@@ -3898,8 +4471,7 @@
       "requires": [
         "part_assembly",
         "advanced_aluminum_production",
-        "bauxite_refinement",
-        "aeronautical_engineering"
+        "bauxite_refinement"
       ]
     },
     {
@@ -3909,19 +4481,20 @@
         "advanced_aluminum_production",
         "advanced_steel_production",
         "bauxite_refinement",
-        "part_assembly",
-        "leading_edge_production"
+        "part_assembly"
       ]
     },
     {
       "id": "alt_heat_fused_frame",
       "requires": [
+        "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
         "oil_processing",
         "bauxite_refinement",
+        "industrial_manufacturing",
         "advanced_aluminum_production",
-        "industrial_manufacturing"
+        "particle_enrichment"
       ]
     },
     {
@@ -3967,7 +4540,33 @@
     "create:crafting/kinetics/water_wheel",
     "create:crafting/kinetics/large_water_wheel",
     "create:splashing/crushed_raw_iron",
-    "create:splashing/crushed_raw_copper"
+    "create:splashing/crushed_raw_copper",
+    "create:crafting/kinetics/deployer",
+    "create:crafting/kinetics/mechanical_crafter",
+    "create:mechanical_crafting/crushing_wheel",
+    "createdieselgenerators:mechanical_crafting/pumpjack_crank",
+    "cgs:mechanical_crafting/hammer",
+    "cgs:mechanical_crafting/nailgun",
+    "create:crushing/magma_block",
+    "createdieselgenerators:bulk_fermenting/lava",
+    "minecraft:potent_sulfur",
+    "farmersdelight:wheat_dough_from_egg",
+    "farmersdelight:wheat_dough_from_water",
+    "farmersdelight:bread_from_smelting",
+    "farmersdelight:bread_from_smoking",
+    "create:crafting/appliances/clipboard",
+    "create:crafting/appliances/crafting_blueprint",
+    "create:crafting/appliances/linked_controller",
+    "create:crafting/curiosities/peculiar_bell",
+    "create:crafting/kinetics/copper_valve_handle",
+    "create:crafting/kinetics/cuckoo_clock",
+    "create:crafting/kinetics/placard",
+    "create:crafting/kinetics/steam_whistle",
+    "create:crafting/kinetics/turntable",
+    "create:mechanical_crafting/extendo_grip",
+    "create:mechanical_crafting/potato_cannon",
+    "create:mechanical_crafting/wand_of_symmetry",
+    "create:andesite_table_cloth_from_andesite_alloy_stonecutting"
   ],
   "workshop": [
     {

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "siftec:circuit_board",
+    "C": "siftec:steel_casing",
+    "T": "minecraft:crafting_table"
+  },
+  "pattern": [
+    "B",
+    "C",
+    "T"
+  ],
+  "result": {
+    "count": 3,
+    "id": "create:mechanical_crafter"
+  }
+}

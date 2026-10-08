@@ -5,10 +5,10 @@
     "I": "minecraft:iron_ingot"
   },
   "pattern": [
-    "II"
+    "III"
   ],
   "result": {
-    "count": 2,
+    "count": 3,
     "id": "create:iron_sheet"
   }
 }

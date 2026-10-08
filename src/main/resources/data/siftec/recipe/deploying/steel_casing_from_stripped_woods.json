@@ -1,15 +1,7 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "cgs"
-      ]
-    }
-  ],
   "type": "create:deploying",
   "target": "#c:stripped_woods",
-  "ingredient": "cgs:steel_ingot",
+  "ingredient": "#c:ingots/steel",
   "results": [
     {
       "id": "siftec:steel_casing"

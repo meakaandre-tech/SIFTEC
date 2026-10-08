@@ -1,0 +1,26 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "siftec:reinforced_iron_plate",
+    "T": "create:copper_backtank",
+    "R": "siftec:iron_rod",
+    "S": "siftec:screw"
+  },
+  "pattern": [
+    "PPT",
+    "RS "
+  ],
+  "result": {
+    "count": 1,
+    "id": "cgs:nailgun"
+  }
+}

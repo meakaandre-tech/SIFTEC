@@ -52,8 +52,13 @@ public class ModItems {
             item(preserve.getKey(), properties -> new com.meakaandre.siftec.food.PreserveItem(preserve.getValue(), properties.stacksTo(16)
                 .food(new net.minecraft.world.food.FoodProperties.Builder().nutrition(6).saturationModifier(0.6f).alwaysEdible().build())));
         }
-        for (String id : Milestones.partIds()) {
-            PARTS.put(id, item(id, Item::new).get());
+        for (com.google.gson.JsonElement entry : Milestones.raw().getAsJsonArray("parts")) {
+            com.google.gson.JsonObject part = entry.getAsJsonObject();
+            String id = part.get("id").getAsString();
+            // a part that burns (Biomass, Solid Biofuel and so on): the burn time is data, data/siftec/context_int_provider/<fuel>.json
+            ResourceKey<net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider> fuel = part.has("fuel")
+                ? ResourceKey.create(Registries.CONTEXT_INT_PROVIDER, Siftec.id(part.get("fuel").getAsString())) : null;
+            PARTS.put(id, item(id, properties -> new Item(fuel == null ? properties : properties.cookingFuel(fuel))).get());
         }
     }
 }

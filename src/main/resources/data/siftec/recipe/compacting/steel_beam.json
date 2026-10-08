@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "#c:ingots/steel",
+    "#c:ingots/steel"
+  ],
+  "results": [
+    {
+      "id": "siftec:steel_beam"
+    }
+  ]
+}

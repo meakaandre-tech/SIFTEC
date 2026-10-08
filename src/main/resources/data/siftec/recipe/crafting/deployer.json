@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": "siftec:rotor",
+    "C": "create:andesite_casing",
+    "P": "siftec:reinforced_iron_plate"
+  },
+  "pattern": [
+    "R",
+    "C",
+    "P"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:deployer"
+  }
+}
