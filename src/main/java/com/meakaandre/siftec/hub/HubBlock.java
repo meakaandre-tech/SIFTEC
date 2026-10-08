@@ -25,7 +25,7 @@ public class HubBlock extends Block implements EntityBlock {
 
     public HubBlock(boolean gateway, Properties properties) {
         // a HUB holds land: it cannot be blown up or pushed, or its claim would be left behind
-        super(properties.explosionResistance(3600000.0F).pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK));
+        super(properties.explosionResistance(3600000.0F).pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE));
         this.gateway = gateway;
     }
 

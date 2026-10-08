@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 public class ClaimMarkerBlock extends Block {
     public ClaimMarkerBlock(Properties properties) {
         // a marker holds land: it cannot be blown up or pushed, or its claim would be left behind
-        super(properties.explosionResistance(3600000.0F).pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK));
+        super(properties.explosionResistance(3600000.0F).pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE));
     }
 
     @Override
