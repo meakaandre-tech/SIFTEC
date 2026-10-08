@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": "siftec:iron_rod",
+    "S": "create:iron_sheet",
+    "A": "create:shaft"
+  },
+  "pattern": [
+    "RSR",
+    "SAS",
+    "RSR"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:flywheel"
+  }
+}

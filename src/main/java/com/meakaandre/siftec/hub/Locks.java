@@ -49,6 +49,16 @@ public final class Locks {
         return BY_ITEM.get(BuiltInRegistries.ITEM.getKey(item));
     }
 
+    /** False, with the reason shown to the player, if the player's company may not take this item out of a result slot. */
+    public static boolean mayTake(Player player, ItemStack stack) {
+        if (allowed(player, stack)) return true;
+        Milestone lock = lockOf(stack.getItem());
+        if (player instanceof ServerPlayer server && lock != null) {
+            server.sendOverlayMessage(Component.translatable("siftec.lock.item", lock.name()));
+        }
+        return false;
+    }
+
     /** Checked on both sides; the client uses the copy of its company's progress the server sent. */
     public static boolean allowed(Player player, ItemStack stack) {
         if (stack.isEmpty() || player.hasInfiniteMaterials()) return true;

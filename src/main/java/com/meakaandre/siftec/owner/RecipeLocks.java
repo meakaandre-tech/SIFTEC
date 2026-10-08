@@ -6,6 +6,8 @@ import com.meakaandre.siftec.hub.Milestones;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import com.meakaandre.siftec.company.Companies;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -89,10 +91,27 @@ public final class RecipeLocks {
         return company == null || !company.has(lock);
     }
 
-    /** True if the machine ticking right now may not run this recipe. Nothing is blocked outside a machine's tick. */
+    /** True if the player's company has not unlocked this recipe. Creative players are never stopped. */
+    public static boolean blocked(ServerPlayer player, Recipe<?> recipe) {
+        if (player.hasInfiniteMaterials()) return false;
+        String lock = table(player.level().getServer()).get(recipe);
+        return lock != null && !Companies.of(player).has(lock);
+    }
+
+    /** True while a lookup is being made for a machine's tick or a player's click, so locks apply. */
+    public static boolean active() {
+        return Ownership.ticking() != null || Ownership.asking() != null;
+    }
+
+    /**
+     * True if whoever is asking right now (the machine ticking, or else the player whose click is being carried
+     * out) may not use this recipe. Nothing is blocked outside those.
+     */
     public static boolean blocked(Recipe<?> recipe) {
         BlockEntity machine = Ownership.ticking();
-        return machine != null && blocked(machine, recipe);
+        if (machine != null) return blocked(machine, recipe);
+        ServerPlayer player = Ownership.asking();
+        return player != null && blocked(player, recipe);
     }
 
     public static boolean blocked(RecipeHolder<?> holder) {
@@ -101,13 +120,12 @@ public final class RecipeLocks {
 
     /** The list without the recipes the ticking machine may not run; the same list when nothing is taken out. */
     public static <T> List<T> allowed(List<T> list) {
-        BlockEntity machine = Ownership.ticking();
-        if (machine == null || list.isEmpty()) return list;
+        if (!active() || list.isEmpty()) return list;
         List<T> kept = null;
         for (int i = 0; i < list.size(); i++) {
             T entry = list.get(i);
             Recipe<?> recipe = entry instanceof RecipeHolder<?> holder ? holder.value() : entry instanceof Recipe<?> r ? r : null;
-            boolean blocked = recipe != null && blocked(machine, recipe);
+            boolean blocked = recipe != null && blocked(recipe);
             if (blocked && kept == null) kept = new ArrayList<>(list.subList(0, i));
             else if (!blocked && kept != null) kept.add(entry);
         }

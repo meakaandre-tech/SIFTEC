@@ -161,7 +161,7 @@ MILESTONES = [
       C + "radial_chassis", C + "super_glue", C + "sticker", C + "contraption_controls"] + SAILS, []),
     (4, "hypertubes", "Hypertubes", "500 Copper Sheet, 300 Steel Pipe, 50 Encased Industrial Beam", "10:00",
      "Hypertube Entrance and Hypertubes",
-     ["create_hypertube:hypertube", "create_hypertube:hypertube_entrance", "create_hypertube:hypertube_accelerator", "create_hypertube:hypertube_junction"], []),
+     ["create_hypertube:hypertube", "create_hypertube:hypertube_entrance", "create_hypertube:hypertube_accelerator"], []),
 
     (5, "jetpack", "Jetpack", "50 Motor, 1000 Cable, 1000 Iron Sheet", "5:00", "Jetpack, +3 backpack slots", ["siftec:jetpack"], ["backpack"]),
     (5, "oil_processing", "Oil Processing", "50 Motor, 100 Encased Industrial Beam, 500 Steel Pipe, 500 Copper Sheet", "12:00",
@@ -278,31 +278,31 @@ MAM = [
         ("Inflated Pocket Dimension", "5 DNA Capsule, 3 minecraft:ender_pearl, 25 Cable", "3:00", "+3 backpack slots", None, [], ["backpack"]),
     ]),
     ("caterium", "Caterium", C + "raw_zinc", [
-        ("Caterium", "10 Raw Zinc", "0:30", "Brass blend, Brass Ingot, Brass Sheet", [], ["siftec:brass_blend", C + "brass_ingot", C + "brass_sheet"], []),
+        ("Caterium", "10 create:crushed_raw_zinc", "0:30", "Brass blend, Brass Ingot, Brass Sheet", [], ["siftec:brass_blend", C + "brass_ingot", C + "brass_sheet"], []),
         ("Quickwire", "10 Brass Ingot", "1:00", "Quickwire", [1], ["siftec:quickwire"], []),
-        ("Caterium Electronics", "50 Quickwire", "2:00", "Electron Tube, Precision Mechanism, Brass Funnel, Brass Tunnel, Smart Chute, filters, Smart Fluid Pipe, Controller Rail", [2],
+        ("Caterium Electronics", "50 Quickwire", "2:00", "Electron Tube, Precision Mechanism, Brass Funnel, Brass Tunnel, Smart Chute, filters, Smart Fluid Pipe, Controller Rail, Smart Observer, Threshold Switch", [2],
          [C + "electron_tube", C + "precision_mechanism", C + "brass_funnel", C + "brass_tunnel", C + "smart_chute", C + "filter", C + "attribute_filter",
-          C + "smart_fluid_pipe", C + "controller_rail"], []),
+          C + "smart_fluid_pipe", C + "controller_rail", C + "content_observer", C + "stockpile_switch"], []),
         ("AI Limiter", "100 Quickwire, 50 Copper Sheet", "3:00", "AI Limiter, Mechanical Arm", [3], ["siftec:ai_limiter", C + "mechanical_arm"], []),
         ("Power Switch", "50 Quickwire, 25 Rotor", "2:00", "Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Speed Governor", [2],
          [C + "clutch", C + "gearshift", C + "sequenced_gearshift", C + "adjustable_chain_gearshift", "siftec:speed_governor"], []),
         ("Zipline", "100 Quickwire, 50 Cable", "2:00", "Use a Wrench on a Power Pole or Tower to ride its Power Lines", [2], [], ["zipline"]),
-        ("High-Speed Connector", "500 Quickwire, 25 Plastic", "5:00", "High-Speed Connector", [4], ["siftec:high_speed_connector"], []),
+        ("High-Speed Connector", "500 Quickwire, 25 Plastic, 10 Computer", "5:00", "High-Speed Connector", [4], ["siftec:high_speed_connector"], []),
     ]),
     ("mycelia", "Mycelia", M + "brown_mushroom", [
         ("Mycelia", "5 #c:mushrooms", "0:30", "Biomass from mushrooms in the Millstone", [], [], []),
-        ("Fabric", "25 #c:mushrooms, 100 Biomass", "1:00", "Fabric", [1], ["siftec:fabric"], []),
+        ("Fabric", "25 #c:mushrooms, 100 Biomass, 10 Rotor", "1:00", "Fabric", [1], ["siftec:fabric"], []),
         ("Parachute", "10 Fabric, 10 Cable", "2:00", "Parachute", [2], ["siftec:parachute"], []),
         ("Diving Gear", "10 Fabric, 10 Copper Sheet", "2:00", "Diving Helmet and Diving Boots, then the netherite backtank and diving gear", [2],
          [C + "copper_diving_helmet", C + "copper_diving_boots", C + "netherite_diving_helmet", C + "netherite_diving_boots", C + "netherite_backtank"], []),
-        ("Toxic Cellular Modification", "50 Fabric, 25 Rubber", "3:00", "Gas Filter and Gas Mask", [2], ["siftec:gas_filter", "siftec:gas_mask"], []),
+        ("Toxic Cellular Modification", "50 Fabric, 25 Rubber, 5 Heavy Modular Frame", "3:00", "Gas Filter and Gas Mask", [2], ["siftec:gas_filter", "siftec:gas_mask"], []),
     ]),
     ("nutrients", "Nutrients", M + "sweet_berries", [
         ("Fermentation", "20 #c:crops, 10 minecraft:sugar", "1:00", "Bulk fermenter and vinegar", [], ["createdieselgenerators:bulk_fermenter", "siftec:vinegar_bucket"], ["food:vinegar"]),
-        ("Preserves", "10 minecraft:glass_bottle, 20 minecraft:sweet_berries", "2:00", "Pickles from the Spout and jams from the heated Mixer. Sneak and use one to throw it", [1], ["siftec:pickled_tomato", "siftec:pickled_onion", "siftec:pickled_cabbage", "siftec:pickled_pumpkin", "siftec:pickled_carrot", "siftec:pickled_beetroot", "siftec:pickled_kelp", "siftec:sweet_berry_jam", "siftec:glow_berry_jam", "siftec:apple_jam", "siftec:melon_jam"], ["food:preserves"]),
-        ("Brewing", "20 minecraft:apple, 10 minecraft:honey_bottle", "2:00", "Mead from the bulk fermenter, bottled at the Spout", [1], ["siftec:mead_bucket", "siftec:mead"], ["food:brewing"]),
-        ("Seasoning", "10 minecraft:glowstone_dust, 10 minecraft:blaze_powder, 10 minecraft:nether_wart", "2:00", "Secret ingredients: hold glowstone dust, blaze powder or nether wart in your main hand and food in your off hand, and use", [2], [], ["food:seasoning"]),
-        ("Automated Kitchen", "10 minecraft:bread, 10 Rotor", "3:00", "Cutting board recipes on the Deployer, cooking pot meals in the heated Mixer", [2], [], ["food:kitchen"]),
+        ("Preserves", "10 minecraft:glass_bottle, 20 minecraft:sweet_berries, 5 Empty Canister", "2:00", "Pickles from the Spout and jams from the heated Mixer. Sneak and use one to throw it", [1], ["siftec:pickled_tomato", "siftec:pickled_onion", "siftec:pickled_cabbage", "siftec:pickled_pumpkin", "siftec:pickled_carrot", "siftec:pickled_beetroot", "siftec:pickled_kelp", "siftec:sweet_berry_jam", "siftec:glow_berry_jam", "siftec:apple_jam", "siftec:melon_jam"], ["food:preserves"]),
+        ("Brewing", "20 minecraft:apple, 10 minecraft:honey_bottle, 5 Empty Canister", "2:00", "Mead from the bulk fermenter, bottled at the Spout", [1], ["siftec:mead_bucket", "siftec:mead"], ["food:brewing"]),
+        ("Seasoning", "10 minecraft:glowstone_dust, 10 minecraft:blaze_powder, 10 minecraft:nether_wart", "2:00", "Secret ingredients: hold glowstone dust, blaze powder or nether wart in your main hand and food in your off hand, and use", [1], [], ["food:seasoning"]),
+        ("Automated Kitchen", "10 minecraft:bread, 10 Rotor", "3:00", "Cutting board recipes on the Deployer, cooking pot meals in the heated Mixer", [1], [], ["food:kitchen"]),
     ]),
     ("slugs", "Power Slugs", "siftec:blue_power_slug", [
         ("Blue Power Slugs", "1 Blue Power Slug", "0:30", "Power Shards from blue slugs", [], ["siftec:power_shard"], []),
@@ -314,10 +314,10 @@ MAM = [
     ("quartz", "Quartz", M + "quartz", [
         ("Quartz Crystals", "10 Nether Quartz", "0:30", "Quartz Crystal and Sand Paper", [], ["siftec:quartz_crystal", C + "sand_paper", C + "red_sand_paper"], []),
         ("Silica", "10 Nether Quartz", "0:30", "Silica", [], ["siftec:silica"], []),
-        ("Radio Signal Scanning", "25 Quartz Crystal, 50 minecraft:redstone", "2:00", "Rose quartz and Create's redstone components", [1],
+        ("Radio Signal Scanning", "25 Quartz Crystal, 50 minecraft:redstone, 10 Brass Sheet", "2:00", "Rose quartz and Create's redstone components", [1],
          [C + "rose_quartz", C + "pulse_repeater", C + "pulse_extender", C + "pulse_timer", C + "powered_latch", C + "powered_toggle_latch",
-          C + "stockpile_switch", C + "content_observer", C + "analog_lever", C + "redstone_contact"], []),
-        ("Crystal Oscillator", "100 Quartz Crystal, 50 Reinforced Iron Plate", "3:00", "Crystal Oscillator", [1], ["siftec:crystal_oscillator"], []),
+          C + "analog_lever", C + "redstone_contact"], []),
+        ("Crystal Oscillator", "100 Quartz Crystal, 50 Reinforced Iron Plate, 5 Heavy Modular Frame", "3:00", "Crystal Oscillator", [1], ["siftec:crystal_oscillator"], []),
         ("Frequency Mapping", "5 Crystal Oscillator, 50 minecraft:redstone", "3:00", "Redstone Link, Display Link, Display Board, Nixie Tube", [3, 4],
          [C + "redstone_link", C + "display_link", C + "display_board", C + "nixie_tube"], []),
         ("Blade Runners", "50 Silica, 10 Modular Frame", "2:00", "Blade Runners", [2], ["siftec:blade_runners"], []),
@@ -325,9 +325,9 @@ MAM = [
     ]),
     ("sulfur", "Sulfur", "cgs:sulfur", [
         ("Black Powder", "10 Sulfur", "0:30", "Gunpowder from sulfur, coal or charcoal, and bone meal", [], [], []),
-        ("Ignimbrite", "20 Sulfur, 20 minecraft:cobblestone", "1:00", "Ignimbrite, fire charges, magma blocks and lava", [1], ["siftec:ignimbrite_bucket"], []),
-        ("Explosives", "50 Gunpowder, 10 Steel Pipe", "2:00", "TNT from the Spout, Frag Grenade", [2], ["cgs:frag_grenade"], []),
-        ("The Rifle", "50 Gunpowder, 25 Steel Pipe, 10 Motor", "3:00", "Revolver and Shotgun", [1], ["cgs:revolver", "cgs:shotgun"], []),
+        ("Ignimbrite", "20 Sulfur, 20 minecraft:cobblestone, 10 Steel Pipe", "1:00", "Ignimbrite, fire charges, magma blocks and lava", [1], ["siftec:ignimbrite_bucket"], []),
+        ("Explosives", "50 Gunpowder, 10 Steel Pipe, 10 Encased Industrial Beam", "2:00", "TNT from the Spout, Frag Grenade", [2], ["cgs:frag_grenade"], []),
+        ("The Rifle", "50 Gunpowder, 25 Steel Pipe, 10 Motor, 5 Heavy Modular Frame", "3:00", "Revolver and Shotgun", [1], ["cgs:revolver", "cgs:shotgun"], []),
         ("Heavy Weapons", "100 Gunpowder, 25 Motor, 10 Encased Industrial Beam", "5:00", "Gatling and Launcher", [4], ["cgs:gatling", "cgs:launcher"], []),
         ("Compacted Coal", "25 Coal, 25 Sulfur", "2:00", "Compacted Coal", [1], ["siftec:compacted_coal"], []),
         ("Turbofuel", "15 Compacted Coal, 20 createdieselgenerators:diesel_bucket", "5:00", "Turbofuel", [6], ["siftec:turbofuel_bucket"], []),
@@ -437,33 +437,33 @@ MORE_LOCKS = {
     # with the AWESOME Shop: the dyed and haunted versions of what it sells, and the rest of the design's Shop list
     "resource_sink_bonus_program": [C + "desk_bell", C + "haunted_bell", C + "mysterious_cuckoo_clock", C + "metal_bracket", C + "wooden_bracket",
                                     C + "copper_table_cloth"] + [f"{C}{c}_table_cloth" for c in COLOURS] + [f"{C}{c}_valve_handle" for c in COLOURS],
-    "basic_steel_production": [G + "steel_nugget", G + "steel_block", G + "steel_sheet"],
+    "basic_steel_production": [G + "steel_nugget", G + "steel_block", G + "steel_sheet", G + "nail_steel"],
     # melee weapons go with the Xeno-Basher
     "enhanced_asset_security": [G + "hammer_stone", G + "hammer_iron", G + "hammer_diamond", G + "hammer_netherite", G + "axe_stone", G + "axe_iron",
-                                G + "axe_diamond", G + "axe_netherite", G + "hammer_chamber", G + "spear", G + "bayonet", G + "big_bayonet"],
+                                G + "axe_diamond", G + "axe_netherite", G + "spear"],
     "expanded_power_infrastructure": [C + "piston_extension_pole", C + "secondary_linear_chassis", C + "elevator_contact"],
     "hypertubes": [H + "hypertube_funnel", H + "redstone_detector_tube_attachment", H + "tube_scanner_attachment"],
     "oil_processing": [DG + "asphalt_block", DG + "asphalt_slab", DG + "asphalt_stairs", DG + "oil_scanner", DG + "mold", DG + "sheet_metal_panel",
                        DG + "hammer", DG + "wire_cutters"],
     "fluid_packaging": [DG + "oil_barrel"],
     "petroleum_power": [DG + "burner", DG + "engine_piston", DG + "engine_silencer", DG + "engine_turbocharger", DG + "lighter"],
-    "industrial_manufacturing": [C + "crafter_slot_cover"],
+    # Mechanical Crafter recipes
+    "industrial_manufacturing": [C + "crafter_slot_cover", H + "hypertube_junction", G + "nailgun_splitter"],
     "monorail_train_technology": [C + "train_door", C + "train_trapdoor", DG + "track_layers_bag"] + [f"{C}{c}_postbox" for c in COLOURS],
     "aeronautical_engineering": [C + "cardboard", C + "cardboard_block", C + "bound_cardboard_block", C + "cardboard_helmet", C + "cardboard_chestplate",
                                  C + "cardboard_leggings", C + "cardboard_boots", C + "cardboard_sword", C + "package_filter"],
     # MAM research
-    "mam_megafauna_3": [G + "nail", G + "nail_steel", G + "nailgun_splitter"],
-    "mam_caterium_1": [C + "zinc_ingot", C + "zinc_nugget", C + "zinc_block", C + "brass_nugget", C + "brass_block", C + "brass_casing", C + "brass_bars",
+    "mam_megafauna_3": [G + "nail"],
+    "mam_caterium_1": [C + "brass_nugget", C + "brass_block", C + "brass_casing", C + "brass_bars",
                        C + "brass_door", C + "brass_ladder", C + "brass_scaffolding", C + "brass_table_cloth", C + "brass_encased_shaft",
                        C + "brass_encased_cogwheel", C + "brass_encased_large_cogwheel"],
     "mam_caterium_3": [DG + "entity_filter"],
     "mam_nutrients_1": [DG + "basin_lid"],
     "mam_quartz_3": [C + "polished_rose_quartz", C + "rose_quartz_block", C + "rose_quartz_lamp", C + "rose_quartz_tiles", C + "small_rose_quartz_tiles"],
-    "mam_quartz_5": [C + "transmitter"],
     # guns: the flintlock with black powder, then the Rifle and Heavy Weapons nodes with their parts and rounds
     "mam_sulfur_1": [G + "flintlock", G + "flintlock_chambers", G + "flintlock_long_barrel", G + "blunderbuss_barrel",
-                     G + "blunderbuss_barrel_long", G + "stock", G + "scope", G + "paper_cartridge", G + "paper_shot", G + "lead_balls"],
-    "mam_sulfur_4": [G + "long_barrel", G + "auto_fire", G + "round_belt", G + "shotgun_drum", G + "shotgun_long_barrel", G + "shotgun_pump",
+                     G + "blunderbuss_barrel_long", G + "paper_cartridge", G + "paper_shot", G + "lead_balls"],
+    "mam_sulfur_4": [G + "stock", G + "scope", G + "bayonet", G + "big_bayonet", G + "hammer_chamber", G + "long_barrel", G + "auto_fire", G + "round_belt", G + "shotgun_drum", G + "shotgun_long_barrel", G + "shotgun_pump",
                      G + "shotgun_spread_barrel", G + "press_form_revolver", G + "press_form_shotgun", G + "round_revolver", G + "round_revolver_blank",
                      G + "round_revolver_piercing", G + "round_shotgun", G + "round_shotgun_blank", G + "round_shotgun_flechette",
                      G + "round_shotgun_flechette_steel", G + "round_shotgun_incendiary"],
@@ -476,7 +476,7 @@ MORE_LOCKS = {
 FREE = [C + i for i in (
     "shaft cogwheel large_cogwheel gearbox vertical_gearbox encased_chain_drive hand_crank andesite_alloy andesite_alloy_block andesite_casing "
     "andesite_encased_shaft andesite_encased_cogwheel andesite_encased_large_cogwheel iron_sheet golden_sheet sturdy_sheet brass_hand propeller whisk "
-    "unprocessed_obsidian_sheet powdered_obsidian pulp raw_zinc raw_zinc_block zinc_ore deepslate_zinc_ore limestone asurine crimsite ochrum scorchia "
+    "unprocessed_obsidian_sheet powdered_obsidian pulp transmitter raw_zinc raw_zinc_block zinc_ore deepslate_zinc_ore zinc_ingot zinc_nugget zinc_block limestone asurine crimsite ochrum scorchia "
     "scoria veridium bar_of_chocolate builders_tea chocolate_glazed_berries dough honeyed_apple sweet_roll wheat_flour cinder_flour chocolate_bucket "
     "honey_bucket experience_nugget experience_block incomplete_precision_mechanism incomplete_track creative_crate creative_fluid_tank creative_motor "
     "handheld_worldshaper minecart_contraption chest_minecart_contraption furnace_minecart_contraption refined_radiance_casing shadow_steel_casing "

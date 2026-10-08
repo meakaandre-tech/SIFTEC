@@ -24,6 +24,8 @@ public final class Ownership {
     private static final ThreadLocal<ServerPlayer> ACTING = new ThreadLocal<>();
     /** The machine whose tick is running right now, so a recipe lookup knows who is asking. */
     private static final ThreadLocal<BlockEntity> TICKING = new ThreadLocal<>();
+    /** The player whose click makes something without a crafting grid (a Crafting Blueprint, Sand Paper, a casing put on by hand). */
+    private static final ThreadLocal<ServerPlayer> ASKING = new ThreadLocal<>();
 
     private Ownership() {
     }
@@ -48,6 +50,17 @@ public final class Ownership {
 
     public static void ticking(@Nullable BlockEntity be) {
         TICKING.set(be != null && be.getLevel() instanceof ServerLevel ? be : null);
+    }
+
+    public static @Nullable ServerPlayer asking() {
+        return ASKING.get();
+    }
+
+    /** Sets the asking player and returns the one that was set before, to put back afterwards. */
+    public static @Nullable ServerPlayer asking(@Nullable ServerPlayer player) {
+        ServerPlayer before = ASKING.get();
+        ASKING.set(player);
+        return before;
     }
 
     public static @Nullable Company of(BlockEntity be) {
