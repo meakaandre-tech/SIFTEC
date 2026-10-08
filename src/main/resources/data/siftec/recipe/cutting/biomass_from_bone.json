@@ -1,11 +1,11 @@
 {
-  "type": "create:milling",
+  "type": "create:cutting",
   "ingredient": "minecraft:bone",
-  "processing_time": 100,
   "results": [
     {
       "id": "siftec:biomass",
       "count": 2
     }
-  ]
+  ],
+  "processing_time": 100
 }

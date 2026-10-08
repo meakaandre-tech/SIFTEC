@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "siftec:reinforced_iron_plate",
+    "R": "siftec:rotor",
+    "M": "siftec:modular_frame",
+    "F": "siftec:iron_rod"
+  },
+  "pattern": [
+    " PR",
+    " MP",
+    "F  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "cgs:hammer"
+  }
+}

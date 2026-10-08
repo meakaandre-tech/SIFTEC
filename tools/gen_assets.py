@@ -10,7 +10,11 @@ ROOT = os.path.join(os.path.dirname(__file__), "..", "src", "main", "resources")
 A = os.path.join(ROOT, "assets", "siftec")
 D = os.path.join(ROOT, "data", "siftec")
 
+WRITTEN = set()
+
+
 def write(path, obj):
+    WRITTEN.add(os.path.normpath(path))
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         json.dump(obj, f, indent=2)
@@ -225,26 +229,34 @@ def secs(t):
     m, sec = t.split(":")
     return int(m) * 60 + int(sec)
 
-KNOWN = set()
-ids_file = os.path.join(os.path.dirname(__file__), "known_ids.txt")
-if os.path.exists(ids_file):
-    KNOWN = set(open(ids_file).read().split())
+# every item id of the game and of the mods the pack's data names (items only: blocks without an item are not
+# in it), so a typo or a renamed item stops the generator instead of loading as nothing
+KNOWN = set(open(os.path.join(os.path.dirname(__file__), "known_ids.txt")).read().split())
+CHECKED = ("minecraft", "create", "cgs", "createdieselgenerators", "create_hypertube")
+UNKNOWN = []
 
-def check(item):
-    ns = item.split(":")[0]
-    if KNOWN and ns in ("create", "cgs", "createdieselgenerators", "create_hypertube") and item not in KNOWN:
-        print("warning: unknown item id", item)
+def check(item, where=""):
+    if item.split(":")[0] in CHECKED and item not in KNOWN:
+        UNKNOWN.append(f"{item} ({where})")
 
 data = {"parts": [], "milestones": [], "phases": [], "disabled": content.DISABLED}
-for i in content.DISABLED: check(i)
+for i in content.DISABLED: check(i, "disabled")
 for pid, name, tex, tint in content.PARTS:
-    data["parts"].append({"id": pid})
+    part = {"id": pid}
+    if pid in content.FUELS:
+        # a furnace fuel, burning as long as the number says (coal is 1600); the Blaze Burner reads the same value
+        part["fuel"] = f"cooking/time_{pid}"
+        write(f"{D}/context_int_provider/cooking/time_{pid}.json", {"type": "minecraft:div", "left": content.FUELS[pid], "right": {
+            "type": "minecraft:conditional", "condition": "minecraft:block/fast_cooking",
+            "on_false": "minecraft:cooking/normal_burn_time_reduction_factor", "on_true": "minecraft:cooking/fast_burn_time_reduction_factor"}})
+    data["parts"].append(part)
     lang[f"item.siftec.{pid}"] = name
     write(f"{A}/models/item/{pid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
     item_def(pid, f"siftec:item/{pid}", tint)
 # the tier tabs show the tier's first milestones in their tooltip
 for tier, mid, name, cost, time, text, items, tokens in content.MILESTONES:
-    for i in items: check(i)
+    for i in items: check(i, mid)
+    for i, c in content.parse_cost(cost): check(i, mid + " cost")
     data["milestones"].append({"id": mid, "tier": tier, "cost": [{"item": i, "count": c} for i, c in content.parse_cost(cost)],
                                "seconds": secs(time), "items": items, "tokens": tokens})
     lang[f"siftec.milestone.{mid}"] = name
@@ -257,12 +269,13 @@ for mid, name, cost, text in content.PHASES:
 # ---- MAM research: every node is stored like a milestone, with its tree and what it needs first
 data["trees"] = []
 for tree_id, tree_name, icon, nodes in content.MAM:
-    check(icon)
+    check(icon, tree_id)
     ids = [f"mam_{tree_id}_{n + 1}" for n in range(len(nodes))]
     data["trees"].append({"id": tree_id, "icon": icon, "nodes": ids})
     lang[f"siftec.tree.{tree_id}"] = tree_name
     for n, (name, cost, time, text, needs, items, tokens) in enumerate(nodes):
-        for i in items: check(i)
+        for i in items: check(i, ids[n])
+        for i, c in content.parse_cost(cost): check(i, ids[n] + " cost")
         if needs is None:
             needs = [n] if n > 0 else []
         data["milestones_mam"] = data.get("milestones_mam", [])
@@ -270,6 +283,29 @@ for tree_id, tree_name, icon, nodes in content.MAM:
                                        "seconds": secs(time), "items": items, "tokens": tokens, "needs": [ids[k - 1] for k in needs]})
         lang[f"siftec.milestone.{ids[n]}"] = name
         lang[f"siftec.milestone.{ids[n]}.unlocks"] = text
+# the other mods' items that unlock with a milestone, beyond the ones listed with it
+by_id = {m["id"]: m for m in data["milestones"] + data["milestones_mam"]}
+for mid, more in content.MORE_LOCKS.items():
+    if mid not in by_id:
+        raise SystemExit(f"MORE_LOCKS: no milestone {mid}")
+    for i in more:
+        check(i, mid)
+        by_id[mid]["items"].append(i)
+# locked by default: every item of those mods has to be unlocked by something, or be left free on purpose
+placed = {}
+for m in data["milestones"] + data["milestones_mam"]:
+    for i in m["items"]:
+        if i in placed:
+            raise SystemExit(f"{i} is unlocked twice: {placed[i]} and {m['id']}")
+        placed[i] = m["id"]
+for i in content.FREE: check(i, "FREE")
+accounted = set(placed) | set(content.FREE) | set(content.DISABLED) | {i for i, c, p in content.SHOP}
+both = sorted((set(placed) | set(content.DISABLED)) & set(content.FREE))
+if both:
+    raise SystemExit(f"both locked and free: {both}")
+loose = sorted(i for i in KNOWN if i.split(":")[0] in ("create", "cgs", "createdieselgenerators", "create_hypertube") and i not in accounted)
+if loose:
+    raise SystemExit(f"{len(loose)} items have no milestone and are not listed as free: {loose}")
 lang.update({"block.siftec.mam": "MAM", "siftec.mam.title": "MAM: %s", "siftec.mam.research": "Research time: %s",
              "siftec.mam.busy": "Already researching %s", "siftec.mam.running": "Researching %s: %s left", "siftec.mam.idle": "No research running",
              "siftec.mam.started": "Research started: %s", "siftec.mam.click": "Click to deliver parts from your inventory",
@@ -332,7 +368,7 @@ lang.update({"siftec.processor.selected": "Making: %s", "siftec.processor.fluid"
 # ---- AWESOME Sink and Shop
 data["sink_points"] = {names_table[n]: p for n, p in content.SINK_POINTS.items()}
 data["shop"] = [{"item": i, "count": c, "price": p} for i, c, p in content.SHOP]
-for i, c, p in content.SHOP: check(i)
+for i, c, p in content.SHOP: check(i, "shop")
 lang.update({"block.siftec.awesome_sink": "AWESOME Sink", "block.siftec.awesome_shop": "AWESOME Shop", "siftec.sink.points": "AWESOME points: %s",
              "siftec.shop.title": "AWESOME Shop: %s points", "siftec.shop.price": "%s points", "siftec.shop.poor": "Not enough points",
              "siftec.sift.enter": "Enter The Sift", "siftec.sift.missing": "The Sift is not installed on this server"})
@@ -342,7 +378,10 @@ for b, top in (("awesome_sink", "minecraft:block/hopper_top"), ("awesome_shop", 
         "top": top, "side": "create:block/andesite_casing", "bottom": "create:block/andesite_casing"}})
     item_def(b, f"siftec:block/{b}")
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}]}]})
-for i in content.ALIAS.values(): check(i)
+for i in content.ALIAS.values(): check(i, "alias")
+for i, cost in recipes.WORKSHOP:
+    check(i, "workshop")
+    for c, n in content.parse_cost(cost): check(c, "workshop " + i)
 # ---- fluids
 data["fluids"] = []
 for fid, name, colour in content.FLUIDS:
@@ -387,6 +426,11 @@ for path, body in recipes.build().items():
             key = "seq:" + rid.split(":")[1] if body["type"] == "create:sequenced_assembly" else "siftec:" + path
             data["recipe_locks"][key] = mid
             break
+# recipes that need a milestone their result does not show (gunpowder, lava, TNT, Biomass from mob drops, acids)
+for path, mid in recipes.LOCKED.items():
+    if mid not in by_id:
+        raise SystemExit(f"recipes.LOCKED: no milestone {mid} for {path}")
+    data["recipe_locks"]["siftec:" + path] = mid
 # Farmer's Delight recipes moved onto Create machines need the Automated Kitchen research
 kitchen_node = next(m["id"] for m in data["milestones_mam"] if "food:kitchen" in m["tokens"])
 for path in recipes.KITCHEN:
@@ -394,16 +438,29 @@ for path in recipes.KITCHEN:
 print("kitchen recipes:", len(recipes.KITCHEN), "locked to", kitchen_node)
 # ---- alternates: each has its own lock, and is only offered once everything it uses is unlocked
 C = "create:"
-MACHINE_OF = {"create:cutting": [C + "mechanical_saw"], "create:deploying": [C + "deployer"], "create:mixing": [C + "mechanical_mixer"],
-              "create:compacting": [C + "mechanical_press", C + "basin"], "create:splashing": [C + "encased_fan"], "create:mechanical_crafting": [C + "mechanical_crafter"],
-              "minecraft:smelting": [], "minecraft:blasting": []}
-FLUID_NEEDS = {"createdieselgenerators:diesel": "oil_processing", "createdieselgenerators:crude_oil": "oil_processing"}
+MACHINE_OF = {"create:cutting": [C + "mechanical_saw"], "create:deploying": [C + "deployer"], "create:mixing": [C + "mechanical_mixer", C + "basin"],
+              "create:compacting": [C + "mechanical_press", C + "basin"], "create:splashing": [C + "encased_fan"], "create:haunting": [C + "encased_fan"],
+              "create:mechanical_crafting": [C + "mechanical_crafter"], "create:pressing": [C + "mechanical_press"], "create:milling": [C + "millstone"],
+              "create:crushing": [C + "crushing_wheel"], "create:filling": [C + "spout"], "create:sandpaper_polishing": [C + "sand_paper"],
+              "create:sequenced_assembly": [C + "deployer", C + "mechanical_press"], "create:item_application": [],
+              "createdieselgenerators:bulk_fermenting": ["createdieselgenerators:bulk_fermenter"],
+              "minecraft:smelting": [], "minecraft:blasting": [], "minecraft:crafting_shaped": [], "minecraft:crafting_shapeless": []}
 built = recipes.build()
+# Where the things no milestone locks come from, so an alternate is only offered once its company can get every
+# input: fluids and crushed ore from the machines that make them, tags from what is in them, and anything one of
+# the pack's own recipes makes from that recipe's inputs, machine and lock.
+SOURCES = {"createdieselgenerators:crude_oil": ["createdieselgenerators:pumpjack_crank", "createdieselgenerators:pumpjack_bearing"],
+           "createdieselgenerators:diesel": ["createdieselgenerators:distillation_controller", "createdieselgenerators:crude_oil"],
+           "createdieselgenerators:biodiesel": ["siftec:solid_biofuel", "siftec:recipe/mixing/liquid_biofuel"],
+           "siftec:nitrogen": ["siftec:resource_well_extractor"], "siftec:sam": ["siftec:portable_miner"], "siftec:raw_bauxite": ["siftec:portable_miner"],
+           "#c:ingots/steel": ["cgs:steel_ingot"]}
+for ore in ("iron", "copper", "zinc", "gold"):
+    SOURCES[f"create:crushed_raw_{ore}"] = [C + "crushing_wheel"]
 
 
 def ids_in(node, found):
     if isinstance(node, str):
-        if ":" in node and not node.startswith("#") and " " not in node: found.add(node)
+        if ":" in node and " " not in node: found.add(node)
     elif isinstance(node, dict):
         for k, v in node.items():
             if k != "type": ids_in(v, found)
@@ -411,30 +468,54 @@ def ids_in(node, found):
         for v in node: ids_in(v, found)
 
 
-def needs_of(things):
+def inputs_of(body):
+    """Everything a recipe needs: its ingredients and fluids, its machines, heat, and its own lock."""
+    used = set()
+    for k, v in body.items():
+        if k not in ("type", "results", "result", "fluid_results", "fabric:load_conditions", "transitional_item"): ids_in(v, used)
+    used.update(MACHINE_OF[body["type"]])
+    if body.get("heat_requirement"): used.add(C + "blaze_burner")
+    return used
+
+
+alt_paths = {p for info in recipes.ALTS.values() for p in info["paths"]}
+for path, body in built.items():
+    if path in alt_paths: continue
+    made = [r if isinstance(r, str) else r.get("id", "") for r in list(body.get("results", [])) + list(body.get("fluid_results", [])) + ([body["result"]] if "result" in body else [])]
+    for o in made:
+        if o and o not in lock_of and o not in SOURCES and not o.startswith("minecraft:"):
+            SOURCES[o] = sorted(inputs_of(body)) + ["siftec:recipe/" + path]
+for path, mid in data["recipe_locks"].items():
+    lock_of["siftec:recipe/" + path.split(":", 1)[1]] = mid
+
+
+def needs_of(things, seen=None):
+    seen = set() if seen is None else seen
     out = []
-    for t in things:
-        mid = FLUID_NEEDS.get(t) or lock_of.get(t) or lock_of.get(t + "_bucket")
-        if mid and mid not in out: out.append(mid)
+    for t in sorted(things):
+        if t in seen: continue
+        seen.add(t)
+        mid = lock_of.get(t) or lock_of.get(t + "_bucket")
+        found = [mid] if mid else needs_of(SOURCES.get(t, []), seen)
+        for f in found:
+            if f not in out: out.append(f)
     return out
+
 
 
 data["alternates"] = []
 for aid, info in recipes.ALTS.items():
     used = set()
     for path in info["paths"]:
-        body = built[path]
-        ids_in(body, used)
-        used.update(MACHINE_OF[body["type"]])
-        if body.get("heat_requirement"): used.add(C + "blaze_burner")
+        used |= inputs_of(built[path])
         data["recipe_locks"]["siftec:" + path] = "alt_" + aid
-    data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(sorted(used))})
+    data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(used)})
     lang[f"siftec.alt.alt_{aid}"] = info["name"]
     lang[f"siftec.alt.alt_{aid}.text"] = info["text"]
 for aid, aname, machine, items, fluid_in, result, seconds, text in content.ALT_PROCESSORS:
     used = {i for i, c in content.parse_cost(items)} | {i for i, c in content.parse_cost(result)} | {"siftec:" + machine}
     if fluid_in: used.add(recipes.FLUID_IDS[fluid_in[0]])
-    data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(sorted(used))})
+    data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(used)})
     lang[f"siftec.alt.alt_{aid}"] = aname
     lang[f"siftec.alt.alt_{aid}.text"] = text
 print("alternates:", len(data["alternates"]), "; with nothing required:", [a["id"] for a in data["alternates"] if not a["requires"]])
@@ -450,6 +531,8 @@ write(f"{A}/models/block/equipment_workshop.json", {"parent": "minecraft:block/c
 item_def("equipment_workshop", "siftec:block/equipment_workshop")
 write(f"{D}/loot_table/blocks/equipment_workshop.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
       "entries": [{"type": "minecraft:item", "name": "siftec:equipment_workshop"}]}]})
+if UNKNOWN:
+    raise SystemExit("unknown item ids (not items of the game or of the pack's mods):\n  " + "\n  ".join(UNKNOWN))
 write(os.path.join(ROOT, "siftec_content.json"), data)
 
 # ---- HUB and Wormhole Gateway

@@ -4,3 +4,5 @@ run/
 libs/
 server/
 *.log
+__pycache__/
+*.pyc
