@@ -89,6 +89,7 @@ public final class WorldTests {
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             MONITORS.clear();
+            SITES.clear();
             watchedChunk = null;
         });
     }
@@ -106,6 +107,13 @@ public final class WorldTests {
 
     /** A place to build tests: beside spawn, well above the ground, its chunk kept loaded while in use. */
     private static BlockPos site(ServerLevel level, int dx, int dz) {
+        // the same spot for a setup and its check, even though the setup built on it
+        return SITES.computeIfAbsent(dx + "," + dz, k -> findSite(level, dx, dz));
+    }
+
+    private static final Map<String, BlockPos> SITES = new java.util.HashMap<>();
+
+    private static BlockPos findSite(ServerLevel level, int dx, int dz) {
         BlockPos o = origin(level);
         int x = o.getX() + dx, z = o.getZ() + dz;
         level.getChunk(x >> 4, z >> 4);
@@ -479,23 +487,27 @@ public final class WorldTests {
             report(source, "powerline setup: towers at " + near.toShortString() + " and " + far.toShortString());
             return 1;
         }
-        boolean loadedBefore = level.hasChunk(far.getX() >> 4, far.getZ() >> 4);
-        watchedChunk = new ChunkPos(far.getX() >> 4, far.getZ() >> 4);
-        watchedLoads = 0;
-        int loadsBefore = allLoads;
+        ChunkPos farChunk = new ChunkPos(far.getX() >> 4, far.getZ() >> 4);
         BlockState placed = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
         BlockState motor = placed.hasProperty(BlockStateProperties.FACING) ? placed.setValue(BlockStateProperties.FACING, Direction.UP) : placed;
         // a source under the near tower, on for a second and off for a second, five times (Create wires kinetics up on the next tick)
         MONITORS.add(new Monitor() {
-            int ticks;
+            int ticks, waited, loadsBefore;
             float seen;
 
             @Override
             public boolean tick() {
+                // first wait (up to a minute) until the far chunk has really been unloaded
+                if (watchedChunk == null) {
+                    if (level.hasChunk(farChunk.x(), farChunk.z()) && ++waited < 1200) return false;
+                    watchedChunk = farChunk;
+                    watchedLoads = 0;
+                    loadsBefore = allLoads;
+                }
                 if (ticks % 20 == 0 && ticks < 200) level.setBlockAndUpdate(near.below(), ticks % 40 == 0 ? motor : Blocks.AIR.defaultBlockState());
                 if (level.getBlockEntity(near) instanceof PoleBlockEntity p) seen = Math.max(seen, Math.abs(p.getSpeed()));
                 if (++ticks < 220) return false;
-                report(source, "powerline check: far chunk loaded before " + loadedBefore + "; five starts and stops of a source under the near tower (it turned at up to "
+                report(source, "powerline check: far chunk unloaded first " + (waited < 1200) + " (after " + waited / 20 + " s); five starts and stops of a source under the near tower (it turned at up to "
                     + seen + " RPM) loaded the far chunk " + watchedLoads + " times (chunk loads in all meanwhile: " + (allLoads - loadsBefore) + ")");
                 watchedChunk = null;
                 level.setChunkForced(near.getX() >> 4, near.getZ() >> 4, false);
