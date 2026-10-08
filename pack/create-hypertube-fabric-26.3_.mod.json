@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "create_hypertube",
+  "version": "0.6.0+26.3",
+  "name": "Create Hypertube",
+  "description": "Adding a new way to move in your world. Fabric port for Create Fly.",
+  "authors": ["Rok"],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/hypertube",
+    "sources": "https://github.com/PedroRok/CreateHypertubes"
+  },
+  "license": "Apache-2.0",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.pedrorok.hypertube.HypertubeMod"],
+    "client": ["com.pedrorok.hypertube.client.HypertubeClient"]
+  },
+  "mixins": ["create_hypertube.mixins.json"],
+  "depends": {
+    "fabricloader": "*",
+    "fabric-api": "*",
+    "minecraft": ">=26.3- <26.4-",
+    "java": ">=25",
+    "create": "*"
+  }
+}
