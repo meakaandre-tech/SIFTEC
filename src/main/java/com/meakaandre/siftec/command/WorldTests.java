@@ -71,7 +71,8 @@ public final class WorldTests {
                 .then(Commands.literal("nodes").then(Commands.argument("radius", IntegerArgumentType.integer(128, 8000)).executes(WorldTests::nodes)))
                 .then(Commands.literal("place").then(Commands.argument("type", StringArgumentType.word()).executes(WorldTests::place)))
                 .then(Commands.literal("geyser").then(Commands.literal("build").then(seconds.executes(c -> geyser(c, null))))
-                    .then(Commands.literal("natural").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::naturalGeyser))).then(geyserAt))
+                    .then(Commands.literal("natural").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::naturalGeyser)))
+                    .then(Commands.literal("wet").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::wetGeyser))).then(geyserAt))
                 .then(Commands.literal("furnace").then(Commands.literal("setup").executes(c -> furnace(c, true))).then(Commands.literal("check").executes(c -> furnace(c, false))))
                 .then(Commands.literal("processor").executes(WorldTests::processor))
                 .then(Commands.literal("powerline").then(Commands.literal("setup").executes(c -> powerline(c, true))).then(Commands.literal("check").executes(c -> powerline(c, false))))
@@ -95,6 +96,7 @@ public final class WorldTests {
             MONITORS.clear();
             SITES.clear();
             NATURAL.clear();
+            WET.clear();
             CHAIN_LOADS.clear();
             weakSource = null;
             watchedChunk = null;
@@ -599,6 +601,30 @@ public final class WorldTests {
 
     /** Periodic geysers (potent sulfur over magma, water above) found by the surveys, nearest to spawn first. */
     private static final List<BlockPos> NATURAL = new ArrayList<>();
+    /** Wet potent sulfur (a sulfur pool's vent: water over it, no heat under it) found by the surveys, nearest first. */
+    private static final List<BlockPos> WET = new ArrayList<>();
+
+    /**
+     * The nearest wet vent the surveys found, given a magma block underneath the way a player would: vanilla
+     * turns it into a periodic geyser, and the engine is watched on it.
+     */
+    private static int wetGeyser(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ServerLevel level = source.getServer().overworld();
+        if (WET.isEmpty()) {
+            report(source, "geyser wet: the surveys found no wet vent");
+            return 0;
+        }
+        BlockPos vent = WET.getFirst();
+        for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced((vent.getX() >> 4) + dx, (vent.getZ() >> 4) + dz, true);
+        BlockState before = level.getBlockState(vent);
+        String under = BuiltInRegistries.BLOCK.getKey(level.getBlockState(vent.below()).getBlock()).getPath();
+        level.setBlockAndUpdate(vent.below(), Blocks.MAGMA_BLOCK.defaultBlockState());
+        BlockState after = level.getBlockState(vent);
+        report(source, "geyser wet: vent " + vent.toShortString() + " was " + (before.is(Blocks.POTENT_SULFUR) ? before.getValue(PotentSulfurBlock.STATE).getSerializedName() : before.toString())
+            + " over " + under + "; with a magma block put under it, it is " + (after.is(Blocks.POTENT_SULFUR) ? after.getValue(PotentSulfurBlock.STATE).getSerializedName() : after.toString()));
+        return geyser(context, vent);
+    }
 
     /**
      * Counts the potent sulfur a stretch of the world generated. Vanilla only places it from features of the
@@ -669,12 +695,14 @@ public final class WorldTests {
                     long distance = Math.round(Math.sqrt(Math.pow(pos.getX() - o.getX(), 2) + Math.pow(pos.getZ() - o.getZ(), 2)));
                     if (listed.size() < 14) listed.add(pos.toShortString() + " " + stateName + " over " + under + " water " + water + (open ? " open" : " covered") + " " + biome + " " + distance + "m");
                     if (below.is(Blocks.MAGMA_BLOCK) && water > 0) periodic.add(pos.immutable());
+                    else if (stateName.equals("wet") && water > 0 && !WET.contains(pos)) WET.add(pos.immutable());
                 }
             }
         }
         periodic.sort(java.util.Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
         for (BlockPos b : periodic) if (!NATURAL.contains(b)) NATURAL.add(b);
         NATURAL.sort(java.util.Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
+        WET.sort(java.util.Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
         double km2 = (2.0 * half) * (2.0 * half) / 1_000_000.0;
         report(source, String.format("geysers survey x %d..%d z %d..%d (%.2f km2): %d chunks, %d with sulfur caves below (biome sampled in %d ms), %d chunks generated and searched in %d ms; "
                 + "potent sulfur %d (%d inside the area, %.1f per 1000x1000), periodic geysers (magma under, water over) %d; kinds %s; nearest periodic to spawn %s; first: %s",
@@ -775,12 +803,17 @@ public final class WorldTests {
             public boolean tick() {
                 ticks++;
                 if (!settled) {
+                    // the chunks are new: count from when the motor's and the far fan's chunks really tick (up to a minute)
+                    if (ticks == 1 && !(level.shouldTickBlocksAt(motorAt) && level.shouldTickBlocksAt(farFan) && level.shouldTickBlocksAt(branchFan)) && ++waited < 1200) {
+                        ticks = 0;
+                        return false;
+                    }
                     if (!restart && ticks == 40) {
                         report(source, "powerchain all loaded: " + fans() + "; " + network());
                         for (int i : middle) level.setChunkForced(t[i].getX() >> 4, t[i].getZ() >> 4, false);
                     }
                     if (ticks < (restart ? 100 : 41)) return false;
-                    if (middleAnyLoaded(level, t) && ++waited < 1200) return false;
+                    if (middleAnyLoaded(level, t) && ++waited < 2400) return false;
                     settled = true;
                     for (int i : middle) CHAIN_LOADS.put(ChunkPos.pack(t[i]), 0);
                     allBefore = allLoads;
