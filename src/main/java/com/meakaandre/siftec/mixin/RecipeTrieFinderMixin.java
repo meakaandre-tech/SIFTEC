@@ -23,11 +23,13 @@ public abstract class RecipeTrieFinderMixin {
     private static RecipeTrie<Recipe<?>> siftec$whole(Object key, ServerLevel level, Predicate<RecipeHolder<? extends Recipe<?>>> conditions,
                                                      Operation<RecipeTrie<Recipe<?>>> original) {
         BlockEntity asking = Ownership.ticking();
+        net.minecraft.server.level.ServerPlayer player = Ownership.asking(null);
         Ownership.ticking(null);
         try {
             return original.call(key, level, conditions);
         } finally {
             Ownership.ticking(asking);
+            Ownership.asking(player);
         }
     }
 }

@@ -1139,7 +1139,8 @@
         "siftec:versatile_framework",
         "cgs:steel_nugget",
         "cgs:steel_block",
-        "cgs:steel_sheet"
+        "cgs:steel_sheet",
+        "cgs:nail_steel"
       ],
       "tokens": []
     },
@@ -1171,10 +1172,7 @@
         "cgs:axe_iron",
         "cgs:axe_diamond",
         "cgs:axe_netherite",
-        "cgs:hammer_chamber",
-        "cgs:spear",
-        "cgs:bayonet",
-        "cgs:big_bayonet"
+        "cgs:spear"
       ],
       "tokens": [
         "backpack"
@@ -1330,7 +1328,6 @@
         "create_hypertube:hypertube",
         "create_hypertube:hypertube_entrance",
         "create_hypertube:hypertube_accelerator",
-        "create_hypertube:hypertube_junction",
         "create_hypertube:hypertube_funnel",
         "create_hypertube:redstone_detector_tube_attachment",
         "create_hypertube:tube_scanner_attachment"
@@ -1526,7 +1523,9 @@
         "siftec:heavy_modular_frame",
         "siftec:modular_engine",
         "siftec:adaptive_control_unit",
-        "create:crafter_slot_cover"
+        "create:crafter_slot_cover",
+        "create_hypertube:hypertube_junction",
+        "cgs:nailgun_splitter"
       ],
       "tokens": []
     },
@@ -2285,9 +2284,7 @@
       "items": [
         "cgs:nailgun",
         "create:copper_backtank",
-        "cgs:nail",
-        "cgs:nail_steel",
-        "cgs:nailgun_splitter"
+        "cgs:nail"
       ],
       "tokens": [],
       "needs": [
@@ -2351,7 +2348,7 @@
       "tree": "caterium",
       "cost": [
         {
-          "item": "create:raw_zinc",
+          "item": "create:crushed_raw_zinc",
           "count": 10
         }
       ],
@@ -2360,9 +2357,6 @@
         "siftec:brass_blend",
         "create:brass_ingot",
         "create:brass_sheet",
-        "create:zinc_ingot",
-        "create:zinc_nugget",
-        "create:zinc_block",
         "create:brass_nugget",
         "create:brass_block",
         "create:brass_casing",
@@ -2416,6 +2410,8 @@
         "create:attribute_filter",
         "create:smart_fluid_pipe",
         "create:controller_rail",
+        "create:content_observer",
+        "create:stockpile_switch",
         "createdieselgenerators:entity_filter"
       ],
       "tokens": [],
@@ -2505,6 +2501,10 @@
         {
           "item": "siftec:plastic",
           "count": 25
+        },
+        {
+          "item": "siftec:computer",
+          "count": 10
         }
       ],
       "seconds": 300,
@@ -2541,6 +2541,10 @@
         {
           "item": "siftec:biomass",
           "count": 100
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 10
         }
       ],
       "seconds": 60,
@@ -2611,6 +2615,10 @@
         {
           "item": "siftec:rubber",
           "count": 25
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 5
         }
       ],
       "seconds": 180,
@@ -2658,6 +2666,10 @@
         {
           "item": "minecraft:sweet_berries",
           "count": 20
+        },
+        {
+          "item": "createdieselgenerators:canister",
+          "count": 5
         }
       ],
       "seconds": 120,
@@ -2692,6 +2704,10 @@
         {
           "item": "minecraft:honey_bottle",
           "count": 10
+        },
+        {
+          "item": "createdieselgenerators:canister",
+          "count": 5
         }
       ],
       "seconds": 120,
@@ -2729,7 +2745,7 @@
         "food:seasoning"
       ],
       "needs": [
-        "mam_nutrients_2"
+        "mam_nutrients_1"
       ]
     },
     {
@@ -2751,7 +2767,7 @@
         "food:kitchen"
       ],
       "needs": [
-        "mam_nutrients_2"
+        "mam_nutrients_1"
       ]
     },
     {
@@ -2913,6 +2929,10 @@
         {
           "item": "minecraft:redstone",
           "count": 50
+        },
+        {
+          "item": "create:brass_sheet",
+          "count": 10
         }
       ],
       "seconds": 120,
@@ -2923,8 +2943,6 @@
         "create:pulse_timer",
         "create:powered_latch",
         "create:powered_toggle_latch",
-        "create:stockpile_switch",
-        "create:content_observer",
         "create:analog_lever",
         "create:redstone_contact",
         "create:polished_rose_quartz",
@@ -2949,6 +2967,10 @@
         {
           "item": "siftec:reinforced_iron_plate",
           "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 5
         }
       ],
       "seconds": 180,
@@ -2978,8 +3000,7 @@
         "create:redstone_link",
         "create:display_link",
         "create:display_board",
-        "create:nixie_tube",
-        "create:transmitter"
+        "create:nixie_tube"
       ],
       "tokens": [],
       "needs": [
@@ -3047,8 +3068,6 @@
         "cgs:flintlock_long_barrel",
         "cgs:blunderbuss_barrel",
         "cgs:blunderbuss_barrel_long",
-        "cgs:stock",
-        "cgs:scope",
         "cgs:paper_cartridge",
         "cgs:paper_shot",
         "cgs:lead_balls"
@@ -3067,6 +3086,10 @@
         {
           "item": "minecraft:cobblestone",
           "count": 20
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 10
         }
       ],
       "seconds": 60,
@@ -3088,6 +3111,10 @@
         },
         {
           "item": "siftec:steel_pipe",
+          "count": 10
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
           "count": 10
         }
       ],
@@ -3115,12 +3142,21 @@
         {
           "item": "siftec:motor",
           "count": 10
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 5
         }
       ],
       "seconds": 180,
       "items": [
         "cgs:revolver",
         "cgs:shotgun",
+        "cgs:stock",
+        "cgs:scope",
+        "cgs:bayonet",
+        "cgs:big_bayonet",
+        "cgs:hammer_chamber",
         "cgs:long_barrel",
         "cgs:auto_fire",
         "cgs:round_belt",
@@ -3880,6 +3916,7 @@
     "siftec:crafting/modular_frame_by_hand": "part_assembly",
     "siftec:crafting/smart_plating_by_hand": "part_assembly",
     "siftec:crafting/solid_biofuel_by_hand": "obstacle_clearing",
+    "siftec:crafting/flywheel": "hub_upgrade_6",
     "siftec:crafting/deployer": "part_assembly",
     "siftec:crafting/nailgun": "mam_megafauna_3",
     "siftec:mixing/steel_ingot": "basic_steel_production",
@@ -3958,13 +3995,12 @@
     "siftec:pressing/power_shard_from_yellow_slug": "mam_slugs_1",
     "siftec:pressing/power_shard_from_purple_slug": "mam_slugs_1",
     "siftec:deploying/synthetic_power_shard": "mam_slugs_1",
-    "siftec:crushing/silica": "mam_quartz_2",
+    "siftec:milling/silica": "mam_quartz_2",
     "siftec:sandpaper_polishing/quartz_crystal": "mam_quartz_1",
     "siftec:mechanical_crafting/crystal_oscillator": "mam_quartz_4",
     "siftec:mixing/ignimbrite": "mam_sulfur_2",
     "siftec:compacting/compacted_coal": "mam_sulfur_6",
     "siftec:mixing/turbofuel": "mam_sulfur_7",
-    "siftec:mixing/acid_leached_zinc": "mam_caterium_1",
     "siftec:item_application/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:deploying/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:item_application/steel_casing_from_stripped_woods": "basic_steel_production",
@@ -4543,6 +4579,7 @@
     "create:splashing/crushed_raw_copper",
     "create:crafting/kinetics/deployer",
     "create:crafting/kinetics/mechanical_crafter",
+    "create:crafting/kinetics/flywheel",
     "create:mechanical_crafting/crushing_wheel",
     "createdieselgenerators:mechanical_crafting/pumpjack_crank",
     "cgs:mechanical_crafting/hammer",

@@ -318,7 +318,7 @@ write(f"{D}/loot_table/blocks/mam.json", {"type": "minecraft:block", "pools": [{
 # ---- slugs and artefacts in the world
 lang.update({"item.siftec.object_scanner": "Object Scanner", "siftec.boost.no_slot": "No free slot for that: research more at the MAM", "siftec.boost.status": "Power Shards: %s, Somersloop: %s",
              "siftec.boost.yes": "yes", "siftec.boost.no": "no", "siftec.collect.already": "Your company already collected this one",
-             "siftec.collect.got": "Collected: %s", "siftec.scanner.none_object": "No %s left in range"})
+             "siftec.collect.got": "Collected: %s", "siftec.scanner.none_object": "No %s left in range", "siftec.scanner.mobs": "hostile mobs"})
 write(f"{A}/models/item/object_scanner.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/compass_16"}})
 item_def("object_scanner", "siftec:item/object_scanner")
 COLLECT = {"blue_power_slug": ("minecraft:block/blue_concrete", "Blue Power Slug"), "yellow_power_slug": ("minecraft:block/yellow_concrete", "Yellow Power Slug"),
@@ -629,7 +629,18 @@ for f in sorted(os.listdir(os.path.join(TEX, "item"))) if os.path.isdir(os.path.
         continue
     write(f"{A}/models/item/{iid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"siftec:item/{iid}"}})
     item_def(iid, f"siftec:item/{iid}")
-# the Zipline item was taken out; its model went with it
-for gone in (f"{A}/models/item/zipline.json", f"{A}/items/zipline.json"):
-    if os.path.exists(gone):
-        os.remove(gone)
+
+# Create's dough replaces Farmer's Delight's (whose recipes are removed and whose dough is switched off). A tag can
+# only lose an entry by being replaced, which works when this mod's data loads after Farmer's Delight's; if it loads
+# first, the dough is still uncraftable and hidden, so nothing is lost.
+write(os.path.join(ROOT, "data", "c", "tags", "item", "foods", "dough", "wheat.json"), {"replace": True, "values": ["create:dough"]})
+
+# ---- whatever an earlier run wrote that this one did not (a removed item's model, say) is deleted; these folders
+# hold only generated files. Textures are tools/import_art.py's.
+for folder in (f"{A}/items", f"{A}/models", f"{A}/blockstates", f"{D}/loot_table", f"{D}/context_int_provider", f"{D}/recipe"):
+    for dirpath, dirs, files in os.walk(folder):
+        for f in files:
+            path = os.path.normpath(os.path.join(dirpath, f))
+            if f.endswith(".json") and path not in WRITTEN:
+                print("removed stale", os.path.relpath(path, ROOT))
+                os.remove(path)

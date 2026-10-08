@@ -4,6 +4,10 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.client.ClientLocks;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.runtime.IJeiRuntime;
+import com.meakaandre.siftec.hub.Milestones;
+import net.minecraft.core.registries.BuiltInRegistries;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -31,6 +35,14 @@ public class SiftecJeiPlugin implements IModPlugin {
     @Override
     public Identifier getPluginUid() {
         return ID;
+    }
+
+    /** What the pack switches off for good (Farmer's Delight's dough, the water wheels and so on) is not listed at all. */
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime runtime) {
+        List<ItemStack> off = new ArrayList<>();
+        for (Identifier id : Milestones.disabled()) BuiltInRegistries.ITEM.getOptional(id).ifPresent(item -> off.add(new ItemStack(item)));
+        if (!off.isEmpty()) runtime.getIngredientManager().removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK, off);
     }
 
     @Override

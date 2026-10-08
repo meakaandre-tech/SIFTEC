@@ -368,6 +368,7 @@ def build():
     shaped("siftec:equipment_workshop", ["SSS", "RSR", "SRS"], {"S": "Iron Sheet", "R": "Iron Rod"}, name="equipment_workshop")
     # Create's own machines, rewritten with the pack's parts so each can be built at the tier that unlocks it
     # (Create's recipes need brass and Electron Tubes, which come later; theirs are in REMOVED)
+    shaped("create:flywheel", ["RSR", "SAS", "RSR"], {"R": "Iron Rod", "S": "Iron Sheet", "A": "create:shaft"}, name="flywheel")  # HUB Upgrade 6
     shaped("create:deployer", ["R", "C", "P"], {"R": "Rotor", "C": "create:andesite_casing", "P": "Reinforced Iron Plate"}, name="deployer")
     # the Rebar Gun: Megafauna research, long before the Mechanical Crafter
     shaped("cgs:nailgun", ["PPT", "RS "], {"P": "Reinforced Iron Plate", "T": "create:copper_backtank", "R": "Iron Rod", "S": "Screw"}, name="nailgun")
@@ -474,7 +475,7 @@ def build():
     for colour, n in (("Blue", 1), ("Yellow", 2), ("Purple", 5)):
         press(colour + " Power Slug", "Power Shard", n, name="power_shard_from_" + colour.lower() + "_slug")
     deploy("Time Crystal", "Dark Matter Crystal", "Power Shard", name="synthetic_power_shard")
-    crush("Nether Quartz", "Silica", 2)
+    mill("Nether Quartz", "Silica", 2)  # the Millstone, so Silica comes with its research, not at Tier 4
     add("sandpaper_polishing", "quartz_crystal", {"type": "create:sandpaper_polishing", "ingredient": item("Nether Quartz"), "result": res("Quartz Crystal")})
     crafter("Crystal Oscillator", [(4, "Quartz Crystal"), (3, "Cable"), (1, "Reinforced Iron Plate")])
     # the old tweaks pack: gunpowder, Ignimbrite and what it makes
@@ -523,7 +524,7 @@ REMOVED = [
     # washing crushed ore now belongs to the Pure Iron Ingot and Pure Copper Ingot alternates
     "create:splashing/crushed_raw_iron", "create:splashing/crushed_raw_copper",
     # rewritten in build() with the pack's parts, so each machine can be built at the tier that unlocks it
-    "create:crafting/kinetics/deployer", "create:crafting/kinetics/mechanical_crafter", "create:mechanical_crafting/crushing_wheel",
+    "create:crafting/kinetics/deployer", "create:crafting/kinetics/mechanical_crafter", "create:crafting/kinetics/flywheel", "create:mechanical_crafting/crushing_wheel",
     "createdieselgenerators:mechanical_crafting/pumpjack_crank", "cgs:mechanical_crafting/hammer", "cgs:mechanical_crafting/nailgun",
     # sulfur and lava come only by the owner's routes: no sulfur from crushing magma (Gunsmithing ships this one under
     # Create's name), no lava from fermenting cobblestone, and no Potent Sulfur (a geyser) from nine Blocks of Sulfur
