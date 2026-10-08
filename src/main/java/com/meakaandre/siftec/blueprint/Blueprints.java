@@ -84,7 +84,9 @@ public final class Blueprints {
     }
 
     private static final java.util.Set<String> FRESH = java.util.Set.of("age", "level", "honey_level", "charges", "moisture", "stage", "berries",
-        "has_bottle_0", "has_bottle_1", "has_bottle_2", "has_book", "has_record", "dusted", "hatch", "bites", "extended");
+        "has_bottle_0", "has_bottle_1", "has_bottle_2", "has_book", "has_record", "dusted", "hatch", "bites", "extended",
+        // running state, not shape: a furnace is not burning, a lever or button is not pressed, a dispenser has not fired
+        "lit", "powered", "triggered", "power");
     private static final java.util.Set<String> COUNTS = java.util.Set.of("candles", "pickles", "eggs", "flower_amount", "segment_amount", "layers");
 
     private static <T extends Comparable<T>> BlockState fresh(BlockState state, net.minecraft.world.level.block.state.properties.Property<T> property) {
@@ -92,10 +94,10 @@ public final class Blueprints {
     }
 
     /**
-     * A blueprint keeps the shape and the way a block faces, not what has grown or been put in it: crops go
-     * back to seedlings, cauldrons and composters are empty, nothing holds water.
+     * A blueprint keeps the shape and the way a block faces, not what has grown or been put in it or what it is
+     * doing: crops go back to seedlings, cauldrons and composters are empty, nothing holds water, furnaces are out.
      */
-    private static BlockState tidy(BlockState state) {
+    public static BlockState tidy(BlockState state) {
         if (state.getBlock() instanceof net.minecraft.world.level.block.AbstractCauldronBlock) return net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState();
         for (net.minecraft.world.level.block.state.properties.Property<?> property : state.getProperties()) {
             if (FRESH.contains(property.getName())) state = fresh(state, property);
