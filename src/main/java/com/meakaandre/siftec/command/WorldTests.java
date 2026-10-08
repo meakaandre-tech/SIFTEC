@@ -326,7 +326,8 @@ public final class WorldTests {
         BlockPos finalVent = vent;
         report(source, "geyser " + vent.toShortString() + ": state " + ventState.getValue(PotentSulfurBlock.STATE).getSerializedName() + ", water " + depth
             + " deep; an engine right on the water would be refused: " + refused + "; engine found the vent: " + finalVent.equals(GeyserEngineBlockEntity.findVent(level, engine))
-            + "; watching " + seconds + " s");
+            + "; watching " + seconds + " s; engine block " + level.getBlockState(engine) + " entity " + level.getBlockEntity(engine)
+            + (level.getBlockEntity(engine) instanceof GeyserEngineBlockEntity e ? " sees " + e.describe() : ""));
         MONITORS.add(new Monitor() {
             int ticks;
             long lastStart = -1;
@@ -366,7 +367,8 @@ public final class WorldTests {
                 double min = gaps.stream().mapToDouble(Double::doubleValue).min().orElse(0), max = gaps.stream().mapToDouble(Double::doubleValue).max().orElse(0);
                 report(source, "geyser " + finalVent.toShortString() + " after " + seconds + " s: " + eruptions + " eruptions, gaps " + gaps + " s (min " + min + ", max " + max
                     + ", all within 20-70: " + gaps.stream().allMatch(g -> g >= 20 && g <= 70) + "); engine ran " + runningInside + " ticks during eruptions and " + runningOutside
-                    + " outside; SU-seconds per eruption " + su + "; storage on top banked " + stored + "; engine half a second into eruptions: " + seen);
+                    + " outside; SU-seconds per eruption " + su + "; storage on top banked " + stored + "; engine half a second into eruptions: " + seen + "; engine block now " + level.getBlockState(engine)
+                    + (level.getBlockEntity(engine) instanceof GeyserEngineBlockEntity e ? " sees " + e.describe() : " (no engine entity)"));
                 level.setChunkForced(finalVent.getX() >> 4, finalVent.getZ() >> 4, false);
                 return true;
             }
