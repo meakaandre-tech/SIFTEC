@@ -71,6 +71,11 @@ public class GeyserEngineBlock extends KineticBlock implements IBE<GeyserEngineB
 
     @Override
     public net.minecraft.world.level.block.state.BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        // right on the geyser's water the engine would shut the gas in, and a geyser that cannot breathe stops: leave a block of air
+        if (GeyserEngineBlockEntity.blocksVent(context.getLevel(), context.getClickedPos())) {
+            if (context.getPlayer() instanceof ServerPlayer player) player.sendOverlayMessage(Component.translatable("siftec.geyser.blocked_place"));
+            return null;
+        }
         return com.meakaandre.siftec.block.Facing.place(super.getStateForPlacement(context), context);
     }
 

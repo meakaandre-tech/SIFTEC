@@ -111,7 +111,7 @@ lang.update({"siftec.claim.denied": "This land belongs to %s", "siftec.claim.bud
              "siftec.claim.hub": "HUB placed: %s chunks claimed"})
 lang.update({"item.siftec.gypsum": "Gypsum", "item.siftec.toxic_residue": "Toxic Residue",
              "siftec.geyser.full": "Geyser Engine: acid tank full (%s mB). Pipe it away", "siftec.geyser.running": "Geyser Engine: erupting (%s mB acid)",
-             "siftec.geyser.none": "Geyser Engine: no geyser below (%s mB acid)", "siftec.geyser.waiting": "Geyser Engine: waiting for the next eruption (%s mB acid)"})
+             "siftec.geyser.none": "Geyser Engine: no geyser below (%s mB acid)", "siftec.geyser.blocked": "Geyser Engine: sitting on the geyser's water shuts its gas in. Leave a block of air between (%s mB acid)", "siftec.geyser.blocked_place": "A Geyser Engine needs a block of air between it and the geyser's water", "siftec.geyser.waiting": "Geyser Engine: waiting for the next eruption (%s mB acid)"})
 for name, tex, tint in (("gypsum", "minecraft:item/bone_meal", None), ("toxic_residue", "minecraft:item/slime_ball", 0x90C020)):
     write(f"{A}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
     item_def(name, f"siftec:item/{name}", tint)
