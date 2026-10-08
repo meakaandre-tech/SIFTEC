@@ -318,11 +318,18 @@ public final class NodeTests {
 
                 @Override
                 public boolean tick() {
-                    MinerTier mark = MinerTier.values()[tier];
-                    if (t == 0) miner = build(level, at, mark, company);
+                    MinerTier mark = MinerTier.values()[Math.max(tier, 0)];
+                    if (t == 0 && tier >= 0) miner = build(level, at, mark, company);
                     t++;
                     if (miner == null || miner.isRemoved()) {
                         report(source, "miner " + mark + " on " + node + ": no miner block entity (" + level.getBlockState(at) + ")");
+                        return true;
+                    }
+                    if (tier < 0) {
+                        if (t < 70) return false;
+                        level.setBlockAndUpdate(at.above(2), Blocks.AIR.defaultBlockState());
+                        report(source, "miner freeze " + node.purity().getSerializedName() + " at " + at.toShortString() + ": "
+                            + miner.tier() + " fluid " + miner.fluidAmount() + " mB, progress " + miner.progress() + ", output " + miner.output.get());
                         return true;
                     }
                     if (t == WARM) {
@@ -344,9 +351,10 @@ public final class NodeTests {
                         t = 0;
                         tier++;
                         if (tier == MinerTier.values().length) {
-                            // left for the screenshots and the restart check: Mk.1 on the impure node, Mk.2 on the normal one, Mk.3 on the pure one
-                            build(level, at, MinerTier.values()[node.purity().ordinal()], company);
-                            return true;
+                            // left for the screenshots and the restart check: Mk.1 on the impure node, Mk.2 on the normal one, Mk.3 on the pure one,
+                            // run for 70 ticks (part way into a cycle), then stopped and reported, to be compared after the restart
+                            miner = build(level, at, MinerTier.values()[node.purity().ordinal()], company);
+                            tier = -1;
                         }
                     }
                     return false;

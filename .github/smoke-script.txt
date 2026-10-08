@@ -126,5 +126,3 @@ shot
 cmd siftec worldtest look miner 2 2
 sleep 8
 shot
-cmd siftec worldtest miners freeze
-sleep 2
