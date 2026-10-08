@@ -43,6 +43,33 @@ public final class Equipment {
         {"siftec:compacted_coal", "600"}, {"siftec:solid_biofuel", "300"}};
 
     private static final Map<UUID, Integer> THRUSTING = new HashMap<>();
+    /**
+     * Players coming down after their flight ended in mid-air (the Hover Pack out of range, a zipline let go): they
+     * keep slow falling until they land, are in water, or are flying again. Kept by id, so it also holds for
+     * someone who drops off by leaving the game and comes back in the air.
+     */
+    private static final java.util.Set<UUID> SAFE_FALL = new java.util.HashSet<>();
+
+    /** Slow falling from now until the player is on the ground (or in water, or flying). */
+    public static void safeFall(ServerPlayer player) {
+        SAFE_FALL.add(player.getUUID());
+        player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, true, false, false));
+    }
+
+    private static void tickSafeFall(MinecraftServer server) {
+        for (Iterator<UUID> it = SAFE_FALL.iterator(); it.hasNext(); ) {
+            ServerPlayer player = server.getPlayerList().getPlayer(it.next());
+            if (player == null) continue;   // offline: still owed a soft landing when they come back
+            if (player.onGround() || player.isInWater() || player.getAbilities().flying || player.isPassenger() || player.isSpectator() || !player.isAlive()) {
+                it.remove();
+                continue;
+            }
+            player.resetFallDistance();
+            if (!player.hasEffect(MobEffects.SLOW_FALLING) || player.getEffect(MobEffects.SLOW_FALLING).getDuration() < 20) {
+                player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, true, false, false));
+            }
+        }
+    }
     /** Thrust left in the tank, and when the running filters give out. Kept with the player. */
     private static final net.fabricmc.fabric.api.attachment.v1.AttachmentType<Integer> JET_TICKS = net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.create(
         com.meakaandre.siftec.Siftec.id("jet_fuel"), builder -> builder.persistent(com.mojang.serialization.Codec.INT).copyOnDeath());
@@ -75,6 +102,7 @@ public final class Equipment {
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             THRUSTING.clear();
+            SAFE_FALL.clear();
             Poles.clear();
             Ziplines.clear();
             com.meakaandre.siftec.blueprint.Blueprints.clear();
@@ -178,6 +206,7 @@ public final class Equipment {
     private static void tick(MinecraftServer server) {
         tickJetpacks(server);
         Ziplines.tick(server);
+        tickSafeFall(server);
         com.meakaandre.siftec.blueprint.Blueprints.tick(server);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if ((server.getTickCount() + player.getId()) % 10 != 0) continue;
@@ -205,9 +234,9 @@ public final class Equipment {
         if (want == player.getAbilities().mayfly) return;
         player.getAbilities().mayfly = want;
         if (!want) {
-            // the pack cut out in mid-air: come down gently
+            // the pack cut out in mid-air: come down gently, all the way down
             player.getAbilities().flying = false;
-            player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 0, true, false, false));
+            if (!player.onGround()) safeFall(player);
         }
         player.onUpdateAbilities();
     }

@@ -62,6 +62,33 @@ public final class Ziplines {
         return best;
     }
 
+    /**
+     * Where a rider gets off at the last pole: on the ground beside it, past it in the direction of travel if there
+     * is room there, else on another side; if there is no ground near, beside the pole at the height of the line
+     * (the rider then comes down slowly).
+     */
+    private static Vec3 landing(ServerLevel level, BlockPos pole, Vec3 heading) {
+        java.util.List<net.minecraft.core.Direction> sides = new java.util.ArrayList<>(4);
+        net.minecraft.core.Direction ahead = heading.lengthSqr() < 0.01 ? net.minecraft.core.Direction.NORTH : net.minecraft.core.Direction.getApproximateNearest(heading.x, 0, heading.z);
+        sides.add(ahead);
+        sides.add(ahead.getClockWise());
+        sides.add(ahead.getCounterClockWise());
+        sides.add(ahead.getOpposite());
+        for (net.minecraft.core.Direction side : sides) {
+            BlockPos column = pole.relative(side);
+            for (int dy = 1; dy >= -8; dy--) {
+                BlockPos feet = column.above(dy);
+                if (level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), net.minecraft.core.Direction.UP)
+                    && level.getBlockState(feet).getCollisionShape(level, feet).isEmpty() && level.getBlockState(feet.above()).getCollisionShape(level, feet.above()).isEmpty()
+                    && level.getFluidState(feet).isEmpty()) {
+                    return new Vec3(feet.getX() + 0.5, feet.getY(), feet.getZ() + 0.5);
+                }
+            }
+        }
+        BlockPos beside = pole.relative(ahead);
+        return new Vec3(beside.getX() + 0.5, top(pole).y, beside.getZ() + 0.5);
+    }
+
     public static boolean start(ServerPlayer player, BlockPos pole) {
         ServerLevel level = player.level();
         Vec3 look = player.getLookAngle();
@@ -95,6 +122,8 @@ public final class Ziplines {
             Ride ride = it.next();
             ServerLevel level = (ServerLevel) ride.carrier.level();
             if (ride.rider.isRemoved() || ride.carrier.isRemoved() || ride.rider.getVehicle() != ride.carrier) {
+                // let go (sneaking) or left the game: come down gently, not into whatever is under the line
+                if (ride.rider.getVehicle() == null) Equipment.safeFall(ride.rider);
                 ride.carrier.discard();
                 it.remove();
                 continue;
@@ -106,8 +135,10 @@ public final class Ziplines {
                 BlockPos onward = next(level, ride.to, new Vec3(b.x - a.x, 0, b.z - a.z).normalize(), ride.from, 0.5);
                 if (onward == null) {
                     ride.rider.stopRiding();
-                    ride.rider.teleportTo(b.x, ride.to.getY() + 1.0, b.z + 0.0);
+                    Vec3 off = landing(level, ride.to, new Vec3(b.x - a.x, 0, b.z - a.z));
+                    ride.rider.teleportTo(off.x, off.y, off.z);
                     ride.rider.resetFallDistance();
+                    Equipment.safeFall(ride.rider);
                     ride.carrier.discard();
                     it.remove();
                     continue;
