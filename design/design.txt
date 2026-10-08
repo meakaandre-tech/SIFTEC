@@ -3,8 +3,8 @@
  · 
 ## Overview
 A Minecraft modpack that follows Satisfactory's progression, with Create as the tech base and a wormhole in place of the space elevator.
-Version: Fabric 26.2, where Create Fly already works. The pack moves to 26.3 once Create Fly supports it.
-Structure: Satisfactory's 10 tiers and 45 milestones, with the same names. Two tiers unlock per wormhole phase, and the finished wormhole opens a portal to The Sift.
+Version: Fabric 26.3, on Create Fly (the owner's 26.3 port) and the owner's 26.3 ports of Hypertubes, Diesel Generators and Gunsmithing.
+Structure: Satisfactory's 10 tiers and milestones, with the same names (44: Tier 8's Nuclear Power is removed for now). Two tiers unlock per wormhole phase, and the finished wormhole opens a portal to The Sift.
 Milestones: paid in parts at a company's HUB. Progression belongs to the company, not the player. After Tier 0, each one locks the HUB for its listed time.
 Locked by default: every machine and recipe is locked until a milestone or MAM node unlocks it.
 Resources: ore spawns normally for hand mining. Above-ground infinite nodes only produce with a miner on them.
@@ -12,7 +12,7 @@ Power: rotation only, with no electricity. Speed is capped per Logistics tier: 3
 Custom mod: one mod holds every pack feature. Ported mods stay pure ports.
 Every part recipe and build cost is on its own tab: 
 ## Mods and port list
-Four mods need porting to Fabric 26.2. Create Fly, Farmer's Delight and The Sift already have 26.2 builds.
+The pack runs on Fabric 26.3. The table is the original port plan; Create Fly, Hypertubes, Diesel Generators and Gunsmithing are now ported to 26.3 on the owner's forks. Create Nuclear was dropped (2026-10-05) for geothermal power.
 Mod
  | Role in the pack
  | Newest build found
@@ -20,8 +20,8 @@ Mod
  | 
 Create Fly
  | Create on modern Fabric
- | Fabric 26.2, on an active branch
- | None: built from its 26.2 branch. Licensed CC0, with Create's own licences bundled. A 26.3 port was started on the fork and is parked: 26.3 moved fuel, brewing, tool actions and ore features into data, so it needs system rewrites
+ | Fabric 26.3, the owner's port (pack-26.3 release)
+ | Ported: 26.3 moved fuel, brewing, tool actions and ore features into data. Licensed CC0, with Create's own licences bundled.
  | 
 Create: Hypertubes
  | Hypertubes (Tier 4)
@@ -33,11 +33,6 @@ Create: Diesel Generators
  | NeoForge 1.21.1
  | Port, then make the Pumpjack work only on oil nodes. Licence not checked.
  | 
-Create Nuclear
- | Reactors, uranium, radiation (Tier 8); thorium removed
- | NeoForge 1.21.1
- | Port. MIT.
- | 
 Create: Gunsmithing
  | Weapons
  | Forge and NeoForge 1.20.1
@@ -45,12 +40,12 @@ Create: Gunsmithing
  | 
 Farmer's Delight Refabricated
  | Food
- | Fabric 26.2
- | None: use its 26.2 build, which has Create Fly compatibility.
+ | Fabric 26.3
+ | None: its 26.3 build has Create Fly compatibility. Its dough is switched off in favour of Create's.
  | 
-Order of work: Hypertubes, Diesel Generators, Create Nuclear, then Gunsmithing. Nothing before Tier 4 needs them, so the custom mod's early tiers can be built alongside.
+Order of work: Hypertubes, Diesel Generators, then Gunsmithing. Nothing before Tier 4 needs them, so the custom mod's early tiers can be built alongside.
 Not ported: Create: Dreams & Desires. Its furnace engine is rebuilt in the custom mod with new textures, because the original art is all rights reserved.
-Destination: Mielon's The Sift is the dimension the finished wormhole opens. It has a Fabric 26.2 build and is MIT licensed, so it needs no port. Its own Ancient City portal and natural rifts are switched off, so the wormhole is the only way in.
+Destination: Mielon's The Sift is the dimension the finished wormhole opens. It has a Fabric 26.3 build and is MIT licensed, so it needs no port. Its own Ancient City portal and natural rifts are switched off, so the wormhole is the only way in.
 ## Parts
 Satisfactory parts keep their names. Where a vanilla or modded item already fits, the pack uses it; everything else is a custom item.
 Satisfactory
@@ -100,14 +95,6 @@ Sulfur
 Crude Oil, Fuel
  | Crude oil; diesel and gasoline
  | Create: Diesel Generators
- | 
-Uranium
- | Uranium
- | Create Nuclear
- | 
-Plutonium
- | Plutonium, a custom fuel added to the reactor
- | Custom
  | 
 Diamonds
  | Diamond
@@ -211,7 +198,7 @@ Both tiers open once Tier 0 is done. They add logistics, research and the first 
  | Field Research
  | 300 Wire, 300 Screw, 100 Iron Sheet
  | 3:00
- | MAM; Toolbox; Object Scanner; Beacon (waypoints); map; +3 backpack slots
+ | MAM; Toolbox; Object Scanner; +3 backpack slots (no Beacon: the pack uses Xaero's Minimap)
  | 
 ### Tier 2
 #
@@ -230,7 +217,7 @@ Both tiers open once Tier 0 is done. They add logistics, research and the first 
  | Obstacle Clearing
  | 500 Screw, 100 Cable, 100 Concrete
  | 3:00
- | Solid Biofuel recipe; Chainsaw; +3 backpack slots
+ | Solid Biofuel recipe; Mechanical Harvester, Mechanical Plough, Tree Fertilizer; +3 backpack slots (no Chainsaw)
  | 
 3
  | Jump Pads
@@ -263,13 +250,13 @@ Unlocked by Wormhole Phase 1. They add coal power, steel, fluids and blueprints.
  | Coal Power
  | 150 Reinforced Iron Plate, 50 Rotor, 500 Cable
  | 8:00
- | Coal Generator (Steam Engine on a Fluid Tank boiler, heated by Blaze Burners); Water Extractor (Mechanical Pump and Hose Pulley); Fluid Pipe; Fluid Tank; coal nodes on the scanner
+ | Coal Generator (Steam Engine on a Fluid Tank boiler, heated by Blaze Burners); Water Extractor (Mechanical Pump and Hose Pulley); Fluid Pipe; Fluid Tank; coal nodes on the scanner (the Smart Fluid Pipe needs Electron Tubes, so it comes with Caterium Electronics)
  | 
 2
  | Vehicular Transport
  | 25 Modular Frame, 100 Rotor, 200 Cable, 400 Iron Rod
  | 4:00
- | Cart Assembler (minecart contraptions); Rope Pulley; +3 backpack slots
+ | Cart Assembler (minecart contraptions); Rope Pulley; Minecart Coupling; +3 backpack slots (the Controller Rail needs an Electron Tube, so it comes with Caterium Electronics)
  | 
 3
  | Basic Steel Production
@@ -306,7 +293,7 @@ Unlocked by Wormhole Phase 1. They add coal power, steel, fluids and blueprints.
  | Advanced Steel Production
  | 100 Steel Pipe, 200 Rotor, 100 Modular Frame, 500 Concrete
  | 10:00
- | Miner Mk.2; Encased Industrial Beam, Stator, Motor and Automated Wiring recipes
+ | Miner Mk.2; Crushing Wheels (a crafting-table recipe from Steel Beams, Rotor and andesite alloy); Encased Industrial Beam, Stator, Motor and Automated Wiring recipes
  | 
 4
  | Expanded Power Infrastructure
@@ -371,7 +358,7 @@ Unlocked by Wormhole Phase 2. They add oil through Create: Diesel Generators, th
  | Industrial Manufacturing
  | 100 Motor, 200 Plastic, 200 Rubber, 1,000 Cable
  | 12:00
- | Manufacturer (Mechanical Crafter); Computer, Heavy Modular Frame, Modular Engine and Adaptive Control Unit recipes
+ | Manufacturer (Mechanical Crafter, from Circuit Board, Steel Casing and a crafting table); Computer, Heavy Modular Frame, Modular Engine and Adaptive Control Unit recipes
  | 
 2
  | Monorail Train Technology
@@ -387,7 +374,7 @@ Unlocked by Wormhole Phase 2. They add oil through Create: Diesel Generators, th
  | 
 Logistics Mk.4 costs Tier 6 parts, as in Satisfactory, so it is finished after Industrial Manufacturing.
 ## Tiers 7 and 8
-Unlocked by Wormhole Phase 3. They add aluminium, cardboard drones and nuclear power through Create Nuclear.
+Unlocked by Wormhole Phase 3. They add aluminium and cardboard drones. The Tier 8 Nuclear Power milestone is removed for now; geothermal power is MAM research (Sulfur tree).
 ### Tier 7
 #
  | Milestone
@@ -411,7 +398,7 @@ Unlocked by Wormhole Phase 3. They add aluminium, cardboard drones and nuclear p
  | Hazmat Suit
  | 50 Aluminum Casing, 500 Quickwire, 50 Gas Filter
  | 5:00
- | Hazmat Suit (Create Nuclear's anti-radiation armour); Iodine Infused Filter recipe; +3 backpack slots
+ | Hazmat Suit (against the geyser waste's radiation); Iodine Infused Filter recipe; +3 backpack slots
  | 
 4
  | Hover Pack
@@ -432,29 +419,23 @@ Unlocked by Wormhole Phase 3. They add aluminium, cardboard drones and nuclear p
  | 15:00
  | Drone Port and Cardboard Drone; Create's Packager; Sulfuric Acid, Supercomputer and Assembly Director System recipes; sulfur nodes on the scanner
  | 
-2
- | Nuclear Power
- | 50 Supercomputer, 200 Heavy Modular Frame, 1,000 Cable, 2,000 Concrete
- | 10:00
- | Nuclear Power Plant (Create Nuclear reactor); Encased Uranium Cell, Electromagnetic Control Rod, Uranium Fuel Rod and Magnetic Field Generator recipes; uranium nodes on the scanner
- | 
 3
  | Advanced Aluminum Production
  | 50 Radio Control Unit, 200 Aluminum Casing, 200 Alclad Aluminum Sheet, 300 Wire
  | 15:00
- | Resource Well extractor for nitrogen nodes; Heat Sink, Cooling System and Fused Modular Frame recipes; nitrogen as reactor coolant
+ | Resource Well extractor for nitrogen nodes; Empty Fluid Tank and packaged nitrogen; Heat Sink, Cooling System, Fused Modular Frame and Electromagnetic Control Rod recipes; nitrogen nodes on the scanner
  | 
 4
  | Leading-edge Production
  | 50 Fused Modular Frame, 100 Supercomputer, 1,000 Steel Pipe
  | 5:00
- | Miner Mk.3; Turbo Motor and Thermal Propulsion Rocket recipes
+ | Miner Mk.3; Turbo Motor, Thermal Propulsion Rocket and Magnetic Field Generator recipes
  | 
 5
  | Particle Enrichment
  | 400 Electromagnetic Control Rod, 400 Cooling System, 200 Fused Modular Frame, 100 Turbo Motor
  | 20:00
- | Particle Accelerator; Nitric Acid, Copper Powder, Pressure Conversion Cube and Nuclear Pasta recipes; Plutonium Fuel Rod, made from Uranium Waste
+ | Particle Accelerator; Nitric Acid, Copper Powder, Pressure Conversion Cube and Nuclear Pasta recipes
  | 
 Quickwire and the Gas Filter come from the MAM. Satisfactory's Battery recipe is dropped, because drones burn fire charges.
 ## Tier 9
@@ -493,7 +474,7 @@ Unlocked by Wormhole Phase 4. Almost all of it is new content built around SAM, 
  | Peak Efficiency
  | 250 Time Crystal, 250 Ficsite Trigon, 1,000 Alclad Aluminum Sheet, 2,000 Iron Sheet
  | 20:00
- | Speed cap raised to 256 RPM; Ficsonium and Ficsonium Fuel Rod recipes
+ | Speed cap raised to 256 RPM
  | 
 ## MAM research tree
 The MAM unlocks at Field Research (Tier 1). Each tree starts when its trigger item is brought to the MAM, and each node costs items plus a short research time.
@@ -506,8 +487,8 @@ Alien Megafauna
  | Biomass from mob drops; Nailgun (the Rebar Gun) and Copper Backtank; DNA Capsule for sink points
  | 
 Caterium
- | Zinc
- | Brass blend and brass; Quickwire; AI Limiter; High-Speed Connector; Smart Splitter (Brass Tunnel, Brass Funnel, Smart Chute, filters); Mechanical Arm; Electron Tube; Precision Mechanism; Power Switch (Clutch, Gearshift, Sequenced Gearshift, Rotation Speed Controller); Zipline (ride the power lines)
+ | Zinc (crushed: the research starts once the Crushing Wheels are built)
+ | Brass blend and brass; Quickwire; AI Limiter; High-Speed Connector; Smart Splitter (Brass Tunnel, Brass Funnel, Smart Chute, filters); Mechanical Arm; Electron Tube and Precision Mechanism (made on the Deployer too); Smart Fluid Pipe, Controller Rail, Smart Observer and Threshold Switch; Power Switch (Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Speed Governor); Zipline (ride the power lines with a Wrench)
  | 
 Mycelia
  | Mushrooms
@@ -527,7 +508,7 @@ Quartz
  | 
 Sulfur
  | Sulfur
- | Black Powder (gunpowder); Ignimbrite, with its TNT, fire charge and magma recipes; Frag Grenade; Revolver, Shotgun, Gatling and Launcher; Compacted Coal; Turbofuel
+ | Black Powder (gunpowder) and the Flintlock; Ignimbrite, with its fire charge, magma and lava recipes; TNT and Frag Grenade; Revolver and Shotgun; Gatling, Launcher and the other heavy weapons; Compacted Coal; Turbofuel; Geothermal Power (Geyser Engine)
  | 
 Alien Technology
  | A Mercer Sphere or a Somersloop
@@ -593,7 +574,7 @@ Somersloop
 A crash site is a cargo pod thrown out of a failed rift, with wreckage around it. Each pod holds one Hard Drive.
 Opening a pod: some open freely. Others need parts delivered, such as 20 Rotors, or a shaft connected with enough stress. Requirements get harder further from spawn.
 Hard Drive: researched at the MAM for 10 minutes. It then offers a choice of two alternate recipes, drawn from the tiers the company has unlocked.
-Alternate recipes: cheaper or different routes to existing parts. Examples: pure ingots by Fan washing, Cast Screw, Iron Wire, Stitched Iron Plate. The full pool of 61 is on the Recipes tab.
+Alternate recipes: cheaper or different routes to existing parts. Examples: pure ingots by Fan washing, Cast Screw, Iron Wire, Stitched Iron Plate. The full pool of 57 is on the Recipes tab.
 When the pool runs out: spare drives go in the AWESOME Sink for points.
 ## Custom systems
 Everything below is built in the pack's own mod.
@@ -607,7 +588,7 @@ Wormhole Gateway
  | Takes the phase parts. Five phases, each unlocking the next tiers.
  | 
 Resource nodes
- | Above-ground, infinite, and only productive with a miner on them. Purity is impure, normal or pure, as in Satisfactory. Placement and looks are in the Nodes section. Types: iron, copper, limestone, coal, zinc, oil, quartz, bauxite, sulfur, uranium, nitrogen, SAM.
+ | Above-ground, infinite, and only productive with a miner on them. Purity is impure, normal or pure, as in Satisfactory. Placement and looks are in the Nodes section. Types: iron, copper, limestone, coal, zinc, oil, quartz, bauxite, sulfur, nitrogen, SAM.
  | 
 Miners
  | Portable Miner, then Miner Mk.1, Mk.2 and Mk.3.
@@ -622,7 +603,7 @@ Power poles
  | Power Line, Power Pole and Power Tower carry rotation over distance. Power Storage holds stress and releases it later.
  | 
 Speed cap
- | A global RPM limit raised by each Logistics milestone.
+ | A per-company RPM limit raised by each Logistics milestone, set with the Speed Governor up to the limit of the company that placed it or whose claim it stands in.
  | 
 Backpack
  | Extra slots shown in the normal inventory screen when pressing E. Grows by 3 per reward. The offhand is always unlocked.
@@ -640,7 +621,7 @@ AWESOME Sink and Shop
  | The Sink turns surplus items into points; the Shop spends them.
  | 
 Equipment
- | Equipment Workshop, Chainsaw, Jetpack, Hover Pack, Blade Runners, Parachute, Gas Mask, Object Scanner, Beacon, Jump Pad landing pad, Zipline.
+ | Equipment Workshop, Jetpack, Hover Pack, Blade Runners, Parachute, Gas Mask, Object Scanner, Jump Pad landing pad. No Chainsaw, no Beacon, and no Zipline item: Power Lines are ridden with a Wrench.
  | 
 Cardboard Drones
  | Drone Ports send drones carrying Create packages between ports. Each trip burns fire charges.
@@ -652,16 +633,16 @@ Late-game machines
  | Particle Accelerator, Converter, Main Portal and Satellite Portal.
  | 
 Tweaks
- | Gunpowder from sulfur, coal or charcoal, and bone meal. Ignimbrite as a real fluid, from cobblestone and sulfur in a heated mixer, used for TNT, fire charges and magma blocks. Magma blocks melt to lava and always crush into sulfur.
+ | Gunpowder from sulfur, coal or charcoal, and bone meal. Ignimbrite as a real fluid, from cobblestone and sulfur in a heated mixer, used for TNT, fire charges and magma blocks. Magma blocks melt to lava, and that is the only way to lava (Diesel Generators' cobblestone fermenting is removed). Crushing magma gives no sulfur, so there is no sulfur loop. Vanilla's sulfur block is the Block of Sulfur, 4 sulfur and back; Potent Sulfur cannot be crafted.
  | 
 Companies
  | Players form a company, and all progression belongs to the company: milestones, wormhole phases, MAM research and the cloud inventory. Milestone and phase costs rise 50% for each member after the first.
  | 
 Pollution
- | Visual only: fuel-burning power dirties the sky, with no gameplay effect. Windmills are the clean alternative from the midgame.
+ | None for now: the pollution mechanism is removed.
  | 
-Nuclear waste
- | As in Satisfactory. Reactors produce Uranium Waste, which is radioactive and cannot go in the AWESOME Sink. Particle Enrichment turns it into Plutonium Fuel Rods, which leave Plutonium Waste. Ficsonium Fuel Rods in Tier 9 burn that with no waste. Thorium is removed.
+Geothermal waste
+ | The Geyser Engine's waste is sulfuric acid, which cannot be pumped back down. It can be neutralised with limestone or calcite (gypsum, a fertiliser, by-product) or used for ore leaching and boiled down for sulfur; every use leaves Toxic Residue, which can be packed into Toxic Shot. The waste is radioactive near it; lead does not shield it.
  | 
 Dropped from the old tweaks pack: the lava steel recipe and the Blaze Burner texture.
 ## Nodes
@@ -694,10 +675,6 @@ Bauxite
  | Jungle, savanna, badlands
  | Rare
  | 
-Uranium
- | Mountains and badlands
- | Rare
- | 
 Nitrogen
  | Cold biomes and peaks
  | Rare
@@ -711,7 +688,7 @@ Quartz
  | Common
  | 
 Sulfur
- | Nether
+ | Sulfur caves (Overworld only; none in the Nether)
  | Uncommon
  | 
 Purity
@@ -865,7 +842,7 @@ Coal
 Sulfur
  | 3
  | 
-Crushing Wheels unlock at Advanced Steel Production, so brass is reachable from Tier 4 by a company that finds zinc and researches the Caterium tree. Quickwire is brass wire.
+Crushing Wheels unlock at Advanced Steel Production, so brass is reachable from Tier 4 by a company that finds zinc and researches the Caterium tree, which starts from crushed zinc. Quickwire is brass wire.
 ### Heat
 Superheating is removed: Blaze Cake is disabled and a Blaze Burner only has its normal heat level.
 Recipes: anything that asked for superheating becomes a heated recipe that also takes diesel as a fuel fluid, so it needs Tier 5.
@@ -922,12 +899,12 @@ Weighted Ejector
  | Jump Pads
  | 
 Potato Cannon, Extendo Grip, Wand of Symmetry, Linked Controller, Lectern Controller, Cuckoo Clock, Steam Whistle, bells, Clipboard, Placard, Crafting Blueprint, Turntable, table cloths, Shopping List, brackets, Valve Handle
- | AWESOME Shop
+ | AWESOME Shop: what it sells is bought only (the crafting recipes are removed); the dyed, haunted and other versions unlock with Resource Sink Bonus Program
  | 
-Steam Engine, Blaze Burner, Fluid Pipe, Smart Fluid Pipe, Mechanical Pump, Fluid Tank, Hose Pulley
+Steam Engine, Blaze Burner, Fluid Pipe, Mechanical Pump, Fluid Tank, Hose Pulley
  | Coal Power
  | 
-Cart Assembler, Rope Pulley, Controller Rail, Minecart Coupling
+Cart Assembler, Rope Pulley, Minecart Coupling
  | Vehicular Transport
  | 
 Mechanical Mixer
@@ -960,13 +937,13 @@ Sequenced Assembly
 Refined Radiance (as Excited Photonic Matter), Shadow Steel (as Dark Matter Crystal)
  | Quantum Encoding
  | 
-Zinc, brass, Brass Tunnel, Brass Funnel, Smart Chute, filters, Mechanical Arm, Electron Tube, Precision Mechanism
+Brass, Brass Tunnel, Brass Funnel, Smart Chute, filters, Mechanical Arm, Electron Tube, Precision Mechanism, Smart Fluid Pipe, Controller Rail, Smart Observer, Threshold Switch (zinc itself is free)
  | MAM: Caterium
  | 
-Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Rotation Speed Controller
+Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Speed Governor (the Rotation Speed Controller is switched off)
  | MAM: Caterium
  | 
-Redstone Link, Display Link, Display Board, Nixie Tube, rose quartz, Sand Paper, Threshold Switch, Smart Observer, latches, pulse blocks, Analog Lever, Redstone Contact
+Redstone Link, Display Link, Display Board, Nixie Tube, rose quartz, Sand Paper, latches, pulse blocks, Analog Lever, Redstone Contact
  | MAM: Quartz
  | 
 Copper Backtank
@@ -984,8 +961,11 @@ Water Wheel, Large Water Wheel
 Schematic Table, Schematicannon, Empty Schematic, Schematic and Quill
  | Disabled: replaced by the Blueprint Designer
  | 
-Blaze Cake, Chromatic Compound
+Blaze Cake (Create Fly has no Chromatic Compound)
  | Disabled
+ | 
+Everything else from Create, Diesel Generators, Gunsmithing and Hypertubes
+ | Each item is assigned in tools/content.py (MORE_LOCKS): decorative stone, windows, seats, copper roofing and girders at Base Building; steel blocks at Basic Steel Production; melee weapons with the Xeno-Basher; guns and their parts and rounds with the Sulfur research; diesel engine parts at Petroleum Power; train doors and postboxes with the trains; cardboard with the package network. The generator stops if an item is left out.
  | 
 ### Machine jobs
 Every Create process has a production job, apart from superheating, which is removed.
@@ -1031,11 +1011,11 @@ Distillation
  | 
 Milling
  | Millstone
- | Flour, rice, sugar and bone meal for the food lines; biomass from leaves, wood and crop waste
+ | Flour, rice, sugar and bone meal for the food lines; biomass from leaves, wood and crop waste; Silica
  | 
 Crushing
  | Crushing Wheels
- | Crushed copper and zinc for brass; sulfur from magma blocks; Silica; Copper Powder; crushed bauxite
+ | Crushed copper and zinc for brass; Copper Powder; crushed bauxite. Crushing magma gives no sulfur.
  | 
 Compacting
  | Mechanical Press over a Basin
@@ -1059,7 +1039,7 @@ Sandpaper polishing
  | 
 Arm handling
  | Mechanical Arm
- | Loading fuel rods into reactors; feeding Blaze Burners
+ | Feeding Blaze Burners and machines
  | 
 Contraption farming
  | Harvester, Plough and Saw on contraptions
@@ -1071,5 +1051,4 @@ No production job by design: Weighted Ejector (Jump Pad), Mechanical Roller (tra
 A balance pass on the recipes once they can be tested in game.
 ### Values to verify
 The licence for Create: Diesel Generators.
-Whether Create Nuclear already has waste of its own, once it is ported.
 Which recipes in the ported mods use superheating.

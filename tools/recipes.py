@@ -464,6 +464,9 @@ def build():
         mix("brass_blend_with_" + slug(flux), items=["create:crushed_raw_copper", "create:crushed_raw_zinc", flux], results=[("Brass Blend", n)])
     smelt("Brass Blend", "Brass Ingot", name="brass_ingot_from_blend")
     saw("Brass Ingot", "Quickwire", 4)
+    # the Assembler makes Create's brass-tier parts too (Create's own recipes stay as well)
+    deploy("Iron Sheet", "Quickwire", "Electron Tube")
+    deploy("Brass Sheet", "Rotor", "Precision Mechanism")
     deploy("Copper Sheet", "Quickwire", "AI Limiter")
     crafter("High-Speed Connector", [(5, "Quickwire"), (3, "Cable"), (1, "Circuit Board")])
     for mushroom in ("brown_mushroom", "red_mushroom"):

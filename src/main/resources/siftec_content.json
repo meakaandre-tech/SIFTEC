@@ -3984,6 +3984,8 @@
     "siftec:smelting/brass_ingot_from_blend": "mam_caterium_1",
     "siftec:blasting/brass_ingot_from_blend": "mam_caterium_1",
     "siftec:cutting/quickwire": "mam_caterium_2",
+    "siftec:deploying/electron_tube": "mam_caterium_3",
+    "siftec:deploying/precision_mechanism": "mam_caterium_3",
     "siftec:deploying/ai_limiter": "mam_caterium_4",
     "siftec:mechanical_crafting/high_speed_connector": "mam_caterium_7",
     "siftec:deploying/fabric_from_brown_mushroom": "mam_mycelia_2",

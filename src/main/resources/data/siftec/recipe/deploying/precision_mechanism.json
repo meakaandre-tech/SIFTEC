@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "create:brass_sheet",
+  "ingredient": "siftec:rotor",
+  "results": [
+    {
+      "id": "create:precision_mechanism"
+    }
+  ]
+}

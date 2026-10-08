@@ -46,9 +46,9 @@ Quantum Encoder
  | Sequenced assembly line
  | A base item and a fixed order of steps
  | 
-Nodes give raw materials: raw iron, raw copper, raw zinc, coal, limestone, Nether quartz, bauxite, sulfur, raw uranium, SAM, and the fluids crude oil and nitrogen.
+Nodes give raw materials: raw iron, raw copper, raw zinc, coal, limestone, Nether quartz, bauxite, sulfur, SAM, and the fluids crude oil and nitrogen.
 Hand crafting: until its machine unlocks, a part is crafted at a crafting table from the same ingredients.
-Create's blocks keep Create's own crafting recipes. The milestone or MAM node is what locks them.
+Create's blocks keep Create's own crafting recipes, except seven that would otherwise need something from a later tier (Create's need brass, Electron Tubes or the Mechanical Crafter). These are crafting-table recipes from the pack's parts, and the originals are removed: Deployer (Rotor, Andesite Casing, Reinforced Iron Plate), Mechanical Crafter (Circuit Board, Steel Casing, crafting table; makes 3), Crushing Wheels (4 andesite alloy, 4 Steel Beam, 1 Rotor; makes 2), Flywheel (4 Iron Rod, 4 Iron Sheet, 1 shaft), Diesel Generators' Pumpjack crank (andesite alloy, iron sheets, zinc, shafts), Gunsmithing's Xeno-Basher (Reinforced Iron Plates, Rotor, Modular Frame, Iron Rod) and Nailgun (Reinforced Iron Plates, Copper Backtank, Iron Rod, Screw). The milestone or MAM node is what locks a block; locked by default means every item of Create, Diesel Generators, Gunsmithing and Hypertubes is either unlocked by a milestone or listed as free (the starting kinetics, raw and crushed materials, crafting ingredients and food).
 Custom blocks and equipment are built at the Equipment Workshop, which takes a list of parts and has no grid.
 ## Tiers 0 to 2
 The starting parts are all iron, copper and limestone, made on single-item machines until the Deployer arrives.
@@ -115,7 +115,7 @@ Reinforced Iron Plate
 Biomass
  | 2 leaves, 1 log or 4 crop waste
  | 1, 4 or 1
- | Millstone
+ | Millstone; the Mechanical Saw for sugar cane, cactus and grass, which Create already mills into sugar, green dye and seeds
  | HUB Upgrade 6
  | 
 Copper Sheet
@@ -148,7 +148,7 @@ Solid Biofuel
  | Compacting
  | Obstacle Clearing
  | 
-Concrete is vanilla light gray concrete; the dyes from Resource Sink Bonus Program recolour it. Before their machines unlock, the Press, Saw and compacting recipes are crafted by hand, and Reinforced Iron Plate stays hand-crafted until Part Assembly.
+Concrete is vanilla light gray concrete; the dyes from Resource Sink Bonus Program recolour it. Iron Sheet by hand is three ingots in a row for three sheets, because two side by side is the heavy weighted pressure plate. Before their machines unlock, the Press, Saw and compacting recipes are crafted by hand, and Reinforced Iron Plate stays hand-crafted until Part Assembly.
 ## Tiers 3 and 4
 Steel is the new material, and it needs heat from a Blaze Burner.
 Part
@@ -164,9 +164,9 @@ Steel Ingot
  | Basic Steel Production
  | 
 Steel Beam
- | 1 Steel Ingot
+ | 2 Steel Ingot
  | 1
- | Mechanical Press
+ | Press over a Basin (compacting): a plain Press turns a steel ingot into Gunsmithing's Steel Sheet
  | Basic Steel Production
  | 
 Steel Pipe
@@ -205,7 +205,7 @@ Automated Wiring
  | Deployer
  | Advanced Steel Production
  | 
-Coal Power's boiler runs on water and Blaze Burners fed with coal or Solid Biofuel.
+Coal Power's boiler runs on water and Blaze Burners fed with coal or Solid Biofuel. Burn times (coal is 1,600 ticks): Biomass 960, Solid Biofuel 2,400, Compacted Coal 3,360, Petroleum Coke 960, in a furnace, a Blaze Burner or the HUB Engine. Recipes take steel by its tag, so any mod's steel ingot works.
 ## Tiers 5 and 6
 Oil brings fluids into recipes, and the Mechanical Crafter takes the first parts with three or four ingredients.
 Part
@@ -227,7 +227,7 @@ Plastic
  | Oil Processing
  | 
 Rubber
- | 250 mB crude oil
+ | 250 mB crude oil + 1 coal
  | 2, plus 150 mB Heavy Oil Residue
  | Heated Mixer
  | Oil Processing
@@ -288,7 +288,7 @@ Adaptive Control Unit
  | 
 Heavy Oil Residue is a custom fluid. Liquid Biofuel uses the biodiesel fluid from Create: Diesel Generators, so it burns in the same engines as diesel.
 ## Tiers 7 and 8
-Aluminium, nitrogen and uranium each add a multi-step chain, and the Particle Accelerator takes the densest recipes.
+Aluminium and nitrogen each add a multi-step chain, and the Particle Accelerator takes the densest recipes.
 ### Aluminium and Tier 7
 Part
  | Ingredients
@@ -369,34 +369,22 @@ Assembly Director System
  | Deployer
  | Aeronautical Engineering
  | 
-Encased Uranium Cell
- | 1 raw uranium, 1 Concrete, 250 mB Sulfuric Acid
- | 1
- | Heated Mixer
- | Nuclear Power
- | 
 Electromagnetic Control Rod
  | Stator + AI Limiter
  | 1
  | Deployer
- | Nuclear Power
- | 
-Uranium Fuel Rod
- | 5 Encased Uranium Cell, 2 Encased Industrial Beam, 2 Electromagnetic Control Rod
- | 1
- | Mechanical Crafter
- | Nuclear Power
+ | Advanced Aluminum Production
  | 
 Magnetic Field Generator
  | Versatile Framework + Electromagnetic Control Rod
  | 1
  | Deployer
- | Nuclear Power
+ | Leading-edge Production
  | 
 Empty Fluid Tank
  | 1 Aluminum Ingot
  | 1
- | Mechanical Press
+ | Mechanical Saw (the Press makes Aluminum Casing from an ingot)
  | Advanced Aluminum Production
  | 
 Packaged Nitrogen Gas
@@ -441,30 +429,6 @@ Nitric Acid
  | Heated Mixer
  | Particle Enrichment
  | 
-Non-fissile Uranium
- | 1 Uranium Waste, 1 Silica, 250 mB Nitric Acid, 250 mB Sulfuric Acid
- | 1
- | Heated Mixer
- | Particle Enrichment
- | 
-Plutonium Pellet
- | 3 Non-fissile Uranium + 1 Uranium Waste
- | 1
- | Particle Accelerator
- | Particle Enrichment
- | 
-Encased Plutonium Cell
- | Plutonium Pellet + Concrete
- | 1
- | Deployer
- | Particle Enrichment
- | 
-Plutonium Fuel Rod
- | 4 Encased Plutonium Cell, 2 Steel Beam, 2 Electromagnetic Control Rod, 1 Heat Sink
- | 1
- | Mechanical Crafter
- | Particle Enrichment
- | 
 Copper Powder
  | 1 Copper Ingot
  | 1
@@ -483,7 +447,7 @@ Nuclear Pasta
  | Particle Accelerator
  | Particle Enrichment
  | 
-A Uranium Fuel Rod leaves Uranium Waste in the reactor and a Plutonium Fuel Rod leaves Plutonium Waste. Each Uranium Fuel Rod leaves 5 and each Plutonium Fuel Rod leaves 1, so one Plutonium Fuel Rod uses up the waste of about three Uranium Fuel Rods.
+Create Nuclear was removed (2026-10-05), and its uranium and plutonium chain with it; geothermal power (the Geyser Engine, MAM Sulfur tree) replaces it. Its waste is sulfuric acid.
 ## Tier 9
 Everything here starts from SAM. The Converter and the Quantum Encoder line make the parts for Wormhole Phase 5.
 Part
@@ -553,46 +517,34 @@ Shadow Steel (Dark Matter Crystal)
  | Quantum Encoding
  | 
 Superposition Oscillator
- | Crystal Oscillator base; apply Shadow Steel, Alclad Aluminum Sheet, Refined Radiance; 2 loops
+ | Crystal Oscillator base; apply Dark Matter Crystal, Alclad Aluminum Sheet, Excited Photonic Matter; 2 loops
  | 1
  | Quantum Encoder
  | Quantum Encoding
  | 
 Neural-Quantum Processor
- | Supercomputer base; apply Time Crystal, Ficsite Trigon, Refined Radiance; 3 loops
+ | Supercomputer base; apply Time Crystal, Ficsite Trigon, Excited Photonic Matter; 3 loops
  | 1
  | Quantum Encoder
  | Quantum Encoding
  | 
 AI Expansion Server
- | Magnetic Field Generator base; apply Neural-Quantum Processor, Superposition Oscillator, Refined Radiance; then press
+ | Magnetic Field Generator base; apply Neural-Quantum Processor, Superposition Oscillator, Excited Photonic Matter; then press
  | 1
  | Quantum Encoder
  | Quantum Encoding
  | 
 Singularity Cell
- | 1 Nuclear Pasta, 2 Shadow Steel, 3 Iron Sheet, 3 Concrete
+ | 1 Nuclear Pasta, 2 Dark Matter Crystal, 3 Iron Sheet, 3 Concrete
  | 1
  | Mechanical Crafter
  | Spatial Energy Regulation
  | 
 Ballistic Warp Drive
- | 1 Thermal Propulsion Rocket, 3 Singularity Cell, 2 Superposition Oscillator, 3 Shadow Steel
+ | 1 Thermal Propulsion Rocket, 3 Singularity Cell, 2 Superposition Oscillator, 3 Dark Matter Crystal
  | 1
  | Mechanical Crafter
  | Spatial Energy Regulation
- | 
-Ficsonium
- | 1 Plutonium Waste, 1 Singularity Cell, 250 mB Dark Matter Residue
- | 1
- | Particle Accelerator
- | Peak Efficiency
- | 
-Ficsonium Fuel Rod
- | Ficsonium base; apply Electromagnetic Control Rod, Ficsite Trigon, Refined Radiance; 2 loops
- | 1
- | Quantum Encoder
- | Peak Efficiency
  | 
 In a Quantum Encoder line, each "apply" is a Deployer step in Create's sequenced assembly, and a loop repeats the whole order.
 ## MAM parts
@@ -604,10 +556,10 @@ Part
  | Tree
  | 
 Biomass
- | 1 rotten flesh, bone, string or spider eye
+ | 1 rotten flesh, string or spider eye; 1 bone
  | 2
- | Millstone
- | Alien Megafauna
+ | Millstone; the Mechanical Saw for bone (the Millstone makes bone meal)
+ | Alien Megafauna (Hostile Remains)
  | 
 DNA Capsule
  | 2 mob drops of one kind
@@ -678,7 +630,7 @@ Power Shard
 Silica
  | 1 Nether quartz
  | 2
- | Crushing Wheels
+ | Millstone
  | Quartz
  | 
 Quartz Crystal
@@ -692,12 +644,6 @@ Crystal Oscillator
  | 1
  | Mechanical Crafter
  | Quartz
- | 
-Sulfur
- | 1 magma block
- | 1
- | Crushing Wheels
- | Start, with Crushing Wheels
  | 
 Black Powder (gunpowder)
  | 1 sulfur, 1 coal or charcoal, 1 bone meal
@@ -747,8 +693,8 @@ Turbofuel
  | Heated Mixer
  | Sulfur
  | 
-Electron Tubes and Precision Mechanisms are only used in Create's own brass-tier recipes, which stay as Create has them.
-Magma blocks make sulfur, and sulfur makes Ignimbrite, which makes magma blocks. With these amounts one sulfur returns two, so sulfur is infinite once the Sulfur tree is researched. The loop is kept on purpose, as it was in the tweaks pack.
+Electron Tubes and Precision Mechanisms are only used in Create's own brass-tier recipes, which stay as Create has them; Create's own Electron Tube (polished rose quartz) and Precision Mechanism (sequenced assembly) recipes stay too.
+No sulfur loop (owner's decision, 2026-10-05): crushing magma gives no sulfur (Gunsmithing's recipe for it is removed), so sulfur comes from sulfur caves and sulfur nodes. Lava comes only by Ignimbrite: sulfur and cobblestone make Ignimbrite, Ignimbrite makes magma blocks, and magma blocks melt to lava; Diesel Generators' lava from fermenting cobblestone is removed. Block of Sulfur is vanilla's sulfur block, crafted from 4 sulfur and back; vanilla's Potent Sulfur (a geyser) recipe from nine of them is removed, so geysers stay where the world puts them.
 ## Custom blocks and equipment
 These are built at the Equipment Workshop from a list of parts. Costs follow Satisfactory's build costs as I recall them where the building exists there, and are set for the pack otherwise.
 Block or item
@@ -756,15 +702,31 @@ Block or item
  | Unlocks at
  | 
 Equipment Workshop
- | 6 Iron Sheet, 4 Iron Rod (crafting table)
- | HUB Upgrade 1
+ | 6 Iron Sheet, 3 Iron Rod (crafting table; ten items do not fit a 3 by 3 grid)
+ | Start (it builds the HUB)
  | 
 Portable Miner
  | 1 Mechanical Drill, 2 Iron Sheet, 4 Iron Rod
  | HUB Upgrade 1
  | 
+Node Scanner
+ | 2 Iron Sheet, 4 Wire
+ | Start
+ | 
+HUB
+ | 10 Iron Sheet, 10 Iron Rod
+ | Start
+ | 
+Claim Marker
+ | 5 Iron Rod, 5 Concrete
+ | Start (each company has a budget of markers)
+ | 
 Power Line
  | 1 Cable
+ | HUB Upgrade 2
+ | 
+HUB Engine
+ | 5 Iron Sheet, 5 Iron Rod
  | HUB Upgrade 2
  | 
 Power Pole
@@ -790,14 +752,6 @@ MAM
 Object Scanner
  | 4 Reinforced Iron Plate, 20 Wire, 50 Screw
  | Field Research
- | 
-Beacon
- | 3 Iron Sheet, 1 Iron Rod, 15 Wire, 2 Cable
- | Field Research
- | 
-Chainsaw
- | 5 Reinforced Iron Plate, 25 Iron Rod, 160 Screw, 15 Cable
- | Obstacle Clearing
  | 
 Landing pad
  | 20 Rotor, 30 Cable, 200 Biomass
@@ -879,10 +833,6 @@ Blade Runners
  | 20 Silica, 3 Modular Frame, 3 Rotor
  | MAM: Quartz
  | 
-Zipline
- | 30 Quickwire, 3 Iron Rod, 10 Cable
- | MAM: Caterium
- | 
 Parachute
  | 10 Fabric, 5 Cable
  | MAM: Mycelia
@@ -899,11 +849,19 @@ Dimensional Depot
  | 1 Mercer Sphere, 5 Modular Frame, 20 Cable
  | MAM: Alien Technology
  | 
-Not listed because they keep their own mod's recipes: Create's blocks, hypertubes, pumpjacks and diesel engines, the reactor, and the Gunsmithing weapons. A Production Amplifier is a Somersloop slotted into a machine, so it has no build cost.
+Speed Governor
+ | 25 Quickwire, 2 Rotor, 2 Reinforced Iron Plate
+ | MAM: Caterium (Power Switch)
+ | 
+Geyser Engine
+ | 20 Heavy Modular Frame, 10 Supercomputer, 50 Steel Pipe, 20 Rubber
+ | MAM: Sulfur (Geothermal Power)
+ | 
+Not listed because they keep their own mod's recipes: Create's blocks (except the seven above), hypertubes, pumpjacks and diesel engines, and the Gunsmithing weapons. No Beacon (the pack uses Xaero's Minimap), no Chainsaw and no Zipline item: Power Lines are ridden with a Wrench after the Zipline research. A Production Amplifier is a Somersloop slotted into a machine, so it has no build cost.
 ## Alternate recipes
-The Hard Drive pool has 61 alternates, adapted from Satisfactory's. Each one is a second way to make a part the company already has; none replaces the standard recipe.
+The Hard Drive pool has 57 alternates, adapted from Satisfactory's. Each one is a second way to make a part the company already has; none replaces the standard recipe.
 Offer: a researched drive shows two alternates the company does not own yet.
-Eligibility: an alternate is only offered once its machine and every ingredient are unlocked, MAM trees included.
+Eligibility: an alternate is only offered once its machine and every ingredient are unlocked, MAM trees included. An ingredient no milestone locks (crushed ore, a fluid) is traced back to the machine, fluid source or recipe that makes it, so Pure Iron Ingot waits for Crushing Wheels and Coated Cable for Oil Processing.
 Yield: where "Makes" is higher than the standard recipe, that is the reward.
 ### Tiers 0 to 2
 Alternate
@@ -1209,26 +1167,6 @@ Heat-Fused Frame
  | 1 Fused Modular Frame
  | Heated Mixer
  | 
-Infused Uranium Cell
- | 1 raw uranium, 1 Silica, 1 sulfur, 1 Quickwire
- | 2 Encased Uranium Cell, no acid
- | Mechanical Crafter
- | 
-Uranium Fuel Unit
- | 4 Encased Uranium Cell, 1 Electromagnetic Control Rod, 1 Crystal Oscillator, 2 Rotor
- | 1 Uranium Fuel Rod
- | Mechanical Crafter
- | 
-Instant Plutonium Cell
- | 4 Non-fissile Uranium + 1 Aluminum Casing
- | 1 Encased Plutonium Cell
- | Particle Accelerator
- | 
-Plutonium Fuel Unit
- | Encased Plutonium Cell + Pressure Conversion Cube
- | 1 Plutonium Fuel Rod
- | Deployer
- | 
 ### Tier 9
 Alternate
  | Ingredients
@@ -1257,6 +1195,6 @@ Brass Ficsite Ingot
  | 
 Dark Matter Trap
  | 1 Time Crystal + 250 mB Dark Matter Residue
- | 2 Shadow Steel
+ | 2 Dark Matter Crystal
  | Particle Accelerator
  | 
