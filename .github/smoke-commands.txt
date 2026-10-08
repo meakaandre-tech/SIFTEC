@@ -11,6 +11,9 @@ locate biome minecraft:sulfur_caves
 siftec worldtest geysers 0 0 500
 siftec worldtest geysers 1300 300 500
 siftec worldtest geysers -1500 -1500 500
+siftec worldtest pads 12
+siftec worldtest miners setup
+siftec worldtest showroom
 siftec worldtest geyser build 160
 siftec worldtest geyser natural 160
 siftec worldtest geyser wet 160

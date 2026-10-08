@@ -42,12 +42,16 @@ public class MinerRenderer implements BlockEntityRenderer<MinerBlockEntity, Mine
         Level level = SmartBlockEntityRenderer.extractBase(be, state, breakProgress);
         CardinalLighting lighting = SmartBlockEntityRenderer.getCardinalLighting(level);
         int color = getTintColor(be);
-        state.head = CachedBuffers.partialFacing(AllPartialModels.DRILL_HEAD, state.blockState, Direction.DOWN)
-            .cardinalLighting(lighting).light(state.lightCoords).color(color).extractRenderState();
-        state.cog = CachedBuffers.partial(AllPartialModels.SHAFTLESS_COGWHEEL, state.blockState)
-            .cardinalLighting(lighting).light(state.lightCoords).color(color).extractRenderState();
-        state.shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state.blockState, Direction.UP)
-            .cardinalLighting(lighting).light(state.lightCoords).color(color).extractRenderState();
+        net.minecraft.world.level.block.state.BlockState blockState = be.getBlockState();
+        int light = SmartBlockEntityRenderer.getLightCoords(level, be.getBlockPos());
+        // the cog and shaft end are up in the upper block: lit as it is
+        int lightAbove = SmartBlockEntityRenderer.getLightCoords(level, be.getBlockPos().above());
+        state.head = CachedBuffers.partialFacing(AllPartialModels.DRILL_HEAD, blockState, Direction.DOWN)
+            .cardinalLighting(lighting).light(light).color(color).extractRenderState();
+        state.cog = CachedBuffers.partial(AllPartialModels.SHAFTLESS_COGWHEEL, blockState)
+            .cardinalLighting(lighting).light(lightAbove).color(color).extractRenderState();
+        state.shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockState, Direction.UP)
+            .cardinalLighting(lighting).light(lightAbove).color(color).extractRenderState();
         state.angle = getRotateAngleWithoutBeOffset(Direction.Axis.Y, be, state, level);
     }
 

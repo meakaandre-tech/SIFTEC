@@ -318,7 +318,8 @@ public final class WorldTests {
                     if (!s.isAir() && s.getFluidState().isEmpty()) solid++;
                 }
             }
-            result = "core at " + pos.toShortString() + " on " + BuiltInRegistries.BLOCK.getKey(under.getBlock()) + ", solid under the mound " + solid + "/" + around;
+            result = "core at " + pos.toShortString() + " on " + BuiltInRegistries.BLOCK.getKey(under.getBlock()) + ", solid under the mound " + solid + "/" + around
+                + "; " + NodeTests.padReport(level, node);
         }
         report(source, "place " + type.id() + " " + node + ": " + result);
         for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced(cx + dx, cz + dz, false);
@@ -438,7 +439,7 @@ public final class WorldTests {
     }
 
     /** A company that has every speed limit milestone done, for machines that turn fast. */
-    private static String fastCompany(CommandSourceStack source) {
+    static String fastCompany(CommandSourceStack source) {
         var data = com.meakaandre.siftec.company.CompanyData.get(source.getServer());
         com.meakaandre.siftec.company.Company company = data.byId("worldtest_fast");
         if (company == null) {

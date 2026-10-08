@@ -5,3 +5,4 @@ execute in minecraft:the_nether run siftec selftest nether
 siftec selftest state verify
 siftec worldtest powerchain restart
 #sleep 40
+siftec worldtest miners verify
