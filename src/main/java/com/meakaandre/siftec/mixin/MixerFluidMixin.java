@@ -14,7 +14,7 @@ import java.util.List;
 /** A Mechanical Mixer with a Somersloop doubles the fluids a recipe makes too, not only the items. */
 @Mixin(value = {MixingRecipe.class, PotionRecipe.class}, remap = false)
 public abstract class MixerFluidMixin {
-    @ModifyArg(method = {"matches", "apply"}, index = 1, at = @At(value = "INVOKE",
+    @ModifyArg(method = {"matches(Lcom/zurrtum/create/content/processing/basin/BasinInput;Lnet/minecraft/world/level/Level;)Z", "apply(Lcom/zurrtum/create/content/processing/basin/BasinInput;)Z"}, index = 1, at = @At(value = "INVOKE",
         target = "Lcom/zurrtum/create/content/processing/basin/BasinInput;acceptOutputs(Ljava/util/List;Ljava/util/List;Z)Z"))
     private List<FluidStack> siftec$doubleFluids(List<FluidStack> fluids) {
         if (fluids.isEmpty() || !Boosts.doubling()) return fluids;
