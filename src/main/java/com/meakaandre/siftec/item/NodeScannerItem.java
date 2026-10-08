@@ -76,4 +76,9 @@ public class NodeScannerItem extends Item {
         int index = Math.floorMod((int) Math.round(angle / 45.0), 8);
         return COMPASS[index];
     }
+
+    /** Forgets every player's choice; called when the server stops. */
+    public static void forget() {
+        SELECTED.clear();
+    }
 }

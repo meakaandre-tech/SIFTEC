@@ -36,18 +36,61 @@ public class Company {
     public long researchEnd;
     /** The Dimensional Depot cloud: item id -> count. */
     public Map<String, Integer> cloud = new HashMap<>();
+    /** The founder, who may kick members. Empty in older saves, where the first member counts as founder. */
+    public String owner = "";
+    /**
+     * Players who left or were kicked, and the real time (ms) they went. For a while they still count toward
+     * the cost multiplier and cannot join again, so leaving to pay less does not work.
+     */
+    public Map<String, Long> leftAt = new HashMap<>();
+    /** The cost multiplier the parts in {@link #paid} were delivered at; they are scaled when it changes. 0 in older saves. */
+    public float paidAt;
+
+    public String owner() {
+        if (!owner.isEmpty() && members.contains(owner)) return owner;
+        return members.isEmpty() ? "" : members.iterator().next();
+    }
+
+    /** Players who left recently and are not back. */
+    public int recentLeavers() {
+        long now = System.currentTimeMillis(), cooldown = com.meakaandre.siftec.config.SiftecConfig.memberCooldownMillis();
+        leftAt.values().removeIf(at -> now - at >= cooldown);
+        int n = 0;
+        for (String id : leftAt.keySet()) if (!members.contains(id)) n++;
+        return n;
+    }
+
+    /** True if the player left this company too recently to join it again. */
+    public boolean coolingDown(String playerId) {
+        Long at = leftAt.get(playerId);
+        return at != null && System.currentTimeMillis() - at < com.meakaandre.siftec.config.SiftecConfig.memberCooldownMillis();
+    }
+
+    /** Scales parts already delivered when the multiplier has changed, so a partial payment keeps its share. */
+    public void syncPaid() {
+        float now = costMultiplier();
+        if (paidAt <= 0) {
+            paidAt = now;
+            return;
+        }
+        if (Math.abs(paidAt - now) < 1e-4) return;
+        float ratio = now / paidAt;
+        for (Map<String, Integer> parts : paid.values()) parts.replaceAll((item, count) -> Math.round(count * ratio));
+        paidAt = now;
+    }
 
     public boolean has(String id) {
         return done.contains(id);
     }
 
-    /** Costs rise 50% for each member after the first. */
+    /** Costs rise 50% for each member after the first; someone who left recently still counts. */
     public float costMultiplier() {
-        return 1f + 0.5f * Math.max(0, members.size() - 1);
+        return 1f + 0.5f * Math.max(0, members.size() + recentLeavers() - 1);
     }
 
     public int cost(Milestone.Cost cost) {
-        return (int) Math.ceil(cost.count() * costMultiplier());
+        syncPaid();
+        return (int) Math.ceil(cost.count() * paidAt);
     }
 
     public int paid(Milestone m, Milestone.Cost cost) {
@@ -60,6 +103,7 @@ public class Company {
     }
 
     public void pay(Milestone m, Milestone.Cost cost, int amount) {
+        syncPaid();
         paid.computeIfAbsent(m.id(), k -> new HashMap<>()).merge(cost.key(), amount, Integer::sum);
     }
 

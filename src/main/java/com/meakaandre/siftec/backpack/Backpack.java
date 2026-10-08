@@ -6,7 +6,10 @@ import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.net.ClientState;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.core.NonNullList;
@@ -30,11 +33,54 @@ public final class Backpack {
     public static final class Contents {
         public final NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
 
-        static final Codec<Contents> CODEC = ItemStack.OPTIONAL_CODEC.listOf().xmap(list -> {
-            Contents contents = new Contents();
-            for (int i = 0; i < list.size() && i < SIZE; i++) contents.items.set(i, list.get(i));
-            return contents;
-        }, contents -> List.copyOf(contents.items));
+        /**
+         * Saved as a list of {Slot, Item} for the filled slots, so every item keeps its place. Each item is read
+         * on its own: one that cannot be read any more (its mod was removed) is logged and skipped, and the
+         * rest stay where they were. Older saves were a plain list by position, and still load.
+         */
+        public static final Codec<Contents> CODEC = new Codec<>() {
+            @Override
+            public <T> DataResult<Pair<Contents, T>> decode(DynamicOps<T> ops, T input) {
+                Contents contents = new Contents();
+                DataResult<java.util.stream.Stream<T>> list = ops.getStream(input);
+                if (list.isError()) return DataResult.success(Pair.of(contents, ops.empty()));
+                List<T> entries = list.getOrThrow().toList();
+                for (int i = 0; i < entries.size(); i++) {
+                    T entry = entries.get(i);
+                    int slot = i;
+                    T item = entry;
+                    DataResult<T> tagged = ops.get(entry, "Item");
+                    if (tagged.isSuccess()) {
+                        item = tagged.getOrThrow();
+                        slot = ops.get(entry, "Slot").flatMap(ops::getNumberValue).map(Number::intValue).result().orElse(-1);
+                    }
+                    if (slot < 0 || slot >= SIZE) continue;
+                    DataResult<ItemStack> stack = ItemStack.OPTIONAL_CODEC.parse(ops, item);
+                    if (stack.isSuccess()) {
+                        contents.items.set(slot, stack.getOrThrow());
+                    } else {
+                        Siftec.LOGGER.warn("SIFTEC: dropped an unreadable item from backpack slot {}: {}", slot, stack.error().map(e -> e.message()).orElse("?"));
+                    }
+                }
+                return DataResult.success(Pair.of(contents, ops.empty()));
+            }
+
+            @Override
+            public <T> DataResult<T> encode(Contents contents, DynamicOps<T> ops, T prefix) {
+                List<T> out = new java.util.ArrayList<>();
+                for (int i = 0; i < SIZE; i++) {
+                    ItemStack stack = contents.items.get(i);
+                    if (stack.isEmpty()) continue;
+                    DataResult<T> item = ItemStack.CODEC.encodeStart(ops, stack);
+                    if (item.isError()) {
+                        Siftec.LOGGER.warn("SIFTEC: could not save the item in backpack slot {}: {}", i, stack);
+                        continue;
+                    }
+                    out.add(ops.createMap(java.util.Map.of(ops.createString("Slot"), ops.createInt(i), ops.createString("Item"), item.getOrThrow())));
+                }
+                return DataResult.success(ops.createList(out.stream()));
+            }
+        };
     }
 
     public static final AttachmentType<Contents> CONTENTS = AttachmentRegistry.create(Siftec.id("backpack"),

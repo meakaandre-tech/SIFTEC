@@ -9,6 +9,8 @@ import net.minecraft.world.item.ItemStack;
 public class BackpackSlot extends Slot {
     /** Where the first backpack slot sits in the inventory window, just under the hotbar. */
     public static final int LEFT = 8, TOP = 170;
+    /** Set by the client while the creative inventory is open, where these slots would sit on top of the hotbar. */
+    public static volatile boolean hiddenOnClient;
     private final Player player;
     private final int number;
 
@@ -24,6 +26,7 @@ public class BackpackSlot extends Slot {
 
     @Override
     public boolean isActive() {
+        if (hiddenOnClient && player.level().isClientSide()) return false;
         return open() || hasItem();
     }
 

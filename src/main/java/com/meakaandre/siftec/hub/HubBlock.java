@@ -24,7 +24,8 @@ public class HubBlock extends Block implements EntityBlock {
     public final boolean gateway;
 
     public HubBlock(boolean gateway, Properties properties) {
-        super(properties);
+        // a HUB holds land: it cannot be blown up or pushed, or its claim would be left behind
+        super(properties.explosionResistance(3600000.0F).pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK));
         this.gateway = gateway;
     }
 
@@ -37,13 +38,34 @@ public class HubBlock extends Block implements EntityBlock {
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (placer instanceof ServerPlayer player && level.getBlockEntity(pos) instanceof HubBlockEntity hub) {
-            hub.companyId = Companies.of(player).id;
-            hub.setChanged();
+            Company company = Companies.of(player);
             // a HUB claims the land around it; the Gateway does not
-            if (!gateway && level instanceof net.minecraft.server.level.ServerLevel server) {
-                int chunks = com.meakaandre.siftec.claim.Claims.claim(server, Companies.of(player), pos, com.meakaandre.siftec.claim.Claims.HUB_RADIUS, false);
-                player.sendOverlayMessage(Component.translatable("siftec.claim.hub", chunks));
+            if (!gateway && level instanceof net.minecraft.server.level.ServerLevel server && !company.id.isEmpty()) {
+                // not right next to another company's land, so two bases never share a border by accident
+                if (com.meakaandre.siftec.claim.Claims.nearForeignHub(server, company, pos)
+                    || com.meakaandre.siftec.claim.Claims.nearForeign(server, company, pos, com.meakaandre.siftec.claim.Claims.HUB_RADIUS + 1, false)) {
+                    level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    if (!player.hasInfiniteMaterials()) player.getInventory().placeItemBackInInventory(new ItemStack(this), net.minecraft.util.Prediction.SERVER_ONLY);
+                    player.sendOverlayMessage(Component.translatableWithFallback("siftec.claim.hub_too_close",
+                        "Too close to another company's land: a HUB must be more than %s chunks from another HUB", com.meakaandre.siftec.claim.Claims.HUB_SPACING));
+                    return;
+                }
+                hub.companyId = company.id;
+                hub.setChanged();
+                int chunks = com.meakaandre.siftec.claim.Claims.claimForHub(server, company, pos);
+                if (chunks < 0) {
+                    player.sendOverlayMessage(Component.translatableWithFallback("siftec.claim.hub_extra",
+                        "HUB placed. Your company's first HUB already holds its land, so this one claims nothing"));
+                } else if (chunks == 0 && com.meakaandre.siftec.claim.Claims.inSpawnZone(server, pos)) {
+                    player.sendOverlayMessage(Component.translatableWithFallback("siftec.claim.hub_spawn",
+                        "HUB placed. Nothing can be claimed within %s blocks of spawn", com.meakaandre.siftec.config.SiftecConfig.spawnFreeRadius));
+                } else {
+                    player.sendOverlayMessage(Component.translatable("siftec.claim.hub", chunks));
+                }
+                return;
             }
+            hub.companyId = company.id;
+            hub.setChanged();
         }
     }
 

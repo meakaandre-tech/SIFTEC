@@ -54,24 +54,34 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
             return Component.translatableWithFallback("siftec.tag." + path.replace('/', '.'), "any " + path.substring(path.lastIndexOf('/') + 1).replace('_', ' '));
         }
 
-        /** How many matching items the player is carrying. */
+        /** The inventory and, on the server, the backpack. */
+        private static java.util.List<net.minecraft.world.Container> containers(Inventory inventory) {
+            if (!(inventory.player instanceof net.minecraft.server.level.ServerPlayer)) return java.util.List.of(inventory);
+            return java.util.List.of(inventory, new com.meakaandre.siftec.backpack.BackpackContainer(inventory.player));
+        }
+
+        /** How many matching items the player is carrying, backpack included. */
         public int carried(Inventory inventory) {
             int n = 0;
-            for (int i = 0; i < inventory.getContainerSize(); i++) {
-                if (matches(inventory.getItem(i))) n += inventory.getItem(i).getCount();
+            for (net.minecraft.world.Container container : containers(inventory)) {
+                for (int i = 0; i < container.getContainerSize(); i++) {
+                    if (matches(container.getItem(i))) n += container.getItem(i).getCount();
+                }
             }
             return n;
         }
 
-        /** Takes up to {@code amount} matching items out of the inventory and says how many it got. */
+        /** Takes up to {@code amount} matching items out of the inventory, then the backpack, and says how many it got. */
         public int take(Inventory inventory, int amount) {
             int left = amount;
-            for (int i = 0; i < inventory.getContainerSize() && left > 0; i++) {
-                ItemStack stack = inventory.getItem(i);
-                if (!matches(stack)) continue;
-                int take = Math.min(left, stack.getCount());
-                inventory.removeItem(i, take);
-                left -= take;
+            for (net.minecraft.world.Container container : containers(inventory)) {
+                for (int i = 0; i < container.getContainerSize() && left > 0; i++) {
+                    ItemStack stack = container.getItem(i);
+                    if (!matches(stack)) continue;
+                    int take = Math.min(left, stack.getCount());
+                    container.removeItem(i, take);
+                    left -= take;
+                }
             }
             return amount - left;
         }
