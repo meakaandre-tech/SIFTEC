@@ -1,6 +1,16 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/nitric_acid_bucket"
+    "model": "siftec:item/nitric_acid_bucket",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -1
+      },
+      {
+        "type": "minecraft:constant",
+        "value": 14217376
+      }
+    ]
   }
 }

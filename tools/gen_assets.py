@@ -351,8 +351,11 @@ for fid, name, colour in content.FLUIDS:
     lang[f"fluid.siftec.{fid}"] = name
     lang[f"item.siftec.{fid}_bucket"] = name + " Bucket"
     write(f"{A}/blockstates/{fid}.json", {"variants": {"": {"model": "siftec:block/fluid"}}})
-    write(f"{A}/models/item/{fid}_bucket.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/milk_bucket"}})
-    item_def(f"{fid}_bucket", f"siftec:item/{fid}_bucket", colour)
+    # the game's own empty bucket, with the liquid in its opening tinted the fluid's colour
+    write(f"{A}/models/item/{fid}_bucket.json", {"parent": "minecraft:item/generated", "textures": {
+        "layer0": "minecraft:item/bucket", "layer1": "siftec:item/fluid_in_bucket"}})
+    write(f"{A}/items/{fid}_bucket.json", {"model": {"type": "minecraft:model", "model": f"siftec:item/{fid}_bucket",
+          "tints": [{"type": "minecraft:constant", "value": -1}, {"type": "minecraft:constant", "value": colour}]}})
 write(f"{A}/models/block/fluid.json", {"textures": {"particle": "minecraft:block/water_still"}})
 
 # ---- recipes
@@ -539,6 +542,8 @@ for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "
             write(f"{A}/models/block/{bid}_core.json", model)
 for f in sorted(os.listdir(os.path.join(TEX, "item"))) if os.path.isdir(os.path.join(TEX, "item")) else []:
     iid = f[:-4]
+    if iid == "fluid_in_bucket":
+        continue
     write(f"{A}/models/item/{iid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"siftec:item/{iid}"}})
     item_def(iid, f"siftec:item/{iid}")
 # the Zipline item was taken out; its model went with it

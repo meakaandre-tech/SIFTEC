@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "siftec:item/nitrogen_bucket"
+    "layer0": "minecraft:item/bucket",
+    "layer1": "siftec:item/fluid_in_bucket"
   }
 }

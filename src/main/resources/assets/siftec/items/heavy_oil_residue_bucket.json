@@ -1,6 +1,16 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/heavy_oil_residue_bucket"
+    "model": "siftec:item/heavy_oil_residue_bucket",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -1
+      },
+      {
+        "type": "minecraft:constant",
+        "value": 6961802
+      }
+    ]
   }
 }

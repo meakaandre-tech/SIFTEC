@@ -31,9 +31,8 @@ ITEM_SHEETS = {
         "neural_quantum_processor incomplete_neural_quantum_processor",
     "items_gear.png": "jetpack hover_pack parachute hazmat_suit gas_mask blade_runners gas_filter iodine_infused_filter node_scanner "
         "object_scanner hub_planner blueprint cardboard_drone power_line toxic_shot apple_jam sweet_berry_jam glow_berry_jam melon_jam "
-        "pickled_beetroot pickled_cabbage pickled_carrot pickled_kelp pickled_onion pickled_pumpkin pickled_tomato "
-        "heavy_oil_residue_bucket alumina_solution_bucket sulfuric_acid_bucket nitrogen_bucket nitric_acid_bucket "
-        "dark_matter_residue_bucket ignimbrite_bucket turbofuel_bucket vinegar_bucket mead_bucket",
+        "pickled_beetroot pickled_cabbage pickled_carrot pickled_kelp pickled_onion pickled_pumpkin pickled_tomato",
+    # the sheet's last ten are buckets; the mod draws those from the game's own bucket instead (see bucket_overlay)
 }
 SCALE = 4
 uneven = []
@@ -56,6 +55,22 @@ def save(image, kind, name):
     image.save(os.path.join(OUT, kind, name + ".png"))
 
 
+# where the liquid shows in the game's bucket: the opening at the top, as rows of (first x, last x)
+OPENING = {2: (5, 10), 3: (3, 12), 4: (3, 12), 5: (5, 10)}
+
+
+def bucket_overlay():
+    """A grey layer of liquid in the bucket's opening; each fluid's bucket tints it its own colour."""
+    out = Image.new("RGBA", (16, 16))
+    shade = {2: 236, 3: 214, 4: 196, 5: 172}
+    for y, (x0, x1) in OPENING.items():
+        for x in range(x0, x1 + 1):
+            edge = x in (x0, x1)
+            v = shade[y] - (18 if edge else 0)
+            out.putpixel((x, y), (v, v, v, 255))
+    save(out, "item", "fluid_in_bucket")
+
+
 def main():
     blocks, items = [], []
     for file, ids in BLOCK_SHEETS.items():
@@ -71,6 +86,7 @@ def main():
         for i, iid in enumerate(ids.split()):
             save(shrink(sheet, (i % 10) * 64, (i // 10) * 64, iid), "item", iid)
             items.append(iid)
+    bucket_overlay()
     print(f"{len(blocks)} blocks, {len(items)} items; sprites not on the 4x grid: {sorted(set(uneven))}")
 
 
