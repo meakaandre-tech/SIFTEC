@@ -308,9 +308,11 @@ public final class WorldTests {
             level.setBlockAndUpdate(base.above(1), Block.updateFromNeighbourShapes(Blocks.POTENT_SULFUR.defaultBlockState(), level, base.above(1)));
             vent = base.above(1);
         } else {
-            level.setChunkForced(vent.getX() >> 4, vent.getZ() >> 4, true);
+            // the chunk and the ones round it, so it is a fully ticking chunk and not only a loaded one
+            for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced((vent.getX() >> 4) + dx, (vent.getZ() >> 4) + dz, true);
             level.getChunk(vent.getX() >> 4, vent.getZ() >> 4);
         }
+        BlockPos forcedAt = vent;
         BlockState ventState = level.getBlockState(vent);
         if (!ventState.is(Blocks.POTENT_SULFUR)) {
             report(source, "geyser " + vent.toShortString() + ": no geyser there (" + ventState + ")");
@@ -343,8 +345,12 @@ public final class WorldTests {
             final List<String> seen = new ArrayList<>();
             boolean wasErupting;
 
+            int waited;
+
             @Override
             public boolean tick() {
+                // the watch starts once the geyser's chunk really ticks (up to a minute after the chunk is forced)
+                if (ticks == 0 && !level.shouldTickBlocksAt(finalVent) && ++waited < 1200) return false;
                 ticks++;
                 BlockState state = level.getBlockState(finalVent);
                 boolean erupting = state.is(Blocks.POTENT_SULFUR) && state.getValue(PotentSulfurBlock.STATE) == PotentSulfurState.ERUPTING;
@@ -371,11 +377,11 @@ public final class WorldTests {
                 List<Double> su = new ArrayList<>();
                 for (int run : runs) su.add(run / 20.0 * GeyserEngineBlockEntity.BURST_SU);
                 double min = gaps.stream().mapToDouble(Double::doubleValue).min().orElse(0), max = gaps.stream().mapToDouble(Double::doubleValue).max().orElse(0);
-                report(source, "geyser " + finalVent.toShortString() + " after " + seconds + " s: " + eruptions + " eruptions, gaps " + gaps + " s (min " + min + ", max " + max
+                report(source, "geyser " + finalVent.toShortString() + " after " + seconds + " s (chunk ticking after " + waited / 20 + " s): " + eruptions + " eruptions, gaps " + gaps + " s (min " + min + ", max " + max
                     + ", all within 20-70: " + gaps.stream().allMatch(g -> g >= 20 && g <= 70) + "); engine ran " + runningInside + " ticks during eruptions and " + runningOutside
                     + " outside; SU-seconds per eruption " + su + "; storage on top banked " + stored + "; engine half a second into eruptions: " + seen + "; engine block now " + level.getBlockState(engine)
                     + (level.getBlockEntity(engine) instanceof GeyserEngineBlockEntity e ? " sees " + e.describe() : " (no engine entity)"));
-                level.setChunkForced(finalVent.getX() >> 4, finalVent.getZ() >> 4, false);
+                for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced((forcedAt.getX() >> 4) + dx, (forcedAt.getZ() >> 4) + dz, false);
                 return true;
             }
         });
