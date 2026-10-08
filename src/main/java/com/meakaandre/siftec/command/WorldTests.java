@@ -332,7 +332,8 @@ public final class WorldTests {
             long lastStart = -1;
             final List<Double> gaps = new ArrayList<>();
             final List<Integer> runs = new ArrayList<>();
-            int eruptions, runningOutside, runningInside, current;
+            int eruptions, runningOutside, runningInside, current, inEruption;
+            final List<String> seen = new ArrayList<>();
             boolean wasErupting;
 
             @Override
@@ -350,6 +351,8 @@ public final class WorldTests {
                     runs.add(current);
                     current = 0;
                 }
+                if (erupting && wasErupting && ++inEruption == 10 && seen.size() < 3 && level.getBlockEntity(engine) instanceof GeyserEngineBlockEntity e) seen.add(e.describe());
+                if (!erupting) inEruption = 0;
                 if (running) {
                     current++;
                     if (erupting) runningInside++;
@@ -363,7 +366,7 @@ public final class WorldTests {
                 double min = gaps.stream().mapToDouble(Double::doubleValue).min().orElse(0), max = gaps.stream().mapToDouble(Double::doubleValue).max().orElse(0);
                 report(source, "geyser " + finalVent.toShortString() + " after " + seconds + " s: " + eruptions + " eruptions, gaps " + gaps + " s (min " + min + ", max " + max
                     + ", all within 20-70: " + gaps.stream().allMatch(g -> g >= 20 && g <= 70) + "); engine ran " + runningInside + " ticks during eruptions and " + runningOutside
-                    + " outside; SU-seconds per eruption " + su + "; storage on top banked " + stored);
+                    + " outside; SU-seconds per eruption " + su + "; storage on top banked " + stored + "; engine half a second into eruptions: " + seen);
                 level.setChunkForced(finalVent.getX() >> 4, finalVent.getZ() >> 4, false);
                 return true;
             }
