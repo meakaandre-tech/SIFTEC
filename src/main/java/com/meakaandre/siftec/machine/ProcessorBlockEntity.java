@@ -54,6 +54,19 @@ public class ProcessorBlockEntity extends KineticBlockEntity {
         return list.isEmpty() ? null : list.get(Math.floorMod(selected, list.size()));
     }
 
+    /** Selects a recipe by its place in the machine's list (the selftest uses it). */
+    public void select(int index) {
+        selected = index;
+        progress = 0;
+        setChanged();
+    }
+
+    /** True if everything the selected recipe needs is in and there is room for what it makes. */
+    public boolean readyNow() {
+        ProcessorRecipe recipe = recipe();
+        return recipe != null && ready(recipe);
+    }
+
     /** An empty-handed click: take the output, or (sneaking) switch to the next recipe. */
     public void use(Player player) {
         if (!(player instanceof ServerPlayer server)) return;
@@ -83,11 +96,25 @@ public class ProcessorBlockEntity extends KineticBlockEntity {
         if (recipe != null) server.sendOverlayMessage(Component.translatable("siftec.processor.selected", recipe.label()));
     }
 
+    /**
+     * True if this input slot may hold the stack. The nine slots are shared out among the selected recipe's
+     * ingredients (slot i belongs to ingredient i mod n), so a plentiful ingredient can never fill the slots the
+     * scarce one needs and stall the machine.
+     */
+    private boolean slotTakes(int slot, ItemStack stack) {
+        ProcessorRecipe recipe = recipe();
+        if (slot >= INPUTS || recipe == null || stack.isEmpty()) return false;
+        List<Milestone.Cost> inputs = recipe.inputs();
+        if (inputs.isEmpty()) return false;
+        return inputs.get(slot % inputs.size()).matches(stack);
+    }
+
     /** Puts a held stack into the inputs if the selected recipe uses it. */
     public boolean insert(ItemStack stack) {
         ProcessorRecipe recipe = recipe();
         if (recipe == null || !recipe.uses(stack)) return false;
         for (int i = 0; i < INPUTS && !stack.isEmpty(); i++) {
+            if (!slotTakes(i, stack)) continue;
             ItemStack slot = items.stacks.get(i);
             if (slot.isEmpty()) {
                 items.stacks.set(i, stack.copy());
@@ -212,8 +239,7 @@ public class ProcessorBlockEntity extends KineticBlockEntity {
 
         @Override
         public boolean canPlaceItem(int slot, ItemStack stack) {
-            ProcessorRecipe recipe = recipe();
-            return slot < INPUTS && recipe != null && recipe.uses(stack);
+            return slotTakes(slot, stack);
         }
 
         @Override
