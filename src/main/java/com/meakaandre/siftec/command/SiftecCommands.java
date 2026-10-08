@@ -50,6 +50,7 @@ public final class SiftecCommands {
                     .then(Commands.literal("setup").executes(context -> selfTest(context, true)))
                     .then(Commands.literal("check").executes(context -> selfTest(context, false)))
                     .then(Commands.literal("hub").executes(SiftecCommands::hubTest))
+                    .then(Commands.literal("content").executes(ContentSelfTest::run))
                     .then(Commands.literal("nether").executes(SiftecCommands::netherTest)))
         ));
     }
