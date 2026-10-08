@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "createdieselgenerators",
+  "version": "1.3.15+26.3",
+  "name": "Create Diesel Generators",
+  "description": "Diesel Generators, Oil processing. Fabric port for Create Fly.",
+  "authors": ["George VI"],
+  "contact": {
+    "sources": "https://github.com/meakaandre-tech/create-diesel-generators"
+  },
+  "license": "MIT",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.jesz.createdieselgenerators.CreateDieselGenerators"],
+    "client": ["com.jesz.createdieselgenerators.client.CDGClient"]
+  },
+  "mixins": ["createdieselgenerators.mixins.json"],
+  "depends": {
+    "fabricloader": "*",
+    "fabric-api": "*",
+    "minecraft": ">=26.3- <26.4-",
+    "java": ">=25",
+    "create": "*"
+  }
+}
