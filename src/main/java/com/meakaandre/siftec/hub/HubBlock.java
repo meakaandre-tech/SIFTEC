@@ -42,7 +42,7 @@ public class HubBlock extends Block implements EntityBlock {
             // a HUB claims the land around it; the Gateway does not
             if (!gateway && level instanceof net.minecraft.server.level.ServerLevel server && !company.id.isEmpty()) {
                 // a HUB that will claim may not go right next to another company's land
-                boolean claims = !com.meakaandre.siftec.claim.Claims.hasClaimingHub(server, company);
+                boolean claims = !com.meakaandre.siftec.claim.Claims.hasClaimingHub(server.getServer(), company);
                 if (claims && (com.meakaandre.siftec.claim.Claims.nearForeignHub(server, company, pos)
                     || com.meakaandre.siftec.claim.Claims.nearForeign(server, company, pos, com.meakaandre.siftec.claim.Claims.HUB_RADIUS + 1, false))) {
                     level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
