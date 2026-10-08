@@ -160,7 +160,7 @@ jobs:
             done
             if grep -q 'Done (' server.log; then
               if [ -f $root/.github/smoke-commands.txt ]; then
-                while read -r line; do echo "$line" >&3; sleep 0.3; done < $root/.github/smoke-commands.txt
+                while read -r line; do case "$line" in "#sleep "*) sleep "${line#\#sleep }";; *) echo "$line" >&3; sleep 0.3;; esac; done < $root/.github/smoke-commands.txt
                 sleep 10
               fi
               if [ -f $root/.github/smoke-client ]; then
@@ -242,6 +242,31 @@ jobs:
               fi
               exec 3>&-
               cp server2.log /tmp/ci/server2.log
+            fi
+            if [ -f $root/.github/smoke-commands-isles.txt ]; then
+              # a second world with The Isles (public vanilla-biome build plus its ores for the pack's mods): floating
+              # islands over void, so the node, geyser and scanner selftests run where columns can be empty
+              echo "=== The Isles phase"
+              mkdir -p isles/datapacks
+              curl -fsSL -o isles/datapacks/the-isles.zip https://github.com/meakaandre-tech/The-Isles/releases/download/pack-test-latest/the-isles-tested.zip || echo "could not fetch the-isles-tested.zip"
+              curl -fsSL -o isles/datapacks/the-isles-mods.zip https://github.com/meakaandre-tech/The-Isles/releases/download/pack-test-latest/the-isles-mods-tested.zip || echo "could not fetch the-isles-mods-tested.zip"
+              ls -l isles/datapacks
+              sed -i 's/^level-name=.*//' server.properties; echo "level-name=isles" >> server.properties
+              rm -f in.fifo; mkfifo in.fifo
+              (java -Xmx3G -Dcreate.mixin.audit=true -jar server.jar --nogui < in.fifo > server-isles.log 2>&1; echo "EXIT $?" >> server-isles.log) &
+              exec 3> in.fifo
+              for i in $(seq 1 180); do
+                if grep -q 'Done (' server-isles.log || grep -q '^EXIT' server-isles.log; then break; fi
+                sleep 5
+              done
+              if grep -q 'Done (' server-isles.log; then
+                while read -r line; do case "$line" in "#sleep "*) sleep "${line#\#sleep }";; *) echo "$line" >&3; sleep 0.3;; esac; done < $root/.github/smoke-commands-isles.txt
+                sleep 10
+                echo "stop" >&3
+                for i in $(seq 1 90); do grep -q '^EXIT' server-isles.log && break; sleep 2; done
+              fi
+              exec 3>&-
+              cp server-isles.log /tmp/ci/server-isles.log
             fi
             cp -r crash-reports /tmp/ci/ 2>/dev/null || true
             cd $root
