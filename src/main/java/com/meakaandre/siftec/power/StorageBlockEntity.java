@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.power;
 
-import com.zurrtum.create.content.kinetics.KineticNetwork;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -9,23 +8,29 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 /**
- * Power Storage. Once a second it looks at its kinetic network:
- * - spare capacity on the line is taken as charge (it shows up as stress, like any machine);
- * - if the line is overstressed, or nothing is driving it at all, the storage becomes a source and
- *   covers the shortfall until it is empty or the line can carry itself again.
- * Energy is counted in SU-seconds.
+ * Power Storage. Every tick it looks at its kinetic network:
+ * - spare capacity on the line is taken as charge (it shows up as stress, like any machine), and banked tick by
+ *   tick, so even a geyser's eruption of a second or two is caught;
+ * - if the line is overstressed, or nothing is driving it at all, the storage becomes a source and covers the
+ *   shortfall until it is empty or the line can carry itself again. It only spends what the line actually
+ *   takes, and nothing while the line cannot turn anyway.
+ * It turns a line the way that line last turned (or the way it was turned when it charged), so it never meets
+ * another source head on. Energy is counted in SU-seconds.
  */
 public class StorageBlockEntity extends GeneratingKineticBlockEntity {
     public static final float CAPACITY = 1_024_000f, MAX_CHARGE = 8192f, MAX_DISCHARGE = 4096f;
     /** The speed it runs a line at when nothing else is turning it. */
     private static final float OWN_SPEED = 32f;
+    /** After giving up on a line that stays overstressed even with its help, it waits this long before trying again. */
+    private static final int RETRY_TICKS = 100;
     public static final int IDLE = 0, CHARGING = 1, DISCHARGING = 2;
 
     public float stored;
     public int mode = IDLE;
     private float chargeRate;
+    /** Signed: the direction is the one the line last turned. */
     private float runSpeed = OWN_SPEED;
-    private int clock;
+    private int clock, cooldown;
 
     public StorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -54,48 +59,68 @@ public class StorageBlockEntity extends GeneratingKineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (level == null || level.isClientSide() || ++clock < 20) return;
-        clock = 0;
+        if (level == null || level.isClientSide()) return;
+        clock++;
+        if (cooldown > 0) cooldown--;
         int before = mode;
         float speed = getTheoreticalSpeed();
-        KineticNetwork network = hasNetwork() ? getOrCreateNetwork() : null;
-        float capacity = network == null ? 0 : network.calculateCapacity();
-        float stress = network == null ? 0 : network.calculateStress();
+        boolean networked = hasNetwork();
 
         if (mode == DISCHARGING) {
+            // capacity and stress are the network's totals, kept up to date by Create
             float others = capacity - MAX_DISCHARGE;
-            stored -= Math.clamp(stress - others, 0, MAX_DISCHARGE);
-            if (stored <= 0) {
-                stored = 0;
+            if (!networked || isOverStressed()) {
+                // even with this storage the line cannot turn: nothing would be delivered, so stop and spend nothing
                 mode = IDLE;
-            } else if (others > 0 && others >= stress) {
-                mode = IDLE;   // the line can carry itself again
+                cooldown = RETRY_TICKS;
+            } else {
+                float delivered = Math.clamp(stress - Math.max(0, others), 0, MAX_DISCHARGE);
+                stored -= delivered / 20f;
+                if (stored <= 0) {
+                    stored = 0;
+                    mode = IDLE;
+                } else if (others > 0 && others >= stress) {
+                    mode = IDLE;   // the line can carry itself again
+                }
             }
-        } else if (speed == 0 || network == null) {
-            chargeRate = 0;
-            mode = stored > 0 ? DISCHARGING : IDLE;
-            runSpeed = OWN_SPEED;
+        } else if (speed == 0 || !networked) {
+            if (chargeRate != 0) {
+                chargeRate = 0;
+                mode = IDLE;
+            }
+            if (stored > 0 && cooldown == 0) {
+                // nothing turns the line: turn it, the way it last turned
+                runSpeed = Math.copySign(OWN_SPEED, runSpeed);
+                mode = DISCHARGING;
+            }
         } else {
+            runSpeed = Math.copySign(OWN_SPEED, speed);
             float own = mode == CHARGING ? chargeRate : 0;
+            // bank what the line gave this tick
+            if (own > 0 && !isOverStressed()) stored = Math.min(CAPACITY, stored + own / 20f);
             float spare = capacity - (stress - own);
-            if (spare < 0 && stored > 0) {
+            if (spare < 0 && stored > 0 && cooldown == 0) {
                 // overstressed: join in at the line's own speed and direction
                 chargeRate = 0;
                 runSpeed = speed;
                 mode = DISCHARGING;
-            } else {
-                stored = Math.min(CAPACITY, stored + own);
+            } else if (mode == IDLE || clock % 4 == 0 || stored >= CAPACITY) {
                 float rate = Math.clamp(spare * 0.9f, 0, Math.min(MAX_CHARGE, CAPACITY - stored));
-                chargeRate = rate < 1 ? 0 : rate;
-                mode = chargeRate > 0 ? CHARGING : IDLE;
-                network.updateStressFor(this, calculateStressApplied());
+                if (rate < 1) rate = 0;
+                // the network is only told about real changes: each update is felt along the whole line
+                if (rate == 0 ? chargeRate != 0 : Math.abs(rate - chargeRate) > Math.max(16f, chargeRate * 0.05f)) {
+                    chargeRate = rate;
+                    mode = rate > 0 ? CHARGING : IDLE;
+                    getOrCreateNetwork().updateStressFor(this, calculateStressApplied());
+                }
             }
         }
-        if (mode != before) {
+        if ((mode == DISCHARGING) != (before == DISCHARGING)) {
+            if (mode != DISCHARGING) chargeRate = 0;
             updateGeneratedRotation();
             if (hasNetwork()) getOrCreateNetwork().updateStressFor(this, calculateStressApplied());
         }
-        setChanged();
+        if (clock % 20 == 0 || mode != before) setChanged();
     }
 
     @Override
