@@ -34,6 +34,7 @@ public final class Collectibles {
 
     private static final Map<Long, Optional<Spot>> CACHE = new ConcurrentHashMap<>();
     private static volatile long cacheSeed = Long.MIN_VALUE;
+    private static final java.util.Set<Long> PENDING = ConcurrentHashMap.newKeySet();
 
     private Collectibles() {
     }
@@ -56,7 +57,15 @@ public final class Collectibles {
 
     public static void prefetch(ServerLevel level, int chunkX, int chunkZ) {
         int cellX = Math.floorDiv(chunkX << 4, CELL), cellZ = Math.floorDiv(chunkZ << 4, CELL);
-        NodeMap.async(level.getServer(), () -> inCell(level, cellX, cellZ), spot -> {
+        long key = key(cellX, cellZ);
+        if (!PENDING.add(key)) return;
+        NodeMap.async(level.getServer(), () -> {
+            try {
+                return inCell(level, cellX, cellZ);
+            } finally {
+                PENDING.remove(key);
+            }
+        }, spot -> {
         });
     }
 

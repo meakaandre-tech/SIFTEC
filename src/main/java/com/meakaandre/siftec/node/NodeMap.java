@@ -150,14 +150,21 @@ public final class NodeMap {
 
     /** Works the cell out on the worker thread, so a later {@link #inCell} finds it cached. */
     public static void prefetch(ServerLevel level, int cellX, int cellZ) {
+        // every chunk of a cell asks, again and again until it is done: queue each cell once
+        long pending = cellKey(cellX, cellZ) * 31 + level.dimension().identifier().hashCode();
+        if (!PENDING.add(pending)) return;
         WORKER.execute(() -> {
             try {
                 inCell(level, cellX, cellZ);
             } catch (RuntimeException e) {
                 com.meakaandre.siftec.Siftec.LOGGER.warn("Could not work out node cell {} {}", cellX, cellZ, e);
+            } finally {
+                PENDING.remove(pending);
             }
         });
     }
+
+    private static final java.util.Set<Long> PENDING = ConcurrentHashMap.newKeySet();
 
     /** The surface (or Nether) node of a cell, if any. */
     private static List<Node> surface(ServerLevel level, int cellX, int cellZ) {
