@@ -35,14 +35,23 @@ public class RadarBlock extends Block {
     }
 
     /**
-     * A waypoint in the form Xaero's Minimap and World Map share over chat. With either mod installed the
-     * player sees the name with an [Add] button; without them it is a line of text.
+     * A waypoint in the form Xaero's Minimap and World Map share over chat
+     * ({@code xaero-waypoint:name:initials:x:y:z:colour:use_yaw:yaw:Internal-<dimension>-waypoints}, the dimension
+     * written with dashes, such as {@code Internal-the-nether-waypoints}). With either mod installed the player sees
+     * the name with an [Add] button; without them it is a line of text. The name is at most 32 characters and has no
+     * colons; y is the ground height the generator gives (a number: the format has no "unknown").
      */
-    private static Component waypoint(Level level, Component what, int x, int z) {
-        String name = what.getString().replace(':', ' ').replace(',', ' ').trim();
-        String initial = name.isEmpty() ? "S" : name.substring(0, 1).toUpperCase(java.util.Locale.ROOT);
-        return Component.literal("xaero-waypoint:" + name + ":" + initial + ":" + x + ":~:" + z + ":11:false:0:Internal_"
-            + level.dimension().identifier().getPath() + "_waypoints");
+    static String waypointText(Level level, String name, int x, int y, int z) {
+        String clean = name.replace(':', ' ').replace(',', ' ').trim();
+        if (clean.length() > 32) clean = clean.substring(0, 32).trim();
+        if (clean.isEmpty()) clean = "SIFTEC";
+        String initial = clean.substring(0, 1).toUpperCase(java.util.Locale.ROOT);
+        String dimension = level.dimension().identifier().getPath().replace('_', '-').replace('/', '-');
+        return "xaero-waypoint:" + clean + ":" + initial + ":" + x + ":" + y + ":" + z + ":11:false:0:Internal-" + dimension + "-waypoints";
+    }
+
+    private static Component waypoint(Level level, Component what, int x, int y, int z) {
+        return Component.literal(waypointText(level, what.getString(), x, y, z));
     }
 
     private static Component line(Component what, double dx, double dz, int x, int z) {
@@ -55,25 +64,39 @@ public class RadarBlock extends Block {
         if (!(level instanceof ServerLevel server) || !(user instanceof ServerPlayer player)) return InteractionResult.SUCCESS;
         Company company = Companies.of(player);
         player.sendSystemMessage(Component.translatable("siftec.radar.title").withStyle(ChatFormatting.GOLD));
-        int found = 0;
-        for (NodeType type : NodeType.values()) {
-            if (type.dimension() != level.dimension() || !type.onScanner(company)) continue;
-            Optional<Node> node = NodeMap.nearest(server, pos.getX(), pos.getZ(), type, NODE_CELLS);
-            if (node.isEmpty()) continue;
-            player.sendSystemMessage(line(NodeBlock.label(type, node), node.get().x() - pos.getX(), node.get().z() - pos.getZ(), node.get().x(), node.get().z()));
-            player.sendSystemMessage(waypoint(level, NodeBlock.label(type, node), node.get().x(), node.get().z()));
-            found++;
-        }
-        for (Collectible type : Collectible.values()) {
-            if (!type.scannerToken.isEmpty() && !company.hasToken(type.scannerToken)) continue;
-            Optional<Collectibles.Spot> spot = Collectibles.nearest(server, pos.getX(), pos.getZ(), type, company.collected, OBJECT_CELLS);
-            if (spot.isEmpty()) continue;
-            player.sendSystemMessage(line(Component.translatable("item.siftec." + type.id()), spot.get().x() - pos.getX(), spot.get().z() - pos.getZ(),
-                spot.get().x(), spot.get().z()).copy().withStyle(ChatFormatting.AQUA));
-            player.sendSystemMessage(waypoint(level, Component.translatable("item.siftec." + type.id()), spot.get().x(), spot.get().z()));
-            found++;
-        }
-        if (found == 0) player.sendSystemMessage(Component.translatable("siftec.radar.nothing"));
+        // every lookup samples the world generator: the whole sweep runs on the node map's worker thread
+        java.util.List<NodeType> types = new java.util.ArrayList<>();
+        for (NodeType type : NodeType.values()) if (type.dimension() == level.dimension() && type.onScanner(company)) types.add(type);
+        java.util.List<Collectible> objects = new java.util.ArrayList<>();
+        for (Collectible type : Collectible.values()) if (type.scannerToken.isEmpty() || company.hasToken(type.scannerToken)) objects.add(type);
+        java.util.Set<String> collected = java.util.Set.copyOf(company.collected);
+        com.meakaandre.siftec.node.Terrain.Border border = com.meakaandre.siftec.node.Terrain.Border.of(server);
+        int fallbackY = pos.getY();
+        NodeMap.async(server.getServer(), () -> {
+            java.util.List<Component> lines = new java.util.ArrayList<>();
+            for (NodeType type : types) {
+                Optional<Node> node = NodeMap.nearest(server, pos.getX(), pos.getZ(), type, NODE_CELLS, border, NodeMap.SEARCH_NANOS / 4);
+                if (node.isEmpty()) continue;
+                Node n = node.get();
+                int y = NodeMap.groundOf(n).map(g -> g + 1).orElse(fallbackY);
+                lines.add(line(NodeBlock.label(type, node), n.x() - pos.getX(), n.z() - pos.getZ(), n.x(), n.z()));
+                lines.add(waypoint(level, NodeBlock.label(type, node), n.x(), y, n.z()));
+            }
+            for (Collectible type : objects) {
+                Optional<Collectibles.Spot> spot = Collectibles.nearest(server, pos.getX(), pos.getZ(), type, collected, OBJECT_CELLS, border, NodeMap.SEARCH_NANOS / 4);
+                if (spot.isEmpty()) continue;
+                Collectibles.Spot s = spot.get();
+                var column = com.meakaandre.siftec.node.Terrain.column(server, s.x(), s.z());
+                int y = column == null ? fallbackY : column.y() + 1;
+                lines.add(line(Component.translatable("item.siftec." + type.id()), s.x() - pos.getX(), s.z() - pos.getZ(), s.x(), s.z()).copy().withStyle(ChatFormatting.AQUA));
+                lines.add(waypoint(level, Component.translatable("item.siftec." + type.id()), s.x(), y, s.z()));
+            }
+            return lines;
+        }, lines -> {
+            if (player.isRemoved()) return;
+            if (lines == null || lines.isEmpty()) player.sendSystemMessage(Component.translatable("siftec.radar.nothing"));
+            else lines.forEach(player::sendSystemMessage);
+        });
         return InteractionResult.SUCCESS;
     }
 }

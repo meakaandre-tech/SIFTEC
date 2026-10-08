@@ -54,19 +54,24 @@ public class NodeScannerItem extends Item {
                 Component.translatable(type.dimension() == Level.NETHER ? "siftec.dimension.nether" : "siftec.dimension.overworld")));
             return InteractionResult.SUCCESS;
         }
-        Optional<Node> found = NodeMap.nearest(server, player.getX(), player.getZ(), type, RANGE);
-        if (found.isEmpty()) {
-            player.sendOverlayMessage(Component.translatable("siftec.scanner.none", Component.translatable(type.key())));
-            return InteractionResult.SUCCESS;
-        }
-        Node node = found.get();
-        int distance = (int) Math.round(node.distanceTo(player.getX(), player.getZ()));
-        player.sendOverlayMessage(Component.translatable(
-            node.y() == Node.SURFACE ? "siftec.scanner.found" : "siftec.scanner.found_cave", NodeBlock.label(type, found), distance,
-            Component.translatable("siftec.direction." + direction(node.x() - player.getX(), node.z() - player.getZ())),
-            node.x(), node.z()
-        ));
+        // the search samples the world generator: it runs on the node map's worker thread and answers when done
         player.getCooldowns().addCooldown(player.getItemInHand(hand), 20);
+        NodeType looking = type;
+        double px = player.getX(), pz = player.getZ();
+        NodeMap.nearestAsync(server, px, pz, looking, RANGE, found -> {
+            if (player.isRemoved()) return;
+            if (found.isEmpty()) {
+                player.sendOverlayMessage(Component.translatable("siftec.scanner.none", Component.translatable(looking.key())));
+                return;
+            }
+            Node node = found.get();
+            int distance = (int) Math.round(node.distanceTo(player.getX(), player.getZ()));
+            player.sendOverlayMessage(Component.translatable(
+                node.y() == Node.SURFACE ? "siftec.scanner.found" : "siftec.scanner.found_cave", NodeBlock.label(looking, found), distance,
+                Component.translatable("siftec.direction." + direction(node.x() - player.getX(), node.z() - player.getZ())),
+                node.x(), node.z()
+            ));
+        });
         return InteractionResult.SUCCESS;
     }
 

@@ -41,6 +41,7 @@ public final class SiftecCommands {
     }
 
     public static void register() {
+        WorldTests.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("node")
@@ -107,6 +108,8 @@ public final class SiftecCommands {
                 String made = be instanceof MinerBlockEntity m ? m.output.get() + " speed " + m.getSpeed()
                     : be instanceof PortableMinerBlockEntity m ? m.output.get().toString() : "no block entity (" + level.getBlockState(miner) + ")";
                 report(source, "SELFTEST check " + node + ": " + made);
+                // the setup kept this chunk loaded until now; let it go
+                level.setChunkForced(node.x() >> 4, node.z() >> 4, false);
             }
         }
         return 1;
@@ -299,22 +302,42 @@ public final class SiftecCommands {
         }
         ServerLevel level = source.getLevel();
         Vec3 from = source.getPosition();
-        Optional<Node> found = NodeMap.nearest(level, from.x, from.z, type, 64);
-        if (found.isEmpty()) {
-            source.sendFailure(Component.translatable("siftec.scanner.none", Component.translatable(type.key())));
-            return 0;
-        }
-        Node node = found.get();
-        int distance = (int) Math.round(node.distanceTo(from.x, from.z));
-        source.sendSuccess(() -> Component.translatable(
-            "siftec.command.found", NodeBlock.label(type, found), node.x(), node.z(), distance
-        ), false);
-        if (teleport && source.getEntity() instanceof ServerPlayer player) {
-            // loading the chunk places the node; stand next to it, above the ground
-            level.getChunk(node.x() >> 4, node.z() >> 4);
-            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING, node.x() + 2, node.z()) + 2;
-            player.teleportTo(level, node.x() + 2.5, y, node.z() + 0.5, Set.of(), player.getYRot(), player.getXRot(), true);
-        }
+        // searched on the node map's worker thread; the answer comes when it is done
+        NodeMap.nearestAsync(level, from.x, from.z, type, 64, found -> {
+            if (found.isEmpty()) {
+                source.sendFailure(Component.translatable("siftec.scanner.none", Component.translatable(type.key())));
+                return;
+            }
+            Node node = found.get();
+            int distance = (int) Math.round(node.distanceTo(from.x, from.z));
+            source.sendSuccess(() -> Component.translatable(
+                "siftec.command.found", NodeBlock.label(type, found), node.x(), node.z(), distance
+            ), false);
+            if (teleport && source.getEntity() instanceof ServerPlayer player) {
+                // loading the chunk places the node; stand next to it, on the ground
+                level.getChunk(node.x() >> 4, node.z() >> 4);
+                for (int[] spot : new int[][]{{2, 0}, {-2, 0}, {0, 2}, {0, -2}, {0, 0}}) {
+                    int x = node.x() + spot[0], z = node.z() + spot[1];
+                    int y = node.y() != Node.SURFACE ? caveFloor(level, x, node.y(), z) : level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+                    if (y <= level.getMinY() + 1) continue;
+                    player.teleportTo(level, x + 0.5, y + (node.y() != Node.SURFACE ? 1 : 0), z + 0.5, Set.of(), player.getYRot(), player.getXRot(), true);
+                    return;
+                }
+                // no ground anywhere next to it: do not drop the player into the void
+                source.sendFailure(Component.literal("No ground next to that node to stand on"));
+            }
+        });
         return 1;
+    }
+
+    /** The floor near a cave height with room to stand above it, or the world's bottom if there is none. */
+    private static int caveFloor(ServerLevel level, int x, int around, int z) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int d = 0; d <= 32; d++) {
+            for (int y : new int[]{around - d, around + d}) {
+                if (!level.getBlockState(pos.set(x, y, z)).isAir() && level.getBlockState(pos.set(x, y + 1, z)).isAir() && level.getBlockState(pos.set(x, y + 2, z)).isAir()) return y;
+            }
+        }
+        return level.getMinY();
     }
 }

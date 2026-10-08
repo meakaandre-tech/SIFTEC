@@ -33,11 +33,26 @@ public final class NodePlacer {
     }
 
     private static final ArrayDeque<Queued> QUEUE = new ArrayDeque<>();
+    /** Chunks whose cells are still being worked out on the worker thread; tried again a little later. */
+    private static final ArrayDeque<Queued> WAITING = new ArrayDeque<>();
 
     private NodePlacer() {
     }
 
+    public static void clear() {
+        synchronized (QUEUE) {
+            QUEUE.clear();
+        }
+        WAITING.clear();
+    }
+
     public static void register() {
+        // a new world (or the next single player world) starts with nothing remembered from the last one
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            clear();
+            NodeMap.clear();
+            com.meakaandre.siftec.collect.Collectibles.clear();
+        });
         // only note the chunk here: blocks are placed from the tick, when the chunk is fully in the world
         ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
             if (!NodeMap.hasNodes(level)) return;
@@ -49,6 +64,12 @@ public final class NodePlacer {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             ServerLevel overworld = server.overworld();
             NodeMap.settle(overworld);
+            if (server.getTickCount() % 10 == 0 && !WAITING.isEmpty()) {
+                synchronized (QUEUE) {
+                    QUEUE.addAll(WAITING);
+                }
+                WAITING.clear();
+            }
             int placed = 0;
             for (int i = 0; i < 512 && placed < 8; i++) {
                 Queued next;
@@ -57,11 +78,36 @@ public final class NodePlacer {
                 }
                 if (next == null) return;
                 ServerLevel level = server.getLevel(next.dimension());
-                if (level == null) continue;
+                if (level == null || !NodeMap.ready(level) || !level.hasChunk(next.x(), next.z())) continue;
+                // working a cell out samples the world generator: done on the worker thread, the chunk waits for it
+                if (!cellsReady(level, next.x(), next.z())) {
+                    WAITING.add(next);
+                    continue;
+                }
                 if (placeChunk(level, next.x(), next.z())) placed++;
-                if (NodeMap.ready(level) && level.hasChunk(next.x(), next.z())) com.meakaandre.siftec.collect.Collectibles.placeChunk(level, next.x(), next.z());
+                com.meakaandre.siftec.collect.Collectibles.placeChunk(level, next.x(), next.z());
             }
         });
+    }
+
+    /** True if every cell a chunk's nodes and collectibles can come from is worked out; asks for the missing ones. */
+    private static boolean cellsReady(ServerLevel level, int chunkX, int chunkZ) {
+        boolean ready = true;
+        int minX = (chunkX << 4) - RADIUS, maxX = (chunkX << 4) + 15 + RADIUS;
+        int minZ = (chunkZ << 4) - RADIUS, maxZ = (chunkZ << 4) + 15 + RADIUS;
+        for (int cx = Math.floorDiv(minX, NodeMap.CELL); cx <= Math.floorDiv(maxX, NodeMap.CELL); cx++) {
+            for (int cz = Math.floorDiv(minZ, NodeMap.CELL); cz <= Math.floorDiv(maxZ, NodeMap.CELL); cz++) {
+                if (!NodeMap.cached(level, cx, cz)) {
+                    NodeMap.prefetch(level, cx, cz);
+                    ready = false;
+                }
+            }
+        }
+        if (!com.meakaandre.siftec.collect.Collectibles.cached(level, chunkX, chunkZ)) {
+            com.meakaandre.siftec.collect.Collectibles.prefetch(level, chunkX, chunkZ);
+            ready = false;
+        }
+        return ready;
     }
 
     /** The nodes whose mound reaches into this chunk. */
@@ -90,11 +136,13 @@ public final class NodePlacer {
             int height = Node.SURFACE;
             if (level0) {
                 height = data.height(node.key());
+                if (height == NO_PLACE) continue;
                 if (height == NodeSavedData.NO_HEIGHT) {
                     // only the chunk with the middle of the node can choose the height
                     if (node.x() >> 4 != chunkX || node.z() >> 4 != chunkZ) continue;
                     height = chooseHeight(level, node);
                     data.setHeight(node.key(), height);
+                    if (height == NO_PLACE) continue;
                     // neighbours that loaded earlier have been waiting for this
                     for (int dx = -1; dx <= 1; dx++) {
                         for (int dz = -1; dz <= 1; dz++) {
@@ -118,22 +166,50 @@ public final class NodePlacer {
         return placed;
     }
 
-    /** The floor a cave or Nether node stands on, found under the middle of the node. */
+    /** The floor a cave or Nether node stands on, found under the middle of the node. NO_PLACE if there is none fit to stand on. */
     private static int chooseHeight(ServerLevel level, Node node) {
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         boolean nether = node.type().where == NodeType.Where.NETHER;
         if (nether) {
-            // the lowest floor above the lava sea, so nodes are on the ground and not up on a ledge
-            for (int y = 32; y <= 110; y++) {
-                if (isFloor(level, pos, node.x(), y, node.z())) return y;
+            // every floor in the column that the whole mound can stand on (no lava or drop under its middle)
+            java.util.List<Integer> floors = new java.util.ArrayList<>();
+            int top = Math.min(level.getMaxY() - 3, level.getMinY() + level.dimensionType().logicalHeight() - 3);
+            for (int y = level.getMinY() + 1; y <= top; y++) {
+                if (isFloor(level, pos, node.x(), y, node.z()) && supported(level, pos, node, y)) floors.add(y);
             }
-            return 64;
+            if (floors.isEmpty()) return NO_PLACE;
+            if (level.getHeight() <= 256) {
+                // an ordinary Nether: the lowest floor above the lava sea, so nodes are on the ground and not up on a ledge
+                for (int y : floors) if (y > level.getSeaLevel()) return y;
+                return floors.getFirst();
+            }
+            // a tall Nether of many layers: any of its floors, picked by the node, so every layer gets some
+            return floors.get((int) Long.remainderUnsigned(hash(node.key(), 7, 11), floors.size()));
         }
-        for (int y = node.y() + 24; y >= node.y() - 24; y--) {
-            if (isFloor(level, pos, node.x(), y, node.z())) return y;
+        for (int d = 0; d <= 32; d++) {
+            if (isFloor(level, pos, node.x(), node.y() - d, node.z())) return node.y() - d;
+            if (d > 0 && isFloor(level, pos, node.x(), node.y() + d, node.z())) return node.y() + d;
         }
         return node.y();
     }
+
+    /** True if most of a mound at this height has solid ground under it: not over lava or a drop. */
+    private static boolean supported(ServerLevel level, BlockPos.MutableBlockPos pos, Node node, int y) {
+        int solid = 0, total = 0;
+        for (int dx = -RADIUS; dx <= RADIUS; dx++) {
+            for (int dz = -RADIUS; dz <= RADIUS; dz++) {
+                if (dx * dx + dz * dz > RADIUS * RADIUS) continue;
+                total++;
+                BlockState state = level.getBlockState(pos.set(node.x() + dx, y, node.z() + dz));
+                BlockState under = level.getBlockState(pos.set(node.x() + dx, y - 1, node.z() + dz));
+                if (!state.isAir() && state.getFluidState().isEmpty() || !under.isAir() && under.getFluidState().isEmpty()) solid++;
+            }
+        }
+        return solid * 4 >= total * 3;
+    }
+
+    /** Height recorded for a cave or Nether node that has nowhere to stand: it is left out. */
+    public static final int NO_PLACE = Integer.MIN_VALUE + 1;
 
     private static boolean isFloor(ServerLevel level, BlockPos.MutableBlockPos pos, int x, int y, int z) {
         BlockState floor = level.getBlockState(pos.set(x, y, z));
