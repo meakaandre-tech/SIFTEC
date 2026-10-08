@@ -1,0 +1,6 @@
+data/minecraft/worldgen/*sulfur*
+data/minecraft/worldgen/*/*sulfur*
+data/minecraft/worldgen/*/*spring*
+data/minecraft/worldgen/*/*/*sulfur*
+data/minecraft/structure/spring/*
+data/minecraft/tags/worldgen/*

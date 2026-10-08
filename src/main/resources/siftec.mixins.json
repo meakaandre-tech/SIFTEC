@@ -38,6 +38,8 @@
     "MixerFluidMixin",
     "PotentSulfurMixin",
     "ProcessingOutputMixin",
+    "NetworkNoLoadMixin",
+    "PropagatorInvoker",
     "PropagatorMixin",
     "PumpBehaviourMixin",
     "PumpMixin",

@@ -3,3 +3,5 @@ siftec selftest check
 siftec node find oil
 execute in minecraft:the_nether run siftec selftest nether
 siftec selftest state verify
+siftec worldtest powerchain restart
+#sleep 40
