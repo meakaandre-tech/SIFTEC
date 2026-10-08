@@ -121,11 +121,27 @@ public final class RecipeLocks {
     /** The list without the recipes the ticking machine may not run; the same list when nothing is taken out. */
     public static <T> List<T> allowed(List<T> list) {
         if (!active() || list.isEmpty()) return list;
+        // whoever is asking (the ticking machine, or else the clicking player) and their company: looked up once,
+        // and only if some recipe in the list is locked
+        BlockEntity machine = Ownership.ticking();
+        ServerPlayer player = machine == null ? Ownership.asking() : null;
+        if (player != null && player.hasInfiniteMaterials()) return list;
+        MinecraftServer server = machine != null ? (machine.getLevel() instanceof ServerLevel l ? l.getServer() : null)
+            : player != null ? player.level().getServer() : null;
+        if (server == null) return list;
+        Map<Recipe<?>, String> locks = table(server);
+        Company company = null;
+        boolean looked = false;
         List<T> kept = null;
         for (int i = 0; i < list.size(); i++) {
             T entry = list.get(i);
             Recipe<?> recipe = entry instanceof RecipeHolder<?> holder ? holder.value() : entry instanceof Recipe<?> r ? r : null;
-            boolean blocked = recipe != null && blocked(recipe);
+            String lock = recipe == null ? null : locks.get(recipe);
+            if (lock != null && !looked) {
+                company = machine != null ? Ownership.of(machine) : Companies.of(player);
+                looked = true;
+            }
+            boolean blocked = lock != null && (company == null || !company.has(lock));
             if (blocked && kept == null) kept = new ArrayList<>(list.subList(0, i));
             else if (!blocked && kept != null) kept.add(entry);
         }
