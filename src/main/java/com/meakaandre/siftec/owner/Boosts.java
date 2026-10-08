@@ -100,10 +100,35 @@ public final class Boosts {
         return boost == 0 ? 1f : STRESS[Math.min(3, boost % SLOOP)] * (boost >= SLOOP ? 4f : 1f);
     }
 
+    /** More than 0 while a whole result list is being made that is doubled afterwards, at once. Server thread only. */
+    private static int wholeList;
+
     /** True if the machine ticking right now has a Somersloop in it. */
     public static boolean doubling() {
+        if (wholeList > 0) return false;
         BlockEntity machine = Ownership.ticking();
         return machine != null && amplified(machine);
+    }
+
+    /** Runs the job with the per-roll doubling off: the caller doubles the whole result itself. */
+    public static <T> T withoutDoubling(java.util.function.Supplier<T> job) {
+        wholeList++;
+        try {
+            return job.get();
+        } finally {
+            wholeList--;
+        }
+    }
+
+    /** Every stack twice over (as more stacks where they would not fit), except a container that is handed back. */
+    public static java.util.List<ItemStack> doubled(java.util.List<ItemStack> results, net.minecraft.world.item.@org.jspecify.annotations.Nullable ItemStackTemplate keep) {
+        java.util.List<ItemStack> out = new java.util.ArrayList<>(results.size() * 2);
+        for (ItemStack stack : results) {
+            out.add(stack);
+            if (stack.isEmpty() || keep != null && stack.is(keep.item())) continue;
+            out.add(stack.copy());
+        }
+        return out;
     }
 
     private static void changed(BlockEntity be, int boost) {

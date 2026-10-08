@@ -16,7 +16,8 @@ public abstract class PumpMixin {
         return FluidPropagator.getPumpRange() * Upgrades.pumps((PumpBlockEntity) (Object) this);
     }
 
-    @ModifyVariable(method = "distributePressureTo", at = @At("STORE"), name = "pressure")
+    // the method's only float local; by ordinal, so it works on a Create Fly built without local variable names
+    @ModifyVariable(method = "distributePressureTo", at = @At("STORE"), ordinal = 0)
     private float siftec$pressure(float pressure) {
         return pressure * Upgrades.pumps((PumpBlockEntity) (Object) this);
     }

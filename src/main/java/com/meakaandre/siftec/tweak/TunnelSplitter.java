@@ -31,7 +31,8 @@ import java.util.WeakHashMap;
  * single items, go to the outputs in turn. (Create's own tunnel only peels one item off to each side.)
  */
 public final class TunnelSplitter {
-    private static final Map<BeltTunnelBlockEntity, Integer> TURN = new WeakHashMap<>();
+    /** Whose turn it is at each tunnel. One map per side: in single player the client's Ponder scenes run belts too, on their own thread. */
+    private static final Map<BeltTunnelBlockEntity, Integer> TURN = new WeakHashMap<>(), CLIENT_TURN = new WeakHashMap<>();
 
     private TunnelSplitter() {
     }
@@ -73,7 +74,9 @@ public final class TunnelSplitter {
             int outputs = sides.size() + 1;
             int count = current.stack.getCount();
             int share = count / outputs, extra = count % outputs;
-            int turn = TURN.getOrDefault(tunnel, 0);
+            Map<BeltTunnelBlockEntity, Integer> turns = level.isClientSide() ? CLIENT_TURN : TURN;
+            int turn = turns.getOrDefault(tunnel, 0);
+            boolean movedAny = false;
             // outputs are numbered 0 = straight on, 1.. = the sides; the leftover items go to them in turn
             for (int i = 0; i < sides.size(); i++) {
                 int slot = i + 1;
@@ -83,10 +86,11 @@ public final class TunnelSplitter {
                 int moved = amount - rest.getCount();
                 if (moved <= 0) continue;
                 current.stack.shrink(moved);
+                movedAny = true;
                 BeltTunnelInteractionHandler.flapTunnel(inventory, upcomingSegment, sides.get(i), false);
             }
-            TURN.put(tunnel, Math.floorMod(turn + extra, outputs));
-            belt.notifyUpdate();
+            turns.put(tunnel, Math.floorMod(turn + extra, outputs));
+            if (movedAny) belt.notifyUpdate();
         }
         boolean gone = current.stack.isEmpty();
         if (gone) current.stack = ItemStack.EMPTY;

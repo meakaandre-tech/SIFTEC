@@ -17,6 +17,7 @@ public abstract class SiftEntryMixin {
     @Inject(method = "teleport(Lnet/minecraft/world/level/portal/TeleportTransition;)Lnet/minecraft/server/level/ServerPlayer;", at = @At("HEAD"), cancellable = true)
     private void siftec$gate(TeleportTransition transition, CallbackInfoReturnable<ServerPlayer> cir) {
         ServerPlayer self = (ServerPlayer) (Object) this;
-        if (SiftGate.refuses(self, transition.newLevel())) cir.setReturnValue(self);
+        // null is vanilla's answer for a teleport that did not happen: callers then do not mount, move or report success
+        if (SiftGate.refuses(self, transition.newLevel())) cir.setReturnValue(null);
     }
 }
