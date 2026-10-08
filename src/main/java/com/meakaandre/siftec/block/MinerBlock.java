@@ -88,7 +88,7 @@ public class MinerBlock extends KineticBlock implements IBE<MinerBlockEntity>, I
     }
 
     @Override
-    public @Nullable com.zurrtum.create.infrastructure.fluids.FluidInventory getFluidInventory(
+    public com.zurrtum.create.infrastructure.fluids.@Nullable FluidInventory getFluidInventory(
         LevelAccessor world, BlockPos pos, BlockState state, MinerBlockEntity be, @Nullable Direction side
     ) {
         return side == Direction.DOWN ? null : be.tank.getCapability();
