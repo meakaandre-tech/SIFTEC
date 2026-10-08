@@ -323,6 +323,12 @@ public final class WorldTests {
         boolean refused = GeyserEngineBlockEntity.blocksVent(level, onWater);
         level.setBlockAndUpdate(engine, ModBlocks.GEYSER_ENGINE.get().defaultBlockState());
         level.setBlockAndUpdate(store, ModBlocks.POWER_STORAGE.get().defaultBlockState());
+        // the engine turns at 64 RPM: it belongs to a company whose speed limit allows that (unowned blocks break past 32)
+        String company = fastCompany(source);
+        for (BlockPos at : new BlockPos[]{engine, store}) {
+            var be = level.getBlockEntity(at);
+            if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company);
+        }
         BlockPos finalVent = vent;
         report(source, "geyser " + vent.toShortString() + ": state " + ventState.getValue(PotentSulfurBlock.STATE).getSerializedName() + ", water " + depth
             + " deep; an engine right on the water would be refused: " + refused + "; engine found the vent: " + finalVent.equals(GeyserEngineBlockEntity.findVent(level, engine))
@@ -374,6 +380,21 @@ public final class WorldTests {
             }
         });
         return 1;
+    }
+
+    /** A company that has every speed limit milestone done, for machines that turn fast. */
+    private static String fastCompany(CommandSourceStack source) {
+        var data = com.meakaandre.siftec.company.CompanyData.get(source.getServer());
+        com.meakaandre.siftec.company.Company company = data.byId("worldtest_fast");
+        if (company == null) {
+            company = new com.meakaandre.siftec.company.Company();
+            company.id = "worldtest_fast";
+            for (com.meakaandre.siftec.hub.Milestone m : com.meakaandre.siftec.hub.Milestones.all()) {
+                if (m.tokens().stream().anyMatch(t -> t.startsWith("cap:"))) company.done.add(m.id());
+            }
+            data.companies().put(company.id, company);
+        }
+        return company.id;
     }
 
     // ---- Furnace Engines
