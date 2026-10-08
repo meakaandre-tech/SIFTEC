@@ -19,7 +19,10 @@ import java.util.List;
  */
 @Mixin(value = FanProcessing.class, remap = false)
 public abstract class FanOutputMixin {
-    @WrapOperation(method = "applyProcessing", require = 2, at = @At(value = "INVOKE",
+    @WrapOperation(method = {
+        "applyProcessing(Lnet/minecraft/world/entity/item/ItemEntity;Lcom/zurrtum/create/content/kinetics/fan/processing/FanProcessingType;)Z",
+        "applyProcessing(Lcom/zurrtum/create/content/kinetics/belt/transport/TransportedItemStack;Lnet/minecraft/world/level/Level;Lcom/zurrtum/create/content/kinetics/fan/processing/FanProcessingType;)Lcom/zurrtum/create/content/kinetics/belt/behaviour/TransportedItemStackHandlerBehaviour$TransportedResult;"
+    }, require = 2, at = @At(value = "INVOKE",
         target = "Lcom/zurrtum/create/content/kinetics/fan/processing/FanProcessingType;process(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;)Ljava/util/List;"))
     private static List<ItemStack> siftec$doubleProcessed(FanProcessingType type, ItemStack stack, Level level, Operation<List<ItemStack>> original) {
         boolean doubling = Boosts.doubling();
