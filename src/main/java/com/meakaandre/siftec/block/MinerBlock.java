@@ -20,13 +20,22 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
-/** A powered miner. Sits on the middle block of a node and takes rotation from a shaft on top. */
-public class MinerBlock extends KineticBlock implements IBE<MinerBlockEntity>, ItemInventoryProvider<MinerBlockEntity> {
+/**
+ * A powered miner, shaped like the old node drills: two blocks tall. This is the lower block, which sits on the
+ * node and holds the drill, its output and its fluid tank; the upper block ({@link MinerTopBlock}) is the top of
+ * the casing and passes rotation down from a shaft above. One model draws the whole machine from here: the casing
+ * running up into the block above, the lip and ring of beams at its foot and four legs down to the pad. The
+ * renderer adds Create's drill head (resting on the node), the cog on top and the shaft end, all turning with
+ * the shaft. Pipes fill the tank from any side of either block; funnels take the output from this block.
+ */
+public class MinerBlock extends KineticBlock implements IBE<MinerBlockEntity>, ItemInventoryProvider<MinerBlockEntity>,
+    com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider<MinerBlockEntity> {
     public final MinerTier tier;
 
     public MinerBlock(MinerTier tier, Properties properties) {
@@ -52,8 +61,37 @@ public class MinerBlock extends KineticBlock implements IBE<MinerBlockEntity>, I
         withBlockEntityDo(level, pos, miner -> {
             if (player.isShiftKeyDown()) miner.ejectBoosts();
             else miner.giveTo(player);
+            player.sendOverlayMessage(miner.describe());
         });
         return InteractionResult.SUCCESS;
+    }
+
+    /** Two blocks tall: it needs room above for the top of its casing. */
+    @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        BlockPos above = context.getClickedPos().above();
+        if (above.getY() > context.getLevel().getMaxY() || !context.getLevel().getBlockState(above).canBeReplaced(context)) return null;
+        return com.meakaandre.siftec.block.Facing.place(super.getStateForPlacement(context), context);
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide()) placeTop(level, pos);
+    }
+
+    /** Puts the upper block on a miner (placing by hand does it; commands and tests call this). */
+    public static void placeTop(Level level, BlockPos pos) {
+        if (level.getBlockState(pos.above()).canBeReplaced()) {
+            level.setBlock(pos.above(), com.meakaandre.siftec.registry.ModBlocks.MINER_TOP.get().defaultBlockState(), Block.UPDATE_ALL);
+        }
+    }
+
+    @Override
+    public @Nullable com.zurrtum.create.infrastructure.fluids.FluidInventory getFluidInventory(
+        LevelAccessor world, BlockPos pos, BlockState state, MinerBlockEntity be, @Nullable Direction side
+    ) {
+        return side == Direction.DOWN ? null : be.tank.getCapability();
     }
 
     /** Power Shards and a Somersloop are slotted in by clicking the miner with them. */
@@ -110,10 +148,6 @@ public class MinerBlock extends KineticBlock implements IBE<MinerBlockEntity>, I
         builder.add(com.meakaandre.siftec.block.Facing.FACING);
     }
 
-    @Override
-    public net.minecraft.world.level.block.state.BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
-        return com.meakaandre.siftec.block.Facing.place(super.getStateForPlacement(context), context);
-    }
 
     @Override
     protected net.minecraft.world.level.block.state.BlockState rotate(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.Rotation rotation) {

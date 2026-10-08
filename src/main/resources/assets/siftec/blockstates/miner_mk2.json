@@ -4,16 +4,13 @@
       "model": "siftec:block/miner_mk2"
     },
     "facing=east": {
-      "model": "siftec:block/miner_mk2",
-      "y": 90
+      "model": "siftec:block/miner_mk2"
     },
     "facing=south": {
-      "model": "siftec:block/miner_mk2",
-      "y": 180
+      "model": "siftec:block/miner_mk2"
     },
     "facing=west": {
-      "model": "siftec:block/miner_mk2",
-      "y": 270
+      "model": "siftec:block/miner_mk2"
     }
   }
 }

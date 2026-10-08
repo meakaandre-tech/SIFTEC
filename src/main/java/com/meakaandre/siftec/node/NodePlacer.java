@@ -20,14 +20,32 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Puts the node blocks into the world. A node is a low mound about 7 blocks across.
- * Each chunk places only its own columns of a mound, the first time it loads, so no neighbouring chunk is
- * ever forced to load or generate. Surface mounds follow the ground column by column. Cave and Nether
- * mounds are level: their height is chosen when the chunk holding the middle of the node loads.
+ * Puts the node blocks into the world. A node site is a level, round pad of unbreakable Node Pad 7 blocks
+ * across with the node itself standing on its middle, like a resource node in Satisfactory. Under the pad,
+ * unbreakable fill runs down to solid ground, flaring out so the pad sits in the terrain instead of on a
+ * pillar; above it the ground is cut back so the pad is open and level.
+ * Each chunk places only its own columns of a site, the first time it loads, so no neighbouring chunk is
+ * ever forced to load or generate. The height of a surface pad comes from the world generator (the middle
+ * height of the ground across the pad), so every chunk works out the same one. Cave and Nether pads take the
+ * floor found when the chunk holding the middle of the node loads.
+ * Nodes placed before pads existed (old worlds) keep their old rough mound: any piece of them still to be
+ * placed is placed the old way.
  */
 public final class NodePlacer {
-    /** Mound radius in blocks. */
+    /** Radius of an old-style mound, and how near a block has to be to a node to tell which node it is. */
     public static final int RADIUS = 3;
+    /** The pad: every column within this distance of the node. 3.5 gives a round pad 7 blocks across (37 blocks). */
+    public static final double PAD_RADIUS = 3.5;
+    /** How far the fill under the pad flares out (one block out per block down), and how far the cut above it reaches. */
+    private static final int FLARE = 3;
+    /** How far from the node a site can change blocks. */
+    public static final int REACH = 7;
+    /** Air kept above the pad: the node, a two-block miner and the shaft above it. */
+    private static final int HEADROOM = 6;
+    /** Trees and plants are cleared this far above the pad. */
+    private static final int CLEAR_PLANTS = 24;
+    /** The deepest the fill under a pad goes looking for solid ground. */
+    private static final int MAX_FILL = 40;
 
     private record Queued(ResourceKey<Level> dimension, int x, int z) {
     }
@@ -93,8 +111,8 @@ public final class NodePlacer {
     /** True if every cell a chunk's nodes and collectibles can come from is worked out; asks for the missing ones. */
     private static boolean cellsReady(ServerLevel level, int chunkX, int chunkZ) {
         boolean ready = true;
-        int minX = (chunkX << 4) - RADIUS, maxX = (chunkX << 4) + 15 + RADIUS;
-        int minZ = (chunkZ << 4) - RADIUS, maxZ = (chunkZ << 4) + 15 + RADIUS;
+        int minX = (chunkX << 4) - REACH, maxX = (chunkX << 4) + 15 + REACH;
+        int minZ = (chunkZ << 4) - REACH, maxZ = (chunkZ << 4) + 15 + REACH;
         for (int cx = Math.floorDiv(minX, NodeMap.CELL); cx <= Math.floorDiv(maxX, NodeMap.CELL); cx++) {
             for (int cz = Math.floorDiv(minZ, NodeMap.CELL); cz <= Math.floorDiv(maxZ, NodeMap.CELL); cz++) {
                 if (!NodeMap.cached(level, cx, cz)) {
@@ -110,11 +128,15 @@ public final class NodePlacer {
         return ready;
     }
 
-    /** The nodes whose mound reaches into this chunk. */
+    /** The nodes whose site reaches into this chunk. */
     public static Set<Node> nodesTouching(ServerLevel level, int chunkX, int chunkZ) {
+        return nodesTouching(level, chunkX, chunkZ, REACH);
+    }
+
+    private static Set<Node> nodesTouching(ServerLevel level, int chunkX, int chunkZ, int reach) {
         Set<Node> nodes = new HashSet<>(2);
-        int minX = (chunkX << 4) - RADIUS, maxX = (chunkX << 4) + 15 + RADIUS;
-        int minZ = (chunkZ << 4) - RADIUS, maxZ = (chunkZ << 4) + 15 + RADIUS;
+        int minX = (chunkX << 4) - reach, maxX = (chunkX << 4) + 15 + reach;
+        int minZ = (chunkZ << 4) - reach, maxZ = (chunkZ << 4) + 15 + reach;
         // mounds never cross a cell edge, so the cells under the chunk's corners are the only candidates
         for (int cx = Math.floorDiv(minX, NodeMap.CELL); cx <= Math.floorDiv(maxX, NodeMap.CELL); cx++) {
             for (int cz = Math.floorDiv(minZ, NodeMap.CELL); cz <= Math.floorDiv(maxZ, NodeMap.CELL); cz++) {
@@ -132,6 +154,9 @@ public final class NodePlacer {
         NodeSavedData data = NodeSavedData.get(level.getServer());
         boolean any = false;
         for (Node node : nodesTouching(level, chunkX, chunkZ)) {
+            boolean flat = isFlat(data, node);
+            // an old mound only ever reached RADIUS blocks from its node
+            if (!flat && (Math.abs((chunkX << 4) + 8 - node.x()) > 8 + RADIUS || Math.abs((chunkZ << 4) + 8 - node.z()) > 8 + RADIUS)) continue;
             boolean level0 = node.type().where == NodeType.Where.NETHER || node.type().where == NodeType.Where.SULFUR_CAVE;
             int height = Node.SURFACE;
             if (level0) {
@@ -147,21 +172,42 @@ public final class NodePlacer {
                     for (int dx = -1; dx <= 1; dx++) {
                         for (int dz = -1; dz <= 1; dz++) {
                             if ((dx != 0 || dz != 0) && level.hasChunk(chunkX + dx, chunkZ + dz)) {
-                                any |= placePiece(level, data, node, chunkX + dx, chunkZ + dz, height);
+                                any |= placePiece(level, data, node, chunkX + dx, chunkZ + dz, height, flat);
                             }
                         }
                     }
                 }
+            } else if (flat) {
+                height = data.height(node.key());
+                if (height == NodeSavedData.NO_HEIGHT) {
+                    height = NodeMap.padHeight(level, node);
+                    data.setHeight(node.key(), height);
+                }
             }
-            any |= placePiece(level, data, node, chunkX, chunkZ, height);
+            any |= placePiece(level, data, node, chunkX, chunkZ, height, flat);
         }
         return any;
     }
 
-    private static boolean placePiece(ServerLevel level, NodeSavedData data, Node node, int chunkX, int chunkZ, int height) {
+    /**
+     * True if this node gets a flat pad: it is marked as one, or none of it has been placed yet (it is new).
+     * A node that an older version had already started placing keeps its rough mound.
+     */
+    public static boolean isFlat(NodeSavedData data, Node node) {
+        if (data.isFlat(node.key())) return true;
+        for (int cx = (node.x() - RADIUS) >> 4; cx <= (node.x() + RADIUS) >> 4; cx++) {
+            for (int cz = (node.z() - RADIUS) >> 4; cz <= (node.z() + RADIUS) >> 4; cz++) {
+                if (data.isPlaced(NodeSavedData.piece(node.key(), cx, cz))) return false;
+            }
+        }
+        data.markFlat(node.key());
+        return true;
+    }
+
+    private static boolean placePiece(ServerLevel level, NodeSavedData data, Node node, int chunkX, int chunkZ, int height, boolean flat) {
         long piece = NodeSavedData.piece(node.key(), chunkX, chunkZ);
         if (data.isPlaced(piece)) return false;
-        boolean placed = placeColumns(level, node, chunkX, chunkZ, height);
+        boolean placed = flat ? placePad(level, node, chunkX, chunkZ, height) : placeColumns(level, node, chunkX, chunkZ, height);
         data.markPlaced(piece);
         return placed;
     }
@@ -193,12 +239,12 @@ public final class NodePlacer {
         return node.y();
     }
 
-    /** True if most of a mound at this height has solid ground under it: not over lava or a drop. */
+    /** True if most of a pad at this height has solid ground under it: not over lava or a drop. */
     private static boolean supported(ServerLevel level, BlockPos.MutableBlockPos pos, Node node, int y) {
         int solid = 0, total = 0;
         for (int dx = -RADIUS; dx <= RADIUS; dx++) {
             for (int dz = -RADIUS; dz <= RADIUS; dz++) {
-                if (dx * dx + dz * dz > RADIUS * RADIUS) continue;
+                if (dx * dx + dz * dz > PAD_RADIUS * PAD_RADIUS) continue;
                 total++;
                 BlockState state = level.getBlockState(pos.set(node.x() + dx, y, node.z() + dz));
                 BlockState under = level.getBlockState(pos.set(node.x() + dx, y - 1, node.z() + dz));
@@ -217,12 +263,94 @@ public final class NodePlacer {
         return level.getBlockState(pos.set(x, y + 1, z)).isAir() && level.getBlockState(pos.set(x, y + 2, z)).isAir();
     }
 
+    /** The block a node's middle is: its resource block (an Oil Well for oil), marked as the core, showing its purity. */
+    public static BlockState coreState(Node node) {
+        Block block = node.type() == NodeType.OIL ? ModBlocks.OIL_WELL.get() : ModBlocks.NODES.get(node.type()).get();
+        return block.defaultBlockState().setValue(NodeBlock.CORE, true).setValue(NodeBlock.PURITY, node.purity());
+    }
+
+    /** True for blocks a site must never remove: other unbreakable blocks (bedrock, nodes, collectibles) and anything with a block entity. */
+    private static boolean keep(ServerLevel level, BlockState state, BlockPos pos) {
+        return state.hasBlockEntity() || state.getDestroySpeed(level, pos) < 0;
+    }
+
+    /** Plants, trees and snow: what is cleared off a pad for a long way up. */
+    private static boolean plant(BlockState state) {
+        return state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.is(Blocks.SNOW) || state.is(Blocks.BAMBOO)
+            || state.is(Blocks.CACTUS) || state.is(Blocks.SUGAR_CANE) || state.is(Blocks.VINE) || state.canBeReplaced() && state.getFluidState().isEmpty();
+    }
+
+    /**
+     * One chunk's columns of a flat site whose pad is at {@code height}: the pad and, under it, fill down to solid
+     * ground (flaring out one block per block down); above it, the ground cut back (narrow at the pad, wider
+     * higher up) and plants cleared; the node on the middle of the pad.
+     */
+    private static boolean placePad(ServerLevel level, Node node, int chunkX, int chunkZ, int height) {
+        BlockState pad = ModBlocks.NODE_PAD.get().defaultBlockState();
+        BlockState fill = ModBlocks.NODE_PAD_FILL.get().defaultBlockState();
+        BlockState air = Blocks.AIR.defaultBlockState();
+        boolean cave = node.type().where == NodeType.Where.SULFUR_CAVE;
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        int flags = Block.UPDATE_CLIENTS;
+        boolean any = false;
+        int minY = level.getMinY();
+        for (int dx = -REACH; dx <= REACH; dx++) {
+            for (int dz = -REACH; dz <= REACH; dz++) {
+                int x = node.x() + dx, z = node.z() + dz;
+                if (x >> 4 != chunkX || z >> 4 != chunkZ) continue;
+                double r = Math.sqrt(dx * dx + dz * dz);
+                // how far outside the pad this column is, in whole blocks (0 on the pad)
+                int out = r <= PAD_RADIUS ? 0 : (int) Math.ceil(r - PAD_RADIUS);
+                if (out > FLARE) continue;
+                // a cave pad never cuts up to the surface: the cut stops a few blocks under the ground above
+                int roof = cave ? level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - 4 : Integer.MAX_VALUE;
+                // the pad and the fill below it; the flare starts lower the further out it is
+                int top = height - out;
+                for (int y = top, depth = 0; y > minY && depth < MAX_FILL; y--, depth++) {
+                    BlockState here = level.getBlockState(pos.set(x, y, z));
+                    boolean solid = !here.isAir() && !here.canBeReplaced() && here.getFluidState().isEmpty() && !plant(here);
+                    if (out == 0 && y == height) {
+                        if (keep(level, here, pos)) break;
+                        level.setBlock(pos, pad, flags);
+                        any = true;
+                        continue;
+                    }
+                    if (solid && (out > 0 || y < height)) {
+                        // the fill joins the ground: one more block of fill where the ground is soft, then stop
+                        break;
+                    }
+                    if (keep(level, here, pos)) break;
+                    level.setBlock(pos, fill, flags);
+                    any = true;
+                }
+                // the cut: open air over the pad, stepping back one block per block up around it
+                for (int up = 1 + out; up <= HEADROOM && height + up < roof; up++) {
+                    BlockState here = level.getBlockState(pos.set(x, height + up, z));
+                    if (here.isAir() || keep(level, here, pos)) continue;
+                    if (!here.getFluidState().isEmpty() && out > 0) continue;
+                    level.setBlock(pos, air, flags);
+                }
+                // trees, plants and snow over the site
+                if (!cave) {
+                    for (int up = 1; up <= CLEAR_PLANTS; up++) {
+                        BlockState here = level.getBlockState(pos.set(x, height + up, z));
+                        if (!here.isAir() && plant(here) && !keep(level, here, pos)) level.setBlock(pos, air, flags);
+                    }
+                }
+                if (dx == 0 && dz == 0) {
+                    level.setBlock(pos.set(x, height + 1, z), coreState(node), flags);
+                    any = true;
+                }
+            }
+        }
+        return any;
+    }
+
+    /** An old-style mound that follows the ground: only for nodes an older version had already begun placing. */
     private static boolean placeColumns(ServerLevel level, Node node, int chunkX, int chunkZ, int height) {
         Block ore = ModBlocks.NODES.get(node.type()).get();
         BlockState oreState = ore.defaultBlockState();
-        BlockState coreState = node.type() == NodeType.OIL
-            ? ModBlocks.OIL_WELL.get().defaultBlockState().setValue(NodeBlock.CORE, true)
-            : oreState.setValue(NodeBlock.CORE, true);
+        BlockState coreState = coreState(node);
         BlockState rock = ModBlocks.NODE_ROCK.get().defaultBlockState();
         boolean pool = node.type() == NodeType.OIL;
         boolean surface = height == Node.SURFACE;

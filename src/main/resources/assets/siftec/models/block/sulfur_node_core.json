@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "top": "siftec:block/sulfur_node_top",
-    "side": "siftec:block/sulfur_node_side",
-    "bottom": "siftec:block/node_rock_side"
-  }
-}

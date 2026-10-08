@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:block/iron_node"
+    "model": "siftec:block/iron_node_mound_normal"
   }
 }

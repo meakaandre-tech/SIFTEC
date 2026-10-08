@@ -49,6 +49,11 @@ public class ModBlocks {
             .sound(SoundType.DEEPSLATE).pushReaction(PushReaction.IMMOVEABLE);
     }
 
+    /** A node's own blocks: unbreakable like the rest, and drawn as a mound that does not fill its block. */
+    private static BlockBehaviour.Properties nodeCore() {
+        return node().noOcclusion();
+    }
+
     private static BlockBehaviour.Properties machine() {
         return BlockBehaviour.Properties.of().strength(2.0F, 6.0F).sound(SoundType.METAL).noOcclusion();
     }
@@ -58,16 +63,21 @@ public class ModBlocks {
 
     static {
         for (NodeType type : NodeType.values()) {
-            NODES.put(type, block(type.id() + "_node", properties -> new NodeBlock(type, properties), ModBlocks::node));
+            NODES.put(type, block(type.id() + "_node", properties -> new NodeBlock(type, properties), ModBlocks::nodeCore));
         }
     }
 
     public static final Supplier<PortableMinerBlock> PORTABLE_MINER = block("portable_miner", PortableMinerBlock::new, ModBlocks::machine);
     /** The middle of an oil pool: the one block a Pumpjack can stand on. */
-    public static final Supplier<NodeBlock> OIL_WELL = block("oil_well", properties -> new NodeBlock(NodeType.OIL, properties), ModBlocks::node);
+    public static final Supplier<NodeBlock> OIL_WELL = block("oil_well", properties -> new NodeBlock(NodeType.OIL, properties), ModBlocks::nodeCore);
+    /** The flat pad a node stands on, and the fill under it: unbreakable, immovable, not in the creative tab (ops can /give it). */
+    public static final Supplier<com.meakaandre.siftec.block.NodePadBlock> NODE_PAD = hidden("node_pad", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node);
+    public static final Supplier<com.meakaandre.siftec.block.NodePadBlock> NODE_PAD_FILL = hidden("node_pad_fill", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node);
     public static final Supplier<MinerBlock> MINER_MK1 = block("miner_mk1", properties -> new MinerBlock(MinerTier.MK1, properties), ModBlocks::machine);
     public static final Supplier<MinerBlock> MINER_MK2 = block("miner_mk2", properties -> new MinerBlock(MinerTier.MK2, properties), ModBlocks::machine);
     public static final Supplier<MinerBlock> MINER_MK3 = block("miner_mk3", properties -> new MinerBlock(MinerTier.MK3, properties), ModBlocks::machine);
+    /** The upper block of a powered miner (placed with it, never on its own). */
+    public static final Supplier<com.meakaandre.siftec.block.MinerTopBlock> MINER_TOP = hidden("miner_top", com.meakaandre.siftec.block.MinerTopBlock::new, ModBlocks::machine);
     public static final Supplier<ExtractorBlock> RESOURCE_WELL_EXTRACTOR = block("resource_well_extractor", ExtractorBlock::new, ModBlocks::machine);
 
     public static final Supplier<HubBlock> HUB = block("hub", properties -> new HubBlock(false, properties), ModBlocks::machine);
@@ -112,6 +122,14 @@ public class ModBlocks {
     public static final Supplier<SinkBlock> AWESOME_SINK = block("awesome_sink", properties -> new SinkBlock(false, properties), ModBlocks::machine);
     public static final Supplier<SinkBlock> AWESOME_SHOP = block("awesome_shop", properties -> new SinkBlock(true, properties), ModBlocks::machine);
     public static final Supplier<ClaimMarkerBlock> CLAIM_MARKER = block("claim_marker", ClaimMarkerBlock::new, ModBlocks::machine);
+
+    private static <T extends Block> Supplier<T> hidden(
+        String name, Function<BlockBehaviour.Properties, T> factory, Supplier<BlockBehaviour.Properties> properties
+    ) {
+        Supplier<T> block = block(name, factory, properties);
+        TAB_ITEMS.removeLast();
+        return block;
+    }
 
     private static <T extends Block> Supplier<T> block(
         String name, Function<BlockBehaviour.Properties, T> factory, Supplier<BlockBehaviour.Properties> properties

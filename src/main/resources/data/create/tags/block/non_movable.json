@@ -1,4 +1,4 @@
 {
   "replace": false,
-  "values": ["siftec:hub", "siftec:claim_marker"]
+  "values": ["siftec:hub", "siftec:claim_marker", "siftec:node_pad", "siftec:node_pad_fill", "siftec:node_rock", "siftec:oil_well", "siftec:iron_node", "siftec:copper_node", "siftec:limestone_node", "siftec:coal_node", "siftec:zinc_node", "siftec:oil_node", "siftec:bauxite_node", "siftec:nitrogen_node", "siftec:sam_node", "siftec:quartz_node", "siftec:sulfur_node"]
 }
