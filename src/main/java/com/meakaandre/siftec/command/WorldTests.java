@@ -219,22 +219,32 @@ public final class WorldTests {
         Node node = sulfur.get();
         long start = System.nanoTime();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        BlockPos best = null;
+        BlockPos best = null, dry = null;
         double bestDistance = Double.MAX_VALUE;
-        int chunks = 0;
+        int chunks = 0, potent = 0, wet = 0, sulfurBlocks = 0, caveBiome = 0;
+        BlockPos middle = new BlockPos(node.x(), node.y(), node.z());
         for (int r = 0; r <= 3 && best == null; r++) {
             for (int cx = (node.x() >> 4) - r; cx <= (node.x() >> 4) + r; cx++) {
                 for (int cz = (node.z() >> 4) - r; cz <= (node.z() >> 4) + r; cz++) {
                     if (Math.max(Math.abs(cx - (node.x() >> 4)), Math.abs(cz - (node.z() >> 4))) != r) continue;
                     var chunk = level.getChunk(cx, cz);
                     chunks++;
-                    for (int y = Math.max(level.getMinY(), node.y() - 48); y <= Math.min(level.getMaxY() - 2, node.y() + 48); y++) {
+                    if (Terrain.biome(level, (cx << 4) + 8, node.y(), (cz << 4) + 8).unwrapKey().map(k -> k.identifier().getPath().equals("sulfur_caves")).orElse(false)) caveBiome++;
+                    // the whole height: pools lie on the cave's sulfur floor, springs on the ground above the cave
+                    for (int y = level.getMinY(); y < level.getMaxY() - 1; y++) {
                         for (int x = 0; x < 16; x++) {
                             for (int z = 0; z < 16; z++) {
                                 pos.set((cx << 4) + x, y, (cz << 4) + z);
-                                if (!chunk.getBlockState(pos).is(Blocks.POTENT_SULFUR)) continue;
-                                if (!chunk.getFluidState(pos.above()).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) continue;
-                                double d = pos.distSqr(new BlockPos(node.x(), node.y(), node.z()));
+                                BlockState state = chunk.getBlockState(pos);
+                                if (state.is(Blocks.SULFUR)) sulfurBlocks++;
+                                if (!state.is(Blocks.POTENT_SULFUR)) continue;
+                                potent++;
+                                if (!chunk.getFluidState(pos.above()).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) {
+                                    if (dry == null) dry = pos.immutable();
+                                    continue;
+                                }
+                                wet++;
+                                double d = pos.distSqr(middle);
                                 if (d < bestDistance) {
                                     bestDistance = d;
                                     best = pos.immutable();
@@ -245,10 +255,13 @@ public final class WorldTests {
                 }
             }
         }
-        report(source, "geyser natural: sulfur node " + node + ", searched " + chunks + " chunks in " + (System.nanoTime() - start) / 1_000_000 + " ms, "
-            + (best == null ? "no geyser under water found" : "world-generated geyser at " + best.toShortString() + " in " + Terrain.biome(level, best.getX(), best.getY(), best.getZ()).unwrapKey().map(k -> k.identifier().toString()).orElse("?")));
-        if (best == null) return 0;
-        return geyser(context, best);
+        BlockPos chosen = best != null ? best : dry;
+        report(source, "geyser natural: sulfur node " + node + ", searched " + chunks + " chunks (" + caveBiome + " with sulfur caves at the node's height) in "
+            + (System.nanoTime() - start) / 1_000_000 + " ms: " + sulfurBlocks + " sulfur blocks, " + potent + " potent sulfur, " + wet + " of them under water; "
+            + (chosen == null ? "no geyser found" : "world-generated geyser at " + chosen.toShortString() + (best == null ? " (dry)" : "") + " in "
+            + Terrain.biome(level, chosen.getX(), chosen.getY(), chosen.getZ()).unwrapKey().map(k -> k.identifier().toString()).orElse("?")));
+        if (chosen == null) return 0;
+        return geyser(context, chosen);
     }
 
     /** Places the nearest node of a type (from spawn, or 150,150 in the Nether) and reports where its core is and what it stands on. */
