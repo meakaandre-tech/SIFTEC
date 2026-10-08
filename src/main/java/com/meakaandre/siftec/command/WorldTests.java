@@ -60,21 +60,23 @@ public final class WorldTests {
     }
 
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
-            Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .then(Commands.literal("worldtest")
-                    .then(Commands.literal("nodes").then(Commands.argument("radius", IntegerArgumentType.integer(128, 8000)).executes(WorldTests::nodes)))
-                    .then(Commands.literal("pockets").then(Commands.argument("list", StringArgumentType.greedyString()).executes(WorldTests::pockets)))
-                    .then(Commands.literal("place").then(Commands.argument("type", StringArgumentType.word()).executes(WorldTests::place)))
-                    .then(Commands.literal("geyser")
-                        .then(Commands.literal("build").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(c -> geyser(c, null))))
-                        .then(Commands.argument("x", IntegerArgumentType.integer()).then(Commands.argument("y", IntegerArgumentType.integer()).then(Commands.argument("z", IntegerArgumentType.integer())
-                            .then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(c -> geyser(c,
-                                new BlockPos(IntegerArgumentType.getInteger(c, "x"), IntegerArgumentType.getInteger(c, "y"), IntegerArgumentType.getInteger(c, "z"))))))))
-                    .then(Commands.literal("furnace").then(Commands.literal("setup").executes(c -> furnace(c, true))).then(Commands.literal("check").executes(c -> furnace(c, false))))
-                    .then(Commands.literal("processor").executes(WorldTests::processor))
-                    .then(Commands.literal("powerline").then(Commands.literal("setup").executes(c -> powerline(c, true))).then(Commands.literal("check").executes(c -> powerline(c, false)))))
-        ));
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            var seconds = Commands.argument("seconds", IntegerArgumentType.integer(10, 600));
+            var geyserAt = Commands.argument("x", IntegerArgumentType.integer())
+                .then(Commands.argument("y", IntegerArgumentType.integer())
+                    .then(Commands.argument("z", IntegerArgumentType.integer())
+                        .then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(c -> geyser(c, new BlockPos(
+                            IntegerArgumentType.getInteger(c, "x"), IntegerArgumentType.getInteger(c, "y"), IntegerArgumentType.getInteger(c, "z")))))));
+            var worldtest = Commands.literal("worldtest")
+                .then(Commands.literal("nodes").then(Commands.argument("radius", IntegerArgumentType.integer(128, 8000)).executes(WorldTests::nodes)))
+                .then(Commands.literal("pockets").then(Commands.argument("list", StringArgumentType.greedyString()).executes(WorldTests::pockets)))
+                .then(Commands.literal("place").then(Commands.argument("type", StringArgumentType.word()).executes(WorldTests::place)))
+                .then(Commands.literal("geyser").then(Commands.literal("build").then(seconds.executes(c -> geyser(c, null)))).then(geyserAt))
+                .then(Commands.literal("furnace").then(Commands.literal("setup").executes(c -> furnace(c, true))).then(Commands.literal("check").executes(c -> furnace(c, false))))
+                .then(Commands.literal("processor").executes(WorldTests::processor))
+                .then(Commands.literal("powerline").then(Commands.literal("setup").executes(c -> powerline(c, true))).then(Commands.literal("check").executes(c -> powerline(c, false))));
+            dispatcher.register(Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).then(worldtest));
+        });
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (var it = MONITORS.iterator(); it.hasNext(); ) {
                 Monitor monitor = it.next();
