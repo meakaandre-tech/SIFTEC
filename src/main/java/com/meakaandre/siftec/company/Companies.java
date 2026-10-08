@@ -55,6 +55,7 @@ public final class Companies {
             // per-player choices held in memory belong to this server run only
             com.meakaandre.siftec.item.NodeScannerItem.forget();
             com.meakaandre.siftec.item.ObjectScannerItem.forget();
+            com.meakaandre.siftec.power.PowerLineItem.forget();
         });
         // once a second: finish any research whose time is up
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {

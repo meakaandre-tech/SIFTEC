@@ -16,6 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PowerLineItem extends Item {
     private static final Map<UUID, BlockPos> FIRST = new ConcurrentHashMap<>();
 
+    /** Forgets every half-made line; called when the server stops. */
+    public static void forget() {
+        FIRST.clear();
+    }
+
     public PowerLineItem(Properties properties) {
         super(properties);
     }
