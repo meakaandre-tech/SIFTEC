@@ -74,7 +74,10 @@ public final class WorldTests {
                     .then(Commands.literal("natural").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::naturalGeyser))).then(geyserAt))
                 .then(Commands.literal("furnace").then(Commands.literal("setup").executes(c -> furnace(c, true))).then(Commands.literal("check").executes(c -> furnace(c, false))))
                 .then(Commands.literal("processor").executes(WorldTests::processor))
-                .then(Commands.literal("powerline").then(Commands.literal("setup").executes(c -> powerline(c, true))).then(Commands.literal("check").executes(c -> powerline(c, false))));
+                .then(Commands.literal("powerline").then(Commands.literal("setup").executes(c -> powerline(c, true))).then(Commands.literal("check").executes(c -> powerline(c, false))))
+                .then(Commands.literal("powerchain").then(Commands.literal("setup").executes(c -> powerchain(c, false))).then(Commands.literal("restart").executes(c -> powerchain(c, true))))
+                .then(Commands.literal("geysers").then(Commands.argument("dx", IntegerArgumentType.integer()).then(Commands.argument("dz", IntegerArgumentType.integer())
+                    .then(Commands.argument("half", IntegerArgumentType.integer(16, 1500)).executes(WorldTests::geyserSurvey)))));
             dispatcher.register(Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).then(worldtest));
         });
         ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -85,11 +88,15 @@ public final class WorldTests {
         });
         ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
             if (watchedChunk != null && chunk.getPos().equals(watchedChunk)) watchedLoads++;
+            CHAIN_LOADS.computeIfPresent(chunk.getPos().pack(), (k, v) -> v + 1);
             allLoads++;
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             MONITORS.clear();
             SITES.clear();
+            NATURAL.clear();
+            CHAIN_LOADS.clear();
+            weakSource = null;
             watchedChunk = null;
         });
     }
@@ -211,6 +218,12 @@ public final class WorldTests {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
         BlockPos o = origin(level);
+        if (!NATURAL.isEmpty()) {
+            BlockPos found = NATURAL.getFirst();
+            report(source, "geyser natural: the nearest periodic geyser the surveys found, at " + found.toShortString() + ", " + Math.round(Math.sqrt(found.distSqr(new BlockPos(o.getX(), found.getY(), o.getZ()))))
+                + " blocks from spawn");
+            return geyser(context, found);
+        }
         Optional<Node> sulfur = NodeMap.nearest(level, o.getX(), o.getZ(), NodeType.SULFUR, 64, Terrain.Border.of(level), Long.MAX_VALUE);
         if (sulfur.isEmpty() || sulfur.get().y() == Node.SURFACE) {
             report(source, "geyser natural: no sulfur cave found");
@@ -581,5 +594,275 @@ public final class WorldTests {
             }
         });
         return 1;
+    }
+    // ---- natural geysers: how many the world really makes
+
+    /** Periodic geysers (potent sulfur over magma, water above) found by the surveys, nearest to spawn first. */
+    private static final List<BlockPos> NATURAL = new ArrayList<>();
+
+    /**
+     * Counts the potent sulfur a stretch of the world generated. Vanilla only places it from features of the
+     * sulfur_caves biome (its sulfur springs, rooted in the cave and grown up to the first open, level spot above,
+     * and the wet sulfur pools on the cave floor), so only chunks with sulfur caves under them, and the chunks
+     * round those, are generated and searched. Each one is reported with its state, what is under it, how much
+     * water is over it and how far it is from spawn.
+     */
+    private static int geyserSurvey(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ServerLevel level = source.getServer().overworld();
+        BlockPos o = origin(level);
+        int half = IntegerArgumentType.getInteger(context, "half");
+        int x0 = o.getX() + IntegerArgumentType.getInteger(context, "dx") - half, z0 = o.getZ() + IntegerArgumentType.getInteger(context, "dz") - half;
+        int x1 = x0 + 2 * half, z1 = z0 + 2 * half;
+        long start = System.nanoTime();
+        java.util.Set<Long> cave = new java.util.HashSet<>(), scan = new java.util.LinkedHashSet<>();
+        int chunks = 0;
+        for (int cx = x0 >> 4; cx <= x1 >> 4; cx++) {
+            for (int cz = z0 >> 4; cz <= z1 >> 4; cz++) {
+                chunks++;
+                outer:
+                for (int y = -60; y <= 100; y += 8) {
+                    for (int[] d : new int[][]{{4, 4}, {12, 12}, {4, 12}, {12, 4}}) {
+                        if (Terrain.biome(level, (cx << 4) + d[0], y, (cz << 4) + d[1]).unwrapKey().map(k -> k.identifier().getPath().equals("sulfur_caves")).orElse(false)) {
+                            cave.add(ChunkPos.pack(cx, cz));
+                            break outer;
+                        }
+                    }
+                }
+            }
+        }
+        for (long c : cave) {
+            ChunkPos p = ChunkPos.unpack(c);
+            for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) scan.add(ChunkPos.pack(p.x() + dx, p.z() + dz));
+        }
+        long sampled = System.nanoTime();
+        Map<String, Integer> byKind = new java.util.TreeMap<>();
+        List<String> listed = new ArrayList<>();
+        List<BlockPos> periodic = new ArrayList<>();
+        int found = 0, inArea = 0;
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (long c : scan) {
+            ChunkPos p = ChunkPos.unpack(c);
+            var chunk = level.getChunk(p.x(), p.z());
+            var sections = chunk.getSections();
+            for (int i = 0; i < sections.length; i++) {
+                var section = sections[i];
+                if (section.hasOnlyAir() || !section.maybeHas(st -> st.is(Blocks.POTENT_SULFUR))) continue;
+                int baseY = level.getMinY() + (i << 4);
+                for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) {
+                    BlockState state = section.getBlockState(x, y, z);
+                    if (!state.is(Blocks.POTENT_SULFUR)) continue;
+                    pos.set((p.x() << 4) + x, baseY + y, (p.z() << 4) + z);
+                    found++;
+                    boolean inside = pos.getX() >= x0 && pos.getX() <= x1 && pos.getZ() >= z0 && pos.getZ() <= z1;
+                    if (inside) inArea++;
+                    BlockState below = level.getBlockState(pos.below());
+                    int water = 0;
+                    while (water < 8 && level.getFluidState(pos.above(water + 1)).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) water++;
+                    String stateName = state.getValue(PotentSulfurBlock.STATE).getSerializedName();
+                    String under = BuiltInRegistries.BLOCK.getKey(below.getBlock()).getPath();
+                    int surface = level.getHeight(Heightmap.Types.WORLD_SURFACE, pos.getX(), pos.getZ());
+                    boolean open = surface <= pos.getY() + water + 2;
+                    String biome = Terrain.biome(level, pos.getX(), pos.getY(), pos.getZ()).unwrapKey().map(k -> k.identifier().getPath()).orElse("?");
+                    String kind = stateName + "/over " + under + "/" + (water > 0 ? "water" : "no water") + "/" + (open ? "open sky" : "covered");
+                    byKind.merge(kind, 1, Integer::sum);
+                    long distance = Math.round(Math.sqrt(Math.pow(pos.getX() - o.getX(), 2) + Math.pow(pos.getZ() - o.getZ(), 2)));
+                    if (listed.size() < 14) listed.add(pos.toShortString() + " " + stateName + " over " + under + " water " + water + (open ? " open" : " covered") + " " + biome + " " + distance + "m");
+                    if (below.is(Blocks.MAGMA_BLOCK) && water > 0) periodic.add(pos.immutable());
+                }
+            }
+        }
+        periodic.sort(java.util.Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
+        for (BlockPos b : periodic) if (!NATURAL.contains(b)) NATURAL.add(b);
+        NATURAL.sort(java.util.Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
+        double km2 = (2.0 * half) * (2.0 * half) / 1_000_000.0;
+        report(source, String.format("geysers survey x %d..%d z %d..%d (%.2f km2): %d chunks, %d with sulfur caves below (biome sampled in %d ms), %d chunks generated and searched in %d ms; "
+                + "potent sulfur %d (%d inside the area, %.1f per 1000x1000), periodic geysers (magma under, water over) %d; kinds %s; nearest periodic to spawn %s; first: %s",
+            x0, x1, z0, z1, km2, chunks, cave.size(), (sampled - start) / 1_000_000, scan.size(), (System.nanoTime() - sampled) / 1_000_000,
+            found, inArea, inArea / km2, periodic.size(), byKind, periodic.isEmpty() ? "none" : periodic.getFirst().toShortString() + " ("
+                + Math.round(Math.sqrt(Math.pow(periodic.getFirst().getX() - o.getX(), 2) + Math.pow(periodic.getFirst().getZ() - o.getZ(), 2))) + "m)", listed));
+        return 1;
+    }
+
+    // ---- a long Power Line whose middle is unloaded
+
+    /** Chunk loads of the chunks the chain test watches. */
+    private static final Map<Long, Integer> CHAIN_LOADS = new java.util.concurrent.ConcurrentHashMap<>();
+    /** Test only: the block entity at this position offers this much stress capacity per RPM instead of its own. */
+    public static volatile BlockPos weakSource;
+    public static volatile float weakCapacity;
+
+    /**
+     * Source, then five Power Towers 200 blocks apart (800 blocks), plus a branch from the middle tower: a creative
+     * motor under the first, an encased fan under the last and under the branch's end. The first and the two ends
+     * are kept loaded; the three in between are let go and must unload. Then: the far fans turn at the motor's RPM
+     * in one network with its capacity; speed, direction, stop and overstress all reach them; and the middle
+     * chunks are never loaded. After a restart: it works again with the middle still unloaded, and breaking the
+     * middle tower (its chunk loaded for that, on purpose) cuts both ends.
+     */
+    private static BlockPos[] chain(ServerLevel level) {
+        BlockPos o = origin(level);
+        BlockPos t0 = new BlockPos(o.getX() + 64, 200, o.getZ() + 400);
+        return new BlockPos[]{t0, t0.east(200), t0.east(400), t0.east(600), t0.east(800), t0.east(400).south(200)};
+    }
+
+    private static int powerchain(CommandContext<CommandSourceStack> context, boolean restart) {
+        CommandSourceStack source = context.getSource();
+        ServerLevel level = source.getServer().overworld();
+        BlockPos[] t = chain(level);
+        BlockPos motorAt = t[0].below(), farFan = t[4].below(), branchFan = t[5].below();
+        int[] middle = {1, 2, 3}, ends = {0, 4, 5};
+        for (int i : middle) CHAIN_LOADS.put(ChunkPos.pack(t[i]), 0);
+        if (!restart) {
+            for (BlockPos p : t) level.setChunkForced(p.getX() >> 4, p.getZ() >> 4, true);
+            for (BlockPos p : t) level.getChunk(p.getX() >> 4, p.getZ() >> 4);
+            String company = fastCompany(source);
+            BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP);
+            BlockState fan = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:encased_fan")).defaultBlockState().setValue(BlockStateProperties.FACING, Direction.DOWN);
+            for (BlockPos p : t) level.setBlockAndUpdate(p, ModBlocks.POWER_TOWER.get().defaultBlockState());
+            level.setBlockAndUpdate(motorAt, motor);
+            level.setBlockAndUpdate(farFan, fan);
+            level.setBlockAndUpdate(branchFan, fan);
+            for (BlockPos p : new BlockPos[]{t[0], t[1], t[2], t[3], t[4], t[5], motorAt, farFan, branchFan}) {
+                var be = level.getBlockEntity(p);
+                if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company);
+            }
+            int[][] links = {{0, 1}, {1, 2}, {2, 3}, {3, 4}, {2, 5}};
+            for (int[] l : links) {
+                if (level.getBlockEntity(t[l[0]]) instanceof PoleBlockEntity a && level.getBlockEntity(t[l[1]]) instanceof PoleBlockEntity b) {
+                    a.link(t[l[1]]);
+                    b.link(t[l[0]]);
+                }
+            }
+            report(source, "powerchain setup: towers " + java.util.Arrays.stream(t).map(BlockPos::toShortString).toList() + " (a branch from the middle one); motor under the first, fans under the far end and the branch end");
+        } else {
+            for (int i : ends) level.setChunkForced(t[i].getX() >> 4, t[i].getZ() >> 4, true);
+            report(source, "powerchain after restart: map of lines " + com.meakaandre.siftec.power.PowerGrid.get(level).describe(level) + "; middle chunks loaded " + middleLoaded(level, t));
+        }
+        MONITORS.add(new Monitor() {
+            int ticks, step, waited, allBefore;
+            boolean settled;
+
+            String fans() {
+                return "far fan " + speed(farFan) + " RPM" + (over(farFan) ? " OVERSTRESSED" : "") + ", branch fan " + speed(branchFan) + " RPM" + (over(branchFan) ? " OVERSTRESSED" : "");
+            }
+
+            float speed(BlockPos p) {
+                return level.getBlockEntity(p) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k ? k.getSpeed() : Float.NaN;
+            }
+
+            boolean over(BlockPos p) {
+                return level.getBlockEntity(p) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k && k.isOverStressed();
+            }
+
+            String network() {
+                if (!(level.getBlockEntity(motorAt) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity m) || !(level.getBlockEntity(farFan) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity f)) return "no motor/fan";
+                String far = f.hasNetwork() ? String.format("far fan's network capacity %.0f SU, stress %.0f SU", f.getOrCreateNetwork().calculateCapacity(), f.getOrCreateNetwork().calculateStress()) : "far fan has no network";
+                String src = level.getBlockEntity(t[4]) instanceof PoleBlockEntity p4 && p4.source != null ? p4.source.toShortString() : "none";
+                return "same network as the motor " + (m.network != null && m.network.equals(f.network)) + "; " + far + "; the motor offers " + m.calculateAddedStressCapacity() + " SU/RPM at " + m.getSpeed()
+                    + " RPM; last tower takes its rotation from " + src;
+            }
+
+            void setMotor(int rpm) {
+                if (level.getBlockEntity(motorAt) instanceof com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity m) m.generatedSpeed.setValue(rpm);
+            }
+
+            void capacity() {
+                if (level.getBlockEntity(motorAt) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity m && m.hasNetwork()) m.getOrCreateNetwork().updateCapacityFor(m, m.calculateAddedStressCapacity());
+            }
+
+            @Override
+            public boolean tick() {
+                ticks++;
+                if (!settled) {
+                    if (!restart && ticks == 40) {
+                        report(source, "powerchain all loaded: " + fans() + "; " + network());
+                        for (int i : middle) level.setChunkForced(t[i].getX() >> 4, t[i].getZ() >> 4, false);
+                    }
+                    if (ticks < (restart ? 100 : 41)) return false;
+                    if (middleAnyLoaded(level, t) && ++waited < 1200) return false;
+                    settled = true;
+                    for (int i : middle) CHAIN_LOADS.put(ChunkPos.pack(t[i]), 0);
+                    allBefore = allLoads;
+                    ticks = 0;
+                    report(source, "powerchain middle unloaded " + !middleAnyLoaded(level, t) + " (after " + waited / 20 + " s): " + middleLoaded(level, t));
+                    return false;
+                }
+                if (ticks % 30 != 0) return false;
+                step++;
+                String tag = "powerchain" + (restart ? " after restart" : "") + " step " + step + ": ";
+                if (!restart) {
+                    switch (step) {
+                        case 1 -> {
+                            report(source, tag + "motor at 16 RPM: " + fans() + "; " + network() + "; middle " + middleLoaded(level, t));
+                            setMotor(24);
+                        }
+                        case 2 -> {
+                            report(source, tag + "motor set to 24 RPM: " + fans());
+                            setMotor(-16);
+                        }
+                        case 3 -> {
+                            report(source, tag + "motor reversed to -16 RPM: " + fans());
+                            setMotor(0);
+                        }
+                        case 4 -> {
+                            report(source, tag + "motor stopped: " + fans());
+                            setMotor(16);
+                        }
+                        case 5 -> {
+                            report(source, tag + "motor started at 16 RPM again: " + fans() + "; " + network());
+                            weakSource = motorAt;
+                            weakCapacity = 1;
+                            capacity();
+                        }
+                        case 6 -> {
+                            report(source, tag + "motor weakened to 1 SU/RPM (two fans need 2 each): " + fans() + "; motor overstressed " + over(motorAt) + "; " + network());
+                            weakSource = null;
+                            capacity();
+                        }
+                        default -> {
+                            report(source, tag + "motor back to full strength: " + fans() + "; middle " + middleLoaded(level, t) + "; loads of the middle chunks during all this " + CHAIN_LOADS
+                                + " (chunk loads anywhere meanwhile, other tests included: " + (allLoads - allBefore) + "); map of lines " + com.meakaandre.siftec.power.PowerGrid.get(level).describe(level));
+                            return true;
+                        }
+                    }
+                } else {
+                    switch (step) {
+                        case 1 -> {
+                            report(source, tag + "after the restart: " + fans() + "; " + network() + "; middle " + middleLoaded(level, t));
+                            setMotor(24);
+                        }
+                        case 2 -> {
+                            report(source, tag + "motor set to 24 RPM: " + fans() + "; middle loads so far " + CHAIN_LOADS);
+                            // break the middle tower, the branch point: its chunk is loaded for that, on purpose, and let go again
+                            level.setChunkForced(t[2].getX() >> 4, t[2].getZ() >> 4, true);
+                            level.getChunk(t[2].getX() >> 4, t[2].getZ() >> 4);
+                            level.destroyBlock(t[2], false);
+                            level.setChunkForced(t[2].getX() >> 4, t[2].getZ() >> 4, false);
+                        }
+                        case 3 -> report(source, tag + "middle tower broken (its chunk loaded for it): " + fans() + "; loads of the middle chunks " + CHAIN_LOADS
+                            + " (the broken tower's own chunk counts the one on purpose); map of lines " + com.meakaandre.siftec.power.PowerGrid.get(level).describe(level));
+                        default -> {
+                            report(source, tag + "a second later: " + fans() + "; middle " + middleLoaded(level, t) + "; chunk loads anywhere meanwhile: " + (allLoads - allBefore));
+                            for (BlockPos p : t) level.setChunkForced(p.getX() >> 4, p.getZ() >> 4, false);
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        });
+        return 1;
+    }
+
+    private static boolean middleAnyLoaded(ServerLevel level, BlockPos[] t) {
+        for (int i = 1; i <= 3; i++) if (level.hasChunk(t[i].getX() >> 4, t[i].getZ() >> 4)) return true;
+        return false;
+    }
+
+    private static String middleLoaded(ServerLevel level, BlockPos[] t) {
+        StringBuilder out = new StringBuilder("[");
+        for (int i = 1; i <= 3; i++) out.append(i > 1 ? ", " : "").append("tower ").append(i).append(' ').append(level.hasChunk(t[i].getX() >> 4, t[i].getZ() >> 4) ? "loaded" : "unloaded");
+        return out.append(']').toString();
     }
 }
