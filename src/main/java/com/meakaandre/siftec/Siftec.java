@@ -33,6 +33,7 @@ public class Siftec implements ModInitializer {
         ModBlocks.register();
         ModBlockEntities.register();
         ModItems.register();
+        com.meakaandre.siftec.hub.HubMenu.register();
         ModFluids.register();
         ModTab.register();
         NodePlacer.register();

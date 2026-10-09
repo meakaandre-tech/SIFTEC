@@ -75,6 +75,7 @@ public final class WorldTests {
                     .then(Commands.literal("wet").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::wetGeyser))).then(geyserAt))
                 .then(Commands.literal("furnace").then(Commands.literal("setup").executes(c -> furnace(c, true))).then(Commands.literal("check").executes(c -> furnace(c, false))))
                 .then(Commands.literal("processor").executes(WorldTests::processor))
+                .then(Commands.literal("hubui").executes(WorldTests::hubUi))
                 .then(Commands.literal("powerline").then(Commands.literal("setup").executes(c -> powerline(c, true))).then(Commands.literal("check").executes(c -> powerline(c, false))))
                 .then(Commands.literal("powerchain").then(Commands.literal("setup").executes(c -> powerchain(c, false))).then(Commands.literal("restart").executes(c -> powerchain(c, true))))
                 .then(Commands.literal("geysers").then(Commands.argument("dx", IntegerArgumentType.integer()).then(Commands.argument("dz", IntegerArgumentType.integer())
@@ -101,6 +102,45 @@ public final class WorldTests {
             weakSource = null;
             watchedChunk = null;
         });
+    }
+
+    /**
+     * For the client screenshots of the HUB screen: a HUB on a 9 x 9 stone brick floor (a Tier 0 building, marked)
+     * in front of every player, who is turned to face it. Their company starts over at Tier 0.
+     */
+    private static int hubUi(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ServerLevel level = source.getServer().overworld();
+        int x = 24, z = 24;
+        level.getChunkAt(new BlockPos(x, 0, z));
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+        for (int dx = -5; dx <= 5; dx++) {
+            for (int dz = -5; dz <= 6; dz++) {
+                level.setBlockAndUpdate(new BlockPos(x + dx, y - 1, z + dz), Math.abs(dx) <= 4 && Math.abs(dz) <= 4 ? Blocks.STONE_BRICKS.defaultBlockState() : Blocks.SMOOTH_STONE.defaultBlockState());
+                for (int dy = 0; dy < 4; dy++) level.setBlockAndUpdate(new BlockPos(x + dx, y + dy, z + dz), Blocks.AIR.defaultBlockState());
+            }
+        }
+        BlockPos hubPos = new BlockPos(x, y, z);
+        level.setBlockAndUpdate(hubPos, ModBlocks.HUB.get().defaultBlockState());
+        for (net.minecraft.server.level.ServerPlayer player : source.getServer().getPlayerList().getPlayers()) {
+            com.meakaandre.siftec.company.Company company = com.meakaandre.siftec.company.Companies.of(player);
+            company.done.clear();
+            company.paid.clear();
+            company.active = "";
+            company.lockUntil = 0;
+            com.meakaandre.siftec.company.Companies.save(source.getServer());
+            if (level.getBlockEntity(hubPos) instanceof com.meakaandre.siftec.hub.HubBlockEntity hub) {
+                hub.companyId = company.id;
+                hub.boxMin = new BlockPos(x - 4, y - 1, z - 4);
+                hub.boxMax = new BlockPos(x + 4, y + 1, z + 4);
+                hub.setChanged();
+                com.meakaandre.siftec.hub.HubBuilding.Result result = hub.measure();
+                report(source, "SELFTEST world: hubui building good for tier " + (result == null ? "none" : result.builtTier()));
+            }
+            // three blocks south of the HUB, looking north and down at it
+            player.teleportTo(level, x + 0.5, y, z + 3.5, java.util.Set.of(), 180f, 22f, true);
+        }
+        return 1;
     }
 
     private static void report(CommandSourceStack source, String text) {

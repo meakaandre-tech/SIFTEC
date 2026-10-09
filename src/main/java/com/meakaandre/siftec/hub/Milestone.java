@@ -48,6 +48,15 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
             return isTag() ? stack.is(tag()) : stack.is(item());
         }
 
+        /** What to draw for the cost: the item, or for a tag one of its items in turn (a new one every second). */
+        public ItemStack icon() {
+            if (!isTag()) return new ItemStack(item());
+            List<Item> items = new java.util.ArrayList<>();
+            for (net.minecraft.core.Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag())) items.add(holder.value());
+            if (items.isEmpty()) return new ItemStack(Items.BARRIER);
+            return new ItemStack(items.get((int) (System.currentTimeMillis() / 1000 % items.size())));
+        }
+
         public Component label() {
             if (!isTag()) return new ItemStack(item()).getItemName();
             String path = key.substring(key.indexOf(':') + 1);
