@@ -25,6 +25,45 @@ sleep 2
 shot
 key Escape
 sleep 1
+cmd siftec worldtest hubui
+cmd give @a siftec:iron_rod 10
+cmd give @a create:iron_sheet 5
+sleep 4
+key u
+sleep 3
+shot
+click 658 492
+sleep 2
+click 658 492
+sleep 3
+shot
+click 444 300
+sleep 1
+click 658 492
+sleep 2
+click 658 492
+sleep 3
+move 584 300
+sleep 2
+shot
+click 484 174
+sleep 2
+shot
+click 352 174
+sleep 1
+click 444 220
+sleep 2
+shot
+click 572 174
+sleep 1
+click 444 220
+sleep 2
+shot
+click 812 174
+sleep 2
+shot
+key Escape
+sleep 1
 cmd gamemode spectator @a
 cmd effect give @a minecraft:night_vision infinite 0 true
 cmd time set noon

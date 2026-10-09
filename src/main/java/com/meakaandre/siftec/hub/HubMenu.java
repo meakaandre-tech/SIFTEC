@@ -1,212 +1,196 @@
 package com.meakaandre.siftec.hub;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
+import com.meakaandre.siftec.company.CompanyData;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ItemLore;
+import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * The HUB and Wormhole Gateway screen. It is an ordinary six-row chest window run entirely by the server:
- * every slot is a button. Top rows pick the tier, the middle row lists that tier's milestones, and
- * clicking a milestone delivers the parts you are carrying.
+ * The HUB and Wormhole Gateway window, drawn on the client by {@code client.HubScreen} in the style of the old
+ * Tweaker HUB screen: tier tabs, the tier's milestones, the chosen one's costs, and the HUB status.
+ * <p>
+ * The menu has no slots. The screen's buttons arrive as vanilla menu button clicks (which the game only passes on
+ * for the player's open menu, and only while {@link #stillValid} holds); every one is decoded, bounds-checked and
+ * judged here by the same rules as before. What the screen shows is sent as a {@link HubViewPayload} whenever it
+ * changes.
  */
-public class HubMenu extends ChestMenu {
-    private static final int SIZE = 54;
-    private static final int INFO_SLOT = 13, LOCK_SLOT = 17, FIRST_MILESTONE = 28, SIFT_SLOT = 49;
+public class HubMenu extends AbstractContainerMenu {
+    public static MenuType<HubMenu> TYPE;
 
-    private final SimpleContainer view;
-    private final ServerPlayer player;
-    private final Company company;
+    /** Button actions. */
+    public static final int SELECT = 1, PAY = 2, RESCAN = 3, SIFT = 4;
+    /** The "tier" that stands for the wormhole phases in a button id. */
+    public static final int PHASES = Milestones.TIERS;
+    private static final double REACH = 8.0;
+
+    private final @Nullable ServerPlayer player;
+    private final @Nullable Company company;
+    private final @Nullable BlockPos pos;
     private final boolean gateway;
-    /** The highest tier the HUB's building is good for. */
-    private final int built;
-    private int tier;
+    private byte[] sent;
     private int ticks;
+    /** The client's copy of what to show; null until the server has sent it. */
+    public @Nullable HubView view;
 
-    private HubMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, boolean gateway, int built) {
-        super(MenuType.GENERIC_9x6, id, inventory, view, 6);
-        this.view = view;
+    public static void register() {
+        TYPE = Registry.register(BuiltInRegistries.MENU, Siftec.id("hub"), new MenuType<>(HubMenu::new, FeatureFlags.VANILLA_SET));
+        PayloadTypeRegistry.clientboundPlay().register(HubViewPayload.TYPE, HubViewPayload.STREAM_CODEC);
+    }
+
+    /** The client's menu. */
+    public HubMenu(int id, Inventory inventory) {
+        super(TYPE, id);
+        this.player = null;
+        this.company = null;
+        this.pos = null;
+        this.gateway = false;
+    }
+
+    private HubMenu(int id, ServerPlayer player, Company company, BlockPos pos, boolean gateway) {
+        super(TYPE, id);
         this.player = player;
         this.company = company;
+        this.pos = pos;
         this.gateway = gateway;
-        this.built = built;
-        this.tier = firstUnfinishedTier();
-        refresh();
     }
 
-    public static void open(ServerPlayer player, Company company, boolean gateway, int built) {
+    public static void open(ServerPlayer player, Company company, BlockPos pos, boolean gateway) {
         Component title = Component.translatable(gateway ? "siftec.gateway.title" : "siftec.hub.title", company.name);
-        player.openMenu(new SimpleMenuProvider(
-            (id, inventory, p) -> new HubMenu(id, inventory, new SimpleContainer(SIZE), player, company, gateway, built), title));
+        BlockPos at = pos.immutable();
+        player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new HubMenu(id, player, company, at, gateway), title));
+        if (player.containerMenu instanceof HubMenu menu) menu.sync(true);
     }
 
-    private int firstUnfinishedTier() {
-        for (int t = 0; t < Milestones.TIERS; t++) {
-            if (!Milestones.tierOpen(company, t)) break;
-            for (Milestone m : Milestones.tier(t)) if (!company.has(m.id())) return t;
-        }
-        return 0;
+    // ---- button ids: action << 12 | tier << 6 | index
+
+    public static int button(int action, int tier, int index) {
+        return action << 12 | tier << 6 | index;
     }
 
-    private List<Milestone> shown() {
-        return gateway ? Milestones.phases() : Milestones.tier(tier);
+    /** The milestone a button id names, or null if it names none (out of range, unknown tier, garbage). */
+    public static @Nullable Milestone milestone(int id) {
+        if (id < 0) return null;
+        int tier = id >> 6 & 63, index = id & 63;
+        if (tier > PHASES) return null;
+        List<Milestone> list = tier == PHASES ? Milestones.phases() : Milestones.tier(tier);
+        return index < list.size() ? list.get(index) : null;
+    }
+
+    public static int action(int id) {
+        return id < 0 ? 0 : id >>> 12;
+    }
+
+    // ---- server side
+
+    private @Nullable HubBlockEntity hub() {
+        if (player == null || pos == null || !(player.level() instanceof ServerLevel level) || !level.isLoaded(pos)) return null;
+        return level.getBlockEntity(pos) instanceof HubBlockEntity hub ? hub : null;
     }
 
     private long lockTicks() {
         return Math.max(0, company.lockUntil - player.level().getServer().overworld().getGameTime());
     }
 
-    private static String clock(long ticks) {
+    private boolean exempt() {
+        return gateway || player.hasInfiniteMaterials();
+    }
+
+    private int built() {
+        if (exempt()) return Milestones.TIERS;
+        HubBlockEntity hub = hub();
+        return hub == null ? -1 : hub.builtTier();
+    }
+
+    /** Why this player cannot pay into this milestone here and now, or null when they can. */
+    private @Nullable Component refusal(Milestone m) {
+        if (company.has(m.id())) return Component.translatable("siftec.hub.done");
+        if (m.isPhase() != gateway) return Component.translatable(m.isPhase() ? "siftec.hub.at_gateway" : "siftec.hub.at_hub");
+        Milestone blocker = Milestones.blocker(company, m);
+        if (blocker != null) return Component.translatable("siftec.hub.needs", blocker.name());
+        if (!m.isPhase() && lockTicks() > 0) return Component.translatable("siftec.hub.busy", clock(lockTicks()));
+        if (!m.isPhase() && m.tier() > built()) return Component.translatable("siftec.building.needed", m.tier());
+        return null;
+    }
+
+    public static String clock(long ticks) {
         long seconds = (ticks + 19) / 20;
         return seconds / 60 + ":" + (seconds % 60 < 10 ? "0" : "") + seconds % 60;
     }
 
-    private void refresh() {
-        for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
-        if (!gateway) {
-            for (int t = 0; t < Milestones.TIERS; t++) view.setItem(t, tierTab(t));
-            long lock = lockTicks();
-            view.setItem(LOCK_SLOT, button(Items.CLOCK, lock > 0
-                ? Component.translatable("siftec.hub.locked_for", clock(lock)).withStyle(ChatFormatting.RED)
-                : Component.translatable("siftec.hub.ready").withStyle(ChatFormatting.GREEN), List.of(), false));
-        }
-        view.setItem(INFO_SLOT, button(Items.NAME_TAG, Component.translatable(
-            "siftec.hub.company", company.name, company.members.size(), company.costMultiplier()), List.of(), false));
-        List<Milestone> list = shown();
-        for (int i = 0; i < list.size() && i < 7; i++) view.setItem(FIRST_MILESTONE + i, milestoneButton(list.get(i)));
-        // the finished wormhole: the only way into The Sift
-        if (gateway && company.has("phase_5")) {
-            view.setItem(SIFT_SLOT, button(Items.ENDER_EYE, Component.translatable("siftec.sift.enter").withStyle(ChatFormatting.LIGHT_PURPLE), List.of(), true));
-        }
-    }
-
-    private ItemStack tierTab(int t) {
-        boolean open = Milestones.tierOpen(company, t);
-        boolean all = true;
-        for (Milestone m : Milestones.tier(t)) all &= company.has(m.id());
-        Item icon = !open ? icon("red_stained_glass_pane") : all ? icon("lime_stained_glass_pane") : icon("yellow_stained_glass_pane");
-        List<Component> lore = new ArrayList<>();
-        if (!open) {
-            int phase = Milestones.phaseFor(t);
-            lore.add(phase == 0 || !company.has("hub_upgrade_6")
-                ? Component.translatable("siftec.hub.tier.locked0")
-                : Component.translatable("siftec.hub.tier.locked", Milestones.phases().get(phase - 1).name()));
-        }
-        ItemStack tab = button(icon, Component.translatable("siftec.hub.tier", t), lore, t == tier);
-        tab.setCount(Math.max(1, t));
-        return tab;
-    }
-
-    private ItemStack milestoneButton(Milestone m) {
-        List<Component> lore = new ArrayList<>();
-        boolean done = company.has(m.id());
-        Milestone blocker = done ? null : Milestones.blocker(company, m);
-        if (done) {
-            lore.add(Component.translatable("siftec.hub.done").withStyle(ChatFormatting.GREEN));
-        } else {
-            for (Milestone.Cost cost : m.cost()) {
-                if (!cost.present()) continue;
-                int need = company.cost(cost), have = company.paid(m, cost);
-                lore.add(Component.translatable("siftec.hub.cost", cost.label(), have, need)
-                    .withStyle(have >= need ? ChatFormatting.GREEN : ChatFormatting.WHITE));
-            }
-            if (m.seconds() > 0) lore.add(Component.translatable("siftec.hub.time", clock(m.seconds() * 20L)).withStyle(ChatFormatting.GRAY));
-        }
-        lore.add(Component.translatable("siftec.hub.unlocks", m.unlockText()).withStyle(ChatFormatting.AQUA));
-        if (blocker != null) {
-            lore.add(Component.translatable("siftec.hub.needs", blocker.name()).withStyle(ChatFormatting.RED));
-        } else if (!done) {
-            lore.add(Component.translatable("siftec.hub.click").withStyle(ChatFormatting.YELLOW));
-        }
-        Item icon = done ? icon("lime_dye") : blocker != null ? Items.BARRIER : Items.PAPER;
-        return button(icon, m.name(), lore, !done && company.active.equals(m.id()));
-    }
-
-    private static Item icon(String id) {
-        return BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(id));
-    }
-
-    private static ItemStack button(Item icon, Component name, List<Component> lore, boolean glint) {
-        ItemStack stack = new ItemStack(icon);
-        MutableComponent plain = Component.empty().append(name).withStyle(style -> style.withItalic(false));
-        stack.set(DataComponents.CUSTOM_NAME, plain);
-        if (!lore.isEmpty()) {
-            List<Component> lines = new ArrayList<>();
-            for (Component line : lore) lines.add(Component.empty().append(line).withStyle(style -> style.withItalic(false)));
-            stack.set(DataComponents.LORE, new ItemLore(lines));
-        }
-        if (glint) stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-        return stack;
-    }
-
-    private void press(int slot) {
-        if (!gateway && slot < Milestones.TIERS) {
-            tier = slot;
-            refresh();
-            return;
-        }
-        if (gateway && slot == SIFT_SLOT && company.has("phase_5")) {
-            player.closeContainer();
-            com.meakaandre.siftec.compat.SiftGate.enter(player);
-            return;
-        }
-        int index = slot - FIRST_MILESTONE;
-        List<Milestone> list = shown();
-        if (index < 0 || index >= list.size()) return;
-        Milestone m = list.get(index);
+    @Override
+    public boolean clickMenuButton(Player who, int id) {
+        if (player == null || who != player || company == null) return false;
+        int action = action(id);
         MinecraftServer server = player.level().getServer();
-        if (company.has(m.id())) return;
-        Milestone blocker = Milestones.blocker(company, m);
-        if (blocker != null) {
-            player.sendOverlayMessage(Component.translatable("siftec.hub.needs", blocker.name()));
-            return;
+        switch (action) {
+            case SELECT, PAY -> {
+                Milestone m = milestone(id);
+                if (m == null) return false;
+                Component why = refusal(m);
+                if (why != null) {
+                    player.sendOverlayMessage(why);
+                    sync(true);
+                    return false;
+                }
+                company.active = m.id();
+                if (action == PAY) {
+                    int delivered = deliver(player, company, m);
+                    Companies.save(server);
+                    if (company.fullyPaid(m)) {
+                        Companies.complete(server, company, m, player.getName());
+                    } else {
+                        player.sendOverlayMessage(delivered > 0
+                            ? Component.translatable("siftec.hub.delivered", delivered)
+                            : Component.translatable("siftec.hub.nothing"));
+                    }
+                } else {
+                    Companies.save(server);
+                    player.sendOverlayMessage(Component.translatable("siftec.hub.now_active", m.name()));
+                }
+            }
+            case RESCAN -> {
+                HubBlockEntity hub = hub();
+                if (gateway || hub == null) return false;
+                if (hub.measure() == null) player.sendOverlayMessage(Component.translatable("siftec.planner.how"));
+            }
+            case SIFT -> {
+                if (!gateway || !company.has("phase_5")) return false;
+                player.closeContainer();
+                com.meakaandre.siftec.compat.SiftGate.enter(player);
+                return true;
+            }
+            default -> {
+                return false;
+            }
         }
-        if (!m.isPhase() && lockTicks() > 0) {
-            player.sendOverlayMessage(Component.translatable("siftec.hub.busy", clock(lockTicks())));
-            return;
-        }
-        if (!m.isPhase() && m.tier() > built) {
-            player.sendOverlayMessage(Component.translatable("siftec.building.needed", m.tier()));
-            return;
-        }
-        company.active = m.id();
-        int delivered = deliver(m);
-        Companies.save(server);
-        if (company.fullyPaid(m)) {
-            Companies.complete(server, company, m, player.getName());
-        } else {
-            player.sendOverlayMessage(delivered > 0
-                ? Component.translatable("siftec.hub.delivered", delivered)
-                : Component.translatable("siftec.hub.nothing"));
-        }
-        refresh();
+        sync(true);
+        return true;
     }
 
-    /** Takes what the milestone still needs out of the player's inventory. */
-    private int deliver(Milestone m) {
-        return deliver(player, company, m);
-    }
-
+    /** Takes what the milestone still needs out of the player's inventory and backpack, and books it. */
     public static int deliver(ServerPlayer player, Company company, Milestone m) {
         int total = 0;
         for (Milestone.Cost cost : m.cost()) {
@@ -218,14 +202,32 @@ public class HubMenu extends ChestMenu {
         return total;
     }
 
+    /** Sends the view if it changed (or always, when {@code force}). */
+    private void sync(boolean force) {
+        if (player == null || company == null) return;
+        HubBlockEntity hub = gateway ? null : hub();
+        int built = built();
+        HubView v = HubView.of(company, gateway, built, exempt(), lockTicks(), hub == null ? null : hub.lastResult());
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        v.write(buf);
+        byte[] bytes = new byte[buf.readableBytes()];
+        buf.readBytes(bytes);
+        buf.release();
+        if (!force && Arrays.equals(bytes, sent)) return;
+        sent = bytes;
+        ServerPlayNetworking.send(player, new HubViewPayload(containerId, v));
+    }
+
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        // payments by belt or by other members, the lock timer and the building all change while the window is open
+        if (player != null && ++ticks % 10 == 0) sync(false);
+    }
+
+    // the menu has no slots: nothing can be put in, taken out or shift-clicked
     @Override
     public void clicked(int slot, int button, ContainerInput input, Player who) {
-        if (slot >= 0 && slot < SIZE) {
-            if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) press(slot);
-            return;
-        }
-        // the player's own inventory still works, but nothing may be moved into the buttons
-        if (input == ContainerInput.PICKUP || input == ContainerInput.THROW) super.clicked(slot, button, input, who);
     }
 
     @Override
@@ -234,14 +236,14 @@ public class HubMenu extends ChestMenu {
     }
 
     @Override
-    public void broadcastChanges() {
-        // the lock timer counts down while the window is open
-        if (++ticks % 20 == 0) refresh();
-        super.broadcastChanges();
-    }
-
-    @Override
     public boolean stillValid(Player who) {
-        return true;
+        if (player == null) return true;
+        if (who != player || company == null || pos == null || player.isRemoved()) return false;
+        if (player.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(pos)) > REACH * REACH) return false;
+        HubBlockEntity hub = hub();
+        if (hub == null || !(hub.getBlockState().getBlock() instanceof HubBlock block) || block.gateway != gateway) return false;
+        // the block must still be this company's, and the player still in it
+        if (!company.id.equals(hub.companyId) || !company.members.contains(player.getUUID().toString())) return false;
+        return CompanyData.get(player.level().getServer()).byId(company.id) == company;
     }
 }

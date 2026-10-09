@@ -25,6 +25,7 @@ public class HubBlockEntity extends BlockEntity {
     private int builtTier = -1;
     private long builtAt;
     private boolean measured;
+    private HubBuilding.Result result;
 
     /** Measures the building again. Null if no box has been marked. */
     public HubBuilding.Result measure() {
@@ -34,6 +35,7 @@ public class HubBlockEntity extends BlockEntity {
         builtTier = result.builtTier();
         builtAt = level.getGameTime();
         measured = true;
+        this.result = result;
         return result;
     }
 
@@ -41,6 +43,7 @@ public class HubBlockEntity extends BlockEntity {
     public int builtTier() {
         if (level != null && (!measured || level.getGameTime() - builtAt > 200)) {
             if (measure() == null) {
+                result = null;
                 builtTier = -1;
                 measured = true;
                 builtAt = level.getGameTime();
@@ -48,6 +51,12 @@ public class HubBlockEntity extends BlockEntity {
         }
         return builtTier;
     }
+    /** The building as last measured (measured again when stale), or null when no area is marked. */
+    public HubBuilding.@Nullable Result lastResult() {
+        builtTier();
+        return result;
+    }
+
     /** Lets belts, funnels and hoppers deliver; it only takes parts the active milestone still needs. */
     public final com.meakaandre.siftec.util.IntakeStorage intake = new com.meakaandre.siftec.util.IntakeStorage(this::wanted, this::accept);
 

@@ -144,6 +144,24 @@ public final class SiftecCommands {
             if (!company.fullyPaid(m)) report(source, "SELFTEST hub: " + m.id() + " not paid, which is wrong");
             company.done.add(m.id());
         }
+        // the HUB screen: button ids are bounds-checked, and the view survives the trip to the client
+        boolean buttons = com.meakaandre.siftec.hub.HubMenu.milestone(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.PAY, 0, 0)) == Milestones.tier(0).get(0)
+            && com.meakaandre.siftec.hub.HubMenu.milestone(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.PAY, com.meakaandre.siftec.hub.HubMenu.PHASES, Milestones.phases().size() - 1)) == Milestones.phases().getLast()
+            && com.meakaandre.siftec.hub.HubMenu.milestone(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.PAY, 0, 63)) == null
+            && com.meakaandre.siftec.hub.HubMenu.milestone(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.PAY, 11, 0)) == null
+            && com.meakaandre.siftec.hub.HubMenu.milestone(-7) == null && com.meakaandre.siftec.hub.HubMenu.action(-7) == 0
+            && com.meakaandre.siftec.hub.HubMenu.action(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.SIFT, 0, 0)) == com.meakaandre.siftec.hub.HubMenu.SIFT;
+        Milestone base = Milestones.tier(1).get(0);
+        company.pay(base, base.cost().get(0), 7);
+        com.meakaandre.siftec.hub.HubView sent = com.meakaandre.siftec.hub.HubView.of(company, false, 0, false, 40, null);
+        net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+        sent.write(buf);
+        com.meakaandre.siftec.hub.HubView got = com.meakaandre.siftec.hub.HubView.read(buf);
+        buf.release();
+        report(source, "SELFTEST hub: screen buttons checked " + buttons + "; view paid " + got.paid(base, 0) + " of " + got.need(base.cost().get(0))
+            + " (server " + company.paid(base, base.cost().get(0)) + " of " + company.cost(base.cost().get(0)) + "), done " + got.done.size()
+            + ", tier 1 open " + (Milestones.blocker(got.asCompany(), base) == null) + ", lock " + got.lock);
+        company.paid.clear();
         Milestone coal = Milestones.get("coal_power");
         report(source, "SELFTEST hub: two members pay x" + company.costMultiplier() + "; tier 1 open " + Milestones.tierOpen(company, 1)
             + "; tier 3 open " + Milestones.tierOpen(company, 3) + "; coal power needs " + Milestones.blocker(company, coal).id()

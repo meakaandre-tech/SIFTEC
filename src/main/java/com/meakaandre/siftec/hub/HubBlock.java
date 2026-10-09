@@ -108,7 +108,7 @@ public class HubBlock extends Block implements EntityBlock {
             server.sendOverlayMessage(Component.translatable("siftec.hub.not_yours", owner.name));
             return InteractionResult.SUCCESS;
         }
-        HubMenu.open(server, mine, gateway, gateway || server.hasInfiniteMaterials() ? Milestones.TIERS : hub.builtTier());
+        HubMenu.open(server, mine, pos, gateway);
         return InteractionResult.SUCCESS;
     }
 
