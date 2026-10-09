@@ -1,0 +1,48 @@
+fabric api: https://cdn.modrinth.com/data/P7dR8mSH/versions/bNnaTiuM/fabric-api-0.161.0%2B26.3.jar
+releases of createhypertubes:
+   fabric-26.3-latest https://github.com/meakaandre-tech/CreateHypertubes/releases/download/fabric-26.3-latest/create-hypertube-fabric-26.3.jar
+   fabric-26.2-latest https://github.com/meakaandre-tech/CreateHypertubes/releases/download/fabric-26.2-latest/create-hypertube-fabric-26.2.jar
+releases of creategunmod:
+   fabric-26.3-latest https://github.com/meakaandre-tech/CreateGunMod/releases/download/fabric-26.3-latest/cgs-fabric-26.3.jar
+   fabric-26.2-latest https://github.com/meakaandre-tech/CreateGunMod/releases/download/fabric-26.2-latest/cgs-fabric-26.2.jar
+releases of create-diesel-generators:
+   fabric-26.3-latest https://github.com/meakaandre-tech/Create-Diesel-Generators/releases/download/fabric-26.3-latest/createdieselgenerators-fabric-26.3.jar
+   fabric-26.2-latest https://github.com/meakaandre-tech/Create-Diesel-Generators/releases/download/fabric-26.2-latest/createdieselgenerators-fabric-26.2.jar
+releases of Create-Fly:
+   pack-26.3-latest https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3-6.0.9-1.jar
+   pack-26.3-latest https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
+   pack-26.2-latest https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.2-latest/create-fly-26.2-6.0.9-1.jar
+   pack-26.2-latest https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.2-latest/create-fly-26.2.jar
+modrinth search for The Sift:
+   mielons-the-sift | Mielon's The Sift | Mielon | ['1.20.1', '1.21.1', '26.2', '26.3']
+   mc-stargate | Stargate: Wellspring, a The Sift Dimension | Wroud | ['26.3-rc-1', '26.3-rc-2', '26.3-rc-3', '26.3']
+   mielons-the-sift-rus | Mielon's The Sift RUS | Tovasha | ['1.20.1', '1.21.1', '26.2', '26.3']
+   the-sift-replace | The Sift Replace | RalTu | ['24w14potato']
+   mielons-the-sift-translation-zh-tw | Mielon's The Sift 繁體中文翻譯 | FenghuangAcid | ['26.3']
+   create-sifting | Create Sifting | oierbravo | ['1.19.4', '1.20', '1.20.1', '1.21.1']
+   sculk-depths | Sculk Depths | warior456 | ['1.20.3', '1.20.4', '1.21', '1.21.1']
+   stiky-skyblock | Skyblock++ | StikyPiston2483 | ['1.20.1']
+modrinth:mielons-the-sift -> https://cdn.modrinth.com/data/j0IfTxBq/versions/QK8RaspH/mielon%27s-the-sift-1.1.2-mc26.3-fabric.jar
+  needs {'version_id': 'uGEFXLKA', 'project_id': '8BmcQJ2H', 'file_name': None, 'dependency_type': 'required'}
+  needs {'version_id': None, 'project_id': 'P7dR8mSH', 'file_name': None, 'dependency_type': 'required'}
+  needs {'version_id': 'rylKnJ4M', 'project_id': 'yBW8D80W', 'file_name': None, 'dependency_type': 'optional'}
+total 58384
+-rw-r--r-- 1 runner runner  3486296 Oct  9 05:20 FarmersDelight-26.3-3.6.27%2Brefabricated.jar
+-rw-r--r-- 1 runner runner  1779958 Oct  9 05:20 cgs-fabric-26.3.jar
+-rw-r--r-- 1 runner runner 21139910 Oct  9 05:20 create-fly-26.3.jar
+-rw-r--r-- 1 runner runner   547675 Oct  9 05:20 create-hypertube-fabric-26.3.jar
+-rw-r--r-- 1 runner runner  3500335 Oct  9 05:20 createdieselgenerators-fabric-26.3.jar
+-rw-r--r-- 1 runner runner  2620967 Oct  9 05:20 fabric-api.jar
+-rw-r--r-- 1 runner runner  1191230 Oct  9 05:20 geckolib-fabric-26.3-5.5.7.jar
+-rw-r--r-- 1 runner runner 20632725 Oct  9 05:20 mielon%27s-the-sift-1.1.2-mc26.3-fabric.jar
+-rw-r--r-- 1 runner runner  3780405 Oct  9 05:20 ntgl-fabric-26.3.jar
+-rw-r--r-- 1 runner runner  1088940 Oct  9 05:20 siftec-0.1.0+26.3.jar
+total 54760
+-rw-r--r-- 1 runner runner  3486296 Oct  9 05:25 FarmersDelight-26.3-3.6.27%2Brefabricated.jar
+-rw-r--r-- 1 runner runner  1779958 Oct  9 05:25 cgs-fabric-26.3.jar
+-rw-r--r-- 1 runner runner 21139910 Oct  9 05:25 create-fly-26.3.jar
+-rw-r--r-- 1 runner runner   547675 Oct  9 05:25 create-hypertube-fabric-26.3.jar
+-rw-r--r-- 1 runner runner  3500335 Oct  9 05:25 createdieselgenerators-fabric-26.3.jar
+-rw-r--r-- 1 runner runner  1191230 Oct  9 05:25 geckolib-fabric-26.3-5.5.7.jar
+-rw-r--r-- 1 runner runner 20632725 Oct  9 05:25 mielon%27s-the-sift-1.1.2-mc26.3-fabric.jar
+-rw-r--r-- 1 runner runner  3780405 Oct  9 05:25 ntgl-fabric-26.3.jar
