@@ -708,7 +708,6 @@ lang.update({
     "siftec.hubui.active_gateway": "Pay by hand, or feed the Gateway by belt or funnel",
     "siftec.hubui.any": "Any %s", "siftec.hubui.lock_after": "Locks the HUB for %s when done",
     "siftec.hubui.phases": "Wormhole: %s of %s phases delivered",
-    "siftec.hubui.phases_at_gateway": "Wormhole: %s of %s phases. Deliver them at the Wormhole Gateway",
     "siftec.hubui.blocks": "HUB blocks: %s / %s", "siftec.hubui.shelter": "Walls %s/2   Roof %s",
     "siftec.hubui.half": "= half a block each", "siftec.hubui.half_tip": "Slabs, doors and trapdoors count as half a block",
     "siftec.hubui.newest": "Needs at least %s of these; the rest can be any mix",

@@ -259,10 +259,13 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
         if (tab == WORMHOLE_TAB) {
             int phases = 0;
             for (Milestone p : Milestones.phases()) if (view.done.contains(p.id())) phases++;
-            Component line = view.gateway
-                ? Component.translatable("siftec.hubui.phases", phases, Milestones.phases().size())
-                : Component.translatable("siftec.hubui.phases_at_gateway", phases, Milestones.phases().size());
-            g.text(font, line, left + 8, top + H - 34, view.gateway ? PURPLE : ORANGE, false);
+            // under the phase list, as the old screen showed the Wormhole Generator
+            List<FormattedCharSequence> lines = font.split(Component.translatable("siftec.hubui.phases", phases, Milestones.phases().size()), 110);
+            int ly = top + H - 30 - 10 * lines.size();
+            for (FormattedCharSequence line : lines) {
+                g.text(font, line, left + 8, ly, view.gateway ? PURPLE : ORANGE, false);
+                ly += 10;
+            }
         }
         boolean card = BUILDING.equals(selected) && showBuilding();
         locked = tab != WORMHOLE_TAB && !tierOpen(tab) && !card;

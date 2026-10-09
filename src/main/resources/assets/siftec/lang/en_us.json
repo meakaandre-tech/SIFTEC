@@ -473,7 +473,6 @@
   "siftec.hubui.not_marked": "Mark it: HUB Planner on two corners, then on the HUB",
   "siftec.hubui.pay": "Pay from inventory",
   "siftec.hubui.phases": "Wormhole: %s of %s phases delivered",
-  "siftec.hubui.phases_at_gateway": "Wormhole: %s of %s phases. Deliver them at the Wormhole Gateway",
   "siftec.hubui.rescan": "Rescan",
   "siftec.hubui.set_active": "Set as active",
   "siftec.hubui.shelter": "Walls %s/2   Roof %s",
