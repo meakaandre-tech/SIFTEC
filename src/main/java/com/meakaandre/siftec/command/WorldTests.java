@@ -135,7 +135,7 @@ public final class WorldTests {
                 hub.boxMax = new BlockPos(x + 4, y + 1, z + 4);
                 hub.setChanged();
                 com.meakaandre.siftec.hub.HubBuilding.Result result = hub.measure();
-                report(source, "SELFTEST world: hubui building good for tier " + (result == null ? "none" : result.builtTier()));
+                report(source, "hubui building good for tier " + (result == null ? "none" : result.builtTier()));
             }
             // three blocks south of the HUB, looking north and down at it
             player.teleportTo(level, x + 0.5, y, z + 3.5, java.util.Set.of(), 180f, 22f, true);

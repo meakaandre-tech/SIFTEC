@@ -54,6 +54,14 @@ sleep 1
 click 444 220
 sleep 2
 shot
+click 572 174
+sleep 1
+click 444 220
+sleep 2
+shot
+click 812 174
+sleep 2
+shot
 key Escape
 sleep 1
 cmd gamemode spectator @a

@@ -53,6 +53,8 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
     private ItemStack hoverStack = ItemStack.EMPTY;
     private Component hoverExtra;
     private List<Component> hoverLines;
+    /** The shown tier is locked; its header already says why. */
+    private boolean locked;
 
     public HubScreen(HubMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, W, H);
@@ -263,11 +265,12 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
             g.text(font, line, left + 8, top + H - 34, view.gateway ? PURPLE : ORANGE, false);
         }
         boolean card = BUILDING.equals(selected) && showBuilding();
-        if (tab != WORMHOLE_TAB && !tierOpen(tab) && !card) {
+        locked = tab != WORMHOLE_TAB && !tierOpen(tab) && !card;
+        if (locked) {
             Milestone gate = Milestones.blocker(company(), Milestones.tier(tab).get(0));
             g.text(font, Component.translatable("siftec.hubui.tier_locked", tab), x, y, RED, false);
-            g.text(font, Component.translatable("siftec.hub.needs", gate == null ? Component.literal("?") : gate.name()), x, y + 12, 0xFFAAAAAA, false);
-            y += 30;
+            g.text(font, Component.translatable("siftec.hub.needs", gate == null ? Component.literal("?") : gate.name()), x, y + 10, 0xFFAAAAAA, false);
+            y += 24;
         }
         if (card) {
             buildingCard(g, x, y, mouseX, mouseY);
@@ -287,28 +290,49 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
     }
 
     private void milestone(GuiGraphicsExtractor g, Milestone sel, int x, int y, int mouseX, int mouseY) {
-        int top = topPos;
+        int top = topPos, width = W - 132;
         boolean done = view.done.contains(sel.id());
+        // the line above the buttons: why it cannot be paid, or what to do next (not repeated under a locked tier's header)
+        Component why = done ? Component.translatable("siftec.hubui.complete") : locked ? null : blocker(sel);
+        int whyColour = done ? GREEN : ORANGE;
+        if (why == null && !done && !locked) {
+            boolean active = sel.id().equals(view.active);
+            why = Component.translatable(sel.isPhase() ? (active ? "siftec.hubui.active_gateway" : "siftec.hubui.hint_gateway")
+                : (active ? "siftec.hubui.active" : "siftec.hubui.hint"));
+            whyColour = DIM;
+        }
+        List<FormattedCharSequence> whyLines = why == null ? List.of() : font.split(why, width);
+        if (whyLines.size() > 2) whyLines = whyLines.subList(0, 2);
+        int bottom = top + H - 54 - 10 * whyLines.size();
+
+        List<Milestone.Cost> costs = new ArrayList<>();
+        List<Integer> lineOf = new ArrayList<>();
+        for (int i = 0; i < sel.cost().size(); i++) {
+            if (sel.cost().get(i).present()) {
+                costs.add(sel.cost().get(i));
+                lineOf.add(i);
+            }
+        }
+        int row = costs.size() >= 3 ? 18 : 20;
+        boolean lockLine = sel.seconds() > 0 && !done;
+
         g.text(font, sel.name(), x, y, GOLD, false);
         y += 12;
         Component unlocks = Component.translatable("siftec.hub.unlocks", sel.unlockText());
-        List<FormattedCharSequence> lines = font.split(unlocks, W - 132);
-        int shown = Math.min(lines.size(), 3);
+        List<FormattedCharSequence> lines = font.split(unlocks, width);
+        int room = (bottom - y - 4 - costs.size() * row - (lockLine ? 10 : 0)) / 10;
+        int shown = Math.max(1, Math.min(lines.size(), Math.min(3, room)));
         for (int i = 0; i < shown; i++) {
             g.text(font, lines.get(i), x, y, GREY, false);
             y += 10;
         }
-        if (lines.size() > shown && over(mouseX, mouseY, x, y - 10 * shown, W - 132, 10 * shown)) {
-            hoverLines = List.of(unlocks);
-        }
+        if (lines.size() > shown && over(mouseX, mouseY, x, y - 10 * shown, width, 10 * shown)) hoverLines = List.of(unlocks);
         y += 4;
-        List<Milestone.Cost> costs = sel.cost();
-        for (int i = 0; i < costs.size(); i++) {
-            Milestone.Cost c = costs.get(i);
-            if (!c.present()) continue;
+        for (int k = 0; k < costs.size(); k++) {
+            Milestone.Cost c = costs.get(k);
             ItemStack icon = c.icon();
             g.item(icon, x, y);
-            int need = view.need(c), have = done ? need : view.paid(sel, i);
+            int need = view.need(c), have = done ? need : view.paid(sel, lineOf.get(k));
             g.text(font, num(have) + " / " + num(need), x + 20, y + 1, have >= need ? GREEN : WHITE, false);
             int barX = x + 20, barY = y + 11, barW = 100;
             g.fill(barX, barY, barX + barW, barY + 3, BAR_BACK);
@@ -317,18 +341,15 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
                 hoverStack = icon;
                 hoverExtra = c.isTag() ? Component.translatable("siftec.hubui.any", c.label()) : null;
             }
-            y += 20;
+            y += row;
         }
-        if (sel.seconds() > 0 && !done && y < top + H - 66) {
+        if (lockLine && y + 9 <= bottom) {
             g.text(font, Component.translatable("siftec.hubui.lock_after", HubMenu.clock(sel.seconds() * 20L)), x, y, DIM, false);
         }
-        Component why = done ? Component.translatable("siftec.hubui.complete") : blocker(sel);
-        if (why != null) {
-            g.text(font, why, x, top + H - 64, done ? GREEN : ORANGE, false);
-        } else {
-            boolean active = sel.id().equals(view.active);
-            String key = sel.isPhase() ? (active ? "siftec.hubui.active_gateway" : "siftec.hubui.hint_gateway") : (active ? "siftec.hubui.active" : "siftec.hubui.hint");
-            g.text(font, Component.translatable(key), x, top + H - 64, DIM, false);
+        int wy = bottom + 1;
+        for (FormattedCharSequence line : whyLines) {
+            g.text(font, line, x, wy, whyColour, false);
+            wy += 10;
         }
     }
 
@@ -414,14 +435,13 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
 
     private void statusBar(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int left = leftPos, top = topPos, sy = top + H - 20;
-        Component building = view.gateway ? Component.literal(view.company)
+        Component first = view.gateway ? Component.literal(view.company)
             : view.exempt ? Component.translatable("siftec.hubui.status_exempt")
             : view.built < 0 ? Component.translatable("siftec.hubui.status_none")
             : Component.translatable("siftec.hubui.status_built", Math.min(view.built, Milestones.TIERS - 1));
-        Component state = lock() > 0 ? Component.translatable("siftec.hub.locked_for", HubMenu.clock(lock()))
-            : Component.translatable("siftec.hub.ready");
-        Component status = Component.translatable("siftec.hubui.status", building, view.members,
-            String.format(Locale.ROOT, "%.1f", view.mult), state);
+        String mult = view.mult == Math.round(view.mult) ? String.valueOf(Math.round(view.mult)) : String.format(Locale.ROOT, "%.1f", view.mult);
+        Component status = Component.translatable("siftec.hubui.status", first, view.members, mult);
+        if (lock() > 0) status = Component.translatable("siftec.hubui.status_locked", status, HubMenu.clock(lock()));
         boolean ok = (view.gateway || view.exempt || view.built >= 0) && lock() <= 0;
         g.text(font, status, left + 8, sy, ok ? 0xFF80FF80 : 0xFFFF8080, false);
         if (!view.gateway && over(mouseX, mouseY, left + 4, sy - 2, W - 64, 12)) hoverLines = report();

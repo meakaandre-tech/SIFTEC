@@ -716,7 +716,7 @@ lang.update({
     "siftec.hubui.not_marked": "Mark it: HUB Planner on two corners, then on the HUB",
     "siftec.hubui.too_big": "The marked area is too big: mark it again",
     "siftec.hubui.built": "Built: good for Tier %s", "siftec.hubui.build_more": "Build it up, then Rescan",
-    "siftec.hubui.status": "%s  |  Members %s  |  Costs x%s  |  %s",
+    "siftec.hubui.status": "%s  |  Members %s  |  Costs x%s", "siftec.hubui.status_locked": "%s  |  Locked %s",
     "siftec.hubui.status_built": "Building: Tier %s", "siftec.hubui.status_none": "Building: no tier yet",
     "siftec.hubui.status_exempt": "Building: any tier",
     "siftec.lock.item": "Locked: needs %s",
