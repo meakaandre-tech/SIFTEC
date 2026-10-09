@@ -239,7 +239,7 @@ public class HubMenu extends AbstractContainerMenu {
     public boolean stillValid(Player who) {
         if (player == null) return true;
         if (who != player || company == null || pos == null || player.isRemoved()) return false;
-        if (player.distanceToSqr(pos.getCenter()) > REACH * REACH) return false;
+        if (player.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(pos)) > REACH * REACH) return false;
         HubBlockEntity hub = hub();
         if (hub == null || !(hub.getBlockState().getBlock() instanceof HubBlock block) || block.gateway != gateway) return false;
         // the block must still be this company's, and the player still in it
