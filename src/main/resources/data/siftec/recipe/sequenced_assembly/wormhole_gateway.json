@@ -7,7 +7,7 @@
   "result": {
     "id": "siftec:wormhole_gateway"
   },
-  "loops": 24,
+  "loops": 9,
   "sequence": [
     {
       "type": "create:deploying",

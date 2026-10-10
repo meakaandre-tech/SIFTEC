@@ -1,18 +1,18 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": "create:iron_sheet",
+  "ingredient": "siftec:wire_spool",
   "transitional_item": {
     "id": "siftec:incomplete_awesome_shop"
   },
   "result": {
     "id": "siftec:awesome_shop"
   },
-  "loops": 33,
+  "loops": 4,
   "sequence": [
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:cable",
+      "ingredient": "create:iron_sheet",
       "results": [
         "$result"
       ]
@@ -20,7 +20,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:screw",
+      "ingredient": "siftec:wire_spool",
       "results": [
         "$result"
       ]
@@ -28,7 +28,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:screw",
+      "ingredient": "siftec:screw_bundle",
       "results": [
         "$result"
       ]
@@ -36,31 +36,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:screw",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:screw",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:screw",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:screw",
+      "ingredient": "siftec:screw_bundle",
       "results": [
         "$result"
       ]

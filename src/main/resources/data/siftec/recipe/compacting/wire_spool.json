@@ -1,0 +1,15 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable"
+  ],
+  "results": [
+    {
+      "id": "siftec:wire_spool"
+    }
+  ]
+}

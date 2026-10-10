@@ -1,50 +1,18 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": "siftec:modular_frame",
+  "ingredient": "siftec:silica_bundle",
   "transitional_item": {
     "id": "siftec:incomplete_blade_runners"
   },
   "result": {
     "id": "siftec:blade_runners"
   },
-  "loops": 4,
+  "loops": 3,
   "sequence": [
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:silica",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:silica",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:silica",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:silica",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:silica",
+      "ingredient": "siftec:modular_frame",
       "results": [
         "$result"
       ]
@@ -53,6 +21,14 @@
       "type": "create:deploying",
       "target": "$ingredient",
       "ingredient": "siftec:rotor",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:silica_bundle",
       "results": [
         "$result"
       ]

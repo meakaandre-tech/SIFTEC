@@ -287,6 +287,27 @@
       "id": "designer_frame"
     },
     {
+      "id": "mask_lining"
+    },
+    {
+      "id": "screw_bundle"
+    },
+    {
+      "id": "wire_spool"
+    },
+    {
+      "id": "iron_bundle"
+    },
+    {
+      "id": "precast_concrete"
+    },
+    {
+      "id": "quickwire_coil"
+    },
+    {
+      "id": "silica_bundle"
+    },
+    {
       "id": "incomplete_furnace_engine"
     },
     {
@@ -339,9 +360,6 @@
     },
     {
       "id": "incomplete_jetpack"
-    },
-    {
-      "id": "incomplete_gas_mask"
     },
     {
       "id": "incomplete_radar_tower"
@@ -510,7 +528,10 @@
         "siftec:wormhole_gateway",
         "siftec:furnace_engine",
         "create:flywheel",
-        "siftec:biomass"
+        "siftec:biomass",
+        "siftec:wire_spool",
+        "siftec:iron_bundle",
+        "siftec:precast_concrete"
       ],
       "tokens": []
     },
@@ -972,7 +993,8 @@
         "create:brown_toolbox",
         "create:green_toolbox",
         "create:red_toolbox",
-        "create:black_toolbox"
+        "create:black_toolbox",
+        "siftec:screw_bundle"
       ],
       "tokens": [
         "backpack"
@@ -2582,7 +2604,8 @@
         "create:gearshift",
         "create:sequenced_gearshift",
         "create:adjustable_chain_gearshift",
-        "siftec:speed_governor"
+        "siftec:speed_governor",
+        "siftec:quickwire_coil"
       ],
       "tokens": [],
       "needs": [
@@ -2745,7 +2768,8 @@
       "seconds": 180,
       "items": [
         "siftec:gas_filter",
-        "siftec:gas_mask"
+        "siftec:gas_mask",
+        "siftec:mask_lining"
       ],
       "tokens": [],
       "needs": [
@@ -3144,7 +3168,8 @@
       ],
       "seconds": 120,
       "items": [
-        "siftec:blade_runners"
+        "siftec:blade_runners",
+        "siftec:silica_bundle"
       ],
       "tokens": [],
       "needs": [
@@ -4145,6 +4170,12 @@
     "siftec:mechanical_crafting/workshop_power_tower": "expanded_power_infrastructure",
     "siftec:mechanical_crafting/workshop_parachute": "mam_mycelia_3",
     "siftec:mechanical_crafting/workshop_cardboard_drone": "aeronautical_engineering",
+    "siftec:compacting/screw_bundle": "field_research",
+    "siftec:compacting/wire_spool": "hub_upgrade_6",
+    "siftec:compacting/precast_concrete": "hub_upgrade_6",
+    "siftec:compacting/quickwire_coil": "mam_caterium_5",
+    "siftec:compacting/silica_bundle": "mam_quartz_6",
+    "siftec:compacting/iron_bundle": "hub_upgrade_6",
     "seq:furnace_engine": "hub_upgrade_6",
     "seq:mam": "field_research",
     "seq:object_scanner": "field_research",
@@ -4163,10 +4194,11 @@
     "seq:miner_mk2": "advanced_steel_production",
     "seq:jetpack_thruster": "jetpack",
     "seq:jetpack": "jetpack",
-    "seq:gas_mask": "mam_mycelia_5",
     "seq:radar_tower": "mam_quartz_7",
     "seq:drill_shaft": "leading_edge_production",
     "seq:designer_frame": "ficsit_blueprints_mk3",
+    "siftec:mechanical_crafting/mask_lining": "mam_mycelia_5",
+    "siftec:mechanical_crafting/gas_mask": "mam_mycelia_5",
     "siftec:mechanical_crafting/hazmat_lining": "hazmat_suit",
     "siftec:mechanical_crafting/hazmat_suit": "hazmat_suit",
     "siftec:mechanical_crafting/hover_thruster": "hover_pack",

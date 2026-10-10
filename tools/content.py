@@ -87,6 +87,12 @@ PARTS = [
     ("converter_core", "Converter Core", "minecraft:item/heart_of_the_sea", None), ("portal_module", "Portal Module", "minecraft:item/end_crystal", None),
     ("geyser_core", "Geyser Engine Core", "minecraft:item/magma_cream", None), ("extractor_pump", "Extractor Pump", "minecraft:item/hopper", 0xE0E8F8),
     ("drill_shaft", "Drill Shaft", "minecraft:item/blaze_rod", 0x70747C), ("designer_frame", "Designer Frame", "minecraft:item/item_frame", 0xA0D0FF),
+    ("mask_lining", "Mask Lining", "minecraft:item/phantom_membrane", None),
+    # bundles: many of one cheap part pressed together in a Basin, so an assembly line takes a few big inputs instead
+    # of many small ones (recipes.BUNDLES); each unlocks with the first build whose line takes it
+    ("screw_bundle", "Screw Bundle", "minecraft:item/bundle", 0xA8B0C0), ("wire_spool", "Wire Spool", "minecraft:item/lead", 0xD07848),
+    ("iron_bundle", "Iron Bundle", "minecraft:item/bundle", 0xD8D8E0), ("precast_concrete", "Precast Concrete", "minecraft:block/light_gray_concrete", None),
+    ("quickwire_coil", "Quickwire Coil", "minecraft:item/lead", 0xF0C850), ("silica_bundle", "Silica Bundle", "minecraft:item/bundle", 0xF0F0F8),
 ]
 # Half-built items on the machine routes' sequenced assembly lines: (what the line makes, its name, texture)
 for _rid, _name, _tex in (
@@ -99,12 +105,14 @@ for _rid, _name, _tex in (
         ("speed_governor", "Speed Governor", "minecraft:item/clock_00"), ("blade_runners", "Blade Runners", "minecraft:item/iron_boots"),
         ("dimensional_depot", "Dimensional Depot", "minecraft:item/ender_pearl"), ("miner_mk2", "Miner Mk.2", "minecraft:item/iron_pickaxe"),
         ("jetpack_thruster", "Jetpack Thruster", "create:item/propeller"), ("jetpack", "Jetpack", "minecraft:item/elytra"),
-        ("gas_mask", "Gas Mask", "minecraft:item/leather_helmet"), ("radar_tower", "Radar Tower", "minecraft:item/compass_16"),
+        ("radar_tower", "Radar Tower", "minecraft:item/compass_16"),
         ("drill_shaft", "Drill Shaft", "minecraft:item/blaze_rod"), ("designer_frame", "Designer Frame", "minecraft:item/item_frame")):
     PARTS.append(("incomplete_" + _rid, "Incomplete " + _name, _tex, 0x808080))
 # The sub-assemblies' milestones: the build's own, or the one that brings the machine that makes them when that comes
 # later (the Wormhole Gateway is HUB Upgrade 6, but its coils and frames need the Deployer from Part Assembly)
 ASSEMBLY_LOCKS = {
+    "hub_upgrade_6": ["siftec:wire_spool", "siftec:iron_bundle", "siftec:precast_concrete"], "field_research": ["siftec:screw_bundle"],
+    "mam_caterium_5": ["siftec:quickwire_coil"], "mam_quartz_6": ["siftec:silica_bundle"], "mam_mycelia_5": ["siftec:mask_lining"],
     "part_assembly": ["siftec:gateway_coil", "siftec:gateway_frame"], "jump_pads": ["siftec:landing_cushion"],
     "jetpack": ["siftec:jetpack_thruster"], "hazmat_suit": ["siftec:hazmat_lining"], "hover_pack": ["siftec:hover_thruster"],
     "aeronautical_engineering": ["siftec:drone_port_module"], "particle_enrichment": ["siftec:accelerator_segment"],

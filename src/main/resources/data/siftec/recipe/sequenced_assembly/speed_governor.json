@@ -1,58 +1,18 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": "siftec:rotor",
+  "ingredient": "siftec:quickwire_coil",
   "transitional_item": {
     "id": "siftec:incomplete_speed_governor"
   },
   "result": {
     "id": "siftec:speed_governor"
   },
-  "loops": 4,
+  "loops": 2,
   "sequence": [
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:quickwire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:quickwire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:quickwire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:quickwire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:quickwire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:quickwire",
+      "ingredient": "siftec:rotor",
       "results": [
         "$result"
       ]
@@ -61,6 +21,22 @@
       "type": "create:deploying",
       "target": "$ingredient",
       "ingredient": "siftec:reinforced_iron_plate",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:quickwire_coil",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:quickwire_coil",
       "results": [
         "$result"
       ]

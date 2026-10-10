@@ -92,6 +92,9 @@ public final class AutomateTests {
             machines(source, level, at);
             assembly(source, level, at.east(4), "siftec:gateway_coil");
             assembly(source, level, at.east(4), "siftec:wormhole_gateway");
+            // a shortened line: three Deployers (Reinforced Iron Plate, Wire Spool, Screw Bundle), two loops
+            assembly(source, level, at.east(4), "siftec:object_scanner");
+            crafted(source, level, at.east(4), "siftec:gas_mask");
             crafted(source, level, at.east(4), "siftec:accelerator_segment");
             crafted(source, level, at.east(4), "siftec:particle_accelerator");
             workshop(source, level, at.west(4));

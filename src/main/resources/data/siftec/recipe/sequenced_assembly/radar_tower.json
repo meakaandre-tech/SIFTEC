@@ -20,39 +20,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:cable",
+      "ingredient": "siftec:wire_spool",
       "results": [
         "$result"
       ]

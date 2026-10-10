@@ -535,34 +535,45 @@ def build():
 # their build (content.ASSEMBLY_LOCKS). The Power Line is pressed from Cable.
 CRAFTER_MOST = 25
 W = "siftec:"
-# sequenced assembly: (what it makes, base item, the steps of one loop, loops)
+# Bundles, pressed in a Basin from many of one cheap part (no other Basin recipe takes that part alone, so a Basin fed
+# with it makes only the bundle): (bundle, part, how many). The Wire Spool takes Cable, as Wire alone would be pressed
+# into Cable; a spool is 10 Wire's worth. Biomass has no bundle (two Biomass press into Solid Biofuel).
+BUNDLES = [
+    (W + "screw_bundle", "Screw", 25), (W + "wire_spool", "Cable", 5), (W + "precast_concrete", "Concrete", 10),
+    (W + "quickwire_coil", "Quickwire", 5), (W + "silica_bundle", "Silica", 5),
+]
+# sequenced assembly: (what it makes, base item, the steps of one loop, loops). At most four steps and ten loops: the
+# many small parts come in bundles.
+SB, WS, IB, PC = W + "screw_bundle", W + "wire_spool", W + "iron_bundle", W + "precast_concrete"
+RIP, MF, HMF = "Reinforced Iron Plate", "Modular Frame", "Heavy Modular Frame"
 ASSEMBLY_LINES = [
-    (W + "furnace_engine", "Iron Sheet", ["Iron Rod", "Wire", "Iron Sheet", "Wire"], 14),
-    (W + "mam", "Reinforced Iron Plate", ["Cable", "Wire", "Wire", "Wire"], 16),
-    (W + "object_scanner", "Reinforced Iron Plate", ["Wire", "Screw", "Screw", "Wire", "Screw", "Screw", "Screw"], 10),
-    # the Wormhole Gateway: 24 coils of wire and 25 frames of concrete, sheet and rod, put together on a third line
-    (W + "gateway_coil", "Iron Rod", ["Wire"] * 5, 12),
-    (W + "gateway_frame", "Concrete", ["Iron Rod", "Concrete", "Iron Sheet", "Concrete", "Iron Rod"], 9),
-    (W + "wormhole_gateway", W + "gateway_frame", [W + "gateway_coil", W + "gateway_frame"], 24),
-    (W + "landing_cushion", "Biomass", ["Biomass"], 19),
-    (W + "landing_pad", "Rotor", ["Cable", "Cable", "Cable", W + "landing_cushion", "Rotor", "Rotor"], 10),
-    (W + "awesome_sink", "Concrete", ["Reinforced Iron Plate", "Cable", "Concrete", "Cable", "Concrete", "Concrete"], 15),
-    (W + "awesome_shop", "Iron Sheet", ["Cable"] + ["Screw"] * 6, 33),
-    (W + "blueprint_designer", "Modular Frame", ["Concrete", "Concrete", "Cable", "Concrete", "Concrete"], 25),
-    (W + "power_storage", "Stator", ["Modular Frame", "Wire", "Wire", "Wire", "Wire", "Modular Frame", "Stator"], 5),
-    (W + "speed_governor", "Rotor", ["Quickwire"] * 6 + ["Reinforced Iron Plate"], 4),
-    (W + "blade_runners", "Modular Frame", ["Silica"] * 5 + ["Rotor"], 4),
-    (W + "dimensional_depot", "Mercer Sphere", ["Modular Frame", "Cable", "Cable", "Cable", "Cable"], 5),
-    (W + "miner_mk2", W + "portable_miner", ["Encased Industrial Beam", "Steel Pipe", "Steel Pipe", "Modular Frame"], 10),
+    (W + "furnace_engine", IB, [WS, IB, "Cable"], 2),
+    (W + "mam", "Cable", [RIP, WS, "Cable"], 6),
+    (W + "object_scanner", RIP, [RIP, WS, SB], 2),
+    # the Wormhole Gateway: 9 coils of wire and 10 frames of concrete, sheet and rod, put together on a third line
+    (W + "gateway_coil", WS, [WS, WS], 8),
+    (W + "gateway_frame", "Iron Rod", [PC, IB, "Iron Rod", "Iron Rod"], 5),
+    (W + "wormhole_gateway", W + "gateway_frame", [W + "gateway_coil", W + "gateway_frame"], 9),
+    (W + "landing_cushion", "Rotor", ["Biomass"] * 4, 5),
+    (W + "landing_pad", WS, [W + "landing_cushion", "Rotor", W + "landing_cushion", WS], 5),
+    (W + "awesome_sink", WS, [RIP, RIP, WS, PC], 5),
+    (W + "awesome_shop", WS, ["Iron Sheet", WS, SB, SB], 4),
+    (W + "blueprint_designer", MF, [PC, WS, PC], 5),
+    (W + "power_storage", WS, [MF, MF, "Stator", "Cable"], 5),
+    (W + "speed_governor", W + "quickwire_coil", ["Rotor", RIP, W + "quickwire_coil", W + "quickwire_coil"], 2),
+    (W + "blade_runners", W + "silica_bundle", [MF, "Rotor", W + "silica_bundle"], 3),
+    (W + "dimensional_depot", "Mercer Sphere", [MF, WS], 4),
+    (W + "miner_mk2", W + "portable_miner", ["Encased Industrial Beam", "Steel Pipe", "Steel Pipe", MF], 10),
     (W + "jetpack_thruster", "Motor", ["Plastic", "Rubber"], 10),
     (W + "jetpack", W + "jetpack_thruster", ["Circuit Board", W + "jetpack_thruster"], 4),
-    (W + "gas_mask", "Fabric", ["Plastic", "Rubber", "Plastic", "Fabric"], 50),
-    (W + "radar_tower", "Heavy Modular Frame", ["Crystal Oscillator"] + ["Cable"] * 5 + ["Heavy Modular Frame"], 10),
+    (W + "radar_tower", HMF, ["Crystal Oscillator", WS, HMF], 10),
     (W + "drill_shaft", "Fused Modular Frame", ["Steel Pipe"], 5),
     (W + "designer_frame", "Fused Modular Frame", ["Concrete"], 10),
 ]
 # Mechanical Crafter, beyond the builds of 25 parts or fewer: (what it makes, [(count, part)])
 CRAFTED = [
+    (W + "mask_lining", [(5, "Rubber"), (10, "Plastic"), (5, "Fabric")]),
+    (W + "gas_mask", [(10, W + "mask_lining")]),
     (W + "hazmat_lining", [(5, "Rubber"), (5, "Plastic"), (5, "Alclad Aluminum Sheet"), (5, "Fabric")]),
     (W + "hazmat_suit", [(10, W + "hazmat_lining")]),
     (W + "hover_thruster", [(1, "Motor"), (1, "Computer"), (5, "Alclad Aluminum Sheet")]),
@@ -598,6 +609,10 @@ def workshop_by_machine():
         parts = [(n, c) for c, n in _c.parse_cost(cost)]
         if sum(n for n, c in parts) <= CRAFTER_MOST:
             crafter(out, parts, name="workshop_" + out.split(":")[1], most=CRAFTER_MOST)
+    for out, part, n in BUNDLES:
+        compact(slug(out), items=[part] * n, results=[out])
+    # the Iron Bundle: 5 Iron Sheet and 5 Iron Rod pressed together
+    compact("iron_bundle", items=["Iron Sheet"] * 5 + ["Iron Rod"] * 5, results=[IB])
     for out, base, steps, loops in ASSEMBLY_LINES:
         sequence(base, out, steps, loops)
     for out, parts in CRAFTED:

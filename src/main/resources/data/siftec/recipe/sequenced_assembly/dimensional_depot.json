@@ -7,7 +7,7 @@
   "result": {
     "id": "siftec:dimensional_depot"
   },
-  "loops": 5,
+  "loops": 4,
   "sequence": [
     {
       "type": "create:deploying",
@@ -20,31 +20,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:cable",
+      "ingredient": "siftec:wire_spool",
       "results": [
         "$result"
       ]

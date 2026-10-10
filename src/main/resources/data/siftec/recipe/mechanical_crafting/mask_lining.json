@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:rubber",
+    "B": "siftec:plastic",
+    "C": "siftec:fabric"
+  },
+  "pattern": [
+    "AAAAA",
+    "BBBBB",
+    "BBBBB",
+    "CCCCC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:mask_lining"
+  }
+}

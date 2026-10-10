@@ -1,14 +1,38 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": "siftec:biomass",
+  "ingredient": "siftec:rotor",
   "transitional_item": {
     "id": "siftec:incomplete_landing_cushion"
   },
   "result": {
     "id": "siftec:landing_cushion"
   },
-  "loops": 19,
+  "loops": 5,
   "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:biomass",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:biomass",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:biomass",
+      "results": [
+        "$result"
+      ]
+    },
     {
       "type": "create:deploying",
       "target": "$ingredient",

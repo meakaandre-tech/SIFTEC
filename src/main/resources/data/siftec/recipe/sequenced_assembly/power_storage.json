@@ -1,6 +1,6 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": "siftec:stator",
+  "ingredient": "siftec:wire_spool",
   "transitional_item": {
     "id": "siftec:incomplete_power_storage"
   },
@@ -20,38 +20,6 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:wire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:wire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:wire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:wire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
       "ingredient": "siftec:modular_frame",
       "results": [
         "$result"
@@ -61,6 +29,14 @@
       "type": "create:deploying",
       "target": "$ingredient",
       "ingredient": "siftec:stator",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:cable",
       "results": [
         "$result"
       ]

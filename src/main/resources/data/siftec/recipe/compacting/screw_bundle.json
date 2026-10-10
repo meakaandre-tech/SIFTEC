@@ -1,0 +1,35 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw"
+  ],
+  "results": [
+    {
+      "id": "siftec:screw_bundle"
+    }
+  ]
+}
