@@ -1,0 +1,15 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica"
+  ],
+  "results": [
+    {
+      "id": "siftec:silica_bundle"
+    }
+  ]
+}

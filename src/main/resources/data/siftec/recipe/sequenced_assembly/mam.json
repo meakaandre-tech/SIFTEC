@@ -1,42 +1,34 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": "siftec:reinforced_iron_plate",
+  "ingredient": "siftec:cable",
   "transitional_item": {
     "id": "siftec:incomplete_mam"
   },
   "result": {
     "id": "siftec:mam"
   },
-  "loops": 16,
+  "loops": 6,
   "sequence": [
     {
       "type": "create:deploying",
       "target": "$ingredient",
+      "ingredient": "siftec:reinforced_iron_plate",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:wire_spool",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
       "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:wire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:wire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:wire",
       "results": [
         "$result"
       ]

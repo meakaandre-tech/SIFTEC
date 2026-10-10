@@ -1,0 +1,15 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:mask_lining"
+  },
+  "pattern": [
+    "AAAA",
+    "AAAA",
+    "AA  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:gas_mask"
+  }
+}

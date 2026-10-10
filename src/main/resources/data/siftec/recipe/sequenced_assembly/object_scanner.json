@@ -7,12 +7,12 @@
   "result": {
     "id": "siftec:object_scanner"
   },
-  "loops": 10,
+  "loops": 2,
   "sequence": [
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:wire",
+      "ingredient": "siftec:reinforced_iron_plate",
       "results": [
         "$result"
       ]
@@ -20,7 +20,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:screw",
+      "ingredient": "siftec:wire_spool",
       "results": [
         "$result"
       ]
@@ -28,39 +28,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:screw",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:wire",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:screw",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:screw",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:screw",
+      "ingredient": "siftec:screw_bundle",
       "results": [
         "$result"
       ]

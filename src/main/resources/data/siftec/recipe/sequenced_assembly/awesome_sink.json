@@ -1,13 +1,13 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": "minecraft:light_gray_concrete",
+  "ingredient": "siftec:wire_spool",
   "transitional_item": {
     "id": "siftec:incomplete_awesome_sink"
   },
   "result": {
     "id": "siftec:awesome_sink"
   },
-  "loops": 15,
+  "loops": 5,
   "sequence": [
     {
       "type": "create:deploying",
@@ -20,7 +20,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:cable",
+      "ingredient": "siftec:reinforced_iron_plate",
       "results": [
         "$result"
       ]
@@ -28,7 +28,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "minecraft:light_gray_concrete",
+      "ingredient": "siftec:wire_spool",
       "results": [
         "$result"
       ]
@@ -36,23 +36,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "minecraft:light_gray_concrete",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "minecraft:light_gray_concrete",
+      "ingredient": "siftec:precast_concrete",
       "results": [
         "$result"
       ]

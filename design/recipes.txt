@@ -701,25 +701,26 @@ These are built at the Equipment Workshop from a list of parts. Costs follow Sat
 Automation. The Workshop builds by hand only. Every build on this list also has a machine route, at about the same cost, that runs with no player and no Workshop. Each route recipe is locked to the build's own milestone; each sub-assembly unlocks with its build, or with the machine that makes it when that comes later.
 - Mechanical Crafter, at the Workshop's cost, for every build of 25 parts or fewer, one part per crafter on a grid of up to 5 by 5: Portable Miner, Node Scanner, Miner Mk.1, HUB, Claim Marker, HUB Engine, Power Pole, Power Tower, Parachute and Cardboard Drone.
 - Power Line: a Mechanical Press turns 1 Cable into 1 Power Line, the same as the Workshop.
-- Sequenced assembly, for the bigger builds before the Mechanical Crafter (from Part Assembly, which brings the Deployer): Deployers over a belt or depot apply the parts one step after another, and the half-built item goes round the line until every loop is done. "Base + [steps] x loops" below: the base item goes in, each Deployer holds one step's part, and each loop uses one of each.
+- Sequenced assembly, for the bigger builds before the Mechanical Crafter (from Part Assembly, which brings the Deployer): Deployers over a belt or depot apply the parts one step after another, and the half-built item goes round the line until every loop is done. "Base + [steps] x loops" below: the base item goes in, each Deployer holds one step's part, and each loop uses one of each. No line has more than four Deployers or ten loops (2026-10-11): the many small parts come in bundles.
+- Bundles, pressed by a Mechanical Press over a Basin from many of one cheap part; each unlocks with the first build whose line takes it. Screw Bundle = 25 Screw (Field Research). Wire Spool = 5 Cable, 10 Wire's worth (HUB Upgrade 6; Wire alone would be pressed into Cable, so the spool takes Cable). Iron Bundle = 5 Iron Sheet, 5 Iron Rod (HUB Upgrade 6). Precast Concrete = 10 Concrete (HUB Upgrade 6). Quickwire Coil = 5 Quickwire (Power Switch). Silica Bundle = 5 Silica (Blade Runners). No other Basin recipe takes those parts alone, so a Basin fed with them makes only the bundle. Biomass has no bundle: two Biomass press into Solid Biofuel.
 - From Tier 6 on, the big builds are made in a Mechanical Crafter from a few sub-assemblies (a module or segment, each a part of the build), each from its own crafter grid or assembly line.
-Routes (machine total against the Workshop's, in the Workshop's own parts):
-- Wormhole Gateway: Gateway Coil = Iron Rod + [Wire x5] x12 (61 parts); Gateway Frame = Concrete + [Iron Rod, Concrete, Iron Sheet, Concrete, Iron Rod] x9 (46); the Gateway = Gateway Frame + [Gateway Coil, Gateway Frame] x24. 2,614 against 2,650. The coils and frames unlock with Part Assembly (the Gateway itself is HUB Upgrade 6, before the Deployer).
-- Furnace Engine: Iron Sheet + [Iron Rod, Wire, Iron Sheet, Wire] x14. 57 against 55.
-- MAM: Reinforced Iron Plate + [Cable, Wire, Wire, Wire] x16. 65 against 65.
-- Object Scanner: Reinforced Iron Plate + [Wire, Screw, Screw, Wire, Screw, Screw, Screw] x10. 71 against 74.
-- Landing Pad: Landing Cushion = Biomass + [Biomass] x19 (one Deployer, 20 Biomass); the pad = Rotor + [Cable, Cable, Cable, Landing Cushion, Rotor, Rotor] x10. 251 against 250.
-- AWESOME Sink: Concrete + [Reinforced Iron Plate, Cable, Concrete, Cable, Concrete, Concrete] x15. 91 against 90.
-- AWESOME Shop: Iron Sheet + [Cable, Screw x6] x33. 232 against 235.
-- Blueprint Designer: Modular Frame + [Concrete, Concrete, Cable, Concrete, Concrete] x25. 126 against 129.
-- Power Storage: Stator + [Modular Frame, Wire x4, Modular Frame, Stator] x5. 36 against 35.
-- Speed Governor: Rotor + [Quickwire x6, Reinforced Iron Plate] x4. 29 against 29.
-- Blade Runners: Modular Frame + [Silica x5, Rotor] x4. 25 against 26.
-- Dimensional Depot: Mercer Sphere + [Modular Frame, Cable x4] x5. 26 against 26 (the sphere is found in the world and fed in).
+Routes (machine total against the Workshop's, in the Workshop's own parts; a Cable counts as 2 Wire where the Workshop asks for Wire):
+- Wormhole Gateway: Gateway Coil = Wire Spool + [Wire Spool, Wire Spool] x8 (170 Wire); Gateway Frame = Iron Rod + [Precast Concrete, Iron Bundle, Iron Rod, Iron Rod] x5 (50 Concrete, 25 Iron Sheet, 36 Iron Rod); the Gateway = Gateway Frame + [Gateway Coil, Gateway Frame] x9. 2,640 against 2,650. The coils and frames unlock with Part Assembly (the Gateway itself is HUB Upgrade 6, before the Deployer).
+- Furnace Engine: Iron Bundle + [Wire Spool, Iron Bundle, Cable] x2. 54 against 55.
+- MAM: Cable + [Reinforced Iron Plate, Wire Spool, Cable] x6. 6 Reinforced Iron Plate and 37 Cable (74 Wire) against 5 and 75.
+- Object Scanner: Reinforced Iron Plate + [Reinforced Iron Plate, Wire Spool, Screw Bundle] x2. 73 against 74.
+- Landing Pad: Landing Cushion = Rotor + [Biomass x4] x5 (1 Rotor, 20 Biomass); the pad = Wire Spool + [Landing Cushion, Rotor, Landing Cushion, Wire Spool] x5. 245 against 250.
+- AWESOME Sink: Wire Spool + [Reinforced Iron Plate, Reinforced Iron Plate, Wire Spool, Precast Concrete] x5. 90 against 90.
+- AWESOME Shop: Wire Spool + [Iron Sheet, Wire Spool, Screw Bundle, Screw Bundle] x4. 229 against 235.
+- Blueprint Designer: Modular Frame + [Precast Concrete, Wire Spool, Precast Concrete] x5. 126 against 129.
+- Power Storage: Wire Spool + [Modular Frame, Modular Frame, Stator, Cable] x5. 35 against 35.
+- Speed Governor: Quickwire Coil + [Rotor, Reinforced Iron Plate, Quickwire Coil, Quickwire Coil] x2. 29 against 29.
+- Blade Runners: Silica Bundle + [Modular Frame, Rotor, Silica Bundle] x3. 26 against 26.
+- Dimensional Depot: Mercer Sphere + [Modular Frame, Wire Spool] x4. 25 against 26 (the sphere is found in the world and fed in).
 - Miner Mk.2: Portable Miner + [Encased Industrial Beam, Steel Pipe, Steel Pipe, Modular Frame] x10. 41 against 42.
 - Jetpack: Jetpack Thruster = Motor + [Plastic, Rubber] x10 (21); the Jetpack = Jetpack Thruster + [Circuit Board, Jetpack Thruster] x4. 109 against 110.
-- Gas Mask: Fabric + [Plastic, Rubber, Plastic, Fabric] x50. 201 against 200.
-- Radar Tower: Heavy Modular Frame + [Crystal Oscillator, Cable x5, Heavy Modular Frame] x10. 71 against 70.
+- Gas Mask (Tier 6, with the Mechanical Crafter): Mask Lining = crafter 5 Rubber, 10 Plastic, 5 Fabric; the mask = crafter 10 Mask Lining. 200 against 200. The lining unlocks with Toxic Cellular Modification.
+- Radar Tower: Heavy Modular Frame + [Crystal Oscillator, Wire Spool, Heavy Modular Frame] x10. 71 against 70.
 - Hazmat Suit: Hazmat Lining = crafter 5 Rubber, 5 Plastic, 5 Alclad Aluminum Sheet, 5 Fabric; the suit = crafter 10 Hazmat Lining. 200 against 200.
 - Hover Pack: Hover Thruster = crafter 1 Motor, 1 Computer, 5 Alclad Aluminum Sheet; the pack = crafter 8 Hover Thruster, 4 Heavy Modular Frame. 60 against 60.
 - Drone Port: Drone Port Module = crafter 2 Heavy Modular Frame, 1 High-Speed Connector, 5 Alclad Aluminum Sheet, 5 Aluminum Casing, 1 Radio Control Unit; the port = crafter 10 modules. 140 against 140.

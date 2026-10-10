@@ -1,18 +1,18 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": "create:iron_sheet",
+  "ingredient": "siftec:iron_bundle",
   "transitional_item": {
     "id": "siftec:incomplete_furnace_engine"
   },
   "result": {
     "id": "siftec:furnace_engine"
   },
-  "loops": 14,
+  "loops": 2,
   "sequence": [
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:iron_rod",
+      "ingredient": "siftec:wire_spool",
       "results": [
         "$result"
       ]
@@ -20,7 +20,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:wire",
+      "ingredient": "siftec:iron_bundle",
       "results": [
         "$result"
       ]
@@ -28,15 +28,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "create:iron_sheet",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "siftec:wire",
+      "ingredient": "siftec:cable",
       "results": [
         "$result"
       ]

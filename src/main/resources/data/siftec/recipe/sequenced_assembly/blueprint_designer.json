@@ -7,12 +7,12 @@
   "result": {
     "id": "siftec:blueprint_designer"
   },
-  "loops": 25,
+  "loops": 5,
   "sequence": [
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "minecraft:light_gray_concrete",
+      "ingredient": "siftec:precast_concrete",
       "results": [
         "$result"
       ]
@@ -20,7 +20,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "minecraft:light_gray_concrete",
+      "ingredient": "siftec:wire_spool",
       "results": [
         "$result"
       ]
@@ -28,23 +28,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:cable",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "minecraft:light_gray_concrete",
-      "results": [
-        "$result"
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "target": "$ingredient",
-      "ingredient": "minecraft:light_gray_concrete",
+      "ingredient": "siftec:precast_concrete",
       "results": [
         "$result"
       ]
