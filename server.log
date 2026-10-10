@@ -1,0 +1,656 @@
+Downloading Minecraft server
+Installing Fabric Loader 0.19.5(26.3) on the server
+Downloading required files
+Downloading library org.ow2.asm:asm:9.10.1
+Downloading library org.ow2.asm:asm-analysis:9.10.1
+Downloading library org.ow2.asm:asm-commons:9.10.1
+Downloading library org.ow2.asm:asm-tree:9.10.1
+Downloading library org.ow2.asm:asm-util:9.10.1
+Downloading library net.fabricmc:sponge-mixin:0.17.4+mixin.0.8.7
+Downloading library net.fabricmc:fabric-loader:0.19.5
+Generating server launch JAR
+Unpacking 26.3/server-26.3.jar (versions:26.3) to versions/26.3/server-26.3.jar
+Unpacking at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar (libraries:at.yawk.lz4:lz4-java:1.10.1) to libraries/at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar
+Unpacking com/azure/azure-json/1.4.0/azure-json-1.4.0.jar (libraries:com.azure:azure-json:1.4.0) to libraries/com/azure/azure-json/1.4.0/azure-json-1.4.0.jar
+Unpacking com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar (libraries:com.github.oshi:oshi-core:6.9.0) to libraries/com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar
+Unpacking com/google/code/gson/gson/2.14.0/gson-2.14.0.jar (libraries:com.google.code.gson:gson:2.14.0) to libraries/com/google/code/gson/gson/2.14.0/gson-2.14.0.jar
+Unpacking com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar (libraries:com.google.guava:failureaccess:1.0.3) to libraries/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar
+Unpacking com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar (libraries:com.google.guava:guava:33.6.0-jre) to libraries/com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar
+Unpacking com/microsoft/azure/msal4j/1.24.1/msal4j-1.24.1.jar (libraries:com.microsoft.azure:msal4j:1.24.1) to libraries/com/microsoft/azure/msal4j/1.24.1/msal4j-1.24.1.jar
+Unpacking com/mojang/authlib/10.0.77/authlib-10.0.77.jar (libraries:com.mojang:authlib:10.0.77) to libraries/com/mojang/authlib/10.0.77/authlib-10.0.77.jar
+Unpacking com/mojang/brigadier/1.3.11/brigadier-1.3.11.jar (libraries:com.mojang:brigadier:1.3.11) to libraries/com/mojang/brigadier/1.3.11/brigadier-1.3.11.jar
+Unpacking com/mojang/datafixerupper/10.0.21/datafixerupper-10.0.21.jar (libraries:com.mojang:datafixerupper:10.0.21) to libraries/com/mojang/datafixerupper/10.0.21/datafixerupper-10.0.21.jar
+Unpacking com/mojang/jtracy/1.14.38/jtracy-1.14.38.jar (libraries:com.mojang:jtracy:1.14.38) to libraries/com/mojang/jtracy/1.14.38/jtracy-1.14.38.jar
+Unpacking com/mojang/logging/1.7.12/logging-1.7.12.jar (libraries:com.mojang:logging:1.7.12) to libraries/com/mojang/logging/1.7.12/logging-1.7.12.jar
+Unpacking commons-io/commons-io/2.20.0/commons-io-2.20.0.jar (libraries:commons-io:commons-io:2.20.0) to libraries/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar
+Unpacking io/netty/netty-buffer/4.2.16.Final/netty-buffer-4.2.16.Final.jar (libraries:io.netty:netty-buffer:4.2.16.Final) to libraries/io/netty/netty-buffer/4.2.16.Final/netty-buffer-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-base/4.2.16.Final/netty-codec-base-4.2.16.Final.jar (libraries:io.netty:netty-codec-base:4.2.16.Final) to libraries/io/netty/netty-codec-base/4.2.16.Final/netty-codec-base-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-compression/4.2.16.Final/netty-codec-compression-4.2.16.Final.jar (libraries:io.netty:netty-codec-compression:4.2.16.Final) to libraries/io/netty/netty-codec-compression/4.2.16.Final/netty-codec-compression-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-http/4.2.16.Final/netty-codec-http-4.2.16.Final.jar (libraries:io.netty:netty-codec-http:4.2.16.Final) to libraries/io/netty/netty-codec-http/4.2.16.Final/netty-codec-http-4.2.16.Final.jar
+Unpacking io/netty/netty-common/4.2.16.Final/netty-common-4.2.16.Final.jar (libraries:io.netty:netty-common:4.2.16.Final) to libraries/io/netty/netty-common/4.2.16.Final/netty-common-4.2.16.Final.jar
+Unpacking io/netty/netty-handler/4.2.16.Final/netty-handler-4.2.16.Final.jar (libraries:io.netty:netty-handler:4.2.16.Final) to libraries/io/netty/netty-handler/4.2.16.Final/netty-handler-4.2.16.Final.jar
+Unpacking io/netty/netty-resolver/4.2.16.Final/netty-resolver-4.2.16.Final.jar (libraries:io.netty:netty-resolver:4.2.16.Final) to libraries/io/netty/netty-resolver/4.2.16.Final/netty-resolver-4.2.16.Final.jar
+Unpacking io/netty/netty-transport/4.2.16.Final/netty-transport-4.2.16.Final.jar (libraries:io.netty:netty-transport:4.2.16.Final) to libraries/io/netty/netty-transport/4.2.16.Final/netty-transport-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-classes-epoll/4.2.16.Final/netty-transport-classes-epoll-4.2.16.Final.jar (libraries:io.netty:netty-transport-classes-epoll:4.2.16.Final) to libraries/io/netty/netty-transport-classes-epoll/4.2.16.Final/netty-transport-classes-epoll-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-classes-kqueue/4.2.16.Final/netty-transport-classes-kqueue-4.2.16.Final.jar (libraries:io.netty:netty-transport-classes-kqueue:4.2.16.Final) to libraries/io/netty/netty-transport-classes-kqueue/4.2.16.Final/netty-transport-classes-kqueue-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-x86_64.jar (libraries:io.netty:netty-transport-native-epoll:4.2.16.Final:linux-x86_64) to libraries/io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-x86_64.jar
+Unpacking io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-aarch_64.jar (libraries:io.netty:netty-transport-native-epoll:4.2.16.Final:linux-aarch_64) to libraries/io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-aarch_64.jar
+Unpacking io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-x86_64.jar (libraries:io.netty:netty-transport-native-kqueue:4.2.16.Final:osx-x86_64) to libraries/io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-x86_64.jar
+Unpacking io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-aarch_64.jar (libraries:io.netty:netty-transport-native-kqueue:4.2.16.Final:osx-aarch_64) to libraries/io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-aarch_64.jar
+Unpacking io/netty/netty-transport-native-unix-common/4.2.16.Final/netty-transport-native-unix-common-4.2.16.Final.jar (libraries:io.netty:netty-transport-native-unix-common:4.2.16.Final) to libraries/io/netty/netty-transport-native-unix-common/4.2.16.Final/netty-transport-native-unix-common-4.2.16.Final.jar
+Unpacking it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar (libraries:it.unimi.dsi:fastutil:8.5.18) to libraries/it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar
+Unpacking net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar (libraries:net.java.dev.jna:jna:5.17.0) to libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar
+Unpacking net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar (libraries:net.java.dev.jna:jna-platform:5.17.0) to libraries/net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar
+Unpacking net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar (libraries:net.sf.jopt-simple:jopt-simple:5.0.4) to libraries/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar
+Unpacking org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar (libraries:org.apache.commons:commons-lang3:3.20.0) to libraries/org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar
+Unpacking org/apache/logging/log4j/log4j-api/2.26.0/log4j-api-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-api:2.26.0) to libraries/org/apache/logging/log4j/log4j-api/2.26.0/log4j-api-2.26.0.jar
+Unpacking org/apache/logging/log4j/log4j-core/2.26.0/log4j-core-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-core:2.26.0) to libraries/org/apache/logging/log4j/log4j-core/2.26.0/log4j-core-2.26.0.jar
+Unpacking org/apache/logging/log4j/log4j-slf4j2-impl/2.26.0/log4j-slf4j2-impl-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-slf4j2-impl:2.26.0) to libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.26.0/log4j-slf4j2-impl-2.26.0.jar
+Unpacking org/joml/joml/1.10.9/joml-1.10.9.jar (libraries:org.joml:joml:1.10.9) to libraries/org/joml/joml/1.10.9/joml-1.10.9.jar
+Unpacking org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar (libraries:org.jspecify:jspecify:1.0.0) to libraries/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar
+Unpacking org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar (libraries:org.slf4j:slf4j-api:2.0.17) to libraries/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar
+Starting net.fabricmc.loader.impl.game.minecraft.BundlerClassPathCapture
+[22:43:14] [main/INFO]: Loading Minecraft 26.3 with Fabric Loader 0.19.5
+[22:43:14] [main/INFO]: Mappings not present!
+[22:43:14] [main/WARN]: Warnings were found!
+ - Mod 'Mielon's The Sift' (the_sift) 1.1.2 recommends version 4.13.0 or later of lambdynlights, which is missing!
+	 - You should install version 4.13.0 or later of lambdynlights for the optimal experience.
+[22:43:14] [main/INFO]: Loading 51 mods:
+	- cgs 1.4.9+26.3
+	- create 6.0.9-1
+	- create_hypertube 0.6.0+26.3
+	- createdieselgenerators 1.3.15+26.3
+	- fabric-api 0.161.0+26.3
+	   |-- fabric-advancement-api-v1 1.0.0+38c7a2d55d
+	   |-- fabric-api-base 2.0.6+fcdff87f5d
+	   |-- fabric-api-lookup-api-v1 2.0.24+3434d6d95d
+	   |-- fabric-biome-api-v1 20.0.9+74ed1ea55d
+	   |-- fabric-block-api-v1 3.1.0+0ae6f9115d
+	   |-- fabric-block-getter-api-v2 2.0.9+3434d6d95d
+	   |-- fabric-command-api-v2 3.1.2+fcdff87f5d
+	   |-- fabric-content-registries-v0 15.0.4+74ed1ea55d
+	   |-- fabric-convention-tags-v2 4.10.3+6b5b47fd5d
+	   |-- fabric-crash-report-info-v1 1.0.7+fcdff87f5d
+	   |-- fabric-creative-tab-api-v1 5.0.21+fcdff87f5d
+	   |-- fabric-data-attachment-api-v1 2.2.30+3434d6d95d
+	   |-- fabric-data-generation-api-v1 27.2.4+427eab975d
+	   |-- fabric-debug-api-v1 1.0.4+3434d6d95d
+	   |-- fabric-dimensions-v1 5.1.19+47f74c985d
+	   |-- fabric-entity-events-v1 6.0.4+3434d6d95d
+	   |-- fabric-events-interaction-v0 5.3.6+3434d6d95d
+	   |-- fabric-game-rule-api-v1 4.0.10+3434d6d95d
+	   |-- fabric-item-api-v1 14.7.0+cf6bc2db5d
+	   |-- fabric-lifecycle-events-v1 4.1.9+ffef5f675d
+	   |-- fabric-loot-api-v3 4.0.8+4068fd645d
+	   |-- fabric-menu-api-v1 2.0.27+ed66f0a35d
+	   |-- fabric-message-api-v1 7.0.10+3434d6d95d
+	   |-- fabric-networking-api-v1 6.3.8+fcdff87f5d
+	   |-- fabric-object-builder-api-v1 24.1.9+3434d6d95d
+	   |-- fabric-particles-v1 5.0.24+3434d6d95d
+	   |-- fabric-permission-api-v1 1.0.8+fcdff87f5d
+	   |-- fabric-recipe-api-v1 10.0.8+fcdff87f5d
+	   |-- fabric-registry-sync-v0 8.0.1+fcdff87f5d
+	   |-- fabric-rendering-fluids-v1 6.0.6+3434d6d95d
+	   |-- fabric-resource-conditions-api-v1 6.1.5+3434d6d95d
+	   |-- fabric-resource-loader-v0 3.3.26+4fc5413f5d
+	   |-- fabric-resource-loader-v1 3.0.4+fcdff87f5d
+	   |-- fabric-serialization-api-v1 2.0.7+74ed1ea55d
+	   |-- fabric-tag-api-v1 2.1.10+fcdff87f5d
+	   |-- fabric-transfer-api-v1 8.0.25+fcdff87f5d
+	   \-- fabric-transitive-access-wideners-v1 8.1.16+52268a0e5d
+	- fabricloader 0.19.5
+	   \-- mixinextras 0.5.5
+	- farmersdelight 26.3-3.6.27+refabricated
+	- geckolib 5.5.7
+	- java 25
+	- minecraft 26.3
+	- ntgl 3.1.8+26.3
+	- siftec 0.1.0+26.3
+	- the_sift 1.1.2
+[22:43:14] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/net/fabricmc/sponge-mixin/0.17.4+mixin.0.8.7/sponge-mixin-0.17.4+mixin.0.8.7.jar Service=Knot/Fabric Env=SERVER
+[22:43:15] [main/WARN]: Error loading class: net/minecraft/client/gui/screens/recipebook/GhostSlots (java.lang.ClassNotFoundException: net/minecraft/client/gui/screens/recipebook/GhostSlots)
+[22:43:15] [main/WARN]: @Mixin target net.minecraft.client.gui.screens.recipebook.GhostSlots was not found farmersdelight.mixins.json:refabricated.GhostSlotsInvoker from mod farmersdelight
+[22:43:15] [main/WARN]: Error loading class: net/minecraft/client/gui/GuiGraphicsExtractor (java.lang.ClassNotFoundException: net/minecraft/client/gui/GuiGraphicsExtractor)
+[22:43:15] [main/WARN]: @Mixin target net.minecraft.client.gui.GuiGraphicsExtractor was not found farmersdelight.mixins.json:refabricated.GuiGraphicsExtractorAccessor from mod farmersdelight
+[22:43:15] [main/INFO]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.joml.MemUtil$MemUtilUnsafe (file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/org/joml/joml/1.10.9/joml-1.10.9.jar)
+WARNING: Please consider reporting this to the maintainers of class org.joml.MemUtil$MemUtilUnsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[22:43:24] [main/INFO]: [STDERR]: Failed to read config file: /home/runner/work/SIFTEC/SIFTEC/server/./config/create/server.json
+[22:43:24] [main/INFO]: [STDERR]: java.nio.file.NoSuchFileException: ./config/create/server.json
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:92)
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixFileSystemProvider.newFileChannel(UnixFileSystemProvider.java:213)
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:244)
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newByteChannel(Files.java:357)
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newByteChannel(Files.java:399)
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.spi.FileSystemProvider.newInputStream(FileSystemProvider.java:371)
+[22:43:24] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newInputStream(Files.java:154)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.FileUtils.lambda$readFileToString$14(FileUtils.java:2768)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.IOUtils.toString(IOUtils.java:3204)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.IOUtils.toString(IOUtils.java:3179)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.FileUtils.readFileToString(FileUtils.java:2768)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.read(Builder.java:136)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.<init>(Builder.java:36)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.create(Builder.java:49)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.create(Builder.java:44)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.infrastructure.config.AllConfigs.register(AllConfigs.java:28)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.Create.onInitialize(Create.java:62)
+[22:43:24] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.FabricLoaderImpl.invokeEntrypoints(FabricLoaderImpl.java:409)
+[22:43:24] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.game.minecraft.Hooks.startServer(Hooks.java:63)
+[22:43:24] [main/INFO]: [STDERR]: 	at knot//net.minecraft.server.Main.main(Main.java:114)
+[22:43:24] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:517)
+[22:43:24] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+[22:43:24] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.knot.KnotServer.main(KnotServer.java:23)
+[22:43:24] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.server.FabricServerLauncher.main(FabricServerLauncher.java:69)
+[22:43:24] [main/INFO]: [STDERR]: 	at net.fabricmc.installer.ServerLauncher.main(ServerLauncher.java:69)
+[22:43:25] [main/INFO]: Loaded config farmersdelight-common.json
+[22:43:25] [main/INFO]: The Sift initialized.
+[22:43:25] [main/INFO]: Environment: Environment[discoveryUrl=https://discovery.minecraftservices.com/minecraft/client, name=PROD]
+[22:43:25] [main/INFO]: Created 13 recipes which will be injected into the game
+[22:43:25] [main/INFO]: Found new data pack create:dynamic_data, loading it automatically
+[22:43:26] [Worker-Main-2/INFO]: No existing world data, creating new world
+[22:43:27] [Worker-Main-3/INFO]: Loaded 3349 advancements
+[22:43:28] [main/INFO]: Applied 146 biome modifications to 61 of 77 new biomes in 7.976 ms
+[22:43:28] [Server thread/INFO]: SIFTEC settings: spawn_free_radius=64, member_cooldown_hours=24
+[22:43:28] [Server thread/INFO]: Starting minecraft server version 26.3
+[22:43:28] [Server thread/INFO]: Loading properties
+[22:43:28] [Server thread/INFO]: Default game type: CREATIVE
+[22:43:28] [Server thread/INFO]: Generating keypair
+[22:43:28] [Server thread/INFO]: Starting Minecraft server on *:25565
+[22:43:28] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[22:43:28] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[22:43:28] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[22:43:28] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[22:43:28] [Server thread/INFO]: Preparing level "world"
+[22:43:28] [Server thread/INFO]: Selecting global world spawn...
+[22:43:32] [Server thread/INFO]: Loading 0 persistent chunks...
+[22:43:32] [Server thread/INFO]: Preparing spawn area: 100%
+[22:43:32] [Server thread/INFO]: Time elapsed: 3655 ms
+[22:43:32] [Server thread/INFO]: Done (3.836s)! For help, type "help"
+[22:43:32] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[22:43:32] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[22:43:32] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[22:43:32] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+[22:43:32] [Server thread/INFO]: SIFTEC: took the old saved force-load off 0 claimed chunks; claims now load only while a member is online
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTrimRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SingleItemRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTransformRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.RotationPropagator
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.CollectingNeighborUpdater$MultiNeighborUpdate
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.PlayerAdvancements
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.network.config.SynchronizeRegistriesTask
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.chunk.LevelChunkSection$1BlockCounter
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ServerboundSelectKnownPacks
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RemoteSlot$Synchronized
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.ExperimentalRedstoneWireEvaluator
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerHandshakePacketListenerImpl
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.BlockItemTagAppender
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistriesDatapackGenerator
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.Swim
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener
+[22:43:32] [Server thread/INFO]: Force-loading class com.jesz.createdieselgenerators.world.OilChunksSavedData
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.commands.DebugConfigCommand
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.HashedStack$ActualItem
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.WalkNodeEvaluator
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.TransmuteRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ConfigurationProtocols
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerLoginPacketListenerImpl
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.entity.PersistentEntitySectionManager$Callback
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.commands.execution.CommandQueueEntry
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RecipeBookType
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider$1
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.stats.ServerRecipeBook
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.gametest.framework.GameTestServer
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.BundlePacket
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.util.ParticleUtils
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.CompoundContainer
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender$1
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.stats.RecipeBookSettings
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.pump.PumpBlockEntity$PumpFluidTransferBehaviour
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.PacketEncoder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagsProvider
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SimpleCookingRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SpecialRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.level.ServerEntity
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.stats.RecipeBookSettings$TypeSettings
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapedRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.tags.TagBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.food.FoodData
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.ServerExplosion
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltInventory
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeOutput
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.foundation.recipe.trie.RecipeTrie
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.KineticNetwork
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.DeployerHandler
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.block.RailState
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.PacketDecoder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.dedicated.ServerWatchdog
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapelessRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.CustomCraftingRecipeBuilder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.item.enchantment.EnchantmentHelper
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.GiveGiftToHero
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.advancements.packs.VanillaAdventureAdvancements
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.ManualApplicationHelper
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.BlockLootSubProvider
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltTunnelInteractionHandler
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.game.GameProtocols
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.commands.execution.tasks.BuildContexts
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.WorkAtComposter
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingProvider
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonSittingPhase
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistryPatchGenerator
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.level.ChunkMap$TrackedEntity
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.server.network.PlayerChunkSender
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.item.Item$TooltipContext$2
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache$ProviderCache
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.StartAttacking
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.PathfindingContext
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.fan.processing.FanProcessing
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.FluidPropagator
+[22:43:32] [Server thread/INFO]: Force-loading class com.mojang.brigadier.context.ContextChain
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.PathFinder
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.codec.IdDispatchCodec
+[22:43:32] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.DataProvider
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.EntityLootSubProvider
+[22:43:32] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ClientboundCustomQueryPacket
+[22:43:32] [Server thread/INFO]: [MixinAudit] audit finished
+[22:43:39] [Server thread/INFO]: SELFTEST owner setup: set 48 -> 48, set 200 -> 64 (limit 64); set 48 -> 48, set 200 -> 64 (limit 64);
+[22:43:39] [Server thread/INFO]: System chat: SELFTEST owner setup: set 48 -> 48, set 200 -> 64 (limit 64); set 48 -> 48, set 200 -> 64 (limit 64);
+[22:43:40] [Server thread/INFO]: SELFTEST drone setup: a trip needs 1 fire charge(s)
+[22:43:40] [Server thread/INFO]: System chat: SELFTEST drone setup: a trip needs 1 fire charge(s)
+[22:43:40] [Server thread/INFO]: SELFTEST setup Node[x=155, z=-81, type=IRON, purity=NORMAL, y=-2147483648] core at 155, 143, -81
+[22:43:40] [Server thread/INFO]: System chat: SELFTEST setup Node[x=155, z=-81, type=IRON, purity=NORMAL, y=-2147483648] core at 155, 143, -81
+[22:43:41] [Server thread/INFO]: SELFTEST setup Node[x=21, z=98, type=COPPER, purity=NORMAL, y=-2147483648] core at 21, 63, 98
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST setup Node[x=21, z=98, type=COPPER, purity=NORMAL, y=-2147483648] core at 21, 63, 98
+[22:43:41] [Server thread/INFO]: SELFTEST hub: 98 milestones and phases, 116 parts
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST hub: 98 milestones and phases, 116 parts
+[22:43:41] [Server thread/INFO]: SELFTEST hub: ids not present in this install: []
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST hub: ids not present in this install: []
+[22:43:41] [Server thread/INFO]: SELFTEST hub: screen buttons checked true; view paid 7 of 300 (server 7 of 300), done 6, tier 1 open true, lock 40
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST hub: screen buttons checked true; view paid 7 of 300 (server 7 of 300), done 6, tier 1 open true, lock 40
+[22:43:41] [Server thread/INFO]: SELFTEST hub: two members pay x1.5; tier 1 open true; tier 3 open false; coal power needs phase_1; backpack rewards 3; scanner copper true; speed cap 32
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST hub: two members pay x1.5; tier 1 open true; tier 3 open false; coal power needs phase_1; backpack rewards 3; scanner copper true; speed cap 32
+[22:43:41] [Server thread/INFO]: SELFTEST recipes: 345 SIFTEC recipes loaded; removed recipes gone true; fluids [heavy_oil_residue, alumina_solution, sulfuric_acid, nitrogen, nitric_acid, dark_matter_residue, ignimbrite, turbofuel, vinegar, mead, drilling_mud, coolant]
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST recipes: 345 SIFTEC recipes loaded; removed recipes gone true; fluids [heavy_oil_residue, alumina_solution, sulfuric_acid, nitrogen, nitric_acid, dark_matter_residue, ignimbrite, turbofuel, vinegar, mead, drilling_mud, coolant]
+[22:43:41] [Server thread/INFO]: SELFTEST food: minecraft:golden_carrot SIMPLE [CARROT]; minecraft:pumpkin_pie SIMPLE [PUMPKIN]; minecraft:bread RAW []
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST food: minecraft:golden_carrot SIMPLE [CARROT]; minecraft:pumpkin_pie SIMPLE [PUMPKIN]; minecraft:bread RAW []
+[22:43:41] [Server thread/INFO]: SELFTEST alternates: 57 in the pool; a company that has only done Tier 0 could be offered [alt_iron_wire]
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST alternates: 57 in the pool; a company that has only done Tier 0 could be offered [alt_iron_wire]
+[22:43:41] [Server thread/INFO]: SELFTEST hub: Create's speed limit now reads 256
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST hub: Create's speed limit now reads 256
+[22:43:41] [Server thread/INFO]: SELFTEST content fuels: minecraft:coal=1600 siftec:biomass=960 siftec:solid_biofuel=2400 siftec:compacted_coal=3360 siftec:petroleum_coke=960
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST content fuels: minecraft:coal=1600 siftec:biomass=960 siftec:solid_biofuel=2400 siftec:compacted_coal=3360 siftec:petroleum_coke=960
+[22:43:41] [Server thread/INFO]: SELFTEST content item locks: cgs:flintlock=mam_sulfur_1 cgs:revolver=mam_sulfur_4 create:cut_granite=base_building create:deployer=part_assembly create:mechanical_crafter=industrial_manufacturing create:brass_ingot=mam_caterium_1 createdieselgenerators:pumpjack_crank=oil_processing farmersdelight:wheat_dough=disabled create:shaft=free
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST content item locks: cgs:flintlock=mam_sulfur_1 cgs:revolver=mam_sulfur_4 create:cut_granite=base_building create:deployer=part_assembly create:mechanical_crafter=industrial_manufacturing create:brass_ingot=mam_caterium_1 createdieselgenerators:pumpjack_crank=oil_processing farmersdelight:wheat_dough=disabled create:shaft=free
+[22:43:41] [Server thread/INFO]: SELFTEST content recipe locks: siftec:mixing/gunpowder_with_coal=mam_sulfur_1 siftec:mixing/lava_from_magma_block=mam_sulfur_2 siftec:mixing/sulfuric_acid=aeronautical_engineering siftec:crafting/deployer=part_assembly siftec:compacting/steel_beam=basic_steel_production
+[22:43:41] [Server thread/INFO]: System chat: SELFTEST content recipe locks: siftec:mixing/gunpowder_with_coal=mam_sulfur_1 siftec:mixing/lava_from_magma_block=mam_sulfur_2 siftec:mixing/sulfuric_acid=aeronautical_engineering siftec:crafting/deployer=part_assembly siftec:compacting/steel_beam=basic_steel_production
+[22:43:42] [Server thread/INFO]: SELFTEST content crafter cache: nothing done: none everything done: siftec:crafting/deployer nothing done: none
+[22:43:42] [Server thread/INFO]: System chat: SELFTEST content crafter cache: nothing done: none everything done: siftec:crafting/deployer nothing done: none
+[22:43:42] [Server thread/INFO]: SIFTEC: companies was in the old one-string format (68077 characters); it is saved as an NBT tree from now on
+[22:43:42] [Server thread/ERROR]: SIFTEC: COULD NOT READ data/siftec/companies.dat. The data is kept on disk and will not be overwritten; the game runs without it until the file is fixed.
+com.google.gson.JsonSyntaxException: java.io.EOFException: End of input at line 1 column 20 path $.companies.oops
+	at knot//com.google.gson.internal.Streams.parse(Streams.java:58)
+	at knot//com.google.gson.JsonParser.parseReader(JsonParser.java:144)
+	at knot//com.google.gson.JsonParser.parseReader(JsonParser.java:110)
+	at knot//com.google.gson.JsonParser.parseString(JsonParser.java:92)
+	at knot//com.meakaandre.siftec.save.JsonSavedData.read(JsonSavedData.java:141)
+	at knot//com.meakaandre.siftec.save.JsonSavedData$2.decode(JsonSavedData.java:123)
+	at knot//com.mojang.serialization.Decoder.parse(Decoder.java:18)
+	at knot//com.meakaandre.siftec.claim.StateSelfTest.codecTests(StateSelfTest.java:207)
+	at knot//com.meakaandre.siftec.claim.StateSelfTest.setup(StateSelfTest.java:91)
+	at knot//com.meakaandre.siftec.claim.StateSelfTest.lambda$register$1(StateSelfTest.java:60)
+	at knot//com.mojang.brigadier.context.ContextChain.runExecutable$mixinextras$wrapped$10(ContextChain.java:73)
+	at knot//com.mojang.brigadier.context.ContextChain.mixinextras$bridge$runExecutable$mixinextras$wrapped$10$11(ContextChain.java)
+	at knot//com.mojang.brigadier.context.ContextChain.wrapMethod$zjj000$fabric-entity-events-v1$onRunExecutable(ContextChain.java:1057)
+	at knot//com.mojang.brigadier.context.ContextChain.runExecutable(ContextChain.java)
+	at knot//net.minecraft.commands.execution.tasks.ExecuteCommand.execute(ExecuteCommand.java:29)
+	at knot//net.minecraft.commands.execution.tasks.ExecuteCommand.execute(ExecuteCommand.java:13)
+	at knot//net.minecraft.commands.execution.UnboundEntryAction.lambda$bind$0(UnboundEntryAction.java:8)
+	at knot//net.minecraft.commands.execution.CommandQueueEntry.execute$mixinextras$wrapped$8(CommandQueueEntry.java:8)
+	at knot//net.minecraft.commands.execution.CommandQueueEntry.mixinextras$bridge$execute$mixinextras$wrapped$8$9(CommandQueueEntry.java)
+	at knot//net.minecraft.commands.execution.CommandQueueEntry.wrapMethod$zji000$fabric-entity-events-v1$onExecute(CommandQueueEntry.java:549)
+	at knot//net.minecraft.commands.execution.CommandQueueEntry.execute(CommandQueueEntry.java)
+	at knot//net.minecraft.commands.execution.ExecutionContext.runCommandQueue(ExecutionContext.java:106)
+	at knot//net.minecraft.commands.Commands.executeCommandInContext(Commands.java:438)
+	at knot//net.minecraft.commands.Commands.performCommand(Commands.java:370)
+	at knot//net.minecraft.commands.Commands.performPrefixedCommand(Commands.java:356)
+	at knot//net.minecraft.server.dedicated.DedicatedServer.handleConsoleInputs(DedicatedServer.java:412)
+	at knot//net.minecraft.server.dedicated.DedicatedServer.tickConnection(DedicatedServer.java:402)
+	at knot//net.minecraft.server.MinecraftServer.tickChildren(MinecraftServer.java:1127)
+	at knot//net.minecraft.server.MinecraftServer.tickServer(MinecraftServer.java:980)
+	at knot//net.minecraft.server.dedicated.DedicatedServer.tickServer(DedicatedServer.java:278)
+	at knot//net.minecraft.server.MinecraftServer.processPacketsAndTick(MinecraftServer.java:1013)
+	at knot//net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:752)
+	at knot//net.minecraft.server.MinecraftServer.lambda$spin$0(MinecraftServer.java:310)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+Caused by: java.io.EOFException: End of input at line 1 column 20 path $.companies.oops
+	at knot//com.google.gson.stream.JsonReader.nextNonWhitespace(JsonReader.java:1605)
+	at knot//com.google.gson.stream.JsonReader.doPeek(JsonReader.java:646)
+	at knot//com.google.gson.stream.JsonReader.peek(JsonReader.java:545)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:102)
+	at knot//com.google.gson.internal.Streams.parse(Streams.java:48)
+	... 33 more
+[22:43:42] [Server thread/ERROR]: SIFTEC: NOT saving companies because the file could not be read when the world loaded. Fix or restore data/siftec/companies.dat (a copy is kept as companies.dat.broken-*) and restart; changes made now will be lost.
+[22:43:42] [Server thread/INFO]: SELFTEST state codec: tree round trip true (68077 chars as JSON); old string format loads true; unreadable file kept and not overwritten true; claim flags and positions true
+[22:43:42] [Server thread/INFO]: System chat: SELFTEST state codec: tree round trip true (68077 chars as JSON); old string format loads true; unreadable file kept and not overwritten true; claim flags and positions true
+[22:43:42] [Server thread/WARN]: SIFTEC: dropped an unreadable item from backpack slot 1: Unknown registry key in ResourceKey[minecraft:root / minecraft:item]: nosuchmod:thing
+[22:43:42] [Server thread/INFO]: SELFTEST state backpack codec: slots kept true; unreadable item skipped, others in place true; old list format loads true
+[22:43:42] [Server thread/INFO]: System chat: SELFTEST state backpack codec: slots kept true; unreadable item skipped, others in place true; old list format loads true
+[22:43:42] [Server thread/INFO]: SELFTEST state save: companies 72841 chars, claims 161285 chars as JSON (the old one-string limit was 65535)
+[22:43:42] [Server thread/INFO]: System chat: SELFTEST state save: companies 72841 chars, claims 161285 chars as JSON (the old one-string limit was 65535)
+[22:43:44] [Server thread/INFO]: SELFTEST state claims setup: marker A claimed 9, marker B claimed 9
+[22:43:44] [Server thread/INFO]: System chat: SELFTEST state claims setup: marker A claimed 9, marker B claimed 9
+[22:43:45] [Server thread/INFO]: SELFTEST state budget: first HUB claimed 25, second HUB claims nothing; then 4 markers until the budget of 61 chunks was used (61); HUB next to another company's land refused true
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST state budget: first HUB claimed 25, second HUB claims nothing; then 4 markers until the budget of 61 chunks was used (61); HUB next to another company's land refused true
+[22:43:45] [Server thread/INFO]: SELFTEST state spawn: radius 64, spawn in zone true, 300 blocks out in zone false, a marker at spawn claimed 0
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST state spawn: radius 64, spawn in zone true, 300 blocks out in zone false, a marker at spawn claimed 0
+[22:43:45] [Server thread/INFO]: SELFTEST state loading: member online 4 chunks loaded; after the last member left 0; with the real player list 0
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST state loading: member online 4 chunks loaded; after the last member left 0; with the real player list 0
+[22:43:45] [Server thread/INFO]: SELFTEST state kick: by a member false, by the founder true; members 1; multiplier right after 1.5; may rejoin false; 15 parts paid at x2.0 become 8 at x1.0
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST state kick: by a member false, by the founder true; members 1; multiplier right after 1.5; may rejoin false; 15 parts paid at x2.0 become 8 at x1.0
+[22:43:45] [Server thread/INFO]: SELFTEST state check: marker replaced by setblock released its claim true; after an explosion the marker is still there true, its claim true, a block in the claim true
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST state check: marker replaced by setblock released its claim true; after an explosion the marker is still there true, its claim true, a block in the claim true
+[22:43:45] [Server thread/INFO]: SELFTEST state check: HUB removed released its claim true
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST state check: HUB removed released its claim true
+[22:43:45] [Server thread/INFO]: SELFTEST world scan iron: at 155,~,-81 distance 77 on land in 72 ms, 50 biome samples
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST world scan iron: at 155,~,-81 distance 77 on land in 72 ms, 50 biome samples
+[22:43:45] [Server thread/INFO]: SELFTEST world scan copper: at 21,~,98 distance 150 on land in 44 ms, 12 biome samples
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST world scan copper: at 21,~,98 distance 150 on land in 44 ms, 12 biome samples
+[22:43:45] [Server thread/INFO]: SELFTEST world scan limestone: at 195,~,-336 distance 320 on land in 63 ms, 14 biome samples
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST world scan limestone: at 195,~,-336 distance 320 on land in 63 ms, 14 biome samples
+[22:43:45] [Server thread/INFO]: SELFTEST world scan coal: at 90,~,-61 distance 30 on land in 0 ms, 0 biome samples
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST world scan coal: at 90,~,-61 distance 30 on land in 0 ms, 0 biome samples
+[22:43:45] [Server thread/INFO]: SELFTEST world scan zinc: at 415,~,577 distance 687 on land in 373 ms, 110 biome samples
+[22:43:45] [Server thread/INFO]: System chat: SELFTEST world scan zinc: at 415,~,577 distance 687 on land in 373 ms, 110 biome samples
+[22:43:49] [Server thread/INFO]: SELFTEST world scan oil: at 294,~,2354 distance 2394 on land in 3484 ms, 1076 biome samples
+[22:43:49] [Server thread/INFO]: System chat: SELFTEST world scan oil: at 294,~,2354 distance 2394 on land in 3484 ms, 1076 biome samples
+[22:43:49] [Server thread/INFO]: SELFTEST world scan bauxite: at -843,~,-187 distance 952 on land in 0 ms, 0 biome samples
+[22:43:49] [Server thread/INFO]: System chat: SELFTEST world scan bauxite: at -843,~,-187 distance 952 on land in 0 ms, 0 biome samples
+[22:43:49] [Server thread/INFO]: SELFTEST world scan nitrogen: at 477,~,-210 distance 421 on land in 0 ms, 0 biome samples
+[22:43:49] [Server thread/INFO]: System chat: SELFTEST world scan nitrogen: at 477,~,-210 distance 421 on land in 0 ms, 0 biome samples
+[22:43:52] [Server thread/INFO]: SELFTEST world scan sam: at -685,~,-3034 distance 3102 on land in 2699 ms, 880 biome samples
+[22:43:52] [Server thread/INFO]: System chat: SELFTEST world scan sam: at -685,~,-3034 distance 3102 on land in 2699 ms, 880 biome samples
+[22:43:52] [Server thread/INFO]: SELFTEST world scan sulfur: at 1341,13,319 distance 1294 on land in 428 ms, 53238 biome samples
+[22:43:52] [Server thread/INFO]: System chat: SELFTEST world scan sulfur: at 1341,13,319 distance 1294 on land in 428 ms, 53238 biome samples
+[22:43:53] [Server thread/INFO]: SELFTEST world census radius 2000 (961 cells) in 558 ms: 476 nodes {IRON=120, COPPER=119, LIMESTONE=94, COAL=66, ZINC=3, OIL=1, BAUXITE=9, NITROGEN=14, SULFUR=50}; not on land / over water / outside a sulfur cave: 0 []
+[22:43:53] [Server thread/INFO]: System chat: SELFTEST world census radius 2000 (961 cells) in 558 ms: 476 nodes {IRON=120, COPPER=119, LIMESTONE=94, COAL=66, ZINC=3, OIL=1, BAUXITE=9, NITROGEN=14, SULFUR=50}; not on land / over water / outside a sulfur cave: 0 []
+[22:43:53] [Server thread/INFO]: SELFTEST world scanner results checked 73, on land 73
+[22:43:53] [Server thread/INFO]: System chat: SELFTEST world scanner results checked 73, on land 73
+[22:43:53] [Server thread/INFO]: SELFTEST world collectible spots within 1000: 137, on land 137
+[22:43:53] [Server thread/INFO]: System chat: SELFTEST world collectible spots within 1000: 137, on land 137
+[22:43:53] [Server thread/INFO]: SELFTEST world place iron Node[x=155, z=-81, type=IRON, purity=NORMAL, y=-2147483648]: core at 155, 143, -81 on siftec:iron_node_pad, solid under the mound 25/25; pad at y 142: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 1 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:43:53] [Server thread/INFO]: System chat: SELFTEST world place iron Node[x=155, z=-81, type=IRON, purity=NORMAL, y=-2147483648]: core at 155, 143, -81 on siftec:iron_node_pad, solid under the mound 25/25; pad at y 142: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 1 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:43:55] [Server thread/INFO]: SELFTEST world place sulfur Node[x=1341, z=319, type=SULFUR, purity=IMPURE, y=13]: core at 1341, 32, 319 on siftec:sulfur_node_pad, solid under the mound 25/25; pad at y 31: 37/37 sulfur_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node sulfur_node purity impure (map says impure)
+[22:43:55] [Server thread/INFO]: System chat: SELFTEST world place sulfur Node[x=1341, z=319, type=SULFUR, purity=IMPURE, y=13]: core at 1341, 32, 319 on siftec:sulfur_node_pad, solid under the mound 25/25; pad at y 31: 37/37 sulfur_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node sulfur_node purity impure (map says impure)
+[22:43:56] [Server thread/INFO]: SELFTEST world place quartz Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648]: core at 218, 91, 154 on siftec:quartz_node_pad, solid under the mound 25/25; pad at y 90: 37/37 quartz_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node quartz_node purity impure (map says impure)
+[22:43:56] [Server thread/INFO]: System chat: SELFTEST world place quartz Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648]: core at 218, 91, 154 on siftec:quartz_node_pad, solid under the mound 25/25; pad at y 90: 37/37 quartz_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node quartz_node purity impure (map says impure)
+[22:43:57] [Server thread/INFO]: SELFTEST world pad coal normal at 90,-61: pad at y 126: 37/37 coal_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node coal_node purity normal (map says normal)
+[22:43:57] [Server thread/INFO]: System chat: SELFTEST world pad coal normal at 90,-61: pad at y 126: 37/37 coal_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node coal_node purity normal (map says normal)
+[22:43:58] [Server thread/INFO]: SELFTEST world pad iron impure at -47,-227: pad at y 62: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 252 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity impure (map says impure)
+[22:43:58] [Server thread/INFO]: System chat: SELFTEST world pad iron impure at -47,-227: pad at y 62: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 252 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity impure (map says impure)
+[22:43:58] [Server thread/INFO]: SELFTEST world pad iron pure at 88,-159: pad at y 114: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 28 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity pure (map says pure)
+[22:43:58] [Server thread/INFO]: System chat: SELFTEST world pad iron pure at 88,-159: pad at y 114: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 28 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity pure (map says pure)
+[22:43:58] [Server thread/INFO]: SELFTEST world pad copper normal at 21,98: pad at y 62: 37/37 copper_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 810 fill blocks under it, 3 solid blocks in the 4 above it; node copper_node purity normal (map says normal)
+[22:43:58] [Server thread/INFO]: System chat: SELFTEST world pad copper normal at 21,98: pad at y 62: 37/37 copper_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 810 fill blocks under it, 3 solid blocks in the 4 above it; node copper_node purity normal (map says normal)
+[22:44:00] [Server thread/INFO]: SELFTEST world pad iron normal at 152,-209: pad at y 150: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 21 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:44:00] [Server thread/INFO]: System chat: SELFTEST world pad iron normal at 152,-209: pad at y 150: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 21 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:44:00] [Server thread/INFO]: SELFTEST world pad iron normal at 155,-81: pad at y 142: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 1 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:44:00] [Server thread/INFO]: System chat: SELFTEST world pad iron normal at 155,-81: pad at y 142: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 1 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:44:01] [Server thread/INFO]: SELFTEST world pad iron impure at 230,76: pad at y 119: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 6 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity impure (map says impure)
+[22:44:01] [Server thread/INFO]: System chat: SELFTEST world pad iron impure at 230,76: pad at y 119: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 6 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity impure (map says impure)
+[22:44:02] [Server thread/INFO]: SELFTEST world pad coal impure at -32,-332: pad at y 68: 37/37 coal_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node coal_node purity impure (map says impure)
+[22:44:02] [Server thread/INFO]: System chat: SELFTEST world pad coal impure at -32,-332: pad at y 68: 37/37 coal_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node coal_node purity impure (map says impure)
+[22:44:04] [Server thread/INFO]: SELFTEST world pad limestone normal at 195,-336: pad at y 189: 37/37 limestone_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 19 fill blocks under it, 0 solid blocks in the 4 above it; node limestone_node purity normal (map says normal)
+[22:44:04] [Server thread/INFO]: System chat: SELFTEST world pad limestone normal at 195,-336: pad at y 189: 37/37 limestone_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 19 fill blocks under it, 0 solid blocks in the 4 above it; node limestone_node purity normal (map says normal)
+[22:44:05] [Server thread/INFO]: SELFTEST world pad copper normal at 315,-337: pad at y 152: 37/37 copper_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 21 fill blocks under it, 0 solid blocks in the 4 above it; node copper_node purity normal (map says normal)
+[22:44:05] [Server thread/INFO]: System chat: SELFTEST world pad copper normal at 315,-337: pad at y 152: 37/37 copper_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 21 fill blocks under it, 0 solid blocks in the 4 above it; node copper_node purity normal (map says normal)
+[22:44:06] [Server thread/INFO]: SELFTEST world pad iron normal at 321,-35: pad at y 163: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:44:06] [Server thread/INFO]: System chat: SELFTEST world pad iron normal at 321,-35: pad at y 163: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:44:07] [Server thread/INFO]: SELFTEST world pad copper impure at 337,81: pad at y 90: 37/37 copper_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 45 fill blocks under it, 0 solid blocks in the 4 above it; node copper_node purity impure (map says impure)
+[22:44:07] [Server thread/INFO]: System chat: SELFTEST world pad copper impure at 337,81: pad at y 90: 37/37 copper_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 45 fill blocks under it, 0 solid blocks in the 4 above it; node copper_node purity impure (map says impure)
+[22:44:07] [Server thread/INFO]: SELFTEST world pads: 12 nodes placed in 10626 ms
+[22:44:07] [Server thread/INFO]: System chat: SELFTEST world pads: 12 nodes placed in 10626 ms
+[22:44:07] [Server thread/INFO]: SELFTEST world unbreakable siftec:coal_node_pad at 93, 126, -61: hardness -1.0, blast resistance 3600000.0, piston IMMOVEABLE (immovable), create:non_movable true, node in create:non_movable true, Create drill could break pad false / node false; survival player on coal_node_pad: progress per tick 0.0, still there true; survival player on coal_node: progress per tick 0.0, still there true; survival player on dirt: progress per tick 0.013333334, still there true; two power-6 explosions: pad blocks 37 -> 37, node still there true
+[22:44:07] [Server thread/INFO]: System chat: SELFTEST world unbreakable siftec:coal_node_pad at 93, 126, -61: hardness -1.0, blast resistance 3600000.0, piston IMMOVEABLE (immovable), create:non_movable true, node in create:non_movable true, Create drill could break pad false / node false; survival player on coal_node_pad: progress per tick 0.0, still there true; survival player on coal_node: progress per tick 0.0, still there true; survival player on dirt: progress per tick 0.013333334, still there true; two power-6 explosions: pad blocks 37 -> 37, node still there true
+[22:44:07] [Server thread/INFO]: SELFTEST world miners: nodes {IMPURE=Node[x=218, z=277, type=COAL, purity=IMPURE, y=-2147483648], NORMAL=Node[x=-352, z=-481, type=COAL, purity=NORMAL, y=-2147483648], PURE=Node[x=193, z=-748, type=LIMESTONE, purity=PURE, y=-2147483648]}
+[22:44:07] [Server thread/INFO]: System chat: SELFTEST world miners: nodes {IMPURE=Node[x=218, z=277, type=COAL, purity=IMPURE, y=-2147483648], NORMAL=Node[x=-352, z=-481, type=COAL, purity=NORMAL, y=-2147483648], PURE=Node[x=193, z=-748, type=LIMESTONE, purity=PURE, y=-2147483648]}
+[22:44:12] [Server thread/INFO]: SELFTEST world showroom: 11 node types x 3 purities and 3 miners at y 200 from 46, 200, 16
+[22:44:12] [Server thread/INFO]: System chat: SELFTEST world showroom: 11 node types x 3 purities and 3 miners at y 200 from 46, 200, 16
+[22:44:12] [Server thread/INFO]: System chat: The nearest minecraft:sulfur_caves is at [1152, 17, 768] (1330 blocks away)
+[22:44:12] [Server thread/INFO]: Locating element minecraft:sulfur_caves took 52 ms
+[22:44:14] [Server thread/INFO]: SELFTEST world geysers survey x -404..596 z -532..468 (1.00 km2): 4096 chunks, 0 with sulfur caves below (biome sampled in 1893 ms), 0 chunks generated and searched in 1 ms; potent sulfur 0 (0 inside the area, 0.0 per 1000x1000), periodic geysers (magma under, water over) 0; kinds {}; nearest periodic to spawn none; first: []
+[22:44:14] [Server thread/INFO]: System chat: SELFTEST world geysers survey x -404..596 z -532..468 (1.00 km2): 4096 chunks, 0 with sulfur caves below (biome sampled in 1893 ms), 0 chunks generated and searched in 1 ms; potent sulfur 0 (0 inside the area, 0.0 per 1000x1000), periodic geysers (magma under, water over) 0; kinds {}; nearest periodic to spawn none; first: []
+[22:44:25] [Server thread/INFO]: SELFTEST world geysers survey x 896..1896 z -232..768 (1.00 km2): 4032 chunks, 154 with sulfur caves below (biome sampled in 1974 ms), 279 chunks generated and searched in 9705 ms; potent sulfur 61 (34 inside the area, 34.0 per 1000x1000), periodic geysers (magma under, water over) 0; kinds {wet/over cinnabar/water/covered=4, wet/over deepslate/water/covered=16, wet/over deepslate_gold_ore/water/covered=1, wet/over stone/water/covered=1, wet/over sulfur/water/covered=39}; nearest periodic to spawn none; first: [1240, -3, 720 wet over deepslate water 1 covered sulfur_caves 1369m, 1241, 3, 736 wet over deepslate water 1 covered sulfur_caves 1379m, 1260, -16, 711 wet over sulfur water 2 covered sulfur_caves 1381m, 1257, 1, 740 wet over deepslate water 2 covered sulfur_caves 1394m, 1270, -6, 733 wet over sulfur water 1 covered sulfur_caves 1401m, 1266, -51, 777 wet over deepslate water 2 covered frozen_ocean 1422m, 1279, -49, 778 wet over deepslate water 1 covered frozen_ocean 1434m, 1276, -34, 768 wet over sulfur water 2 covered sulfur_caves 1426m, 1280, -50, 771 wet over deepslate water 2 covered frozen_ocean 1431m, 1280, -50, 782 wet over deepslate water 2 covered frozen_ocean 1437m, 1295, -9, 772 wet over sulfur water 1 covered sulfur_caves 1444m, 1277, -49, 786 wet over deepslate water 1 covered frozen_ocean 1437m, 1269, -25, 788 wet over sulfur water 2 covered sulfur_caves 1431m, 1291, -37, 787 wet over sulfur water 2 covered sulfur_caves 1449m]
+[22:44:25] [Server thread/INFO]: System chat: SELFTEST world geysers survey x 896..1896 z -232..768 (1.00 km2): 4032 chunks, 154 with sulfur caves below (biome sampled in 1974 ms), 279 chunks generated and searched in 9705 ms; potent sulfur 61 (34 inside the area, 34.0 per 1000x1000), periodic geysers (magma under, water over) 0; kinds {wet/over cinnabar/water/covered=4, wet/over deepslate/water/covered=16, wet/over deepslate_gold_ore/water/covered=1, wet/over stone/water/covered=1, wet/over sulfur/water/covered=39}; nearest periodic to spawn none; first: [1240, -3, 720 wet over deepslate water 1 covered sulfur_caves 1369m, 1241, 3, 736 wet over deepslate water 1 covered sulfur_caves 1379m, 1260, -16, 711 wet over sulfur water 2 covered sulfur_caves 1381m, 1257, 1, 740 wet over deepslate water 2 covered sulfur_caves 1394m, 1270, -6, 733 wet over sulfur water 1 covered sulfur_caves 1401m, 1266, -51, 777 wet over deepslate water 2 covered frozen_ocean 1422m, 1279, -49, 778 wet over deepslate water 1 covered frozen_ocean 1434m, 1276, -34, 768 wet over sulfur water 2 covered sulfur_caves 1426m, 1280, -50, 771 wet over deepslate water 2 covered frozen_ocean 1431m, 1280, -50, 782 wet over deepslate water 2 covered frozen_ocean 1437m, 1295, -9, 772 wet over sulfur water 1 covered sulfur_caves 1444m, 1277, -49, 786 wet over deepslate water 1 covered frozen_ocean 1437m, 1269, -25, 788 wet over sulfur water 2 covered sulfur_caves 1431m, 1291, -37, 787 wet over sulfur water 2 covered sulfur_caves 1449m]
+[22:44:32] [Server thread/INFO]: SELFTEST world geysers survey x -1904..-904 z -2032..-1032 (1.00 km2): 3969 chunks, 75 with sulfur caves below (biome sampled in 2111 ms), 121 chunks generated and searched in 4365 ms; potent sulfur 28 (27 inside the area, 27.0 per 1000x1000), periodic geysers (magma under, water over) 2; kinds {dormant/over magma_block/water/open sky=1, wet/over andesite/water/covered=1, wet/over cinnabar/water/covered=2, wet/over deepslate/water/covered=7, wet/over gravel/water/covered=1, wet/over magma_block/water/covered=1, wet/over sulfur/water/covered=13, wet/over tuff/water/covered=2}; nearest periodic to spawn -1416, 69, -1127 (1867m); first: [-1454, -10, -1138 wet over deepslate water 1 covered forest 1904m, -1451, 4, -1140 wet over sulfur water 1 covered sulfur_caves 1903m, -1416, 69, -1127 dormant over magma_block water 1 open forest 1867m, -1483, -6, -1137 wet over deepslate water 2 covered sulfur_caves 1927m, -1500, 16, -1094 wet over sulfur water 2 covered sulfur_caves 1917m, -1477, -5, -1105 wet over sulfur water 1 covered sulfur_caves 1904m, -1479, 21, -1110 wet over sulfur water 1 covered sulfur_caves 1909m, -1463, -6, -1120 wet over cinnabar water 1 covered sulfur_caves 1901m, -1470, -5, -1105 wet over sulfur water 1 covered sulfur_caves 1898m, -1463, 16, -1108 wet over sulfur water 2 covered sulfur_caves 1894m, -1463, -5, -1101 wet over cinnabar water 1 covered sulfur_caves 1890m, -1470, 25, -1090 wet over sulfur water 2 covered sulfur_caves 1890m, -1464, 28, -1099 wet over magma_block water 2 covered sulfur_caves 1890m, -1467, -9, -1077 wet over deepslate water 1 covered forest 1880m]
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST world geysers survey x -1904..-904 z -2032..-1032 (1.00 km2): 3969 chunks, 75 with sulfur caves below (biome sampled in 2111 ms), 121 chunks generated and searched in 4365 ms; potent sulfur 28 (27 inside the area, 27.0 per 1000x1000), periodic geysers (magma under, water over) 2; kinds {dormant/over magma_block/water/open sky=1, wet/over andesite/water/covered=1, wet/over cinnabar/water/covered=2, wet/over deepslate/water/covered=7, wet/over gravel/water/covered=1, wet/over magma_block/water/covered=1, wet/over sulfur/water/covered=13, wet/over tuff/water/covered=2}; nearest periodic to spawn -1416, 69, -1127 (1867m); first: [-1454, -10, -1138 wet over deepslate water 1 covered forest 1904m, -1451, 4, -1140 wet over sulfur water 1 covered sulfur_caves 1903m, -1416, 69, -1127 dormant over magma_block water 1 open forest 1867m, -1483, -6, -1137 wet over deepslate water 2 covered sulfur_caves 1927m, -1500, 16, -1094 wet over sulfur water 2 covered sulfur_caves 1917m, -1477, -5, -1105 wet over sulfur water 1 covered sulfur_caves 1904m, -1479, 21, -1110 wet over sulfur water 1 covered sulfur_caves 1909m, -1463, -6, -1120 wet over cinnabar water 1 covered sulfur_caves 1901m, -1470, -5, -1105 wet over sulfur water 1 covered sulfur_caves 1898m, -1463, 16, -1108 wet over sulfur water 2 covered sulfur_caves 1894m, -1463, -5, -1101 wet over cinnabar water 1 covered sulfur_caves 1890m, -1470, 25, -1090 wet over sulfur water 2 covered sulfur_caves 1890m, -1464, 28, -1099 wet over magma_block water 2 covered sulfur_caves 1890m, -1467, -9, -1077 wet over deepslate water 1 covered forest 1880m]
+[22:44:32] [Server thread/INFO]: SELFTEST world geyser 120, 163, -56: state dormant, water 1 deep; an engine right on the water would be refused: true; engine found the vent: true; watching 160 s; engine block Block{siftec:geyser_engine}[facing=north] entity com.meakaandre.siftec.geyser.GeyserEngineBlockEntity@48f20a7d sees vent 120, 163, -56 gas escapes true state dormant, armed false, erupt ticks 0, running false, speed 0.0, acid 0
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST world geyser 120, 163, -56: state dormant, water 1 deep; an engine right on the water would be refused: true; engine found the vent: true; watching 160 s; engine block Block{siftec:geyser_engine}[facing=north] entity com.meakaandre.siftec.geyser.GeyserEngineBlockEntity@48f20a7d sees vent 120, 163, -56 gas escapes true state dormant, armed false, erupt ticks 0, running false, speed 0.0, acid 0
+[22:44:32] [Server thread/INFO]: SELFTEST world geyser natural: the nearest periodic geyser the surveys found, at -1416, 69, -1127, 1867 blocks from spawn
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST world geyser natural: the nearest periodic geyser the surveys found, at -1416, 69, -1127, 1867 blocks from spawn
+[22:44:32] [Server thread/INFO]: SELFTEST world geyser -1416, 69, -1127: state dormant, water 1 deep; an engine right on the water would be refused: true; engine found the vent: true; watching 160 s; engine block Block{siftec:geyser_engine}[facing=north] entity com.meakaandre.siftec.geyser.GeyserEngineBlockEntity@1977c28a sees vent -1416, 69, -1127 gas escapes true state dormant, armed false, erupt ticks 0, running false, speed 0.0, acid 0
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST world geyser -1416, 69, -1127: state dormant, water 1 deep; an engine right on the water would be refused: true; engine found the vent: true; watching 160 s; engine block Block{siftec:geyser_engine}[facing=north] entity com.meakaandre.siftec.geyser.GeyserEngineBlockEntity@1977c28a sees vent -1416, 69, -1127 gas escapes true state dormant, armed false, erupt ticks 0, running false, speed 0.0, acid 0
+[22:44:32] [Server thread/INFO]: SELFTEST world geyser wet: vent 1150, 12, 755 was wet over sulfur; with a magma block put under it, it is dormant
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST world geyser wet: vent 1150, 12, 755 was wet over sulfur; with a magma block put under it, it is dormant
+[22:44:32] [Server thread/INFO]: SELFTEST world geyser 1150, 12, 755: state dormant, water 1 deep; an engine right on the water would be refused: true; engine found the vent: true; watching 160 s; engine block Block{siftec:geyser_engine}[facing=north] entity com.meakaandre.siftec.geyser.GeyserEngineBlockEntity@276f378 sees vent 1150, 12, 755 gas escapes true state dormant, armed false, erupt ticks 0, running false, speed 0.0, acid 0
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST world geyser 1150, 12, 755: state dormant, water 1 deep; an engine right on the water would be refused: true; engine found the vent: true; watching 160 s; engine block Block{siftec:geyser_engine}[facing=north] entity com.meakaandre.siftec.geyser.GeyserEngineBlockEntity@276f378 sees vent 1150, 12, 755 gas escapes true state dormant, armed false, erupt ticks 0, running false, speed 0.0, acid 0
+[22:44:32] [Server thread/INFO]: SELFTEST world processor converter recipe [Cost[key=siftec:aluminum_ingot, count=4], Cost[key=siftec:reanimated_sam, count=2]]: plentiful ingredient took 5 slots, the other 4; ready to run: true
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST world processor converter recipe [Cost[key=siftec:aluminum_ingot, count=4], Cost[key=siftec:reanimated_sam, count=2]]: plentiful ingredient took 5 slots, the other 4; ready to run: true
+[22:44:32] [Server thread/INFO]: SELFTEST automate machines unlocked company: press on Cable -> [1 siftec:power_line], crafter on the Portable Miner grid -> 1 siftec:portable_miner; locked company: press on Cable -> refused, crafter on the Portable Miner grid -> refused
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST automate machines unlocked company: press on Cable -> [1 siftec:power_line], crafter on the Portable Miner grid -> 1 siftec:portable_miner; locked company: press on Cable -> refused, crafter on the Portable Miner grid -> refused
+[22:44:32] [Server thread/INFO]: SELFTEST automate assembly siftec:gateway_coil: unlocked company: 1 siftec:gateway_coil after 60 steps from 61 parts; locked company: refused at step 1 of 60
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST automate assembly siftec:gateway_coil: unlocked company: 1 siftec:gateway_coil after 60 steps from 61 parts; locked company: refused at step 1 of 60
+[22:44:32] [Server thread/INFO]: SELFTEST automate assembly siftec:wormhole_gateway: unlocked company: 1 siftec:wormhole_gateway after 48 steps from 49 parts; locked company: refused at step 1 of 48
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST automate assembly siftec:wormhole_gateway: unlocked company: 1 siftec:wormhole_gateway after 48 steps from 49 parts; locked company: refused at step 1 of 48
+[22:44:32] [Server thread/INFO]: SELFTEST automate crafter siftec:accelerator_segment (5 by 5, 21 parts): unlocked company: 1 siftec:accelerator_segment; locked company: refused
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST automate crafter siftec:accelerator_segment (5 by 5, 21 parts): unlocked company: 1 siftec:accelerator_segment; locked company: refused
+[22:44:32] [Server thread/INFO]: SELFTEST automate crafter siftec:particle_accelerator (4 by 4, 15 parts): unlocked company: 1 siftec:particle_accelerator; locked company: refused
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST automate crafter siftec:particle_accelerator (4 by 4, 15 parts): unlocked company: 1 siftec:particle_accelerator; locked company: refused
+[22:44:32] [Server thread/INFO]: SELFTEST automate workshop: loaded 5 items from the old save; takes items from belts: false; gave back true (4 Wire, 1 Node Scanner); left 0
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST automate workshop: loaded 5 items from the old save; takes items from belts: false; gave back true (4 Wire, 1 Node Scanner); left 0
+[22:44:32] [Server thread/INFO]: SELFTEST automate poles: uses [Success[swingSource=PREDICTED, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], Success[swingSource=PREDICTED, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]]]; lines left in hand 1; first pole [BlockPos{x=10, y=0, z=0}], pole 10 east [BlockPos{x=-10, y=0, z=0}], pole 40 east [] (fake player counts as a machine: true)
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST automate poles: uses [Success[swingSource=PREDICTED, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], Success[swingSource=PREDICTED, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]]]; lines left in hand 1; first pole [BlockPos{x=10, y=0, z=0}], pole 10 east [BlockPos{x=-10, y=0, z=0}], pole 40 east [] (fake player counts as a machine: true)
+[22:44:32] [Server thread/INFO]: SELFTEST automate deployer: lines left in the Deployer 2; pole in front [BlockPos{x=12, y=0, z=0}], pole 12 further [BlockPos{x=-12, y=0, z=0}]
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST automate deployer: lines left in the Deployer 2; pole in front [BlockPos{x=12, y=0, z=0}], pole 12 further [BlockPos{x=-12, y=0, z=0}]
+[22:44:32] [Server thread/INFO]: SELFTEST world furnace: a blueprint keeps a burning furnace as lit=false
+[22:44:32] [Server thread/INFO]: System chat: SELFTEST world furnace: a blueprint keeps a burning furnace as lit=false
+[22:44:33] [Server thread/INFO]: SELFTEST world powerline setup: towers at 120, 155, -8 and 360, 155, -8
+[22:44:33] [Server thread/INFO]: System chat: SELFTEST world powerline setup: towers at 120, 155, -8 and 360, 155, -8
+[22:44:37] [Server thread/INFO]: SELFTEST world powerchain setup: towers [160, 200, 368, 360, 200, 368, 560, 200, 368, 760, 200, 368, 960, 200, 368, 560, 200, 568] (a branch from the middle one); motor under the first, fans under the far end and the branch end
+[22:44:37] [Server thread/INFO]: System chat: SELFTEST world powerchain setup: towers [160, 200, 368, 360, 200, 368, 560, 200, 368, 760, 200, 368, 960, 200, 368, 560, 200, 568] (a branch from the middle one); motor under the first, fans under the far end and the branch end
+[22:44:37] [Server thread/INFO]: SELFTEST world furnace: engine on a furnace that shows flames with no fuel gives 0.0 SU (furnace lit=true); engines on one burning furnace: 0.0 0.0 0.0 -> 0 running
+[22:44:37] [Server thread/INFO]: System chat: SELFTEST world furnace: engine on a furnace that shows flames with no fuel gives 0.0 SU (furnace lit=true); engines on one burning furnace: 0.0 0.0 0.0 -> 0 running
+[22:44:37] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 60255ms or 1205 ticks behind
+[22:44:41] [Server thread/INFO]: SELFTEST world powerchain all loaded: far fan 16.0 RPM, branch fan 16.0 RPM; same network as the motor true; far fan's network capacity 262144 SU, stress 64 SU; the motor offers 16384.0 SU/RPM at 16.0 RPM; last tower takes its rotation from 760, 200, 368
+[22:44:41] [Server thread/INFO]: System chat: SELFTEST world powerchain all loaded: far fan 16.0 RPM, branch fan 16.0 RPM; same network as the motor true; far fan's network capacity 262144 SU, stress 64 SU; the motor offers 16384.0 SU/RPM at 16.0 RPM; last tower takes its rotation from 760, 200, 368
+[22:44:41] [Server thread/INFO]: SELFTEST world powerchain middle unloaded true (after 0 s): [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[22:44:41] [Server thread/INFO]: System chat: SELFTEST world powerchain middle unloaded true (after 0 s): [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[22:44:41] [Server thread/INFO]: SELFTEST world powerchain step 1: motor at 16 RPM: far fan 16.0 RPM, branch fan 16.0 RPM; same network as the motor true; far fan's network capacity 262144 SU, stress 64 SU; the motor offers 16384.0 SU/RPM at 16.0 RPM; last tower takes its rotation from 560, 200, 568; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[22:44:41] [Server thread/INFO]: System chat: SELFTEST world powerchain step 1: motor at 16 RPM: far fan 16.0 RPM, branch fan 16.0 RPM; same network as the motor true; far fan's network capacity 262144 SU, stress 64 SU; the motor offers 16384.0 SU/RPM at 16.0 RPM; last tower takes its rotation from 560, 200, 568; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[22:44:42] [Server thread/INFO]: SELFTEST world powerchain step 2: motor set to 24 RPM: far fan 24.0 RPM, branch fan 24.0 RPM
+[22:44:42] [Server thread/INFO]: System chat: SELFTEST world powerchain step 2: motor set to 24 RPM: far fan 24.0 RPM, branch fan 24.0 RPM
+[22:44:44] [Server thread/INFO]: SELFTEST world powerchain step 3: motor reversed to -16 RPM: far fan -16.0 RPM, branch fan -16.0 RPM
+[22:44:44] [Server thread/INFO]: System chat: SELFTEST world powerchain step 3: motor reversed to -16 RPM: far fan -16.0 RPM, branch fan -16.0 RPM
+[22:44:45] [Server thread/INFO]: SELFTEST world powerchain step 4: motor stopped: far fan 0.0 RPM, branch fan 0.0 RPM
+[22:44:45] [Server thread/INFO]: System chat: SELFTEST world powerchain step 4: motor stopped: far fan 0.0 RPM, branch fan 0.0 RPM
+[22:44:47] [Server thread/INFO]: SELFTEST world powerchain step 5: motor started at 16 RPM again: far fan 16.0 RPM, branch fan 16.0 RPM; same network as the motor true; far fan's network capacity 262144 SU, stress 64 SU; the motor offers 16384.0 SU/RPM at 16.0 RPM; last tower takes its rotation from 560, 200, 568
+[22:44:47] [Server thread/INFO]: System chat: SELFTEST world powerchain step 5: motor started at 16 RPM again: far fan 16.0 RPM, branch fan 16.0 RPM; same network as the motor true; far fan's network capacity 262144 SU, stress 64 SU; the motor offers 16384.0 SU/RPM at 16.0 RPM; last tower takes its rotation from 560, 200, 568
+[22:44:48] [Server thread/INFO]: SELFTEST world miner MK1 on impure coal at 218, 64, 277: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 2 coal (0.40 a cycle; expected 0.5, fractions carry over), 125 mB Water used (25.0 a cycle), stress 16 SU per RPM = 1024 SU, status drilling, overstressed false
+[22:44:48] [Server thread/INFO]: System chat: SELFTEST world miner MK1 on impure coal at 218, 64, 277: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 2 coal (0.40 a cycle; expected 0.5, fractions carry over), 125 mB Water used (25.0 a cycle), stress 16 SU per RPM = 1024 SU, status drilling, overstressed false
+[22:44:48] [Server thread/INFO]: SELFTEST world miner MK1 on normal coal at -352, 95, -481: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 5 coal (1.00 a cycle; expected 1.0, fractions carry over), 125 mB Water used (25.0 a cycle), stress 16 SU per RPM = 1024 SU, status drilling, overstressed false
+[22:44:48] [Server thread/INFO]: System chat: SELFTEST world miner MK1 on normal coal at -352, 95, -481: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 5 coal (1.00 a cycle; expected 1.0, fractions carry over), 125 mB Water used (25.0 a cycle), stress 16 SU per RPM = 1024 SU, status drilling, overstressed false
+[22:44:48] [Server thread/INFO]: SELFTEST world miner MK1 on pure limestone at 193, 89, -748: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 10 limestone (2.00 a cycle; expected 2.0, fractions carry over), 125 mB Water used (25.0 a cycle), stress 16 SU per RPM = 1024 SU, status drilling, overstressed false
+[22:44:48] [Server thread/INFO]: System chat: SELFTEST world miner MK1 on pure limestone at 193, 89, -748: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 10 limestone (2.00 a cycle; expected 2.0, fractions carry over), 125 mB Water used (25.0 a cycle), stress 16 SU per RPM = 1024 SU, status drilling, overstressed false
+[22:44:48] [Server thread/INFO]: SELFTEST world powerchain step 6: motor weakened to 1 SU/RPM (two fans need 2 each): far fan 0.0 RPM OVERSTRESSED, branch fan 0.0 RPM OVERSTRESSED; motor overstressed true; same network as the motor true; far fan's network capacity 16 SU, stress 64 SU; the motor offers 1.0 SU/RPM at 0.0 RPM; last tower takes its rotation from 560, 200, 568
+[22:44:48] [Server thread/INFO]: System chat: SELFTEST world powerchain step 6: motor weakened to 1 SU/RPM (two fans need 2 each): far fan 0.0 RPM OVERSTRESSED, branch fan 0.0 RPM OVERSTRESSED; motor overstressed true; same network as the motor true; far fan's network capacity 16 SU, stress 64 SU; the motor offers 1.0 SU/RPM at 0.0 RPM; last tower takes its rotation from 560, 200, 568
+[22:44:48] [Server thread/INFO]: SELFTEST world powerline check: far chunk unloaded first true (after 0 s); five starts and stops of a source under the near tower (it turned at up to 16.0 RPM) loaded the far chunk 0 times (chunk loads in all meanwhile: 0)
+[22:44:48] [Server thread/INFO]: System chat: SELFTEST world powerline check: far chunk unloaded first true (after 0 s); five starts and stops of a source under the near tower (it turned at up to 16.0 RPM) loaded the far chunk 0 times (chunk loads in all meanwhile: 0)
+[22:44:50] [Server thread/INFO]: SELFTEST world powerchain step 7: motor back to full strength: far fan 16.0 RPM, branch fan 16.0 RPM; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]; loads of the middle chunks during all this {98784247830=0, 98784247843=0, 98784247855=0} (chunk loads anywhere meanwhile, other tests included: 0); map of lines 10 poles, 7 lines
+[22:44:50] [Server thread/INFO]: System chat: SELFTEST world powerchain step 7: motor back to full strength: far fan 16.0 RPM, branch fan 16.0 RPM; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]; loads of the middle chunks during all this {98784247830=0, 98784247843=0, 98784247855=0} (chunk loads anywhere meanwhile, other tests included: 0); map of lines 10 poles, 7 lines
+[22:44:59] [Server thread/INFO]: SELFTEST world miner MK2 on impure coal at 218, 64, 277: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 5 coal (1.00 a cycle; expected 1.0, fractions carry over), 125 mB Drilling Mud used (25.0 a cycle), stress 64 SU per RPM = 4096 SU, status drilling, overstressed false
+[22:44:59] [Server thread/INFO]: System chat: SELFTEST world miner MK2 on impure coal at 218, 64, 277: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 5 coal (1.00 a cycle; expected 1.0, fractions carry over), 125 mB Drilling Mud used (25.0 a cycle), stress 64 SU per RPM = 4096 SU, status drilling, overstressed false
+[22:44:59] [Server thread/INFO]: SELFTEST world miner MK2 on normal coal at -352, 95, -481: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 10 coal (2.00 a cycle; expected 2.0, fractions carry over), 125 mB Drilling Mud used (25.0 a cycle), stress 64 SU per RPM = 4096 SU, status drilling, overstressed false
+[22:44:59] [Server thread/INFO]: System chat: SELFTEST world miner MK2 on normal coal at -352, 95, -481: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 10 coal (2.00 a cycle; expected 2.0, fractions carry over), 125 mB Drilling Mud used (25.0 a cycle), stress 64 SU per RPM = 4096 SU, status drilling, overstressed false
+[22:44:59] [Server thread/INFO]: SELFTEST world miner MK2 on pure limestone at 193, 89, -748: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 20 limestone (4.00 a cycle; expected 4.0, fractions carry over), 125 mB Drilling Mud used (25.0 a cycle), stress 64 SU per RPM = 4096 SU, status drilling, overstressed false
+[22:44:59] [Server thread/INFO]: System chat: SELFTEST world miner MK2 on pure limestone at 193, 89, -748: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 20 limestone (4.00 a cycle; expected 4.0, fractions carry over), 125 mB Drilling Mud used (25.0 a cycle), stress 64 SU per RPM = 4096 SU, status drilling, overstressed false
+[22:45:10] [Server thread/INFO]: SELFTEST world miner MK3 on impure coal at 218, 64, 277: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 10 coal (2.00 a cycle; expected 2.0, fractions carry over), 125 mB Coolant used (25.0 a cycle), stress 192 SU per RPM = 12288 SU, status drilling, overstressed false
+[22:45:10] [Server thread/INFO]: System chat: SELFTEST world miner MK3 on impure coal at 218, 64, 277: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 10 coal (2.00 a cycle; expected 2.0, fractions carry over), 125 mB Coolant used (25.0 a cycle), stress 192 SU per RPM = 12288 SU, status drilling, overstressed false
+[22:45:10] [Server thread/INFO]: SELFTEST world miner MK3 on normal coal at -352, 95, -481: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 20 coal (4.00 a cycle; expected 4.0, fractions carry over), 125 mB Coolant used (25.0 a cycle), stress 192 SU per RPM = 12288 SU, status drilling, overstressed false
+[22:45:10] [Server thread/INFO]: System chat: SELFTEST world miner MK3 on normal coal at -352, 95, -481: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 20 coal (4.00 a cycle; expected 4.0, fractions carry over), 125 mB Coolant used (25.0 a cycle), stress 192 SU per RPM = 12288 SU, status drilling, overstressed false
+[22:45:10] [Server thread/INFO]: SELFTEST world miner MK3 on pure limestone at 193, 89, -748: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 40 limestone (8.00 a cycle; expected 8.0, fractions carry over), 125 mB Coolant used (25.0 a cycle), stress 192 SU per RPM = 12288 SU, status drilling, overstressed false
+[22:45:10] [Server thread/INFO]: System chat: SELFTEST world miner MK3 on pure limestone at 193, 89, -748: 64 RPM, 5 cycles in 200 ticks (40.0 ticks a cycle), 40 limestone (8.00 a cycle; expected 8.0, fractions carry over), 125 mB Coolant used (25.0 a cycle), stress 192 SU per RPM = 12288 SU, status drilling, overstressed false
+[22:45:13] [Server thread/INFO]: SELFTEST world miner freeze impure at 218, 64, 277: MK1 fluid 975 mB, progress 1920.0, output 0 minecraft:air
+[22:45:13] [Server thread/INFO]: System chat: SELFTEST world miner freeze impure at 218, 64, 277: MK1 fluid 975 mB, progress 1920.0, output 0 minecraft:air
+[22:45:13] [Server thread/INFO]: SELFTEST world miner freeze normal at -352, 95, -481: MK2 fluid 975 mB, progress 1920.0, output 2 minecraft:coal
+[22:45:13] [Server thread/INFO]: System chat: SELFTEST world miner freeze normal at -352, 95, -481: MK2 fluid 975 mB, progress 1920.0, output 2 minecraft:coal
+[22:45:13] [Server thread/INFO]: SELFTEST world miner freeze pure at 193, 89, -748: MK3 fluid 975 mB, progress 1920.0, output 8 create:limestone
+[22:45:13] [Server thread/INFO]: System chat: SELFTEST world miner freeze pure at 193, 89, -748: MK3 fluid 975 mB, progress 1920.0, output 8 create:limestone
+[22:47:17] [Server thread/INFO]: SELFTEST world geyser 120, 163, -56 after 160 s (chunk ticking after 0 s): 4 eruptions, gaps [38.0, 46.0, 38.0] s (min 38.0, max 46.0, all within 20-70: true); engine ran 80 ticks during eruptions and 0 outside; SU-seconds per eruption [32768.0, 32768.0, 32768.0, 32768.0]; storage on top banked 29901 SU-s, mode 2; engine half a second into eruptions: [vent 120, 163, -56 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 0, vent 120, 163, -56 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 50, vent 120, 163, -56 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 100]; engine block now Block{siftec:geyser_engine}[facing=north] sees vent 120, 163, -56 gas escapes true state dormant, armed true, erupt ticks 0, running false, speed 32.0, acid 200
+[22:47:17] [Server thread/INFO]: System chat: SELFTEST world geyser 120, 163, -56 after 160 s (chunk ticking after 0 s): 4 eruptions, gaps [38.0, 46.0, 38.0] s (min 38.0, max 46.0, all within 20-70: true); engine ran 80 ticks during eruptions and 0 outside; SU-seconds per eruption [32768.0, 32768.0, 32768.0, 32768.0]; storage on top banked 29901 SU-s, mode 2; engine half a second into eruptions: [vent 120, 163, -56 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 0, vent 120, 163, -56 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 50, vent 120, 163, -56 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 100]; engine block now Block{siftec:geyser_engine}[facing=north] sees vent 120, 163, -56 gas escapes true state dormant, armed true, erupt ticks 0, running false, speed 32.0, acid 200
+[22:47:17] [Server thread/INFO]: SELFTEST world geyser -1416, 69, -1127 after 160 s (chunk ticking after 0 s): 3 eruptions, gaps [42.0, 40.0] s (min 40.0, max 42.0, all within 20-70: true); engine ran 57 ticks during eruptions and 3 outside; SU-seconds per eruption [31129.6, 32768.0, 32768.0]; storage on top banked 22528 SU-s, mode 2; engine half a second into eruptions: [vent -1416, 69, -1127 gas escapes true state erupting, armed true, erupt ticks 10, running true, speed 64.0, acid 0, vent -1416, 69, -1127 gas escapes true state erupting, armed true, erupt ticks 10, running true, speed 64.0, acid 50, vent -1416, 69, -1127 gas escapes true state erupting, armed true, erupt ticks 10, running true, speed 64.0, acid 100]; engine block now Block{siftec:geyser_engine}[facing=north] sees vent -1416, 69, -1127 gas escapes true state dormant, armed true, erupt ticks 0, running false, speed 32.0, acid 150
+[22:47:17] [Server thread/INFO]: System chat: SELFTEST world geyser -1416, 69, -1127 after 160 s (chunk ticking after 0 s): 3 eruptions, gaps [42.0, 40.0] s (min 40.0, max 42.0, all within 20-70: true); engine ran 57 ticks during eruptions and 3 outside; SU-seconds per eruption [31129.6, 32768.0, 32768.0]; storage on top banked 22528 SU-s, mode 2; engine half a second into eruptions: [vent -1416, 69, -1127 gas escapes true state erupting, armed true, erupt ticks 10, running true, speed 64.0, acid 0, vent -1416, 69, -1127 gas escapes true state erupting, armed true, erupt ticks 10, running true, speed 64.0, acid 50, vent -1416, 69, -1127 gas escapes true state erupting, armed true, erupt ticks 10, running true, speed 64.0, acid 100]; engine block now Block{siftec:geyser_engine}[facing=north] sees vent -1416, 69, -1127 gas escapes true state dormant, armed true, erupt ticks 0, running false, speed 32.0, acid 150
+[22:47:17] [Server thread/INFO]: SELFTEST world geyser 1150, 12, 755 after 160 s (chunk ticking after 0 s): 4 eruptions, gaps [40.0, 25.0, 37.0] s (min 25.0, max 40.0, all within 20-70: true); engine ran 80 ticks during eruptions and 0 outside; SU-seconds per eruption [32768.0, 32768.0, 32768.0, 32768.0]; storage on top banked 29901 SU-s, mode 2; engine half a second into eruptions: [vent 1150, 12, 755 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 0, vent 1150, 12, 755 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 50, vent 1150, 12, 755 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 100]; engine block now Block{siftec:geyser_engine}[facing=north] sees vent 1150, 12, 755 gas escapes true state dormant, armed true, erupt ticks 0, running false, speed 32.0, acid 200
+[22:47:17] [Server thread/INFO]: System chat: SELFTEST world geyser 1150, 12, 755 after 160 s (chunk ticking after 0 s): 4 eruptions, gaps [40.0, 25.0, 37.0] s (min 25.0, max 40.0, all within 20-70: true); engine ran 80 ticks during eruptions and 0 outside; SU-seconds per eruption [32768.0, 32768.0, 32768.0, 32768.0]; storage on top banked 29901 SU-s, mode 2; engine half a second into eruptions: [vent 1150, 12, 755 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 0, vent 1150, 12, 755 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 50, vent 1150, 12, 755 gas escapes true state erupting, armed true, erupt ticks 11, running true, speed 64.0, acid 100]; engine block now Block{siftec:geyser_engine}[facing=north] sees vent 1150, 12, 755 gas escapes true state dormant, armed true, erupt ticks 0, running false, speed 32.0, acid 200
+[22:48:27] [Server thread/INFO]: Player156[/127.0.0.1:58960] logged in with entity id 468 at (102.5, 145.0, -35.5)
+[22:48:27] [Server thread/INFO]: System chat: Player156 joined the game
+[22:49:10] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:noon
+[22:49:10] [Server thread/INFO]: System chat: Set the weather to clear
+[22:49:10] [Server thread/INFO]: System chat: Set Player156's game mode to Survival Mode
+[22:49:10] [Server thread/INFO]: System chat: Removed 2 item(s) from player Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Heavy Oil Residue Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Alumina Solution Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Sulfuric Acid Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Nitrogen Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Nitric Acid Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Dark Matter Residue Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Ignimbrite Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Turbofuel Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Vinegar Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Mead Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Water Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Player156 has made the advancement [Hot Stuff]
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Lava Bucket] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Mead] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Claim Marker] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Power Pole] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [HUB] to Player156
+[22:49:10] [Server thread/INFO]: System chat: Gave 1 [Speed Governor] to Player156
+[22:49:16] [Server thread/INFO]: SELFTEST world hubui building good for tier 0
+[22:49:16] [Server thread/INFO]: System chat: SELFTEST world hubui building good for tier 0
+[22:49:16] [Server thread/INFO]: System chat: Gave 10 [Iron Rod] to Player156
+[22:49:16] [Server thread/INFO]: System chat: Gave 5 [Iron Sheet] to Player156
+[22:49:58] [Server thread/INFO]: System chat: Set Player156's game mode to Spectator Mode
+[22:49:58] [Server thread/INFO]: System chat: Applied effect Night Vision to Player156
+[22:49:58] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:noon
+[22:49:58] [Server thread/INFO]: System chat: Set the weather to clear
+[22:49:58] [Server thread/INFO]: SELFTEST world look at 96.5 201.5 26.5 in minecraft:overworld from 117.7 216.5 5.3
+[22:49:58] [Server thread/INFO]: System chat: SELFTEST world look at 96.5 201.5 26.5 in minecraft:overworld from 117.7 216.5 5.3
+[22:50:08] [Server thread/INFO]: SELFTEST world look at 46.5 201.5 26.5 in minecraft:overworld from 49.3 202.3 23.7
+[22:50:08] [Server thread/INFO]: System chat: SELFTEST world look at 46.5 201.5 26.5 in minecraft:overworld from 49.3 202.3 23.7
+[22:50:12] [Server thread/INFO]: SELFTEST world look at 56.5 201.5 26.5 in minecraft:overworld from 59.3 202.3 23.7
+[22:50:12] [Server thread/INFO]: System chat: SELFTEST world look at 56.5 201.5 26.5 in minecraft:overworld from 59.3 202.3 23.7
+[22:50:15] [Server thread/INFO]: SELFTEST world look at 66.5 201.5 26.5 in minecraft:overworld from 69.3 202.3 23.7
+[22:50:15] [Server thread/INFO]: System chat: SELFTEST world look at 66.5 201.5 26.5 in minecraft:overworld from 69.3 202.3 23.7
+[22:50:18] [Server thread/INFO]: SELFTEST world look at 76.5 201.5 26.5 in minecraft:overworld from 79.3 202.3 23.7
+[22:50:18] [Server thread/INFO]: System chat: SELFTEST world look at 76.5 201.5 26.5 in minecraft:overworld from 79.3 202.3 23.7
+[22:50:21] [Server thread/INFO]: SELFTEST world look at 86.5 201.5 26.5 in minecraft:overworld from 89.3 202.3 23.7
+[22:50:21] [Server thread/INFO]: System chat: SELFTEST world look at 86.5 201.5 26.5 in minecraft:overworld from 89.3 202.3 23.7
+[22:50:24] [Server thread/INFO]: SELFTEST world look at 96.5 201.5 26.5 in minecraft:overworld from 99.3 202.3 23.7
+[22:50:24] [Server thread/INFO]: System chat: SELFTEST world look at 96.5 201.5 26.5 in minecraft:overworld from 99.3 202.3 23.7
+[22:50:28] [Server thread/INFO]: SELFTEST world look at 106.5 201.5 26.5 in minecraft:overworld from 109.3 202.3 23.7
+[22:50:28] [Server thread/INFO]: System chat: SELFTEST world look at 106.5 201.5 26.5 in minecraft:overworld from 109.3 202.3 23.7
+[22:50:31] [Server thread/INFO]: SELFTEST world look at 116.5 201.5 26.5 in minecraft:overworld from 119.3 202.3 23.7
+[22:50:31] [Server thread/INFO]: System chat: SELFTEST world look at 116.5 201.5 26.5 in minecraft:overworld from 119.3 202.3 23.7
+[22:50:34] [Server thread/INFO]: SELFTEST world look at 126.5 201.5 26.5 in minecraft:overworld from 129.3 202.3 23.7
+[22:50:34] [Server thread/INFO]: System chat: SELFTEST world look at 126.5 201.5 26.5 in minecraft:overworld from 129.3 202.3 23.7
+[22:50:37] [Server thread/INFO]: SELFTEST world look at 136.5 201.5 26.5 in minecraft:overworld from 139.3 202.3 23.7
+[22:50:37] [Server thread/INFO]: System chat: SELFTEST world look at 136.5 201.5 26.5 in minecraft:overworld from 139.3 202.3 23.7
+[22:50:40] [Server thread/INFO]: SELFTEST world look at 146.5 201.5 26.5 in minecraft:overworld from 149.3 202.3 23.7
+[22:50:40] [Server thread/INFO]: System chat: SELFTEST world look at 146.5 201.5 26.5 in minecraft:overworld from 149.3 202.3 23.7
+[22:50:44] [Server thread/INFO]: SELFTEST world look at 46.5 201.5 16.5 in minecraft:overworld from 49.3 202.3 13.7
+[22:50:44] [Server thread/INFO]: System chat: SELFTEST world look at 46.5 201.5 16.5 in minecraft:overworld from 49.3 202.3 13.7
+[22:50:47] [Server thread/INFO]: SELFTEST world look at 46.5 201.5 26.5 in minecraft:overworld from 49.3 202.3 23.7
+[22:50:47] [Server thread/INFO]: System chat: SELFTEST world look at 46.5 201.5 26.5 in minecraft:overworld from 49.3 202.3 23.7
+[22:50:50] [Server thread/INFO]: SELFTEST world look at 46.5 201.5 36.5 in minecraft:overworld from 49.3 202.3 33.7
+[22:50:50] [Server thread/INFO]: System chat: SELFTEST world look at 46.5 201.5 36.5 in minecraft:overworld from 49.3 202.3 33.7
+[22:50:53] [Server thread/INFO]: SELFTEST world look at 56.5 201.5 16.5 in minecraft:overworld from 66.4 208.5 26.4
+[22:50:53] [Server thread/INFO]: System chat: SELFTEST world look at 56.5 201.5 16.5 in minecraft:overworld from 66.4 208.5 26.4
+[22:50:56] [Server thread/INFO]: SELFTEST world look at 46.5 202.5 46.5 in minecraft:overworld from 50.4 203.0 42.6
+[22:50:56] [Server thread/INFO]: System chat: SELFTEST world look at 46.5 202.5 46.5 in minecraft:overworld from 50.4 203.0 42.6
+[22:50:59] [Server thread/INFO]: SELFTEST world look at 56.5 202.5 46.5 in minecraft:overworld from 60.4 203.0 42.6
+[22:50:59] [Server thread/INFO]: System chat: SELFTEST world look at 56.5 202.5 46.5 in minecraft:overworld from 60.4 203.0 42.6
+[22:51:02] [Server thread/INFO]: SELFTEST world look at 66.5 202.5 46.5 in minecraft:overworld from 70.4 203.0 42.6
+[22:51:02] [Server thread/INFO]: System chat: SELFTEST world look at 66.5 202.5 46.5 in minecraft:overworld from 70.4 203.0 42.6
+[22:51:06] [Server thread/INFO]: SELFTEST world look at 56.5 202.5 46.5 in minecraft:overworld from 56.5 208.5 34.5
+[22:51:06] [Server thread/INFO]: System chat: SELFTEST world look at 56.5 202.5 46.5 in minecraft:overworld from 56.5 208.5 34.5
+[22:51:09] [Server thread/INFO]: SELFTEST world look at 56.5 202.5 46.5 in minecraft:overworld from 56.5 212.5 46.5
+[22:51:09] [Server thread/INFO]: System chat: SELFTEST world look at 56.5 202.5 46.5 in minecraft:overworld from 56.5 212.5 46.5
+[22:51:12] [Server thread/INFO]: SELFTEST world look at 66.5 202.5 46.5 in minecraft:overworld from 68.6 204.0 44.4
+[22:51:12] [Server thread/INFO]: System chat: SELFTEST world look at 66.5 202.5 46.5 in minecraft:overworld from 68.6 204.0 44.4
+[22:51:15] [Server thread/INFO]: SELFTEST world look at 155.5 143.5 -80.5 in minecraft:overworld from 160.4 146.5 -85.4
+[22:51:15] [Server thread/INFO]: System chat: SELFTEST world look at 155.5 143.5 -80.5 in minecraft:overworld from 160.4 146.5 -85.4
+[22:51:15] [Server thread/INFO]: SELFTEST world look node iron Node[x=155, z=-81, type=IRON, purity=NORMAL, y=-2147483648]: pad at y 142: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 1 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:51:15] [Server thread/INFO]: System chat: SELFTEST world look node iron Node[x=155, z=-81, type=IRON, purity=NORMAL, y=-2147483648]: pad at y 142: 37/37 iron_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 1 solid blocks in the 4 above it; node iron_node purity normal (map says normal)
+[22:51:26] [Server thread/INFO]: SELFTEST world look at 21.5 63.5 98.5 in minecraft:overworld from 26.4 66.5 93.6
+[22:51:26] [Server thread/INFO]: System chat: SELFTEST world look at 21.5 63.5 98.5 in minecraft:overworld from 26.4 66.5 93.6
+[22:51:26] [Server thread/INFO]: SELFTEST world look node copper Node[x=21, z=98, type=COPPER, purity=NORMAL, y=-2147483648]: pad at y 62: 37/37 copper_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 810 fill blocks under it, 3 solid blocks in the 4 above it; node copper_node purity normal (map says normal)
+[22:51:26] [Server thread/INFO]: System chat: SELFTEST world look node copper Node[x=21, z=98, type=COPPER, purity=NORMAL, y=-2147483648]: pad at y 62: 37/37 copper_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 810 fill blocks under it, 3 solid blocks in the 4 above it; node copper_node purity normal (map says normal)
+[22:51:37] [Server thread/INFO]: SELFTEST world look at 195.5 190.5 -335.5 in minecraft:overworld from 200.4 193.5 -340.4
+[22:51:37] [Server thread/INFO]: System chat: SELFTEST world look at 195.5 190.5 -335.5 in minecraft:overworld from 200.4 193.5 -340.4
+[22:51:37] [Server thread/INFO]: SELFTEST world look node limestone Node[x=195, z=-336, type=LIMESTONE, purity=NORMAL, y=-2147483648]: pad at y 189: 37/37 limestone_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 19 fill blocks under it, 0 solid blocks in the 4 above it; node limestone_node purity normal (map says normal)
+[22:51:37] [Server thread/INFO]: System chat: SELFTEST world look node limestone Node[x=195, z=-336, type=LIMESTONE, purity=NORMAL, y=-2147483648]: pad at y 189: 37/37 limestone_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 19 fill blocks under it, 0 solid blocks in the 4 above it; node limestone_node purity normal (map says normal)
+[22:51:48] [Server thread/INFO]: SELFTEST world look at 90.5 127.5 -60.5 in minecraft:overworld from 95.4 130.5 -65.4
+[22:51:48] [Server thread/INFO]: System chat: SELFTEST world look at 90.5 127.5 -60.5 in minecraft:overworld from 95.4 130.5 -65.4
+[22:51:48] [Server thread/INFO]: SELFTEST world look node coal Node[x=90, z=-61, type=COAL, purity=NORMAL, y=-2147483648]: pad at y 126: 37/37 coal_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node coal_node purity normal (map says normal)
+[22:51:48] [Server thread/INFO]: System chat: SELFTEST world look node coal Node[x=90, z=-61, type=COAL, purity=NORMAL, y=-2147483648]: pad at y 126: 37/37 coal_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node coal_node purity normal (map says normal)
+[22:52:00] [Server thread/INFO]: SELFTEST world look at 294.5 63.5 2354.5 in minecraft:overworld from 299.4 66.5 2349.6
+[22:52:00] [Server thread/INFO]: System chat: SELFTEST world look at 294.5 63.5 2354.5 in minecraft:overworld from 299.4 66.5 2349.6
+[22:52:00] [Server thread/INFO]: SELFTEST world look node oil Node[x=294, z=2354, type=OIL, purity=NORMAL, y=-2147483648]: pad at y 62: 37/37 oil_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node oil_well purity normal (map says normal)
+[22:52:00] [Server thread/INFO]: System chat: SELFTEST world look node oil Node[x=294, z=2354, type=OIL, purity=NORMAL, y=-2147483648]: pad at y 62: 37/37 oil_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node oil_well purity normal (map says normal)
+[22:52:09] [Server thread/INFO]: SELFTEST world look at 1341.5 32.5 319.5 in minecraft:overworld from 1344.7 33.5 316.3
+[22:52:09] [Server thread/INFO]: System chat: SELFTEST world look at 1341.5 32.5 319.5 in minecraft:overworld from 1344.7 33.5 316.3
+[22:52:09] [Server thread/INFO]: SELFTEST world look node sulfur Node[x=1341, z=319, type=SULFUR, purity=IMPURE, y=13]: pad at y 31: 37/37 sulfur_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node sulfur_node purity impure (map says impure)
+[22:52:09] [Server thread/INFO]: System chat: SELFTEST world look node sulfur Node[x=1341, z=319, type=SULFUR, purity=IMPURE, y=13]: pad at y 31: 37/37 sulfur_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node sulfur_node purity impure (map says impure)
+[22:52:20] [Server thread/INFO]: SELFTEST world look at 218.5 91.5 154.5 in minecraft:the_nether from 223.4 94.5 149.6
+[22:52:20] [Server thread/INFO]: System chat: SELFTEST world look at 218.5 91.5 154.5 in minecraft:the_nether from 223.4 94.5 149.6
+[22:52:20] [Server thread/INFO]: SELFTEST world look node quartz Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648]: pad at y 90: 37/37 quartz_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node quartz_node purity impure (map says impure)
+[22:52:20] [Server thread/INFO]: System chat: SELFTEST world look node quartz Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648]: pad at y 90: 37/37 quartz_node_pad blocks level, 0 pad blocks off that level, 0 with air or fluid under, 0 fill blocks under it, 0 solid blocks in the 4 above it; node quartz_node purity impure (map says impure)
+[22:52:20] [Server thread/INFO]: System chat: Player156 has made the advancement [We Need to Go Deeper]
+[22:52:24] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-3/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-3/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-3/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:24] [Worker-Main-3/WARN]: Skipping Entity with id minecraft:piglin_brute
+[22:52:30] [Server thread/INFO]: SELFTEST world look at 218.5 64.5 277.5 in minecraft:overworld from 224.5 66.0 277.5
+[22:52:30] [Server thread/INFO]: System chat: SELFTEST world look at 218.5 64.5 277.5 in minecraft:overworld from 224.5 66.0 277.5
+[22:52:39] [Server thread/INFO]: SELFTEST world look at -351.5 95.5 -480.5 in minecraft:overworld from -345.5 97.0 -480.5
+[22:52:39] [Server thread/INFO]: System chat: SELFTEST world look at -351.5 95.5 -480.5 in minecraft:overworld from -345.5 97.0 -480.5
+[22:52:48] [Server thread/INFO]: SELFTEST world look at 193.5 89.5 -747.5 in minecraft:overworld from 199.5 91.0 -747.5
+[22:52:48] [Server thread/INFO]: System chat: SELFTEST world look at 193.5 89.5 -747.5 in minecraft:overworld from 199.5 91.0 -747.5
+[22:52:56] [Server thread/INFO]: Player156 lost connection: Disconnected
+[22:52:56] [Server thread/INFO]: System chat: Player156 left the game
+[22:53:01] [Server thread/INFO]: System chat: Stopping the server
+[22:53:01] [Server thread/INFO]: Stopping server
+[22:53:01] [Server thread/INFO]: Saving players
+[22:53:01] [Server thread/INFO]: Saving worlds
+[22:53:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[22:53:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[22:53:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[22:53:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+EXIT 0
