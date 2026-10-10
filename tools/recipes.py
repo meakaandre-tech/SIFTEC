@@ -353,13 +353,13 @@ def build():
     compact("solid_biofuel", items=["Biomass", "Biomass"], results=["Solid Biofuel"])
     # by hand, until the machines unlock. Sheets and rods both start from ingots, so they are shaped
     # (three in a row: two side by side is the heavy weighted pressure plate)
-    shaped("Iron Sheet", ["III"], {"I": "Iron Ingot"}, 3, name="iron_sheet_by_hand")
-    shaped("Iron Rod", ["I", "I"], {"I": "Iron Ingot"}, 2, name="iron_rod_by_hand")
-    shaped("Copper Sheet", ["II"], {"I": "Copper Ingot"}, 2, name="copper_sheet_by_hand")
-    shaped("Wire", ["I", "I"], {"I": "Copper Ingot"}, 4, name="wire_by_hand")
+    shaped("Iron Sheet", ["III"], {"I": "Iron Ingot"}, 2, name="iron_sheet_by_hand")  # by hand: less than the Press (1 per ingot)
+    shaped("Iron Rod", ["I", "I"], {"I": "Iron Ingot"}, 1, name="iron_rod_by_hand")  # by hand: half the Saw
+    shaped("Copper Sheet", ["II"], {"I": "Copper Ingot"}, 1, name="copper_sheet_by_hand")  # by hand: half the Press
+    shaped("Wire", ["I", "I"], {"I": "Copper Ingot"}, 2, name="wire_by_hand")  # by hand: half the Saw
     hand("Cable", [(2, "Wire")], name="cable_by_hand")
     hand("Concrete", [(3, "Limestone")], name="concrete_by_hand")
-    hand("Screw", [(1, "Iron Rod")], 4, name="screw_by_hand")
+    hand("Screw", [(1, "Iron Rod")], 2, name="screw_by_hand")  # by hand: half the Saw
     hand("Reinforced Iron Plate", [(1, "Iron Sheet"), (1, "Screw")], name="reinforced_iron_plate_by_hand")
     hand("Rotor", [(1, "Iron Rod"), (1, "Screw")], name="rotor_by_hand")
     hand("Modular Frame", [(1, "Reinforced Iron Plate"), (1, "Iron Rod")], name="modular_frame_by_hand")
