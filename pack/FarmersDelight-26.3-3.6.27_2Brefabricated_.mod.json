@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "id": "farmersdelight",
+  "version": "26.3-3.6.27+refabricated",
+  "name": "Farmer's Delight",
+  "description": "A cozy expansion to farming and cooking!",
+  "authors": [
+    "vectorwing, ChrysanthCow, cassiancc, MehVahdJukaar"
+  ],
+  "contributors": [
+    "vectorwing, drexhd, moriyashiine, ProbablyEkho"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/farmers-delight-refabricated",
+    "sources": "https://github.com/MehVahdJukaar/FarmersDelightRefabricated"
+  },
+  "license": "MIT License",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "vectorwing.farmersdelight.FarmersDelight"
+    ],
+    "client": [
+      "vectorwing.farmersdelight.client.FarmersDelightClient"
+    ],
+    "fabric-datagen": [
+      "vectorwing.farmersdelight.data.DataGenerators"
+    ],
+    "jei_mod_plugin": [
+      "vectorwing.farmersdelight.integration.jei.JEIPlugin"
+    ],
+    "rei_client": [
+      "vectorwing.farmersdelight.integration.rei.client.ClientREIPlugin"
+    ],
+    "rei_common": [
+      "vectorwing.farmersdelight.integration.rei.CommonREIPlugin"
+    ],
+    "modmenu": [
+      "vectorwing.farmersdelight.integration.modmenu.ModMenuCompat"
+    ],
+    "rrv_client": [
+      "vectorwing.farmersdelight.integration.rrv.RRVPlugin"
+    ]
+  },
+  "mixins": [
+    "farmersdelight.mixins.json"
+  ],
+  "accessWidener": "farmersdelight.classtweaker",
+  "depends": {
+    "fabricloader": ">=0.19",
+    "fabric-api": "*",
+    "minecraft": "~26.3"
+  },
+  "conflicts": {
+    "rrv": "<8.0.0"
+  }
+}

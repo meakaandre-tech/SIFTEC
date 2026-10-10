@@ -1,0 +1,230 @@
+Starting net.fabricmc.loader.impl.game.minecraft.BundlerClassPathCapture
+[23:39:34] [main/INFO]: Loading Minecraft 26.3 with Fabric Loader 0.19.5
+[23:39:34] [main/INFO]: Mappings not present!
+[23:39:34] [main/WARN]: Warnings were found!
+ - Mod 'Mielon's The Sift' (the_sift) 1.1.2 recommends version 4.13.0 or later of lambdynlights, which is missing!
+	 - You should install version 4.13.0 or later of lambdynlights for the optimal experience.
+[23:39:34] [main/INFO]: Loading 51 mods:
+	- cgs 1.4.9+26.3
+	- create 6.0.9-1
+	- create_hypertube 0.6.0+26.3
+	- createdieselgenerators 1.3.15+26.3
+	- fabric-api 0.161.0+26.3
+	   |-- fabric-advancement-api-v1 1.0.0+38c7a2d55d
+	   |-- fabric-api-base 2.0.6+fcdff87f5d
+	   |-- fabric-api-lookup-api-v1 2.0.24+3434d6d95d
+	   |-- fabric-biome-api-v1 20.0.9+74ed1ea55d
+	   |-- fabric-block-api-v1 3.1.0+0ae6f9115d
+	   |-- fabric-block-getter-api-v2 2.0.9+3434d6d95d
+	   |-- fabric-command-api-v2 3.1.2+fcdff87f5d
+	   |-- fabric-content-registries-v0 15.0.4+74ed1ea55d
+	   |-- fabric-convention-tags-v2 4.10.3+6b5b47fd5d
+	   |-- fabric-crash-report-info-v1 1.0.7+fcdff87f5d
+	   |-- fabric-creative-tab-api-v1 5.0.21+fcdff87f5d
+	   |-- fabric-data-attachment-api-v1 2.2.30+3434d6d95d
+	   |-- fabric-data-generation-api-v1 27.2.4+427eab975d
+	   |-- fabric-debug-api-v1 1.0.4+3434d6d95d
+	   |-- fabric-dimensions-v1 5.1.19+47f74c985d
+	   |-- fabric-entity-events-v1 6.0.4+3434d6d95d
+	   |-- fabric-events-interaction-v0 5.3.6+3434d6d95d
+	   |-- fabric-game-rule-api-v1 4.0.10+3434d6d95d
+	   |-- fabric-item-api-v1 14.7.0+cf6bc2db5d
+	   |-- fabric-lifecycle-events-v1 4.1.9+ffef5f675d
+	   |-- fabric-loot-api-v3 4.0.8+4068fd645d
+	   |-- fabric-menu-api-v1 2.0.27+ed66f0a35d
+	   |-- fabric-message-api-v1 7.0.10+3434d6d95d
+	   |-- fabric-networking-api-v1 6.3.8+fcdff87f5d
+	   |-- fabric-object-builder-api-v1 24.1.9+3434d6d95d
+	   |-- fabric-particles-v1 5.0.24+3434d6d95d
+	   |-- fabric-permission-api-v1 1.0.8+fcdff87f5d
+	   |-- fabric-recipe-api-v1 10.0.8+fcdff87f5d
+	   |-- fabric-registry-sync-v0 8.0.1+fcdff87f5d
+	   |-- fabric-rendering-fluids-v1 6.0.6+3434d6d95d
+	   |-- fabric-resource-conditions-api-v1 6.1.5+3434d6d95d
+	   |-- fabric-resource-loader-v0 3.3.26+4fc5413f5d
+	   |-- fabric-resource-loader-v1 3.0.4+fcdff87f5d
+	   |-- fabric-serialization-api-v1 2.0.7+74ed1ea55d
+	   |-- fabric-tag-api-v1 2.1.10+fcdff87f5d
+	   |-- fabric-transfer-api-v1 8.0.25+fcdff87f5d
+	   \-- fabric-transitive-access-wideners-v1 8.1.16+52268a0e5d
+	- fabricloader 0.19.5
+	   \-- mixinextras 0.5.5
+	- farmersdelight 26.3-3.6.27+refabricated
+	- geckolib 5.5.7
+	- java 25
+	- minecraft 26.3
+	- ntgl 3.1.8+26.3
+	- siftec 0.1.0+26.3
+	- the_sift 1.1.2
+[23:39:34] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/net/fabricmc/sponge-mixin/0.17.4+mixin.0.8.7/sponge-mixin-0.17.4+mixin.0.8.7.jar Service=Knot/Fabric Env=SERVER
+[23:39:35] [main/WARN]: Error loading class: net/minecraft/client/gui/screens/recipebook/GhostSlots (java.lang.ClassNotFoundException: net/minecraft/client/gui/screens/recipebook/GhostSlots)
+[23:39:35] [main/WARN]: @Mixin target net.minecraft.client.gui.screens.recipebook.GhostSlots was not found farmersdelight.mixins.json:refabricated.GhostSlotsInvoker from mod farmersdelight
+[23:39:35] [main/WARN]: Error loading class: net/minecraft/client/gui/GuiGraphicsExtractor (java.lang.ClassNotFoundException: net/minecraft/client/gui/GuiGraphicsExtractor)
+[23:39:35] [main/WARN]: @Mixin target net.minecraft.client.gui.GuiGraphicsExtractor was not found farmersdelight.mixins.json:refabricated.GuiGraphicsExtractorAccessor from mod farmersdelight
+[23:39:35] [main/INFO]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.joml.MemUtil$MemUtilUnsafe (file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/org/joml/joml/1.10.9/joml-1.10.9.jar)
+WARNING: Please consider reporting this to the maintainers of class org.joml.MemUtil$MemUtilUnsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[23:39:45] [main/INFO]: Loaded config farmersdelight-common.json
+[23:39:46] [main/INFO]: The Sift initialized.
+[23:39:46] [main/INFO]: Environment: Environment[discoveryUrl=https://discovery.minecraftservices.com/minecraft/client, name=PROD]
+[23:39:46] [main/INFO]: Created 13 recipes which will be injected into the game
+[23:39:49] [Worker-Main-2/INFO]: Loaded 3349 advancements
+[23:39:49] [main/INFO]: Applied 146 biome modifications to 61 of 77 new biomes in 10.33 ms
+[23:39:49] [Server thread/INFO]: SIFTEC settings: spawn_free_radius=64, member_cooldown_hours=24
+[23:39:49] [Server thread/INFO]: Starting minecraft server version 26.3
+[23:39:49] [Server thread/INFO]: Loading properties
+[23:39:49] [Server thread/INFO]: Default game type: CREATIVE
+[23:39:49] [Server thread/INFO]: Generating keypair
+[23:39:49] [Server thread/INFO]: Starting Minecraft server on *:25565
+[23:39:50] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[23:39:50] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[23:39:50] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[23:39:50] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[23:39:50] [Server thread/INFO]: Preparing level "world"
+[23:39:50] [Server thread/INFO]: Loading 247 persistent chunks...
+[23:39:50] [Server thread/INFO]: Preparing spawn area: 3%
+[23:39:51] [Server thread/INFO]: Preparing spawn area: 3%
+[23:39:51] [Server thread/INFO]: Preparing spawn area: 3%
+[23:39:52] [Server thread/INFO]: Preparing spawn area: 3%
+[23:39:52] [Server thread/INFO]: Preparing spawn area: 3%
+[23:39:53] [Server thread/INFO]: Preparing spawn area: 25%
+[23:39:53] [Server thread/INFO]: Time elapsed: 2764 ms
+[23:39:53] [Server thread/INFO]: Done (3.259s)! For help, type "help"
+[23:39:53] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[23:39:54] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+[23:39:54] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[23:39:54] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTrimRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SingleItemRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTransformRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.RotationPropagator
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.CollectingNeighborUpdater$MultiNeighborUpdate
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.server.PlayerAdvancements
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.server.network.config.SynchronizeRegistriesTask
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ServerboundSelectKnownPacks
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RemoteSlot$Synchronized
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.ExperimentalRedstoneWireEvaluator
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerHandshakePacketListenerImpl
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.BlockItemTagAppender
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistriesDatapackGenerator
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.Swim
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener
+[23:39:54] [Server thread/INFO]: Force-loading class com.jesz.createdieselgenerators.world.OilChunksSavedData
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.server.commands.DebugConfigCommand
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.HashedStack$ActualItem
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.TransmuteRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ConfigurationProtocols
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerLoginPacketListenerImpl
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.commands.execution.CommandQueueEntry
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RecipeBookType
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider$1
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.stats.ServerRecipeBook
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.gametest.framework.GameTestServer
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.BundlePacket
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.util.ParticleUtils
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.CompoundContainer
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender$1
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.stats.RecipeBookSettings
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.pump.PumpBlockEntity$PumpFluidTransferBehaviour
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.PacketEncoder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagsProvider
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SimpleCookingRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SpecialRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.stats.RecipeBookSettings$TypeSettings
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapedRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.tags.TagBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.food.FoodData
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.level.ServerExplosion
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltInventory
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeOutput
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.foundation.recipe.trie.RecipeTrie
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.KineticNetwork
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.DeployerHandler
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.level.block.RailState
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.PacketDecoder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.server.dedicated.ServerWatchdog
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapelessRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.CustomCraftingRecipeBuilder
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.item.enchantment.EnchantmentHelper
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.GiveGiftToHero
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.advancements.packs.VanillaAdventureAdvancements
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.ManualApplicationHelper
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.BlockLootSubProvider
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltTunnelInteractionHandler
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.game.GameProtocols
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.commands.execution.tasks.BuildContexts
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.WorkAtComposter
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingProvider
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonSittingPhase
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistryPatchGenerator
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.server.network.PlayerChunkSender
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.item.Item$TooltipContext$2
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache$ProviderCache
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.PathfindingContext
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.fan.processing.FanProcessing
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.FluidPropagator
+[23:39:54] [Server thread/INFO]: Force-loading class com.mojang.brigadier.context.ContextChain
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.codec.IdDispatchCodec
+[23:39:54] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.DataProvider
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.EntityLootSubProvider
+[23:39:54] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ClientboundCustomQueryPacket
+[23:39:54] [Server thread/INFO]: [MixinAudit] audit finished
+[23:39:56] [Server thread/INFO]: SELFTEST power: pole A speed 16.0 lines 1; pole B speed 16.0 lines 1; storage speed 16.0 stored 1023254.94 mode 1
+[23:39:56] [Server thread/INFO]: System chat: SELFTEST power: pole A speed 16.0 lines 1; pole B speed 16.0 lines 1; storage speed 16.0 stored 1023254.94 mode 1
+[23:39:56] [Server thread/INFO]: SELFTEST owner same company: governor is siftec:speed_governor; shaft speed -64.0 owner selftest_fast
+[23:39:56] [Server thread/INFO]: System chat: SELFTEST owner same company: governor is siftec:speed_governor; shaft speed -64.0 owner selftest_fast
+[23:39:56] [Server thread/INFO]: SELFTEST owner slower company below: governor is minecraft:air; shaft speed 0.0 owner selftest_slow
+[23:39:56] [Server thread/INFO]: System chat: SELFTEST owner slower company below: governor is minecraft:air; shaft speed 0.0 owner selftest_slow
+[23:39:56] [Server thread/INFO]: SELFTEST owner recipes: 1660 locked; create:acacia_window needs base_building; blocked before true, after unlocking false
+[23:39:56] [Server thread/INFO]: System chat: SELFTEST owner recipes: 1660 locked; create:acacia_window needs base_building; blocked before true, after unlocking false
+[23:39:56] [Server thread/INFO]: SELFTEST drone: home port state 0, fire charges left 2, still waiting 0 minecraft:air; far port arrived 5 minecraft:iron_ingot
+[23:39:56] [Server thread/INFO]: System chat: SELFTEST drone: home port state 0, fire charges left 2, still waiting 0 minecraft:air; far port arrived 5 minecraft:iron_ingot
+[23:39:56] [Server thread/INFO]: SELFTEST check Node[x=155, z=-81, type=IRON, purity=NORMAL, y=-2147483648]: 42 minecraft:raw_iron
+[23:39:56] [Server thread/INFO]: System chat: SELFTEST check Node[x=155, z=-81, type=IRON, purity=NORMAL, y=-2147483648]: 42 minecraft:raw_iron
+[23:39:56] [Server thread/INFO]: SELFTEST check Node[x=21, z=98, type=COPPER, purity=NORMAL, y=-2147483648]: 15 minecraft:raw_copper speed -16.0 Miner Mk.1: drilling | Water 625 / 4000 mB | 0.0 per cycle
+[23:39:56] [Server thread/INFO]: System chat: SELFTEST check Node[x=21, z=98, type=COPPER, purity=NORMAL, y=-2147483648]: 15 minecraft:raw_copper speed -16.0 Miner Mk.1: drilling | Water 625 / 4000 mB | 0.0 per cycle
+[23:39:57] [Server thread/INFO]: SELFTEST nether: Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648] height 90 block Block{siftec:quartz_node_pad} under Block{siftec:quartz_node}[core=true,purity=impure]
+[23:39:57] [Server thread/INFO]: System chat: SELFTEST nether: Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648] height 90 block Block{siftec:quartz_node_pad} under Block{siftec:quartz_node}[core=true,purity=impure]
+[23:39:57] [Server thread/INFO]: SELFTEST state save after restart: OK (company 4000 collected, claims 1500, places 600; broken false/false)
+[23:39:57] [Server thread/INFO]: System chat: SELFTEST state save after restart: OK (company 4000 collected, claims 1500, places 600; broken false/false)
+[23:39:57] [Server thread/INFO]: SELFTEST state loading after restart: chunks held by claims 0, claimed chunks force-loaded the vanilla way 0
+[23:39:57] [Server thread/INFO]: System chat: SELFTEST state loading after restart: chunks held by claims 0, claimed chunks force-loaded the vanilla way 0
+[23:39:57] [Server thread/INFO]: SELFTEST state cleanup: removed 8 test companies
+[23:39:57] [Server thread/INFO]: System chat: SELFTEST state cleanup: removed 8 test companies
+[23:39:58] [Server thread/INFO]: SELFTEST world miner after restart impure at 218, 64, 277: MK1 fluid 975 mB, progress 1920.0, output 0 minecraft:air, upper block siftec:miner_top
+[23:39:58] [Server thread/INFO]: System chat: SELFTEST world miner after restart impure at 218, 64, 277: MK1 fluid 975 mB, progress 1920.0, output 0 minecraft:air, upper block siftec:miner_top
+[23:39:58] [Server thread/INFO]: SELFTEST world miner after restart normal at -352, 95, -481: MK2 fluid 975 mB, progress 1920.0, output 2 minecraft:coal, upper block siftec:miner_top
+[23:39:58] [Server thread/INFO]: System chat: SELFTEST world miner after restart normal at -352, 95, -481: MK2 fluid 975 mB, progress 1920.0, output 2 minecraft:coal, upper block siftec:miner_top
+[23:39:58] [Server thread/INFO]: SELFTEST world miner after restart pure at 193, 89, -748: MK3 fluid 975 mB, progress 1920.0, output 8 create:limestone, upper block siftec:miner_top
+[23:39:58] [Server thread/INFO]: System chat: SELFTEST world miner after restart pure at 193, 89, -748: MK3 fluid 975 mB, progress 1920.0, output 8 create:limestone, upper block siftec:miner_top
+[23:39:58] [Server thread/INFO]: SELFTEST world powerchain after restart: map of lines 10 poles, 7 lines; middle chunks loaded [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[23:39:58] [Server thread/INFO]: System chat: SELFTEST world powerchain after restart: map of lines 10 poles, 7 lines; middle chunks loaded [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[23:40:01] [Server thread/INFO]: System chat: Crude Oil, Impure at x -1818, z -1592 (2469 blocks away)
+[23:40:03] [Server thread/INFO]: SELFTEST world powerchain middle unloaded true (after 0 s): [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[23:40:03] [Server thread/INFO]: System chat: SELFTEST world powerchain middle unloaded true (after 0 s): [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[23:40:04] [Server thread/INFO]: SELFTEST world powerchain after restart step 1: after the restart: far fan 16.0 RPM, branch fan 16.0 RPM; same network as the motor true; far fan's network capacity 262144 SU, stress 64 SU; the motor offers 16384.0 SU/RPM at 16.0 RPM; last tower takes its rotation from 560, 200, 568; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[23:40:04] [Server thread/INFO]: System chat: SELFTEST world powerchain after restart step 1: after the restart: far fan 16.0 RPM, branch fan 16.0 RPM; same network as the motor true; far fan's network capacity 262144 SU, stress 64 SU; the motor offers 16384.0 SU/RPM at 16.0 RPM; last tower takes its rotation from 560, 200, 568; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[23:40:06] [Server thread/INFO]: SELFTEST world powerchain after restart step 2: motor set to 24 RPM: far fan 24.0 RPM, branch fan 24.0 RPM; middle loads so far {98784247830=0, 98784247843=0, 98784247855=0}
+[23:40:06] [Server thread/INFO]: System chat: SELFTEST world powerchain after restart step 2: motor set to 24 RPM: far fan 24.0 RPM, branch fan 24.0 RPM; middle loads so far {98784247830=0, 98784247843=0, 98784247855=0}
+[23:40:07] [Server thread/INFO]: SELFTEST world powerchain after restart step 3: middle tower broken (its chunk loaded for it): far fan 0.0 RPM, branch fan 0.0 RPM; loads of the middle chunks {98784247830=0, 98784247843=1, 98784247855=0} (the broken tower's own chunk counts the one on purpose); map of lines 9 poles, 4 lines
+[23:40:07] [Server thread/INFO]: System chat: SELFTEST world powerchain after restart step 3: middle tower broken (its chunk loaded for it): far fan 0.0 RPM, branch fan 0.0 RPM; loads of the middle chunks {98784247830=0, 98784247843=1, 98784247855=0} (the broken tower's own chunk counts the one on purpose); map of lines 9 poles, 4 lines
+[23:40:09] [Server thread/INFO]: SELFTEST world powerchain after restart step 4: a second later: far fan 0.0 RPM, branch fan 0.0 RPM; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]; chunk loads anywhere meanwhile: 9
+[23:40:09] [Server thread/INFO]: System chat: SELFTEST world powerchain after restart step 4: a second later: far fan 0.0 RPM, branch fan 0.0 RPM; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]; chunk loads anywhere meanwhile: 9
+[23:40:48] [Server thread/INFO]: System chat: Stopping the server
+[23:40:48] [Server thread/INFO]: Stopping server
+[23:40:48] [Server thread/INFO]: Saving players
+[23:40:48] [Server thread/INFO]: Saving worlds
+[23:40:48] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[23:40:48] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+[23:40:48] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[23:40:48] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+EXIT 0
