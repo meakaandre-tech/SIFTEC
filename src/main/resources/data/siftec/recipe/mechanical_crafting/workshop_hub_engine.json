@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "create:iron_sheet",
+    "B": "siftec:iron_rod"
+  },
+  "pattern": [
+    "AAAA",
+    "ABBB",
+    "BB  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:hub_engine"
+  }
+}

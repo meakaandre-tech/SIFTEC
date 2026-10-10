@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "create:mechanical_drill",
+    "B": "create:iron_sheet",
+    "C": "siftec:iron_rod"
+  },
+  "pattern": [
+    "ABB",
+    "CCC",
+    "C  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:portable_miner"
+  }
+}

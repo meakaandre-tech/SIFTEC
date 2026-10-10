@@ -456,6 +456,9 @@ if loose:
 lang.update({"block.siftec.mam": "MAM", "siftec.mam.title": "MAM: %s", "siftec.mam.research": "Research time: %s",
              "siftec.mam.busy": "Already researching %s", "siftec.mam.running": "Researching %s: %s left", "siftec.mam.idle": "No research running",
              "siftec.mam.started": "Research started: %s", "siftec.mam.click": "Click to deliver parts from your inventory",
+             "siftec.mam.auto.pick": "Right-click: parts fed into a MAM by belt, funnel or chute go here",
+             "siftec.mam.auto.on": "Parts fed in by belt, funnel or chute go here (right-click to stop)",
+             "siftec.mam.auto.picked": "Parts fed into the MAM now go to %s", "siftec.mam.auto.stopped": "Parts fed into the MAM go nowhere now",
              "siftec.tag.mushrooms": "any mushroom", "siftec.tag.crops": "any crop"})
 write(f"{A}/blockstates/mam.json", {"variants": {"": {"model": "siftec:block/mam"}}})
 write(f"{A}/models/block/mam.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
@@ -671,7 +674,13 @@ data["removed_recipes"] = recipes.REMOVED
 data["workshop"] = [{"item": i, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]} for i, cost in recipes.WORKSHOP]
 lang.update({"block.siftec.equipment_workshop": "Equipment Workshop", "siftec.workshop.title": "Equipment Workshop",
              "siftec.workshop.click": "Click to build from the parts in your inventory", "siftec.workshop.missing": "You are missing parts for that",
-             "siftec.workshop.built": "Built %s"})
+             "siftec.workshop.built": "Built %s",
+             "siftec.workshop.auto.pick": "Right-click: build this automatically from parts fed in by belt, funnel or chute",
+             "siftec.workshop.auto.on": "Built automatically here (right-click to stop)",
+             "siftec.workshop.auto.held": "In the Workshop: %s %s / %s",
+             "siftec.workshop.auto.picked": "This Workshop now builds %s from the parts fed into it",
+             "siftec.workshop.auto.stopped": "This Workshop no longer builds automatically",
+             "siftec.workshop.auto.locked": "The company this Workshop belongs to has not unlocked that"})
 write(f"{A}/blockstates/equipment_workshop.json", {"variants": {"": {"model": "siftec:block/equipment_workshop"}}})
 write(f"{A}/models/block/equipment_workshop.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
     "top": "minecraft:block/smithing_table_top", "side": "create:block/andesite_casing", "bottom": "create:block/andesite_casing"}})

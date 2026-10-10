@@ -1,0 +1,19 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:portable_miner",
+    "B": "create:iron_sheet",
+    "C": "minecraft:light_gray_concrete"
+  },
+  "pattern": [
+    "ABBBB",
+    "BBBBB",
+    "BCCCC",
+    "CCCCC",
+    "C    "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:miner_mk1"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "create:iron_sheet",
+    "B": "siftec:wire"
+  },
+  "pattern": [
+    "AAB",
+    "BBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:node_scanner"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "create:cardboard",
+    "B": "siftec:motor",
+    "C": "siftec:alclad_aluminum_sheet",
+    "D": "siftec:radio_control_unit",
+    "E": "siftec:ai_limiter"
+  },
+  "pattern": [
+    "AAAAA",
+    "AAABB",
+    "BBCCC",
+    "CCCCC",
+    "CCDEE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:cardboard_drone"
+  }
+}

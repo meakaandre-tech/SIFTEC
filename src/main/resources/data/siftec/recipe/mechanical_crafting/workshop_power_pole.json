@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:wire",
+    "B": "siftec:iron_rod",
+    "C": "minecraft:light_gray_concrete"
+  },
+  "pattern": [
+    "AB",
+    "C "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:power_pole"
+  }
+}

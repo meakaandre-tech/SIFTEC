@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:fabric",
+    "B": "siftec:cable"
+  },
+  "pattern": [
+    "AAAA",
+    "AAAA",
+    "AABB",
+    "BBB "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:parachute"
+  }
+}

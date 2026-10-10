@@ -130,16 +130,16 @@ def deploy(base, held, out, n=1, name=None):
     add("deploying", name or slug(out), {"type": "create:deploying", "target": item(base), "ingredient": item(held), "results": [res(out, n)]})
 
 
-def crafter(out, parts, n=1, name=None):
-    """parts: [(count, name)], at most nine items, laid out row by row."""
+def crafter(out, parts, n=1, name=None, most=9):
+    """parts: [(count, name)], at most nine items (or `most`, up to 25 on a 5 by 5 grid), laid out row by row."""
     keys, cells = {}, []
     for i, (count, part) in enumerate(parts):
         letter = "ABCDEFGHI"[i]
         keys[letter] = item(part)
         cells += [letter] * count
-    if len(cells) > 9:
-        raise SystemExit(f"recipes: {out} needs more than nine items")
-    width = 3 if len(cells) > 4 else 2 if len(cells) > 1 else 1
+    if len(cells) > min(most, 25):
+        raise SystemExit(f"recipes: {out} needs more than {min(most, 25)} items")
+    width = 5 if len(cells) > 16 else 4 if len(cells) > 9 else 3 if len(cells) > 4 else 2 if len(cells) > 1 else 1
     rows = ["".join(cells[i:i + width]).ljust(width) for i in range(0, len(cells), width)]
     add("mechanical_crafting", name or slug(out), {"type": "create:mechanical_crafting", "key": keys, "pattern": rows,
         "result": {"count": n, "id": made(out)}})
@@ -518,7 +518,26 @@ def build():
     # Block of Sulfur (vanilla's sulfur block) packs four Gunsmithing sulfur
     shaped("minecraft:sulfur", ["SS", "SS"], {"S": "Sulfur"}, name="block_of_sulfur")
     hand("Sulfur", [(1, "minecraft:sulfur")], 4, name="sulfur_from_block")
+    workshop_by_machine()
     return dict(OUT)
+
+
+# Workshop builds small enough for a Mechanical Crafter grid (one part per crafter, at most 5 by 5) get a crafter
+# recipe at the same cost. Everything else on the list is automated by the Workshop itself: belts, funnels and
+# chutes feed it the parts for the build its owner picked, and funnels take what it makes.
+CRAFTER_MOST = 25
+
+
+def workshop_by_machine():
+    import content as _c
+    # the Power Line: one Cable pressed flat, as the Workshop makes it (1 Cable, 1 line)
+    press("Cable", "siftec:power_line", name="power_line")
+    for out, cost in WORKSHOP:
+        if out == "siftec:power_line":
+            continue
+        parts = [(n, c) for c, n in _c.parse_cost(cost)]
+        if sum(n for n, c in parts) <= CRAFTER_MOST:
+            crafter(out, parts, name="workshop_" + out.split(":")[1], most=CRAFTER_MOST)
 
 
 # Recipes from other mods that the pack takes out.
