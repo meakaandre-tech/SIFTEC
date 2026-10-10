@@ -1,0 +1,19 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:fused_modular_frame",
+    "B": "siftec:cooling_system",
+    "C": "siftec:radio_control_unit",
+    "D": "siftec:sam_fluctuator"
+  },
+  "pattern": [
+    "AABBC",
+    "CCCCD",
+    "DDDDD",
+    "DDDD "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:converter_core"
+  }
+}

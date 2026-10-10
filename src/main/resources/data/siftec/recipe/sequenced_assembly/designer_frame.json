@@ -1,0 +1,21 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:fused_modular_frame",
+  "transitional_item": {
+    "id": "siftec:incomplete_designer_frame"
+  },
+  "result": {
+    "id": "siftec:designer_frame"
+  },
+  "loops": 10,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:light_gray_concrete",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:motor",
+  "transitional_item": {
+    "id": "siftec:incomplete_jetpack_thruster"
+  },
+  "result": {
+    "id": "siftec:jetpack_thruster"
+  },
+  "loops": 10,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:plastic",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:rubber",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

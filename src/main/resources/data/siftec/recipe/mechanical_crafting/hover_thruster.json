@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:motor",
+    "B": "siftec:computer",
+    "C": "siftec:alclad_aluminum_sheet"
+  },
+  "pattern": [
+    "ABC",
+    "CCC",
+    "C  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:hover_thruster"
+  }
+}

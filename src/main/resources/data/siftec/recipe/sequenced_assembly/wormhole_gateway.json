@@ -1,0 +1,29 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:gateway_frame",
+  "transitional_item": {
+    "id": "siftec:incomplete_wormhole_gateway"
+  },
+  "result": {
+    "id": "siftec:wormhole_gateway"
+  },
+  "loops": 24,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:gateway_coil",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:gateway_frame",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

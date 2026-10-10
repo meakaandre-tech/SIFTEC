@@ -167,11 +167,16 @@ def shaped(out, pattern, key, n=1, name=None):
 
 
 def sequence(base, out, steps, loops, name=None):
-    """steps: part names applied by Deployer in order; "press" for a pressing step."""
+    """steps: part names applied by Deployer in order; "press" for a pressing step, "cut" for the Saw,
+    ("fill", fluid, mB) for the Spout."""
     seq = []
     for step in steps:
         if step == "press":
             seq.append({"type": "create:pressing", "ingredient": "$ingredient", "results": ["$result"]})
+        elif step == "cut":
+            seq.append({"type": "create:cutting", "ingredient": "$ingredient", "results": ["$result"]})
+        elif isinstance(step, tuple):
+            seq.append({"type": "create:filling", "ingredient": "$ingredient", "fluid_ingredient": fl_in(step[1], step[2]), "results": ["$result"]})
         else:
             seq.append({"type": "create:deploying", "target": "$ingredient", "ingredient": item(step), "results": ["$result"]})
     add("sequenced_assembly", name or slug(out), {"type": "create:sequenced_assembly", "ingredient": item(base),
@@ -522,10 +527,65 @@ def build():
     return dict(OUT)
 
 
-# Workshop builds small enough for a Mechanical Crafter grid (one part per crafter, at most 5 by 5) get a crafter
-# recipe at the same cost. Everything else on the list is automated by the Workshop itself: belts, funnels and
-# chutes feed it the parts for the build its owner picked, and funnels take what it makes.
+# Every Workshop build also has a machine route, at about the Workshop's cost: the Workshop is for building by
+# hand. Builds of 25 parts or fewer go in a Mechanical Crafter (one part per crafter, at most 5 by 5). Bigger ones
+# before the Mechanical Crafter (Tier 6) are made by sequenced assembly: Deployers on a belt or depot apply the
+# parts, looping until the build is done. From Tier 6 on, the big ones are made in a Mechanical Crafter from a few
+# sub-assemblies, each from a crafter or an assembly line. The sub-assemblies are in content.PARTS and unlock with
+# their build (content.ASSEMBLY_LOCKS). The Power Line is pressed from Cable.
 CRAFTER_MOST = 25
+W = "siftec:"
+# sequenced assembly: (what it makes, base item, the steps of one loop, loops)
+ASSEMBLY_LINES = [
+    (W + "furnace_engine", "Iron Sheet", ["Iron Rod", "Wire", "Iron Sheet", "Wire"], 14),
+    (W + "mam", "Reinforced Iron Plate", ["Cable", "Wire", "Wire", "Wire"], 16),
+    (W + "object_scanner", "Reinforced Iron Plate", ["Wire", "Screw", "Screw", "Wire", "Screw", "Screw", "Screw"], 10),
+    # the Wormhole Gateway: 24 coils of wire and 25 frames of concrete, sheet and rod, put together on a third line
+    (W + "gateway_coil", "Iron Rod", ["Wire"] * 5, 12),
+    (W + "gateway_frame", "Concrete", ["Iron Rod", "Concrete", "Iron Sheet", "Concrete", "Iron Rod"], 9),
+    (W + "wormhole_gateway", W + "gateway_frame", [W + "gateway_coil", W + "gateway_frame"], 24),
+    (W + "landing_cushion", "Biomass", ["Biomass"], 19),
+    (W + "landing_pad", "Rotor", ["Cable", "Cable", "Cable", W + "landing_cushion", "Rotor", "Rotor"], 10),
+    (W + "awesome_sink", "Concrete", ["Reinforced Iron Plate", "Cable", "Concrete", "Cable", "Concrete", "Concrete"], 15),
+    (W + "awesome_shop", "Iron Sheet", ["Cable"] + ["Screw"] * 6, 33),
+    (W + "blueprint_designer", "Modular Frame", ["Concrete", "Concrete", "Cable", "Concrete", "Concrete"], 25),
+    (W + "power_storage", "Stator", ["Modular Frame", "Wire", "Wire", "Wire", "Wire", "Modular Frame", "Stator"], 5),
+    (W + "speed_governor", "Rotor", ["Quickwire"] * 6 + ["Reinforced Iron Plate"], 4),
+    (W + "blade_runners", "Modular Frame", ["Silica"] * 5 + ["Rotor"], 4),
+    (W + "dimensional_depot", "Mercer Sphere", ["Modular Frame", "Cable", "Cable", "Cable", "Cable"], 5),
+    (W + "miner_mk2", W + "portable_miner", ["Encased Industrial Beam", "Steel Pipe", "Steel Pipe", "Modular Frame"], 10),
+    (W + "jetpack_thruster", "Motor", ["Plastic", "Rubber"], 10),
+    (W + "jetpack", W + "jetpack_thruster", ["Circuit Board", W + "jetpack_thruster"], 4),
+    (W + "gas_mask", "Fabric", ["Plastic", "Rubber", "Plastic", "Fabric"], 50),
+    (W + "radar_tower", "Heavy Modular Frame", ["Crystal Oscillator"] + ["Cable"] * 5 + ["Heavy Modular Frame"], 10),
+    (W + "drill_shaft", "Fused Modular Frame", ["Steel Pipe"], 5),
+    (W + "designer_frame", "Fused Modular Frame", ["Concrete"], 10),
+]
+# Mechanical Crafter, beyond the builds of 25 parts or fewer: (what it makes, [(count, part)])
+CRAFTED = [
+    (W + "hazmat_lining", [(5, "Rubber"), (5, "Plastic"), (5, "Alclad Aluminum Sheet"), (5, "Fabric")]),
+    (W + "hazmat_suit", [(10, W + "hazmat_lining")]),
+    (W + "hover_thruster", [(1, "Motor"), (1, "Computer"), (5, "Alclad Aluminum Sheet")]),
+    (W + "hover_pack", [(8, W + "hover_thruster"), (4, "Heavy Modular Frame")]),
+    (W + "drone_port_module", [(2, "Heavy Modular Frame"), (1, "High-Speed Connector"), (5, "Alclad Aluminum Sheet"), (5, "Aluminum Casing"),
+                               (1, "Radio Control Unit")]),
+    (W + "drone_port", [(10, W + "drone_port_module")]),
+    (W + "accelerator_segment", [(10, "Electromagnetic Control Rod"), (5, "Cooling System"), (2, "Fused Modular Frame"), (2, "Radio Control Unit"),
+                                 (1, "Supercomputer"), (1, "Turbo Motor")]),
+    (W + "particle_accelerator", [(10, W + "accelerator_segment"), (5, "Radio Control Unit")]),
+    (W + "converter_core", [(2, "Fused Modular Frame"), (2, "Cooling System"), (5, "Radio Control Unit"), (10, "SAM Fluctuator")]),
+    (W + "converter", [(5, W + "converter_core")]),
+    # one module is a fifth of a Satellite Portal; the Main Portal takes 17 and 8 more Turbo Motors
+    (W + "portal_module", [(1, "Turbo Motor"), (2, "Radio Control Unit"), (1, "Superposition Oscillator"), (2, "SAM Fluctuator"), (10, "Ficsite Trigon")]),
+    (W + "satellite_portal", [(5, W + "portal_module")]),
+    (W + "main_portal", [(17, W + "portal_module"), (8, "Turbo Motor")]),
+    (W + "geyser_core", [(2, "Heavy Modular Frame"), (1, "Supercomputer"), (5, "Steel Pipe"), (2, "Rubber")]),
+    (W + "geyser_engine", [(10, W + "geyser_core")]),
+    (W + "extractor_pump", [(2, "Aluminum Casing"), (2, "Encased Industrial Beam"), (1, "Motor"), (5, "Rubber")]),
+    (W + "resource_well_extractor", [(10, W + "extractor_pump")]),
+    (W + "miner_mk3", [(10, W + "drill_shaft"), (3, W + "portable_miner"), (5, "Supercomputer"), (3, "Turbo Motor")]),
+    (W + "blueprint_designer_mk3", [(10, W + "designer_frame"), (5, "Neural-Quantum Processor")]),
+]
 
 
 def workshop_by_machine():
@@ -538,6 +598,10 @@ def workshop_by_machine():
         parts = [(n, c) for c, n in _c.parse_cost(cost)]
         if sum(n for n, c in parts) <= CRAFTER_MOST:
             crafter(out, parts, name="workshop_" + out.split(":")[1], most=CRAFTER_MOST)
+    for out, base, steps, loops in ASSEMBLY_LINES:
+        sequence(base, out, steps, loops)
+    for out, parts in CRAFTED:
+        crafter(out, parts, name=out.split(":")[1], most=CRAFTER_MOST)
 
 
 # Recipes from other mods that the pack takes out.

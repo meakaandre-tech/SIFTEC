@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:portal_module",
+    "B": "siftec:turbo_motor"
+  },
+  "pattern": [
+    "AAAAA",
+    "AAAAA",
+    "AAAAA",
+    "AABBB",
+    "BBBBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:main_portal"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:heavy_modular_frame",
+    "B": "siftec:high_speed_connector",
+    "C": "siftec:alclad_aluminum_sheet",
+    "D": "siftec:aluminum_casing",
+    "E": "siftec:radio_control_unit"
+  },
+  "pattern": [
+    "AABC",
+    "CCCC",
+    "DDDD",
+    "DE  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:drone_port_module"
+  }
+}

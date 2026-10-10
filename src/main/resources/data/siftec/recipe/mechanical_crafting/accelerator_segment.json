@@ -1,0 +1,22 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:electromagnetic_control_rod",
+    "B": "siftec:cooling_system",
+    "C": "siftec:fused_modular_frame",
+    "D": "siftec:radio_control_unit",
+    "E": "siftec:supercomputer",
+    "F": "siftec:turbo_motor"
+  },
+  "pattern": [
+    "AAAAA",
+    "AAAAA",
+    "BBBBB",
+    "CCDDE",
+    "F    "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:accelerator_segment"
+  }
+}

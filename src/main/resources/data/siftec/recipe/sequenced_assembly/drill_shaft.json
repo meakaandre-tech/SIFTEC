@@ -1,0 +1,21 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:fused_modular_frame",
+  "transitional_item": {
+    "id": "siftec:incomplete_drill_shaft"
+  },
+  "result": {
+    "id": "siftec:drill_shaft"
+  },
+  "loops": 5,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:steel_pipe",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

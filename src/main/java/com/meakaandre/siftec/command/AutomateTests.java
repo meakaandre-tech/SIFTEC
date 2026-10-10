@@ -10,14 +10,14 @@ import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.power.PoleBlockEntity;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.workshop.WorkshopBlockEntity;
+import com.zurrtum.create.content.kinetics.crafter.MechanicalCraftingRecipe;
+import com.zurrtum.create.content.kinetics.deployer.ItemApplicationInput;
+import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
+import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.AllRecipeTypes;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -31,6 +31,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -43,12 +46,13 @@ import java.util.List;
 
 /**
  * Selftests for automation: the Power Line pressed from Cable and a Workshop item made in a Mechanical Crafter only
- * for a company that has them unlocked; the Workshop fed and emptied through the item transfer API that belts,
- * funnels and chutes use; and a machine's fake player stringing a Power Line between two poles. Every line of
- * output starts with "SELFTEST automate".
+ * for a company that has them unlocked; a big build's sub-assembly and the build itself run step by step through a
+ * sequenced assembly (as the Deployer asks for each step) and through the Mechanical Crafter, for an unlocked and a
+ * locked company; a Workshop saved by the old automatic mode giving its parts back; and a machine's fake player and
+ * a real Deployer stringing a Power Line between two poles. Every line of output starts with "SELFTEST automate".
  */
 public final class AutomateTests {
-    private static final String YES = "selftest_auto_yes", NO = "selftest_auto_no", MAM = "selftest_auto_mam";
+    private static final String YES = "selftest_auto_yes", NO = "selftest_auto_no";
 
     private AutomateTests() {
     }
@@ -86,9 +90,12 @@ public final class AutomateTests {
         level.setChunkForced(x >> 4, z >> 4, true);
         try {
             machines(source, level, at);
-            workshop(source, level, at.east(4));
+            assembly(source, level, at.east(4), "siftec:gateway_coil");
+            assembly(source, level, at.east(4), "siftec:wormhole_gateway");
+            crafted(source, level, at.east(4), "siftec:accelerator_segment");
+            crafted(source, level, at.east(4), "siftec:particle_accelerator");
+            workshop(source, level, at.west(4));
             poles(source, level, at.south(4));
-            mam(source, level, at.west(4), data);
             deployer(source, level, at.north(6));
         } catch (RuntimeException e) {
             report(source, "FAILED with " + e);
@@ -97,7 +104,6 @@ public final class AutomateTests {
             level.setChunkForced(x >> 4, z >> 4, false);
             data.companies().remove(YES);
             data.companies().remove(NO);
-            data.companies().remove(MAM);
         }
         return 1;
     }
@@ -142,83 +148,132 @@ public final class AutomateTests {
         level.setBlockAndUpdate(at.east(), Blocks.AIR.defaultBlockState());
     }
 
-    /** A Workshop picks the Node Scanner (2 Iron Sheet, 4 Wire), is fed through the transfer API and emptied the same way. */
-    private static void workshop(CommandSourceStack source, ServerLevel level, BlockPos at) {
-        for (String company : List.of(YES, NO)) {
-            level.setBlockAndUpdate(at, ModBlocks.EQUIPMENT_WORKSHOP.get().defaultBlockState());
-            if (!(level.getBlockEntity(at) instanceof WorkshopBlockEntity workshop)) {
-                report(source, "workshop: no block entity");
-                return;
-            }
-            workshop.setAttached(Ownership.OWNER, company);
-            // the Portable Miner needs HUB Upgrade 1, so only the unlocked company's Workshop takes its parts
-            String target = company.equals(YES) ? "siftec:node_scanner" : "siftec:portable_miner";
-            workshop.pick(Identifier.parse(target), null);
-            Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, at, Direction.UP);
-            if (storage == null) {
-                report(source, "workshop: no item storage");
-                return;
-            }
-            long sheets, wires, rods, extra;
-            try (Transaction t = Transaction.openOuter()) {
-                sheets = storage.insert(ItemVariant.of(item("create:iron_sheet")), 64, t);
-                wires = storage.insert(ItemVariant.of(item("siftec:wire")), 64, t);
-                rods = storage.insert(ItemVariant.of(item("siftec:iron_rod")), 64, t);
-                extra = storage.insert(ItemVariant.of(item("minecraft:dirt")), 64, t);
-                t.commit();
-            }
-            workshop.tryBuild();
-            long out;
-            try (Transaction t = Transaction.openOuter()) {
-                out = storage.extract(ItemVariant.of(item(target)), 64, t);
-                t.commit();
-            }
-            report(source, "workshop " + (company.equals(YES) ? "unlocked company building the Node Scanner" : "locked company picking the Portable Miner")
-                + ": took " + sheets + " Iron Sheet, " + wires + " Wire, " + rods + " Iron Rod, " + extra + " dirt; funnel took out " + out + " " + target);
-            level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
-        }
+    private static ItemStack first(Ingredient ingredient) {
+        return ingredient.items().findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
-    /** A MAM fed through the transfer API: the parts go to the company's picked node, whose research then starts. */
-    private static void mam(CommandSourceStack source, ServerLevel level, BlockPos at, CompanyData data) {
-        Company company = new Company();
-        company.id = MAM;
-        for (Milestone m : Milestones.all()) company.done.add(m.id());
-        for (Milestones.Tree tree : Milestones.trees()) for (Milestone m : tree.nodes()) company.done.remove(m.id());
-        data.companies().put(company.id, company);
-        Milestone node = null;
-        for (Milestones.Tree tree : Milestones.trees()) {
-            for (Milestone m : tree.nodes()) {
-                if (node == null && Milestones.blocker(company, m) == null && m.cost().stream().noneMatch(c -> c.isTag() || !c.present())) node = m;
-            }
+    /**
+     * Runs the sequenced assembly that makes the item, one step after another, asking for each step's recipe the way a
+     * Deployer on a belt does (its held item and the item in front of it) while that Deployer ticks for the company.
+     */
+    private static void assembly(CommandSourceStack source, ServerLevel level, BlockPos at, String made) {
+        SequencedAssemblyRecipe line = null;
+        for (RecipeHolder<?> holder : source.getServer().getRecipeManager().getRecipes()) {
+            if (holder.value() instanceof SequencedAssemblyRecipe r && BuiltInRegistries.ITEM.getKey(r.result().item().value()).toString().equals(made)) line = r;
         }
-        if (node == null) {
-            report(source, "mam: no node to test");
+        if (line == null) {
+            report(source, "assembly " + made + ": no sequenced assembly makes it");
             return;
         }
-        level.setBlockAndUpdate(at, ModBlocks.MAM.get().defaultBlockState());
-        BlockEntity mam = level.getBlockEntity(at);
-        if (mam == null) {
-            report(source, "mam: no block entity");
+        level.setBlockAndUpdate(at, BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:deployer")).defaultBlockState());
+        BlockEntity deployer = level.getBlockEntity(at);
+        if (deployer == null) {
+            report(source, "assembly: the deployer has no block entity");
             return;
         }
-        mam.setAttached(Ownership.OWNER, company.id);
-        Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, at, Direction.UP);
-        long before = 0, taken = 0;
-        if (storage != null) {
-            try (Transaction t = Transaction.openOuter()) {
-                for (Milestone.Cost cost : node.cost()) before += storage.insert(ItemVariant.of(item(cost.key())), cost.count(), t);
-                t.abort();
+        StringBuilder said = new StringBuilder();
+        for (String company : List.of(YES, NO)) {
+            deployer.setAttached(Ownership.OWNER, company);
+            ItemStack stack = first(line.ingredient());
+            int used = 1, step = 0;
+            String outcome = null;
+            Ownership.ticking(deployer);
+            try {
+                for (Recipe<?> recipe : line.sequence()) {
+                    step++;
+                    if (!(recipe instanceof ItemApplicationRecipe application)) {
+                        outcome = "step " + step + " is not a Deployer step";
+                        break;
+                    }
+                    ItemApplicationInput input = new ItemApplicationInput(stack, first(application.ingredient()));
+                    var found = level.recipeAccess().getRecipeFor(com.zurrtum.create.AllRecipeTypes.DEPLOYING, input, level);
+                    if (found.isEmpty()) {
+                        outcome = "refused at step " + step + " of " + line.sequence().size();
+                        break;
+                    }
+                    List<ItemStack> out = found.get().value().assemble(input, level.getRandom());
+                    stack = out.isEmpty() ? ItemStack.EMPTY : out.get(0);
+                    used++;
+                }
+            } finally {
+                Ownership.ticking(null);
             }
-            company.mamPick = node.id();
-            try (Transaction t = Transaction.openOuter()) {
-                for (Milestone.Cost cost : node.cost()) taken += storage.insert(ItemVariant.of(item(cost.key())), cost.count() + 5, t);
-                t.commit();
-            }
+            if (outcome == null) outcome = stack + " after " + line.sequence().size() + " steps from " + used + " parts";
+            said.append(company.equals(YES) ? "unlocked company: " : "; locked company: ").append(outcome);
         }
-        int total = node.cost().stream().mapToInt(c -> company.cost(c)).sum();
-        report(source, "mam: node " + node.id() + " costs " + total + " parts; taken before it was picked " + before + ", after " + taken
-            + "; research now '" + company.research + "'" + (storage == null ? " (no item storage)" : ""));
+        report(source, "assembly " + made + ": " + said);
+        level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
+    }
+
+    /** The Mechanical Crafter recipe that makes the item, its grid laid out as the crafters hold it. */
+    private static void crafted(CommandSourceStack source, ServerLevel level, BlockPos at, String made) {
+        MechanicalCraftingRecipe recipe = null;
+        for (RecipeHolder<?> holder : source.getServer().getRecipeManager().getRecipes()) {
+            if (holder.value() instanceof MechanicalCraftingRecipe r && holder.id().identifier().getNamespace().equals("siftec")
+                && BuiltInRegistries.ITEM.getKey(r.result().item().value()).toString().equals(made)) recipe = r;
+        }
+        if (recipe == null) {
+            report(source, "crafter " + made + ": no Mechanical Crafter recipe makes it");
+            return;
+        }
+        List<ItemStack> cells = new ArrayList<>();
+        int parts = 0;
+        for (java.util.Optional<Ingredient> cell : recipe.raw().ingredients()) {
+            ItemStack stack = cell.map(AutomateTests::first).orElse(ItemStack.EMPTY);
+            if (!stack.isEmpty()) parts++;
+            cells.add(stack);
+        }
+        CraftingInput grid = CraftingInput.of(recipe.raw().width(), recipe.raw().height(), cells);
+        level.setBlockAndUpdate(at, BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:mechanical_crafter")).defaultBlockState());
+        BlockEntity crafter = level.getBlockEntity(at);
+        if (crafter == null) {
+            report(source, "crafter: no block entity");
+            return;
+        }
+        StringBuilder said = new StringBuilder();
+        for (String company : List.of(YES, NO)) {
+            crafter.setAttached(Ownership.OWNER, company);
+            String result;
+            Ownership.ticking(crafter);
+            try {
+                result = level.recipeAccess().getRecipeFor(com.zurrtum.create.AllRecipeTypes.MECHANICAL_CRAFTING, grid, level)
+                    .map(h -> h.value().assemble(grid).toString()).orElse("refused");
+            } finally {
+                Ownership.ticking(null);
+            }
+            said.append(company.equals(YES) ? "unlocked company: " : "; locked company: ").append(result);
+        }
+        report(source, "crafter " + made + " (" + recipe.raw().width() + " by " + recipe.raw().height() + ", " + parts + " parts): " + said);
+        level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
+    }
+
+    /**
+     * A Workshop loaded from what the old automatic mode saved (4 Wire held, a Node Scanner in the output slot): it
+     * takes nothing from belts any more, and gives what it held to the player who opens it.
+     */
+    private static void workshop(CommandSourceStack source, ServerLevel level, BlockPos at) {
+        level.setBlockAndUpdate(at, ModBlocks.EQUIPMENT_WORKSHOP.get().defaultBlockState());
+        if (!(level.getBlockEntity(at) instanceof WorkshopBlockEntity workshop)) {
+            report(source, "workshop: no block entity");
+            return;
+        }
+        net.minecraft.nbt.CompoundTag saved = new net.minecraft.nbt.CompoundTag();
+        net.minecraft.nbt.CompoundTag held = new net.minecraft.nbt.CompoundTag();
+        held.putInt("siftec:wire", 4);
+        saved.put("Held", held);
+        saved.putString("Target", "siftec:node_scanner");
+        saved.put("Output", ItemStack.OPTIONAL_CODEC.encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE),
+            new ItemStack(item("siftec:node_scanner"))).getOrThrow());
+        workshop.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), saved));
+        int loaded = workshop.leftover();
+        boolean storage = net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, at, Direction.UP) != null;
+        FakePlayer fake = FakePlayer.get(level);
+        fake.getInventory().clearContent();
+        boolean gave = workshop.giveBack(fake);
+        int wire = fake.getInventory().countItem(item("siftec:wire")), scanners = fake.getInventory().countItem(item("siftec:node_scanner"));
+        fake.getInventory().clearContent();
+        report(source, "workshop: loaded " + loaded + " items from the old save; takes items from belts: " + storage + "; gave back " + gave
+            + " (" + wire + " Wire, " + scanners + " Node Scanner); left " + workshop.leftover());
         level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
     }
 

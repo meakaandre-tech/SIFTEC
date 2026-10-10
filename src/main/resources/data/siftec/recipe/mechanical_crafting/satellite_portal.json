@@ -1,0 +1,14 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:portal_module"
+  },
+  "pattern": [
+    "AAA",
+    "AA "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:satellite_portal"
+  }
+}

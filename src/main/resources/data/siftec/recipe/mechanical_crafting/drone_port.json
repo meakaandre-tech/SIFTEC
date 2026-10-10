@@ -1,0 +1,15 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:drone_port_module"
+  },
+  "pattern": [
+    "AAAA",
+    "AAAA",
+    "AA  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:drone_port"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:jetpack_thruster",
+  "transitional_item": {
+    "id": "siftec:incomplete_jetpack"
+  },
+  "result": {
+    "id": "siftec:jetpack"
+  },
+  "loops": 4,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:circuit_board",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:jetpack_thruster",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

@@ -33,8 +33,6 @@ public class Company {
     /** The alternates a finished Hard Drive is offering; empty when there is nothing to choose. */
     public java.util.List<String> offer = new java.util.ArrayList<>();
     public String research = "";
-    /** The MAM node that parts arriving at a MAM by belt or funnel go to; empty for none. */
-    public String mamPick = "";
     public long researchEnd;
     /** The Dimensional Depot cloud: item id -> count. */
     public Map<String, Integer> cloud = new HashMap<>();

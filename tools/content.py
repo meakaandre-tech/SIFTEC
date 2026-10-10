@@ -77,7 +77,41 @@ PARTS = [
     ("incomplete_superposition_oscillator", "Incomplete Superposition Oscillator", "minecraft:item/clock_00", 0x808080),
     ("incomplete_neural_quantum_processor", "Incomplete Neural-Quantum Processor", "minecraft:item/ender_eye", 0x808080),
     ("incomplete_ai_expansion_server", "Incomplete AI Expansion Server", "minecraft:item/music_disc_5", 0x808080),
+    # sub-assemblies on the machine routes for the big Workshop builds (recipes.workshop_by_machine); each is locked
+    # with the build it goes into (ASSEMBLY_LOCKS below)
+    ("gateway_coil", "Gateway Coil", "minecraft:item/lead", 0xE0803C), ("gateway_frame", "Gateway Frame", "minecraft:item/item_frame", 0xB8B8C0),
+    ("landing_cushion", "Landing Cushion", "minecraft:item/leather", 0x8CB060), ("jetpack_thruster", "Jetpack Thruster", "create:item/propeller", 0x50A0E8),
+    ("hazmat_lining", "Hazmat Lining", "minecraft:item/paper", 0xE8E040), ("hover_thruster", "Hover Thruster", "create:item/propeller", 0xE8D0B8),
+    ("drone_port_module", "Drone Port Module", "create:item/sturdy_sheet", 0x90C0E0),
+    ("accelerator_segment", "Accelerator Segment", "minecraft:item/nautilus_shell", 0x80C0FF),
+    ("converter_core", "Converter Core", "minecraft:item/heart_of_the_sea", None), ("portal_module", "Portal Module", "minecraft:item/end_crystal", None),
+    ("geyser_core", "Geyser Engine Core", "minecraft:item/magma_cream", None), ("extractor_pump", "Extractor Pump", "minecraft:item/hopper", 0xE0E8F8),
+    ("drill_shaft", "Drill Shaft", "minecraft:item/blaze_rod", 0x70747C), ("designer_frame", "Designer Frame", "minecraft:item/item_frame", 0xA0D0FF),
 ]
+# Half-built items on the machine routes' sequenced assembly lines: (what the line makes, its name, texture)
+for _rid, _name, _tex in (
+        ("furnace_engine", "Furnace Engine", "minecraft:item/minecart"), ("mam", "MAM", "minecraft:item/comparator"),
+        ("object_scanner", "Object Scanner", "minecraft:item/compass_16"), ("gateway_coil", "Gateway Coil", "minecraft:item/lead"),
+        ("gateway_frame", "Gateway Frame", "minecraft:item/item_frame"), ("wormhole_gateway", "Wormhole Gateway", "minecraft:item/end_crystal"),
+        ("landing_cushion", "Landing Cushion", "minecraft:item/leather"), ("landing_pad", "Landing Pad", "minecraft:item/leather"),
+        ("awesome_sink", "AWESOME Sink", "minecraft:item/hopper"), ("awesome_shop", "AWESOME Shop", "minecraft:item/emerald"),
+        ("blueprint_designer", "Blueprint Designer", "minecraft:item/map"), ("power_storage", "Power Storage", "minecraft:item/redstone"),
+        ("speed_governor", "Speed Governor", "minecraft:item/clock_00"), ("blade_runners", "Blade Runners", "minecraft:item/iron_boots"),
+        ("dimensional_depot", "Dimensional Depot", "minecraft:item/ender_pearl"), ("miner_mk2", "Miner Mk.2", "minecraft:item/iron_pickaxe"),
+        ("jetpack_thruster", "Jetpack Thruster", "create:item/propeller"), ("jetpack", "Jetpack", "minecraft:item/elytra"),
+        ("gas_mask", "Gas Mask", "minecraft:item/leather_helmet"), ("radar_tower", "Radar Tower", "minecraft:item/compass_16"),
+        ("drill_shaft", "Drill Shaft", "minecraft:item/blaze_rod"), ("designer_frame", "Designer Frame", "minecraft:item/item_frame")):
+    PARTS.append(("incomplete_" + _rid, "Incomplete " + _name, _tex, 0x808080))
+# The sub-assemblies' milestones: the build's own, or the one that brings the machine that makes them when that comes
+# later (the Wormhole Gateway is HUB Upgrade 6, but its coils and frames need the Deployer from Part Assembly)
+ASSEMBLY_LOCKS = {
+    "part_assembly": ["siftec:gateway_coil", "siftec:gateway_frame"], "jump_pads": ["siftec:landing_cushion"],
+    "jetpack": ["siftec:jetpack_thruster"], "hazmat_suit": ["siftec:hazmat_lining"], "hover_pack": ["siftec:hover_thruster"],
+    "aeronautical_engineering": ["siftec:drone_port_module"], "particle_enrichment": ["siftec:accelerator_segment"],
+    "matter_conversion": ["siftec:converter_core"], "spatial_energy_regulation": ["siftec:portal_module"],
+    "mam_sulfur_8": ["siftec:geyser_core"], "advanced_aluminum_production": ["siftec:extractor_pump"],
+    "leading_edge_production": ["siftec:drill_shaft"], "ficsit_blueprints_mk3": ["siftec:designer_frame"],
+}
 
 # Custom fluids: id, name, colour. They look like tinted water until real textures are picked.
 FLUIDS = [

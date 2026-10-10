@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:heavy_modular_frame",
+    "B": "siftec:supercomputer",
+    "C": "siftec:steel_pipe",
+    "D": "siftec:rubber"
+  },
+  "pattern": [
+    "AABC",
+    "CCCC",
+    "DD  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:geyser_core"
+  }
+}

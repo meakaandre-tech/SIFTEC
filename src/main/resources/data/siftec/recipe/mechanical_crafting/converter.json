@@ -1,0 +1,14 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:converter_core"
+  },
+  "pattern": [
+    "AAA",
+    "AA "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:converter"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:extractor_pump"
+  },
+  "pattern": [
+    "AAAA",
+    "AAAA",
+    "AA  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:resource_well_extractor"
+  }
+}

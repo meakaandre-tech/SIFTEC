@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:designer_frame",
+    "B": "siftec:neural_quantum_processor"
+  },
+  "pattern": [
+    "AAAA",
+    "AAAA",
+    "AABB",
+    "BBB "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:blueprint_designer_mk3"
+  }
+}

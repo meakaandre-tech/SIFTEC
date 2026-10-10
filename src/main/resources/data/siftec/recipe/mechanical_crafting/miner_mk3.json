@@ -1,0 +1,20 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:drill_shaft",
+    "B": "siftec:portable_miner",
+    "C": "siftec:supercomputer",
+    "D": "siftec:turbo_motor"
+  },
+  "pattern": [
+    "AAAAA",
+    "AAAAA",
+    "BBBCC",
+    "CCCDD",
+    "D    "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:miner_mk3"
+  }
+}

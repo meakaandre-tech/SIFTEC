@@ -1,0 +1,18 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:aluminum_casing",
+    "B": "siftec:encased_industrial_beam",
+    "C": "siftec:motor",
+    "D": "siftec:rubber"
+  },
+  "pattern": [
+    "AABB",
+    "CDDD",
+    "DD  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:extractor_pump"
+  }
+}

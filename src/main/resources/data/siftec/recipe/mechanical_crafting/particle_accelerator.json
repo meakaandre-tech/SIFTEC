@@ -1,0 +1,17 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:accelerator_segment",
+    "B": "siftec:radio_control_unit"
+  },
+  "pattern": [
+    "AAAA",
+    "AAAA",
+    "AABB",
+    "BBB "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:particle_accelerator"
+  }
+}

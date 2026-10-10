@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:hover_thruster",
+    "B": "siftec:heavy_modular_frame"
+  },
+  "pattern": [
+    "AAAA",
+    "AAAA",
+    "BBBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:hover_pack"
+  }
+}

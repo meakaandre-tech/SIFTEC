@@ -243,6 +243,114 @@
     },
     {
       "id": "incomplete_ai_expansion_server"
+    },
+    {
+      "id": "gateway_coil"
+    },
+    {
+      "id": "gateway_frame"
+    },
+    {
+      "id": "landing_cushion"
+    },
+    {
+      "id": "jetpack_thruster"
+    },
+    {
+      "id": "hazmat_lining"
+    },
+    {
+      "id": "hover_thruster"
+    },
+    {
+      "id": "drone_port_module"
+    },
+    {
+      "id": "accelerator_segment"
+    },
+    {
+      "id": "converter_core"
+    },
+    {
+      "id": "portal_module"
+    },
+    {
+      "id": "geyser_core"
+    },
+    {
+      "id": "extractor_pump"
+    },
+    {
+      "id": "drill_shaft"
+    },
+    {
+      "id": "designer_frame"
+    },
+    {
+      "id": "incomplete_furnace_engine"
+    },
+    {
+      "id": "incomplete_mam"
+    },
+    {
+      "id": "incomplete_object_scanner"
+    },
+    {
+      "id": "incomplete_gateway_coil"
+    },
+    {
+      "id": "incomplete_gateway_frame"
+    },
+    {
+      "id": "incomplete_wormhole_gateway"
+    },
+    {
+      "id": "incomplete_landing_cushion"
+    },
+    {
+      "id": "incomplete_landing_pad"
+    },
+    {
+      "id": "incomplete_awesome_sink"
+    },
+    {
+      "id": "incomplete_awesome_shop"
+    },
+    {
+      "id": "incomplete_blueprint_designer"
+    },
+    {
+      "id": "incomplete_power_storage"
+    },
+    {
+      "id": "incomplete_speed_governor"
+    },
+    {
+      "id": "incomplete_blade_runners"
+    },
+    {
+      "id": "incomplete_dimensional_depot"
+    },
+    {
+      "id": "incomplete_miner_mk2"
+    },
+    {
+      "id": "incomplete_jetpack_thruster"
+    },
+    {
+      "id": "incomplete_jetpack"
+    },
+    {
+      "id": "incomplete_gas_mask"
+    },
+    {
+      "id": "incomplete_radar_tower"
+    },
+    {
+      "id": "incomplete_drill_shaft"
+    },
+    {
+      "id": "incomplete_designer_frame"
     }
   ],
   "milestones": [
@@ -897,7 +1005,9 @@
         "create:copper_sheet",
         "siftec:rotor",
         "siftec:modular_frame",
-        "siftec:smart_plating"
+        "siftec:smart_plating",
+        "siftec:gateway_coil",
+        "siftec:gateway_frame"
       ],
       "tokens": []
     },
@@ -949,7 +1059,8 @@
       "seconds": 240,
       "items": [
         "create:weighted_ejector",
-        "siftec:landing_pad"
+        "siftec:landing_pad",
+        "siftec:landing_cushion"
       ],
       "tokens": []
     },
@@ -1353,7 +1464,8 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:jetpack"
+        "siftec:jetpack",
+        "siftec:jetpack_thruster"
       ],
       "tokens": [
         "backpack"
@@ -1684,7 +1796,8 @@
       "seconds": 300,
       "items": [
         "siftec:hazmat_suit",
-        "siftec:iodine_infused_filter"
+        "siftec:iodine_infused_filter",
+        "siftec:hazmat_lining"
       ],
       "tokens": [
         "backpack"
@@ -1713,7 +1826,8 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:hover_pack"
+        "siftec:hover_pack",
+        "siftec:hover_thruster"
       ],
       "tokens": [
         "backpack"
@@ -1762,7 +1876,8 @@
         "create:cardboard_leggings",
         "create:cardboard_boots",
         "create:cardboard_sword",
-        "create:package_filter"
+        "create:package_filter",
+        "siftec:drone_port_module"
       ],
       "tokens": [
         "scanner:sulfur"
@@ -1797,7 +1912,8 @@
         "siftec:heat_sink",
         "siftec:cooling_system",
         "siftec:fused_modular_frame",
-        "siftec:electromagnetic_control_rod"
+        "siftec:electromagnetic_control_rod",
+        "siftec:extractor_pump"
       ],
       "tokens": [
         "scanner:nitrogen"
@@ -1825,7 +1941,8 @@
         "siftec:miner_mk3",
         "siftec:turbo_motor",
         "siftec:thermal_propulsion_rocket",
-        "siftec:magnetic_field_generator"
+        "siftec:magnetic_field_generator",
+        "siftec:drill_shaft"
       ],
       "tokens": []
     },
@@ -1855,7 +1972,8 @@
         "siftec:particle_accelerator",
         "siftec:copper_powder",
         "siftec:pressure_conversion_cube",
-        "siftec:nuclear_pasta"
+        "siftec:nuclear_pasta",
+        "siftec:accelerator_segment"
       ],
       "tokens": []
     },
@@ -1884,7 +2002,8 @@
         "siftec:ficsite_ingot",
         "siftec:ficsite_trigon",
         "siftec:time_crystal",
-        "siftec:biochemical_sculptor"
+        "siftec:biochemical_sculptor",
+        "siftec:converter_core"
       ],
       "tokens": [
         "scanner:sam"
@@ -1942,7 +2061,8 @@
       ],
       "seconds": 1200,
       "items": [
-        "siftec:blueprint_designer_mk3"
+        "siftec:blueprint_designer_mk3",
+        "siftec:designer_frame"
       ],
       "tokens": []
     },
@@ -1972,7 +2092,8 @@
         "siftec:main_portal",
         "siftec:satellite_portal",
         "siftec:singularity_cell",
-        "siftec:ballistic_warp_drive"
+        "siftec:ballistic_warp_drive",
+        "siftec:portal_module"
       ],
       "tokens": []
     },
@@ -3287,7 +3408,8 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:geyser_engine"
+        "siftec:geyser_engine",
+        "siftec:geyser_core"
       ],
       "tokens": [],
       "needs": [
@@ -4023,6 +4145,47 @@
     "siftec:mechanical_crafting/workshop_power_tower": "expanded_power_infrastructure",
     "siftec:mechanical_crafting/workshop_parachute": "mam_mycelia_3",
     "siftec:mechanical_crafting/workshop_cardboard_drone": "aeronautical_engineering",
+    "seq:furnace_engine": "hub_upgrade_6",
+    "seq:mam": "field_research",
+    "seq:object_scanner": "field_research",
+    "seq:gateway_coil": "part_assembly",
+    "seq:gateway_frame": "part_assembly",
+    "seq:wormhole_gateway": "hub_upgrade_6",
+    "seq:landing_cushion": "jump_pads",
+    "seq:landing_pad": "jump_pads",
+    "seq:awesome_sink": "resource_sink_bonus_program",
+    "seq:awesome_shop": "resource_sink_bonus_program",
+    "seq:blueprint_designer": "ficsit_blueprints",
+    "seq:power_storage": "expanded_power_infrastructure",
+    "seq:speed_governor": "mam_caterium_5",
+    "seq:blade_runners": "mam_quartz_6",
+    "seq:dimensional_depot": "mam_alien_2",
+    "seq:miner_mk2": "advanced_steel_production",
+    "seq:jetpack_thruster": "jetpack",
+    "seq:jetpack": "jetpack",
+    "seq:gas_mask": "mam_mycelia_5",
+    "seq:radar_tower": "mam_quartz_7",
+    "seq:drill_shaft": "leading_edge_production",
+    "seq:designer_frame": "ficsit_blueprints_mk3",
+    "siftec:mechanical_crafting/hazmat_lining": "hazmat_suit",
+    "siftec:mechanical_crafting/hazmat_suit": "hazmat_suit",
+    "siftec:mechanical_crafting/hover_thruster": "hover_pack",
+    "siftec:mechanical_crafting/hover_pack": "hover_pack",
+    "siftec:mechanical_crafting/drone_port_module": "aeronautical_engineering",
+    "siftec:mechanical_crafting/drone_port": "aeronautical_engineering",
+    "siftec:mechanical_crafting/accelerator_segment": "particle_enrichment",
+    "siftec:mechanical_crafting/particle_accelerator": "particle_enrichment",
+    "siftec:mechanical_crafting/converter_core": "matter_conversion",
+    "siftec:mechanical_crafting/converter": "matter_conversion",
+    "siftec:mechanical_crafting/portal_module": "spatial_energy_regulation",
+    "siftec:mechanical_crafting/satellite_portal": "spatial_energy_regulation",
+    "siftec:mechanical_crafting/main_portal": "spatial_energy_regulation",
+    "siftec:mechanical_crafting/geyser_core": "mam_sulfur_8",
+    "siftec:mechanical_crafting/geyser_engine": "mam_sulfur_8",
+    "siftec:mechanical_crafting/extractor_pump": "advanced_aluminum_production",
+    "siftec:mechanical_crafting/resource_well_extractor": "advanced_aluminum_production",
+    "siftec:mechanical_crafting/miner_mk3": "leading_edge_production",
+    "siftec:mechanical_crafting/blueprint_designer_mk3": "ficsit_blueprints_mk3",
     "siftec:mixing/liquid_biofuel": "fluid_packaging",
     "siftec:mixing/sulfuric_acid": "aeronautical_engineering",
     "siftec:mixing/nitric_acid": "particle_enrichment",

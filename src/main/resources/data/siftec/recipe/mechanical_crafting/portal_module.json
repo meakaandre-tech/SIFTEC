@@ -1,0 +1,20 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:turbo_motor",
+    "B": "siftec:radio_control_unit",
+    "C": "siftec:superposition_oscillator",
+    "D": "siftec:sam_fluctuator",
+    "E": "siftec:ficsite_trigon"
+  },
+  "pattern": [
+    "ABBC",
+    "DDEE",
+    "EEEE",
+    "EEEE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:portal_module"
+  }
+}

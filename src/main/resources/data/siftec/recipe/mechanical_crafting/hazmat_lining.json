@@ -1,0 +1,19 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:rubber",
+    "B": "siftec:plastic",
+    "C": "siftec:alclad_aluminum_sheet",
+    "D": "siftec:fabric"
+  },
+  "pattern": [
+    "AAAAA",
+    "BBBBB",
+    "CCCCC",
+    "DDDDD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:hazmat_lining"
+  }
+}
