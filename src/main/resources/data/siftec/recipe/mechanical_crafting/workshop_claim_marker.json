@@ -1,0 +1,16 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:iron_rod",
+    "B": "minecraft:light_gray_concrete"
+  },
+  "pattern": [
+    "AAAA",
+    "ABBB",
+    "BB  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:claim_marker"
+  }
+}

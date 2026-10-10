@@ -18,6 +18,7 @@ siftec worldtest geyser build 160
 siftec worldtest geyser natural 160
 siftec worldtest geyser wet 160
 siftec worldtest processor
+siftec worldtest automate
 siftec worldtest furnace setup
 siftec worldtest powerline setup
 siftec worldtest powerchain setup

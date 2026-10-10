@@ -31,19 +31,24 @@ public class WorkshopMenu extends ChestMenu {
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final Company company;
+    /** The last slot shows what the Workshop has built automatically; a click takes it. */
+    private static final int OUTPUT = SIZE - 1;
     private final List<Milestones.Build> shown = new ArrayList<>();
+    private final @org.jspecify.annotations.Nullable WorkshopBlockEntity workshop;
 
-    private WorkshopMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company) {
+    private WorkshopMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company,
+                         @org.jspecify.annotations.Nullable WorkshopBlockEntity workshop) {
         super(MenuType.GENERIC_9x6, id, inventory, view, 6);
         this.view = view;
         this.player = player;
         this.company = company;
+        this.workshop = workshop;
         refresh();
     }
 
-    public static void open(ServerPlayer player, Company company) {
+    public static void open(ServerPlayer player, Company company, @org.jspecify.annotations.Nullable WorkshopBlockEntity workshop) {
         player.openMenu(new SimpleMenuProvider(
-            (id, inventory, p) -> new WorkshopMenu(id, inventory, new SimpleContainer(SIZE), player, company),
+            (id, inventory, p) -> new WorkshopMenu(id, inventory, new SimpleContainer(SIZE), player, company, workshop),
             Component.translatable("siftec.workshop.title")));
     }
 
@@ -52,7 +57,7 @@ public class WorkshopMenu extends ChestMenu {
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         for (Milestones.Build build : Milestones.workshop()) {
             Item result = BuiltInRegistries.ITEM.getOptional(build.item()).orElse(Items.AIR);
-            if (result == Items.AIR || shown.size() >= SIZE) continue;
+            if (result == Items.AIR || shown.size() >= OUTPUT) continue;
             Milestone lock = Locks.lockOf(result);
             if (lock != null && !company.has(lock.id()) && !player.hasInfiniteMaterials()) continue;
             ItemStack icon = new ItemStack(result);
@@ -65,10 +70,51 @@ public class WorkshopMenu extends ChestMenu {
             }
             lore.add(Component.empty().append(Component.translatable("siftec.workshop.click"))
                 .withStyle(style -> style.withItalic(false).withColor(ChatFormatting.YELLOW)));
+            if (workshop != null) {
+                boolean picked = build.item().equals(workshop.target());
+                lore.add(Component.empty().append(Component.translatable(picked ? "siftec.workshop.auto.on" : "siftec.workshop.auto.pick"))
+                    .withStyle(style -> style.withItalic(false).withColor(picked ? ChatFormatting.AQUA : ChatFormatting.GRAY)));
+                if (picked) {
+                    icon.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+                    for (Milestone.Cost cost : build.cost()) {
+                        if (!cost.present() || cost.isTag()) continue;
+                        int in = Math.min(workshop.held(BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse(cost.key()))), cost.count());
+                        lore.add(Component.empty().append(Component.translatable("siftec.workshop.auto.held", cost.label(), in, cost.count()))
+                            .withStyle(style -> style.withItalic(false).withColor(ChatFormatting.AQUA)));
+                    }
+                }
+            }
             icon.set(DataComponents.LORE, new ItemLore(lore));
             view.setItem(shown.size(), icon);
             shown.add(build);
         }
+        if (workshop != null) view.setItem(OUTPUT, workshop.output.getItem(0).copy());
+    }
+
+    /** A right-click: build this one automatically (or stop, if it already is). */
+    private void pick(int slot) {
+        if (workshop == null || slot >= shown.size()) return;
+        Milestones.Build build = shown.get(slot);
+        if (build.item().equals(workshop.target())) {
+            workshop.pick(null, player);
+            player.sendOverlayMessage(Component.translatable("siftec.workshop.auto.stopped"));
+        } else if (!workshop.unlocked(build.item())) {
+            player.sendOverlayMessage(Component.translatable("siftec.workshop.auto.locked"));
+        } else {
+            workshop.pick(build.item(), player);
+            player.sendOverlayMessage(Component.translatable("siftec.workshop.auto.picked",
+                new ItemStack(BuiltInRegistries.ITEM.getValue(build.item())).getItemName()));
+        }
+        refresh();
+    }
+
+    private void takeOutput() {
+        if (workshop == null) return;
+        ItemStack out = workshop.output.removeItemNoUpdate(0);
+        workshop.output.setChanged();
+        if (!out.isEmpty()) player.getInventory().placeItemBackInInventory(out, Prediction.SERVER_ONLY);
+        workshop.tryBuild();
+        refresh();
     }
 
     private void press(int slot) {
@@ -93,7 +139,13 @@ public class WorkshopMenu extends ChestMenu {
     @Override
     public void clicked(int slot, int button, ContainerInput input, Player who) {
         if (slot >= 0 && slot < SIZE) {
-            if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) press(slot);
+            if (slot == OUTPUT) {
+                if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) takeOutput();
+            } else if (input == ContainerInput.PICKUP && button == 1) {
+                pick(slot);
+            } else if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) {
+                press(slot);
+            }
             return;
         }
         if (input == ContainerInput.PICKUP || input == ContainerInput.THROW) super.clicked(slot, button, input, who);

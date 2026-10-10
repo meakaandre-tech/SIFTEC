@@ -1,0 +1,19 @@
+{
+  "type": "create:mechanical_crafting",
+  "key": {
+    "A": "siftec:steel_beam",
+    "B": "minecraft:light_gray_concrete",
+    "C": "siftec:wire"
+  },
+  "pattern": [
+    "AAAAA",
+    "BBBBB",
+    "BBBBB",
+    "CCCCC",
+    "CCCCC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "siftec:power_tower"
+  }
+}
