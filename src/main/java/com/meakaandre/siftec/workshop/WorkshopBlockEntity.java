@@ -68,7 +68,7 @@ public class WorkshopBlockEntity extends BlockEntity {
         return target;
     }
 
-    private @Nullable Milestones.Build build() {
+    private Milestones.@Nullable Build build() {
         if (target == null) return null;
         for (Milestones.Build build : Milestones.workshop()) if (build.item().equals(target)) return build;
         return null;
