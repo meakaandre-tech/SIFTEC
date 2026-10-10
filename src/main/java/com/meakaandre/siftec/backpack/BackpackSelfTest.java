@@ -32,6 +32,8 @@ import java.util.Map;
  * diamond dropped on the player to be picked up (into the backpack);</li>
  * <li>{@code chest}: opens the test chest (16 iron ingots in its first slot the first time);</li>
  * <li>{@code check}: counts every test item in the inventory, backpack, test chest, cursor and on the ground;</li>
+ * <li>{@code open <kind>}: opens a furnace, hopper, crafting table, anvil or large chest window (for screenshots);</li>
+ * <li>{@code pick}: pick block on a granite block while the only granite is in the backpack;</li>
  * <li>{@code drop}: puts items in the backpack and runs the death drop, then picks the items up again by hand.</li>
  * </ul>
  */
@@ -52,7 +54,10 @@ public final class BackpackSelfTest {
                     .then(Commands.literal("fill").executes(context -> fill(context.getSource())))
                     .then(Commands.literal("chest").executes(context -> chest(context.getSource())))
                     .then(Commands.literal("check").executes(context -> check(context.getSource())))
-                    .then(Commands.literal("drop").executes(context -> drop(context.getSource())))))
+                    .then(Commands.literal("drop").executes(context -> drop(context.getSource())))
+                    .then(Commands.literal("pick").executes(context -> pick(context.getSource())))
+                    .then(Commands.literal("open").then(Commands.argument("kind", com.mojang.brigadier.arguments.StringArgumentType.word())
+                        .executes(context -> open(context.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(context, "kind")))))))
         ));
     }
 
@@ -160,6 +165,47 @@ public final class BackpackSelfTest {
             for (ItemEntity entity : dropped) entity.discard();
             report(source, "SELFTEST bp drop: death drop takes the backpack along: backpack empty " + empty + ", dropped gold " + gold
                 + " emerald " + emerald + " stick " + stick + " (entities before " + before + ") ok " + (empty && gold == 7 && emerald == 3 && stick == 2));
+        }
+        return 1;
+    }
+
+    private static int open(CommandSourceStack source, String kind) {
+        for (ServerPlayer player : players(source)) {
+            net.minecraft.world.inventory.MenuConstructor menu = switch (kind) {
+                case "furnace" -> (id, inventory, p) -> new net.minecraft.world.inventory.FurnaceMenu(id, inventory);
+                case "hopper" -> (id, inventory, p) -> new net.minecraft.world.inventory.HopperMenu(id, inventory);
+                case "crafting" -> (id, inventory, p) -> new net.minecraft.world.inventory.CraftingMenu(id, inventory);
+                case "anvil" -> (id, inventory, p) -> new net.minecraft.world.inventory.AnvilMenu(id, inventory);
+                default -> (id, inventory, p) -> ChestMenu.sixRows(id, inventory);
+            };
+            player.openMenu(new SimpleMenuProvider(menu, Component.literal("Backpack test " + kind)));
+            boolean rows = BackpackRows.of(player.containerMenu) != null;
+            report(source, "SELFTEST bp open " + kind + ": backpack rows in the window " + rows + ", slots " + player.containerMenu.slots.size());
+        }
+        return 1;
+    }
+
+    private static int pick(CommandSourceStack source) {
+        for (ServerPlayer player : players(source)) {
+            Inventory inventory = player.getInventory();
+            inventory.clearContent();
+            for (int i = 0; i < 9; i++) inventory.setItem(i, new ItemStack(Items.STICK, 1 + i));
+            List<ItemStack> items = player.getAttachedOrCreate(Backpack.CONTENTS).items;
+            items.clear();
+            items.set(4, new ItemStack(Items.GRANITE, 12));
+            net.minecraft.core.BlockPos pos = player.blockPosition().above(2);
+            net.minecraft.world.level.block.state.BlockState old = player.level().getBlockState(pos);
+            player.level().setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.GRANITE.defaultBlockState());
+            int selectedBefore = inventory.getSelectedSlot();
+            player.connection.handlePickItemFromBlock(new net.minecraft.network.protocol.game.ServerboundPickItemFromBlockPacket(pos, false));
+            player.level().setBlockAndUpdate(pos, old);
+            ItemStack held = inventory.getSelectedItem();
+            boolean ok = held.is(Items.GRANITE) && held.getCount() == 12 && items.get(4).is(Items.STICK) && count(items, Items.GRANITE) == 0;
+            report(source, "SELFTEST bp pick: selected " + selectedBefore + " -> " + inventory.getSelectedSlot() + " holding " + held
+                + ", backpack slot 4 now " + items.get(4) + "; ok " + ok);
+            inventory.clearContent();
+            items.clear();
+            player.inventoryMenu.broadcastChanges();
         }
         return 1;
     }

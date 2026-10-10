@@ -167,6 +167,35 @@ shot
 key Escape
 sleep 1
 cmd gamemode survival @a
+cmd siftec selftest bp slots 21
+sleep 2
+cmd siftec selftest bp open furnace
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp open hopper
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp open crafting
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp open anvil
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp open large
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp pick
+sleep 1
 cmd siftec selftest bp slots 0
 sleep 1
 cmd gamemode spectator @a
