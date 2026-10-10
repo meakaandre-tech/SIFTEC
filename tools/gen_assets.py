@@ -497,11 +497,14 @@ for cid, (tex, name) in COLLECT.items():
 # sits turned one of four ways, picked by its position.
 SLUG_UV = {"side": [7, 8, 13, 12], "skirt": [3, 11, 13, 13], "under": [4, 12, 12, 14], "top": [7, 6, 13, 10], "core": [6, 6, 9, 9]}
 # (from, to, uv of the sides, uv of the top, light the faces give off)
-SLUG_PARTS = [([3, 0, 4.5], [13, 2, 11.5], "skirt", "side", 9), ([4.5, 0, 3], [11.5, 2, 13], "skirt", "side", 9),
-              ([4, 1.5, 4], [12, 4.5, 12], "side", "top", 10), ([5, 4.5, 5], [11, 6, 11], "side", "top", 11),
-              ([5.5, 5.5, 6], [7.5, 7, 8], "core", "core", 13), ([8.5, 5.5, 8], [10, 6.5, 9.5], "top", "core", 12),
-              ([6, 2, 3.5], [8, 3.75, 4], "side", "top", 10), ([9.5, 1.75, 11.75], [11, 3.5, 12.5], "side", "top", 10),
-              ([6.5, 6, 6.5], [9.5, 6.75, 9.5], "core", "core", 15)]
+# (from, to, uv of the sides, uv of the top, light the faces give off): three layers, each two crossed boxes so the
+# corners come out round, the second a shade lower so no two tops lie in one plane; a glowing core and two lumps on top
+SLUG_PARTS = [([3, 0, 5], [13, 2, 11], "skirt", "side", 9), ([5, 0, 3], [11, 1.75, 13], "skirt", "side", 9),
+              ([4, 0, 4], [12, 1.5, 12], "skirt", "side", 9),
+              ([4, 2, 5], [12, 4, 11], "side", "top", 10), ([5, 2, 4], [11, 3.75, 12], "side", "top", 10),
+              ([5, 4, 6], [11, 5.5, 10], "side", "top", 11), ([6, 4, 5], [10, 5.25, 11], "side", "top", 11),
+              ([6.5, 5.5, 6.5], [9.5, 6.5, 9.5], "core", "core", 15),
+              ([8.75, 5.25, 5.75], [10, 6.25, 7], "top", "core", 13), ([5.75, 5.25, 8.75], [7, 6, 10], "top", "core", 13)]
 SLUG_MODELS = set()
 for cid in ("blue_power_slug", "yellow_power_slug", "purple_power_slug"):
     bid = f"{cid}_block"

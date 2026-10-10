@@ -26,8 +26,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class CollectibleBlock extends Block {
     private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 8, 12);
     /** The slug's blob (see tools/gen_assets.py): it fits whichever way the model is turned. */
-    private static final VoxelShape SLUG = Shapes.or(Block.box(3, 0, 4.5, 13, 2, 11.5), Block.box(4.5, 0, 3, 11.5, 2, 13),
-        Block.box(4, 0, 4, 12, 4.5, 12), Block.box(5, 4.5, 5, 11, 7, 11));
+    private static final VoxelShape SLUG = Shapes.or(Block.box(3, 0, 5, 13, 2, 11), Block.box(5, 0, 3, 11, 2, 13),
+        Block.box(4, 0, 4, 12, 4, 12), Block.box(5, 4, 5, 11, 6.5, 11));
     public final Collectible type;
 
     public CollectibleBlock(Collectible type, Properties properties) {
