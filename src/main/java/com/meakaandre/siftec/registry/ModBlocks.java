@@ -122,8 +122,10 @@ public class ModBlocks {
         for (Collectible type : Collectible.values()) {
             Identifier id = Siftec.id(type.id() + "_block");
             ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, id);
-            CollectibleBlock block = Registry.register(BuiltInRegistries.BLOCK, key, new CollectibleBlock(type,
-                node().noOcclusion().lightLevel(state -> type.light).sound(SoundType.SLIME_BLOCK).setId(key)));
+            BlockBehaviour.Properties properties = node().noOcclusion().lightLevel(state -> type.light).sound(SoundType.SLIME_BLOCK).setId(key);
+            // the slugs glow: drawn at full brightness however dark it is round them
+            if (type.slug()) properties = properties.emissiveRendering((state, level, pos) -> true);
+            CollectibleBlock block = Registry.register(BuiltInRegistries.BLOCK, key, new CollectibleBlock(type, properties));
             COLLECTIBLES.put(type, () -> block);
         }
     }
