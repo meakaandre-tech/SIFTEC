@@ -89,6 +89,7 @@ public final class AutomateTests {
             workshop(source, level, at.east(4));
             poles(source, level, at.south(4));
             mam(source, level, at.west(4), data);
+            deployer(source, level, at.north(6));
         } catch (RuntimeException e) {
             report(source, "FAILED with " + e);
             Siftec.LOGGER.error("automate selftest", e);
@@ -219,6 +220,52 @@ public final class AutomateTests {
         report(source, "mam: node " + node.id() + " costs " + total + " parts; taken before it was picked " + before + ", after " + taken
             + "; research now '" + company.research + "'" + (storage == null ? " (no item storage)" : ""));
         level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
+    }
+
+    /**
+     * A real Create Deployer facing east, holding Power Lines, with a Power Pole two blocks in front of it and another
+     * 12 blocks further east; it is made to act once, the way its own cycle does (the protected activate()).
+     */
+    private static void deployer(CommandSourceStack source, ServerLevel level, BlockPos at) {
+        net.minecraft.world.level.block.state.BlockState state = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:deployer")).defaultBlockState();
+        if (state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING)) {
+            state = state.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, Direction.EAST);
+        }
+        BlockPos a = at.east(2), b = at.east(14);
+        level.setBlockAndUpdate(at, state);
+        level.setBlockAndUpdate(a, ModBlocks.POWER_POLE.get().defaultBlockState());
+        level.setBlockAndUpdate(b, ModBlocks.POWER_POLE.get().defaultBlockState());
+        String result;
+        if (level.getBlockEntity(at) instanceof com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity deployer) {
+            try {
+                deployer.initHandler();
+                java.lang.reflect.Field field = com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.class.getDeclaredField("player");
+                field.setAccessible(true);
+                com.zurrtum.create.content.kinetics.deployer.DeployerPlayer player = (com.zurrtum.create.content.kinetics.deployer.DeployerPlayer) field.get(deployer);
+                player.cast().setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item("siftec:power_line"), 3));
+                java.lang.reflect.Method activate = com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.class.getDeclaredMethod("activate");
+                activate.setAccessible(true);
+                activate.invoke(deployer);
+                String la = level.getBlockEntity(a) instanceof PoleBlockEntity p ? p.lines.toString() : "missing";
+                String lb = level.getBlockEntity(b) instanceof PoleBlockEntity p ? p.lines.toString() : "missing";
+                result = "lines left in the Deployer " + player.cast().getMainHandItem().getCount() + "; pole in front " + la + ", pole 12 further " + lb;
+                player.cast().setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                result = "could not run: " + e;
+            }
+        } else {
+            result = "no deployer block entity";
+        }
+        report(source, "deployer: " + result);
+        for (BlockPos pos : List.of(a, b)) {
+            if (!(level.getBlockEntity(pos) instanceof PoleBlockEntity p)) continue;
+            for (BlockPos offset : new ArrayList<>(p.lines)) {
+                BlockPos other = pos.offset(offset);
+                p.unlink(other);
+                if (level.getBlockEntity(other) instanceof PoleBlockEntity q) q.unlink(pos);
+            }
+        }
+        for (BlockPos pos : List.of(at, a, b)) level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
     }
 
     /** Two Power Poles 10 apart and one 40 away; a fake player (what a Deployer uses) holding Power Lines uses one on the first. */
