@@ -492,6 +492,30 @@ for cid, (tex, name) in COLLECT.items():
     write(f"{A}/blockstates/{cid}_block.json", {"variants": {"": {"model": f"siftec:block/{cid}_block"}}})
     write(f"{A}/models/block/{cid}_block.json", {"parent": "minecraft:block/block", "textures": {"particle": tex, "all": tex},
           "elements": [{"from": [4, 0, 4], "to": [12, 8, 12], "faces": {f: {"texture": "#all"} for f in ("north", "south", "east", "west", "up", "down")}}]})
+# the power slugs: a low, lumpy, glowing blob, cut from the owner's own slug drawing (the side texture tools/import_art.py
+# imports from tools/art). Every colour's drawing has the same layout, so one set of UVs serves all three. Each slug
+# sits turned one of four ways, picked by its position.
+SLUG_UV = {"side": [7, 8, 13, 12], "skirt": [3, 11, 13, 13], "under": [4, 12, 12, 14], "top": [7, 6, 13, 10], "core": [6, 6, 9, 9]}
+# (from, to, uv of the sides, uv of the top, light the faces give off)
+SLUG_PARTS = [([3, 0, 4.5], [13, 2, 11.5], "skirt", "side", 9), ([4.5, 0, 3], [11.5, 2, 13], "skirt", "side", 9),
+              ([4, 1.5, 4], [12, 4.5, 12], "side", "top", 10), ([5, 4.5, 5], [11, 6, 11], "side", "top", 11),
+              ([5.5, 5.5, 6], [7.5, 7, 8], "core", "core", 13), ([8.5, 5.5, 8], [10, 6.5, 9.5], "top", "core", 12),
+              ([6, 2, 3.5], [8, 3.75, 4], "side", "top", 10), ([9.5, 1.75, 11.75], [11, 3.5, 12.5], "side", "top", 10),
+              ([6.5, 6, 6.5], [9.5, 6.75, 9.5], "core", "core", 15)]
+SLUG_MODELS = set()
+for cid in ("blue_power_slug", "yellow_power_slug", "purple_power_slug"):
+    bid = f"{cid}_block"
+    SLUG_MODELS.add(bid)
+    write(f"{A}/blockstates/{bid}.json", {"variants": {"": [({"model": f"siftec:block/{bid}", "y": y} if y else {"model": f"siftec:block/{bid}"}) for y in (0, 90, 180, 270)]}})
+    elements = []
+    for frm, to, side, top, glow in SLUG_PARTS:
+        faces = {f: {"texture": "#slug", "uv": SLUG_UV[side]} for f in ("north", "south", "east", "west")}
+        faces["up"] = {"texture": "#slug", "uv": SLUG_UV[top]}
+        faces["down"] = {"texture": "#slug", "uv": SLUG_UV["under"]}
+        elements.append({"from": frm, "to": to, "light_emission": glow, "faces": faces})
+    tex = f"siftec:block/{bid}_side"
+    write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/block", "ambientocclusion": False,
+          "textures": {"particle": tex, "slug": tex}, "elements": elements})
 # ---- Converter and Particle Accelerator
 data["processors"] = {}
 names_table = content.names()
@@ -780,6 +804,8 @@ TURNS = FRONTED - {"crash_site_block"}
 for bid in ("wormhole_gateway", "awesome_sink"):
     write(f"{A}/blockstates/{bid}.json", {"variants": {f"facing={d}": {"model": f"siftec:block/{bid}"} for d in ("north", "east", "south", "west")}})
 for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "block")) if f.endswith("_side.png")} if os.path.isdir(os.path.join(TEX, "block")) else []):
+    if bid in SLUG_MODELS:
+        continue  # the slugs have their own model (above)
     if bid == "speed_governor" or bid in MINERS:
         continue  # the governor keeps Create's gearshift model; the miners have their own (below)
     t = lambda face: f"siftec:block/{bid}_{face}"
