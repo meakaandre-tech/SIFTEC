@@ -59,6 +59,7 @@ public class ModBlockEntities {
 
     public static final Entry<ProcessorBlockEntity> PROCESSOR = register("processor", ProcessorBlockEntity::new, ModBlocks.CONVERTER.get(), ModBlocks.PARTICLE_ACCELERATOR.get());
     public static final Entry<com.meakaandre.siftec.workshop.WorkshopBlockEntity> WORKSHOP = register("equipment_workshop", com.meakaandre.siftec.workshop.WorkshopBlockEntity::new, ModBlocks.EQUIPMENT_WORKSHOP.get());
+    public static final Entry<com.meakaandre.siftec.mam.MamBlockEntity> MAM = register("mam", com.meakaandre.siftec.mam.MamBlockEntity::new, ModBlocks.MAM.get());
     public static final Entry<SinkBlockEntity> SINK = register("awesome_sink", SinkBlockEntity::new, ModBlocks.AWESOME_SINK.get());
 
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
@@ -79,5 +80,7 @@ public class ModBlockEntities {
         ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());
         // parts for the Workshop's picked build go in; what it builds comes out
         ItemStorage.SIDED.registerForBlockEntity((workshop, side) -> workshop.storage(), WORKSHOP.get());
+        // research parts pushed into a MAM go to the node its company picked for delivery
+        ItemStorage.SIDED.registerForBlockEntity((mam, side) -> mam.intake, MAM.get());
     }
 }

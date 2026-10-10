@@ -48,7 +48,7 @@ import java.util.List;
  * output starts with "SELFTEST automate".
  */
 public final class AutomateTests {
-    private static final String YES = "selftest_auto_yes", NO = "selftest_auto_no";
+    private static final String YES = "selftest_auto_yes", NO = "selftest_auto_no", MAM = "selftest_auto_mam";
 
     private AutomateTests() {
     }
@@ -88,6 +88,7 @@ public final class AutomateTests {
             machines(source, level, at);
             workshop(source, level, at.east(4));
             poles(source, level, at.south(4));
+            mam(source, level, at.west(4), data);
         } catch (RuntimeException e) {
             report(source, "FAILED with " + e);
             Siftec.LOGGER.error("automate selftest", e);
@@ -95,6 +96,7 @@ public final class AutomateTests {
             level.setChunkForced(x >> 4, z >> 4, false);
             data.companies().remove(YES);
             data.companies().remove(NO);
+            data.companies().remove(MAM);
         }
         return 1;
     }
@@ -174,6 +176,49 @@ public final class AutomateTests {
                 + ": took " + sheets + " Iron Sheet, " + wires + " Wire, " + rods + " Iron Rod, " + extra + " dirt; funnel took out " + out + " " + target);
             level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
         }
+    }
+
+    /** A MAM fed through the transfer API: the parts go to the company's picked node, whose research then starts. */
+    private static void mam(CommandSourceStack source, ServerLevel level, BlockPos at, CompanyData data) {
+        Company company = new Company();
+        company.id = MAM;
+        for (Milestone m : Milestones.all()) company.done.add(m.id());
+        for (Milestones.Tree tree : Milestones.trees()) for (Milestone m : tree.nodes()) company.done.remove(m.id());
+        data.companies().put(company.id, company);
+        Milestone node = null;
+        for (Milestones.Tree tree : Milestones.trees()) {
+            for (Milestone m : tree.nodes()) {
+                if (node == null && Milestones.blocker(company, m) == null && m.cost().stream().noneMatch(c -> c.isTag() || !c.present())) node = m;
+            }
+        }
+        if (node == null) {
+            report(source, "mam: no node to test");
+            return;
+        }
+        level.setBlockAndUpdate(at, ModBlocks.MAM.get().defaultBlockState());
+        BlockEntity mam = level.getBlockEntity(at);
+        if (mam == null) {
+            report(source, "mam: no block entity");
+            return;
+        }
+        mam.setAttached(Ownership.OWNER, company.id);
+        Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, at, Direction.UP);
+        long before = 0, taken = 0;
+        if (storage != null) {
+            try (Transaction t = Transaction.openOuter()) {
+                for (Milestone.Cost cost : node.cost()) before += storage.insert(ItemVariant.of(item(cost.key())), cost.count(), t);
+                t.abort();
+            }
+            company.mamPick = node.id();
+            try (Transaction t = Transaction.openOuter()) {
+                for (Milestone.Cost cost : node.cost()) taken += storage.insert(ItemVariant.of(item(cost.key())), cost.count() + 5, t);
+                t.commit();
+            }
+        }
+        int total = node.cost().stream().mapToInt(c -> company.cost(c)).sum();
+        report(source, "mam: node " + node.id() + " costs " + total + " parts; taken before it was picked " + before + ", after " + taken
+            + "; research now '" + company.research + "'" + (storage == null ? " (no item storage)" : ""));
+        level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
     }
 
     /** Two Power Poles 10 apart and one 40 away; a fake player (what a Deployer uses) holding Power Lines uses one on the first. */

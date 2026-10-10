@@ -11,14 +11,31 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 /** The MAM: the research block. Any MAM shows the research of the company of whoever opens it. */
-public class MamBlock extends Block {
+public class MamBlock extends Block implements net.minecraft.world.level.block.EntityBlock {
     public MamBlock(Properties properties) {
         super(properties);
     }
 
     @Override
+    public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new MamBlockEntity(com.meakaandre.siftec.registry.ModBlockEntities.MAM.get(), pos, state);
+    }
+
+    @Override
+    public <T extends net.minecraft.world.level.block.entity.BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+        Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        return level.isClientSide() ? null : (l, p, s, be) -> {
+            if (be instanceof MamBlockEntity mam) mam.serverTick();
+        };
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (player instanceof ServerPlayer server) MamMenu.open(server, Companies.of(server));
+        if (player instanceof ServerPlayer server) {
+            // a MAM placed before it had a block entity gets one now, so belts can feed it
+            level.getChunkAt(pos).getBlockEntity(pos, net.minecraft.world.level.chunk.LevelChunk.EntityCreationType.IMMEDIATE);
+            MamMenu.open(server, Companies.of(server));
+        }
         return InteractionResult.SUCCESS;
     }
 

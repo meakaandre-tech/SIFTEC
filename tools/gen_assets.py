@@ -456,6 +456,9 @@ if loose:
 lang.update({"block.siftec.mam": "MAM", "siftec.mam.title": "MAM: %s", "siftec.mam.research": "Research time: %s",
              "siftec.mam.busy": "Already researching %s", "siftec.mam.running": "Researching %s: %s left", "siftec.mam.idle": "No research running",
              "siftec.mam.started": "Research started: %s", "siftec.mam.click": "Click to deliver parts from your inventory",
+             "siftec.mam.auto.pick": "Right-click: parts fed into a MAM by belt, funnel or chute go here",
+             "siftec.mam.auto.on": "Parts fed in by belt, funnel or chute go here (right-click to stop)",
+             "siftec.mam.auto.picked": "Parts fed into the MAM now go to %s", "siftec.mam.auto.stopped": "Parts fed into the MAM go nowhere now",
              "siftec.tag.mushrooms": "any mushroom", "siftec.tag.crops": "any crop"})
 write(f"{A}/blockstates/mam.json", {"variants": {"": {"model": "siftec:block/mam"}}})
 write(f"{A}/models/block/mam.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {

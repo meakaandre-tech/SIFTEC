@@ -176,8 +176,11 @@ public class MamMenu extends ChestMenu {
         lore.add(Component.translatable("siftec.hub.unlocks", m.unlockText()).withStyle(ChatFormatting.AQUA));
         if (blocker != null) lore.add(Component.translatable("siftec.hub.needs", blocker.name()).withStyle(ChatFormatting.RED));
         else if (!done && !researching) lore.add(Component.translatable("siftec.mam.click").withStyle(ChatFormatting.YELLOW));
+        boolean picked = m.id().equals(company.mamPick);
+        if (!done && !researching) lore.add(Component.translatable(picked ? "siftec.mam.auto.on" : "siftec.mam.auto.pick")
+            .withStyle(picked ? ChatFormatting.AQUA : ChatFormatting.GRAY));
         Item icon = done ? item("minecraft:lime_dye") : researching ? Items.CLOCK : blocker != null ? Items.BARRIER : Items.PAPER;
-        return button(icon, m.name(), lore, researching);
+        return button(icon, m.name(), lore, researching || picked && !done);
     }
 
     private void press(int slot) {
@@ -222,10 +225,29 @@ public class MamMenu extends ChestMenu {
         refresh();
     }
 
+    /** A right-click on a node: parts fed into any of the company's MAMs by belt or funnel go to it (again: stop). */
+    private void pick(int slot) {
+        List<Milestones.Tree> trees = Milestones.trees();
+        int index = slot - FIRST_NODE;
+        if (tree >= trees.size()) {
+            press(slot);
+            return;
+        }
+        if (index < 0 || index >= trees.get(tree).nodes().size()) return;
+        Milestone m = trees.get(tree).nodes().get(index);
+        if (company.has(m.id())) return;
+        company.mamPick = m.id().equals(company.mamPick) ? "" : m.id();
+        player.sendOverlayMessage(company.mamPick.isEmpty() ? Component.translatable("siftec.mam.auto.stopped")
+            : Component.translatable("siftec.mam.auto.picked", m.name()));
+        Companies.save(player.level().getServer());
+        refresh();
+    }
+
     @Override
     public void clicked(int slot, int button, ContainerInput input, Player who) {
         if (slot >= 0 && slot < SIZE) {
-            if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) press(slot);
+            if (input == ContainerInput.PICKUP && button == 1 && slot >= FIRST_NODE) pick(slot);
+            else if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) press(slot);
             return;
         }
         if (input == ContainerInput.PICKUP || input == ContainerInput.THROW) super.clicked(slot, button, input, who);
