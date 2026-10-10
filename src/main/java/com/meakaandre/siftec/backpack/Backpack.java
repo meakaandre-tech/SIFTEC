@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The backpack: extra slots under the normal inventory, shown whenever the inventory is open.
- * Every "+3 backpack slots" reward opens three more. The items are saved with the player and are kept on death.
+ * The backpack: up to four extra rows of the normal inventory, shown between the main rows and the hotbar in every
+ * window that shows the player's inventory (see {@link BackpackRows}). Every "+3 backpack slots" reward opens three
+ * more. Items picked up go there once the hotbar and main rows are full. The items are saved with the player; on
+ * death they drop like the rest of the inventory unless keepInventory is on.
  */
 public final class Backpack {
     /** All the slots there can ever be: four rows under the inventory. */
@@ -83,6 +85,7 @@ public final class Backpack {
         };
     }
 
+    /** Copied to the respawned player; when keepInventory is off it was emptied onto the ground first, like the inventory. */
     public static final AttachmentType<Contents> CONTENTS = AttachmentRegistry.create(Siftec.id("backpack"),
         builder -> builder.persistent(Contents.CODEC).copyOnDeath().initializer(Contents::new));
 
@@ -90,6 +93,7 @@ public final class Backpack {
     }
 
     public static void register() {
+        BackpackSelfTest.register();
     }
 
     /** How many slots are open for this player. */
@@ -100,6 +104,40 @@ public final class Backpack {
             return Math.min(SIZE, company.count("backpack") * PER_REWARD);
         }
         return ClientState.backpackSlots;
+    }
+
+    /**
+     * Puts what it can of {@code stack} into the open backpack slots, server side: first onto stacks of the same
+     * item, then (when {@code empties}) into empty slots from the first. Returns whether anything went in.
+     */
+    public static boolean insert(Player player, ItemStack stack, boolean empties) {
+        if (stack.isEmpty() || player.level().isClientSide()) return false;
+        NonNullList<ItemStack> items = player.getAttachedOrCreate(CONTENTS).items;
+        int open = unlocked(player);
+        boolean any = false;
+        if (stack.isStackable()) {
+            for (int i = 0; i < open && !stack.isEmpty(); i++) {
+                ItemStack target = items.get(i);
+                if (target.isEmpty() || !ItemStack.isSameItemSameComponents(target, stack)) continue;
+                int room = Math.min(target.getMaxStackSize(), 99) - target.getCount();
+                if (room <= 0) continue;
+                int n = Math.min(room, stack.getCount());
+                target.grow(n);
+                stack.shrink(n);
+                target.setPopTime(5);
+                any = true;
+            }
+        }
+        if (empties) {
+            for (int i = 0; i < open && !stack.isEmpty(); i++) {
+                if (!items.get(i).isEmpty()) continue;
+                ItemStack put = stack.split(Math.min(stack.getMaxStackSize(), stack.getCount()));
+                put.setPopTime(5);
+                items.set(i, put);
+                any = true;
+            }
+        }
+        return any;
     }
 
     /** The same count, worked out on the client from the progress the server sent. */

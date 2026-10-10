@@ -60,8 +60,6 @@ public final class StateSelfTest {
                     .then(Commands.literal("setup").executes(context -> setup(context.getSource())))
                     .then(Commands.literal("check").executes(context -> check(context.getSource())))
                     .then(Commands.literal("verify").executes(context -> verify(context.getSource())))
-                    .then(Commands.literal("backpack").executes(context -> backpack(context.getSource(), true)))
-                    .then(Commands.literal("backpackcheck").executes(context -> backpack(context.getSource(), false)))
                     .then(Commands.literal("cleanup").executes(context -> {
                         report(context.getSource(), "SELFTEST state cleanup: removed " + cleanup(context.getSource().getServer()) + " test companies");
                         return 1;
@@ -244,33 +242,6 @@ public final class StateSelfTest {
         Backpack.Contents oldFormat = Backpack.Contents.CODEC.parse(ops, old).getOrThrow();
         boolean oldOk = oldFormat.items.get(0).isEmpty() && oldFormat.items.get(1).is(Items.BREAD);
         report(source, "SELFTEST state backpack codec: slots kept " + slotsOk + "; unreadable item skipped, others in place " + partialOk + "; old list format loads " + oldOk);
-    }
-
-    /**
-     * For the client test: opens the backpack for every online player and puts 32 cobblestone in its first slot
-     * (setup), then reports what the slots hold and how many items lie on the ground nearby (check).
-     */
-    private static int backpack(CommandSourceStack source, boolean setup) {
-        MinecraftServer server = source.getServer();
-        for (net.minecraft.server.level.ServerPlayer player : server.getPlayerList().getPlayers()) {
-            Backpack.Contents contents = player.getAttachedOrCreate(Backpack.CONTENTS);
-            if (setup) {
-                Company company = Companies.of(player);
-                for (com.meakaandre.siftec.hub.Milestone m : com.meakaandre.siftec.hub.Milestones.all()) {
-                    if (m.tokens().contains("backpack")) company.done.add(m.id());
-                }
-                Companies.save(server);
-                com.meakaandre.siftec.tweak.SpeedCap.recompute(server);
-                contents.items.set(0, new ItemStack(Items.COBBLESTONE, 32));
-                contents.items.set(1, ItemStack.EMPTY);
-                report(source, "SELFTEST backpack setup: " + Backpack.unlocked(player) + " slots open for " + player.getGameProfile().name());
-            } else {
-                int onGround = player.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, player.getBoundingBox().inflate(24)).size();
-                report(source, "SELFTEST backpack check: slot 0 " + contents.items.get(0) + ", slot 1 " + contents.items.get(1)
-                    + ", carried " + player.containerMenu.getCarried() + ", items on the ground nearby " + onGround);
-            }
-        }
-        return 1;
     }
 
     private static CompoundTag entry(int slot, String id, int count) {

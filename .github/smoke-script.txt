@@ -64,6 +64,111 @@ sleep 2
 shot
 key Escape
 sleep 1
+cmd siftec selftest bp slots 0
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp slots 9
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp slots 21
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp slots 33
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp fill
+sleep 4
+cmd siftec selftest bp check
+key e
+sleep 2
+shot
+move 496 486
+sleep 1
+key 1
+sleep 1
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp check
+cmd siftec selftest bp chest
+sleep 2
+move 496 244
+sleep 1
+keydown Shift_L
+click 496 244
+keyup Shift_L
+sleep 1
+move 532 486
+sleep 1
+keydown Shift_L
+click 532 486
+keyup Shift_L
+sleep 1
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp check
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp check
+cmd clear @a
+sleep 1
+cmd siftec selftest bp check
+cmd siftec selftest bp drop
+cmd gamemode creative @a
+sleep 2
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd gamemode survival @a
+cmd siftec selftest bp slots 0
+sleep 1
 cmd gamemode spectator @a
 cmd effect give @a minecraft:night_vision infinite 0 true
 cmd time set noon
