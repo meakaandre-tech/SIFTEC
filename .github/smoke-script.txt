@@ -165,3 +165,24 @@ shot
 cmd siftec worldtest look miner 2 2
 sleep 8
 shot
+cmd effect clear @a minecraft:night_vision
+cmd time set noon
+cmd fill 994 180 994 1010 180 1010 minecraft:grass_block
+cmd setblock 1000 181 1000 siftec:blue_power_slug_block
+cmd setblock 1002 181 1000 siftec:yellow_power_slug_block
+cmd setblock 1004 181 1000 siftec:purple_power_slug_block
+cmd tp @a 1002.5 181.0 997.6 0 25
+sleep 10
+shot
+cmd tp @a 1001.3 180.6 998.3 20 24
+sleep 3
+shot
+cmd tp @a 1002.5 182.0 993.5 0 20
+sleep 3
+shot
+cmd time set midnight
+sleep 3
+shot
+cmd tp @a 1002.5 181.0 997.6 0 25
+sleep 3
+shot

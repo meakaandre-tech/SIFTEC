@@ -123,7 +123,7 @@ public class ModBlocks {
             Identifier id = Siftec.id(type.id() + "_block");
             ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, id);
             CollectibleBlock block = Registry.register(BuiltInRegistries.BLOCK, key, new CollectibleBlock(type,
-                node().noOcclusion().lightLevel(state -> 10).sound(SoundType.SLIME_BLOCK).setId(key)));
+                node().noOcclusion().lightLevel(state -> type.light).sound(SoundType.SLIME_BLOCK).setId(key)));
             COLLECTIBLES.put(type, () -> block);
         }
     }

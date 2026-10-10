@@ -1,7 +1,21 @@
 {
   "variants": {
-    "": {
-      "model": "siftec:block/blue_power_slug_block"
-    }
+    "": [
+      {
+        "model": "siftec:block/blue_power_slug_block"
+      },
+      {
+        "model": "siftec:block/blue_power_slug_block",
+        "y": 90
+      },
+      {
+        "model": "siftec:block/blue_power_slug_block",
+        "y": 180
+      },
+      {
+        "model": "siftec:block/blue_power_slug_block",
+        "y": 270
+      }
+    ]
   }
 }
