@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "id": "forgeconfigapiport",
+  "version": "26.3.1",
+  "environment": "*",
+  "entrypoints": {
+    "modmenu": [
+      "fuzs.forgeconfigapiport.fabric.impl.integration.modmenu.ModMenuApiImpl"
+    ],
+    "client": [
+      "fuzs.forgeconfigapiport.fabric.impl.client.ForgeConfigAPIPortFabricClient"
+    ],
+    "main": [
+      "fuzs.forgeconfigapiport.fabric.impl.ForgeConfigAPIPortFabric"
+    ]
+  },
+  "mixins": [
+    "forgeconfigapiport.common.mixins.json",
+    "forgeconfigapiport.fabric.mixins.json"
+  ],
+  "accessWidener": "forgeconfigapiport.classtweaker",
+  "depends": {
+    "minecraft": "~26.3-",
+    "fabricloader": "\u003e\u003d0.19.4",
+    "fabric-api": "\u003e\u003d0.160.6"
+  },
+  "recommends": {
+    "modmenu": "*"
+  },
+  "name": "Forge Config API Port",
+  "description": "Provides NeoForge\u0027s \u0026 Forge\u0027s config systems to other modding ecosystems. Designed for a multi-loader architecture.",
+  "authors": [
+    "Fuzs"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/forge-config-api-port",
+    "sources": "https://github.com/Fuzss/forge-config-api-port",
+    "issues": "https://github.com/Fuzss/forge-config-api-port/issues"
+  },
+  "license": "MPL-2.0",
+  "icon": "pack.png",
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ]
+    }
+  },
+  "jars": [
+    {
+      "file": "META-INF/jars/core-3.8.4.jar"
+    },
+    {
+      "file": "META-INF/jars/toml-3.8.4.jar"
+    }
+  ]
+}
