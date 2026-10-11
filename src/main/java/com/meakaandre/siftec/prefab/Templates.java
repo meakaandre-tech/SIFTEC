@@ -228,7 +228,9 @@ public final class Templates {
         }
         // ---- Phase 5: the rift crown on top
         for (int[] c : new int[][]{{tx0, tz0}, {tx1, tz0}, {tx0, tz1}, {tx1, tz1}}) t.box(5, M, c[0], top + 1, c[1], c[0], top + 3, c[1], rift);
+        t.ring(5, M, tx0, top + 1, tz0, tx1, top + 1, tz1, rift);
         t.ring(5, M, -3, top + 3, 24, 2, top + 3, 29, rift);
+        t.box(5, M, -1, top + 1, 26, 0, top + 3, 27, rift);
         return t;
     }
 }

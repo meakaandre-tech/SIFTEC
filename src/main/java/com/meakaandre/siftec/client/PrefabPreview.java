@@ -41,7 +41,7 @@ public final class PrefabPreview {
     public static void tick(Minecraft mc) {
         LocalPlayer player = mc.player;
         Prefabs.Spot spot = null;
-        if (player != null && mc.level != null && player.getMainHandItem().getItem() instanceof PrefabItem item) spot = Prefabs.aim(player, item.kind);
+        if (player != null && mc.level != null && !player.isSpectator() && player.getMainHandItem().getItem() instanceof PrefabItem item) spot = Prefabs.aim(player, item.kind);
         if (spot == null) {
             if (shown != null) {
                 Outliner.getInstance().remove(SHAPE);

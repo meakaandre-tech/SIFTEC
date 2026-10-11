@@ -79,6 +79,7 @@ key u
 sleep 3
 cmd siftec selftest prefab placed
 sleep 1
+cmd clear @a
 cmd gamemode spectator @a
 cmd siftec worldtest sathub level 0
 cmd siftec worldtest sathub outside

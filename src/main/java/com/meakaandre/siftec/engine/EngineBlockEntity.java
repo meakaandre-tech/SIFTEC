@@ -37,12 +37,18 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         }
     };
     private int burn;
+    /** Ticks run, for the self-test. */
+    public long ticked;
     private float capacity;
     private int status = NO_FUEL;
     private int clock;
 
     public EngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+    }
+
+    public int burnLeft() {
+        return burn;
     }
 
     /** The stress capacity it gives right now, in SU. */
@@ -154,7 +160,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
      * depend on the block they burn in): as a plain furnace at this spot. Create's context-free lookup gives 0 on a
      * server, which used up a HUB Engine's fuel without running it.
      */
-    private int burnTime(ItemStack stack) {
+    public int burnTime(ItemStack stack) {
         net.minecraft.world.item.component.CookingFuel cooking = stack.get(net.minecraft.core.component.DataComponents.COOKING_FUEL);
         if (cooking == null || !(level instanceof net.minecraft.server.level.ServerLevel server)) return 0;
         try {
@@ -188,6 +194,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
+        ticked++;
         if (level == null || level.isClientSide()) return;
         if (burn > 0) burn--;
         if (++clock < 10 && !(hubKind() && burn == 0 && capacity > 0)) return;

@@ -316,7 +316,9 @@ public final class PrefabTests {
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
             if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) {
                 b.append(" burner ").append(engine.providedSu()).append(" SU at ").append(engine.getSpeed()).append(" RPM, ")
-                    .append(Component.translatable(engine.statusKey(), engine.fuel.getItem(0).getCount()).getString()).append(";");
+                    .append(Component.translatable(engine.statusKey(), engine.fuel.getItem(0).getCount()).getString())
+                    .append(" (fuel ").append(engine.fuel.getItem(0)).append(", burning ").append(engine.burnLeft()).append(" more ticks, coal burns ")
+                    .append(engine.burnTime(new ItemStack(Items.COAL))).append(", ticked ").append(engine.ticked).append(");");
             } else {
                 b.append(" burner missing;");
             }
@@ -386,7 +388,7 @@ public final class PrefabTests {
             case "outside" -> {
                 // spectator view from the front left, a mannequin at the entrance for scale
                 mannequin(level, spot.at(2, 1, -1));
-                player.teleportTo(level, VX - 16.5, Y + 9, VZ + 14.5, Set.of(), -140f, 18f, true);
+                player.teleportTo(level, VX - 24.5, Y + 16, VZ + 22.5, Set.of(), -145f, 16f, true);
             }
             case "side" -> player.teleportTo(level, VX + 22.5, Y + 12, VZ - 6.5, Set.of(), 105f, 22f, true);
             case "inside" -> player.teleportTo(level, VX + 2.5, Y + 1, VZ - 0.5, Set.of(), 155f, 8f, true);
