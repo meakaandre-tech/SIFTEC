@@ -206,7 +206,7 @@ jobs:
                         click) xdotool mousemove $arg; sleep 0.3; xdotool click 1; sleep 0.4;;
                         rclick) xdotool mousemove $arg; sleep 0.3; xdotool click 3; sleep 0.4;;
                         scroll) xdotool click --repeat 3 "$arg";;
-                        xdo) xdotool $arg;;
+                        xdo) echo "xdo $arg"; xdotool $arg; echo "xdo exit $?";;
                       esac
                     done < .github/smoke-script.txt
                   else

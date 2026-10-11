@@ -39,6 +39,8 @@ public abstract class ContainerScreenBackpackMixin extends Screen implements Bac
     @Mutable
     protected int imageWidth;
     @Shadow
+    protected int titleLabelX;
+    @Shadow
     protected int leftPos;
     @Shadow
     protected int topPos;
@@ -51,6 +53,9 @@ public abstract class ContainerScreenBackpackMixin extends Screen implements Bac
     private int siftec$base = -1, siftec$set = -1, siftec$baseW = -1, siftec$setW = -1, siftec$drawHeight, siftec$extra, siftec$wide, siftec$shown, siftec$lift;
     @Unique
     private boolean siftec$initing;
+    /** How far a centred title was moved to stay centred over the wider window, and where it was put. */
+    @Unique
+    private int siftec$titleShift, siftec$titleAt;
 
     protected ContainerScreenBackpackMixin(Component title) {
         super(title);
@@ -73,6 +78,8 @@ public abstract class ContainerScreenBackpackMixin extends Screen implements Bac
         if (imageWidth != siftec$setW) siftec$baseW = imageWidth;
         imageHeight = siftec$base;
         imageWidth = siftec$baseW;
+        if (siftec$titleShift != 0 && titleLabelX == siftec$titleAt) titleLabelX -= siftec$titleShift;
+        siftec$titleShift = 0;
         siftec$shown = siftec$wanted();
         siftec$extra = BackpackRows.rows(siftec$shown) * 18;
         siftec$wide = BackpackRows.columns(siftec$shown) * 18;
@@ -95,6 +102,12 @@ public abstract class ContainerScreenBackpackMixin extends Screen implements Bac
                 widget.setX(x - shiftLeft + (x >= rightOf ? siftec$wide : 0));
                 widget.setY(y - lift + (y >= below ? siftec$extra : 0));
             }
+        }
+        // a title centred over the window (furnace, crafting table...) stays centred over the wider one
+        if (layout != null && siftec$wide > 0 && Math.abs(titleLabelX - (siftec$baseW - font.width(title)) / 2) <= 1) {
+            siftec$titleShift = siftec$wide / 2;
+            titleLabelX += siftec$titleShift;
+            siftec$titleAt = titleLabelX;
         }
         topPos -= lift;
         leftPos -= shiftLeft;
