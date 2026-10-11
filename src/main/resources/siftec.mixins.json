@@ -29,17 +29,11 @@
     "FoodPropertiesMixin",
     "FurnaceAccessor",
     "GameModeMixin",
-    "InventoryBackpackMixin",
-    "InventoryMenuMixin",
     "ItemCombinerResultMixin",
     "KineticCapacityMixin",
     "LevelChunkMixin",
     "ManualApplicationMixin",
-    "MenuBackpackMixin",
-    "MenuInvoker",
     "MixerFluidMixin",
-    "PickBackpackMixin",
-    "PlayerBackpackMixin",
     "PotentSulfurMixin",
     "ProcessingOutputMixin",
     "NetworkNoLoadMixin",
@@ -55,19 +49,12 @@
     "RecipeTrieMixin",
     "SandPaperMixin",
     "SawResultsMixin",
-    "ServerPlayerBackpackMixin",
     "SiftEntryMixin",
-    "SlotAccessor",
     "SlotMixin",
     "SmartTankMixin",
     "TunnelMixin"
   ],
   "client": [
-    "client.ClientOpenBackpackMixin",
-    "client.ContainerScreenBackpackMixin",
-    "client.CreativeBackpackMixin",
-    "client.RecipeBookBackpackMixin",
-    "client.ScreenBackpackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

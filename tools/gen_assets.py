@@ -284,6 +284,14 @@ for eid, (ename, etex) in EQUIPMENT.items():
     lang[f"item.siftec.{eid}"] = ename
     write(f"{A}/models/item/{eid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": etex}})
     item_def(eid, f"siftec:item/{eid}")
+# the Traveler's Backpack each player is given (compat/TravelersBackpackCompat.java), and the old backpack rows' items
+lang.update({"siftec.backpack.given": "SIFTEC issued you a Traveler's Backpack (%s tier). Press B to open it",
+             "siftec.backpack.tier": "Your Traveler's Backpack grew to %s tier",
+             "siftec.backpack.bound": "Your Traveler's Backpack is bound to you: it stays on your back",
+             "siftec.backpack.returned": "Your Traveler's Backpack went back on your back",
+             "siftec.backpack.extra": "Only one Traveler's Backpack per player: the extra one was unpacked into your inventory",
+             "siftec.backpack.migrated": "The %s stacks from your old SIFTEC backpack rows were moved to your Traveler's Backpack or inventory",
+             "siftec.backpack.dropped": "Some of them did not fit and were dropped at your feet"})
 lang.update({"siftec.jetpack.empty": "Jetpack: out of fuel. It burns Solid Biofuel, Compacted Coal, diesel or Turbofuel",
              "siftec.zipline.no_line": "No Power Line leads that way from this pole", "siftec.zipline.locked": "Riding Power Lines needs the Zipline research (MAM, Caterium)",
              "siftec.crash.somersloop": "There was a Somersloop in the wreckage too", "siftec.boost.shards_only": "This machine takes Power Shards only",
@@ -379,7 +387,7 @@ def secs(t):
 # every item id of the game and of the mods the pack's data names (items only: blocks without an item are not
 # in it), so a typo or a renamed item stops the generator instead of loading as nothing
 KNOWN = set(open(os.path.join(os.path.dirname(__file__), "known_ids.txt")).read().split())
-CHECKED = ("minecraft", "create", "cgs", "createdieselgenerators", "create_hypertube")
+CHECKED = ("minecraft", "create", "cgs", "createdieselgenerators", "create_hypertube", "travelersbackpack")
 UNKNOWN = []
 
 def check(item, where=""):
@@ -459,7 +467,7 @@ accounted = set(placed) | set(content.FREE) | set(content.DISABLED) | {i for i, 
 both = sorted((set(placed) | set(content.DISABLED)) & set(content.FREE))
 if both:
     raise SystemExit(f"both locked and free: {both}")
-loose = sorted(i for i in KNOWN if i.split(":")[0] in ("create", "cgs", "createdieselgenerators", "create_hypertube") and i not in accounted)
+loose = sorted(i for i in KNOWN if i.split(":")[0] in ("create", "cgs", "createdieselgenerators", "create_hypertube", "travelersbackpack") and i not in accounted)
 if loose:
     raise SystemExit(f"{len(loose)} items have no milestone and are not listed as free: {loose}")
 lang.update({"block.siftec.mam": "MAM", "siftec.mam.title": "MAM: %s", "siftec.mam.research": "Research time: %s",

@@ -1,36 +1,35 @@
 package com.meakaandre.siftec.backpack;
 
 import com.meakaandre.siftec.Siftec;
-import com.meakaandre.siftec.company.Companies;
-import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.hub.Milestone;
-import com.meakaandre.siftec.hub.Milestones;
-import com.meakaandre.siftec.net.ClientState;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.util.Prediction;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
-import java.util.Set;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
- * The backpack: extra slots of the normal inventory grid, which grows wider (columns of three beside the main rows)
- * and then taller (rows between the main rows and the hotbar) in every window that shows the player's inventory
- * (see {@link BackpackRows}). Every "+3 backpack slots" reward opens three
- * more. Items picked up go there once the hotbar and main rows are full. The items are saved with the player; on
- * death they drop like the rest of the inventory unless keepInventory is on.
+ * The player's backpack is the Traveler's Backpack each player is given (see
+ * {@link com.meakaandre.siftec.compat.TravelersBackpackCompat}). What is left here: the store of the old SIFTEC
+ * backpack rows, still registered so old saves load, whose items are moved out the next time the player joins; and
+ * the hook through which payments and radiation see what the worn backpack holds.
  */
 public final class Backpack {
-    /** All the slots there can ever be: three columns of three, then rows of twelve (33 reachable in survival). */
+    /** How many slots the old backpack rows had. */
     public static final int SIZE = 36;
-    public static final int PER_REWARD = 3;
 
     /** The saved contents. A plain holder, changed in place. */
     public static final class Contents {
@@ -86,68 +85,55 @@ public final class Backpack {
         };
     }
 
-    /** Copied to the respawned player; when keepInventory is off it was emptied onto the ground first, like the inventory. */
+    /** The old backpack rows' items. Kept only to read old saves: {@link #migrate} empties it. */
     public static final AttachmentType<Contents> CONTENTS = AttachmentRegistry.create(Siftec.id("backpack"),
         builder -> builder.persistent(Contents.CODEC).copyOnDeath().initializer(Contents::new));
+
+    /** What the player's worn backpack holds, for paying milestones and for radiation. Set by the compat layer. */
+    public static volatile Function<ServerPlayer, List<Container>> worn = player -> List.of();
 
     private Backpack() {
     }
 
     public static void register() {
-        BackpackSelfTest.register();
+        // without Traveler's Backpack the old items go to the inventory (with it, the compat layer does this after
+        // making sure the player wears their backpack)
+        if (!FabricLoader.getInstance().isModLoaded("travelersbackpack")) ServerPlayerEvents.JOIN.register(player -> migrate(player, stack -> stack));
     }
 
-    /** How many slots are open for this player. */
-    public static int unlocked(Player player) {
-        if (player.hasInfiniteMaterials()) return SIZE;
-        if (player instanceof ServerPlayer server) {
-            Company company = Companies.of(server);
-            return Math.min(SIZE, company.count("backpack") * PER_REWARD);
-        }
-        return ClientState.backpackSlots;
+    /** The containers of the player's worn backpack: none, or the Traveler's Backpack storage. */
+    public static List<Container> containers(ServerPlayer player) {
+        return worn.apply(player);
     }
 
     /**
-     * Puts what it can of {@code stack} into the open backpack slots, server side: first onto stacks of the same
-     * item, then (when {@code empties}) into empty slots from the first. Returns whether anything went in.
+     * Moves every item of the old backpack rows out: into {@code into} (which returns what did not fit), then the
+     * inventory, then onto the ground at the player's feet with a chat message. The old store is removed. Returns how
+     * many stacks were moved.
      */
-    public static boolean insert(Player player, ItemStack stack, boolean empties) {
-        if (stack.isEmpty() || player.level().isClientSide()) return false;
-        NonNullList<ItemStack> items = player.getAttachedOrCreate(CONTENTS).items;
-        int open = unlocked(player);
-        boolean any = false;
-        if (stack.isStackable()) {
-            for (int i = 0; i < open && !stack.isEmpty(); i++) {
-                ItemStack target = items.get(i);
-                if (target.isEmpty() || !ItemStack.isSameItemSameComponents(target, stack)) continue;
-                int room = Math.min(target.getMaxStackSize(), 99) - target.getCount();
-                if (room <= 0) continue;
-                int n = Math.min(room, stack.getCount());
-                target.grow(n);
-                stack.shrink(n);
-                target.setPopTime(5);
-                any = true;
-            }
+    public static int migrate(ServerPlayer player, UnaryOperator<ItemStack> into) {
+        Contents old = player.getAttached(CONTENTS);
+        if (old == null) return 0;
+        int moved = 0;
+        boolean dropped = false;
+        for (int i = 0; i < SIZE; i++) {
+            ItemStack stack = old.items.get(i);
+            if (stack.isEmpty()) continue;
+            old.items.set(i, ItemStack.EMPTY);
+            moved++;
+            ItemStack left = into.apply(stack);
+            if (left.isEmpty()) continue;
+            player.getInventory().add(left);
+            if (left.isEmpty()) continue;
+            player.getInventory().placeItemBackInInventory(left, Prediction.SERVER_ONLY);
+            dropped = true;
         }
-        if (empties) {
-            for (int i = 0; i < open && !stack.isEmpty(); i++) {
-                if (!items.get(i).isEmpty()) continue;
-                ItemStack put = stack.split(Math.min(stack.getMaxStackSize(), stack.getCount()));
-                put.setPopTime(5);
-                items.set(i, put);
-                any = true;
-            }
+        player.removeAttached(CONTENTS);
+        if (moved > 0) {
+            Siftec.LOGGER.info("SIFTEC: moved {} stacks out of {}'s old backpack rows{}", moved, player.getGameProfile().name(), dropped ? " (some dropped)" : "");
+            player.sendSystemMessage(Component.translatable("siftec.backpack.migrated", moved).withStyle(ChatFormatting.GOLD));
+            if (dropped) player.sendSystemMessage(Component.translatable("siftec.backpack.dropped").withStyle(ChatFormatting.RED));
         }
-        return any;
-    }
-
-    /** The same count, worked out on the client from the progress the server sent. */
-    public static int unlocked(Set<String> done) {
-        int rewards = 0;
-        for (String id : done) {
-            Milestone m = Milestones.get(id);
-            if (m != null && m.tokens().contains("backpack")) rewards++;
-        }
-        return Math.min(SIZE, rewards * PER_REWARD);
+        return moved;
     }
 }

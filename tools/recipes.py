@@ -644,6 +644,28 @@ REMOVED = [
     "create:mechanical_crafting/extendo_grip", "create:mechanical_crafting/potato_cannon", "create:mechanical_crafting/wand_of_symmetry",
     "create:andesite_table_cloth_from_andesite_alloy_stonecutting",
 ]
+# Traveler's Backpack: each player is given one backpack, never crafted, and its tier comes with milestones, so every
+# backpack recipe (designs, dyeing, smithing), the tier upgrades and the sleeping bags (only for those) go
+REMOVED += ["travelersbackpack:" + n for n in """
+    bat_smithing bee bee_smithing black_sleeping_bag blaze blaze_smithing blue_sleeping_bag bookshelf
+    bookshelf_smithing brown_sleeping_bag cactus cactus_smithing cake cake_smithing chicken chicken_smithing coal
+    coal_smithing cow cow_smithing creeper creeper_smithing cyan_sleeping_bag diamond diamond_smithing
+    diamond_tier_upgrade dragon dragon_smithing dye_black_sleeping_bag dye_blue_sleeping_bag dye_brown_sleeping_bag
+    dye_cyan_sleeping_bag dye_gray_sleeping_bag dye_green_sleeping_bag dye_light_blue_sleeping_bag
+    dye_light_gray_sleeping_bag dye_lime_sleeping_bag dye_magenta_sleeping_bag dye_orange_sleeping_bag
+    dye_pink_sleeping_bag dye_purple_sleeping_bag dye_red_sleeping_bag dye_white_sleeping_bag
+    dye_yellow_sleeping_bag emerald emerald_smithing end end_smithing enderman enderman_smithing fox fox_smithing
+    ghast ghast_smithing gold gold_smithing gold_tier_upgrade gray_sleeping_bag green_sleeping_bag hay hay_smithing
+    horse horse_smithing iron iron_golem_smithing iron_smithing iron_tier_upgrade lapis lapis_smithing
+    light_blue_sleeping_bag light_gray_sleeping_bag lime_sleeping_bag magenta_sleeping_bag magma_cube
+    magma_cube_smithing melon melon_smithing nether nether_smithing netherite netherite_smithing
+    netherite_tier_upgrade ocelot ocelot_smithing orange_sleeping_bag pig pig_smithing pink_sleeping_bag pumpkin
+    pumpkin_smithing purple_sleeping_bag quartz quartz_smithing red_sleeping_bag redstone redstone_smithing
+    sandstone sandstone_smithing sheep sheep_smithing skeleton skeleton_smithing snow snow_smithing spider
+    spider_smithing sponge sponge_smithing squid squid_smithing standard standard_dyed standard_no_sleeping_bag
+    standard_no_tanks standard_no_tanks_sleeping_bag standard_smithing villager_smithing warden warden_smithing
+    white_sleeping_bag wither wither_smithing wolf wolf_smithing yellow_sleeping_bag
+""".split()]
 
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked.
 WORKSHOP = [
