@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Container screens with backpack rows draw their background in slices (see {@link BackpackDraw}). */
+/** Container screens with the backpack draw their background in slices (see {@link BackpackDraw}) and grow after their init. */
 @Mixin(Screen.class)
 public abstract class ScreenBackpackMixin {
     @WrapOperation(method = "extractRenderStateWithTooltipAndSubtitles", at = @At(value = "INVOKE",
@@ -21,6 +21,12 @@ public abstract class ScreenBackpackMixin {
         } else {
             original.call(screen, graphics, mouseX, mouseY, delta);
         }
+    }
+
+    /** After the whole init of a container screen (its own class's part too, which runs after the base class's). */
+    @Inject(method = {"init(II)V", "rebuildWidgets()V"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init()V", shift = At.Shift.AFTER))
+    private void siftec$afterInit(CallbackInfo ci) {
+        if ((Object) this instanceof BackpackDraw.Window window) window.siftec$afterInit();
     }
 
     @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)

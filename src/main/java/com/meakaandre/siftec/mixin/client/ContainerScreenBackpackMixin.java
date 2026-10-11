@@ -87,8 +87,10 @@ public abstract class ContainerScreenBackpackMixin extends Screen implements Bac
         siftec$initing = true;
     }
 
-    @Inject(method = "init()V", at = @At("RETURN"))
-    private void siftec$grow(CallbackInfo ci) {
+    /** Called by {@link ScreenBackpackMixin} once the whole init has run (the screen's own class's part included). */
+    @Override
+    public void siftec$afterInit() {
+        if (!siftec$initing || siftec$base < 0) return;
         siftec$initing = false;
         int lift = Math.max(0, Math.min(topPos, topPos + siftec$base + siftec$extra - height));
         int shiftLeft = Math.max(0, Math.min(leftPos, leftPos + siftec$baseW + siftec$wide - width));
