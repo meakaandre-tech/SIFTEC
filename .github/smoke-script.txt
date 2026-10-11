@@ -229,11 +229,10 @@ sleep 2
 shot
 key Escape
 sleep 1
-xdo search --name .
-xdo search --name . getwindowname %@
-xdo search --name . windowsize %@ 960 540
+sh xwininfo -root -children
+sh for w in $(xwininfo -root -children | grep -o '^ *0x[0-9a-f]*'); do xdotool windowsize $w 960 540 2>/dev/null; done
 sleep 1
-xdo search --name . getwindowgeometry %@
+sh xwininfo -root -children
 sleep 4
 key e
 sleep 2
@@ -255,7 +254,7 @@ sleep 2
 shot
 key Escape
 sleep 1
-xdo search --name . windowsize %@ 852 480
+sh for w in $(xwininfo -root -children | grep -o '^ *0x[0-9a-f]*'); do xdotool windowsize $w 852 480 2>/dev/null; done
 sleep 4
 key e
 sleep 2
@@ -277,7 +276,7 @@ sleep 2
 shot
 key Escape
 sleep 1
-xdo search --name . windowsize %@ 1280 720
+sh for w in $(xwininfo -root -children | grep -o '^ *0x[0-9a-f]*'); do xdotool windowsize $w 1280 720 2>/dev/null; done
 sleep 4
 cmd siftec selftest bp pick
 sleep 1

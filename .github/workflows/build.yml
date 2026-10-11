@@ -166,7 +166,7 @@ jobs:
               if [ -f $root/.github/smoke-client ]; then
                 cd $root
                 sudo apt-get update -q >/dev/null 2>&1
-                sudo apt-get install -y -q xvfb xdotool imagemagick libgl1-mesa-dri libglx-mesa0 libegl1 libegl-mesa0 libgles2 mesa-vulkan-drivers libvulkan1 mesa-utils >/dev/null 2>&1
+                sudo apt-get install -y -q xvfb xdotool x11-utils imagemagick libgl1-mesa-dri libglx-mesa0 libegl1 libegl-mesa0 libgles2 mesa-vulkan-drivers libvulkan1 mesa-utils >/dev/null 2>&1
                 mkdir -p run/mods
                 cp libs/create-fly-26.3.jar run/mods/
                 # the client needs the same pack mods as the server, or it cannot join
@@ -206,7 +206,7 @@ jobs:
                         click) xdotool mousemove $arg; sleep 0.3; xdotool click 1; sleep 0.4;;
                         rclick) xdotool mousemove $arg; sleep 0.3; xdotool click 3; sleep 0.4;;
                         scroll) xdotool click --repeat 3 "$arg";;
-                        xdo) echo "xdo $arg"; xdotool $arg; echo "xdo exit $?";;
+                        sh) echo "sh: $arg"; bash -c "$arg";;
                       esac
                     done < .github/smoke-script.txt
                   else

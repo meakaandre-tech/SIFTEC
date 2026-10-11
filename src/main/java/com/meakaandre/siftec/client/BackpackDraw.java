@@ -50,6 +50,9 @@ public final class BackpackDraw {
         /** Whether the screen is running its own init (the backpack's moves come after it). */
         boolean siftec$initing();
 
+        /** Grows the window and moves its widgets, once the screen's whole init has run. */
+        void siftec$afterInit();
+
         /** Sets the window size the screen's own drawing code sees (its original size while it draws). */
         void siftec$drawing(boolean drawing);
     }
