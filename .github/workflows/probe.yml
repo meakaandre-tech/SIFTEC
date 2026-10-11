@@ -1,0 +1,22 @@
+name: Probe
+on:
+  push:
+    branches: ["tb-probe"]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch
+        run: |
+          mkdir -p /tmp/ci
+          python3 .github/fetch-tb.py 26.3 /tmp/libs-tb /tmp/ci 2>&1 | tee /tmp/ci/probe.txt || true
+          # Is the mod's source on GitHub, which branches?
+          for r in Tiviacz1337/Travelers-Backpack; do
+            curl -fsSL "https://api.github.com/repos/$r" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['full_name'], d['default_branch'], d['license'] and d['license']['spdx_id'])" >> /tmp/ci/probe.txt 2>&1
+            curl -fsSL "https://api.github.com/repos/$r/branches?per_page=100" | python3 -c "import json,sys; [print(' ', b['name']) for b in json.load(sys.stdin)]" >> /tmp/ci/probe.txt 2>&1
+          done
+          cd /tmp/ci && git init -q -b x && git config user.name ci && git config user.email ci@x && git add -A && git commit -qm probe
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" x:ci-logs-tb-probe
