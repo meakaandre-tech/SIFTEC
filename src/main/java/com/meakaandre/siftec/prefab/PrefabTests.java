@@ -54,6 +54,14 @@ public final class PrefabTests {
     }
 
     public static void register() {
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (pending != null && server.overworld().getGameTime() >= pendingAt) {
+                Runnable run = pending;
+                pending = null;
+                run.run();
+            }
+        });
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> pending = null);
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("prefab").executes(PrefabTests::run)
@@ -160,10 +168,24 @@ public final class PrefabTests {
         return n;
     }
 
+    /** The rest of the test, run once the freshly generated test chunks have settled (their block entities tick then). */
+    private static Runnable pending;
+    private static long pendingAt;
+
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        long now = level.getGameTime();
+        platform(level, AX - 40, AZ - 40, AX + 40, AZ + 40, 32);
+        platform(level, AX - 30, GZ - 60, AX + 30, GZ + 4, 64);
+        platform(level, BX - 20, BZ - 30, BX + 20, BZ + 10, 32);
+        pending = () -> runSettled(source);
+        pendingAt = level.getGameTime() + 40;
+        report(source, "test sites ready; the test runs in two seconds");
+        return 1;
+    }
+
+    private static void runSettled(CommandSourceStack source) {
+        ServerLevel level = source.getServer().overworld();
         Company a = company(level, A, "Selftest HUB A"), b = company(level, B, "Selftest HUB B");
         for (Company c : new Company[]{a, b}) {
             c.done.clear();
@@ -174,9 +196,6 @@ public final class PrefabTests {
             Claims.releaseCompany(source.getServer(), c.id);
         }
         Companies.save(source.getServer());
-        platform(level, AX - 40, AZ - 40, AX + 40, AZ + 40, 32);
-        platform(level, AX - 30, GZ - 60, AX + 30, GZ + 4, 64);
-        platform(level, BX - 20, BZ - 30, BX + 20, BZ + 10, 32);
         report(source, "sizes: HUB " + Templates.hub().width() + " x " + Templates.hub().length() + " x " + Templates.hub().height()
             + ", Gateway " + Templates.gateway().width() + " x " + Templates.gateway().length() + " x " + Templates.gateway().height()
             + " (blocks: HUB " + Templates.hub().keys().size() + ", Gateway " + Templates.gateway().keys().size() + ")");
@@ -200,7 +219,7 @@ public final class PrefabTests {
         HubBlockEntity hub = terminal(level, spotA);
         if (hub == null) {
             report(source, "placing failed: " + placed.message().getString() + " (" + placed.blocked.size() + " blocked, first " + (placed.blocked.isEmpty() ? "-" : placed.blocked.get(0).toShortString()) + ")");
-            return 0;
+            return;
         }
         boolean claimed = Claims.at(level, spotA.terminal()) != null && Claims.at(level, spotA.terminal()).company.equals(A);
         report(source, "placed " + placed.ok() + " (" + placed.message().getString() + "), controller " + (hub != null && hub.prefab) + ", claims land " + claimed
@@ -294,7 +313,6 @@ public final class PrefabTests {
         report(source, "old single-block HUB: block entity " + (old != null) + ", structure " + (old != null && old.prefab));
         if (old != null) Prefabs.dismantle(level, old);
         Companies.save(source.getServer());
-        return 1;
     }
 
     /** The five gateway rings: o dark, * lit; then + if the crown is up. */
@@ -325,6 +343,8 @@ public final class PrefabTests {
         }
         BlockPos term = spotB.terminal();
         HubBlockEntity hub = terminal(level, spotB);
+        HubBlockEntity hubA = terminal(level, hubSpot(AX, AZ, Direction.EAST));
+        b.append(" first company's terminal ticked ").append(hubA == null ? -1 : hubA.ticked).append(";");
         report(source, "check: the second company's HUB burners:" + b + " terminal ticked " + (hub == null ? -1 : hub.ticked) + ", blocks tick here "
             + level.shouldTickBlocksAt(term) + ", entity ticking " + level.isPositionEntityTicking(term) + ", chunk forced "
             + level.getForceLoadedChunks().contains(net.minecraft.world.level.ChunkPos.pack(term.getX() >> 4, term.getZ() >> 4)));
