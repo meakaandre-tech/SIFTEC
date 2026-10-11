@@ -26,5 +26,4 @@ siftec worldtest powerchain setup
 #sleep 30
 siftec worldtest furnace check
 siftec worldtest powerline check
-siftec selftest prefab check
 #sleep 190

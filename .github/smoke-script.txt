@@ -115,6 +115,7 @@ shot
 cmd siftec worldtest sathub gateway 5
 sleep 3
 shot
+cmd siftec selftest prefab check
 cmd gamemode survival @a
 cmd clear @a
 cmd siftec selftest tb setup
