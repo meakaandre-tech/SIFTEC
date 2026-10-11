@@ -124,7 +124,7 @@ public class ModBlocks {
             ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, id);
             BlockBehaviour.Properties properties = node().noOcclusion().lightLevel(state -> type.light).sound(SoundType.SLIME_BLOCK).setId(key);
             // the slugs glow: drawn at full brightness however dark it is round them
-            if (type.slug()) properties = properties.emissiveRendering((state, level, pos) -> true);
+            if (type.slug()) properties = properties.emissiveRendering(state -> true);
             CollectibleBlock block = Registry.register(BuiltInRegistries.BLOCK, key, new CollectibleBlock(type, properties));
             COLLECTIBLES.put(type, () -> block);
         }
