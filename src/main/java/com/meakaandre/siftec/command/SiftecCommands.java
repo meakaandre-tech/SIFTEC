@@ -42,6 +42,7 @@ public final class SiftecCommands {
 
     public static void register() {
         WorldTests.register();
+        com.meakaandre.siftec.prefab.PrefabTests.register();
         AutomateTests.register();
         NodeTests.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
@@ -154,7 +155,7 @@ public final class SiftecCommands {
             && com.meakaandre.siftec.hub.HubMenu.action(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.SIFT, 0, 0)) == com.meakaandre.siftec.hub.HubMenu.SIFT;
         Milestone base = Milestones.tier(1).get(0);
         company.pay(base, base.cost().get(0), 7);
-        com.meakaandre.siftec.hub.HubView sent = com.meakaandre.siftec.hub.HubView.of(company, false, 0, false, 40, null);
+        com.meakaandre.siftec.hub.HubView sent = com.meakaandre.siftec.hub.HubView.of(company, false, 40);
         net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
         sent.write(buf);
         com.meakaandre.siftec.hub.HubView got = com.meakaandre.siftec.hub.HubView.read(buf);

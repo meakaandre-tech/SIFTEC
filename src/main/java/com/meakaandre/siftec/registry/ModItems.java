@@ -32,10 +32,21 @@ public class ModItems {
     public static final Supplier<Item> BLADE_RUNNERS = item("blade_runners", properties -> new Item(properties.stacksTo(1).equippable(net.minecraft.world.entity.EquipmentSlot.FEET)));
     public static final Supplier<Item> CARDBOARD_DRONE = item("cardboard_drone", properties -> new Item(properties.stacksTo(1)));
     public static final Supplier<com.meakaandre.siftec.blueprint.BlueprintItem> BLUEPRINT = item("blueprint", properties -> new com.meakaandre.siftec.blueprint.BlueprintItem(properties.stacksTo(1)));
-    public static final Supplier<com.meakaandre.siftec.hub.HubPlannerItem> HUB_PLANNER = item("hub_planner", properties -> new com.meakaandre.siftec.hub.HubPlannerItem(properties.stacksTo(1)));
+    /**
+     * The HUB Planner of the old HUB building rule. The rule is gone (the HUB is now a structure placed whole), but the
+     * id stays registered as a plain item that does nothing, so planners in old inventories still load; it has no
+     * recipe and is not in the creative tab.
+     */
+    public static final Supplier<Item> HUB_PLANNER = hiddenItem("hub_planner", properties -> new Item(properties.stacksTo(1)));
     public static final Supplier<Item> TOXIC_SHOT = item("toxic_shot", Item::new);
     public static final Supplier<Item> RAW_BAUXITE = item("raw_bauxite", Item::new);
     public static final Supplier<Item> SAM = item("sam", Item::new);
+
+    private static <T extends Item> Supplier<T> hiddenItem(String name, Function<Item.Properties, T> factory) {
+        ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Siftec.id(name));
+        T item = Registry.register(BuiltInRegistries.ITEM, key, factory.apply(new Item.Properties().setId(key)));
+        return () -> item;
+    }
 
     private static <T extends Item> Supplier<T> item(String name, Function<Item.Properties, T> factory) {
         ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Siftec.id(name));

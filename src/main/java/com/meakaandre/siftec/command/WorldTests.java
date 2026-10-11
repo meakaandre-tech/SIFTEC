@@ -105,7 +105,7 @@ public final class WorldTests {
     }
 
     /**
-     * For the client screenshots of the HUB screen: a HUB on a 9 x 9 stone brick floor (a Tier 0 building, marked)
+     * For the client screenshots of the HUB screen: an old-style single-block HUB terminal on a 9 x 9 stone brick floor
      * in front of every player, who is turned to face it. Their company starts over at Tier 0.
      */
     private static int hubUi(CommandContext<CommandSourceStack> context) {
@@ -131,11 +131,8 @@ public final class WorldTests {
             com.meakaandre.siftec.company.Companies.save(source.getServer());
             if (level.getBlockEntity(hubPos) instanceof com.meakaandre.siftec.hub.HubBlockEntity hub) {
                 hub.companyId = company.id;
-                hub.boxMin = new BlockPos(x - 4, y - 1, z - 4);
-                hub.boxMax = new BlockPos(x + 4, y + 1, z + 4);
                 hub.setChanged();
-                com.meakaandre.siftec.hub.HubBuilding.Result result = hub.measure();
-                report(source, "hubui building good for tier " + (result == null ? "none" : result.builtTier()));
+                report(source, "hubui terminal for " + company.name);
             }
             // three blocks south of the HUB, looking north and down at it
             player.teleportTo(level, x + 0.5, y, z + 3.5, java.util.Set.of(), 180f, 22f, true);

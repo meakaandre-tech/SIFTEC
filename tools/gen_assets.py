@@ -320,20 +320,59 @@ lang.update({"siftec.blueprint.how": "Build inside the frame above (%s blocks ea
              "siftec.blueprint.blocked": "Something is in the way at x %s, y %s, z %s", "siftec.blueprint.missing": "The blueprint needs %s more %s",
              "siftec.blueprint.confirm": "%s blocks would go in the green frame. Use the blueprint here again to build",
              "siftec.blueprint.built": "Built %s blocks"})
-lang["item.siftec.hub_planner"] = "HUB Planner"
+# the old HUB building rule's planner: kept as an item that does nothing, so old inventories load (no recipe, not in the tab)
+lang["item.siftec.hub_planner"] = "HUB Planner (no longer used)"
 write(f"{A}/models/item/hub_planner.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/brush"}})
 item_def("hub_planner", "siftec:item/hub_planner")
-lang.update({"siftec.planner.first": "First corner set. Now click the opposite corner", "siftec.planner.second": "Area %s x %s x %s. Click the HUB with the planner to measure it",
-             "siftec.planner.cleared": "Planner cleared", "siftec.planner.how": "Click two opposite corners of the HUB building first, then the HUB",
-             "siftec.building.title": "HUB building: good for %s", "siftec.building.none": "no tier yet",
-             "siftec.building.hub_outside": "The HUB has to be inside the marked area", "siftec.building.too_big": "The marked area is too big: %s blocks, the limit is %s",
-             "siftec.building.blocks": "For Tier %s: %s of %s building blocks", "siftec.building.newest": "Newest material (%s): %s of %s",
-             "siftec.building.shelter": "Walls: %s of 2. Roof: %s", "siftec.building.ok": "Ready for Tier %s", "siftec.building.not_ok": "Not ready for Tier %s yet",
-             "siftec.building.needed": "The HUB building is too small for Tier %s. Build it up, then click the HUB with the HUB Planner",
-             "siftec.building.family.stone_wood": "logs, planks, stone bricks, polished stone, deepslate bricks, Twigs blocks, and any stairs, slabs, fences, walls and doors",
-             "siftec.building.family.andesite": "Andesite Casing or Block of Andesite Alloy",
-             "siftec.building.family.steel": "Steel Casing or Block of Steel",
-             "siftec.building.family.copper": "Copper Casing or copper blocks", "siftec.building.family.brass": "Brass Casing or Block of Brass"})
+
+# ---- the HUB and Wormhole Gateway structures (prefab/Templates.java): shell blocks by style, and the HUB's parts
+PREFAB = {  # style: (name, texture)
+    "white": ("HUB Panel", "minecraft:block/white_concrete"), "orange": ("HUB Trim", "minecraft:block/orange_concrete"),
+    "metal": ("HUB Frame", "create:block/industrial_iron_block"), "floor": ("HUB Floor", "minecraft:block/light_gray_concrete"),
+    "glass": ("HUB Window", "create:block/palettes/framed_glass"), "lamp": ("HUB Lamp", "minecraft:block/redstone_lamp_on"),
+    "step": ("HUB Step", "minecraft:block/light_gray_concrete"), "locker": ("HUB Locker", "minecraft:block/iron_block"),
+    "railway": ("Gateway Frame", "create:block/railway_casing"), "coil": ("Gateway Ring", "create:block/dark_metal_block"),
+    "coil_lit": ("Gateway Ring (charged)", "minecraft:block/amethyst_block"), "rift": ("Gateway Rift", "minecraft:block/crying_obsidian"),
+    "foundation": ("Structure Leg", "minecraft:block/gray_concrete"),
+}
+for style, (name, tex) in PREFAB.items():
+    b = f"prefab_{style}"
+    lang[f"block.siftec.{b}"] = name
+    write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
+    if style == "step":
+        write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/slab", "textures": {"bottom": tex, "top": tex, "side": tex}})
+    else:
+        write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": tex}})
+ROT = (("north", 0), ("east", 90), ("south", 180), ("west", 270))
+lang.update({"block.siftec.hub_bed": "HUB Bunk", "block.siftec.craft_bench": "Craft Bench", "block.siftec.personal_storage": "Personal Storage Box",
+             "block.siftec.hub_burner": "HUB Burner"})
+write(f"{A}/blockstates/hub_bed.json", {"variants": {f"facing={d},part={part}": ({"model": f"minecraft:block/orange_bed_{part}", "y": y} if y else {"model": f"minecraft:block/orange_bed_{part}"})
+                                                     for d, y in ROT for part in ("foot", "head")}})
+write(f"{A}/blockstates/craft_bench.json", {"variants": {"": {"model": "minecraft:block/crafting_table"}}})
+write(f"{A}/blockstates/personal_storage.json", {"variants": {"": {"model": "minecraft:block/barrel"}}})
+# the built-in burners look like the HUB Engine they are
+write(f"{A}/blockstates/hub_burner.json", {"variants": {f"facing={d}": ({"model": "siftec:block/hub_engine", "y": y} if y else {"model": "siftec:block/hub_engine"}) for d, y in ROT}})
+write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "beds.json"), {"replace": False, "values": ["siftec:hub_bed"]})
+lang.update({
+    "siftec.prefab.hint": "Right-click to build the %s here. Sneak and right-click to turn it",
+    "siftec.prefab.blocked": "%s blocks are in the way (marked red)",
+    "siftec.prefab.no_ground": "No ground under part of it: it can stand at most %s blocks above the ground",
+    "siftec.prefab.unloaded": "Part of that area is not loaded: come closer",
+    "siftec.prefab.height": "It does not fit in the build height here",
+    "siftec.prefab.entity": "Something is standing where it would go",
+    "siftec.prefab.spawn": "Nothing can be built within %s blocks of spawn",
+    "siftec.prefab.claimed": "That land belongs to %s",
+    "siftec.prefab.one_gateway": "Your company already has a Wormhole Gateway (at %s). Pick it up from its terminal to move it",
+    "siftec.prefab.aim": "Aim at the ground, at most %s blocks away",
+    "siftec.prefab.turned": "Turned %s degrees",
+    "siftec.prefab.no_sleep": "The HUB's bunks cannot be slept in here",
+    "siftec.prefab.placed": "%s built",
+    "siftec.prefab.dismantle_confirm": "Sneak and use it again to pick up the whole %s. Its contents come with it and progress is kept",
+    "siftec.prefab.dismantled": "%s picked up",
+    "siftec.prefab.part": "Part of the %s: sneak and use its terminal twice to pick up the whole structure",
+    "siftec.claim.hub_too_close": "Too close to another company's land: a claiming HUB must be more than %s chunks from another company's HUB",
+    "siftec.claim.hub_extra": "HUB placed. Your company's first HUB already holds its land, so this one claims nothing",
+})
 lang["siftec.sift.closed"] = "The Sift is closed to you until your company finishes Wormhole Phase 5"
 PRESERVE_ICONS = {"pickled_tomato": ("Pickled Tomato", 0xC84030), "pickled_onion": ("Pickled Onion", 0xD8C8A8), "pickled_cabbage": ("Pickled Cabbage", 0x90B850),
                   "pickled_pumpkin": ("Pickled Pumpkin", 0xE08828), "pickled_carrot": ("Pickled Carrot", 0xF09030), "pickled_beetroot": ("Pickled Beetroot", 0x902848),
@@ -741,34 +780,25 @@ lang.update({
     "siftec.hub.tier.locked0": "Locked: finish Tier 0 first", "siftec.hub.done": "Completed",
     "siftec.hub.cost": "%s: %s / %s", "siftec.hub.time": "HUB lock: %s", "siftec.hub.unlocks": "Unlocks: %s",
     "siftec.hub.click": "Click to deliver parts from your inventory", "siftec.hub.needs": "Needs: %s",
-    "siftec.hub.locked_for": "HUB locked for %s", "siftec.hub.ready": "HUB ready",
+    "siftec.hub.locked_for": "The freighter is away: back in %s", "siftec.hub.ready": "HUB ready",
     "siftec.hub.company": "%s (%s members, costs x%s)", "siftec.hub.not_yours": "This belongs to %s",
     "siftec.hub.delivered": "Delivered %s parts", "siftec.hub.nothing": "You are not carrying any of the parts it needs",
-    "siftec.hub.complete": "%s completed %s", "siftec.hub.busy": "The HUB is locked for another %s",
+    "siftec.hub.complete": "%s completed %s", "siftec.hub.busy": "The freighter is away for another %s",
     "siftec.hub.at_gateway": "Wormhole phases are delivered at the Wormhole Gateway",
     "siftec.hub.at_hub": "Milestones are delivered at the HUB",
     "siftec.hub.now_active": "%s is active: pay by hand, or by belt and funnel into the HUB",
     # the HUB screen, laid out like the old Tweaker HUB screen
-    "siftec.hubui.wormhole": "Wormhole", "siftec.hubui.building": "HUB building", "siftec.hubui.building_for": "HUB building for Tier %s",
-    "siftec.hubui.set_active": "Set as active", "siftec.hubui.pay": "Pay from inventory", "siftec.hubui.rescan": "Rescan",
+    "siftec.hubui.wormhole": "Wormhole",
+    "siftec.hubui.set_active": "Set as active", "siftec.hubui.pay": "Pay from inventory",
     "siftec.hubui.loading": "Connecting to the HUB...", "siftec.hubui.tier_locked": "Tier %s is locked",
-    "siftec.hubui.complete": "Complete", "siftec.hubui.build_first": "Build the HUB up to Tier %s first",
+    "siftec.hubui.complete": "Complete",
     "siftec.hubui.hint": "Set it active, then pay by hand or feed the HUB",
     "siftec.hubui.active": "Pay by hand, or feed the HUB by belt or funnel",
     "siftec.hubui.hint_gateway": "Set it active, then pay by hand or feed the Gateway",
     "siftec.hubui.active_gateway": "Pay by hand, or feed the Gateway by belt or funnel",
-    "siftec.hubui.any": "Any %s", "siftec.hubui.lock_after": "Locks the HUB for %s when done",
+    "siftec.hubui.any": "Any %s", "siftec.hubui.lock_after": "The freighter is away for %s after this",
     "siftec.hubui.phases": "Wormhole: %s of %s phases delivered",
-    "siftec.hubui.blocks": "HUB blocks: %s / %s", "siftec.hubui.shelter": "Walls %s/2   Roof %s",
-    "siftec.hubui.half": "= half a block each", "siftec.hubui.half_tip": "Slabs, doors and trapdoors count as half a block",
-    "siftec.hubui.newest": "Needs at least %s of these; the rest can be any mix",
-    "siftec.hubui.exempt": "Creative: the building rule is skipped",
-    "siftec.hubui.not_marked": "Mark it: HUB Planner on two corners, then on the HUB",
-    "siftec.hubui.too_big": "The marked area is too big: mark it again",
-    "siftec.hubui.built": "Built: good for Tier %s", "siftec.hubui.build_more": "Build it up, then Rescan",
-    "siftec.hubui.status": "%s  |  Members %s  |  Costs x%s", "siftec.hubui.status_locked": "%s  |  Locked %s",
-    "siftec.hubui.status_built": "Building: Tier %s", "siftec.hubui.status_none": "Building: no tier yet",
-    "siftec.hubui.status_exempt": "Building: any tier",
+    "siftec.hubui.status": "%s  |  Members %s  |  Costs x%s", "siftec.hubui.status_locked": "%s  |  Freighter back in %s",
     "siftec.lock.item": "Locked: needs %s",
     "siftec.milestone.disabled": "nothing: it is switched off in this pack",
     "siftec.company.default_name": "%s's Company", "siftec.company.info": "%s: %s",
@@ -784,8 +814,6 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
         "top": "minecraft:block/lodestone_top", "side": top, "bottom": top}})
     item_def(b, f"siftec:block/{b}")
-    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
-          "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}]}]})
 
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 

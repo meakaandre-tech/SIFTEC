@@ -337,7 +337,6 @@ def build():
     alternates()
     kitchen()
     food()
-    hand("siftec:hub_planner", [(1, "minecraft:stick"), (1, "#minecraft:planks")], name="hub_planner")
     # ---- tiers 0 to 2 -------------------------------------------------------------------------
     saw("Iron Ingot", "Iron Rod")
     saw("Copper Ingot", "Wire", 2)

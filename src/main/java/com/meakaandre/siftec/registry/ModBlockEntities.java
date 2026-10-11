@@ -50,7 +50,9 @@ public class ModBlockEntities {
     public static final Entry<DepotBlockEntity> DEPOT = register("dimensional_depot", DepotBlockEntity::new, ModBlocks.DIMENSIONAL_DEPOT.get());
     public static final Entry<PoleBlockEntity> POLE = register("power_pole", PoleBlockEntity::new, ModBlocks.POWER_POLE.get(), ModBlocks.POWER_TOWER.get());
     public static final Entry<com.meakaandre.siftec.governor.GovernorBlockEntity> GOVERNOR = register("speed_governor", com.meakaandre.siftec.governor.GovernorBlockEntity::new, ModBlocks.SPEED_GOVERNOR.get());
-    public static final Entry<com.meakaandre.siftec.engine.EngineBlockEntity> ENGINE = register("engine", com.meakaandre.siftec.engine.EngineBlockEntity::new, ModBlocks.FURNACE_ENGINE.get(), ModBlocks.HUB_ENGINE.get());
+    public static final Entry<com.meakaandre.siftec.engine.EngineBlockEntity> ENGINE = register("engine", com.meakaandre.siftec.engine.EngineBlockEntity::new, ModBlocks.FURNACE_ENGINE.get(), ModBlocks.HUB_ENGINE.get(), ModBlocks.HUB_BURNER.get());
+    /** The HUB's Personal Storage Box. */
+    public static final Entry<com.meakaandre.siftec.prefab.StorageBoxBlockEntity> STORAGE_BOX = register("personal_storage", com.meakaandre.siftec.prefab.StorageBoxBlockEntity::new, ModBlocks.PERSONAL_STORAGE.get());
     public static final Entry<com.meakaandre.siftec.drone.DronePortBlockEntity> DRONE_PORT = register("drone_port", com.meakaandre.siftec.drone.DronePortBlockEntity::new, ModBlocks.DRONE_PORT.get());
     public static final Entry<com.meakaandre.siftec.blueprint.DesignerBlockEntity> DESIGNER = register("blueprint_designer", com.meakaandre.siftec.blueprint.DesignerBlockEntity::new, ModBlocks.BLUEPRINT_DESIGNER.get(), ModBlocks.BLUEPRINT_DESIGNER_MK3.get());
     public static final Entry<StorageBlockEntity> POWER_STORAGE = register("power_storage", StorageBlockEntity::new, ModBlocks.POWER_STORAGE.get());
@@ -75,6 +77,7 @@ public class ModBlockEntities {
         // parts pushed into a HUB or Gateway go toward the company's active milestone
         ItemStorage.SIDED.registerForBlockEntity((hub, side) -> hub.intake, HUB.get());
         ItemStorage.SIDED.registerForBlockEntity((engine, side) -> ContainerStorage.of(engine.fuel, side), ENGINE.get());
+        ItemStorage.SIDED.registerForBlockEntity((box, side) -> ContainerStorage.of(box.items, side), STORAGE_BOX.get());
         ItemStorage.SIDED.registerForBlockEntity((port, side) -> ContainerStorage.of(port.items, side), DRONE_PORT.get());
         ItemStorage.SIDED.registerForBlockEntity((sink, side) -> sink.intake, SINK.get());
         ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());

@@ -53,6 +53,7 @@ public class Siftec implements ModInitializer {
         Locks.register();
         Companies.register();
         Claims.register();
+        com.meakaandre.siftec.prefab.Prefabs.register();
         com.meakaandre.siftec.geyser.Radiation.register();
         com.meakaandre.siftec.compat.ToxicShot.register();
     }
