@@ -5,7 +5,7 @@
 A Minecraft modpack that follows Satisfactory's progression, with Create as the tech base and a wormhole in place of the space elevator.
 Version: Fabric 26.3, on Create Fly (the owner's 26.3 port) and the owner's 26.3 ports of Hypertubes, Diesel Generators and Gunsmithing.
 Structure: Satisfactory's 10 tiers and milestones, with the same names (44: Tier 8's Nuclear Power is removed for now). Two tiers unlock per wormhole phase, and the finished wormhole opens a portal to The Sift.
-Milestones: paid in parts at a company's HUB. Progression belongs to the company, not the player. After Tier 0, each one locks the HUB for its listed time.
+Milestones: paid in parts at a company's HUB. Progression belongs to the company, not the player. After Tier 0, each one sends the HUB's freighter away for its listed time, and the next milestone waits for it.
 Locked by default: every machine and recipe is locked until a milestone or MAM node unlocks it.
 Resources: ore spawns normally for hand mining. Above-ground infinite nodes only produce with a miner on them.
 Power: rotation only, with no electricity. Speed is capped per Logistics tier: 32, 64, 96, 128, 192, then 256 RPM.
@@ -110,7 +110,7 @@ All other parts (Rotor, Modular Frame, Smart Plating, Motor, Computer and so on)
  | 
 Until the Constructor unlocks, basic parts are hand-crafted at a crafting table.
 ## Wormhole phases
-The Wormhole Gateway unlocks at HUB Upgrade 6. Each phase delivered unlocks the next two tiers, and Phase 5 opens a portal to The Sift.
+The Wormhole Gateway unlocks at HUB Upgrade 6. It is the Space Elevator: a structure placed whole (see HUB and Wormhole Gateway structures), with one ring on its tower per phase that lights up when the phase is delivered. Each phase delivered unlocks the next two tiers, and Phase 5 adds the rift crown and opens a portal to The Sift.
 Phase
  | Cost
  | Unlocks
@@ -135,6 +135,46 @@ Phase
  | 1,000 Nuclear Pasta, 1,000 Biochemical Sculptor, 256 AI Expansion Server, 200 Ballistic Warp Drive
  | Opens a portal to The Sift
  | 
+## HUB and Wormhole Gateway structures
+Satisfactory's HUB and Space Elevator are buildings placed whole with the Build Gun, and so are SIFTEC's HUB and Wormhole Gateway. Sizes follow Satisfactory with the player 1.8 blocks tall, as the Pioneer is 1.8 m: one metre is one block.
+Placing
+ | Holding the HUB or Wormhole Gateway item shows the whole structure as a hologram where the player looks, up to 32 blocks away: its front edge on the block aimed at, stretching away from the player. Sneak and use the item to turn it a quarter. It is green where it fits and red where it does not, with the blocks in the way marked. One click puts all of it down; a survival player uses up the item.
+ | 
+Where it fits
+ | Everything it will ever take up must be free (air, plants, snow, water), and every column of its bottom row needs ground at most 6 blocks down: legs are added down to the ground. Not within the spawn area, not on another company's land, and a claiming HUB not next to another company's land (the claim rules). One Wormhole Gateway per company.
+ | 
+Its blocks
+ | Shell blocks in Create and vanilla textures (white and orange concrete, industrial iron, framed glass, lamps), and the working parts. None can be mined, blown up, pushed or moved by a contraption on their own.
+ | 
+Picking it up
+ | Sneak and use the terminal twice. The whole structure goes and gives back its item, everything in the Personal Storage Box and any fuel left in the burners. The company's progress stays with the company, so the structure comes back at the same level wherever it is put down. A HUB gives up its land and claims again where it goes.
+ | 
+HUB
+ | 14 wide, 26 long, 28 high with the freighter docked (Satisfactory's 14 x 26 x 28 m). From the front: entrance steps, the terminal hall, the living quarters, the burner deck, and the freighter's dock tower over the deck.
+ | 
+HUB Terminal
+ | From the start. The HUB screen: milestones, paying (by hand, or by belt and funnel into the terminal) and the freighter's countdown.
+ | 
+Craft Bench
+ | From the start. A crafting grid, as a crafting table has.
+ | 
+Personal Storage Box
+ | HUB Upgrade 1. 27 slots, for the HUB's company only.
+ | 
+Burners
+ | HUB Upgrade 2 adds the first, HUB Upgrade 5 the second. HUB Engines: put fuel in and set a shaft on top. A HUB structure runs no other HUB Engines.
+ | 
+Living quarters
+ | HUB Upgrade 4. Two bunk beds (sleeping sets the respawn point), lockers, a desk and a washroom; only the beds do anything.
+ | 
+FICSIT Freighter
+ | HUB Upgrade 6. Docked on its tower over the burner deck; it flies off when a milestone is completed and is back when the milestone's time is up.
+ | 
+Wormhole Gateway
+ | 48 wide and 54 long like the Space Elevator (48 x 54 m), but 60 high instead of 118, so it keeps to the build height and few chunk sections. A deck on a frame and pillars, the terminal in a bay under the front of the deck, and a tower in the middle with five rings, one per phase, dark until the phase is delivered and lit after. Phase 5 adds the rift crown on top, and the terminal's screen offers Enter The Sift.
+ | 
+Old worlds
+ | An old single-block HUB or Gateway keeps working as a plain terminal. Sneak-use it twice to pick it up, and put it down again as a structure. The HUB building rule (the HUB Planner, the building's block families, walls and roof) is gone; a HUB Planner left in an inventory is a plain item that does nothing.
 ## Tier 0
 Six HUB upgrades take the player from hand mining to the first automated miner and the Wormhole Gateway. They have no lock time.
 #
@@ -145,12 +185,12 @@ Six HUB upgrades take the player from hand mining to the first automated miner a
 1
  | HUB Upgrade 1
  | 10 Iron Rod
- | Equipment Workshop; Portable Miner; storage box on the HUB; a Traveler's Backpack for every member (Leather tier)
+ | Equipment Workshop; Portable Miner; the Personal Storage Box on the HUB; a Traveler's Backpack for every member (Leather tier)
  | 
 2
  | HUB Upgrade 2
  | 20 Iron Rod, 10 Iron Sheet
- | Smelter (Encased Fan bulk smelting); Power Line; copper ingot, Wire and Cable recipes; copper nodes on the scanner; first furnace engine on the HUB
+ | Smelter (Encased Fan bulk smelting); Power Line; copper ingot, Wire and Cable recipes; copper nodes on the scanner; the first burner (HUB Engine) on the HUB
  | 
 3
  | HUB Upgrade 3
@@ -165,14 +205,14 @@ Six HUB upgrades take the player from hand mining to the first automated miner a
 5
  | HUB Upgrade 5
  | 75 Iron Rod, 50 Cable, 20 Concrete
- | Miner Mk.1; Item Vault; second furnace engine on the HUB; Backpack Pickup and Furnace Upgrades
+ | Miner Mk.1; Item Vault; the second burner (HUB Engine) on the HUB; Backpack Pickup and Furnace Upgrades
  | 
 6
  | HUB Upgrade 6
  | 100 Iron Rod, 100 Iron Sheet, 100 Wire, 50 Concrete
- | Wormhole Gateway; standalone furnace engine and flywheel; biomass recipe; milestone lock times begin
+ | Wormhole Gateway; standalone furnace engine and flywheel; biomass recipe; the FICSIT Freighter docks at the HUB and milestone times begin
  | 
-The two HUB furnace engines are weaker than the standalone one.
+The HUB's two burners are HUB Engines, weaker than the standalone Furnace Engine (as Satisfactory's HUB burners make 20 MW against 30). HUB Upgrade 4 adds the living quarters with the bunk beds.
 ## Tiers 1 and 2
 Both tiers open once Tier 0 is done. They add logistics, research and the first two-input machine.
 ### Tier 1
@@ -582,10 +622,10 @@ System
  | What it does
  | 
 HUB and milestones
- | A company pays parts at its HUB to complete milestones. Completing one unlocks its recipes and, after Tier 0, locks the HUB for the listed time. A Sift Rift above the HUB takes the parts, and the lock is the rift restabilising.
+ | A company pays parts at its HUB Terminal to complete milestones. Completing one unlocks its recipes and, after Tier 0, sends the FICSIT Freighter away for the listed time; the next milestone can be paid when it is back. The HUB is a structure placed whole, as in Satisfactory (see HUB and Wormhole Gateway structures).
  | 
 Wormhole Gateway
- | Takes the phase parts. Five phases, each unlocking the next tiers.
+ | The Space Elevator: a structure placed whole whose terminal takes the phase parts. Five phases, each unlocking the next tiers and lighting a ring on the tower.
  | 
 Resource nodes
  | Above-ground, infinite, and only productive with a miner on them. Purity is impure, normal or pure, as in Satisfactory. Placement and looks are in the Nodes section. Types: iron, copper, limestone, coal, zinc, oil, quartz, bauxite, sulfur, nitrogen, SAM.
@@ -597,7 +637,7 @@ Scanner
  | Points to the nearest node of a chosen resource, like Nature's Compass. It works positions out from the seed, so chunks do not need to be generated or loaded. Resources are added as milestones unlock them.
  | 
 Furnace engine
- | The old Create furnace engine, rebuilt. Sits against a burning furnace and drives a flywheel. Two weaker ones attach to the HUB.
+ | The old Create furnace engine, rebuilt. Sits against a burning furnace and drives a flywheel. The HUB's two built-in burners are the weaker HUB Engine.
  | 
 Power poles
  | Power Line, Power Pole and Power Tower carry rotation over distance. Power Storage holds stress and releases it later.
@@ -719,7 +759,7 @@ SAM: a cluster of dark purple crystals with a faint glow.
 Purity: not visible on the node itself. Looking at a node or scanning it shows a label such as "Iron Ore, Pure".
 ## Claims
 Companies claim land in chunks, and a node belongs to whoever has claimed the land under it.
-HUB: placing a HUB claims the 5 by 5 chunks around it.
+HUB: a company's first HUB claims the 5 by 5 chunks around its terminal. Picking the HUB up gives the land up; putting it down again claims around the new spot.
 Claim Marker: a block that claims the 3 by 3 chunks around it. Markers can go on any unclaimed land, so a distant node can be claimed without owning everything in between.
 Inside a claim: only company members can place or break blocks, open storage, and put miners on nodes.
 Unclaimed land: open to everyone and not protected.

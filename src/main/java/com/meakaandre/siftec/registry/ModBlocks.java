@@ -104,13 +104,13 @@ public class ModBlocks {
 
     static {
         // style, the vanilla block whose sound, light and see-through-ness it copies, light level
-        Object[][] styles = {{"white", net.minecraft.world.level.block.Blocks.WHITE_CONCRETE, 0}, {"orange", net.minecraft.world.level.block.Blocks.ORANGE_CONCRETE, 0},
-            {"metal", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"floor", net.minecraft.world.level.block.Blocks.LIGHT_GRAY_CONCRETE, 0},
+        Object[][] styles = {{"white", net.minecraft.world.level.block.Blocks.CONCRETE.white(), 0}, {"orange", net.minecraft.world.level.block.Blocks.CONCRETE.orange(), 0},
+            {"metal", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"floor", net.minecraft.world.level.block.Blocks.CONCRETE.lightGray(), 0},
             {"glass", net.minecraft.world.level.block.Blocks.GLASS, 0}, {"lamp", net.minecraft.world.level.block.Blocks.REDSTONE_LAMP, 15},
-            {"step", net.minecraft.world.level.block.Blocks.LIGHT_GRAY_CONCRETE, 0}, {"locker", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
+            {"step", net.minecraft.world.level.block.Blocks.CONCRETE.lightGray(), 0}, {"locker", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
             {"railway", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"coil", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
             {"coil_lit", net.minecraft.world.level.block.Blocks.AMETHYST_BLOCK, 15}, {"rift", net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN, 15},
-            {"foundation", net.minecraft.world.level.block.Blocks.GRAY_CONCRETE, 0}};
+            {"foundation", net.minecraft.world.level.block.Blocks.CONCRETE.gray(), 0}};
         for (Object[] style : styles) {
             String name = (String) style[0];
             Block like = (Block) style[1];
@@ -131,7 +131,7 @@ public class ModBlocks {
     }
 
     public static final Supplier<com.meakaandre.siftec.prefab.HubBedBlock> HUB_BED = blockOnly("hub_bed", com.meakaandre.siftec.prefab.HubBedBlock::new,
-        () -> prefabProperties(net.minecraft.world.level.block.Blocks.ORANGE_BED, 0, true));
+        () -> prefabProperties(net.minecraft.world.level.block.Blocks.BED.orange(), 0, true));
     public static final Supplier<com.meakaandre.siftec.prefab.CraftBenchBlock> CRAFT_BENCH = blockOnly("craft_bench", com.meakaandre.siftec.prefab.CraftBenchBlock::new,
         () -> prefabProperties(net.minecraft.world.level.block.Blocks.CRAFTING_TABLE, 0));
     public static final Supplier<com.meakaandre.siftec.prefab.StorageBoxBlock> PERSONAL_STORAGE = blockOnly("personal_storage", com.meakaandre.siftec.prefab.StorageBoxBlock::new,

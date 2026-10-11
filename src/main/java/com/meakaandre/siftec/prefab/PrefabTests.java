@@ -422,7 +422,10 @@ public final class PrefabTests {
     private static void mannequin(ServerLevel level, BlockPos at) {
         AABB near = new AABB(at).inflate(2);
         if (!level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, near, e -> !(e instanceof ServerPlayer)).isEmpty()) return;
-        var type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getOptional(net.minecraft.resources.Identifier.withDefaultNamespace("mannequin")).orElse(EntityType.ARMOR_STAND);
+        var registry = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE;
+        EntityType<?> type = registry.getOptional(net.minecraft.resources.Identifier.withDefaultNamespace("mannequin"))
+            .or(() -> registry.getOptional(net.minecraft.resources.Identifier.withDefaultNamespace("armor_stand"))).orElse(null);
+        if (type == null) return;
         var entity = type.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         if (entity == null) return;
         entity.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 180f, 0f);
