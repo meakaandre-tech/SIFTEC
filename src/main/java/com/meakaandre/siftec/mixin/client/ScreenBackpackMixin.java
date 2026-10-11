@@ -16,7 +16,7 @@ public abstract class ScreenBackpackMixin {
     @WrapOperation(method = "extractRenderStateWithTooltipAndSubtitles", at = @At(value = "INVOKE",
         target = "Lnet/minecraft/client/gui/screens/Screen;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"))
     private void siftec$withBackpackRows(Screen screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta, Operation<Void> original) {
-        if (BackpackDraw.pass == 0 && screen instanceof BackpackDraw.Window window && window.siftec$extra() > 0) {
+        if (BackpackDraw.pass == 0 && screen instanceof BackpackDraw.Window window && (window.siftec$extra() > 0 || window.siftec$wide() > 0)) {
             BackpackDraw.draw(screen, window, graphics, mouseX, mouseY, delta, original);
         } else {
             original.call(screen, graphics, mouseX, mouseY, delta);

@@ -64,6 +64,7 @@ sleep 2
 shot
 key Escape
 sleep 1
+cmd siftec selftest bp layout
 cmd siftec selftest bp slots 0
 sleep 2
 key e
@@ -76,7 +77,31 @@ sleep 2
 shot
 key Escape
 sleep 1
+cmd siftec selftest bp slots 3
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
 cmd siftec selftest bp slots 9
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp slots 15
 sleep 2
 key e
 sleep 2
@@ -105,6 +130,11 @@ sleep 2
 key e
 sleep 2
 shot
+click 692 334
+sleep 2
+shot
+click 846 334
+sleep 1
 key Escape
 sleep 1
 cmd siftec selftest bp chest
@@ -118,7 +148,7 @@ cmd siftec selftest bp check
 key e
 sleep 2
 shot
-move 496 486
+move 820 378
 sleep 1
 key 1
 sleep 1
@@ -134,10 +164,10 @@ keydown Shift_L
 click 496 244
 keyup Shift_L
 sleep 1
-move 532 486
+move 820 414
 sleep 1
 keydown Shift_L
-click 532 486
+click 820 414
 keyup Shift_L
 sleep 1
 shot
@@ -167,11 +197,16 @@ shot
 key Escape
 sleep 1
 cmd gamemode survival @a
-cmd siftec selftest bp slots 21
+cmd siftec selftest bp slots 33
 sleep 2
 cmd siftec selftest bp open furnace
 sleep 2
 shot
+click 524 280
+sleep 2
+shot
+click 678 280
+sleep 1
 key Escape
 sleep 1
 cmd siftec selftest bp open hopper
@@ -194,6 +229,52 @@ sleep 2
 shot
 key Escape
 sleep 1
+xdo search --name Minecraft windowsize %@ 960 540
+sleep 4
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp open large
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp open furnace
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+xdo search --name Minecraft windowsize %@ 852 480
+sleep 4
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp open large
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp open furnace
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest bp chest
+sleep 2
+shot
+key Escape
+sleep 1
+xdo search --name Minecraft windowsize %@ 1280 720
+sleep 4
 cmd siftec selftest bp pick
 sleep 1
 cmd siftec selftest bp slots 0

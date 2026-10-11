@@ -21,13 +21,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The backpack: up to four extra rows of the normal inventory, shown between the main rows and the hotbar in every
- * window that shows the player's inventory (see {@link BackpackRows}). Every "+3 backpack slots" reward opens three
+ * The backpack: extra slots of the normal inventory grid, which grows wider (columns of three beside the main rows)
+ * and then taller (rows between the main rows and the hotbar) in every window that shows the player's inventory
+ * (see {@link BackpackRows}). Every "+3 backpack slots" reward opens three
  * more. Items picked up go there once the hotbar and main rows are full. The items are saved with the player; on
  * death they drop like the rest of the inventory unless keepInventory is on.
  */
 public final class Backpack {
-    /** All the slots there can ever be: four rows under the inventory. */
+    /** All the slots there can ever be: three columns of three, then rows of twelve (33 reachable in survival). */
     public static final int SIZE = 36;
     public static final int PER_REWARD = 3;
 
