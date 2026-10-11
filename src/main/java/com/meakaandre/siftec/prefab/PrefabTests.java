@@ -323,7 +323,11 @@ public final class PrefabTests {
                 b.append(" burner missing;");
             }
         }
-        report(source, "check: the second company's HUB burners:" + b);
+        BlockPos term = spotB.terminal();
+        HubBlockEntity hub = terminal(level, spotB);
+        report(source, "check: the second company's HUB burners:" + b + " terminal ticked " + (hub == null ? -1 : hub.ticked) + ", blocks tick here "
+            + level.shouldTickBlocksAt(term) + ", entity ticking " + level.isPositionEntityTicking(term) + ", chunk forced "
+            + level.getForceLoadedChunks().contains(net.minecraft.world.level.ChunkPos.pack(term.getX() >> 4, term.getZ() >> 4)));
         return 1;
     }
 

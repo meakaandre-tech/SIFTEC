@@ -31,6 +31,8 @@ public class HubBlockEntity extends BlockEntity {
     public int[] legs;
     public int builtLevel;
     private int clock;
+    /** Ticks run, for the self-test. */
+    public long ticked;
 
     /** Lets belts, funnels and hoppers deliver; it only takes parts the active milestone still needs. */
     public final com.meakaandre.siftec.util.IntakeStorage intake = new com.meakaandre.siftec.util.IntakeStorage(this::wanted, this::accept);
@@ -41,6 +43,7 @@ public class HubBlockEntity extends BlockEntity {
 
     /** Once a second: builds or takes away the structure's parts to match the company's progress. */
     public void serverTick() {
+        ticked++;
         if (++clock < 20) return;
         clock = 0;
         Prefabs.refresh(this);
