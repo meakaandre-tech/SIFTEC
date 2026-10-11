@@ -122,14 +122,22 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         return false;
     }
 
-    /** A HUB Engine has to touch its company's HUB, and the HUB only runs as many as the company has unlocked. */
+    /**
+     * A HUB Engine has to touch its company's HUB, and the HUB only runs as many as the company has unlocked. The
+     * burners built into a HUB structure are always allowed (the structure only adds them once unlocked), and a HUB
+     * structure runs no loose HUB Engines besides them: like Satisfactory's HUB it has exactly two burners.
+     */
     private boolean hubAllows() {
+        if (getBlockState().getBlock() instanceof com.meakaandre.siftec.prefab.HubBurnerBlock) {
+            status = OK;
+            return true;
+        }
         for (Direction side : Direction.values()) {
             BlockPos at = worldPosition.relative(side);
             if (!(level.getBlockState(at).getBlock() instanceof HubBlock hub) || hub.gateway) continue;
             if (!(level.getBlockEntity(at) instanceof HubBlockEntity hubEntity)) continue;
             Company company = CompanyData.get(level.getServer()).byId(hubEntity.companyId);
-            int allowed = company == null ? 0 : company.has("hub_upgrade_5") ? 2 : company.has("hub_upgrade_2") ? 1 : 0;
+            int allowed = company == null || hubEntity.prefab ? 0 : company.has("hub_upgrade_5") ? 2 : company.has("hub_upgrade_2") ? 1 : 0;
             int engines = 0;
             for (Direction around : Direction.values()) {
                 if (level.getBlockState(at.relative(around)).getBlock() instanceof EngineBlock engine && engine.hub) engines++;

@@ -92,8 +92,52 @@ public class ModBlocks {
     public static final Supplier<com.meakaandre.siftec.block.MinerTopBlock> MINER_TOP = hidden("miner_top", com.meakaandre.siftec.block.MinerTopBlock::new, ModBlocks::machine);
     public static final Supplier<ExtractorBlock> RESOURCE_WELL_EXTRACTOR = block("resource_well_extractor", ExtractorBlock::new, ModBlocks::machine);
 
-    public static final Supplier<HubBlock> HUB = block("hub", properties -> new HubBlock(false, properties), ModBlocks::machine);
-    public static final Supplier<HubBlock> WORMHOLE_GATEWAY = block("wormhole_gateway", properties -> new HubBlock(true, properties), ModBlocks::machine);
+    /** The HUB Terminal and the Wormhole Gateway's terminal; their items place the whole structure (see prefab.Prefabs). */
+    public static final Supplier<HubBlock> HUB = prefab("hub", com.meakaandre.siftec.prefab.Prefabs.Kind.HUB, properties -> new HubBlock(false, properties));
+    public static final Supplier<HubBlock> WORMHOLE_GATEWAY = prefab("wormhole_gateway", com.meakaandre.siftec.prefab.Prefabs.Kind.GATEWAY, properties -> new HubBlock(true, properties));
+
+    /**
+     * The shell blocks of the HUB and Wormhole Gateway structures, by style: Create and vanilla textures (see
+     * tools/gen_assets.py, PREFAB). Unbreakable, immovable, no item and no loot, like node pads.
+     */
+    public static final Map<String, Supplier<com.meakaandre.siftec.prefab.PrefabBlock>> PREFAB = new java.util.LinkedHashMap<>();
+
+    static {
+        // style, the vanilla block whose sound, light and see-through-ness it copies, light level
+        Object[][] styles = {{"white", net.minecraft.world.level.block.Blocks.WHITE_CONCRETE, 0}, {"orange", net.minecraft.world.level.block.Blocks.ORANGE_CONCRETE, 0},
+            {"metal", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"floor", net.minecraft.world.level.block.Blocks.LIGHT_GRAY_CONCRETE, 0},
+            {"glass", net.minecraft.world.level.block.Blocks.GLASS, 0}, {"lamp", net.minecraft.world.level.block.Blocks.REDSTONE_LAMP, 15},
+            {"step", net.minecraft.world.level.block.Blocks.LIGHT_GRAY_CONCRETE, 0}, {"locker", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
+            {"railway", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"coil", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
+            {"coil_lit", net.minecraft.world.level.block.Blocks.AMETHYST_BLOCK, 15}, {"rift", net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN, 15},
+            {"foundation", net.minecraft.world.level.block.Blocks.GRAY_CONCRETE, 0}};
+        for (Object[] style : styles) {
+            String name = (String) style[0];
+            Block like = (Block) style[1];
+            int light = (Integer) style[2];
+            PREFAB.put(name, blockOnly("prefab_" + name, properties -> new com.meakaandre.siftec.prefab.PrefabBlock(name.equals("step"), properties),
+                () -> prefabProperties(like, light, name.equals("step"))));
+        }
+    }
+
+    private static BlockBehaviour.Properties prefabProperties(Block like, int light) {
+        return prefabProperties(like, light, false);
+    }
+
+    private static BlockBehaviour.Properties prefabProperties(Block like, int light, boolean open) {
+        BlockBehaviour.Properties p = BlockBehaviour.Properties.ofFullCopy(like).strength(-1.0F, 3600000.0F).noLootTable()
+            .pushReaction(PushReaction.IMMOVEABLE).lightLevel(state -> light);
+        return open ? p.noOcclusion() : p;
+    }
+
+    public static final Supplier<com.meakaandre.siftec.prefab.HubBedBlock> HUB_BED = blockOnly("hub_bed", com.meakaandre.siftec.prefab.HubBedBlock::new,
+        () -> prefabProperties(net.minecraft.world.level.block.Blocks.ORANGE_BED, 0, true));
+    public static final Supplier<com.meakaandre.siftec.prefab.CraftBenchBlock> CRAFT_BENCH = blockOnly("craft_bench", com.meakaandre.siftec.prefab.CraftBenchBlock::new,
+        () -> prefabProperties(net.minecraft.world.level.block.Blocks.CRAFTING_TABLE, 0));
+    public static final Supplier<com.meakaandre.siftec.prefab.StorageBoxBlock> PERSONAL_STORAGE = blockOnly("personal_storage", com.meakaandre.siftec.prefab.StorageBoxBlock::new,
+        () -> prefabProperties(net.minecraft.world.level.block.Blocks.BARREL, 0));
+    public static final Supplier<com.meakaandre.siftec.prefab.HubBurnerBlock> HUB_BURNER = blockOnly("hub_burner", com.meakaandre.siftec.prefab.HubBurnerBlock::new,
+        () -> BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.METAL).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
 
     public static final Supplier<WorkshopBlock> EQUIPMENT_WORKSHOP = block("equipment_workshop", WorkshopBlock::new, ModBlocks::machine);
 
@@ -151,6 +195,19 @@ public class ModBlocks {
     ) {
         ResourceKey<Block> blockKey = ResourceKey.create(Registries.BLOCK, Siftec.id(name));
         T block = Registry.register(BuiltInRegistries.BLOCK, blockKey, factory.apply(properties.get().setId(blockKey)));
+        return () -> block;
+    }
+
+    /** The HUB and Wormhole Gateway: the item is a {@link com.meakaandre.siftec.prefab.PrefabItem}, which places the whole structure. */
+    private static Supplier<HubBlock> prefab(String name, com.meakaandre.siftec.prefab.Prefabs.Kind kind, Function<BlockBehaviour.Properties, HubBlock> factory) {
+        Identifier id = Siftec.id(name);
+        ResourceKey<Block> blockKey = ResourceKey.create(Registries.BLOCK, id);
+        HubBlock block = Registry.register(BuiltInRegistries.BLOCK, blockKey, factory.apply(machine().setId(blockKey)));
+        ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, id);
+        BlockItem item = new com.meakaandre.siftec.prefab.PrefabItem(kind, block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix());
+        item.registerBlocks(Item.BY_BLOCK, item);
+        Registry.register(BuiltInRegistries.ITEM, itemKey, item);
+        TAB_ITEMS.add(item);
         return () -> block;
     }
 

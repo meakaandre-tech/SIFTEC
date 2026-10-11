@@ -33,7 +33,6 @@ public final class Companies {
             if (data.gotHub().add(player.getUUID().toString())) {
                 data.setDirty();
                 player.getInventory().placeItemBackInInventory(new ItemStack(ModBlocks.HUB.get()), Prediction.SERVER_ONLY);
-                player.getInventory().placeItemBackInInventory(new ItemStack(com.meakaandre.siftec.registry.ModItems.HUB_PLANNER.get()), Prediction.SERVER_ONLY);
             }
         });
         // valuable changes (payments, the cloud, points) are written within a few seconds instead of at the next autosave

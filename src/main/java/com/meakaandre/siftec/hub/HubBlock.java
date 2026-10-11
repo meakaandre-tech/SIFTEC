@@ -3,29 +3,41 @@ package com.meakaandre.siftec.hub;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
-/** The HUB (milestones) and the Wormhole Gateway (phases). Each belongs to the company of whoever placed it. */
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * The HUB Terminal (milestones) and the Wormhole Gateway's terminal (phases), each the controller of its whole
+ * structure. Each belongs to the company that placed it. Using it opens the milestone screen; sneaking and using it
+ * twice picks the whole structure up (an old single-block one as well) and gives the item back.
+ */
 public class HubBlock extends Block implements EntityBlock {
     public final boolean gateway;
+    /** Who sneak-used which terminal last, and when: the second sneak-use within five seconds picks it up. */
+    private static final Map<UUID, long[]> ARMED = new HashMap<>();
 
     public HubBlock(boolean gateway, Properties properties) {
-        // a HUB holds land: it cannot be blown up or pushed, or its claim would be left behind
-        super(properties.explosionResistance(3600000.0F).pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE));
+        // a HUB holds land: it cannot be broken, blown up or pushed, or its claim would be left behind
+        super(properties.strength(-1.0F, 3600000.0F).noLootTable().pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE));
         this.gateway = gateway;
     }
 
@@ -35,61 +47,10 @@ public class HubBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        super.setPlacedBy(level, pos, state, placer, stack);
-        if (placer instanceof ServerPlayer player && level.getBlockEntity(pos) instanceof HubBlockEntity hub) {
-            Company company = Companies.of(player);
-            // a HUB claims the land around it; the Gateway does not
-            if (!gateway && level instanceof net.minecraft.server.level.ServerLevel server && !company.id.isEmpty()) {
-                // a HUB that will claim may not go right next to another company's land
-                boolean claims = !com.meakaandre.siftec.claim.Claims.hasClaimingHub(server.getServer(), company);
-                if (claims && (com.meakaandre.siftec.claim.Claims.nearForeignHub(server, company, pos)
-                    || com.meakaandre.siftec.claim.Claims.nearForeign(server, company, pos, com.meakaandre.siftec.claim.Claims.HUB_RADIUS + 1, false))) {
-                    level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-                    if (!player.hasInfiniteMaterials()) player.getInventory().placeItemBackInInventory(new ItemStack(this), net.minecraft.util.Prediction.SERVER_ONLY);
-                    player.sendOverlayMessage(Component.translatableWithFallback("siftec.claim.hub_too_close",
-                        "Too close to another company's land: a HUB must be more than %s chunks from another HUB", com.meakaandre.siftec.claim.Claims.HUB_SPACING));
-                    return;
-                }
-                hub.companyId = company.id;
-                hub.setChanged();
-                int chunks = com.meakaandre.siftec.claim.Claims.claimForHub(server, company, pos);
-                if (chunks < 0) {
-                    player.sendOverlayMessage(Component.translatableWithFallback("siftec.claim.hub_extra",
-                        "HUB placed. Your company's first HUB already holds its land, so this one claims nothing"));
-                } else if (chunks == 0 && com.meakaandre.siftec.claim.Claims.inSpawnZone(server, pos)) {
-                    player.sendOverlayMessage(Component.translatableWithFallback("siftec.claim.hub_spawn",
-                        "HUB placed. Nothing can be claimed within %s blocks of spawn", com.meakaandre.siftec.config.SiftecConfig.spawnFreeRadius));
-                } else {
-                    player.sendOverlayMessage(Component.translatable("siftec.claim.hub", chunks));
-                }
-                return;
-            }
-            hub.companyId = company.id;
-            hub.setChanged();
-        }
-    }
-
-    /** The HUB Planner, used on the HUB, sets the building's box and reports on it. */
-    @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
-        if (gateway || !(stack.getItem() instanceof HubPlannerItem)) return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (!(player instanceof ServerPlayer server) || !(level.getBlockEntity(pos) instanceof HubBlockEntity hub)) return InteractionResult.SUCCESS;
-        BlockPos[] box = HubPlannerItem.box(stack);
-        if (box == null) {
-            server.sendOverlayMessage(Component.translatable("siftec.planner.how"));
-            return InteractionResult.SUCCESS;
-        }
-        hub.boxMin = box[0];
-        hub.boxMax = box[1];
-        hub.setChanged();
-        HubBuilding.Result result = hub.measure();
-        Company company = Companies.of(server);
-        int tier = Math.min(Milestones.TIERS - 1, Math.max(0, result.builtTier() + 1));
-        if (result.builtTier() == Milestones.TIERS - 1) tier = Milestones.TIERS - 1;
-        server.sendSystemMessage(Component.translatable("siftec.building.title", result.builtTier() < 0 ? Component.translatable("siftec.building.none") : Component.literal("Tier " + result.builtTier())));
-        for (Component line : result.report(tier)) server.sendSystemMessage(line);
-        return InteractionResult.SUCCESS;
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return level.isClientSide() ? null : (l, p, s, be) -> {
+            if (be instanceof HubBlockEntity hub) hub.serverTick();
+        };
     }
 
     @Override
@@ -106,6 +67,21 @@ public class HubBlock extends Block implements EntityBlock {
         }
         if (owner != mine) {
             server.sendOverlayMessage(Component.translatable("siftec.hub.not_yours", owner.name));
+            return InteractionResult.SUCCESS;
+        }
+        Component name = Component.translatable(gateway ? "block.siftec.wormhole_gateway" : "block.siftec.hub");
+        if (player.isShiftKeyDown()) {
+            long now = level.getGameTime();
+            long[] armed = ARMED.get(player.getUUID());
+            if (armed == null || armed[0] != pos.asLong() || now - armed[1] > 100) {
+                ARMED.put(player.getUUID(), new long[]{pos.asLong(), now});
+                server.sendOverlayMessage(Component.translatable("siftec.prefab.dismantle_confirm", name));
+                return InteractionResult.SUCCESS;
+            }
+            ARMED.remove(player.getUUID());
+            ServerLevel serverLevel = server.level();
+            Prefabs.give(serverLevel, server, pos, Prefabs.dismantle(serverLevel, hub));
+            server.sendOverlayMessage(Component.translatable("siftec.prefab.dismantled", name));
             return InteractionResult.SUCCESS;
         }
         HubMenu.open(server, mine, pos, gateway);

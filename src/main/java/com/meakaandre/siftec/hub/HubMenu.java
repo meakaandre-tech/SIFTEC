@@ -30,7 +30,8 @@ import java.util.List;
 
 /**
  * The HUB and Wormhole Gateway window, drawn on the client by {@code client.HubScreen} in the style of the old
- * Tweaker HUB screen: tier tabs, the tier's milestones, the chosen one's costs, and the HUB status.
+ * Tweaker HUB screen: tier tabs, the tier's milestones, the chosen one's costs, and the HUB status (the
+ * freighter's return, the company's size).
  * <p>
  * The menu has no slots. The screen's buttons arrive as vanilla menu button clicks (which the game only passes on
  * for the player's open menu, and only while {@link #stillValid} holds); every one is decoded, bounds-checked and
@@ -40,8 +41,8 @@ import java.util.List;
 public class HubMenu extends AbstractContainerMenu {
     public static MenuType<HubMenu> TYPE;
 
-    /** Button actions. */
-    public static final int SELECT = 1, PAY = 2, RESCAN = 3, SIFT = 4;
+    /** Button actions (3 was the old building rescan). */
+    public static final int SELECT = 1, PAY = 2, SIFT = 4;
     /** The "tier" that stands for the wormhole phases in a button id. */
     public static final int PHASES = Milestones.TIERS;
     private static final double REACH = 8.0;
@@ -114,16 +115,6 @@ public class HubMenu extends AbstractContainerMenu {
         return Math.max(0, company.lockUntil - player.level().getServer().overworld().getGameTime());
     }
 
-    private boolean exempt() {
-        return gateway || player.hasInfiniteMaterials();
-    }
-
-    private int built() {
-        if (exempt()) return Milestones.TIERS;
-        HubBlockEntity hub = hub();
-        return hub == null ? -1 : hub.builtTier();
-    }
-
     /** Why this player cannot pay into this milestone here and now, or null when they can. */
     private @Nullable Component refusal(Milestone m) {
         if (company.has(m.id())) return Component.translatable("siftec.hub.done");
@@ -131,7 +122,6 @@ public class HubMenu extends AbstractContainerMenu {
         Milestone blocker = Milestones.blocker(company, m);
         if (blocker != null) return Component.translatable("siftec.hub.needs", blocker.name());
         if (!m.isPhase() && lockTicks() > 0) return Component.translatable("siftec.hub.busy", clock(lockTicks()));
-        if (!m.isPhase() && m.tier() > built()) return Component.translatable("siftec.building.needed", m.tier());
         return null;
     }
 
@@ -171,11 +161,6 @@ public class HubMenu extends AbstractContainerMenu {
                     player.sendOverlayMessage(Component.translatable("siftec.hub.now_active", m.name()));
                 }
             }
-            case RESCAN -> {
-                HubBlockEntity hub = hub();
-                if (gateway || hub == null) return false;
-                if (hub.measure() == null) player.sendOverlayMessage(Component.translatable("siftec.planner.how"));
-            }
             case SIFT -> {
                 if (!gateway || !company.has("phase_5")) return false;
                 player.closeContainer();
@@ -205,9 +190,7 @@ public class HubMenu extends AbstractContainerMenu {
     /** Sends the view if it changed (or always, when {@code force}). */
     private void sync(boolean force) {
         if (player == null || company == null) return;
-        HubBlockEntity hub = gateway ? null : hub();
-        int built = built();
-        HubView v = HubView.of(company, gateway, built, exempt(), lockTicks(), hub == null ? null : hub.lastResult());
+        HubView v = HubView.of(company, gateway, lockTicks());
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         v.write(buf);
         byte[] bytes = new byte[buf.readableBytes()];
@@ -221,7 +204,7 @@ public class HubMenu extends AbstractContainerMenu {
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
-        // payments by belt or by other members, the lock timer and the building all change while the window is open
+        // payments by belt or by other members and the freighter's timer change while the window is open
         if (player != null && ++ticks % 10 == 0) sync(false);
     }
 

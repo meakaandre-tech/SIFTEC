@@ -64,6 +64,57 @@ sleep 2
 shot
 key Escape
 sleep 1
+cmd gamemode survival @a
+cmd siftec worldtest sathub ground
+cmd clear @a
+cmd item replace entity @a weapon.mainhand with siftec:hub 2
+sleep 6
+shot
+cmd siftec worldtest sathub obstacle
+sleep 3
+shot
+cmd siftec worldtest sathub clear
+sleep 3
+key u
+sleep 3
+cmd siftec selftest prefab placed
+sleep 1
+cmd gamemode spectator @a
+cmd siftec worldtest sathub level 0
+cmd siftec worldtest sathub outside
+sleep 6
+shot
+cmd siftec worldtest sathub level 3
+sleep 3
+shot
+cmd siftec worldtest sathub level 7
+sleep 3
+shot
+cmd siftec worldtest sathub side
+sleep 4
+shot
+cmd siftec worldtest sathub inside
+sleep 3
+shot
+cmd gamemode survival @a
+cmd siftec worldtest sathub terminal
+sleep 3
+shot
+key Escape
+sleep 1
+cmd siftec selftest prefab bed
+sleep 1
+cmd gamemode spectator @a
+cmd siftec worldtest sathub gateway 0
+sleep 8
+shot
+cmd siftec worldtest sathub gateway 3
+sleep 3
+shot
+cmd siftec worldtest sathub gateway 5
+sleep 3
+shot
+cmd gamemode survival @a
 cmd clear @a
 cmd siftec selftest tb setup
 sleep 2

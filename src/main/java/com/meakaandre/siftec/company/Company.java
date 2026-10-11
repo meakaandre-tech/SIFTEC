@@ -23,8 +23,10 @@ public class Company {
     public Map<String, Map<String, Integer>> paid = new HashMap<>();
     /** The milestone that parts arriving by belt or funnel go to. */
     public String active = "";
-    /** Overworld game time at which the HUB unlocks again. */
+    /** Overworld game time at which the HUB's freighter is back and the next milestone can be paid. */
     public long lockUntil;
+    /** The company's Wormhole Gateway structure, as "dimension|packed position" of its terminal; empty when it has none. */
+    public String gateway = "";
     /** The MAM node being researched, and the game time it finishes. Empty when nothing is running. */
     /** Slugs and artefacts already picked up, as "x,z". */
     public Set<String> collected = new LinkedHashSet<>();
