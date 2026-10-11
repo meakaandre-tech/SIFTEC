@@ -84,7 +84,7 @@ public final class TravelersBackpackSelfTest {
                     .then(Commands.literal("upgrade").then(Commands.literal("crafting").executes(context -> crafting(context.getSource()))))
                     .then(Commands.literal("death")
                         .then(Commands.literal("setup").executes(context -> deathSetup(context.getSource())))
-                        .then(Commands.literal("check").executes(context -> deathCheck(context.getSource())))))))
+                        .then(Commands.literal("check").executes(context -> deathCheck(context.getSource()))))))
         ));
     }
 
