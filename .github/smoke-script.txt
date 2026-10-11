@@ -229,7 +229,11 @@ sleep 2
 shot
 key Escape
 sleep 1
-xdo search --name Minecraft windowsize %@ 960 540
+xdo search --name .
+xdo search --name . getwindowname %@
+xdo search --name . windowsize %@ 960 540
+sleep 1
+xdo search --name . getwindowgeometry %@
 sleep 4
 key e
 sleep 2
@@ -251,7 +255,7 @@ sleep 2
 shot
 key Escape
 sleep 1
-xdo search --name Minecraft windowsize %@ 852 480
+xdo search --name . windowsize %@ 852 480
 sleep 4
 key e
 sleep 2
@@ -273,7 +277,7 @@ sleep 2
 shot
 key Escape
 sleep 1
-xdo search --name Minecraft windowsize %@ 1280 720
+xdo search --name . windowsize %@ 1280 720
 sleep 4
 cmd siftec selftest bp pick
 sleep 1
