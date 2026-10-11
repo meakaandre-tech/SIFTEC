@@ -12,19 +12,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The backpack as extra rows of the normal inventory, in every window that shows the player's inventory.
+ * The backpack as a bigger inventory grid, in every window that shows the player's inventory: the grid grows wider
+ * first, then taller, like Satisfactory's inventory.
  * <p>
- * A window gets the rows when its slots hold the player's 27 main slots as a 9x3 grid and the 9 hotbar slots in a row
- * under it, wherever they were added from (vanilla's helper, Create's menus, other mods). The 36 backpack slots are
- * added after all of the window's own slots, so no slot number the window already uses moves. On screen they sit
- * between the main rows and the hotbar; the hotbar, and anything else below that line, moves down by the rows shown
- * (on the client only: positions mean nothing on the server).
+ * The first {@link #COLUMN_SLOTS} backpack slots are {@link #EXTRA_COLUMNS} columns of three added to the right of the
+ * three main rows (each "+3 slots" reward is one column, filled top to bottom); after that the grid is
+ * {@link #WIDTH} wide, and the rest are rows of {@link #WIDTH} between the main rows and the hotbar (33 slots: a clean
+ * 12x5 grid). The hotbar keeps its 9 slots, left-aligned under the grid as in vanilla, so keys 1-9 still match the
+ * first nine columns. Backpack slot numbers (the saved order) never change; only where each one is drawn does.
+ * <p>
+ * A window gets the backpack when its slots hold the player's 27 main slots as a 9x3 grid and the 9 hotbar slots in a
+ * row under it, wherever they were added from (vanilla's helper, Create's menus, other mods). The 36 backpack slots
+ * are added after all of the window's own slots, so no slot number the window already uses moves. On screen the
+ * window's slots right of the main grid move right by the columns shown, and those under it move down by the rows
+ * shown (on the client only: positions mean nothing on the server).
  * <p>
  * Server and client decide the same way from the same slot positions: the server when it opens the window
  * ({@code ServerPlayer.initMenu}), the client when it makes the screen or handles the open packet, and both for the
  * player's own inventory when it is made.
  */
 public final class BackpackRows {
+    /** Columns of three added beside the main rows before any row is added; the grid is then this wide. */
+    public static final int EXTRA_COLUMNS = 3, COLUMN_SLOTS = 3 * EXTRA_COLUMNS, WIDTH = 9 + EXTRA_COLUMNS;
+
+    /** Column (0 = the first main column) and row (0 = the first main row) of a backpack slot in the grown grid. */
+    public static int column(int slot) {
+        return slot < COLUMN_SLOTS ? 9 + slot / 3 : (slot - COLUMN_SLOTS) % WIDTH;
+    }
+
+    public static int row(int slot) {
+        return slot < COLUMN_SLOTS ? slot % 3 : 3 + (slot - COLUMN_SLOTS) / WIDTH;
+    }
+
+    /** Extra columns shown for this many backpack slots. */
+    public static int columns(int shown) {
+        return Math.min(EXTRA_COLUMNS, (shown + 2) / 3);
+    }
+
+    /** Extra rows (under the main rows) shown for this many backpack slots. */
+    public static int rows(int shown) {
+        return shown <= COLUMN_SLOTS ? 0 : (shown - COLUMN_SLOTS + WIDTH - 1) / WIDTH;
+    }
+
     /** Where the rows of one window are. */
     public static final class Layout {
         /** Slot number of the first backpack slot; the 36 follow. */
@@ -36,8 +65,11 @@ public final class BackpackRows {
         /** The slots under the main rows, and where the window put them. */
         final List<Slot> below = new ArrayList<>();
         final List<Integer> belowY = new ArrayList<>();
-        /** How many backpack rows the slots are placed for now. */
-        public int placedRows;
+        /** The slots right of the main grid, and where the window put them. */
+        final List<Slot> right = new ArrayList<>();
+        final List<Integer> rightX = new ArrayList<>();
+        /** How many backpack columns and rows the slots are placed for now. */
+        public int placedColumns, placedRows;
 
         Layout(int first, int[] main, int[] hotbar, int left, int top) {
             this.first = first;
@@ -110,10 +142,14 @@ public final class BackpackRows {
                 layout.below.add(slot);
                 layout.belowY.add(slot.y);
             }
+            if (slot.x >= x0 + 162 && slot.x < 2000) {
+                layout.right.add(slot);
+                layout.rightX.add(slot.x);
+            }
         }
         BackpackContainer container = new BackpackContainer(player);
         for (int i = 0; i < Backpack.SIZE; i++) {
-            ((MenuInvoker) menu).siftec$addSlot(new BackpackSlot(player, container, i, x0 + (i % 9) * 18, y0 + 54 + (i / 9) * 18));
+            ((MenuInvoker) menu).siftec$addSlot(new BackpackSlot(player, container, i, x0 + column(i) * 18, y0 + row(i) * 18));
         }
         ((Holder) menu).siftec$setBackpack(layout);
     }
@@ -129,17 +165,20 @@ public final class BackpackRows {
         return shown;
     }
 
-    public static int rows(int shown) {
-        return (shown + 8) / 9;
-    }
-
-    /** Moves the hotbar (and anything else under the main rows) down to make room for {@code rows} backpack rows. */
-    public static void place(Layout layout, int rows) {
-        if (layout == null || layout.placedRows == rows) return;
+    /**
+     * Moves the window's slots right of the main grid right by {@code columns} backpack columns, and the hotbar (and
+     * anything else under the main rows) down by {@code rows} backpack rows.
+     */
+    public static void place(Layout layout, int columns, int rows) {
+        if (layout == null || (layout.placedRows == rows && layout.placedColumns == columns)) return;
         for (int i = 0; i < layout.below.size(); i++) {
             ((SlotAccessor) layout.below.get(i)).siftec$setY(layout.belowY.get(i) + rows * 18);
         }
+        for (int i = 0; i < layout.right.size(); i++) {
+            ((SlotAccessor) layout.right.get(i)).siftec$setX(layout.rightX.get(i) + columns * 18);
+        }
         layout.placedRows = rows;
+        layout.placedColumns = columns;
     }
 
     /**

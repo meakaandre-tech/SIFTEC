@@ -34,7 +34,8 @@ import java.util.Map;
  * <li>{@code check}: counts every test item in the inventory, backpack, test chest, cursor and on the ground;</li>
  * <li>{@code open <kind>}: opens a furnace, hopper, crafting table, anvil or large chest window (for screenshots);</li>
  * <li>{@code pick}: pick block on a granite block while the only granite is in the backpack;</li>
- * <li>{@code drop}: puts items in the backpack and runs the death drop, then picks the items up again by hand.</li>
+ * <li>{@code drop}: puts items in the backpack and runs the death drop, then picks the items up again by hand;</li>
+ * <li>{@code layout}: checks where the backpack slots sit: columns first, then full-width rows, each cell once.</li>
  * </ul>
  */
 public final class BackpackSelfTest {
@@ -56,6 +57,7 @@ public final class BackpackSelfTest {
                     .then(Commands.literal("check").executes(context -> check(context.getSource())))
                     .then(Commands.literal("drop").executes(context -> drop(context.getSource())))
                     .then(Commands.literal("pick").executes(context -> pick(context.getSource())))
+                    .then(Commands.literal("layout").executes(context -> layout(context.getSource())))
                     .then(Commands.literal("open").then(Commands.argument("kind", com.mojang.brigadier.arguments.StringArgumentType.word())
                         .executes(context -> open(context.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(context, "kind")))))))
         ));
@@ -207,6 +209,41 @@ public final class BackpackSelfTest {
             items.clear();
             player.inventoryMenu.broadcastChanges();
         }
+        return 1;
+    }
+
+    private static int layout(CommandSourceStack source) {
+        // the grown grid for 9 and for 33 slots must be a full rectangle (12x3, 12x5), every cell once
+        StringBuilder out = new StringBuilder("SELFTEST bp layout: ");
+        boolean ok = true;
+        for (int n : new int[]{3, 9, 15, 21, 33, Backpack.SIZE}) {
+            java.util.Set<Integer> cells = new java.util.HashSet<>();
+            for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) cells.add(r * 100 + c);
+            boolean unique = true;
+            int maxCol = 8, maxRow = 2;
+            for (int i = 0; i < n; i++) {
+                int c = BackpackRows.column(i), r = BackpackRows.row(i);
+                unique &= cells.add(r * 100 + c);
+                maxCol = Math.max(maxCol, c);
+                maxRow = Math.max(maxRow, r);
+            }
+            boolean shape = maxCol == 8 + BackpackRows.columns(n) && maxRow == 2 + BackpackRows.rows(n) && maxCol < BackpackRows.WIDTH;
+            boolean full = n == 9 || n == 33 ? cells.size() == (maxCol + 1) * (maxRow + 1) : true;
+            ok &= unique && shape && full;
+            out.append(n).append(": ").append(maxCol + 1).append('x').append(maxRow + 1).append(unique && shape && full ? " ok" : " BAD").append("; ");
+        }
+        for (ServerPlayer player : players(source)) {
+            BackpackRows.Layout layout = BackpackRows.of(player.inventoryMenu);
+            boolean placed = layout != null;
+            for (int i = 0; placed && i < Backpack.SIZE; i++) {
+                net.minecraft.world.inventory.Slot slot = player.inventoryMenu.slots.get(layout.first + i);
+                placed = slot.x == layout.left + BackpackRows.column(i) * 18 && slot.y == layout.top + BackpackRows.row(i) * 18;
+            }
+            ok &= placed;
+            out.append("slots of ").append(player.getGameProfile().name()).append(" placed ").append(placed).append("; ");
+        }
+        out.append("ok ").append(ok);
+        report(source, out.toString());
         return 1;
     }
 
