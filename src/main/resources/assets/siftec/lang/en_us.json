@@ -762,6 +762,7 @@
   "siftec.prefab.height": "It does not fit in the build height here",
   "siftec.prefab.hint": "Right-click to build the %s here. Sneak and right-click to turn it",
   "siftec.prefab.no_ground": "No ground under part of it: it can stand at most %s blocks above the ground",
+  "siftec.prefab.no_sleep": "The HUB's bunks cannot be slept in here",
   "siftec.prefab.one_gateway": "Your company already has a Wormhole Gateway (at %s). Pick it up from its terminal to move it",
   "siftec.prefab.part": "Part of the %s: sneak and use its terminal twice to pick up the whole structure",
   "siftec.prefab.placed": "%s built",

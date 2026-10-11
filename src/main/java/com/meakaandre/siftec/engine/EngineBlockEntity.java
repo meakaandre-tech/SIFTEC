@@ -149,6 +149,30 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         return false;
     }
 
+    /**
+     * How long an item burns here. Burn times are worked out the way a furnace works its own out (in 26.3 they
+     * depend on the block they burn in): as a plain furnace at this spot. Create's context-free lookup gives 0 on a
+     * server, which used up a HUB Engine's fuel without running it.
+     */
+    private int burnTime(ItemStack stack) {
+        net.minecraft.world.item.component.CookingFuel cooking = stack.get(net.minecraft.core.component.DataComponents.COOKING_FUEL);
+        if (cooking == null || !(level instanceof net.minecraft.server.level.ServerLevel server)) return 0;
+        try {
+            java.util.List<ItemStack> slot = java.util.List.of(stack);
+            var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(server)
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_STATE, Blocks.FURNACE.defaultBlockState())
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY, this)
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, net.minecraft.world.phys.Vec3.atCenterOf(worldPosition))
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.CONTAINER, (net.minecraft.world.entity.SlotProvider) i -> net.minecraft.world.entity.SlotAccess.forListElement(new java.util.ArrayList<>(slot), 0))
+                .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CONTAINER_PROCESS);
+            int time = cooking.burnTime().get(new net.minecraft.world.level.storage.loot.LootContext.Builder(params).create(java.util.Optional.empty()), 0);
+            if (time > 0) return time;
+        } catch (RuntimeException e) {
+            com.meakaandre.siftec.Siftec.LOGGER.warn("SIFTEC: could not work out the burn time of {}: {}", stack, e.toString());
+        }
+        return FuelUtil.burnDuration(level, stack);
+    }
+
     @Override
     public float getGeneratedSpeed() {
         return capacity > 0 ? SPEED : 0;
@@ -171,8 +195,10 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         float target;
         if (hubKind()) {
             boolean allowed = hubAllows();
-            if (allowed && burn == 0 && !fuel.getItem(0).isEmpty()) {
-                burn = FuelUtil.burnDuration(level, fuel.getItem(0));
+            int time = allowed && burn == 0 && !fuel.getItem(0).isEmpty() ? burnTime(fuel.getItem(0)) : 0;
+            // an item that cannot be worked out to burn stays in, rather than vanishing without any power
+            if (time > 0) {
+                burn = time;
                 net.minecraft.world.item.ItemStackTemplate left = fuel.getItem(0).getCraftingRemainder();
                 fuel.removeItem(0, 1);
                 // a lava bucket gives its bucket back

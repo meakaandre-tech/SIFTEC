@@ -54,7 +54,7 @@ public final class PrefabPreview {
         ticks++;
         boolean rebuild = false;
         // checking the ground under a big structure is not free: at most every third tick, and again twice a second
-        if ((!spot.equals(checked) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10) {
+        if (checked == null || (!spot.equals(checked) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10) {
             Prefabs.Check check = Prefabs.check(mc.level, spot, null, false);
             shape = cells(spot);
             blocked = new ArrayList<>(check.blocked);

@@ -365,6 +365,7 @@ lang.update({
     "siftec.prefab.one_gateway": "Your company already has a Wormhole Gateway (at %s). Pick it up from its terminal to move it",
     "siftec.prefab.aim": "Aim at the ground, at most %s blocks away",
     "siftec.prefab.turned": "Turned %s degrees",
+    "siftec.prefab.no_sleep": "The HUB's bunks cannot be slept in here",
     "siftec.prefab.placed": "%s built",
     "siftec.prefab.dismantle_confirm": "Sneak and use it again to pick up the whole %s. Its contents come with it and progress is kept",
     "siftec.prefab.dismantled": "%s picked up",

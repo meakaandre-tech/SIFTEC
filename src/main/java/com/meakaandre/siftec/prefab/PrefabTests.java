@@ -175,7 +175,7 @@ public final class PrefabTests {
         }
         Companies.save(source.getServer());
         platform(level, AX - 40, AZ - 40, AX + 40, AZ + 40, 32);
-        platform(level, AX - 30, GZ - 4, AX + 30, GZ + 60, 64);
+        platform(level, AX - 30, GZ - 60, AX + 30, GZ + 4, 64);
         platform(level, BX - 20, BZ - 30, BX + 20, BZ + 10, 32);
         report(source, "sizes: HUB " + Templates.hub().width() + " x " + Templates.hub().length() + " x " + Templates.hub().height()
             + ", Gateway " + Templates.gateway().width() + " x " + Templates.gateway().length() + " x " + Templates.gateway().height()
