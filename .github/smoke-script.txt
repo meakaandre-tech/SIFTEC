@@ -64,223 +64,47 @@ sleep 2
 shot
 key Escape
 sleep 1
-cmd siftec selftest bp layout
-cmd siftec selftest bp slots 0
-sleep 2
-key e
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp slots 3
-sleep 2
-key e
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp slots 9
-sleep 2
-key e
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp slots 15
-sleep 2
-key e
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp slots 21
-sleep 2
-key e
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp slots 33
-sleep 2
-key e
-sleep 2
-shot
-click 692 334
-sleep 2
-shot
-click 846 334
-sleep 1
-key Escape
-sleep 1
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp fill
-sleep 4
-cmd siftec selftest bp check
-key e
-sleep 2
-shot
-move 820 378
-sleep 1
-key 1
-sleep 1
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp check
-cmd siftec selftest bp chest
-sleep 2
-move 496 244
-sleep 1
-keydown Shift_L
-click 496 244
-keyup Shift_L
-sleep 1
-move 820 414
-sleep 1
-keydown Shift_L
-click 820 414
-keyup Shift_L
-sleep 1
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp check
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp check
 cmd clear @a
-sleep 1
-cmd siftec selftest bp check
-cmd siftec selftest bp drop
-cmd gamemode creative @a
+cmd siftec selftest tb setup
 sleep 2
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
 key e
 sleep 2
 shot
 key Escape
 sleep 1
-cmd gamemode survival @a
-cmd siftec selftest bp slots 33
-sleep 2
-cmd siftec selftest bp open furnace
-sleep 2
+cmd siftec selftest tb give
+sleep 3
+key F5
+sleep 3
 shot
-click 524 280
-sleep 2
-shot
-click 678 280
+key F5
 sleep 1
-key Escape
-sleep 1
-cmd siftec selftest bp open hopper
+key F5
 sleep 2
+key b
+sleep 3
 shot
 key Escape
 sleep 1
-cmd siftec selftest bp open crafting
+cmd siftec selftest tb rules
 sleep 2
+cmd siftec selftest tb locked
+sleep 2
+cmd siftec selftest tb offline
+sleep 2
+cmd siftec selftest tb upgrade crafting
+sleep 2
+key b
+sleep 3
 shot
 key Escape
 sleep 1
-cmd siftec selftest bp open anvil
-sleep 2
+cmd siftec selftest tb tier 4
+sleep 3
+key b
+sleep 3
 shot
 key Escape
-sleep 1
-cmd siftec selftest bp open large
-sleep 2
-shot
-key Escape
-sleep 1
-sh xwininfo -root -children
-sh for w in $(xwininfo -root -children | grep -o '^ *0x[0-9a-f]*'); do xdotool windowsize $w 960 540 2>/dev/null; done
-sleep 1
-sh xwininfo -root -children
-sleep 4
-key e
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp open large
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp open furnace
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-sh for w in $(xwininfo -root -children | grep -o '^ *0x[0-9a-f]*'); do xdotool windowsize $w 852 480 2>/dev/null; done
-sleep 4
-key e
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp open large
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp open furnace
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest bp chest
-sleep 2
-shot
-key Escape
-sleep 1
-sh for w in $(xwininfo -root -children | grep -o '^ *0x[0-9a-f]*'); do xdotool windowsize $w 1280 720 2>/dev/null; done
-sleep 4
-cmd siftec selftest bp pick
-sleep 1
-cmd siftec selftest bp slots 0
 sleep 1
 cmd gamemode spectator @a
 cmd effect give @a minecraft:night_vision infinite 0 true
@@ -404,5 +228,16 @@ cmd time set midnight
 sleep 3
 shot
 cmd execute in minecraft:overworld run tp @a 1002.5 181.0 997.6 0 25
+sleep 3
+shot
+cmd gamemode survival @a
+cmd siftec selftest tb death setup
+sleep 2
+cmd kill @a
+sleep 4
+shot
+click 640 344
+sleep 5
+cmd siftec selftest tb death check
 sleep 3
 shot

@@ -133,13 +133,14 @@ FLUIDS = [
 # ---------------------------------------------------------------------------------------------------
 # Milestones. (tier, id, name, cost, minutes:seconds, unlock text, locked item ids, tokens)
 # "items" are the things nobody in the company can craft or place until the milestone is done.
-# "tokens" are switches other systems read: scanner:<node>, cap:<rpm>, backpack (+3 slots each time).
+# "tokens" are switches other systems read: scanner:<node>, cap:<rpm>, and the Traveler's Backpack: "backpack" gives each member
+# of the company one (Leather tier), "backpack:<tier>" raises it to that tier (iron, gold, diamond, netherite).
 C = "create:"
 SAILS = [C + "white_sail"]   # the dyed sails are blocks only; they have no item to lock
 TOOLBOXES = [C + c + "_toolbox" for c in "white orange magenta light_blue yellow lime pink gray light_gray cyan purple blue brown green red black".split()]
 MILESTONES = [
     (0, "hub_upgrade_1", "HUB Upgrade 1", "10 Iron Rod", "0:00",
-     "Portable Miner, Wrench and Goggles, +3 backpack slots",
+     "Portable Miner, Wrench and Goggles, a Traveler's Backpack for every member (Leather: 27 slots)",
      ["siftec:portable_miner", C + "wrench", C + "goggles", C + "mechanical_drill"], ["backpack"]),
     (0, "hub_upgrade_2", "HUB Upgrade 2", "20 Iron Rod, 10 Iron Sheet", "0:00",
      "Smelter (Encased Fan), Wire and Cable, the first HUB Engine, copper nodes on the scanner",
@@ -149,9 +150,9 @@ MILESTONES = [
      [C + "mechanical_press", C + "mechanical_saw", C + "depot", C + "millstone", C + "basin", "siftec:screw", "siftec:reinforced_iron_plate", "siftec:power_pole"],
      ["scanner:limestone"]),
     (0, "hub_upgrade_4", "HUB Upgrade 4", "75 Iron Sheet, 20 Cable, 10 Concrete", "0:00",
-     "Mechanical Belt and funnels, +3 backpack slots", [C + "belt_connector", C + "andesite_funnel"], ["backpack"]),
+     "Mechanical Belt and funnels, Backpack Crafting Upgrade", [C + "belt_connector", C + "andesite_funnel"], []),
     (0, "hub_upgrade_5", "HUB Upgrade 5", "75 Iron Rod, 50 Cable, 20 Concrete", "0:00",
-     "Miner Mk.1, Item Vault, a second HUB Engine, +3 backpack slots", ["siftec:miner_mk1", C + "item_vault"], ["backpack"]),
+     "Miner Mk.1, Item Vault, a second HUB Engine, Backpack Pickup and Furnace Upgrades", ["siftec:miner_mk1", C + "item_vault"], []),
     (0, "hub_upgrade_6", "HUB Upgrade 6", "100 Iron Rod, 100 Iron Sheet, 100 Wire, 50 Concrete", "0:00",
      "Wormhole Gateway, Furnace Engine, flywheel, Biomass. Milestones lock the HUB from here on",
      ["siftec:wormhole_gateway", "siftec:furnace_engine", C + "flywheel", "siftec:biomass"], []),
@@ -163,14 +164,14 @@ MILESTONES = [
      "Splitter and merger (Andesite Tunnel), Chute, Speedometer and Stressometer",
      [C + "andesite_tunnel", C + "chute", C + "item_hatch", C + "speedometer", C + "stressometer"], []),
     (1, "field_research", "Field Research", "300 Wire, 300 Screw, 100 Iron Sheet", "3:00",
-     "MAM, Toolbox, Object Scanner, +3 backpack slots", ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES, ["backpack"]),
+     "MAM, Toolbox, Object Scanner, backpack to Iron tier (45 slots)", ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES, ["backpack:iron"]),
 
     (2, "part_assembly", "Part Assembly", "200 Cable, 200 Iron Rod, 500 Screw, 300 Iron Sheet", "6:00",
      "Assembler (Deployer), Copper Sheet, Rotor, Modular Frame, Smart Plating",
      [C + "deployer", C + "copper_sheet", "siftec:rotor", "siftec:modular_frame", "siftec:smart_plating"], []),
     (2, "obstacle_clearing", "Obstacle Clearing", "500 Screw, 100 Cable, 100 Concrete", "3:00",
-     "Solid Biofuel, harvesters and ploughs, +3 backpack slots",
-     ["siftec:solid_biofuel", C + "mechanical_harvester", C + "mechanical_plough", C + "tree_fertilizer"], ["backpack"]),
+     "Solid Biofuel, harvesters and ploughs, Backpack Feeding and Smoker Upgrades",
+     ["siftec:solid_biofuel", C + "mechanical_harvester", C + "mechanical_plough", C + "tree_fertilizer"], []),
     (2, "jump_pads", "Jump Pads", "50 Rotor, 300 Iron Sheet, 150 Cable", "4:00",
      "Jump Pad (Weighted Ejector), landing pad that cancels fall damage", [C + "weighted_ejector", "siftec:landing_pad"], []),
     (2, "resource_sink_bonus_program", "Resource Sink Bonus Program", "400 Concrete, 500 Wire, 200 Iron Rod, 200 Iron Sheet", "5:00",
@@ -179,17 +180,17 @@ MILESTONES = [
      "Company speed limit raised from 32 to 64 RPM", [], ["cap:64"]),
 
     (3, "coal_power", "Coal Power", "150 Reinforced Iron Plate, 50 Rotor, 500 Cable", "8:00",
-     "Steam Engine, Blaze Burner, pipes, pumps and tanks, coal nodes on the scanner",
+     "Steam Engine, Blaze Burner, pipes, pumps and tanks, Backpack Tanks Upgrade and hose, coal nodes on the scanner",
      [C + "steam_engine", C + "blaze_burner", C + "empty_blaze_burner", C + "fluid_pipe", C + "mechanical_pump", C + "fluid_tank", C + "hose_pulley"],
      ["scanner:coal"]),
     (3, "vehicular_transport", "Vehicular Transport", "25 Modular Frame, 100 Rotor, 200 Cable, 400 Iron Rod", "4:00",
-     "Cart Assembler, Rope Pulley, +3 backpack slots",
-     [C + "cart_assembler", C + "rope_pulley", C + "minecart_coupling"], ["backpack"]),
+     "Cart Assembler, Rope Pulley, backpack to Gold tier (63 slots)",
+     [C + "cart_assembler", C + "rope_pulley", C + "minecart_coupling"], ["backpack:gold"]),
     (3, "basic_steel_production", "Basic Steel Production", "50 Modular Frame, 150 Rotor, 500 Concrete, 1000 Wire", "8:00",
-     "Foundry (Mechanical Mixer), Steel Ingot, Steel Beam, Steel Pipe, Versatile Framework",
+     "Foundry (Mechanical Mixer), Steel Ingot, Steel Beam, Steel Pipe, Versatile Framework, Backpack Blast Furnace Upgrade",
      [C + "mechanical_mixer", "cgs:steel_ingot", "siftec:steel_casing", "siftec:steel_beam", "siftec:steel_pipe", "siftec:versatile_framework"], []),
     (3, "enhanced_asset_security", "Enhanced Asset Security", "100 Reinforced Iron Plate, 600 Iron Rod, 1500 Wire", "3:00",
-     "Xeno-Basher (Pneumatic Hammer), +3 backpack slots", ["cgs:hammer"], ["backpack"]),
+     "Xeno-Basher (Pneumatic Hammer), Backpack Magnet Upgrade", ["cgs:hammer"], []),
 
     (4, "ficsit_blueprints", "FICSIT Blueprints", "100 Modular Frame, 200 Steel Beam, 500 Cable, 1000 Concrete", "5:00",
      "Blueprint Designer Mk.1", ["siftec:blueprint_designer"], []),
@@ -207,7 +208,7 @@ MILESTONES = [
      "Hypertube Entrance and Hypertubes",
      ["create_hypertube:hypertube", "create_hypertube:hypertube_entrance", "create_hypertube:hypertube_accelerator"], []),
 
-    (5, "jetpack", "Jetpack", "50 Motor, 1000 Cable, 1000 Iron Sheet", "5:00", "Jetpack, +3 backpack slots", ["siftec:jetpack"], ["backpack"]),
+    (5, "jetpack", "Jetpack", "50 Motor, 1000 Cable, 1000 Iron Sheet", "5:00", "Jetpack, backpack to Diamond tier (81 slots)", ["siftec:jetpack"], ["backpack:diamond"]),
     (5, "oil_processing", "Oil Processing", "50 Motor, 100 Encased Industrial Beam, 500 Steel Pipe, 500 Copper Sheet", "12:00",
      "Pumpjack (oil nodes only), distillation, Fluid Valve, Plastic, Rubber, Petroleum Coke, Circuit Board, oil nodes on the scanner",
      ["createdieselgenerators:pumpjack_bearing", "createdieselgenerators:pumpjack_crank", "createdieselgenerators:pumpjack_head",
@@ -239,9 +240,9 @@ MILESTONES = [
     (7, "logistics_mk5", "Logistics Mk.5", "100 Alclad Aluminum Sheet, 200 Encased Industrial Beam, 300 Reinforced Iron Plate", "1:00",
      "Company speed limit raised to 192 RPM", [], ["cap:192"]),
     (7, "hazmat_suit", "Hazmat Suit", "50 Aluminum Casing, 500 Quickwire, 50 Gas Filter", "5:00",
-     "Hazmat Suit, Iodine Infused Filter, +3 backpack slots", ["siftec:hazmat_suit", "siftec:iodine_infused_filter"], ["backpack"]),
+     "Hazmat Suit, Iodine Infused Filter, Backpack Lantern and Jukebox Upgrades", ["siftec:hazmat_suit", "siftec:iodine_infused_filter"], []),
     (7, "hover_pack", "Hover Pack", "200 Motor, 100 Heavy Modular Frame, 100 Computer, 200 Alclad Aluminum Sheet", "5:00",
-     "Hover Pack, +3 backpack slots", ["siftec:hover_pack"], ["backpack"]),
+     "Hover Pack, backpack to Netherite tier (99 slots)", ["siftec:hover_pack"], ["backpack:netherite"]),
 
     (8, "aeronautical_engineering", "Aeronautical Engineering", "50 Radio Control Unit, 100 Alclad Aluminum Sheet, 200 Aluminum Casing, 300 Motor", "15:00",
      "Drone Port and Cardboard Drone, Create's package network, Supercomputer, Assembly Director System, sulfur nodes on the scanner",
@@ -319,7 +320,7 @@ MAM = [
         ("Bio-Organic Properties", "10 minecraft:bone, 10 minecraft:string", "1:00", "DNA Capsule, for AWESOME Sink points", None, ["siftec:dna_capsule"], []),
         ("The Rebar Gun", "10 Reinforced Iron Plate, 25 Iron Rod, 50 Screw", "2:00", "Nailgun and Copper Backtank", None, ["cgs:nailgun", C + "copper_backtank"], []),
         ("Hostile Organism Detection", "10 minecraft:spider_eye, 10 Gunpowder, 25 Wire", "2:00", "The Object Scanner can find hostile mobs", None, [], ["object:mobs"]),
-        ("Inflated Pocket Dimension", "5 DNA Capsule, 3 minecraft:ender_pearl, 25 Cable", "3:00", "+3 backpack slots", None, [], ["backpack"]),
+        ("Inflated Pocket Dimension", "5 DNA Capsule, 3 minecraft:ender_pearl, 25 Cable", "3:00", "Backpack Void and Refill Upgrades", None, [], []),
     ]),
     ("caterium", "Caterium", C + "raw_zinc", [
         ("Caterium", "10 create:crushed_raw_zinc", "0:30", "Brass blend, Brass Ingot, Brass Sheet", [], ["siftec:brass_blend", C + "brass_ingot", C + "brass_sheet"], []),
@@ -440,10 +441,10 @@ SHOP = [
 FUELS = {"biomass": 960, "solid_biofuel": 2400, "compacted_coal": 3360, "petroleum_coke": 960}
 
 # ---------------------------------------------------------------------------------------------------
-# Everything else the other mods add. Locked by default: an item from Create, Diesel Generators, Gunsmithing or
-# Hypertubes is unlocked by a milestone above, by one here (MORE_LOCKS), left free on purpose (FREE), switched
-# off (DISABLED) or sold in the AWESOME Shop (SHOP, whose crafting recipes are removed). gen_assets.py stops
-# with a list if any item is in none of these.
+# Everything else the other mods add. Locked by default: an item from Create, Diesel Generators, Gunsmithing,
+# Hypertubes or Traveler's Backpack is unlocked by a milestone above, by one here (MORE_LOCKS), left free on purpose
+# (FREE), switched off (DISABLED) or sold in the AWESOME Shop (SHOP, whose crafting recipes are removed).
+# gen_assets.py stops with a list if any item is in none of these.
 COLOURS = "white orange magenta light_blue yellow lime pink gray light_gray cyan purple blue brown green red black".split()
 WOODS = "oak spruce birch jungle acacia dark_oak mangrove cherry bamboo crimson warped".split()
 STONES = "andesite asurine calcite crimsite deepslate diorite dripstone granite limestone ochrum scorchia scoria tuff veridium".split()
@@ -467,6 +468,7 @@ def _roofs():
 
 
 DG, G, H = "createdieselgenerators:", "cgs:", "create_hypertube:"
+TB = "travelersbackpack:"
 MORE_LOCKS = {
     # factory building blocks
     "base_building": [C + "copper_casing", C + "andesite_bars", C + "copper_bars", C + "andesite_door", C + "copper_door",
@@ -481,10 +483,17 @@ MORE_LOCKS = {
     # with the AWESOME Shop: the dyed and haunted versions of what it sells, and the rest of the design's Shop list
     "resource_sink_bonus_program": [C + "desk_bell", C + "haunted_bell", C + "mysterious_cuckoo_clock", C + "metal_bracket", C + "wooden_bracket",
                                     C + "copper_table_cloth"] + [f"{C}{c}_table_cloth" for c in COLOURS] + [f"{C}{c}_valve_handle" for c in COLOURS],
-    "basic_steel_production": [G + "steel_nugget", G + "steel_block", G + "steel_sheet", G + "nail_steel"],
+    "basic_steel_production": [G + "steel_nugget", G + "steel_block", G + "steel_sheet", G + "nail_steel", TB + "blast_furnace_upgrade"],
+    # Traveler's Backpack upgrades (the backpack itself is given, and its tiers come with milestones: see the tokens above)
+    "hub_upgrade_4": [TB + "blank_upgrade", TB + "crafting_upgrade"],
+    "hub_upgrade_5": [TB + "pickup_upgrade", TB + "furnace_upgrade"],
+    "obstacle_clearing": [TB + "feeding_upgrade", TB + "smoker_upgrade"],
+    "coal_power": [TB + "tanks_upgrade", TB + "backpack_tank", TB + "hose_nozzle", TB + "hose"],
+    "hazmat_suit": [TB + "lantern_upgrade", TB + "jukebox_upgrade"],
+    "mam_megafauna_5": [TB + "void_upgrade", TB + "refill_upgrade"],
     # melee weapons go with the Xeno-Basher
     "enhanced_asset_security": [G + "hammer_stone", G + "hammer_iron", G + "hammer_diamond", G + "hammer_netherite", G + "axe_stone", G + "axe_iron",
-                                G + "axe_diamond", G + "axe_netherite", G + "spear"],
+                                G + "axe_diamond", G + "axe_netherite", G + "spear", TB + "magnet_upgrade"],
     "expanded_power_infrastructure": [C + "piston_extension_pole", C + "secondary_linear_chassis", C + "elevator_contact"],
     "hypertubes": [H + "hypertube_funnel", H + "redstone_detector_tube_attachment", H + "tube_scanner_attachment"],
     "oil_processing": [DG + "asphalt_block", DG + "asphalt_slab", DG + "asphalt_stairs", DG + "oil_scanner", DG + "mold", DG + "sheet_metal_panel",
@@ -531,3 +540,13 @@ FREE = [C + i for i in (
        "shell_gatling shell_revolver shell_shotgun".split()] \
     + [DG + i for i in "kelp_handle wood_chip crude_oil_bucket diesel_bucket gasoline_bucket biodiesel_bucket ethanol_bucket plant_oil_bucket".split()] \
     + [f"{DG}{c}_cement_bucket" for c in COLOURS] + [H + "tube_scanner_unfinished"]
+
+# Traveler's Backpack: every player is given one backpack and it is never crafted, so every backpack design, the tier
+# upgrades (tiers come with milestones) and the sleeping bags (only for crafting and placed backpacks) are switched off.
+TB_BACKPACKS = [TB + i for i in (
+    "bat bee blaze bookshelf cactus cake chicken coal cow creeper diamond dragon emerald end enderman fox ghast gold hay "
+    "horse iron iron_golem lapis magma_cube melon nether netherite ocelot pig pumpkin quartz redstone sandstone sheep "
+    "skeleton snow spider sponge squid standard villager warden wither wolf").split()]
+TB_TIER_UPGRADES = [TB + t + "_tier_upgrade" for t in ("iron", "gold", "diamond", "netherite")]
+TB_SLEEPING_BAGS = [f"{TB}{c}_sleeping_bag" for c in COLOURS]
+DISABLED += TB_BACKPACKS + TB_TIER_UPGRADES + TB_SLEEPING_BAGS

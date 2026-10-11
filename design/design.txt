@@ -145,7 +145,7 @@ Six HUB upgrades take the player from hand mining to the first automated miner a
 1
  | HUB Upgrade 1
  | 10 Iron Rod
- | Equipment Workshop; Portable Miner; storage box on the HUB; +3 backpack slots
+ | Equipment Workshop; Portable Miner; storage box on the HUB; a Traveler's Backpack for every member (Leather tier)
  | 
 2
  | HUB Upgrade 2
@@ -160,12 +160,12 @@ Six HUB upgrades take the player from hand mining to the first automated miner a
 4
  | HUB Upgrade 4
  | 75 Iron Sheet, 20 Cable, 10 Concrete
- | Mechanical Belt and funnels; +3 backpack slots
+ | Mechanical Belt and funnels; Backpack Crafting Upgrade (and the Blank Upgrade it is made from)
  | 
 5
  | HUB Upgrade 5
  | 75 Iron Rod, 50 Cable, 20 Concrete
- | Miner Mk.1; Item Vault; second furnace engine on the HUB; +3 backpack slots
+ | Miner Mk.1; Item Vault; second furnace engine on the HUB; Backpack Pickup and Furnace Upgrades
  | 
 6
  | HUB Upgrade 6
@@ -198,7 +198,7 @@ Both tiers open once Tier 0 is done. They add logistics, research and the first 
  | Field Research
  | 300 Wire, 300 Screw, 100 Iron Sheet
  | 3:00
- | MAM; Toolbox; Object Scanner; +3 backpack slots (no Beacon: the pack uses Xaero's Minimap)
+ | MAM; Toolbox; Object Scanner; backpack to Iron tier (no Beacon: the pack uses Xaero's Minimap)
  | 
 ### Tier 2
 #
@@ -217,7 +217,7 @@ Both tiers open once Tier 0 is done. They add logistics, research and the first 
  | Obstacle Clearing
  | 500 Screw, 100 Cable, 100 Concrete
  | 3:00
- | Solid Biofuel recipe; Mechanical Harvester, Mechanical Plough, Tree Fertilizer; +3 backpack slots (no Chainsaw)
+ | Solid Biofuel recipe; Mechanical Harvester, Mechanical Plough, Tree Fertilizer; Backpack Feeding and Smoker Upgrades (no Chainsaw)
  | 
 3
  | Jump Pads
@@ -250,25 +250,25 @@ Unlocked by Wormhole Phase 1. They add coal power, steel, fluids and blueprints.
  | Coal Power
  | 150 Reinforced Iron Plate, 50 Rotor, 500 Cable
  | 8:00
- | Coal Generator (Steam Engine on a Fluid Tank boiler, heated by Blaze Burners); Water Extractor (Mechanical Pump and Hose Pulley); Fluid Pipe; Fluid Tank; coal nodes on the scanner (the Smart Fluid Pipe needs Electron Tubes, so it comes with Caterium Electronics)
+ | Coal Generator (Steam Engine on a Fluid Tank boiler, heated by Blaze Burners); Water Extractor (Mechanical Pump and Hose Pulley); Fluid Pipe; Fluid Tank; Backpack Tanks Upgrade, Backpack Tank, Hose and Hose Nozzle; coal nodes on the scanner (the Smart Fluid Pipe needs Electron Tubes, so it comes with Caterium Electronics)
  | 
 2
  | Vehicular Transport
  | 25 Modular Frame, 100 Rotor, 200 Cable, 400 Iron Rod
  | 4:00
- | Cart Assembler (minecart contraptions); Rope Pulley; Minecart Coupling; +3 backpack slots (the Controller Rail needs an Electron Tube, so it comes with Caterium Electronics)
+ | Cart Assembler (minecart contraptions); Rope Pulley; Minecart Coupling; backpack to Gold tier (the Controller Rail needs an Electron Tube, so it comes with Caterium Electronics)
  | 
 3
  | Basic Steel Production
  | 50 Modular Frame, 150 Rotor, 500 Concrete, 1,000 Wire
  | 8:00
- | Foundry (Mechanical Mixer and heated Basin); Steel Ingot, Steel Beam, Steel Pipe and Versatile Framework recipes
+ | Foundry (Mechanical Mixer and heated Basin); Steel Ingot, Steel Beam, Steel Pipe and Versatile Framework recipes; Backpack Blast Furnace Upgrade
  | 
 4
  | Enhanced Asset Security
  | 100 Reinforced Iron Plate, 600 Iron Rod, 1,500 Wire
  | 3:00
- | Xeno-Basher (Gunsmithing's Pneumatic Hammer); +3 backpack slots
+ | Xeno-Basher (Gunsmithing's Pneumatic Hammer); Backpack Magnet Upgrade
  | 
 ### Tier 4
 #
@@ -321,7 +321,7 @@ Unlocked by Wormhole Phase 2. They add oil through Create: Diesel Generators, th
  | Jetpack
  | 50 Motor, 1,000 Cable, 1,000 Iron Sheet
  | 5:00
- | Jetpack (burns fuel); +3 backpack slots
+ | Jetpack (burns fuel); backpack to Diamond tier
  | 
 2
  | Oil Processing
@@ -398,13 +398,13 @@ Unlocked by Wormhole Phase 3. They add aluminium and cardboard drones. The Tier 
  | Hazmat Suit
  | 50 Aluminum Casing, 500 Quickwire, 50 Gas Filter
  | 5:00
- | Hazmat Suit (against the geyser waste's radiation); Iodine Infused Filter recipe; +3 backpack slots
+ | Hazmat Suit (against the geyser waste's radiation); Iodine Infused Filter recipe; Backpack Lantern and Jukebox Upgrades
  | 
 4
  | Hover Pack
  | 200 Motor, 100 Heavy Modular Frame, 100 Computer, 200 Alclad Aluminum Sheet
  | 5:00
- | Hover Pack (flies only near power poles); +3 backpack slots
+ | Hover Pack (flies only near power poles); backpack to Netherite tier
  | 
 ### Tier 8
 #
@@ -484,7 +484,7 @@ Tree
  | 
 Alien Megafauna
  | Hostile mob drops
- | Biomass from mob drops; Nailgun (the Rebar Gun) and Copper Backtank; DNA Capsule for sink points
+ | Biomass from mob drops; Nailgun (the Rebar Gun) and Copper Backtank; DNA Capsule for sink points; Backpack Void and Refill Upgrades (Inflated Pocket Dimension)
  | 
 Caterium
  | Zinc (crushed: the research starts once the Crushing Wheels are built)
@@ -606,7 +606,10 @@ Speed cap
  | A per-company RPM limit raised by each Logistics milestone, set with the Speed Governor up to the limit of the company that placed it or whose claim it stands in.
  | 
 Backpack
- | Extra slots shown in the normal inventory screen when pressing E. Grows by 3 per reward. The offhand is always unlocked.
+ | Traveler's Backpack (Tiviacz1337, LGPL-3.0), worn on the back and opened with B; the player inventory is vanilla. Every member of a company gets one when the company finishes HUB Upgrade 1, and nobody can craft one: every backpack recipe (designs, dyeing, smithing), the tier upgrades and the sleeping bags are removed and those items switched off. Soulbound: it cannot be unequipped, swapped, placed as a block, dropped or put in a container, and it stays on through death with everything in it. A backpack item found in a player's inventory goes back on their back, or is unpacked if they already wear one.
+ | Tiers come with milestones, for every member (offline members on their next login), and are never lowered: Leather at HUB Upgrade 1 (27 slots, 2 upgrade slots), Iron at Field Research (45, 3), Gold at Vehicular Transport (63, 4), Diamond at Jetpack (81, 5), Netherite at Hover Pack (99, 6). Each tier also adds a tool slot and tank room.
+ | Its upgrades are the mod's items, crafted on a crafting table, a Crafter or a Mechanical Crafter, each locked by a milestone (a locked one does not fit an upgrade slot): Crafting at HUB Upgrade 4; Pickup and Furnace at HUB Upgrade 5; Feeding and Smoker at Obstacle Clearing; Void and Refill at Inflated Pocket Dimension (MAM); Tanks with the Backpack Tank, Hose and Hose Nozzle at Coal Power; Magnet at Enhanced Asset Security; Blast Furnace at Basic Steel Production; Lantern and Jukebox at Hazmat Suit.
+ | Milestone payments ("Pay from inventory") take from the inventory and then from the backpack. Items in the old SIFTEC backpack rows (before 2026-10-11) are moved into the Traveler's Backpack on the next login, else the inventory, else dropped at the player's feet with a message.
  | 
 Andesite Tunnel rework
  | Splits evenly across outputs and merges inputs.
@@ -961,11 +964,14 @@ Water Wheel, Large Water Wheel
 Schematic Table, Schematicannon, Empty Schematic, Schematic and Quill
  | Disabled: replaced by the Blueprint Designer
  | 
+Traveler's Backpack backpacks (every design), tier upgrades and sleeping bags
+ | Disabled: each player is given one backpack and its tier comes with milestones
+ | 
 Blaze Cake (Create Fly has no Chromatic Compound)
  | Disabled
  | 
-Everything else from Create, Diesel Generators, Gunsmithing and Hypertubes
- | Each item is assigned in tools/content.py (MORE_LOCKS): decorative stone, windows, seats, copper roofing and girders at Base Building; steel blocks at Basic Steel Production; melee weapons with the Xeno-Basher; guns and their parts and rounds with the Sulfur research; diesel engine parts at Petroleum Power; train doors and postboxes with the trains; cardboard with the package network. The generator stops if an item is left out.
+Everything else from Create, Diesel Generators, Gunsmithing, Hypertubes and Traveler's Backpack
+ | Each item is assigned in tools/content.py (MORE_LOCKS): decorative stone, windows, seats, copper roofing and girders at Base Building; steel blocks at Basic Steel Production; melee weapons with the Xeno-Basher; guns and their parts and rounds with the Sulfur research; diesel engine parts at Petroleum Power; train doors and postboxes with the trains; cardboard with the package network; the Traveler's Backpack upgrades as listed under Backpack. The generator stops if an item is left out.
  | 
 ### Machine jobs
 Every Create process has a production job, apart from superheating, which is removed.

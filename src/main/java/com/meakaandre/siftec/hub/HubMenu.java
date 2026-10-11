@@ -190,7 +190,7 @@ public class HubMenu extends AbstractContainerMenu {
         return true;
     }
 
-    /** Takes what the milestone still needs out of the player's inventory and backpack, and books it. */
+    /** Takes what the milestone still needs out of the player's inventory and worn Traveler's Backpack, and books it. */
     public static int deliver(ServerPlayer player, Company company, Milestone m) {
         int total = 0;
         for (Milestone.Cost cost : m.cost()) {

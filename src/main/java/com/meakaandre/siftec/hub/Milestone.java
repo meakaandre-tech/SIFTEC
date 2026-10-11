@@ -63,10 +63,13 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
             return Component.translatableWithFallback("siftec.tag." + path.replace('/', '.'), "any " + path.substring(path.lastIndexOf('/') + 1).replace('_', ' '));
         }
 
-        /** The inventory and, on the server, the backpack. */
+        /** The inventory and, on the server, the Traveler's Backpack the player wears. */
         private static java.util.List<net.minecraft.world.Container> containers(Inventory inventory) {
-            if (!(inventory.player instanceof net.minecraft.server.level.ServerPlayer)) return java.util.List.of(inventory);
-            return java.util.List.of(inventory, new com.meakaandre.siftec.backpack.BackpackContainer(inventory.player));
+            if (!(inventory.player instanceof net.minecraft.server.level.ServerPlayer server)) return java.util.List.of(inventory);
+            java.util.List<net.minecraft.world.Container> out = new java.util.ArrayList<>();
+            out.add(inventory);
+            out.addAll(com.meakaandre.siftec.backpack.Backpack.containers(server));
+            return out;
         }
 
         /** How many matching items the player is carrying, backpack included. */

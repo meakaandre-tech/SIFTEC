@@ -696,6 +696,76 @@ Turbofuel
  | 
 Electron Tubes and Precision Mechanisms are only used in Create's own brass-tier recipes, which stay as Create has them; Create's own Electron Tube (polished rose quartz) and Precision Mechanism (sequenced assembly) recipes stay too.
 No sulfur loop (owner's decision, 2026-10-05): crushing magma gives no sulfur (Gunsmithing's recipe for it is removed), so sulfur comes from sulfur caves and sulfur nodes. Lava comes only by Ignimbrite: sulfur and cobblestone make Ignimbrite, Ignimbrite makes magma blocks, and magma blocks melt to lava; Diesel Generators' lava from fermenting cobblestone is removed. Block of Sulfur is vanilla's sulfur block, crafted from 4 sulfur and back; vanilla's Potent Sulfur (a geyser) recipe from nine of them is removed, so geysers stay where the world puts them.
+## Traveler's Backpack
+The backpack itself is never crafted: each player is given one at HUB Upgrade 1 and its tier rises with milestones (see design.txt, Backpack). Removed: every backpack recipe (the standard backpack and the 43 designs, dyeing, the smithing recipes that move upgrades and tiers), the tier upgrades (Iron, Gold, Diamond and Netherite) and the sleeping bags and their dyeing.
+The upgrades keep the mod's own crafting-table recipes. Each runs in a Crafter or a Mechanical Crafter as well, under the same lock, so every upgrade can be made by machines from farmed and mined materials.
+Item
+ | Recipe (Traveler's Backpack's own, crafting table)
+ | Unlocks at
+Blank Upgrade (makes 4)
+ | 4 string around 1 leather
+ | HUB Upgrade 4
+ | 
+Crafting Upgrade
+ | crafting table, Blank Upgrade, chest (a column)
+ | HUB Upgrade 4
+ | 
+Pickup Upgrade
+ | 2 hoppers beside a Blank Upgrade over 3 redstone
+ | HUB Upgrade 5
+ | 
+Furnace Upgrade
+ | furnace, Blank Upgrade, chest (a column)
+ | HUB Upgrade 5
+ | 
+Feeding Upgrade
+ | golden carrot, Blank Upgrade, golden apple over 3 redstone
+ | Obstacle Clearing
+ | 
+Smoker Upgrade
+ | smoker, Blank Upgrade, chest (a column)
+ | Obstacle Clearing
+ | 
+Void Upgrade
+ | 2 lava buckets beside a Blank Upgrade over 3 redstone
+ | Inflated Pocket Dimension (MAM, Alien Megafauna)
+ | 
+Refill Upgrade
+ | 2 droppers beside a Blank Upgrade over 3 redstone
+ | Inflated Pocket Dimension (MAM, Alien Megafauna)
+ | 
+Backpack Tank
+ | 4 glass and 2 iron ingots in a ring
+ | Coal Power
+ | 
+Tanks Upgrade
+ | 2 Backpack Tanks beside a Blank Upgrade
+ | Coal Power
+ | 
+Hose Nozzle
+ | 1 gold ingot over 2 iron ingots
+ | Coal Power
+ | 
+Hose
+ | Hose Nozzle and 4 green dye
+ | Coal Power
+ | 
+Magnet Upgrade
+ | 2 ender pearls, 2 redstone, 2 lapis, iron ingot around a Blank Upgrade
+ | Enhanced Asset Security
+ | 
+Blast Furnace Upgrade
+ | blast furnace, Blank Upgrade, chest (a column)
+ | Basic Steel Production
+ | 
+Lantern Upgrade
+ | 2 lanterns beside a Blank Upgrade over 3 redstone
+ | Hazmat Suit
+ | 
+Jukebox Upgrade
+ | Blank Upgrade over redstone, jukebox, redstone
+ | Hazmat Suit
+ | 
 ## Custom blocks and equipment
 These are built at the Equipment Workshop from a list of parts. Costs follow Satisfactory's build costs as I recall them where the building exists there, and are set for the pack otherwise.
 Automation. The Workshop builds by hand only. Every build on this list also has a machine route, at about the same cost, that runs with no player and no Workshop. Each route recipe is locked to the build's own milestone; each sub-assembly unlocks with its build, or with the machine that makes it when that comes later.

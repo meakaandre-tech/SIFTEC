@@ -62,7 +62,6 @@ public class SiftecClient implements ClientModInitializer {
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(JetpackClient::tick);
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
-            ClientState.backpackSlots = 0;
             ClientState.jetFuel = true;
         });
     }

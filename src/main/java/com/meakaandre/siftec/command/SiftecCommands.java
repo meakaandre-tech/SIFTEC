@@ -166,7 +166,7 @@ public final class SiftecCommands {
         Milestone coal = Milestones.get("coal_power");
         report(source, "SELFTEST hub: two members pay x" + company.costMultiplier() + "; tier 1 open " + Milestones.tierOpen(company, 1)
             + "; tier 3 open " + Milestones.tierOpen(company, 3) + "; coal power needs " + Milestones.blocker(company, coal).id()
-            + "; backpack rewards " + company.count("backpack") + "; scanner copper " + company.hasToken("scanner:copper")
+            + "; backpack given " + company.hasToken("backpack") + "; scanner copper " + company.hasToken("scanner:copper")
             + "; speed cap " + company.best("cap:", 32));
         int ours = 0;
         boolean steelGone = true;
