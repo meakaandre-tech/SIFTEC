@@ -396,8 +396,20 @@ public final class NodeTests {
             // what the loot table gives for this player and tool, and whether the game counts the tool as right for it
             String why = "mode " + hand.gameMode.getGameModeForPlayer() + ", instabuild " + hand.getAbilities().instabuild + ", right tool " + hand.hasCorrectToolForDrops(before) + ", loot "
                 + Block.getDrops(before, level, core, null, hand, hand.getMainHandItem());
+            int held = hand.getInventory().countItem(look.output());
             boolean mined = hand.gameMode.destroyBlock(core);
             Map<String, Integer> drops = clearDrops(level, core);
+            why += ", into the player's inventory " + (hand.getInventory().countItem(look.output()) - held)
+                + ", items within 16 " + level.getEntitiesOfClass(ItemEntity.class, new AABB(core).inflate(16)).size();
+            if (entry.getKey() == Purity.IMPURE) {
+                // the control: an ordinary coal ore block, mined the same way on the same spot once the node has grown back
+                BlockPos above = core.above(3);
+                level.setBlock(above, Blocks.COAL_ORE.defaultBlockState(), Block.UPDATE_ALL);
+                FakePlayer control = miner(level, above);
+                boolean minedOre = control.gameMode.destroyBlock(above);
+                report(source, "control: vanilla coal ore mined the same way: removed " + minedOre + ", dropped " + clearDrops(level, above)
+                    + ", into the player's inventory " + control.getInventory().countItem(Items.COAL));
+            }
             String want = BuiltInRegistries.ITEM.getKey(look.output()).toString();
             check(source, tally, mined && drops.getOrDefault(want, 0) == 1, "regrow " + look.id() + " " + node.purity().getSerializedName() + ": cleared "
                 + cleared + " clump blocks, mined " + id(before.getBlock()) + " by hand, dropped " + drops + " (expected 1 " + want + "; " + why + ")");
