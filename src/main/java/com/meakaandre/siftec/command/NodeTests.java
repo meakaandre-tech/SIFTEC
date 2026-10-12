@@ -272,6 +272,8 @@ public final class NodeTests {
     /** A survival player with a pickaxe, standing next to {@code target}. */
     private static FakePlayer miner(ServerLevel level, BlockPos target) {
         FakePlayer player = FakePlayer.get(level);
+        // through creative and back, so the abilities really are a survival player's whatever another test left
+        player.gameMode.changeGameModeForPlayer(GameType.CREATIVE);
         player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_PICKAXE));
         player.setPos(target.getX() + 0.5, target.getY() + 1, target.getZ() - 1.5);
@@ -392,7 +394,7 @@ public final class NodeTests {
             BlockState before = level.getBlockState(core);
             FakePlayer hand = miner(level, core);
             // what the loot table gives for this player and tool, and whether the game counts the tool as right for it
-            String why = "mode " + hand.gameMode.getGameModeForPlayer() + ", right tool " + hand.hasCorrectToolForDrops(before) + ", loot "
+            String why = "mode " + hand.gameMode.getGameModeForPlayer() + ", instabuild " + hand.getAbilities().instabuild + ", right tool " + hand.hasCorrectToolForDrops(before) + ", loot "
                 + Block.getDrops(before, level, core, null, hand, hand.getMainHandItem());
             boolean mined = hand.gameMode.destroyBlock(core);
             Map<String, Integer> drops = clearDrops(level, core);
