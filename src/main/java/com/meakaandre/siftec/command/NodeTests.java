@@ -291,8 +291,8 @@ public final class NodeTests {
                 && !BlockBreakingKineticBlockEntity.isBreakable(pad, pad.getDestroySpeed(level, edge)),
             "patch " + id(pad.getBlock()) + " is unbreakable: hardness " + pad.getDestroySpeed(level, edge) + ", piston " + pad.getPistonPushReaction()
                 + ", create:non_movable " + pad.is(nonMovable) + ", a Create drill could break it " + BlockBreakingKineticBlockEntity.isBreakable(pad, pad.getDestroySpeed(level, edge)));
-        check(source, tally, live.getBlock() instanceof NodeBlock && live.is(nonMovable) && live.getPistonPushReaction() != PushReaction.NORMAL
-                && live.getPistonPushReaction() != PushReaction.DESTROY && BlockBreakingKineticBlockEntity.isBreakable(live, live.getDestroySpeed(level, core)),
+        check(source, tally, live.getBlock() instanceof NodeBlock && live.is(nonMovable) && live.getPistonPushReaction() == PushReaction.IMMOVEABLE
+                && BlockBreakingKineticBlockEntity.isBreakable(live, live.getDestroySpeed(level, core)),
             "node " + id(live.getBlock()) + " can be mined and drilled but not moved: hardness " + live.getDestroySpeed(level, core) + ", piston "
                 + live.getPistonPushReaction() + ", create:non_movable " + live.is(nonMovable));
         // a survival player digging the patch the way the client would: start and finish breaking

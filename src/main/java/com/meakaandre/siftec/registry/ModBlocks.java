@@ -50,7 +50,7 @@ public class ModBlocks {
     /** A node that can be mined: like an ore block to dig, but never pushed or blown up (it regrows instead of going). */
     private static BlockBehaviour.Properties minable() {
         return BlockBehaviour.Properties.of().strength(3.0F, 3600000.0F).requiresCorrectToolForDrops()
-            .sound(SoundType.STONE).pushReaction(PushReaction.BLOCK);
+            .sound(SoundType.STONE).pushReaction(PushReaction.IMMOVEABLE);
     }
 
     private static BlockBehaviour.Properties machine() {
@@ -73,8 +73,8 @@ public class ModBlocks {
         }
         for (NodeLook look : NodeLook.all()) {
             if (look.type() == NodeType.OIL) continue;
-            Supplier<BlockBehaviour.Properties> properties = look.fluid() ? ModBlocks::node : ModBlocks::minable;
-            NODES.put(look.id(), hidden(look.id() + "_node", p -> new NodeBlock(look, p), properties));
+            Supplier<BlockBehaviour.Properties> nodeProperties = look.fluid() ? ModBlocks::node : ModBlocks::minable;
+            NODES.put(look.id(), hidden(look.id() + "_node", p -> new NodeBlock(look, p), nodeProperties));
             if (!look.fluid()) {
                 DEPLETED.put(look.id(), blockOnly(look.id() + "_node_depleted", properties -> new com.meakaandre.siftec.block.DepletedNodeBlock(look, properties), () -> node().noOcclusion()));
             }
