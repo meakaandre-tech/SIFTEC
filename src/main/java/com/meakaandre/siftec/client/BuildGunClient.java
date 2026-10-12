@@ -126,7 +126,7 @@ public final class BuildGunClient {
         }
         if (!wasHolding) {
             // movement presses from before the gun was in hand must not nudge anything
-            drain(o.keyUp, o.keyDown, o.keyLeft, o.keyRight, NEXT_TAB, ROTATE, FLIP, DISMANTLE);
+            drain(o.keyUp, o.keyDown, o.keyLeft, o.keyRight, NEXT_TAB, ROTATE, FLIP, DISMANTLE, NUDGE);
             wasHolding = true;
         }
         while (NEXT_TAB.consumeClick()) {
