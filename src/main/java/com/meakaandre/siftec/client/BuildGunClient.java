@@ -84,7 +84,7 @@ public final class BuildGunClient {
 
     public static boolean nudging() {
         Minecraft mc = Minecraft.getInstance();
-        return nudge && mc.screen == null && holding(mc);
+        return nudge && mc.gui.screen() == null && holding(mc);
     }
 
     private static List<BuildingDef> list(Minecraft mc) {
@@ -102,7 +102,7 @@ public final class BuildGunClient {
     /** Ctrl + Scroll, from the mouse handler: true if the gun used the scroll (the hotbar must not move then). */
     public static boolean scroll(double amount) {
         Minecraft mc = Minecraft.getInstance();
-        if (amount == 0 || mc.screen != null || !holding(mc) || !NUDGE.isDown()) return false;
+        if (amount == 0 || mc.gui.screen() != null || !holding(mc) || !NUDGE.isDown()) return false;
         scrolled = true;
         dismantle = false;
         if (selected) picked[category] += amount > 0 ? -1 : 1;
@@ -115,7 +115,7 @@ public final class BuildGunClient {
     // ------------------------------------------------------------------------------------------------ keys
 
     private static void keys(Minecraft mc) {
-        boolean holding = holding(mc) && mc.screen == null;
+        boolean holding = holding(mc) && mc.gui.screen() == null;
         Options o = mc.options;
         if (!holding) {
             if (wasHolding) clear();
