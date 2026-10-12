@@ -275,6 +275,7 @@ public final class BuildingTests {
         BlockPos side = a.at(1, 2, 1).relative(a.facing().getClockWise());
         level.explode(null, side.getX() + 0.5, side.getY() + 0.5, side.getZ() + 0.5, 4f, Level.ExplosionInteraction.TNT);
         expect(source, "an explosion leaves it whole", standing(level, a) == t.members.size(), standing(level, a) + " of " + t.members.size());
+        dropsNear(level, side); // the floor the explosion broke
 
         // turned and flipped: everything lands where the placement says, ports facing the turned way
         Placement b = new Placement(def, new BlockPos(X + 12, Y, Z), Direction.EAST, true);
