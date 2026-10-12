@@ -55,6 +55,8 @@
     "TunnelMixin"
   ],
   "client": [
+    "client.BuildGunNudgeMixin",
+    "client.BuildGunScrollMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -768,6 +768,69 @@ write(f"{A}/models/block/equipment_workshop.json", {"parent": "minecraft:block/c
 item_def("equipment_workshop", "siftec:block/equipment_workshop")
 write(f"{D}/loot_table/blocks/equipment_workshop.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
       "entries": [{"type": "minecraft:item", "name": "siftec:equipment_workshop"}]}]})
+# ---- Build Gun and its buildings (building/BuildGun.java, building/Buildings.java)
+data["buildings"] = []
+for bid, bname, tab, cost, unlock, dev in content.BUILDINGS:
+    if tab not in content.BUILD_TABS:
+        raise SystemExit(f"building {bid}: unknown Build Gun tab {tab!r}")
+    if unlock and unlock not in by_id:
+        raise SystemExit(f"building {bid}: unlocked by {unlock!r}, which is no milestone or MAM node")
+    if not os.path.exists(os.path.join(D, "structure", "building", bid + ".nbt")):
+        raise SystemExit(f"building {bid}: no template at data/siftec/structure/building/{bid}.nbt (run tools/structures.py)")
+    parsed = content.parse_cost(cost)
+    for c, n in parsed: check(c, "building " + bid)
+    b = {"id": bid, "category": tab, "cost": [{"item": c, "count": n} for c, n in parsed]}
+    if unlock: b["unlock"] = unlock
+    if dev: b["dev"] = True
+    data["buildings"].append(b)
+    lang[f"siftec.building.{bid}"] = bname
+lang["item.siftec.build_gun"] = "Build Gun"
+item_def("build_gun", "create:item/handheld_worldshaper/item")
+lang.update({"block.siftec.building_controller": "Building Controller", "block.siftec.building_port": "Building Port",
+             "key.category.siftec.build_gun": "SIFTEC Build Gun", "key.siftec.build_gun.tab": "Next tab",
+             "key.siftec.build_gun.rotate": "Rotate", "key.siftec.build_gun.flip": "Flip",
+             "key.siftec.build_gun.nudge": "Nudge mode (hold and scroll: pick a building)", "key.siftec.build_gun.dismantle": "Dismantle mode"})
+for tab in content.BUILD_TABS:
+    lang[f"siftec.build_gun.category.{tab}"] = tab.capitalize()
+lang.update({
+    "siftec.build_gun.overlay": "%s: %s | %s",
+    "siftec.build_gun.overlay_nudge": "%s: %s (nudge: W A S D, Ctrl to let go) | %s",
+    "siftec.build_gun.overlay_none": "%s | Ctrl + Scroll to pick a building, Tab for the next tab",
+    "siftec.build_gun.overlay_dismantle": "Dismantle | %s",
+    "siftec.build_gun.fits": "Right-click to build the %s. R rotate, F flip, Ctrl nudge",
+    "siftec.build_gun.blocked": "%s blocks are in the way (marked red)",
+    "siftec.build_gun.missing": "Missing %s %s",
+    "siftec.build_gun.no_template": "The %s building has no template yet",
+    "siftec.build_gun.locked": "Locked: needs %s",
+    "siftec.build_gun.dev": "Test building: creative only",
+    "siftec.build_gun.pick": "Pick a building first: Ctrl + Scroll",
+    "siftec.build_gun.dismantle_aim": "Aim at a building to take it down",
+    "siftec.build_gun.dismantle_hint": "Right-click to take down the %s: its cost and contents come back",
+    "siftec.build_gun.dismantled": "%s taken down",
+    "siftec.build_gun.not_yours": "That building belongs to another company",
+    "siftec.build_gun.part": "Part of the %s: take it down with the Build Gun's dismantle mode (X)",
+    "siftec.build_gun.building": "building",
+    "siftec.building.controller": "%s",
+    "siftec.building.unknown": "Unknown building %s",
+})
+# the controller: a control panel; the ports: a casing with a coloured face pointing out (Andre draws the real ones)
+write(f"{A}/blockstates/building_controller.json", {"variants": {f"facing={d}": ({"model": "siftec:block/building_controller", "y": y} if y else {"model": "siftec:block/building_controller"}) for d, y in ROT}})
+write(f"{A}/models/block/building_controller.json", {"parent": "minecraft:block/cube", "textures": {"particle": "create:block/brass_casing",
+      "north": "minecraft:block/crafter_north", "south": "create:block/brass_casing", "east": "create:block/brass_casing",
+      "west": "create:block/brass_casing", "up": "create:block/brass_casing", "down": "create:block/brass_casing"}})
+item_def("building_controller", "siftec:block/building_controller")
+PORT_FACES = {"item_in": "minecraft:block/lime_glazed_terracotta", "item_out": "minecraft:block/orange_glazed_terracotta",
+              "fluid_in": "minecraft:block/light_blue_glazed_terracotta", "fluid_out": "minecraft:block/blue_glazed_terracotta"}
+PORT_TURN = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
+port_variants = {}
+for kind, face in PORT_FACES.items():
+    write(f"{A}/models/block/building_port_{kind}.json", {"parent": "minecraft:block/cube", "textures": {"particle": "create:block/andesite_casing",
+          "north": face, "south": "create:block/andesite_casing", "east": "create:block/andesite_casing",
+          "west": "create:block/andesite_casing", "up": "create:block/andesite_casing", "down": "create:block/andesite_casing"}})
+    for d, turn in PORT_TURN.items():
+        port_variants[f"facing={d},kind={kind}"] = {"model": f"siftec:block/building_port_{kind}", **turn}
+write(f"{A}/blockstates/building_port.json", {"variants": port_variants})
+item_def("building_port", "siftec:block/building_port_item_in")
 if UNKNOWN:
     raise SystemExit("unknown item ids (not items of the game or of the pack's mods):\n  " + "\n  ".join(UNKNOWN))
 write(os.path.join(ROOT, "siftec_content.json"), data)

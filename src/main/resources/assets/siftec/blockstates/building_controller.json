@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "siftec:block/building_controller"
+    },
+    "facing=east": {
+      "model": "siftec:block/building_controller",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "siftec:block/building_controller",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "siftec:block/building_controller",
+      "y": 270
+    }
+  }
+}

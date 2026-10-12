@@ -1,0 +1,96 @@
+{
+  "variants": {
+    "facing=north,kind=item_in": {
+      "model": "siftec:block/building_port_item_in"
+    },
+    "facing=east,kind=item_in": {
+      "model": "siftec:block/building_port_item_in",
+      "y": 90
+    },
+    "facing=south,kind=item_in": {
+      "model": "siftec:block/building_port_item_in",
+      "y": 180
+    },
+    "facing=west,kind=item_in": {
+      "model": "siftec:block/building_port_item_in",
+      "y": 270
+    },
+    "facing=up,kind=item_in": {
+      "model": "siftec:block/building_port_item_in",
+      "x": 270
+    },
+    "facing=down,kind=item_in": {
+      "model": "siftec:block/building_port_item_in",
+      "x": 90
+    },
+    "facing=north,kind=item_out": {
+      "model": "siftec:block/building_port_item_out"
+    },
+    "facing=east,kind=item_out": {
+      "model": "siftec:block/building_port_item_out",
+      "y": 90
+    },
+    "facing=south,kind=item_out": {
+      "model": "siftec:block/building_port_item_out",
+      "y": 180
+    },
+    "facing=west,kind=item_out": {
+      "model": "siftec:block/building_port_item_out",
+      "y": 270
+    },
+    "facing=up,kind=item_out": {
+      "model": "siftec:block/building_port_item_out",
+      "x": 270
+    },
+    "facing=down,kind=item_out": {
+      "model": "siftec:block/building_port_item_out",
+      "x": 90
+    },
+    "facing=north,kind=fluid_in": {
+      "model": "siftec:block/building_port_fluid_in"
+    },
+    "facing=east,kind=fluid_in": {
+      "model": "siftec:block/building_port_fluid_in",
+      "y": 90
+    },
+    "facing=south,kind=fluid_in": {
+      "model": "siftec:block/building_port_fluid_in",
+      "y": 180
+    },
+    "facing=west,kind=fluid_in": {
+      "model": "siftec:block/building_port_fluid_in",
+      "y": 270
+    },
+    "facing=up,kind=fluid_in": {
+      "model": "siftec:block/building_port_fluid_in",
+      "x": 270
+    },
+    "facing=down,kind=fluid_in": {
+      "model": "siftec:block/building_port_fluid_in",
+      "x": 90
+    },
+    "facing=north,kind=fluid_out": {
+      "model": "siftec:block/building_port_fluid_out"
+    },
+    "facing=east,kind=fluid_out": {
+      "model": "siftec:block/building_port_fluid_out",
+      "y": 90
+    },
+    "facing=south,kind=fluid_out": {
+      "model": "siftec:block/building_port_fluid_out",
+      "y": 180
+    },
+    "facing=west,kind=fluid_out": {
+      "model": "siftec:block/building_port_fluid_out",
+      "y": 270
+    },
+    "facing=up,kind=fluid_out": {
+      "model": "siftec:block/building_port_fluid_out",
+      "x": 270
+    },
+    "facing=down,kind=fluid_out": {
+      "model": "siftec:block/building_port_fluid_out",
+      "x": 90
+    }
+  }
+}

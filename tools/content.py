@@ -550,3 +550,14 @@ TB_BACKPACKS = [TB + i for i in (
 TB_TIER_UPGRADES = [TB + t + "_tier_upgrade" for t in ("iron", "gold", "diamond", "netherite")]
 TB_SLEEPING_BAGS = [f"{TB}{c}_sleeping_bag" for c in COLOURS]
 DISABLED += TB_BACKPACKS + TB_TIER_UPGRADES + TB_SLEEPING_BAGS
+
+
+# ---------------------------------------------------------------------------------------------------
+# Build Gun buildings (building/Buildings.java): id, name, Build Gun tab, Satisfactory 1.0 build cost, the milestone or
+# MAM node that unlocks it ("" = from the start), and whether it is a dev building (only in creative). Each has a
+# structure template, src/main/resources/data/siftec/structure/building/<id>.nbt: built in game and saved with a
+# Structure Block, or written by tools/structures.py. Work packages 5 and 9 add the real buildings here.
+BUILD_TABS = ("production", "power", "logistics", "foundations", "special")
+BUILDINGS = [
+    ("test_building", "Test Building", "production", "2 Iron Sheet, 4 Iron Rod", "", True),
+]

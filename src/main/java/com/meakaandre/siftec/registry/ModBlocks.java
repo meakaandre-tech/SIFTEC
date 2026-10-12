@@ -139,6 +139,16 @@ public class ModBlocks {
     public static final Supplier<com.meakaandre.siftec.prefab.HubBurnerBlock> HUB_BURNER = blockOnly("hub_burner", com.meakaandre.siftec.prefab.HubBurnerBlock::new,
         () -> BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.METAL).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
 
+    /**
+     * The Build Gun's buildings (see building.Buildings): each one's controller and its ports. Like the HUB's shell,
+     * unbreakable and immovable; their items exist (not in the tab) only so buildings can be built and saved with a
+     * Structure Block.
+     */
+    public static final Supplier<com.meakaandre.siftec.building.ControllerBlock> BUILDING_CONTROLLER = hidden("building_controller",
+        com.meakaandre.siftec.building.ControllerBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0));
+    public static final Supplier<com.meakaandre.siftec.building.PortBlock> BUILDING_PORT = hidden("building_port",
+        com.meakaandre.siftec.building.PortBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0));
+
     public static final Supplier<WorkshopBlock> EQUIPMENT_WORKSHOP = block("equipment_workshop", WorkshopBlock::new, ModBlocks::machine);
 
     public static final Supplier<DepotBlock> DIMENSIONAL_DEPOT = block("dimensional_depot", DepotBlock::new, ModBlocks::machine);

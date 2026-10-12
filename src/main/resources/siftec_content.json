@@ -5715,5 +5715,22 @@
         }
       ]
     }
+  ],
+  "buildings": [
+    {
+      "id": "test_building",
+      "category": "production",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 4
+        }
+      ],
+      "dev": true
+    }
   ]
 }

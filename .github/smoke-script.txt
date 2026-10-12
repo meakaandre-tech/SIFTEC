@@ -294,3 +294,40 @@ sleep 5
 cmd siftec selftest tb death check
 sleep 3
 shot
+cmd gamemode creative @a
+cmd siftec worldtest buildgun
+sleep 4
+keydown Control_L
+scroll 5
+keyup Control_L
+sleep 3
+shot
+rclick 640 360
+sleep 3
+shot
+key x
+sleep 2
+shot
+rclick 640 360
+sleep 2
+key x
+sleep 2
+key Control_L
+sleep 1
+key w
+sleep 1
+key w
+sleep 2
+shot
+rclick 640 360
+sleep 3
+shot
+cmd execute in minecraft:overworld run tp @a 1100.5 181 1000.5 180 10
+sleep 2
+key x
+sleep 2
+shot
+rclick 640 360
+sleep 2
+cmd siftec worldtest buildgun check
+sleep 2

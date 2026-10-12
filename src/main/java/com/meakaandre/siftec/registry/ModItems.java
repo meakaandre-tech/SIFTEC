@@ -38,6 +38,8 @@ public class ModItems {
      * recipe and is not in the creative tab.
      */
     public static final Supplier<Item> HUB_PLANNER = hiddenItem("hub_planner", properties -> new Item(properties.stacksTo(1)));
+    /** The Build Gun: places and dismantles every building (see building.BuildGun). Given by the HUB, never crafted. */
+    public static final Supplier<com.meakaandre.siftec.building.BuildGunItem> BUILD_GUN = item("build_gun", properties -> new com.meakaandre.siftec.building.BuildGunItem(properties.stacksTo(1)));
     public static final Supplier<Item> TOXIC_SHOT = item("toxic_shot", Item::new);
     public static final Supplier<Item> RAW_BAUXITE = item("raw_bauxite", Item::new);
     public static final Supplier<Item> SAM = item("sam", Item::new);
