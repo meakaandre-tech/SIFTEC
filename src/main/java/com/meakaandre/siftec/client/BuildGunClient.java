@@ -54,7 +54,7 @@ public final class BuildGunClient {
 
     private static int category;
     private static final int[] picked = new int[Category.values().length];
-    private static boolean selected, dismantle, nudge, flip, ctrlWasDown, scrolled, wasHolding;
+    private static boolean selected, dismantle, nudge, flip, ctrlHeld, scrolled, wasHolding;
     private static int turns;
     private static @Nullable Placement frozen, shown;
     private static BuildGunPayloads.@Nullable Select sent;
@@ -103,6 +103,8 @@ public final class BuildGunClient {
     public static boolean scroll(double amount) {
         Minecraft mc = Minecraft.getInstance();
         if (amount == 0 || mc.gui.screen() != null || !holding(mc) || !NUDGE.isDown()) return false;
+        drain(NUDGE);
+        ctrlHeld = true;
         scrolled = true;
         dismantle = false;
         if (selected) picked[category] += amount > 0 ? -1 : 1;
@@ -146,14 +148,21 @@ public final class BuildGunClient {
             nudge = false;
             frozen = null;
         }
-        boolean ctrl = NUDGE.isDown();
-        if (ctrl && !ctrlWasDown) scrolled = false;
-        if (!ctrl && ctrlWasDown && !scrolled && !dismantle) {
-            nudge = !nudge;
-            frozen = nudge ? shown : null;
-            if (frozen == null) nudge = false;
+        // Ctrl pressed and let go without scrolling toggles nudge mode. Presses are counted as clicks, so even a tap
+        // shorter than a tick counts; a scroll while it is held claims the press (see scroll)
+        if (NUDGE.consumeClick()) {
+            drain(NUDGE);
+            ctrlHeld = true;
+            scrolled = false;
         }
-        ctrlWasDown = ctrl;
+        if (ctrlHeld && !NUDGE.isDown()) {
+            ctrlHeld = false;
+            if (!scrolled && !dismantle) {
+                nudge = !nudge;
+                frozen = nudge ? shown : null;
+                if (frozen == null) nudge = false;
+            }
+        }
         // W, A, S, D: in nudge mode a press moves the hologram a block, relative to where the player looks
         Direction ahead = mc.player.getDirection();
         int[][] moves = {{ahead.getStepX(), ahead.getStepZ()}, {-ahead.getStepX(), -ahead.getStepZ()},
@@ -299,7 +308,7 @@ public final class BuildGunClient {
     public static void reset() {
         category = 0;
         java.util.Arrays.fill(picked, 0);
-        selected = dismantle = nudge = flip = ctrlWasDown = scrolled = wasHolding = false;
+        selected = dismantle = nudge = flip = ctrlHeld = scrolled = wasHolding = false;
         turns = 0;
         frozen = shown = null;
         sent = null;
