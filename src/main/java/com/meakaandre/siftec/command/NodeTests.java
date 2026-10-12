@@ -100,7 +100,13 @@ public final class NodeTests {
                     .then(Commands.literal("clump").then(Commands.argument("angle", IntegerArgumentType.integer(0, 8)).executes(NodeTests::lookClump))));
             dispatcher.register(Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).then(worldtest));
         });
-        ServerTickEvents.END_SERVER_TICK.register(server -> MONITORS.removeIf(Monitor::tick));
+        // a monitor may start others: they join the list for the next tick
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            List<Monitor> running = new ArrayList<>(MONITORS);
+            MONITORS.clear();
+            running.removeIf(Monitor::tick);
+            MONITORS.addAll(0, running);
+        });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             MONITORS.clear();
             clumpSite = null;
@@ -379,8 +385,8 @@ public final class NodeTests {
         for (Node node : mineable(level)) picked.putIfAbsent(node.purity(), node);
         int[] tally = new int[2];
         check(source, tally, picked.size() == Purity.values().length, "a node of each purity to mine: " + picked);
-        // the control: an ordinary coal ore block in the sky over spawn, mined the same way. Whether a fake player gets
-        // drops at all depends on the mods installed (in the smoke test it gets none), so the node is held to the same
+        // the control: an ordinary coal ore block in the sky over spawn, mined the same way, so a node is held to what a
+        // vanilla ore does for this fake player (should it ever get no drops at all)
         boolean[] control = {false};
         BlockPos ore = origin().atY(300);
         level.getChunk(ore);
@@ -390,14 +396,30 @@ public final class NodeTests {
         control[0] = oreDrops.getOrDefault("minecraft:coal", 0) > 0;
         report(source, "regrow control: vanilla coal ore mined by the same fake player: removed " + minedOre + ", dropped " + oreDrops);
         int[] left = {picked.size()};
-        for (Map.Entry<Purity, Node> entry : picked.entrySet()) {
-            Node node = entry.getValue();
-            place(level, node, true);
+        // the sites' chunks are forced now; their entities (the drops) only count a few ticks later
+        for (Node node : picked.values()) place(level, node, true);
+        MONITORS.add(new Monitor() {
+            int wait = 10;
+
+            @Override
+            public boolean tick() {
+                if (--wait > 0) return false;
+                for (Map.Entry<Purity, Node> entry : picked.entrySet()) mineAndTime(source, level, entry.getValue(), tally, left, control);
+                if (left[0] == 0) report(source, "regrow result: " + tally[0] + " passed, " + tally[1] + " failed");
+                return true;
+            }
+        });
+        return 1;
+    }
+
+    /** Mines one node by hand (its clump first) and times its regrowth. */
+    private static void mineAndTime(CommandSourceStack source, ServerLevel level, Node node, int[] tally, int[] left, boolean[] control) {
+        {
             BlockPos core = core(level, node);
             if (core == null) {
                 check(source, tally, false, "regrow " + node + ": no node block (" + padReport(level, node) + ")");
                 left[0]--;
-                continue;
+                return;
             }
             int cleared = mineClump(level, node, core);
             NodeLook look = NodeLook.of(node);
@@ -414,7 +436,7 @@ public final class NodeTests {
             String want = BuiltInRegistries.ITEM.getKey(look.output()).toString();
             List<ItemStack> loot = Block.getDrops(before, level, core, null, hand, hand.getMainHandItem());
             boolean lootOk = loot.size() == 1 && loot.getFirst().is(look.output()) && loot.getFirst().getCount() == 1;
-            // what the player gets is the loot, where the game hands a fake player any drops at all (see the control)
+            // what the player gets is the loot, unless the control shows this fake player gets no drops from any block
             boolean dropsOk = drops.getOrDefault(want, 0) == 1 || !control[0] && drops.isEmpty();
             check(source, tally, mined && lootOk && dropsOk, "regrow " + look.id() + " " + node.purity().getSerializedName() + ": cleared "
                 + cleared + " clump blocks, mined " + id(before.getBlock()) + " by hand, its loot for a pickaxe is " + loot + " (expected 1 " + want + "), dropped " + drops
@@ -448,8 +470,6 @@ public final class NodeTests {
                 }
             });
         }
-        if (left[0] == 0) report(source, "regrow result: " + tally[0] + " passed, " + tally[1] + " failed");
-        return 1;
     }
 
     // ---- the clump and a Build Gun node building
@@ -472,10 +492,25 @@ public final class NodeTests {
             return 0;
         }
         place(level, node, true);
+        // the drops of the mined clump only count once the site's chunks have their entities in: a few ticks
+        MONITORS.add(new Monitor() {
+            int wait = 10;
+
+            @Override
+            public boolean tick() {
+                if (--wait > 0) return false;
+                clumpChecks(source, level, def, node, tally);
+                return true;
+            }
+        });
+        return 1;
+    }
+
+    private static void clumpChecks(CommandSourceStack source, ServerLevel level, BuildingDef def, Node node, int[] tally) {
         BlockPos core = core(level, node);
         if (core == null) {
             check(source, tally, false, "clump " + node + ": no node block (" + padReport(level, node) + ")");
-            return 0;
+            return;
         }
         // the miner's middle bottom cell is the node: the anchor is the front edge, one block south of it
         Placement p = new Placement(def, core.south(), Direction.NORTH, false);
@@ -497,7 +532,6 @@ public final class NodeTests {
         check(source, tally, "siftec.build_gun.no_node".equals(offNode.reason), "the test miner off any node is refused: " + offNode.message().getString());
         clumpSite = core;
         report(source, "clump result: " + tally[0] + " passed, " + tally[1] + " failed");
-        return 1;
     }
 
     // ---- the showroom and camera spots
