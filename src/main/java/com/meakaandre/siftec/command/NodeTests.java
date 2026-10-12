@@ -1,25 +1,27 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
-import com.meakaandre.siftec.block.MinerBlock;
-import com.meakaandre.siftec.block.MinerBlockEntity;
-import com.meakaandre.siftec.block.MinerTier;
+import com.meakaandre.siftec.block.DepletedNodeBlock;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.block.NodePadBlock;
+import com.meakaandre.siftec.building.BuildingDef;
+import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.node.Node;
+import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodePlacer;
+import com.meakaandre.siftec.node.NodeRegrowth;
 import com.meakaandre.siftec.node.NodeSavedData;
 import com.meakaandre.siftec.node.NodeType;
 import com.meakaandre.siftec.node.Purity;
-import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
-import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.commands.CommandSourceStack;
@@ -33,46 +35,51 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * Selftests and camera spots for node pads and miners, run by the automated test on an ordinary world. Every line
- * of output starts with "SELFTEST world".
+ * Selftests and camera spots for node sites, run by the automated test on an ordinary world. Every line of output
+ * starts with "SELFTEST world"; the checks say PASS or FAIL, and each test ends with a count.
  * <ul>
- * <li>{@code worldtest pads <n>}: places the n nodes nearest spawn and reports, for each, whether its pad is level,
- * fully supported and open above; then tries to break a pad block and the node the way a survival player would,
- * blows a charge on the pad, and asks Create's drills, pistons and contraptions whether they could take it.</li>
- * <li>{@code worldtest miners setup}: on a real node of each purity runs Mk.1, Mk.2 and Mk.3 in turn at 64 RPM and
- * reports cycle time, items and fluid per cycle and stress; then leaves Mk.1 / Mk.2 / Mk.3 spinning on the impure /
- * normal / pure node. {@code freeze} stops them and reports their tank and progress, {@code verify} (after a
- * restart) reports them again.</li>
- * <li>{@code worldtest showroom}: a row of pads in the sky with every node type at each purity, and the three miner
- * marks spinning on pads; {@code worldtest look ...} puts every player at a camera spot for screenshots.</li>
+ * <li>{@code worldtest pads <n>}: places the n nodes nearest spawn and checks each site: a level patch of its stone,
+ * the node block with the map's purity, the clump over it; then tries everything that could take a patch block away
+ * (a survival player, two big explosions, Create's drills and contraptions) and mines the node.</li>
+ * <li>{@code worldtest regrow}: on a real node of each purity, clears the clump, mines the node by hand with a pickaxe
+ * and times how long it takes to grow back, against its purity's regrowth time.</li>
+ * <li>{@code worldtest clump}: tries to put the test miner (a Build Gun node building) over a real node with its clump
+ * still there, then mines the clump by hand and tries again; also off any node, and a second one on the same node.</li>
+ * <li>{@code worldtest showroom}: a row of sites in the sky, every node look at each purity and one mined;
+ * {@code worldtest look ...} puts every player at a camera spot for screenshots.</li>
  * </ul>
  */
 public final class NodeTests {
     private NodeTests() {
     }
 
-    private static final List<WorldTestsMonitor> MONITORS = new ArrayList<>();
-    /** The miners the miner test left on nodes, by purity. */
-    private static final Map<Purity, BlockPos> MINERS = new EnumMap<>(Purity.class);
+    private static final List<Monitor> MONITORS = new ArrayList<>();
     private static final int SHOW_Y = 200, SHOW_DZ = 48;
+    /** Where the clump test left its test miner, for the camera. */
+    private static BlockPos clumpSite;
 
-    private interface WorldTestsMonitor {
+    private interface Monitor {
         boolean tick();
     }
 
@@ -81,25 +88,28 @@ public final class NodeTests {
             var angle = Commands.argument("angle", IntegerArgumentType.integer(0, 8));
             var worldtest = Commands.literal("worldtest")
                 .then(Commands.literal("pads").then(Commands.argument("count", IntegerArgumentType.integer(1, 40)).executes(NodeTests::pads)))
-                .then(Commands.literal("miners")
-                    .then(Commands.literal("setup").executes(NodeTests::minersSetup))
-                    .then(Commands.literal("freeze").executes(c -> minersReport(c, true)))
-                    .then(Commands.literal("verify").executes(c -> minersReport(c, false))))
+                .then(Commands.literal("regrow").executes(NodeTests::regrow))
+                .then(Commands.literal("clump").executes(NodeTests::clump))
                 .then(Commands.literal("showroom").executes(NodeTests::showroom))
                 .then(Commands.literal("look")
-                    .then(Commands.literal("showroom").then(Commands.argument("col", IntegerArgumentType.integer(0, 20))
+                    .then(Commands.literal("showroom").then(Commands.argument("col", IntegerArgumentType.integer(0, 40))
                         .then(Commands.argument("row", IntegerArgumentType.integer(0, 3)).then(angle.executes(c -> lookShowroom(c, 0))
-                            .then(Commands.argument("dist", IntegerArgumentType.integer(2, 80)).executes(c -> lookShowroom(c, IntegerArgumentType.getInteger(c, "dist"))))))))
+                            .then(Commands.argument("dist", IntegerArgumentType.integer(2, 120)).executes(c -> lookShowroom(c, IntegerArgumentType.getInteger(c, "dist"))))))))
                     .then(Commands.literal("node").then(Commands.argument("type", StringArgumentType.word())
                         .then(Commands.argument("angle", IntegerArgumentType.integer(0, 8)).executes(NodeTests::lookNode))))
-                    .then(Commands.literal("miner").then(Commands.argument("index", IntegerArgumentType.integer(0, 2))
-                        .then(Commands.argument("angle", IntegerArgumentType.integer(0, 8)).executes(NodeTests::lookMiner)))));
+                    .then(Commands.literal("clump").then(Commands.argument("angle", IntegerArgumentType.integer(0, 8)).executes(NodeTests::lookClump))));
             dispatcher.register(Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).then(worldtest));
         });
-        ServerTickEvents.END_SERVER_TICK.register(server -> MONITORS.removeIf(WorldTestsMonitor::tick));
+        // a monitor may start others: they join the list for the next tick
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            List<Monitor> running = new ArrayList<>(MONITORS);
+            MONITORS.clear();
+            running.removeIf(Monitor::tick);
+            MONITORS.addAll(0, running);
+        });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             MONITORS.clear();
-            MINERS.clear();
+            clumpSite = null;
         });
     }
 
@@ -107,6 +117,12 @@ public final class NodeTests {
         String line = "SELFTEST world " + text;
         Siftec.LOGGER.info(line);
         source.sendSuccess(() -> Component.literal(line), false);
+    }
+
+    /** One check: PASS or FAIL, counted into {@code tally} ({passed, failed}). */
+    private static void check(CommandSourceStack source, int[] tally, boolean ok, String what) {
+        tally[ok ? 0 : 1]++;
+        report(source, (ok ? "PASS " : "FAIL ") + what);
     }
 
     private static BlockPos origin() {
@@ -122,16 +138,21 @@ public final class NodeTests {
             level.getChunk(cx + dx, cz + dz);
         }
         for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) NodePlacer.placeChunk(level, cx + dx, cz + dz);
-        if (!keep) for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced(cx + dx, cz + dz, false);
+        if (!keep) release(level, node);
     }
 
-    /** The node's core, or null if it has none placed. */
+    private static void release(ServerLevel level, Node node) {
+        int cx = node.x() >> 4, cz = node.z() >> 4;
+        for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced(cx + dx, cz + dz, false);
+    }
+
+    /** The node block's position (grown or mined), or null if the site has none. */
     private static BlockPos core(ServerLevel level, Node node) {
         int y = NodeSavedData.get(level.getServer()).height(node.key());
         if (y == NodeSavedData.NO_HEIGHT || y == NodePlacer.NO_PLACE) return null;
         BlockPos pos = new BlockPos(node.x(), y + 1, node.z());
-        BlockState state = level.getBlockState(pos);
-        return state.getBlock() instanceof NodeBlock && state.getValue(NodeBlock.CORE) ? pos : null;
+        Block block = level.getBlockState(pos).getBlock();
+        return block instanceof NodeBlock || block instanceof DepletedNodeBlock ? pos : null;
     }
 
     /** The nodes nearest spawn, cell ring by cell ring, that pass the filter. */
@@ -152,16 +173,34 @@ public final class NodeTests {
         return found;
     }
 
-    // ---- pads
+    /**
+     * Nodes the hand-mining tests may use: past the 12 nearest (the pad test blows a charge on one of those), never iron
+     * or copper (the other selftests put machines on the nearest of those), only surface nodes that can be mined.
+     */
+    private static List<Node> mineable(ServerLevel level) {
+        List<Node> all = nearest(level, 72, n -> true);
+        return all.subList(Math.min(12, all.size()), all.size()).stream().filter(n -> !n.type().isFluid() && n.y() == Node.SURFACE
+            && n.type() != NodeType.IRON && n.type() != NodeType.COPPER && NodeLook.of(n).output() != Items.AIR).toList();
+    }
 
-    /** Level, supported, open above: one line about a placed node's pad. */
-    public static String padReport(ServerLevel level, Node node) {
+    private static String id(Block block) {
+        return BuiltInRegistries.BLOCK.getKey(block).getPath();
+    }
+
+    // ---- sites
+
+    /** What a site check found. */
+    public record SiteReport(boolean ok, String text) {
+    }
+
+    /** The patch, the node and the clump of a placed site, in one line. */
+    public static SiteReport site(ServerLevel level, Node node) {
         int y = NodeSavedData.get(level.getServer()).height(node.key());
-        if (y == NodeSavedData.NO_HEIGHT || y == NodePlacer.NO_PLACE) return "no pad (height " + (y == NodePlacer.NO_PLACE ? "none fit" : "not chosen") + ")";
-        if (!NodeSavedData.get(level.getServer()).isFlat(node.key())) return "an old-style mound (placed before pads)";
+        if (y == NodeSavedData.NO_HEIGHT || y == NodePlacer.NO_PLACE) return new SiteReport(false, "no site (height " + (y == NodePlacer.NO_PLACE ? "none fit" : "not chosen") + ")");
+        NodeLook look = NodeLook.of(node);
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        int cells = 0, level0 = 0, offLevel = 0, unsupported = 0, blocked = 0, fill = 0;
-        Block pad = ModBlocks.NODE_PADS.get(node.type()).get();
+        int cells = 0, level0 = 0, offLevel = 0, unsupported = 0, fill = 0;
+        Block patch = ModBlocks.PATCHES.get(look.patchName()).get();
         List<String> odd = new ArrayList<>();
         for (int dx = -4; dx <= 4; dx++) {
             for (int dz = -4; dz <= 4; dz++) {
@@ -169,26 +208,41 @@ public final class NodeTests {
                 if (dx * dx + dz * dz > NodePlacer.PAD_RADIUS * NodePlacer.PAD_RADIUS) continue;
                 cells++;
                 BlockState at = level.getBlockState(pos.set(x, y, z));
-                if (at.is(pad)) level0++;
-                else if (odd.size() < 4) odd.add(dx + "," + dz + "=" + BuiltInRegistries.BLOCK.getKey(at.getBlock()).getPath());
-                // the fill under the pad is the same block, so only the blocks above the pad count as off its level
+                if (at.is(patch)) level0++;
+                else if (odd.size() < 4) odd.add(dx + "," + dz + "=" + id(at.getBlock()));
+                // the fill under the patch is the same block, so only patch blocks above it count as off its level
                 for (int d = 1; d <= 4; d++) if (level.getBlockState(pos.set(x, y + d, z)).getBlock() instanceof NodePadBlock) offLevel++;
                 BlockState under = level.getBlockState(pos.set(x, y - 1, z));
                 if (under.isAir() || !under.getFluidState().isEmpty()) unsupported++;
-                for (int d = 1; level.getBlockState(pos.set(x, y - d, z)).is(pad) && d < 64; d++) fill++;
-                for (int up = 1; up <= 4; up++) {
-                    if (dx == 0 && dz == 0 && up == 1) continue;
-                    BlockState above = level.getBlockState(pos.set(x, y + up, z));
-                    if (!above.isAir() && !above.is(Blocks.SNOW) && above.getFluidState().isEmpty()) blocked++;
-                }
+                for (int d = 1; level.getBlockState(pos.set(x, y - d, z)).is(patch) && d < 64; d++) fill++;
             }
         }
-        BlockState core = level.getBlockState(new BlockPos(node.x(), y + 1, node.z()));
-        boolean isCore = core.getBlock() instanceof NodeBlock && core.getValue(NodeBlock.CORE);
-        return "pad at y " + y + ": " + level0 + "/" + cells + " " + BuiltInRegistries.BLOCK.getKey(pad).getPath() + " blocks level" + (odd.isEmpty() ? "" : " (others " + odd + ")") + ", " + offLevel
-            + " pad blocks off that level, " + unsupported + " with air or fluid under, " + fill + " fill blocks under it, " + blocked
-            + " solid blocks in the 4 above it; node " + (isCore ? BuiltInRegistries.BLOCK.getKey(core.getBlock()).getPath() + " purity "
-            + core.getValue(NodeBlock.PURITY).getSerializedName() + " (map says " + node.purity().getSerializedName() + ")" : "MISSING (" + core + ")");
+        BlockPos corePos = new BlockPos(node.x(), y + 1, node.z());
+        BlockState core = level.getBlockState(corePos);
+        boolean nodeOk = core.getBlock() instanceof NodeBlock nb && nb.look.equals(look) && core.getValue(NodeBlock.PURITY) == node.purity();
+        // the clump: every cell it should fill, and what is in them
+        List<BlockPos> clump = NodePlacer.clumpCells(node, corePos);
+        int present = 0, stone = 0, ore = 0, raw = 0;
+        for (BlockPos c : clump) {
+            BlockState s = level.getBlockState(c);
+            if (s.isAir() || s.canBeReplaced()) continue;
+            present++;
+            if (s.is(look.patchStone().getBlock())) stone++;
+            else if (s.is(look.oreState().getBlock())) ore++;
+            else if (s.is(look.clumpState().getBlock())) raw++;
+        }
+        boolean patchOk = level0 * 10 >= cells * 9 && offLevel == 0;
+        boolean clumpOk = present == clump.size();
+        String text = look.id() + " (" + look.patchName() + " patch) at y " + y + ": " + level0 + "/" + cells + " patch blocks level" + (odd.isEmpty() ? "" : " (others " + odd + ")")
+            + ", " + offLevel + " above that level, " + unsupported + " with air or fluid under, " + fill + " fill blocks; node "
+            + (nodeOk ? id(core.getBlock()) + " " + core.getValue(NodeBlock.PURITY).getSerializedName() : "WRONG (" + core + ", map says " + look.id() + " " + node.purity().getSerializedName() + ")")
+            + "; clump " + present + "/" + clump.size() + " blocks: " + stone + " stone, " + ore + " ore, " + raw + " raw";
+        return new SiteReport(patchOk && nodeOk && clumpOk, text);
+    }
+
+    /** For the other world tests: the site report as text. */
+    public static String padReport(ServerLevel level, Node node) {
+        return site(level, node).text();
     }
 
     private static int pads(CommandContext<CommandSourceStack> context) {
@@ -197,57 +251,98 @@ public final class NodeTests {
         NodeMap.settle(level);
         int count = IntegerArgumentType.getInteger(context, "count");
         List<Node> nodes = nearest(level, count, n -> true);
+        int[] tally = new int[2];
         Node first = null;
         long start = System.nanoTime();
+        Map<NodeType, Integer> starters = new EnumMap<>(NodeType.class);
+        BlockPos o = origin();
         for (Node node : nodes) {
             place(level, node, false);
-            report(source, "pad " + node.type().id() + " " + node.purity().getSerializedName() + " at " + node.x() + "," + node.z() + ": " + padReport(level, node));
+            SiteReport r = site(level, node);
+            check(source, tally, r.ok(), "site " + node.type().id() + " " + node.purity().getSerializedName() + " at " + node.x() + "," + node.z() + ": " + r.text());
+            if (node.purity() == Purity.NORMAL && node.distanceTo(o.getX(), o.getZ()) <= 256) starters.merge(node.type(), 1, Integer::sum);
             // the blast test keeps off the iron and copper nodes the other selftests put machines on
-            if (first == null && node.y() == Node.SURFACE && node.type() != NodeType.IRON && node.type() != NodeType.COPPER && core(level, node) != null) first = node;
+            if (first == null && node.y() == Node.SURFACE && !node.type().isFluid() && node.type() != NodeType.IRON && node.type() != NodeType.COPPER && core(level, node) != null) first = node;
         }
-        report(source, "pads: " + nodes.size() + " nodes placed in " + (System.nanoTime() - start) / 1_000_000 + " ms");
-        if (first != null) breakTest(source, level, first);
+        report(source, "pads: " + nodes.size() + " sites placed in " + (System.nanoTime() - start) / 1_000_000 + " ms");
+        for (NodeType t : new NodeType[]{NodeType.IRON, NodeType.COPPER, NodeType.STONE}) {
+            check(source, tally, starters.getOrDefault(t, 0) > 0, "a normal " + t.id() + " node within 256 blocks of spawn");
+        }
+        report(source, "pads result: " + tally[0] + " passed, " + tally[1] + " failed");
+        int[] breaking = new int[2];
+        if (first != null) breakTest(source, level, first, breaking);
+        else check(source, breaking, false, "a surface node to try breaking");
         return 1;
     }
 
-    /** Tries everything that could take a pad block or the node away, and reports what is left. */
-    private static void breakTest(CommandSourceStack source, ServerLevel level, Node node) {
+    /** A survival player with a pickaxe, standing next to {@code target}. */
+    private static FakePlayer miner(ServerLevel level, BlockPos target) {
+        FakePlayer player = FakePlayer.get(level);
+        // through creative and back, so the abilities really are a survival player's whatever another test left
+        player.gameMode.changeGameModeForPlayer(GameType.CREATIVE);
+        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_PICKAXE));
+        player.setPos(target.getX() + 0.5, target.getY() + 1, target.getZ() - 1.5);
+        return player;
+    }
+
+    /** Tries everything that could take a patch block away, and mines the node. */
+    private static void breakTest(CommandSourceStack source, ServerLevel level, Node node, int[] tally) {
+        place(level, node, true);
         BlockPos core = core(level, node);
         int y = core.getY() - 1;
         BlockPos edge = new BlockPos(node.x() + 3, y, node.z());
-        place(level, node, true);
         BlockState pad = level.getBlockState(edge);
+        BlockState live = level.getBlockState(core);
         TagKey<Block> nonMovable = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("create", "non_movable"));
-        StringBuilder out = new StringBuilder("unbreakable " + BuiltInRegistries.BLOCK.getKey(pad.getBlock()) + " at " + edge.toShortString() + ": hardness "
-            + pad.getDestroySpeed(level, edge) + ", blast resistance " + pad.getBlock().getExplosionResistance() + ", piston "
-            + pad.getPistonPushReaction() + (pad.getPistonPushReaction() == PushReaction.IMMOVEABLE ? " (immovable)" : "") + ", create:non_movable "
-            + pad.is(nonMovable) + ", node in create:non_movable " + level.getBlockState(core).is(nonMovable) + ", Create drill could break pad "
-            + BlockBreakingKineticBlockEntity.isBreakable(pad, pad.getDestroySpeed(level, edge)) + " / node "
-            + BlockBreakingKineticBlockEntity.isBreakable(level.getBlockState(core), level.getBlockState(core).getDestroySpeed(level, core)));
-        // a survival player digging: start and finish breaking, as the client would
-        var player = net.fabricmc.fabric.api.entity.FakePlayer.get(level);
-        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
-        for (BlockPos target : new BlockPos[]{edge, core, edge.below()}) {
-            player.setPos(target.getX() + 0.5, target.getY() + 1, target.getZ() - 1.5);
-            BlockState before = level.getBlockState(target);
-            float progress = before.getDestroyProgress(player, level, target);
-            player.gameMode.handleBlockBreakAction(target, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, Direction.UP, level.getMaxY(), 0);
-            player.gameMode.handleBlockBreakAction(target, ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, Direction.UP, level.getMaxY(), 1);
-            out.append("; survival player on ").append(BuiltInRegistries.BLOCK.getKey(before.getBlock()).getPath()).append(": progress per tick ").append(progress)
-                .append(", still there ").append(level.getBlockState(target).is(before.getBlock()));
-        }
-        // a big charge on the pad
-        int padBefore = countPad(level, node, y);
+        check(source, tally, pad.getDestroySpeed(level, edge) < 0 && pad.getPistonPushReaction() == PushReaction.IMMOVEABLE && pad.is(nonMovable)
+                && !BlockBreakingKineticBlockEntity.isBreakable(pad, pad.getDestroySpeed(level, edge)),
+            "patch " + id(pad.getBlock()) + " is unbreakable: hardness " + pad.getDestroySpeed(level, edge) + ", piston " + pad.getPistonPushReaction()
+                + ", create:non_movable " + pad.is(nonMovable) + ", a Create drill could break it " + BlockBreakingKineticBlockEntity.isBreakable(pad, pad.getDestroySpeed(level, edge)));
+        check(source, tally, live.getBlock() instanceof NodeBlock && live.is(nonMovable) && live.getPistonPushReaction() == PushReaction.IMMOVEABLE
+                && BlockBreakingKineticBlockEntity.isBreakable(live, live.getDestroySpeed(level, core)),
+            "node " + id(live.getBlock()) + " can be mined and drilled but not moved: hardness " + live.getDestroySpeed(level, core) + ", piston "
+                + live.getPistonPushReaction() + ", create:non_movable " + live.is(nonMovable));
+        // a survival player digging the patch the way the client would: start and finish breaking
+        FakePlayer player = miner(level, edge);
+        float progress = pad.getDestroyProgress(player, level, edge);
+        player.gameMode.handleBlockBreakAction(edge, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, Direction.UP, level.getMaxY(), 0);
+        player.gameMode.handleBlockBreakAction(edge, ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, Direction.UP, level.getMaxY(), 1);
+        check(source, tally, level.getBlockState(edge).is(pad.getBlock()), "a survival player cannot dig the patch (progress per tick " + progress + ")");
+        // two big charges on the patch
+        int padBefore = countPatch(level, node, y);
         level.explode(null, edge.getX() + 0.5, y + 1.5, edge.getZ() + 0.5, 6f, Level.ExplosionInteraction.TNT);
-        level.explode(null, node.x() + 0.5, y + 2.5, node.z() + 0.5, 6f, Level.ExplosionInteraction.TNT);
-        out.append("; two power-6 explosions: pad blocks ").append(padBefore).append(" -> ").append(countPad(level, node, y))
-            .append(", node still there ").append(core(level, node) != null);
-        report(source, out.toString());
-        int cx = node.x() >> 4, cz = node.z() >> 4;
-        for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced(cx + dx, cz + dz, false);
+        level.explode(null, node.x() + 0.5, y + 3.5, node.z() + 0.5, 6f, Level.ExplosionInteraction.TNT);
+        int padAfter = countPatch(level, node, y);
+        BlockState after = level.getBlockState(core);
+        check(source, tally, padAfter == padBefore && after.getBlock() instanceof NodeBlock,
+            "two power-6 explosions: patch blocks " + padBefore + " -> " + padAfter + ", node " + id(after.getBlock()) + " (the clump may go: " + NodePlacer.clumpLeft(level, core) + " blocks left)");
+        // broken the way a Create drill breaks a block (no player): it is mined, and comes back
+        clearDrops(level, core);
+        level.destroyBlock(core, true);
+        Map<String, Integer> drillDrops = clearDrops(level, core);
+        long start = level.getGameTime();
+        MONITORS.add(new Monitor() {
+            boolean depleted;
+
+            @Override
+            public boolean tick() {
+                BlockState now = level.getBlockState(core);
+                if (now.getBlock() instanceof DepletedNodeBlock) depleted = true;
+                long t = level.getGameTime() - start;
+                if (now.getBlock() instanceof NodeBlock || t > 200) {
+                    check(source, tally, depleted && now.getBlock() instanceof NodeBlock, "node broken without a player (as a drill does): mined " + depleted
+                        + ", dropped " + drillDrops + ", grew back after " + t + " ticks, now " + id(now.getBlock()));
+                    release(level, node);
+                    report(source, "break result: " + tally[0] + " passed, " + tally[1] + " failed");
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
-    private static int countPad(ServerLevel level, Node node, int y) {
+    private static int countPatch(ServerLevel level, Node node, int y) {
         int n = 0;
         for (int dx = -4; dx <= 4; dx++) for (int dz = -4; dz <= 4; dz++) {
             if (level.getBlockState(new BlockPos(node.x() + dx, y, node.z() + dz)).getBlock() instanceof NodePadBlock) n++;
@@ -255,177 +350,242 @@ public final class NodeTests {
         return n;
     }
 
-    // ---- miners
-
-    private static final int WARM = 20, RUN = 200, SPEED = 64;
-
-    /**
-     * Where the miner test may build: past the 12 nearest nodes (the pad test blows a charge on one of those), never
-     * iron or copper (the other selftests put machines on the nearest of those), only nodes a miner can work.
-     * The same nodes every time, so a restart finds them again.
-     */
-    private static List<Node> minerNodes(ServerLevel level) {
-        List<Node> all = nearest(level, 72, n -> true);
-        return all.subList(Math.min(12, all.size()), all.size()).stream().filter(n -> !n.type().isFluid() && n.y() == Node.SURFACE
-            && n.type() != NodeType.IRON && n.type() != NodeType.COPPER && n.type().output() != net.minecraft.world.item.Items.AIR).toList();
-    }
-
-    private static Block minerBlock(MinerTier tier) {
-        return switch (tier) {
-            case MK1 -> ModBlocks.MINER_MK1.get();
-            case MK2 -> ModBlocks.MINER_MK2.get();
-            case MK3 -> ModBlocks.MINER_MK3.get();
-        };
-    }
-
-    /** A miner of this mark at {@code at}, its upper block, a creative motor at 64 RPM on top, and 1,000 mB of its fluid. */
-    private static MinerBlockEntity build(ServerLevel level, BlockPos at, MinerTier tier, String company) {
-        for (int up = 2; up >= 0; up--) level.setBlock(at.above(up), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-        level.setBlockAndUpdate(at, minerBlock(tier).defaultBlockState());
-        MinerBlock.placeTop(level, at);
-        BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
-        if (motor.hasProperty(BlockStateProperties.FACING)) motor = motor.setValue(BlockStateProperties.FACING, Direction.DOWN);
-        level.setBlockAndUpdate(at.above(2), motor);
-        // owned by a company allowed 64 RPM (unowned blocks break past 32)
-        for (int up = 0; up <= 2; up++) {
-            var be = level.getBlockEntity(at.above(up));
-            if (be != null) be.setAttached(Ownership.OWNER, company);
+    /** Mines every block of the clump left round the node block at {@code core}, as a survival player; what dropped is counted and cleared. */
+    private static int mineClump(ServerLevel level, Node node, BlockPos core) {
+        int mined = 0;
+        // top down, so nothing is left standing on air
+        List<BlockPos> cells = new ArrayList<>(NodePlacer.clumpCells(node, core));
+        cells.sort((a, b) -> Integer.compare(b.getY(), a.getY()));
+        for (BlockPos c : cells) {
+            BlockState s = level.getBlockState(c);
+            if (s.isAir() || s.canBeReplaced()) continue;
+            if (miner(level, c).gameMode.destroyBlock(c)) mined++;
         }
-        if (level.getBlockEntity(at.above(2)) instanceof CreativeMotorBlockEntity m) m.generatedSpeed.setValue(SPEED);
-        if (!(level.getBlockEntity(at) instanceof MinerBlockEntity miner)) return null;
-        miner.fill(tier.fluid(), 1000);
-        return miner;
+        clearDrops(level, core);
+        return mined;
     }
 
-    private static int minersSetup(CommandContext<CommandSourceStack> context) {
+    /** The items lying round a spot, by item, removed from the world. */
+    private static Map<String, Integer> clearDrops(ServerLevel level, BlockPos at) {
+        Map<String, Integer> out = new LinkedHashMap<>();
+        for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(at).inflate(4))) {
+            out.merge(BuiltInRegistries.ITEM.getKey(e.getItem().getItem()).toString(), e.getItem().getCount(), Integer::sum);
+            e.discard();
+        }
+        return out;
+    }
+
+    // ---- regrowth
+
+    private static int regrow(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
         NodeMap.settle(level);
-        String company = WorldTests.fastCompany(source);
         Map<Purity, Node> picked = new EnumMap<>(Purity.class);
-        for (Node node : minerNodes(level)) picked.putIfAbsent(node.purity(), node);
-        report(source, "miners: nodes " + picked);
-        for (Map.Entry<Purity, Node> entry : picked.entrySet()) {
-            Node node = entry.getValue();
-            place(level, node, true);
+        for (Node node : mineable(level)) picked.putIfAbsent(node.purity(), node);
+        int[] tally = new int[2];
+        check(source, tally, picked.size() == Purity.values().length, "a node of each purity to mine: " + picked);
+        // the control: an ordinary coal ore block in the sky over spawn, mined the same way, so a node is held to what a
+        // vanilla ore does for this fake player (should it ever get no drops at all)
+        boolean[] control = {false};
+        BlockPos ore = origin().atY(300);
+        level.getChunk(ore);
+        level.setBlock(ore, Blocks.COAL_ORE.defaultBlockState(), Block.UPDATE_ALL);
+        boolean minedOre = miner(level, ore).gameMode.destroyBlock(ore);
+        Map<String, Integer> oreDrops = clearDrops(level, ore);
+        control[0] = oreDrops.getOrDefault("minecraft:coal", 0) > 0;
+        report(source, "regrow control: vanilla coal ore mined by the same fake player: removed " + minedOre + ", dropped " + oreDrops);
+        int[] left = {picked.size()};
+        // the sites' chunks are forced now; their entities (the drops) only count a few ticks later
+        for (Node node : picked.values()) place(level, node, true);
+        MONITORS.add(new Monitor() {
+            int wait = 10;
+
+            @Override
+            public boolean tick() {
+                if (--wait > 0) return false;
+                for (Map.Entry<Purity, Node> entry : picked.entrySet()) mineAndTime(source, level, entry.getValue(), tally, left, control);
+                if (left[0] == 0) report(source, "regrow result: " + tally[0] + " passed, " + tally[1] + " failed");
+                return true;
+            }
+        });
+        return 1;
+    }
+
+    /** Mines one node by hand (its clump first) and times its regrowth. */
+    private static void mineAndTime(CommandSourceStack source, ServerLevel level, Node node, int[] tally, int[] left, boolean[] control) {
+        {
             BlockPos core = core(level, node);
             if (core == null) {
-                report(source, "miners: " + node + " has no core: " + padReport(level, node));
-                continue;
+                check(source, tally, false, "regrow " + node + ": no node block (" + padReport(level, node) + ")");
+                left[0]--;
+                return;
             }
-            BlockPos at = core.above();
-            MINERS.put(entry.getKey(), at);
-            MONITORS.add(new WorldTestsMonitor() {
-                int tier, t, c0, items0, f0;
-                MinerBlockEntity miner;
+            int cleared = mineClump(level, node, core);
+            NodeLook look = NodeLook.of(node);
+            BlockState before = level.getBlockState(core);
+            FakePlayer hand = miner(level, core);
+            // what the loot table gives for this player and tool, and whether the game counts the tool as right for it
+            String why = "mode " + hand.gameMode.getGameModeForPlayer() + ", instabuild " + hand.getAbilities().instabuild + ", right tool " + hand.hasCorrectToolForDrops(before) + ", loot "
+                + Block.getDrops(before, level, core, null, hand, hand.getMainHandItem());
+            int held = hand.getInventory().countItem(look.output());
+            boolean mined = hand.gameMode.destroyBlock(core);
+            Map<String, Integer> drops = clearDrops(level, core);
+            why += ", into the player's inventory " + (hand.getInventory().countItem(look.output()) - held)
+                + ", items within 16 " + level.getEntitiesOfClass(ItemEntity.class, new AABB(core).inflate(16)).size();
+            String want = BuiltInRegistries.ITEM.getKey(look.output()).toString();
+            List<ItemStack> loot = Block.getDrops(before, level, core, null, hand, hand.getMainHandItem());
+            boolean lootOk = loot.size() == 1 && loot.getFirst().is(look.output()) && loot.getFirst().getCount() == 1;
+            // what the player gets is the loot, unless the control shows this fake player gets no drops from any block
+            boolean dropsOk = drops.getOrDefault(want, 0) == 1 || !control[0] && drops.isEmpty();
+            check(source, tally, mined && lootOk && dropsOk, "regrow " + look.id() + " " + node.purity().getSerializedName() + ": cleared "
+                + cleared + " clump blocks, mined " + id(before.getBlock()) + " by hand, its loot for a pickaxe is " + loot + " (expected 1 " + want + "), dropped " + drops
+                + (control[0] ? "" : " (as for the vanilla ore of the control)") + "; " + why);
+            long start = level.getGameTime();
+            int expected = NodeRegrowth.ticks(node.purity());
+            MONITORS.add(new Monitor() {
+                boolean sawDepleted;
 
                 @Override
                 public boolean tick() {
-                    MinerTier mark = MinerTier.values()[Math.max(tier, 0)];
-                    if (t == 0 && tier >= 0) miner = build(level, at, mark, company);
-                    t++;
-                    if (miner == null || miner.isRemoved()) {
-                        report(source, "miner " + mark + " on " + node + ": no miner block entity (" + level.getBlockState(at) + ")");
+                    BlockState now = level.getBlockState(core);
+                    long t = level.getGameTime() - start;
+                    if (now.getBlock() instanceof DepletedNodeBlock && !sawDepleted) {
+                        sawDepleted = true;
+                        // a mined node cannot be mined again until it has grown back
+                        FakePlayer player = miner(level, core);
+                        check(source, tally, now.getDestroySpeed(level, core) < 0 && now.getValue(NodeBlock.PURITY) == node.purity()
+                                && now.getDestroyProgress(player, level, core) <= 0,
+                            "regrow " + look.id() + ": mined node is " + id(now.getBlock()) + ", unbreakable (hardness " + now.getDestroySpeed(level, core) + "), purity kept");
+                    }
+                    if (now.getBlock() instanceof NodeBlock || t > expected + 100) {
+                        boolean back = now.getBlock() instanceof NodeBlock nb && nb.look.equals(look) && now.getValue(NodeBlock.PURITY) == node.purity();
+                        check(source, tally, sawDepleted && back && Math.abs(t - expected) <= 2, "regrow " + look.id() + " " + node.purity().getSerializedName()
+                            + ": grew back in " + t + " ticks (its purity's regrowth is " + expected + "), now " + id(now.getBlock()));
+                        release(level, node);
+                        if (--left[0] == 0) report(source, "regrow result: " + tally[0] + " passed, " + tally[1] + " failed");
                         return true;
-                    }
-                    if (tier < 0) {
-                        if (t < 70) return false;
-                        level.setBlockAndUpdate(at.above(2), Blocks.AIR.defaultBlockState());
-                        report(source, "miner freeze " + node.purity().getSerializedName() + " at " + at.toShortString() + ": "
-                            + miner.tier() + " fluid " + miner.fluidAmount() + " mB, progress " + miner.progress() + ", output " + miner.output.get());
-                        return true;
-                    }
-                    if (t == WARM) {
-                        c0 = miner.cycles;
-                        items0 = miner.output.get().getCount();
-                        f0 = miner.fluidAmount();
-                    }
-                    if (t == WARM + RUN) {
-                        int cycles = miner.cycles - c0, items = miner.output.get().getCount() - items0, fluid = f0 - miner.fluidAmount();
-                        float speed = Math.abs(miner.getSpeed()), perRpm = miner.calculateStressApplied();
-                        report(source, String.format(Locale.ROOT,
-                            "miner %s on %s %s at %s: %.0f RPM, %d cycles in %d ticks (%s ticks a cycle), %d %s (%.2f a cycle; expected %.1f, fractions carry over), %d mB %s used (%s a cycle), stress %.0f SU per RPM = %.0f SU, status %s, overstressed %s",
-                            mark, node.purity().getSerializedName(), node.type().id(), at.toShortString(), speed, cycles, RUN,
-                            cycles == 0 ? "-" : String.format(Locale.ROOT, "%.1f", RUN / (float) cycles), items,
-                            BuiltInRegistries.ITEM.getKey(node.type().output()).getPath(), cycles == 0 ? 0f : items / (float) cycles,
-                            node.purity().multiplier * mark.output, fluid, mark.fluidName, cycles == 0 ? "-" : String.format(Locale.ROOT, "%.1f", fluid / (float) cycles),
-                            perRpm, perRpm * speed, miner.status(), miner.isOverStressed()));
-                        miner.output.clearContent();
-                        t = 0;
-                        tier++;
-                        if (tier == MinerTier.values().length) {
-                            // left for the screenshots and the restart check: Mk.1 on the impure node, Mk.2 on the normal one, Mk.3 on the pure one,
-                            // run for 70 ticks (part way into a cycle), then stopped and reported, to be compared after the restart
-                            miner = build(level, at, MinerTier.values()[node.purity().ordinal()], company);
-                            tier = -1;
-                        }
                     }
                     return false;
                 }
             });
         }
-        return 1;
     }
 
-    /** freeze: stops the miners the test left (their motors go) and reports them; verify: reports them after a restart. */
-    private static int minersReport(CommandContext<CommandSourceStack> context, boolean freeze) {
+    // ---- the clump and a Build Gun node building
+
+    private static int clump(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
         NodeMap.settle(level);
-        if (MINERS.isEmpty()) {
-            // after a restart: find the same nodes again (the search is the same, so are the nodes)
-            Map<Purity, Node> picked = new EnumMap<>(Purity.class);
-            for (Node node : minerNodes(level)) picked.putIfAbsent(node.purity(), node);
-            for (Map.Entry<Purity, Node> entry : picked.entrySet()) {
-                place(level, entry.getValue(), false);
-                BlockPos core = core(level, entry.getValue());
-                if (core != null) MINERS.put(entry.getKey(), core.above());
+        int[] tally = new int[2];
+        BuildingDef def = Buildings.def("test_miner");
+        if (def == null) {
+            check(source, tally, false, "clump: no test_miner building");
+            return 0;
+        }
+        // a node the regrowth test does not use: the last of the mineable ones
+        List<Node> candidates = mineable(level);
+        Node node = candidates.isEmpty() ? null : candidates.getLast();
+        if (node == null) {
+            check(source, tally, false, "clump: no node to build on");
+            return 0;
+        }
+        place(level, node, true);
+        // the drops of the mined clump only count once the site's chunks have their entities in: a few ticks
+        MONITORS.add(new Monitor() {
+            int wait = 10;
+
+            @Override
+            public boolean tick() {
+                if (--wait > 0) return false;
+                clumpChecks(source, level, def, node, tally);
+                return true;
             }
-        }
-        for (Map.Entry<Purity, BlockPos> entry : MINERS.entrySet()) {
-            BlockPos at = entry.getValue();
-            level.getChunk(at);
-            if (freeze) level.setBlockAndUpdate(at.above(2), Blocks.AIR.defaultBlockState());
-            report(source, "miner " + (freeze ? "freeze" : "after restart") + " " + entry.getKey().getSerializedName() + " at " + at.toShortString() + ": "
-                + (level.getBlockEntity(at) instanceof MinerBlockEntity m
-                ? m.tier() + " fluid " + m.fluidAmount() + " mB, progress " + m.progress() + ", output " + m.output.get() + ", upper block " + BuiltInRegistries.BLOCK.getKey(level.getBlockState(at.above()).getBlock())
-                : "no miner (" + level.getBlockState(at) + ")"));
-        }
+        });
         return 1;
+    }
+
+    private static void clumpChecks(CommandSourceStack source, ServerLevel level, BuildingDef def, Node node, int[] tally) {
+        BlockPos core = core(level, node);
+        if (core == null) {
+            check(source, tally, false, "clump " + node + ": no node block (" + padReport(level, node) + ")");
+            return;
+        }
+        // the miner's middle bottom cell is the node: the anchor is the front edge, one block south of it
+        Placement p = new Placement(def, core.south(), Direction.NORTH, false);
+        int left = NodePlacer.clumpLeft(level, core);
+        Buildings.Check withClump = Buildings.check(level, p, null, null, true);
+        check(source, tally, left > 0 && !withClump.ok() && "siftec.build_gun.clump".equals(withClump.reason),
+            "clump " + NodeLook.of(node).id() + " at " + core.toShortString() + ": " + left + " clump blocks, the test miner is refused: " + withClump.message().getString());
+        int mined = mineClump(level, node, core);
+        Buildings.Check without = Buildings.check(level, p, null, null, true);
+        check(source, tally, NodePlacer.clumpLeft(level, core) == 0 && without.ok(), "clump mined by hand (" + mined + " blocks): the test miner fits: " + without.message().getString());
+        Buildings.Check placed = Buildings.place(level, p, null, null, true);
+        check(source, tally, placed.ok() && level.getBlockState(core).getBlock() instanceof NodeBlock,
+            "test miner placed over the node, which stays: " + id(level.getBlockState(core).getBlock()));
+        Buildings.Check second = Buildings.check(level, p, null, null, true);
+        check(source, tally, !second.ok(), "a second miner on the same node is refused: " + second.message().getString());
+        Placement off = new Placement(def, core.offset(0, 6, 12), Direction.NORTH, false);
+        for (BlockPos c : BlockPos.betweenClosed(core.offset(-2, 6, 9), core.offset(2, 8, 13))) level.setBlock(c, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        Buildings.Check offNode = Buildings.check(level, off, null, null, true);
+        check(source, tally, "siftec.build_gun.no_node".equals(offNode.reason), "the test miner off any node is refused: " + offNode.message().getString());
+        clumpSite = core;
+        report(source, "clump result: " + tally[0] + " passed, " + tally[1] + " failed");
     }
 
     // ---- the showroom and camera spots
 
+    /** Every node look, in table order. */
+    private static List<NodeLook> looks() {
+        return new ArrayList<>(NodeLook.all());
+    }
+
     private static BlockPos showCentre(int col, int row) {
         BlockPos o = origin();
-        return new BlockPos(o.getX() - 50 + col * 10, SHOW_Y, o.getZ() + SHOW_DZ + row * 10);
+        return new BlockPos(o.getX() - 110 + col * 10, SHOW_Y, o.getZ() + SHOW_DZ + row * 10);
+    }
+
+    /** A node of this look at this spot (stone nodes: the position decides the stone, so one is searched for nearby). */
+    private static Node showNode(NodeLook look, BlockPos c, Purity purity) {
+        if (look.type() != NodeType.STONE) return new Node(c.getX(), c.getZ(), look.type(), purity);
+        for (int i = 0; i < 4096; i++) {
+            Node n = new Node(c.getX(), c.getZ() + i * 100_000, NodeType.STONE, purity);
+            if (NodeLook.of(n).equals(look)) return n;
+        }
+        return new Node(c.getX(), c.getZ(), NodeType.STONE, purity);
     }
 
     private static int showroom(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
         NodeMap.settle(level);
-        String company = WorldTests.fastCompany(source);
-        NodeType[] types = NodeType.values();
-        for (int col = 0; col < types.length; col++) {
+        List<NodeLook> looks = looks();
+        for (int col = 0; col < looks.size(); col++) {
+            NodeLook look = looks.get(col);
             for (int row = 0; row < 4; row++) {
                 BlockPos c = showCentre(col, row);
-                if (row == 3 && col >= MinerTier.values().length) continue;
                 level.getChunk(c);
-                Purity purity = row < 3 ? Purity.values()[row] : Purity.PURE;
-                NodeType type = row < 3 ? types[col] : NodeType.IRON;
-                BlockState padState = ModBlocks.NODE_PADS.get(type).get().defaultBlockState();
+                Purity purity = row < 3 ? Purity.values()[row] : Purity.NORMAL;
+                BlockState patch = ModBlocks.PATCHES.get(look.patchName()).get().defaultBlockState();
                 for (int dx = -4; dx <= 4; dx++) for (int dz = -4; dz <= 4; dz++) {
-                    if (dx * dx + dz * dz <= NodePlacer.PAD_RADIUS * NodePlacer.PAD_RADIUS) {
-                        level.setBlockAndUpdate(c.offset(dx, 0, dz), padState);
-                    }
+                    if (dx * dx + dz * dz <= NodePlacer.PAD_RADIUS * NodePlacer.PAD_RADIUS) level.setBlockAndUpdate(c.offset(dx, 0, dz), patch);
                 }
-                level.setBlockAndUpdate(c.above(), NodePlacer.coreState(new Node(c.getX(), c.getZ(), type, purity)));
-                // the bottom row: the three miner marks, spinning, on pure iron
-                if (row == 3) build(level, c.above(2), MinerTier.values()[col], company);
+                Node node = showNode(look, c, purity);
+                BlockPos core = c.above();
+                if (row < 3) {
+                    level.setBlockAndUpdate(core, NodePlacer.coreState(node));
+                    // the impure row keeps its clump; the others show the node bare
+                    if (row == 0) NodePlacer.placeClump(level, node, core);
+                } else if (ModBlocks.DEPLETED.containsKey(look.id())) {
+                    // the bottom row: mined, as it is while it grows back (no tick scheduled, so it stays mined)
+                    level.setBlockAndUpdate(core, ModBlocks.DEPLETED.get(look.id()).get().defaultBlockState().setValue(NodeBlock.PURITY, purity));
+                } else {
+                    level.setBlockAndUpdate(core, NodePlacer.coreState(node));
+                }
             }
         }
-        report(source, "showroom: " + types.length + " node types x 3 purities and 3 miners at y " + SHOW_Y + " from " + showCentre(0, 0).toShortString());
+        report(source, "showroom: " + looks.size() + " node looks: impure with clump, normal, pure, and mined, at y " + SHOW_Y + " from " + showCentre(0, 0).toShortString());
         return 1;
     }
 
@@ -454,10 +614,9 @@ public final class NodeTests {
     private static int lookShowroom(CommandContext<CommandSourceStack> context, int dist) {
         int col = IntegerArgumentType.getInteger(context, "col"), row = IntegerArgumentType.getInteger(context, "row");
         BlockPos c = showCentre(col, row);
-        boolean miner = row == 3;
-        double distance = dist > 0 ? dist : miner ? 5.5 : 4.0;
-        look(context.getSource(), context.getSource().getServer().overworld(), c.getX() + 0.5, c.getY() + (miner ? 2.5 : 1.5), c.getZ() + 0.5,
-            IntegerArgumentType.getInteger(context, "angle"), distance, dist > 0 ? distance * 0.5 : miner ? 0.5 : 0.8);
+        double distance = dist > 0 ? dist : 4.5;
+        look(context.getSource(), context.getSource().getServer().overworld(), c.getX() + 0.5, c.getY() + 1.5, c.getZ() + 0.5,
+            IntegerArgumentType.getInteger(context, "angle"), distance, dist > 0 ? distance * 0.5 : 1.2);
         return 1;
     }
 
@@ -486,14 +645,13 @@ public final class NodeTests {
         return 1;
     }
 
-    private static int lookMiner(CommandContext<CommandSourceStack> context) {
-        BlockPos at = MINERS.get(Purity.values()[IntegerArgumentType.getInteger(context, "index")]);
-        if (at == null) {
-            report(context.getSource(), "look miner: none set up");
+    private static int lookClump(CommandContext<CommandSourceStack> context) {
+        if (clumpSite == null) {
+            report(context.getSource(), "look clump: the clump test has not run");
             return 0;
         }
-        look(context.getSource(), context.getSource().getServer().overworld(), at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5,
-            IntegerArgumentType.getInteger(context, "angle"), 6.0, 1.5);
+        look(context.getSource(), context.getSource().getServer().overworld(), clumpSite.getX() + 0.5, clumpSite.getY() + 0.5, clumpSite.getZ() + 0.5,
+            IntegerArgumentType.getInteger(context, "angle"), 6.0, 2.5);
         return 1;
     }
 }

@@ -198,13 +198,11 @@ def alternates():
     mix(alt("solid_steel_ingot", "Solid Steel Ingot", "1 Iron Ingot + 1 Coal makes 2 Steel Ingot (heated Mixer)"),
         items=["Iron Ingot", "Coal"], results=[("Steel Ingot", 2)], heated=True)
     compact(alt("cast_screw", "Cast Screw", "1 Iron Ingot makes 5 Screw (heated Press over a Basin)"), items=["Iron Ingot"], results=[("Screw", 5)], heated=True)
-    mix(alt("wet_concrete", "Wet Concrete", "2 Limestone + 250 mB water makes 2 Concrete (Mixer)"),
-        items=["Limestone", "Limestone"], fluids=[("water", 250)], results=[("Concrete", 2)])
     saw("Steel Beam", FR, 4, alt("steel_rod", "Steel Rod", "1 Steel Beam makes 4 Iron Rod (Mechanical Saw)"))
     saw(SP, "Screw", 8, alt("steel_screw", "Steel Screw", "1 Steel Pipe makes 8 Screw (Mechanical Saw)"))
     deploy(SP, FR, "Rotor", 2, alt("steel_rotor", "Steel Rotor", "Steel Pipe + Iron Rod makes 2 Rotor (Deployer)"))
     deploy(R, SP, MF, 2, alt("steeled_frame", "Steeled Frame", "Reinforced Iron Plate + Steel Pipe makes 2 Modular Frame (Deployer)"))
-    deploy(SP, "Concrete", "Encased Industrial Beam", 1, alt("encased_industrial_pipe", "Encased Industrial Pipe", "Steel Pipe + Concrete makes 1 Encased Industrial Beam (Deployer)"))
+    deploy(SP, "Stone", "Encased Industrial Beam", 1, alt("encased_industrial_pipe", "Encased Industrial Pipe", "Steel Pipe + any stone makes 1 Encased Industrial Beam (Deployer)"))
     wash("create:crushed_raw_iron", "Iron Ingot", 2, alt("pure_iron_ingot", "Pure Iron Ingot", "1 crushed raw iron makes 2 Iron Ingot (Fan washing)"))
     wash("create:crushed_raw_copper", "Copper Ingot", 2, alt("pure_copper_ingot", "Pure Copper Ingot", "1 crushed raw copper makes 2 Copper Ingot (Fan washing)"))
     smelt("Solid Biofuel", "Coal", alt("biocoal", "Biocoal", "1 Solid Biofuel makes 1 Coal (Fan smelting or a furnace)"))
@@ -226,8 +224,8 @@ def alternates():
             alt("plastic_smart_plating", "Plastic Smart Plating", "1 Reinforced Iron Plate, 1 Rotor, 2 Plastic makes 2 Smart Plating (Mechanical Crafter)"))
     crafter("Versatile Framework", [(1, MF), (3, "Steel Beam"), (2, "Rubber")], 2,
             alt("flexible_framework", "Flexible Framework", "1 Modular Frame, 3 Steel Beam, 2 Rubber makes 2 Versatile Framework (Mechanical Crafter)"))
-    crafter("Heavy Modular Frame", [(3, MF), (2, "Encased Industrial Beam"), (2, SP), (2, "Concrete")], 2,
-            alt("heavy_encased_frame", "Heavy Encased Frame", "3 Modular Frame, 2 Encased Industrial Beam, 2 Steel Pipe, 2 Concrete makes 2 Heavy Modular Frame (Mechanical Crafter)"))
+    crafter("Heavy Modular Frame", [(3, MF), (2, "Encased Industrial Beam"), (2, SP), (2, "Stone")], 2,
+            alt("heavy_encased_frame", "Heavy Encased Frame", "3 Modular Frame, 2 Encased Industrial Beam, 2 Steel Pipe, 2 stone makes 2 Heavy Modular Frame (Mechanical Crafter)"))
     # needing a MAM tree
     mix(alt("fused_quickwire", "Fused Quickwire", "1 Brass Ingot + 2 Copper Ingot makes 12 Quickwire (Mixer)"),
         items=["Brass Ingot", "Copper Ingot", "Copper Ingot"], results=[("Quickwire", 12)])
@@ -238,8 +236,6 @@ def alternates():
             alt("caterium_computer", "Caterium Computer", "2 Circuit Board, 5 Quickwire, 2 Rubber makes 1 Computer (Mechanical Crafter)"))
     crafter("Automated Wiring", [(2, "Stator"), (4, "Wire"), (1, "High-Speed Connector")], 4,
             alt("automated_speed_wiring", "Automated Speed Wiring", "2 Stator, 4 Wire, 1 High-Speed Connector makes 4 Automated Wiring (Mechanical Crafter)"))
-    compact(alt("fine_concrete", "Fine Concrete", "1 Silica + 2 Limestone makes 2 Concrete (Press over a Basin)"),
-            items=["Silica", "Limestone", "Limestone"], results=[("Concrete", 2)])
     deploy("Copper Sheet", "Silica", "Circuit Board", 2, alt("silicon_circuit_board", "Silicon Circuit Board", "Copper Sheet + Silica makes 2 Circuit Board (Deployer)"))
     deploy("Circuit Board", "Crystal Oscillator", "Computer", 2, alt("crystal_computer", "Crystal Computer", "Circuit Board + Crystal Oscillator makes 2 Computer (Deployer)"))
     crafter("Motor", [(2, "Rotor"), (2, "Stator"), (1, "Crystal Oscillator")], 3,
@@ -341,7 +337,6 @@ def build():
     saw("Iron Ingot", "Iron Rod")
     saw("Copper Ingot", "Wire", 2)
     compact("cable", items=["Wire", "Wire"], results=["Cable"])
-    compact("concrete", items=["Limestone"] * 3, results=["Concrete"])
     saw("Iron Rod", "Screw", 4)
     deploy("Iron Sheet", "Screw", "Reinforced Iron Plate")
     mill("#minecraft:leaves", "Biomass", name="biomass_from_leaves", chance=0.5)
@@ -362,7 +357,6 @@ def build():
     shaped("Copper Sheet", ["II"], {"I": "Copper Ingot"}, 1, name="copper_sheet_by_hand")  # by hand: half the Press
     shaped("Wire", ["I", "I"], {"I": "Copper Ingot"}, 2, name="wire_by_hand")  # by hand: half the Saw
     hand("Cable", [(2, "Wire")], name="cable_by_hand")
-    hand("Concrete", [(3, "Limestone")], name="concrete_by_hand")
     hand("Screw", [(1, "Iron Rod")], 2, name="screw_by_hand")  # by hand: half the Saw
     hand("Reinforced Iron Plate", [(1, "Iron Sheet"), (1, "Screw")], name="reinforced_iron_plate_by_hand")
     hand("Rotor", [(1, "Iron Rod"), (1, "Screw")], name="rotor_by_hand")
@@ -387,7 +381,7 @@ def build():
     shaped("create:crushing_wheel", ["ASA", "SRS", "ASA"], {"A": "create:andesite_alloy", "S": "Steel Beam", "R": "Rotor"}, 2, name="crushing_wheel")
     saw("Steel Ingot", "Steel Pipe")
     deploy("Modular Frame", "Steel Beam", "Versatile Framework")
-    deploy("Steel Beam", "Concrete", "Encased Industrial Beam")
+    deploy("Steel Beam", "Stone", "Encased Industrial Beam")
     deploy("Steel Pipe", "Wire", "Stator")
     deploy("Rotor", "Stator", "Motor")
     deploy("Stator", "Cable", "Automated Wiring")
@@ -456,7 +450,7 @@ def build():
     sequence("Crystal Oscillator", "Superposition Oscillator", ["Dark Matter Crystal", "Alclad Aluminum Sheet", "Excited Photonic Matter"], 2)
     sequence("Supercomputer", "Neural-Quantum Processor", ["Time Crystal", "Ficsite Trigon", "Excited Photonic Matter"], 3)
     sequence("Magnetic Field Generator", "AI Expansion Server", ["Neural-Quantum Processor", "Superposition Oscillator", "Excited Photonic Matter", "press"], 1)
-    crafter("Singularity Cell", [(1, "Nuclear Pasta"), (2, "Dark Matter Crystal"), (3, "Iron Sheet"), (3, "Concrete")])
+    crafter("Singularity Cell", [(1, "Nuclear Pasta"), (2, "Dark Matter Crystal"), (3, "Iron Sheet"), (3, "Stone")])
     crafter("Ballistic Warp Drive", [(1, "Thermal Propulsion Rocket"), (3, "Singularity Cell"), (2, "Superposition Oscillator"), (3, "Dark Matter Crystal")])
 
     # ---- MAM parts ----------------------------------------------------------------------------
@@ -504,7 +498,7 @@ def build():
     compact("compacted_coal", items=["Coal", "Sulfur"], results=["Compacted Coal"])
     mix("turbofuel", items=["Compacted Coal"], fluids=[("diesel", 250)], fluid_results=[("turbofuel", 250)], heated=True)
     # the sulfuric acid loop: neutralise it, or use it and deal with the residue
-    for stone in ("Limestone", "minecraft:calcite"):
+    for stone in ("minecraft:calcite",):
         mix("gypsum_from_" + slug(stone), items=[stone], fluids=[("sulfuric acid", 250)], results=["siftec:gypsum"], fluid_results=[("water", 250)])
     for ore, ingot in (("iron", "minecraft:iron_ingot"), ("copper", "minecraft:copper_ingot"), ("zinc", "create:zinc_ingot")):
         mix("acid_leached_" + ore, items=["create:crushed_raw_" + ore], fluids=[("sulfuric acid", 250)],
@@ -538,36 +532,34 @@ W = "siftec:"
 # with it makes only the bundle): (bundle, part, how many). The Wire Spool takes Cable, as Wire alone would be pressed
 # into Cable; a spool is 10 Wire's worth. Biomass has no bundle (two Biomass press into Solid Biofuel).
 BUNDLES = [
-    (W + "screw_bundle", "Screw", 25), (W + "wire_spool", "Cable", 5), (W + "precast_concrete", "Concrete", 10),
+    (W + "screw_bundle", "Screw", 25), (W + "wire_spool", "Cable", 5),
     (W + "quickwire_coil", "Quickwire", 5), (W + "silica_bundle", "Silica", 5),
 ]
 # sequenced assembly: (what it makes, base item, the steps of one loop, loops). At most four steps and ten loops: the
 # many small parts come in bundles.
-SB, WS, IB, PC = W + "screw_bundle", W + "wire_spool", W + "iron_bundle", W + "precast_concrete"
+SB, WS, IB = W + "screw_bundle", W + "wire_spool", W + "iron_bundle"
 RIP, MF, HMF = "Reinforced Iron Plate", "Modular Frame", "Heavy Modular Frame"
 ASSEMBLY_LINES = [
     (W + "furnace_engine", IB, [WS, IB, "Cable"], 2),
     (W + "mam", "Cable", [RIP, WS, "Cable"], 6),
     (W + "object_scanner", RIP, [RIP, WS, SB], 2),
-    # the Wormhole Gateway: 9 coils of wire and 10 frames of concrete, sheet and rod, put together on a third line
+    # the Wormhole Gateway: 9 coils of wire and 10 frames of stone, sheet and rod, put together on a third line
     (W + "gateway_coil", WS, [WS, WS], 8),
-    (W + "gateway_frame", "Iron Rod", [PC, IB, "Iron Rod", "Iron Rod"], 5),
+    (W + "gateway_frame", "Iron Rod", ["Stone", IB, "Iron Rod", "Iron Rod"], 5),
     (W + "wormhole_gateway", W + "gateway_frame", [W + "gateway_coil", W + "gateway_frame"], 9),
     (W + "landing_cushion", "Rotor", ["Biomass"] * 4, 5),
     (W + "landing_pad", WS, [W + "landing_cushion", "Rotor", W + "landing_cushion", WS], 5),
-    (W + "awesome_sink", WS, [RIP, RIP, WS, PC], 5),
+    (W + "awesome_sink", WS, [RIP, RIP, WS, "Stone"], 5),
     (W + "awesome_shop", WS, ["Iron Sheet", WS, SB, SB], 4),
-    (W + "blueprint_designer", MF, [PC, WS, PC], 5),
+    (W + "blueprint_designer", MF, ["Stone", WS, "Stone"], 5),
     (W + "power_storage", WS, [MF, MF, "Stator", "Cable"], 5),
     (W + "speed_governor", W + "quickwire_coil", ["Rotor", RIP, W + "quickwire_coil", W + "quickwire_coil"], 2),
     (W + "blade_runners", W + "silica_bundle", [MF, "Rotor", W + "silica_bundle"], 3),
     (W + "dimensional_depot", "Mercer Sphere", [MF, WS], 4),
-    (W + "miner_mk2", W + "portable_miner", ["Encased Industrial Beam", "Steel Pipe", "Steel Pipe", MF], 10),
     (W + "jetpack_thruster", "Motor", ["Plastic", "Rubber"], 10),
     (W + "jetpack", W + "jetpack_thruster", ["Circuit Board", W + "jetpack_thruster"], 4),
     (W + "radar_tower", HMF, ["Crystal Oscillator", WS, HMF], 10),
-    (W + "drill_shaft", "Fused Modular Frame", ["Steel Pipe"], 5),
-    (W + "designer_frame", "Fused Modular Frame", ["Concrete"], 10),
+    (W + "designer_frame", "Fused Modular Frame", ["Stone"], 10),
 ]
 # Mechanical Crafter, beyond the builds of 25 parts or fewer: (what it makes, [(count, part)])
 CRAFTED = [
@@ -593,7 +585,6 @@ CRAFTED = [
     (W + "geyser_engine", [(10, W + "geyser_core")]),
     (W + "extractor_pump", [(2, "Aluminum Casing"), (2, "Encased Industrial Beam"), (1, "Motor"), (5, "Rubber")]),
     (W + "resource_well_extractor", [(10, W + "extractor_pump")]),
-    (W + "miner_mk3", [(10, W + "drill_shaft"), (3, W + "portable_miner"), (5, "Supercomputer"), (3, "Turbo Motor")]),
     (W + "blueprint_designer_mk3", [(10, W + "designer_frame"), (5, "Neural-Quantum Processor")]),
 ]
 
@@ -670,17 +661,16 @@ REMOVED += ["travelersbackpack:" + n for n in """
 WORKSHOP = [
     ("siftec:portable_miner", "1 Mechanical Drill, 2 Iron Sheet, 4 Iron Rod"),
     ("siftec:node_scanner", "2 Iron Sheet, 4 Wire"),
-    ("siftec:miner_mk1", "1 siftec:portable_miner, 10 Iron Sheet, 10 Concrete"),
-    ("siftec:wormhole_gateway", "500 Concrete, 250 Iron Sheet, 400 Iron Rod, 1500 Wire"),
+    ("siftec:wormhole_gateway", "500 Stone, 250 Iron Sheet, 400 Iron Rod, 1500 Wire"),
     ("siftec:hub", "10 Iron Sheet, 10 Iron Rod"),
-    ("siftec:claim_marker", "5 Iron Rod, 5 Concrete"),
+    ("siftec:claim_marker", "5 Iron Rod, 5 Stone"),
     ("siftec:mam", "5 Reinforced Iron Plate, 15 Cable, 45 Wire"),
     ("siftec:object_scanner", "4 Reinforced Iron Plate, 20 Wire, 50 Screw"),
     ("siftec:power_line", "1 Cable"),
     ("siftec:hub_engine", "5 Iron Sheet, 5 Iron Rod"),
-    ("siftec:power_pole", "1 Wire, 1 Iron Rod, 1 Concrete"),
+    ("siftec:power_pole", "1 Wire, 1 Iron Rod, 1 Stone"),
     ("siftec:furnace_engine", "15 Iron Sheet, 15 Iron Rod, 25 Wire"),
-    ("siftec:power_tower", "5 Steel Beam, 10 Concrete, 10 Wire"),
+    ("siftec:power_tower", "5 Steel Beam, 10 Stone, 10 Wire"),
     ("siftec:power_storage", "20 Wire, 10 Modular Frame, 5 Stator"),
     ("siftec:speed_governor", "25 Quickwire, 2 Rotor, 2 Reinforced Iron Plate"),
     ("siftec:landing_pad", "20 Rotor, 30 Cable, 200 Biomass"),
@@ -691,19 +681,17 @@ WORKSHOP = [
     ("siftec:parachute", "10 Fabric, 5 Cable"),
     ("siftec:gas_mask", "50 Rubber, 100 Plastic, 50 Fabric"),
     ("siftec:radar_tower", "10 Heavy Modular Frame, 10 Crystal Oscillator, 50 Cable"),
-    ("siftec:blueprint_designer", "4 Modular Frame, 25 Cable, 100 Concrete"),
-    ("siftec:blueprint_designer_mk3", "10 Fused Modular Frame, 5 Neural-Quantum Processor, 100 Concrete"),
+    ("siftec:blueprint_designer", "4 Modular Frame, 25 Cable, 100 Stone"),
+    ("siftec:blueprint_designer_mk3", "10 Fused Modular Frame, 5 Neural-Quantum Processor, 100 Stone"),
     ("siftec:drone_port", "20 Heavy Modular Frame, 10 High-Speed Connector, 50 Alclad Aluminum Sheet, 50 Aluminum Casing, 10 Radio Control Unit"),
     ("siftec:cardboard_drone", "8 Cardboard, 4 Motor, 10 Alclad Aluminum Sheet, 1 Radio Control Unit, 2 AI Limiter"),
     ("siftec:main_portal", "25 Turbo Motor, 25 Radio Control Unit, 15 Superposition Oscillator, 20 SAM Fluctuator, 200 Ficsite Trigon"),
     ("siftec:satellite_portal", "5 Turbo Motor, 10 Radio Control Unit, 5 Superposition Oscillator, 10 SAM Fluctuator, 50 Ficsite Trigon"),
     ("siftec:dimensional_depot", "1 Mercer Sphere, 5 Modular Frame, 20 Cable"),
     ("siftec:geyser_engine", "20 Heavy Modular Frame, 10 Supercomputer, 50 Steel Pipe, 20 Rubber"),
-    ("siftec:awesome_sink", "15 Reinforced Iron Plate, 30 Cable, 45 Concrete"),
+    ("siftec:awesome_sink", "15 Reinforced Iron Plate, 30 Cable, 45 Stone"),
     ("siftec:awesome_shop", "200 Screw, 5 Iron Sheet, 30 Cable"),
     ("siftec:particle_accelerator", "25 Radio Control Unit, 100 Electromagnetic Control Rod, 10 Supercomputer, 50 Cooling System, 20 Fused Modular Frame, 10 Turbo Motor"),
     ("siftec:converter", "10 Fused Modular Frame, 10 Cooling System, 25 Radio Control Unit, 50 SAM Fluctuator"),
-    ("siftec:miner_mk2", "2 siftec:portable_miner, 10 Encased Industrial Beam, 20 Steel Pipe, 10 Modular Frame"),
-    ("siftec:miner_mk3", "3 siftec:portable_miner, 50 Steel Pipe, 5 Supercomputer, 10 Fused Modular Frame, 3 Turbo Motor"),
     ("siftec:resource_well_extractor", "20 Aluminum Casing, 20 Encased Industrial Beam, 10 Motor, 50 Rubber"),
 ]

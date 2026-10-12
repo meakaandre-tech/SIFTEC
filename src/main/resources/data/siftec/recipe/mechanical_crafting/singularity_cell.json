@@ -4,7 +4,7 @@
     "A": "siftec:nuclear_pasta",
     "B": "siftec:dark_matter_crystal",
     "C": "create:iron_sheet",
-    "D": "minecraft:light_gray_concrete"
+    "D": "#siftec:stones"
   },
   "pattern": [
     "ABB",

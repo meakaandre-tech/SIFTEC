@@ -1,22 +1,13 @@
 {
   "variants": {
-    "core=false,purity=impure": {
+    "purity=impure": {
       "model": "siftec:block/coal_node"
     },
-    "core=false,purity=normal": {
+    "purity=normal": {
       "model": "siftec:block/coal_node"
     },
-    "core=false,purity=pure": {
+    "purity=pure": {
       "model": "siftec:block/coal_node"
-    },
-    "core=true,purity=impure": {
-      "model": "siftec:block/coal_node_mound_impure"
-    },
-    "core=true,purity=normal": {
-      "model": "siftec:block/coal_node_mound_normal"
-    },
-    "core=true,purity=pure": {
-      "model": "siftec:block/coal_node_mound_pure"
     }
   }
 }

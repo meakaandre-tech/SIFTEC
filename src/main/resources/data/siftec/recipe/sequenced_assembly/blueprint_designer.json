@@ -12,7 +12,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:precast_concrete",
+      "ingredient": "#siftec:stones",
       "results": [
         "$result"
       ]
@@ -28,7 +28,7 @@
     {
       "type": "create:deploying",
       "target": "$ingredient",
-      "ingredient": "siftec:precast_concrete",
+      "ingredient": "#siftec:stones",
       "results": [
         "$result"
       ]

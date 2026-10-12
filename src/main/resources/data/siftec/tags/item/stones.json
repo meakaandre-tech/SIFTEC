@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:stone",
+    "minecraft:cobblestone",
+    "minecraft:cobbled_deepslate",
+    "minecraft:deepslate",
+    "minecraft:blackstone",
+    "minecraft:basalt",
+    "minecraft:granite",
+    "minecraft:diorite",
+    "minecraft:andesite",
+    "minecraft:tuff",
+    "minecraft:calcite",
+    "minecraft:dripstone_block",
+    "create:asurine",
+    "create:crimsite",
+    "create:ochrum",
+    "create:veridium",
+    "create:scoria",
+    "create:scorchia"
+  ]
+}

@@ -10,7 +10,8 @@ siftec worldtest place iron
 siftec worldtest place sulfur
 execute in minecraft:the_nether run siftec worldtest place quartz
 siftec worldtest pads 12
-siftec worldtest miners setup
+siftec worldtest regrow
+siftec worldtest clump
 siftec worldtest showroom
 locate biome minecraft:sulfur_caves
 siftec worldtest geysers 0 0 500

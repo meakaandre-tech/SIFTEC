@@ -37,6 +37,7 @@ public class Siftec implements ModInitializer {
         ModFluids.register();
         ModTab.register();
         NodePlacer.register();
+        com.meakaandre.siftec.node.NodeRegrowth.register();
         SiftecCommands.register();
         PayloadTypeRegistry.clientboundPlay().register(StatePayload.TYPE, StatePayload.STREAM_CODEC);
         ServerLifecycleEvents.SERVER_STARTED.register(SpeedCap::recompute);

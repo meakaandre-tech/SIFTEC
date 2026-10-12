@@ -2,7 +2,6 @@ package com.meakaandre.siftec.registry;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlockEntity;
-import com.meakaandre.siftec.block.MinerBlockEntity;
 import com.meakaandre.siftec.depot.DepotBlockEntity;
 import com.meakaandre.siftec.geyser.GeyserEngineBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
@@ -41,8 +40,6 @@ public class ModBlockEntities {
     }
 
     public static final Entry<PortableMinerBlockEntity> PORTABLE_MINER = register("portable_miner", PortableMinerBlockEntity::new, ModBlocks.PORTABLE_MINER.get());
-    public static final Entry<MinerBlockEntity> MINER = register("miner", MinerBlockEntity::new, ModBlocks.MINER_MK1.get(), ModBlocks.MINER_MK2.get(), ModBlocks.MINER_MK3.get());
-    public static final Entry<com.zurrtum.create.content.kinetics.base.KineticBlockEntity> MINER_TOP = register("miner_top", com.zurrtum.create.content.kinetics.base.KineticBlockEntity::new, ModBlocks.MINER_TOP.get());
     public static final Entry<ExtractorBlockEntity> EXTRACTOR = register("resource_well_extractor", ExtractorBlockEntity::new, ModBlocks.RESOURCE_WELL_EXTRACTOR.get());
 
     public static final Entry<HubBlockEntity> HUB = register("hub", HubBlockEntity::new, ModBlocks.HUB.get(), ModBlocks.WORMHOLE_GATEWAY.get());
@@ -76,7 +73,6 @@ public class ModBlockEntities {
 
     public static void register() {
         // belts, funnels, chutes and hoppers can take a powered miner's output
-        ItemStorage.SIDED.registerForBlockEntity((miner, side) -> ContainerStorage.of(miner.output, side), MINER.get());
         // parts pushed into a HUB or Gateway go toward the company's active milestone
         ItemStorage.SIDED.registerForBlockEntity((hub, side) -> hub.intake, HUB.get());
         ItemStorage.SIDED.registerForBlockEntity((engine, side) -> ContainerStorage.of(engine.fuel, side), ENGINE.get());

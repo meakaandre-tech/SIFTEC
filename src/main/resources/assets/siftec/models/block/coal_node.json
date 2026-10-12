@@ -1,8 +1,6 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube_all",
   "textures": {
-    "top": "siftec:block/coal_node_top",
-    "side": "siftec:block/coal_node_side",
-    "bottom": "siftec:block/node_rock_side"
+    "all": "minecraft:block/coal_ore"
   }
 }

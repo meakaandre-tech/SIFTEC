@@ -3,7 +3,7 @@
   "key": {
     "A": "siftec:wire",
     "B": "siftec:iron_rod",
-    "C": "minecraft:light_gray_concrete"
+    "C": "#siftec:stones"
   },
   "pattern": [
     "AB",

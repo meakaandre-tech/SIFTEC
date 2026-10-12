@@ -2,7 +2,7 @@
   "type": "create:mechanical_crafting",
   "key": {
     "A": "siftec:iron_rod",
-    "B": "minecraft:light_gray_concrete"
+    "B": "#siftec:stones"
   },
   "pattern": [
     "AAAA",
