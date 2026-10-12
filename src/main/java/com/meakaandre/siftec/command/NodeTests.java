@@ -379,6 +379,16 @@ public final class NodeTests {
         for (Node node : mineable(level)) picked.putIfAbsent(node.purity(), node);
         int[] tally = new int[2];
         check(source, tally, picked.size() == Purity.values().length, "a node of each purity to mine: " + picked);
+        // the control: an ordinary coal ore block in the sky over spawn, mined the same way. Whether a fake player gets
+        // drops at all depends on the mods installed (in the smoke test it gets none), so the node is held to the same
+        boolean[] control = {false};
+        BlockPos ore = origin().atY(300);
+        level.getChunk(ore);
+        level.setBlock(ore, Blocks.COAL_ORE.defaultBlockState(), Block.UPDATE_ALL);
+        boolean minedOre = miner(level, ore).gameMode.destroyBlock(ore);
+        Map<String, Integer> oreDrops = clearDrops(level, ore);
+        control[0] = oreDrops.getOrDefault("minecraft:coal", 0) > 0;
+        report(source, "regrow control: vanilla coal ore mined by the same fake player: removed " + minedOre + ", dropped " + oreDrops);
         int[] left = {picked.size()};
         for (Map.Entry<Purity, Node> entry : picked.entrySet()) {
             Node node = entry.getValue();
@@ -401,18 +411,14 @@ public final class NodeTests {
             Map<String, Integer> drops = clearDrops(level, core);
             why += ", into the player's inventory " + (hand.getInventory().countItem(look.output()) - held)
                 + ", items within 16 " + level.getEntitiesOfClass(ItemEntity.class, new AABB(core).inflate(16)).size();
-            if (entry.getKey() == Purity.IMPURE) {
-                // the control: an ordinary coal ore block, mined the same way on the same spot once the node has grown back
-                BlockPos above = core.above(3);
-                level.setBlock(above, Blocks.COAL_ORE.defaultBlockState(), Block.UPDATE_ALL);
-                FakePlayer control = miner(level, above);
-                boolean minedOre = control.gameMode.destroyBlock(above);
-                report(source, "control: vanilla coal ore mined the same way: removed " + minedOre + ", dropped " + clearDrops(level, above)
-                    + ", into the player's inventory " + control.getInventory().countItem(Items.COAL));
-            }
             String want = BuiltInRegistries.ITEM.getKey(look.output()).toString();
-            check(source, tally, mined && drops.getOrDefault(want, 0) == 1, "regrow " + look.id() + " " + node.purity().getSerializedName() + ": cleared "
-                + cleared + " clump blocks, mined " + id(before.getBlock()) + " by hand, dropped " + drops + " (expected 1 " + want + "; " + why + ")");
+            List<ItemStack> loot = Block.getDrops(before, level, core, null, hand, hand.getMainHandItem());
+            boolean lootOk = loot.size() == 1 && loot.getFirst().is(look.output()) && loot.getFirst().getCount() == 1;
+            // what the player gets is the loot, where the game hands a fake player any drops at all (see the control)
+            boolean dropsOk = drops.getOrDefault(want, 0) == 1 || !control[0] && drops.isEmpty();
+            check(source, tally, mined && lootOk && dropsOk, "regrow " + look.id() + " " + node.purity().getSerializedName() + ": cleared "
+                + cleared + " clump blocks, mined " + id(before.getBlock()) + " by hand, its loot for a pickaxe is " + loot + " (expected 1 " + want + "), dropped " + drops
+                + (control[0] ? "" : " (as for the vanilla ore of the control)") + "; " + why);
             long start = level.getGameTime();
             int expected = NodeRegrowth.ticks(node.purity());
             MONITORS.add(new Monitor() {
