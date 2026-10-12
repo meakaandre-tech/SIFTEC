@@ -1,9 +1,9 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "create:block/palettes/stone_types/veridium",
-    "side": "create:block/palettes/stone_types/veridium",
-    "top": "create:block/palettes/stone_types/veridium"
+    "particle": "create:block/palettes/stone_types/natural/veridium_0",
+    "side": "create:block/palettes/stone_types/natural/veridium_0",
+    "top": "create:block/palettes/stone_types/natural/veridium_0"
   },
   "elements": [
     {

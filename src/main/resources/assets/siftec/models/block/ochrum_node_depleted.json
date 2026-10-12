@@ -1,9 +1,9 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "create:block/palettes/stone_types/ochrum",
-    "side": "create:block/palettes/stone_types/ochrum",
-    "top": "create:block/palettes/stone_types/ochrum"
+    "particle": "create:block/palettes/stone_types/natural/ochrum_0",
+    "side": "create:block/palettes/stone_types/natural/ochrum_0",
+    "top": "create:block/palettes/stone_types/natural/ochrum_0"
   },
   "elements": [
     {
