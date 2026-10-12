@@ -310,7 +310,9 @@ public final class NodeTests {
         check(source, tally, padAfter == padBefore && after.getBlock() instanceof NodeBlock,
             "two power-6 explosions: patch blocks " + padBefore + " -> " + padAfter + ", node " + id(after.getBlock()) + " (the clump may go: " + NodePlacer.clumpLeft(level, core) + " blocks left)");
         // broken the way a Create drill breaks a block (no player): it is mined, and comes back
+        clearDrops(level, core);
         level.destroyBlock(core, true);
+        Map<String, Integer> drillDrops = clearDrops(level, core);
         long start = level.getGameTime();
         MONITORS.add(new Monitor() {
             boolean depleted;
@@ -322,8 +324,7 @@ public final class NodeTests {
                 long t = level.getGameTime() - start;
                 if (now.getBlock() instanceof NodeBlock || t > 200) {
                     check(source, tally, depleted && now.getBlock() instanceof NodeBlock, "node broken without a player (as a drill does): mined " + depleted
-                        + ", grew back after " + t + " ticks, now " + id(now.getBlock()));
-                    clearDrops(level, core);
+                        + ", dropped " + drillDrops + ", grew back after " + t + " ticks, now " + id(now.getBlock()));
                     release(level, node);
                     report(source, "break result: " + tally[0] + " passed, " + tally[1] + " failed");
                     return true;
@@ -389,11 +390,15 @@ public final class NodeTests {
             int cleared = mineClump(level, node, core);
             NodeLook look = NodeLook.of(node);
             BlockState before = level.getBlockState(core);
-            boolean mined = miner(level, core).gameMode.destroyBlock(core);
+            FakePlayer hand = miner(level, core);
+            // what the loot table gives for this player and tool, and whether the game counts the tool as right for it
+            String why = "mode " + hand.gameMode.getGameModeForPlayer() + ", right tool " + hand.hasCorrectToolForDrops(before) + ", loot "
+                + Block.getDrops(before, level, core, null, hand, hand.getMainHandItem());
+            boolean mined = hand.gameMode.destroyBlock(core);
             Map<String, Integer> drops = clearDrops(level, core);
             String want = BuiltInRegistries.ITEM.getKey(look.output()).toString();
             check(source, tally, mined && drops.getOrDefault(want, 0) == 1, "regrow " + look.id() + " " + node.purity().getSerializedName() + ": cleared "
-                + cleared + " clump blocks, mined " + id(before.getBlock()) + " by hand, dropped " + drops + " (expected 1 " + want + ")");
+                + cleared + " clump blocks, mined " + id(before.getBlock()) + " by hand, dropped " + drops + " (expected 1 " + want + "; " + why + ")");
             long start = level.getGameTime();
             int expected = NodeRegrowth.ticks(node.purity());
             MONITORS.add(new Monitor() {

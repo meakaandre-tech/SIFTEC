@@ -114,6 +114,7 @@ public final class NodeMap {
     }
 
     private static void clearCaches() {
+        starters = null;
         CACHE.clear();
         SULFUR.clear();
         LAND.clear();
@@ -365,39 +366,12 @@ public final class NodeMap {
         h = mix(h);
         long spotHash = mix(h ^ 0x6C0A57L);
 
-        // the three cells next to spawn always hold a normal iron, copper and stone node, on dry land within STARTER blocks
-        int spawnCellX = Math.floorDiv(originX, CELL), spawnCellZ = Math.floorDiv(originZ, CELL);
-        NodeType forced = null;
-        if (cellX == spawnCellX + 1 && cellZ == spawnCellZ) forced = NodeType.IRON;
-        else if (cellX == spawnCellX && cellZ == spawnCellZ + 1) forced = NodeType.COPPER;
-        else if (cellX == spawnCellX - 1 && cellZ == spawnCellZ) forced = NodeType.STONE;
-        if (forced != null) {
-            // spots in the cell near enough to spawn, tried until one is dry land; the cell's nearest point to spawn is
-            // never more than about 190 blocks away, so there always are some
-            Terrain.Column column = null;
-            for (int attempt = 0; attempt < 48 && (column == null || column.water()); attempt++) {
-                x = baseX + (int) Long.remainderUnsigned(h, span);
-                h = mix(h);
-                z = baseZ + (int) Long.remainderUnsigned(h, span);
-                h = mix(h);
-                column = Math.hypot(x - originX, z - originZ) <= STARTER ? Terrain.column(level, x, z) : null;
-            }
-            if (column == null || column.water()) {
-                // the cell's nearest point to spawn, then any land in the cell
-                x = Math.clamp(originX, baseX, baseX + span);
-                z = Math.clamp(originZ, baseZ, baseZ + span);
-                column = Terrain.column(level, x, z);
-            }
-            if (column == null || column.water()) {
-                Spot spot = landSpot(level, baseX, baseZ, span, landMask(level, cellX, cellZ, CELL, MARGIN), spotHash);
-                if (spot == null) return List.of();
-                x = spot.x();
-                z = spot.z();
-                column = spot.column();
-            }
-            Node node = new Node(x, z, forced, Purity.NORMAL);
-            GROUND.put(node.key(), column.y());
-            PAD.put(node.key(), padHeight(level, x, z));
+        // the starter iron, copper and stone nodes: normal, on dry land within STARTER blocks of spawn (see starters)
+        Starter starter = starters(level, from).get(cellKey(cellX, cellZ));
+        if (starter != null) {
+            Node node = new Node(starter.spot().x(), starter.spot().z(), starter.type(), Purity.NORMAL);
+            GROUND.put(node.key(), starter.spot().column().y());
+            PAD.put(node.key(), padHeight(level, node.x(), node.z()));
             return List.of(node);
         }
 
@@ -448,6 +422,58 @@ public final class NodeMap {
         GROUND.put(node.key(), column.y());
         PAD.put(node.key(), padHeight(level, x, z));
         return List.of(node);
+    }
+
+    // ---- the starter nodes
+
+    private record Starter(NodeType type, Spot spot) {
+    }
+
+    /** Which cells round spawn hold the starter nodes (by cell key), worked out once per world. */
+    private static volatile @Nullable Map<Long, Starter> starters;
+    /** The cells round spawn the starters may take, in order: the four beside it, the four corners, then its own. */
+    private static final int[][] STARTER_CELLS = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, 1}, {1, -1}, {-1, -1}, {0, 0}};
+
+    /**
+     * Spawn always has a normal iron, copper and stone node within STARTER blocks. Each takes the next cell round
+     * spawn that has a dry spot that near, so a sea or a river beside spawn only moves them on to another cell.
+     */
+    private static Map<Long, Starter> starters(ServerLevel level, int[] from) {
+        Map<Long, Starter> known = starters;
+        if (known != null) return known;
+        synchronized (NodeMap.class) {
+            if (starters != null) return starters;
+            Map<Long, Starter> out = new java.util.HashMap<>();
+            NodeType[] types = {NodeType.IRON, NodeType.COPPER, NodeType.STONE};
+            int scx = Math.floorDiv(from[0], CELL), scz = Math.floorDiv(from[1], CELL);
+            for (int[] d : STARTER_CELLS) {
+                if (out.size() == types.length) break;
+                Spot spot = starterSpot(level, scx + d[0], scz + d[1], from);
+                if (spot != null) out.put(cellKey(scx + d[0], scz + d[1]), new Starter(types[out.size()], spot));
+            }
+            starters = out;
+            return out;
+        }
+    }
+
+    /** A dry spot in the cell within STARTER blocks of spawn, or null: random spots first, then the cell's nearest point. */
+    private static @Nullable Spot starterSpot(ServerLevel level, int cellX, int cellZ, int[] from) {
+        int span = CELL - 2 * MARGIN;
+        int baseX = cellX * CELL + MARGIN, baseZ = cellZ * CELL + MARGIN;
+        long h = mix(level.getSeed() ^ mix(cellX * 0x9E3779B97F4A7C15L + cellZ * 0xC2B2AE3D27D4EB4FL + 0x57A47E5L));
+        for (int attempt = 0; attempt < 48; attempt++) {
+            int x = baseX + (int) Long.remainderUnsigned(h, span);
+            h = mix(h);
+            int z = baseZ + (int) Long.remainderUnsigned(h, span);
+            h = mix(h);
+            if (Math.hypot(x - from[0], z - from[1]) > STARTER) continue;
+            Terrain.Column column = Terrain.column(level, x, z);
+            if (column != null && !column.water()) return new Spot(x, z, column);
+        }
+        int x = Math.clamp(from[0], baseX, baseX + span), z = Math.clamp(from[1], baseZ, baseZ + span);
+        if (Math.hypot(x - from[0], z - from[1]) > STARTER) return null;
+        Terrain.Column column = Terrain.column(level, x, z);
+        return column != null && !column.water() ? new Spot(x, z, column) : null;
     }
 
     // ---- land in a cell
