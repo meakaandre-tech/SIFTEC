@@ -126,7 +126,10 @@ public final class BuildingTemplate {
             cells.add(cell);
         }
         if (controllers != 1) {
-            PROBLEMS.put(id, controllers + " controllers (needs exactly one siftec:building_controller)");
+            java.util.Set<String> kinds = new java.util.TreeSet<>();
+            for (BlockState st : states) kinds.add(BuiltInRegistries.BLOCK.getKey(st.getBlock()).toString());
+            PROBLEMS.put(id, controllers + " controllers (needs exactly one siftec:building_controller); read " + blocks.size() + " blocks, "
+                + palette.size() + " palette entries " + kinds + ", size " + size + ", first palette entry " + (palette.isEmpty() ? "-" : palette.getCompoundOrEmpty(0)));
             return null;
         }
         return new BuildingTemplate(cells, controller);

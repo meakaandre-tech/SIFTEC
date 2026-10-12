@@ -1,0 +1,3 @@
+net.minecraft.nbt.NbtUtils
+net.minecraft.nbt.ListTag
+net.minecraft.nbt.NbtIo
