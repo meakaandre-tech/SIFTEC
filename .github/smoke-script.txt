@@ -295,6 +295,8 @@ cmd siftec selftest tb death check
 sleep 3
 shot
 cmd gamemode creative @a
+cmd time set noon
+key F1
 cmd siftec worldtest buildgun
 sleep 4
 keydown Control_L

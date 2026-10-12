@@ -79,9 +79,9 @@ def structure(cells, nbt=None):
         spec = cells[pos]
         if spec not in index:
             name, _, props = spec.partition("[")
-            entry = {"Name": name}
+            entry = {"id": name}  # the 26.3 block state keys ("id", "properties"), as the game's own structures have them
             if props:
-                entry["Properties"] = dict(kv.split("=") for kv in props.rstrip("]").split(","))
+                entry["properties"] = dict(kv.split("=") for kv in props.rstrip("]").split(","))
             index[spec] = len(palette)
             palette.append(entry)
         b = {"pos": list(pos), "state": index[spec]}

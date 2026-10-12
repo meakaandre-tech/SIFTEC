@@ -99,7 +99,16 @@ public final class BuildingTemplate {
         ListTag palette = tag.getListOrEmpty("palette");
         if (palette.isEmpty()) palette = tag.getListOrEmpty("palettes").getListOrEmpty(0);
         List<BlockState> states = new ArrayList<>();
-        for (int i = 0; i < palette.size(); i++) states.add(NbtUtils.readBlockState(BuiltInRegistries.BLOCK, palette.getCompoundOrEmpty(i)));
+        for (int i = 0; i < palette.size(); i++) {
+            CompoundTag entry = palette.getCompoundOrEmpty(i);
+            // older files name a state "Name" and "Properties"; 26.3 writes "id" and "properties"
+            if (!entry.contains("id") && entry.contains("Name")) {
+                entry = entry.copy();
+                entry.putString("id", entry.getStringOr("Name", ""));
+                entry.put("properties", entry.getCompoundOrEmpty("Properties"));
+            }
+            states.add(NbtUtils.readBlockState(BuiltInRegistries.BLOCK, entry));
+        }
         int cx = sx / 2;
         List<Cell> cells = new ArrayList<>();
         Cell controller = null;
