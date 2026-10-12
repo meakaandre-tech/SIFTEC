@@ -2,7 +2,7 @@
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
     "top": "siftec:block/oil_well_top",
-    "side": "siftec:block/oil_well_side",
-    "bottom": "siftec:block/node_rock_side"
+    "side": "minecraft:block/basalt_side",
+    "bottom": "minecraft:block/basalt_top"
   }
 }

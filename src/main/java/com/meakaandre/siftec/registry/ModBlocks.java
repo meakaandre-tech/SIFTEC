@@ -2,7 +2,6 @@ package com.meakaandre.siftec.registry;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlock;
-import com.meakaandre.siftec.block.MinerBlock;
 import com.meakaandre.siftec.claim.ClaimMarkerBlock;
 import com.meakaandre.siftec.collect.Collectible;
 import com.meakaandre.siftec.collect.CollectibleBlock;
@@ -15,10 +14,9 @@ import com.meakaandre.siftec.mam.MamBlock;
 import com.meakaandre.siftec.power.PoleBlock;
 import com.meakaandre.siftec.power.StorageBlock;
 import com.meakaandre.siftec.workshop.WorkshopBlock;
-import com.meakaandre.siftec.block.MinerTier;
 import com.meakaandre.siftec.block.NodeBlock;
-import com.meakaandre.siftec.block.NodeRockBlock;
 import com.meakaandre.siftec.block.PortableMinerBlock;
+import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.NodeType;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -43,53 +41,58 @@ public class ModBlocks {
     /** Items shown in the creative tab, in registration order. */
     public static final List<Item> TAB_ITEMS = new ArrayList<>();
 
-    /** Node blocks cannot be broken, pushed or blown up. */
+    /** Patches, depleted nodes and fluid nodes cannot be broken, pushed or blown up. */
     private static BlockBehaviour.Properties node() {
         return BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable()
             .sound(SoundType.DEEPSLATE).pushReaction(PushReaction.IMMOVEABLE);
     }
 
-    /** A node's own blocks: unbreakable like the rest, and drawn as a mound that does not fill its block. */
-    private static BlockBehaviour.Properties nodeCore() {
-        return node().noOcclusion();
+    /** A node that can be mined: like an ore block to dig, but never pushed or blown up (it regrows instead of going). */
+    private static BlockBehaviour.Properties minable() {
+        return BlockBehaviour.Properties.of().strength(3.0F, 3600000.0F).requiresCorrectToolForDrops()
+            .sound(SoundType.STONE).pushReaction(PushReaction.BLOCK);
     }
 
     private static BlockBehaviour.Properties machine() {
         return BlockBehaviour.Properties.of().strength(2.0F, 6.0F).sound(SoundType.METAL).noOcclusion();
     }
 
-    public static final Supplier<NodeRockBlock> NODE_ROCK = block("node_rock", NodeRockBlock::new, ModBlocks::node);
-    public static final Map<NodeType, Supplier<NodeBlock>> NODES = new EnumMap<>(NodeType.class);
+    /**
+     * Each patch stone's patch: flat unbreakable ground of that stone under a node (see node.NodeLook). Immovable, no
+     * item and no loot; Create's drills skip it (in create:non_movable, hardness -1).
+     */
+    public static final Map<String, Supplier<com.meakaandre.siftec.block.NodePadBlock>> PATCHES = new java.util.LinkedHashMap<>();
+    /** The node of each look ({@code <look>_node}); oil's is the Oil Well. */
+    public static final Map<String, Supplier<NodeBlock>> NODES = new java.util.LinkedHashMap<>();
+    /** The mined node of each look that can be mined ({@code <look>_node_depleted}), growing back. */
+    public static final Map<String, Supplier<com.meakaandre.siftec.block.DepletedNodeBlock>> DEPLETED = new java.util.LinkedHashMap<>();
 
     static {
-        for (NodeType type : NodeType.values()) {
-            NODES.put(type, block(type.id() + "_node", properties -> new NodeBlock(type, properties), ModBlocks::nodeCore));
+        for (String patch : NodeLook.patches()) {
+            PATCHES.put(patch, blockOnly(patch + "_patch", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node));
+        }
+        for (NodeLook look : NodeLook.all()) {
+            if (look.type() == NodeType.OIL) continue;
+            Supplier<BlockBehaviour.Properties> properties = look.fluid() ? ModBlocks::node : ModBlocks::minable;
+            NODES.put(look.id(), hidden(look.id() + "_node", p -> new NodeBlock(look, p), properties));
+            if (!look.fluid()) {
+                DEPLETED.put(look.id(), blockOnly(look.id() + "_node_depleted", properties -> new com.meakaandre.siftec.block.DepletedNodeBlock(look, properties), () -> node().noOcclusion()));
+            }
         }
     }
+
+    /** The middle of an oil node: the one block a Pumpjack's pipe counts as an oil deposit. */
+    public static final Supplier<NodeBlock> OIL_WELL = hidden("oil_well", properties -> new NodeBlock(NodeLook.byId("oil"), properties), ModBlocks::node);
+
+    static {
+        NODES.put("oil", OIL_WELL);
+    }
+
+    /** Uranium in a uranium node's clump: mined like an ore, it gives Uranium. */
+    public static final Supplier<Block> URANIUM_ORE = blockOnly("uranium_ore", Block::new,
+        () -> BlockBehaviour.Properties.of().strength(3.0F, 3.0F).requiresCorrectToolForDrops().sound(SoundType.STONE));
 
     public static final Supplier<PortableMinerBlock> PORTABLE_MINER = block("portable_miner", PortableMinerBlock::new, ModBlocks::machine);
-    /** The middle of an oil pool: the one block a Pumpjack can stand on. */
-    public static final Supplier<NodeBlock> OIL_WELL = block("oil_well", properties -> new NodeBlock(NodeType.OIL, properties), ModBlocks::nodeCore);
-    /** The flat pad a node stands on, and the fill under it: unbreakable, immovable, not in the creative tab (ops can /give it). */
-    public static final Supplier<com.meakaandre.siftec.block.NodePadBlock> NODE_PAD = hidden("node_pad", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node);
-    public static final Supplier<com.meakaandre.siftec.block.NodePadBlock> NODE_PAD_FILL = hidden("node_pad_fill", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node);
-    /**
-     * Each node type's pad, also used for the fill under it: a plain block of that node's natural stone (the stone is
-     * chosen in tools/gen_assets.py, STONE), unbreakable and immovable like the old pad, with no item and no loot.
-     */
-    public static final Map<NodeType, Supplier<com.meakaandre.siftec.block.NodePadBlock>> NODE_PADS = new EnumMap<>(NodeType.class);
-
-    static {
-        for (NodeType type : NodeType.values()) {
-            NODE_PADS.put(type, blockOnly(type.id() + "_node_pad", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node));
-        }
-    }
-
-    public static final Supplier<MinerBlock> MINER_MK1 = block("miner_mk1", properties -> new MinerBlock(MinerTier.MK1, properties), ModBlocks::machine);
-    public static final Supplier<MinerBlock> MINER_MK2 = block("miner_mk2", properties -> new MinerBlock(MinerTier.MK2, properties), ModBlocks::machine);
-    public static final Supplier<MinerBlock> MINER_MK3 = block("miner_mk3", properties -> new MinerBlock(MinerTier.MK3, properties), ModBlocks::machine);
-    /** The upper block of a powered miner (placed with it, never on its own). */
-    public static final Supplier<com.meakaandre.siftec.block.MinerTopBlock> MINER_TOP = hidden("miner_top", com.meakaandre.siftec.block.MinerTopBlock::new, ModBlocks::machine);
     public static final Supplier<ExtractorBlock> RESOURCE_WELL_EXTRACTOR = block("resource_well_extractor", ExtractorBlock::new, ModBlocks::machine);
 
     /** The HUB Terminal and the Wormhole Gateway's terminal; their items place the whole structure (see prefab.Prefabs). */

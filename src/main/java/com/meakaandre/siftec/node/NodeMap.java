@@ -45,6 +45,8 @@ public final class NodeMap {
     /** Within this many blocks of world spawn, most nodes are impure. */
     private static final int NEAR = 1500;
     private static final int FAR = 5000;
+    /** The starter iron, copper and stone nodes are within this many blocks of spawn (the design asks for 256). */
+    public static final int STARTER = 240;
     /** A search for one resource gives up after this long, keeping the best it found. */
     public static final long SEARCH_NANOS = 4_000_000_000L;
 
@@ -363,20 +365,27 @@ public final class NodeMap {
         h = mix(h);
         long spotHash = mix(h ^ 0x6C0A57L);
 
-        // the three cells next to spawn always hold a normal iron, copper and limestone node
+        // the three cells next to spawn always hold a normal iron, copper and stone node, on dry land within STARTER blocks
         int spawnCellX = Math.floorDiv(originX, CELL), spawnCellZ = Math.floorDiv(originZ, CELL);
         NodeType forced = null;
         if (cellX == spawnCellX + 1 && cellZ == spawnCellZ) forced = NodeType.IRON;
         else if (cellX == spawnCellX && cellZ == spawnCellZ + 1) forced = NodeType.COPPER;
-        else if (cellX == spawnCellX - 1 && cellZ == spawnCellZ) forced = NodeType.LIMESTONE;
+        else if (cellX == spawnCellX - 1 && cellZ == spawnCellZ) forced = NodeType.STONE;
         if (forced != null) {
-            // keep the starter nodes on dry land: try other spots in the cell until one is
-            Terrain.Column column = Terrain.column(level, x, z);
-            for (int attempt = 0; attempt < 24 && (column == null || column.water()); attempt++) {
+            // spots in the cell near enough to spawn, tried until one is dry land; the cell's nearest point to spawn is
+            // never more than about 190 blocks away, so there always are some
+            Terrain.Column column = null;
+            for (int attempt = 0; attempt < 48 && (column == null || column.water()); attempt++) {
                 x = baseX + (int) Long.remainderUnsigned(h, span);
                 h = mix(h);
                 z = baseZ + (int) Long.remainderUnsigned(h, span);
                 h = mix(h);
+                column = Math.hypot(x - originX, z - originZ) <= STARTER ? Terrain.column(level, x, z) : null;
+            }
+            if (column == null || column.water()) {
+                // the cell's nearest point to spawn, then any land in the cell
+                x = Math.clamp(originX, baseX, baseX + span);
+                z = Math.clamp(originZ, baseZ, baseZ + span);
                 column = Terrain.column(level, x, z);
             }
             if (column == null || column.water()) {

@@ -13,22 +13,25 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
 
-/** What both kinds of miner share. */
+/** What a miner standing on a node needs. */
 public final class Mining {
     private Mining() {
     }
 
-    /** The node a miner at {@code pos} is standing on: it has to be on the mound's middle block. */
+    /** The node a miner at {@code pos} is standing on: it has to be right on the node block (grown or mined). */
     public static Optional<Node> nodeUnder(Level level, BlockPos pos) {
         if (!(level instanceof ServerLevel server)) return Optional.empty();
         BlockState below = level.getBlockState(pos.below());
-        if (!(below.getBlock() instanceof NodeBlock node) || !below.getValue(NodeBlock.CORE)) return Optional.empty();
-        return NodeMap.near(server, pos.getX(), pos.getZ(), 0, node.type);
+        com.meakaandre.siftec.node.NodeType type;
+        if (below.getBlock() instanceof NodeBlock node) type = node.type;
+        else if (below.getBlock() instanceof DepletedNodeBlock depleted) type = depleted.look.type();
+        else return Optional.empty();
+        return NodeMap.near(server, pos.getX(), pos.getZ(), 0, type);
     }
 
     /** Adds one item to the output slot. False if it is full. */
     public static boolean produce(OutputContainer output, Node node) {
-        Item item = node.type().output();
+        Item item = com.meakaandre.siftec.node.NodeLook.of(node).output();
         if (item == Items.AIR) return false;
         ItemStack stack = output.get();
         if (stack.isEmpty()) {

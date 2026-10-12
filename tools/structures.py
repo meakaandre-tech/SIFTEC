@@ -113,7 +113,23 @@ def test_building():
     return structure(c)
 
 
-BUILT = {"test_building": test_building}
+# ---- the test miner (dev, creative only): a stand-in for the Build Gun miners of work package 5, for the node
+# selftests. 3 by 3, 2 high: a deck of andesite casing on four corner legs, standing over a node. The node's cell (the
+# middle of the bottom row) and the four cells beside it are left out of the template, so the node stays put.
+def test_miner():
+    CASING = "create:andesite_casing"
+    c = {}
+    for x in (0, 2):
+        for z in (0, 2):
+            c[(x, 0, z)] = CASING
+    for x in range(3):
+        for z in range(3):
+            c[(x, 1, z)] = CASING
+    c[(1, 1, 2)] = "siftec:building_controller[facing=south]"
+    return structure(c)
+
+
+BUILT = {"test_building": test_building, "test_miner": test_miner}
 
 if __name__ == "__main__":
     for bid, make in BUILT.items():

@@ -43,6 +43,8 @@ public class ModItems {
     public static final Supplier<Item> TOXIC_SHOT = item("toxic_shot", Item::new);
     public static final Supplier<Item> RAW_BAUXITE = item("raw_bauxite", Item::new);
     public static final Supplier<Item> SAM = item("sam", Item::new);
+    /** From uranium nodes; work package 4 wires it into the nuclear chain. */
+    public static final Supplier<Item> URANIUM = item("uranium", Item::new);
 
     private static <T extends Item> Supplier<T> hiddenItem(String name, Function<Item.Properties, T> factory) {
         ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Siftec.id(name));

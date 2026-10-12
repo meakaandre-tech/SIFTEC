@@ -6,14 +6,16 @@ files the mod reads. Costs are written the way the design doc writes them ("20 I
 ALIAS = {
     "Iron Ingot": "minecraft:iron_ingot", "Copper Ingot": "minecraft:copper_ingot",
     "Iron Sheet": "create:iron_sheet", "Copper Sheet": "create:copper_sheet",
-    "Concrete": "minecraft:light_gray_concrete", "Coal": "minecraft:coal",
+    "Coal": "minecraft:coal",
     "Steel Ingot": "cgs:steel_ingot", "Sulfur": "cgs:sulfur",
     "Brass Ingot": "create:brass_ingot", "Brass Sheet": "create:brass_sheet",
     "Electron Tube": "create:electron_tube", "Precision Mechanism": "create:precision_mechanism",
     "Diamond": "minecraft:diamond", "Nether Quartz": "minecraft:quartz",
-    "Limestone": "create:limestone", "Raw Iron": "minecraft:raw_iron", "Raw Copper": "minecraft:raw_copper",
+    "Raw Iron": "minecraft:raw_iron", "Raw Copper": "minecraft:raw_copper",
     "Raw Zinc": "create:raw_zinc", "Gunpowder": "minecraft:gunpowder", "Cardboard": "create:cardboard",
     "Empty Canister": "createdieselgenerators:canister", "Mechanical Drill": "create:mechanical_drill",
+    # where Satisfactory takes Concrete, the pack takes any stone (stone nodes, or what any pickaxe digs up)
+    "Stone": "#siftec:stones",
 }
 
 # ---------------------------------------------------------------------------------------------------
@@ -86,12 +88,12 @@ PARTS = [
     ("accelerator_segment", "Accelerator Segment", "minecraft:item/nautilus_shell", 0x80C0FF),
     ("converter_core", "Converter Core", "minecraft:item/heart_of_the_sea", None), ("portal_module", "Portal Module", "minecraft:item/end_crystal", None),
     ("geyser_core", "Geyser Engine Core", "minecraft:item/magma_cream", None), ("extractor_pump", "Extractor Pump", "minecraft:item/hopper", 0xE0E8F8),
-    ("drill_shaft", "Drill Shaft", "minecraft:item/blaze_rod", 0x70747C), ("designer_frame", "Designer Frame", "minecraft:item/item_frame", 0xA0D0FF),
+    ("designer_frame", "Designer Frame", "minecraft:item/item_frame", 0xA0D0FF),
     ("mask_lining", "Mask Lining", "minecraft:item/phantom_membrane", None),
     # bundles: many of one cheap part pressed together in a Basin, so an assembly line takes a few big inputs instead
     # of many small ones (recipes.BUNDLES); each unlocks with the first build whose line takes it
     ("screw_bundle", "Screw Bundle", "minecraft:item/bundle", 0xA8B0C0), ("wire_spool", "Wire Spool", "minecraft:item/lead", 0xD07848),
-    ("iron_bundle", "Iron Bundle", "minecraft:item/bundle", 0xD8D8E0), ("precast_concrete", "Precast Concrete", "minecraft:block/light_gray_concrete", None),
+    ("iron_bundle", "Iron Bundle", "minecraft:item/bundle", 0xD8D8E0),
     ("quickwire_coil", "Quickwire Coil", "minecraft:item/lead", 0xF0C850), ("silica_bundle", "Silica Bundle", "minecraft:item/bundle", 0xF0F0F8),
 ]
 # Half-built items on the machine routes' sequenced assembly lines: (what the line makes, its name, texture)
@@ -103,22 +105,22 @@ for _rid, _name, _tex in (
         ("awesome_sink", "AWESOME Sink", "minecraft:item/hopper"), ("awesome_shop", "AWESOME Shop", "minecraft:item/emerald"),
         ("blueprint_designer", "Blueprint Designer", "minecraft:item/map"), ("power_storage", "Power Storage", "minecraft:item/redstone"),
         ("speed_governor", "Speed Governor", "minecraft:item/clock_00"), ("blade_runners", "Blade Runners", "minecraft:item/iron_boots"),
-        ("dimensional_depot", "Dimensional Depot", "minecraft:item/ender_pearl"), ("miner_mk2", "Miner Mk.2", "minecraft:item/iron_pickaxe"),
+        ("dimensional_depot", "Dimensional Depot", "minecraft:item/ender_pearl"),
         ("jetpack_thruster", "Jetpack Thruster", "create:item/propeller"), ("jetpack", "Jetpack", "minecraft:item/elytra"),
         ("radar_tower", "Radar Tower", "minecraft:item/compass_16"),
-        ("drill_shaft", "Drill Shaft", "minecraft:item/blaze_rod"), ("designer_frame", "Designer Frame", "minecraft:item/item_frame")):
+        ("designer_frame", "Designer Frame", "minecraft:item/item_frame")):
     PARTS.append(("incomplete_" + _rid, "Incomplete " + _name, _tex, 0x808080))
 # The sub-assemblies' milestones: the build's own, or the one that brings the machine that makes them when that comes
 # later (the Wormhole Gateway is HUB Upgrade 6, but its coils and frames need the Deployer from Part Assembly)
 ASSEMBLY_LOCKS = {
-    "hub_upgrade_6": ["siftec:wire_spool", "siftec:iron_bundle", "siftec:precast_concrete"], "field_research": ["siftec:screw_bundle"],
+    "hub_upgrade_6": ["siftec:wire_spool", "siftec:iron_bundle"], "field_research": ["siftec:screw_bundle"],
     "mam_caterium_5": ["siftec:quickwire_coil"], "mam_quartz_6": ["siftec:silica_bundle"], "mam_mycelia_5": ["siftec:mask_lining"],
     "part_assembly": ["siftec:gateway_coil", "siftec:gateway_frame"], "jump_pads": ["siftec:landing_cushion"],
     "jetpack": ["siftec:jetpack_thruster"], "hazmat_suit": ["siftec:hazmat_lining"], "hover_pack": ["siftec:hover_thruster"],
     "aeronautical_engineering": ["siftec:drone_port_module"], "particle_enrichment": ["siftec:accelerator_segment"],
     "matter_conversion": ["siftec:converter_core"], "spatial_energy_regulation": ["siftec:portal_module"],
     "mam_sulfur_8": ["siftec:geyser_core"], "advanced_aluminum_production": ["siftec:extractor_pump"],
-    "leading_edge_production": ["siftec:drill_shaft"], "ficsit_blueprints_mk3": ["siftec:designer_frame"],
+    "ficsit_blueprints_mk3": ["siftec:designer_frame"],
 }
 
 # Custom fluids: id, name, colour. They look like tinted water until real textures are picked.
@@ -146,18 +148,18 @@ MILESTONES = [
      "Smelter (Encased Fan), Wire and Cable, the first HUB Engine, copper nodes on the scanner",
      [C + "encased_fan", C + "nozzle", "siftec:wire", "siftec:cable", "siftec:power_line", "siftec:hub_engine"], ["scanner:copper"]),
     (0, "hub_upgrade_3", "HUB Upgrade 3", "20 Iron Sheet, 20 Iron Rod, 20 Wire", "0:00",
-     "Constructor (Press, Saw, Millstone, Basin), Concrete, Screw, Reinforced Iron Plate, limestone nodes on the scanner",
+     "Constructor (Press, Saw, Millstone, Basin), Screw, Reinforced Iron Plate, stone nodes on the scanner",
      [C + "mechanical_press", C + "mechanical_saw", C + "depot", C + "millstone", C + "basin", "siftec:screw", "siftec:reinforced_iron_plate", "siftec:power_pole"],
-     ["scanner:limestone"]),
-    (0, "hub_upgrade_4", "HUB Upgrade 4", "75 Iron Sheet, 20 Cable, 10 Concrete", "0:00",
+     ["scanner:stone"]),
+    (0, "hub_upgrade_4", "HUB Upgrade 4", "75 Iron Sheet, 20 Cable, 10 Stone", "0:00",
      "Mechanical Belt and funnels, Backpack Crafting Upgrade", [C + "belt_connector", C + "andesite_funnel"], []),
-    (0, "hub_upgrade_5", "HUB Upgrade 5", "75 Iron Rod, 50 Cable, 20 Concrete", "0:00",
-     "Miner Mk.1, Item Vault, a second HUB Engine, Backpack Pickup and Furnace Upgrades", ["siftec:miner_mk1", C + "item_vault"], []),
-    (0, "hub_upgrade_6", "HUB Upgrade 6", "100 Iron Rod, 100 Iron Sheet, 100 Wire, 50 Concrete", "0:00",
+    (0, "hub_upgrade_5", "HUB Upgrade 5", "75 Iron Rod, 50 Cable, 20 Stone", "0:00",
+     "Miner Mk.1, Item Vault, a second HUB Engine, Backpack Pickup and Furnace Upgrades", [C + "item_vault"], []),
+    (0, "hub_upgrade_6", "HUB Upgrade 6", "100 Iron Rod, 100 Iron Sheet, 100 Wire, 50 Stone", "0:00",
      "Wormhole Gateway, Furnace Engine, flywheel, Biomass. Milestones lock the HUB from here on",
      ["siftec:wormhole_gateway", "siftec:furnace_engine", C + "flywheel", "siftec:biomass"], []),
 
-    (1, "base_building", "Base Building", "200 Concrete, 100 Iron Sheet, 100 Iron Rod", "2:00",
+    (1, "base_building", "Base Building", "200 Stone, 100 Iron Sheet, 100 Iron Rod", "2:00",
      "Factory building blocks: girders, scaffolding, ladders, casings",
      [C + "metal_girder", C + "andesite_scaffolding", C + "andesite_ladder", C + "copper_ladder", C + "copper_scaffolding", C + "copycat_panel", C + "copycat_step"], []),
     (1, "logistics", "Logistics", "150 Iron Sheet, 150 Iron Rod, 300 Wire", "4:00",
@@ -169,14 +171,14 @@ MILESTONES = [
     (2, "part_assembly", "Part Assembly", "200 Cable, 200 Iron Rod, 500 Screw, 300 Iron Sheet", "6:00",
      "Assembler (Deployer), Copper Sheet, Rotor, Modular Frame, Smart Plating",
      [C + "deployer", C + "copper_sheet", "siftec:rotor", "siftec:modular_frame", "siftec:smart_plating"], []),
-    (2, "obstacle_clearing", "Obstacle Clearing", "500 Screw, 100 Cable, 100 Concrete", "3:00",
+    (2, "obstacle_clearing", "Obstacle Clearing", "500 Screw, 100 Cable, 100 Stone", "3:00",
      "Solid Biofuel, harvesters and ploughs, Backpack Feeding and Smoker Upgrades",
      ["siftec:solid_biofuel", C + "mechanical_harvester", C + "mechanical_plough", C + "tree_fertilizer"], []),
     (2, "jump_pads", "Jump Pads", "50 Rotor, 300 Iron Sheet, 150 Cable", "4:00",
      "Jump Pad (Weighted Ejector), landing pad that cancels fall damage", [C + "weighted_ejector", "siftec:landing_pad"], []),
-    (2, "resource_sink_bonus_program", "Resource Sink Bonus Program", "400 Concrete, 500 Wire, 200 Iron Rod, 200 Iron Sheet", "5:00",
+    (2, "resource_sink_bonus_program", "Resource Sink Bonus Program", "400 Stone, 500 Wire, 200 Iron Rod, 200 Iron Sheet", "5:00",
      "AWESOME Sink and AWESOME Shop", ["siftec:awesome_sink", "siftec:awesome_shop"], []),
-    (2, "logistics_mk2", "Logistics Mk.2", "50 Reinforced Iron Plate, 200 Concrete, 300 Iron Rod, 300 Iron Sheet", "6:00",
+    (2, "logistics_mk2", "Logistics Mk.2", "50 Reinforced Iron Plate, 200 Stone, 300 Iron Rod, 300 Iron Sheet", "6:00",
      "Company speed limit raised from 32 to 64 RPM", [], ["cap:64"]),
 
     (3, "coal_power", "Coal Power", "150 Reinforced Iron Plate, 50 Rotor, 500 Cable", "8:00",
@@ -186,19 +188,19 @@ MILESTONES = [
     (3, "vehicular_transport", "Vehicular Transport", "25 Modular Frame, 100 Rotor, 200 Cable, 400 Iron Rod", "4:00",
      "Cart Assembler, Rope Pulley, backpack to Gold tier (63 slots)",
      [C + "cart_assembler", C + "rope_pulley", C + "minecart_coupling"], ["backpack:gold"]),
-    (3, "basic_steel_production", "Basic Steel Production", "50 Modular Frame, 150 Rotor, 500 Concrete, 1000 Wire", "8:00",
+    (3, "basic_steel_production", "Basic Steel Production", "50 Modular Frame, 150 Rotor, 500 Stone, 1000 Wire", "8:00",
      "Foundry (Mechanical Mixer), Steel Ingot, Steel Beam, Steel Pipe, Versatile Framework, Backpack Blast Furnace Upgrade",
      [C + "mechanical_mixer", "cgs:steel_ingot", "siftec:steel_casing", "siftec:steel_beam", "siftec:steel_pipe", "siftec:versatile_framework"], []),
     (3, "enhanced_asset_security", "Enhanced Asset Security", "100 Reinforced Iron Plate, 600 Iron Rod, 1500 Wire", "3:00",
      "Xeno-Basher (Pneumatic Hammer), Backpack Magnet Upgrade", ["cgs:hammer"], []),
 
-    (4, "ficsit_blueprints", "FICSIT Blueprints", "100 Modular Frame, 200 Steel Beam, 500 Cable, 1000 Concrete", "5:00",
+    (4, "ficsit_blueprints", "FICSIT Blueprints", "100 Modular Frame, 200 Steel Beam, 500 Cable, 1000 Stone", "5:00",
      "Blueprint Designer Mk.1", ["siftec:blueprint_designer"], []),
     (4, "logistics_mk3", "Logistics Mk.3", "200 Steel Beam, 200 Steel Pipe, 400 Reinforced Iron Plate", "5:00",
      "Company speed limit raised to 96 RPM", [], ["cap:96"]),
-    (4, "advanced_steel_production", "Advanced Steel Production", "100 Steel Pipe, 200 Rotor, 100 Modular Frame, 500 Concrete", "10:00",
+    (4, "advanced_steel_production", "Advanced Steel Production", "100 Steel Pipe, 200 Rotor, 100 Modular Frame, 500 Stone", "10:00",
      "Miner Mk.2, Crushing Wheels, Encased Industrial Beam, Stator, Motor, Automated Wiring",
-     ["siftec:miner_mk2", C + "crushing_wheel", "siftec:encased_industrial_beam", "siftec:stator", "siftec:motor", "siftec:automated_wiring"], []),
+     [C + "crushing_wheel", "siftec:encased_industrial_beam", "siftec:stator", "siftec:motor", "siftec:automated_wiring"], []),
     (4, "expanded_power_infrastructure", "Expanded Power Infrastructure", "100 Steel Beam, 50 Encased Industrial Beam, 200 Modular Frame, 2000 Wire", "5:00",
      "Power Tower, Power Storage, windmills, pistons, bearings and other contraption parts",
      ["siftec:power_tower", "siftec:power_storage", C + "windmill_bearing", C + "sail_frame", C + "mechanical_piston", C + "sticky_mechanical_piston",
@@ -254,10 +256,10 @@ MILESTONES = [
       "siftec:electromagnetic_control_rod"], ["scanner:nitrogen"]),
     (8, "leading_edge_production", "Leading-edge Production", "50 Fused Modular Frame, 100 Supercomputer, 1000 Steel Pipe", "5:00",
      "Miner Mk.3, Turbo Motor, Thermal Propulsion Rocket, Magnetic Field Generator",
-     ["siftec:miner_mk3", "siftec:turbo_motor", "siftec:thermal_propulsion_rocket", "siftec:magnetic_field_generator"], []),
+     ["siftec:turbo_motor", "siftec:thermal_propulsion_rocket", "siftec:magnetic_field_generator"], []),
     (8, "particle_enrichment", "Particle Enrichment", "400 Electromagnetic Control Rod, 400 Cooling System, 200 Fused Modular Frame, 100 Turbo Motor", "20:00",
-     "Particle Accelerator, Copper Powder, Pressure Conversion Cube, Nuclear Pasta",
-     ["siftec:particle_accelerator", "siftec:copper_powder", "siftec:pressure_conversion_cube", "siftec:nuclear_pasta"], []),
+     "Particle Accelerator, Copper Powder, Pressure Conversion Cube, Nuclear Pasta, uranium nodes on the scanner",
+     ["siftec:particle_accelerator", "siftec:copper_powder", "siftec:pressure_conversion_cube", "siftec:nuclear_pasta"], ["scanner:uranium"]),
 
     (9, "matter_conversion", "Matter Conversion", "100 Fused Modular Frame, 250 Radio Control Unit, 500 Cooling System", "5:00",
      "Converter, Ficsite, Time Crystal, Biochemical Sculptor, Reanimated SAM, SAM nodes on the scanner",
@@ -419,7 +421,7 @@ ALT_PROCESSORS = [
 
 # AWESOME Sink: points for one of each item. Anything not listed is worth 1.
 SINK_POINTS = {
-    "Iron Sheet": 6, "Iron Rod": 4, "Screw": 2, "Wire": 6, "Cable": 24, "Concrete": 12, "Copper Sheet": 24, "Reinforced Iron Plate": 120,
+    "Iron Sheet": 6, "Iron Rod": 4, "Screw": 2, "Wire": 6, "Cable": 24, "Copper Sheet": 24, "Reinforced Iron Plate": 120,
     "Rotor": 140, "Modular Frame": 408, "Smart Plating": 520, "Steel Beam": 64, "Steel Pipe": 24, "Versatile Framework": 1176,
     "Encased Industrial Beam": 632, "Stator": 240, "Motor": 1520, "Automated Wiring": 1440, "Plastic": 75, "Rubber": 60, "Circuit Board": 696,
     "Computer": 8352, "Heavy Modular Frame": 10800, "Modular Engine": 9960, "Adaptive Control Unit": 76368, "Aluminum Casing": 393,
@@ -560,4 +562,7 @@ DISABLED += TB_BACKPACKS + TB_TIER_UPGRADES + TB_SLEEPING_BAGS
 BUILD_TABS = ("production", "power", "logistics", "foundations", "special")
 BUILDINGS = [
     ("test_building", "Test Building", "production", "2 Iron Sheet, 4 Iron Rod", "", True),
+    ("test_miner", "Test Miner", "production", "2 Iron Sheet", "", True),
 ]
+# Buildings that stand over a resource node and can only go down once its clump is mined (the miners, extractors)
+NODE_BUILDINGS = {"test_miner"}

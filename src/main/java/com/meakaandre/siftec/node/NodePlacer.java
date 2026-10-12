@@ -20,27 +20,27 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Puts the node blocks into the world. A node site is a level, round pad of unbreakable Node Pad 7 blocks
- * across with the node itself standing on its middle, like a resource node in Satisfactory. Under the pad,
- * unbreakable fill runs down to solid ground, flaring out so the pad sits in the terrain instead of on a
- * pillar; above it the ground is cut back so the pad is open and level.
- * Each chunk places only its own columns of a site, the first time it loads, so no neighbouring chunk is
- * ever forced to load or generate. The height of a surface pad comes from the world generator (the middle
- * height of the ground across the pad), so every chunk works out the same one. Cave and Nether pads take the
- * floor found when the chunk holding the middle of the node loads.
- * Nodes placed before pads existed (old worlds) keep their old rough mound: any piece of them still to be
- * placed is placed the old way.
+ * Puts node sites into the world, like resource nodes in Satisfactory. A site is a level, round <b>patch</b> of
+ * unbreakable stone 7 blocks across (the node's own natural stone, see {@link NodeLook}); under it, unbreakable fill
+ * runs down to solid ground, flaring out so the patch sits in the terrain instead of on a pillar; above it the ground
+ * is cut back so the patch is open. The <b>node</b>, an ore block that regrows when mined, stands on its middle, and
+ * a <b>clump</b> of ordinary breakable blocks (the stone, the ore and the raw ore block, more ore the purer the node)
+ * is piled over and round it; it is placed once and never comes back, and a miner can only go on once it is mined.
+ * Each chunk places only its own columns of a site, the first time it loads, so no neighbouring chunk is ever forced
+ * to load or generate. The height of a surface patch comes from the world generator (the middle height of the ground
+ * across the patch), so every chunk works out the same one. Cave and Nether patches take the floor found when the
+ * chunk holding the middle of the node loads.
  */
 public final class NodePlacer {
-    /** Radius of an old-style mound, and how near a block has to be to a node to tell which node it is. */
+    /** How near a block has to be to a node to tell which node it is. */
     public static final int RADIUS = 3;
-    /** The pad: every column within this distance of the node. 3.5 gives a round pad 7 blocks across (37 blocks). */
+    /** The patch: every column within this distance of the node. 3.5 gives a round pad 7 blocks across (37 blocks). */
     public static final double PAD_RADIUS = 3.5;
     /** How far the fill under the pad flares out (one block out per block down), and how far the cut above it reaches. */
     private static final int FLARE = 3;
     /** How far from the node a site can change blocks. */
     public static final int REACH = 7;
-    /** Air kept above the pad: the node, a two-block miner and the shaft above it. */
+    /** Air kept above the patch: the node, its clump and a miner over it. */
     private static final int HEADROOM = 6;
     /** Trees and plants are cleared this far above the pad. */
     private static final int CLEAR_PLANTS = 24;
@@ -154,9 +154,6 @@ public final class NodePlacer {
         NodeSavedData data = NodeSavedData.get(level.getServer());
         boolean any = false;
         for (Node node : nodesTouching(level, chunkX, chunkZ)) {
-            boolean flat = isFlat(data, node);
-            // an old mound only ever reached RADIUS blocks from its node
-            if (!flat && (Math.abs((chunkX << 4) + 8 - node.x()) > 8 + RADIUS || Math.abs((chunkZ << 4) + 8 - node.z()) > 8 + RADIUS)) continue;
             boolean level0 = node.type().where == NodeType.Where.NETHER || node.type().where == NodeType.Where.SULFUR_CAVE;
             int height = Node.SURFACE;
             if (level0) {
@@ -172,42 +169,27 @@ public final class NodePlacer {
                     for (int dx = -1; dx <= 1; dx++) {
                         for (int dz = -1; dz <= 1; dz++) {
                             if ((dx != 0 || dz != 0) && level.hasChunk(chunkX + dx, chunkZ + dz)) {
-                                any |= placePiece(level, data, node, chunkX + dx, chunkZ + dz, height, flat);
+                                any |= placePiece(level, data, node, chunkX + dx, chunkZ + dz, height);
                             }
                         }
                     }
                 }
-            } else if (flat) {
+            } else {
                 height = data.height(node.key());
                 if (height == NodeSavedData.NO_HEIGHT) {
                     height = NodeMap.padHeight(level, node);
                     data.setHeight(node.key(), height);
                 }
             }
-            any |= placePiece(level, data, node, chunkX, chunkZ, height, flat);
+            any |= placePiece(level, data, node, chunkX, chunkZ, height);
         }
         return any;
     }
 
-    /**
-     * True if this node gets a flat pad: it is marked as one, or none of it has been placed yet (it is new).
-     * A node that an older version had already started placing keeps its rough mound.
-     */
-    public static boolean isFlat(NodeSavedData data, Node node) {
-        if (data.isFlat(node.key())) return true;
-        for (int cx = (node.x() - RADIUS) >> 4; cx <= (node.x() + RADIUS) >> 4; cx++) {
-            for (int cz = (node.z() - RADIUS) >> 4; cz <= (node.z() + RADIUS) >> 4; cz++) {
-                if (data.isPlaced(NodeSavedData.piece(node.key(), cx, cz))) return false;
-            }
-        }
-        data.markFlat(node.key());
-        return true;
-    }
-
-    private static boolean placePiece(ServerLevel level, NodeSavedData data, Node node, int chunkX, int chunkZ, int height, boolean flat) {
+    private static boolean placePiece(ServerLevel level, NodeSavedData data, Node node, int chunkX, int chunkZ, int height) {
         long piece = NodeSavedData.piece(node.key(), chunkX, chunkZ);
         if (data.isPlaced(piece)) return false;
-        boolean placed = flat ? placePad(level, node, chunkX, chunkZ, height) : placeColumns(level, node, chunkX, chunkZ, height);
+        boolean placed = placeSite(level, node, chunkX, chunkZ, height);
         data.markPlaced(piece);
         return placed;
     }
@@ -263,10 +245,9 @@ public final class NodePlacer {
         return level.getBlockState(pos.set(x, y + 1, z)).isAir() && level.getBlockState(pos.set(x, y + 2, z)).isAir();
     }
 
-    /** The block a node's middle is: its resource block (an Oil Well for oil), marked as the core, showing its purity. */
+    /** The node block of a node, showing its purity. */
     public static BlockState coreState(Node node) {
-        Block block = node.type() == NodeType.OIL ? ModBlocks.OIL_WELL.get() : ModBlocks.NODES.get(node.type()).get();
-        return block.defaultBlockState().setValue(NodeBlock.CORE, true).setValue(NodeBlock.PURITY, node.purity());
+        return ModBlocks.NODES.get(NodeLook.of(node).id()).get().defaultBlockState().setValue(NodeBlock.PURITY, node.purity());
     }
 
     /** True for blocks a site must never remove: other unbreakable blocks (bedrock, nodes, collectibles) and anything with a block entity. */
@@ -281,13 +262,14 @@ public final class NodePlacer {
     }
 
     /**
-     * One chunk's columns of a flat site whose pad is at {@code height}: the pad and, under it, fill down to solid
-     * ground (flaring out one block per block down); above it, the ground cut back (narrow at the pad, wider
-     * higher up) and plants cleared; the node on the middle of the pad.
+     * One chunk's columns of a site whose patch is at {@code height}: the patch and, under it, fill down to solid
+     * ground (flaring out one block per block down); above it, the ground cut back (narrow at the patch, wider
+     * higher up) and plants cleared; the node on the middle of the patch and the clump over it.
      */
-    private static boolean placePad(ServerLevel level, Node node, int chunkX, int chunkZ, int height) {
-        // the pad and the fill under it are one block: the node's own natural stone, unbreakable
-        BlockState pad = ModBlocks.NODE_PADS.get(node.type()).get().defaultBlockState();
+    private static boolean placeSite(ServerLevel level, Node node, int chunkX, int chunkZ, int height) {
+        NodeLook look = NodeLook.of(node);
+        // the patch and the fill under it are one block: the node's own natural stone, unbreakable
+        BlockState pad = ModBlocks.PATCHES.get(look.patchName()).get().defaultBlockState();
         BlockState fill = pad;
         BlockState air = Blocks.AIR.defaultBlockState();
         boolean cave = node.type().where == NodeType.Where.SULFUR_CAVE;
@@ -342,85 +324,90 @@ public final class NodePlacer {
                     level.setBlock(pos.set(x, height + 1, z), coreState(node), flags);
                     any = true;
                 }
+                // the clump: placed once with the site, never again
+                for (int dy = 0; dy < CLUMP_HEIGHT; dy++) {
+                    if (!isClump(node, dx, dy, dz)) continue;
+                    BlockState here = level.getBlockState(pos.set(x, height + 1 + dy, z));
+                    if (!here.isAir() && !here.canBeReplaced() || keep(level, here, pos)) continue;
+                    level.setBlock(pos, clumpBlock(node, look, dx, dy, dz), flags);
+                    any = true;
+                }
             }
         }
         return any;
     }
 
-    /** An old-style mound that follows the ground: only for nodes an older version had already begun placing. */
-    private static boolean placeColumns(ServerLevel level, Node node, int chunkX, int chunkZ, int height) {
-        Block ore = ModBlocks.NODES.get(node.type()).get();
-        BlockState oreState = ore.defaultBlockState();
-        BlockState coreState = coreState(node);
-        BlockState rock = ModBlocks.NODE_ROCK.get().defaultBlockState();
-        boolean pool = node.type() == NodeType.OIL;
-        boolean surface = height == Node.SURFACE;
+    // ---- the clump: a small pile over and round the node. Offsets are from the node block; dy 0 is the node's level.
+
+    /** Every cell a clump can fill: two rings round the node at its level, a cross (and some corners) above, a cap on top. */
+    private static final int[][] CLUMP_SPACE;
+    private static final int CLUMP_HEIGHT = 3;
+
+    static {
+        java.util.List<int[]> cells = new java.util.ArrayList<>();
+        for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) {
+            int r2 = dx * dx + dz * dz;
+            if (r2 > 0 && r2 <= 4) cells.add(new int[]{dx, 0, dz});
+            if (r2 <= 2) cells.add(new int[]{dx, 1, dz});
+            if (r2 == 0) cells.add(new int[]{dx, 2, dz});
+        }
+        CLUMP_SPACE = cells.toArray(new int[0][]);
+    }
+
+    /** True if this node's clump fills this cell: the inner ring, the cross and the cap always; the rest by the node. */
+    public static boolean isClump(Node node, int dx, int dy, int dz) {
+        int r2 = dx * dx + dz * dz;
+        if (dy < 0 || dy >= CLUMP_HEIGHT) return false;
+        if (dy == 0) return r2 > 0 && (r2 <= 2 || r2 == 4 && (hash(node.key(), dx, dz + 37) & 1) == 0);
+        if (dy == 1) return r2 <= 1 || r2 == 2 && (hash(node.key(), dx, dz + 71) & 1) == 0;
+        return r2 == 0;
+    }
+
+    /**
+     * Mostly the patch's stone on an impure node, a mix of stone, ore and raw ore blocks on a normal one, mostly ore and
+     * raw ore blocks on a pure one. Where there is no ordinary ore (bauxite, SAM, uranium...) its share is the clump
+     * ore block's; a stone node's clump is all its stone.
+     */
+    private static BlockState clumpBlock(Node node, NodeLook look, int dx, int dy, int dz) {
+        int roll = (int) ((hash(node.key(), dx * 7 + dy, dz) >>> 8) % 100);
+        int stone = switch (node.purity()) {
+            case IMPURE -> 75;
+            case NORMAL -> 40;
+            case PURE -> 10;
+        };
+        int ore = switch (node.purity()) {
+            case IMPURE -> 20;
+            case NORMAL -> 35;
+            case PURE -> 45;
+        };
+        if (roll < stone) return look.patchStone();
+        return roll < stone + ore ? look.oreState() : look.clumpState();
+    }
+
+    /** How many blocks still stand where a clump can be round the node block at {@code core}: 0 once it is mined away. */
+    public static int clumpLeft(net.minecraft.world.level.Level level, BlockPos core) {
+        int left = 0;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        boolean any = false;
-        for (int dx = -RADIUS; dx <= RADIUS; dx++) {
-            for (int dz = -RADIUS; dz <= RADIUS; dz++) {
-                int x = node.x() + dx, z = node.z() + dz;
-                if (x >> 4 != chunkX || z >> 4 != chunkZ) continue;
-                double r = Math.sqrt(dx * dx + dz * dz);
-                long h = hash(node.key(), dx, dz);
-                // a ragged outline: the outermost ring is only partly filled
-                if (r > RADIUS + 0.3 || r > RADIUS - 0.7 && (h & 3) == 0) continue;
-
-                int y;
-                if (surface) {
-                    y = ground(level, x, z, pos);
-                    if (y == Integer.MIN_VALUE) continue;
-                    // in a lake or the sea: build rock up from the bed so the node stands just above the water
-                    int filled = 0;
-                    while (filled < 48 && !level.getFluidState(pos.set(x, y + 1, z)).isEmpty()) {
-                        level.setBlock(pos.set(x, y, z), rock, Block.UPDATE_CLIENTS);
-                        y++;
-                        filled++;
-                    }
-                } else {
-                    y = height;
-                }
-                boolean core = dx == 0 && dz == 0;
-                boolean centre = r < 1.5;
-                boolean rim = r > RADIUS - 1.2;
-                int roll = (int) ((h >>> 8) % 100);
-                BlockState state;
-                if (core) state = coreState;
-                else if (pool) state = rim ? rock : oreState;          // an oil pool: crude inside a rock rim
-                else state = centre || roll < 45 ? oreState : rock;
-                level.setBlock(pos.set(x, y, z), state, Block.UPDATE_CLIENTS);
-                any = true;
-                // lumps around the flat centre (a pool only has them on its rim)
-                int top = y;
-                if (!centre && roll >= 70 && (!pool || rim)) {
-                    top = y + 1;
-                    level.setBlock(pos.set(x, top, z), roll >= 85 && !pool ? oreState : rock, Block.UPDATE_CLIENTS);
-                }
-                // clear what sits on the mound: plants and snow on the surface, rock in a cave
-                for (int up = 1; up <= 2; up++) {
-                    BlockState above = level.getBlockState(pos.set(x, top + up, z));
-                    if (above.isAir()) continue;
-                    if (!surface || above.canBeReplaced() && above.getFluidState().isEmpty()) {
-                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-                    }
-                }
-            }
+        for (int[] c : CLUMP_SPACE) {
+            BlockState here = level.getBlockState(pos.set(core.getX() + c[0], core.getY() + c[1], core.getZ() + c[2]));
+            if (!here.isAir() && !here.canBeReplaced() && !(here.getBlock() instanceof com.meakaandre.siftec.block.NodePadBlock)) left++;
         }
-        return any;
+        return left;
     }
 
-    /** The top ground block of a column, skipping trees and plants. MIN_VALUE if the column is empty (void). */
-    private static int ground(ServerLevel level, int x, int z, BlockPos.MutableBlockPos pos) {
-        int y = level.getHeight(Heightmap.Types.OCEAN_FLOOR, x, z) - 1;
-        int min = level.getMinY();
-        while (y > min) {
-            BlockState state = level.getBlockState(pos.set(x, y, z));
-            if (!state.isAir() && !state.is(BlockTags.LOGS) && !state.is(BlockTags.LEAVES) && !state.canBeReplaced()) {
-                return y;
-            }
-            y--;
+    /** Puts a node's whole clump round its node block at {@code core}, over whatever is there (the selftests' showroom). */
+    public static void placeClump(ServerLevel level, Node node, BlockPos core) {
+        NodeLook look = NodeLook.of(node);
+        for (int[] c : CLUMP_SPACE) {
+            if (isClump(node, c[0], c[1], c[2])) level.setBlock(core.offset(c[0], c[1], c[2]), clumpBlock(node, look, c[0], c[1], c[2]), Block.UPDATE_CLIENTS);
         }
-        return Integer.MIN_VALUE;
+    }
+
+    /** The cells this node's clump fills, round its node block at {@code core}. */
+    public static java.util.List<BlockPos> clumpCells(Node node, BlockPos core) {
+        java.util.List<BlockPos> out = new java.util.ArrayList<>();
+        for (int[] c : CLUMP_SPACE) if (isClump(node, c[0], c[1], c[2])) out.add(core.offset(c[0], c[1], c[2]));
+        return out;
     }
 
     private static long hash(long key, int dx, int dz) {

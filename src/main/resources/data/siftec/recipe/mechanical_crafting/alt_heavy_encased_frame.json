@@ -4,7 +4,7 @@
     "A": "siftec:modular_frame",
     "B": "siftec:encased_industrial_beam",
     "C": "siftec:steel_pipe",
-    "D": "minecraft:light_gray_concrete"
+    "D": "#siftec:stones"
   },
   "pattern": [
     "AAA",

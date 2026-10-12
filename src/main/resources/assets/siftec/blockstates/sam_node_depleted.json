@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "purity=impure": {
+      "model": "siftec:block/sam_node_depleted"
+    },
+    "purity=normal": {
+      "model": "siftec:block/sam_node_depleted"
+    },
+    "purity=pure": {
+      "model": "siftec:block/sam_node_depleted"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "purity=impure": {
+      "model": "siftec:block/tuff_node"
+    },
+    "purity=normal": {
+      "model": "siftec:block/tuff_node"
+    },
+    "purity=pure": {
+      "model": "siftec:block/tuff_node"
+    }
+  }
+}

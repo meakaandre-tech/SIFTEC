@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "purity=impure": {
+      "model": "siftec:block/uranium_node"
+    },
+    "purity=normal": {
+      "model": "siftec:block/uranium_node"
+    },
+    "purity=pure": {
+      "model": "siftec:block/uranium_node"
+    }
+  }
+}

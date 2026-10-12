@@ -1,7 +1,6 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
-import com.meakaandre.siftec.block.MinerBlockEntity;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Milestone;
@@ -66,8 +65,8 @@ public final class SiftecCommands {
     }
 
     /**
-     * Used by the automated test: puts a Portable Miner on the nearest iron node and a Miner Mk.1 with a
-     * creative motor on the nearest copper node, then (check) reports what they made.
+     * Used by the automated test: puts a Portable Miner on the nearest iron and copper nodes (in place of their
+     * clump's middle), then (check) reports what they made.
      */
     private static int selfTest(CommandContext<CommandSourceStack> context, boolean setup) {
         CommandSourceStack source = context.getSource();
@@ -86,7 +85,7 @@ public final class SiftecCommands {
             BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(node.x(), level.getMaxY(), node.z());
             while (pos.getY() > level.getMinY()) {
                 BlockState state = level.getBlockState(pos);
-                if (state.getBlock() instanceof NodeBlock && state.getValue(NodeBlock.CORE)) break;
+                if (state.getBlock() instanceof NodeBlock) break;
                 pos.move(0, -1, 0);
             }
             if (pos.getY() <= level.getMinY()) {
@@ -98,22 +97,11 @@ public final class SiftecCommands {
             if (type == NodeType.IRON) ownerTest(source, level, miner.above(16), setup);
             if (type == NodeType.IRON) droneTest(source, level, miner.above(24), setup);
             if (setup) {
-                if (type == NodeType.IRON) {
-                    level.setBlockAndUpdate(miner, ModBlocks.PORTABLE_MINER.get().defaultBlockState());
-                } else {
-                    // a Mk.1 is two blocks tall and drills with water: the motor goes on its upper block
-                    level.setBlockAndUpdate(miner, ModBlocks.MINER_MK1.get().defaultBlockState());
-                    com.meakaandre.siftec.block.MinerBlock.placeTop(level, miner);
-                    if (level.getBlockEntity(miner) instanceof MinerBlockEntity m) m.fill(net.minecraft.world.level.material.Fluids.WATER, 1000);
-                    BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
-                    if (motor.hasProperty(BlockStateProperties.FACING)) motor = motor.setValue(BlockStateProperties.FACING, Direction.DOWN);
-                    level.setBlockAndUpdate(miner.above(2), motor);
-                }
+                level.setBlockAndUpdate(miner, ModBlocks.PORTABLE_MINER.get().defaultBlockState());
                 report(source, "SELFTEST setup " + node + " core at " + pos.toShortString());
             } else {
                 BlockEntity be = level.getBlockEntity(miner);
-                String made = be instanceof MinerBlockEntity m ? m.output.get() + " speed " + m.getSpeed() + " " + m.describe().getString()
-                    : be instanceof PortableMinerBlockEntity m ? m.output.get().toString() : "no block entity (" + level.getBlockState(miner) + ")";
+                String made = be instanceof PortableMinerBlockEntity m ? m.output.get().toString() : "no block entity (" + level.getBlockState(miner) + ")";
                 report(source, "SELFTEST check " + node + ": " + made);
                 // the setup kept this chunk loaded until now; let it go
                 level.setChunkForced(node.x() >> 4, node.z() >> 4, false);

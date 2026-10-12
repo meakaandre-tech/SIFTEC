@@ -281,9 +281,6 @@
       "id": "extractor_pump"
     },
     {
-      "id": "drill_shaft"
-    },
-    {
       "id": "designer_frame"
     },
     {
@@ -297,9 +294,6 @@
     },
     {
       "id": "iron_bundle"
-    },
-    {
-      "id": "precast_concrete"
     },
     {
       "id": "quickwire_coil"
@@ -353,9 +347,6 @@
       "id": "incomplete_dimensional_depot"
     },
     {
-      "id": "incomplete_miner_mk2"
-    },
-    {
       "id": "incomplete_jetpack_thruster"
     },
     {
@@ -363,9 +354,6 @@
     },
     {
       "id": "incomplete_radar_tower"
-    },
-    {
-      "id": "incomplete_drill_shaft"
     },
     {
       "id": "incomplete_designer_frame"
@@ -447,7 +435,7 @@
         "siftec:power_pole"
       ],
       "tokens": [
-        "scanner:limestone"
+        "scanner:stone"
       ]
     },
     {
@@ -463,7 +451,7 @@
           "count": 20
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 10
         }
       ],
@@ -489,13 +477,12 @@
           "count": 50
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 20
         }
       ],
       "seconds": 0,
       "items": [
-        "siftec:miner_mk1",
         "create:item_vault",
         "travelersbackpack:pickup_upgrade",
         "travelersbackpack:furnace_upgrade"
@@ -519,7 +506,7 @@
           "count": 100
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 50
         }
       ],
@@ -530,8 +517,7 @@
         "create:flywheel",
         "siftec:biomass",
         "siftec:wire_spool",
-        "siftec:iron_bundle",
-        "siftec:precast_concrete"
+        "siftec:iron_bundle"
       ],
       "tokens": []
     },
@@ -540,7 +526,7 @@
       "tier": 1,
       "cost": [
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 200
         },
         {
@@ -1046,7 +1032,7 @@
           "count": 100
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 100
         }
       ],
@@ -1091,7 +1077,7 @@
       "tier": 2,
       "cost": [
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 400
         },
         {
@@ -1161,7 +1147,7 @@
           "count": 50
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 200
         },
         {
@@ -1258,7 +1244,7 @@
           "count": 150
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 500
         },
         {
@@ -1332,7 +1318,7 @@
           "count": 500
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 1000
         }
       ],
@@ -1382,13 +1368,12 @@
           "count": 100
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 500
         }
       ],
       "seconds": 600,
       "items": [
-        "siftec:miner_mk2",
         "create:crushing_wheel",
         "siftec:encased_industrial_beam",
         "siftec:stator",
@@ -1964,11 +1949,9 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:miner_mk3",
         "siftec:turbo_motor",
         "siftec:thermal_propulsion_rocket",
-        "siftec:magnetic_field_generator",
-        "siftec:drill_shaft"
+        "siftec:magnetic_field_generator"
       ],
       "tokens": []
     },
@@ -2001,7 +1984,9 @@
         "siftec:nuclear_pasta",
         "siftec:accelerator_segment"
       ],
-      "tokens": []
+      "tokens": [
+        "scanner:uranium"
+      ]
     },
     {
       "id": "matter_conversion",
@@ -3862,7 +3847,6 @@
     "siftec:screw": 2,
     "siftec:wire": 6,
     "siftec:cable": 24,
-    "minecraft:light_gray_concrete": 12,
     "create:copper_sheet": 24,
     "siftec:reinforced_iron_plate": 120,
     "siftec:rotor": 140,
@@ -4233,7 +4217,6 @@
     "siftec:deploying/steel_casing_from_stripped_woods": "basic_steel_production",
     "siftec:pressing/power_line": "hub_upgrade_2",
     "siftec:mechanical_crafting/workshop_portable_miner": "hub_upgrade_1",
-    "siftec:mechanical_crafting/workshop_miner_mk1": "hub_upgrade_5",
     "siftec:mechanical_crafting/workshop_hub_engine": "hub_upgrade_2",
     "siftec:mechanical_crafting/workshop_power_pole": "hub_upgrade_3",
     "siftec:mechanical_crafting/workshop_power_tower": "expanded_power_infrastructure",
@@ -4241,7 +4224,6 @@
     "siftec:mechanical_crafting/workshop_cardboard_drone": "aeronautical_engineering",
     "siftec:compacting/screw_bundle": "field_research",
     "siftec:compacting/wire_spool": "hub_upgrade_6",
-    "siftec:compacting/precast_concrete": "hub_upgrade_6",
     "siftec:compacting/quickwire_coil": "mam_caterium_5",
     "siftec:compacting/silica_bundle": "mam_quartz_6",
     "siftec:compacting/iron_bundle": "hub_upgrade_6",
@@ -4260,11 +4242,9 @@
     "seq:speed_governor": "mam_caterium_5",
     "seq:blade_runners": "mam_quartz_6",
     "seq:dimensional_depot": "mam_alien_2",
-    "seq:miner_mk2": "advanced_steel_production",
     "seq:jetpack_thruster": "jetpack",
     "seq:jetpack": "jetpack",
     "seq:radar_tower": "mam_quartz_7",
-    "seq:drill_shaft": "leading_edge_production",
     "seq:designer_frame": "ficsit_blueprints_mk3",
     "siftec:mechanical_crafting/mask_lining": "mam_mycelia_5",
     "siftec:mechanical_crafting/gas_mask": "mam_mycelia_5",
@@ -4285,7 +4265,6 @@
     "siftec:mechanical_crafting/geyser_engine": "mam_sulfur_8",
     "siftec:mechanical_crafting/extractor_pump": "advanced_aluminum_production",
     "siftec:mechanical_crafting/resource_well_extractor": "advanced_aluminum_production",
-    "siftec:mechanical_crafting/miner_mk3": "leading_edge_production",
     "siftec:mechanical_crafting/blueprint_designer_mk3": "ficsit_blueprints_mk3",
     "siftec:mixing/liquid_biofuel": "fluid_packaging",
     "siftec:mixing/sulfuric_acid": "aeronautical_engineering",
@@ -4375,14 +4354,12 @@
     "siftec:deploying/kitchen_wither_rose": "mam_nutrients_5",
     "siftec:deploying/kitchen_tag_dough": "mam_nutrients_5",
     "siftec:mixing/alt_iron_alloy_ingot": "alt_iron_alloy_ingot",
-    "siftec:mixing/alt_wet_concrete": "alt_wet_concrete",
     "siftec:cutting/alt_steel_rod": "alt_steel_rod",
     "siftec:splashing/alt_pure_iron_ingot": "alt_pure_iron_ingot",
     "siftec:splashing/alt_pure_copper_ingot": "alt_pure_copper_ingot",
     "siftec:smelting/alt_biocoal": "alt_biocoal",
     "siftec:blasting/alt_biocoal": "alt_biocoal",
     "siftec:deploying/alt_coated_iron_plate": "alt_coated_iron_plate",
-    "siftec:compacting/alt_fine_concrete": "alt_fine_concrete",
     "siftec:mixing/alt_sloppy_alumina": "alt_sloppy_alumina",
     "siftec:mixing/alt_diluted_fuel": "alt_diluted_fuel"
   },
@@ -4435,13 +4412,6 @@
       "requires": [
         "hub_upgrade_3",
         "coal_power"
-      ]
-    },
-    {
-      "id": "alt_wet_concrete",
-      "requires": [
-        "hub_upgrade_3",
-        "basic_steel_production"
       ]
     },
     {
@@ -4644,13 +4614,6 @@
         "mam_caterium_7",
         "advanced_steel_production",
         "hub_upgrade_2"
-      ]
-    },
-    {
-      "id": "alt_fine_concrete",
-      "requires": [
-        "hub_upgrade_3",
-        "mam_quartz_2"
       ]
     },
     {
@@ -5044,27 +5007,10 @@
       ]
     },
     {
-      "item": "siftec:miner_mk1",
-      "cost": [
-        {
-          "item": "siftec:portable_miner",
-          "count": 1
-        },
-        {
-          "item": "create:iron_sheet",
-          "count": 10
-        },
-        {
-          "item": "minecraft:light_gray_concrete",
-          "count": 10
-        }
-      ]
-    },
-    {
       "item": "siftec:wormhole_gateway",
       "cost": [
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 500
         },
         {
@@ -5102,7 +5048,7 @@
           "count": 5
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 5
         }
       ]
@@ -5175,7 +5121,7 @@
           "count": 1
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 1
         }
       ]
@@ -5205,7 +5151,7 @@
           "count": 5
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 10
         },
         {
@@ -5404,7 +5350,7 @@
           "count": 25
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 100
         }
       ]
@@ -5421,7 +5367,7 @@
           "count": 5
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 100
         }
       ]
@@ -5576,7 +5522,7 @@
           "count": 30
         },
         {
-          "item": "minecraft:light_gray_concrete",
+          "item": "#siftec:stones",
           "count": 45
         }
       ]
@@ -5649,52 +5595,6 @@
       ]
     },
     {
-      "item": "siftec:miner_mk2",
-      "cost": [
-        {
-          "item": "siftec:portable_miner",
-          "count": 2
-        },
-        {
-          "item": "siftec:encased_industrial_beam",
-          "count": 10
-        },
-        {
-          "item": "siftec:steel_pipe",
-          "count": 20
-        },
-        {
-          "item": "siftec:modular_frame",
-          "count": 10
-        }
-      ]
-    },
-    {
-      "item": "siftec:miner_mk3",
-      "cost": [
-        {
-          "item": "siftec:portable_miner",
-          "count": 3
-        },
-        {
-          "item": "siftec:steel_pipe",
-          "count": 50
-        },
-        {
-          "item": "siftec:supercomputer",
-          "count": 5
-        },
-        {
-          "item": "siftec:fused_modular_frame",
-          "count": 10
-        },
-        {
-          "item": "siftec:turbo_motor",
-          "count": 3
-        }
-      ]
-    },
-    {
       "item": "siftec:resource_well_extractor",
       "cost": [
         {
@@ -5731,6 +5631,18 @@
         }
       ],
       "dev": true
+    },
+    {
+      "id": "test_miner",
+      "category": "production",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        }
+      ],
+      "dev": true,
+      "node": true
     }
   ]
 }

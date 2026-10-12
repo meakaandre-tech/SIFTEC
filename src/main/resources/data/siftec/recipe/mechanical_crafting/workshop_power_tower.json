@@ -2,7 +2,7 @@
   "type": "create:mechanical_crafting",
   "key": {
     "A": "siftec:steel_beam",
-    "B": "minecraft:light_gray_concrete",
+    "B": "#siftec:stones",
     "C": "siftec:wire"
   },
   "pattern": [

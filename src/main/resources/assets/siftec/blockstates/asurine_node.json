@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "purity=impure": {
+      "model": "siftec:block/asurine_node"
+    },
+    "purity=normal": {
+      "model": "siftec:block/asurine_node"
+    },
+    "purity=pure": {
+      "model": "siftec:block/asurine_node"
+    }
+  }
+}

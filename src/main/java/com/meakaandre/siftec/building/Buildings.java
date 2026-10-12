@@ -78,7 +78,7 @@ public final class Buildings {
                 cost.add(new Milestone.Cost(c.getAsJsonObject().get("item").getAsString(), c.getAsJsonObject().get("count").getAsInt()));
             }
             BuildingDef def = new BuildingDef(o.get("id").getAsString(), Category.of(o.get("category").getAsString()), List.copyOf(cost),
-                o.has("unlock") ? o.get("unlock").getAsString() : "", o.has("dev") && o.get("dev").getAsBoolean());
+                o.has("unlock") ? o.get("unlock").getAsString() : "", o.has("dev") && o.get("dev").getAsBoolean(), o.has("node") && o.get("node").getAsBoolean());
             DEFS.put(def.id(), def);
         }
     }
@@ -160,6 +160,7 @@ public final class Buildings {
             if (!level.getBlockState(pos).canBeReplaced()) check.blocked.add(pos);
             if (cell.solid()) solid.add(pos.asLong());
         }
+        if (p.def().node()) nodeUnder(level, p, t, check);
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, p.bounds(t))) {
             AABB box = entity.getBoundingBox();
             for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1e-4, box.maxY - 1e-4, box.maxZ - 1e-4))) {
@@ -188,6 +189,28 @@ public final class Buildings {
             }
         }
         return check;
+    }
+
+    /**
+     * A node building goes over a resource node, grown or mined (the node block is in its box, in a cell its template
+     * leaves out), and only once the node's clump is mined away. Applies in creative too: the clump is part of the world.
+     */
+    private static void nodeUnder(Level level, Placement p, BuildingTemplate t, Check check) {
+        AABB box = p.bounds(t);
+        BlockPos node = null;
+        for (BlockPos pos : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
+            var block = level.getBlockState(pos).getBlock();
+            if (block instanceof com.meakaandre.siftec.block.NodeBlock || block instanceof com.meakaandre.siftec.block.DepletedNodeBlock) {
+                node = pos.immutable();
+                break;
+            }
+        }
+        if (node == null) {
+            check.fail("siftec.build_gun.no_node", p.def().name());
+            return;
+        }
+        int left = com.meakaandre.siftec.node.NodePlacer.clumpLeft(level, node);
+        if (left > 0) check.fail("siftec.build_gun.clump", left);
     }
 
     private static void land(ServerLevel level, Placement p, BuildingTemplate t, Company company, Check check) {

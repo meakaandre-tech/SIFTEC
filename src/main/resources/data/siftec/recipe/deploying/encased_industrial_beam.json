@@ -1,7 +1,7 @@
 {
   "type": "create:deploying",
   "target": "siftec:steel_beam",
-  "ingredient": "minecraft:light_gray_concrete",
+  "ingredient": "#siftec:stones",
   "results": [
     {
       "id": "siftec:encased_industrial_beam"

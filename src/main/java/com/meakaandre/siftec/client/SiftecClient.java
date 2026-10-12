@@ -21,11 +21,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 public class SiftecClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        // the miner's input: a vertical shaft through the block, turning with the network
+        // machines with a shaft through them, turning with the network
         BlockEntityRendererProvider<KineticBlockEntity, SingleKineticRenderState> shaft = ShaftRenderer::new;
-        // a miner's drill head, cog and shaft end, turning with the shaft
-        BlockEntityRendererProvider<com.meakaandre.siftec.block.MinerBlockEntity, MinerRenderer.State> miner = MinerRenderer::new;
-        BlockEntityRendererRegistry.register(ModBlockEntities.MINER.get(), miner);
         BlockEntityRendererRegistry.register(ModBlockEntities.EXTRACTOR.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.POLE.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.PROCESSOR.get(), shaft);

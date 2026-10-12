@@ -339,7 +339,7 @@ public final class WorldTests {
         if (saved != NodeSavedData.NO_HEIGHT && saved != NodePlacer.NO_PLACE) pos.setY(saved + 1);
         while (pos.getY() > level.getMinY()) {
             BlockState state = level.getBlockState(pos);
-            if (state.getBlock() instanceof NodeBlock && state.getValue(NodeBlock.CORE)) break;
+            if (state.getBlock() instanceof NodeBlock) break;
             pos.move(0, -1, 0);
         }
         String result;
