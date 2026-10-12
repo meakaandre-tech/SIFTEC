@@ -63,9 +63,11 @@ public class SiftecClient implements ClientModInitializer {
         // the HUB and Wormhole Gateway holograms, and the server's verdict on where they stand
         ClientPlayNetworking.registerGlobalReceiver(com.meakaandre.siftec.prefab.PreviewPayload.TYPE, (payload, context) -> net.minecraft.client.Minecraft.getInstance().execute(() -> PrefabPreview.accept(payload)));
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(PrefabPreview::tick);
+        BuildGunClient.register();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
             ClientState.jetFuel = true;
+            BuildGunClient.reset();
         });
     }
 }

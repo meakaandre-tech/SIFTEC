@@ -1,6 +1,7 @@
 siftec selftest setup
 siftec selftest hub
 siftec selftest prefab
+siftec selftest buildings
 siftec selftest content
 siftec selftest state setup
 siftec selftest state check

@@ -43,6 +43,7 @@ public final class SiftecCommands {
     public static void register() {
         WorldTests.register();
         com.meakaandre.siftec.prefab.PrefabTests.register();
+        com.meakaandre.siftec.building.BuildingTests.register();
         AutomateTests.register();
         NodeTests.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(

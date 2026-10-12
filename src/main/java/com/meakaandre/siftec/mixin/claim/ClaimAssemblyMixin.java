@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** A piston, bearing or gantry cannot pick up blocks from a claim other than the one it is assembled in. */
+/** A piston, bearing or gantry cannot pick up blocks from a claim other than the one it is assembled in, nor a building's blocks. */
 @Mixin(Contraption.class)
 public abstract class ClaimAssemblyMixin {
     @Inject(method = "searchMovedStructure", at = @At("RETURN"), cancellable = true)
@@ -19,7 +19,7 @@ public abstract class ClaimAssemblyMixin {
         Contraption self = (Contraption) (Object) this;
         BlockPos anchor = self.anchor;
         for (BlockPos local : self.getBlocks().keySet()) {
-            if (Claims.crosses(level, anchor, local.offset(anchor))) {
+            if (Claims.crosses(level, anchor, local.offset(anchor)) || com.meakaandre.siftec.building.Buildings.protectedAt(level, local.offset(anchor))) {
                 cir.setReturnValue(false);
                 return;
             }

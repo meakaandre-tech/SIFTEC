@@ -64,6 +64,9 @@ public class ModBlockEntities {
     public static final Entry<com.meakaandre.siftec.workshop.WorkshopBlockEntity> WORKSHOP = register("equipment_workshop", com.meakaandre.siftec.workshop.WorkshopBlockEntity::new, ModBlocks.EQUIPMENT_WORKSHOP.get());
     public static final Entry<SinkBlockEntity> SINK = register("awesome_sink", SinkBlockEntity::new, ModBlocks.AWESOME_SINK.get());
 
+    public static final Entry<com.meakaandre.siftec.building.ControllerBlockEntity> BUILDING_CONTROLLER = register("building_controller", com.meakaandre.siftec.building.ControllerBlockEntity::new, ModBlocks.BUILDING_CONTROLLER.get());
+    public static final Entry<com.meakaandre.siftec.building.PortBlockEntity> BUILDING_PORT = register("building_port", com.meakaandre.siftec.building.PortBlockEntity::new, ModBlocks.BUILDING_PORT.get());
+
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
         Entry<T> entry = new Entry<>();
         BlockEntityType<T> type = new BlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state), Set.of(blocks));
@@ -81,5 +84,8 @@ public class ModBlockEntities {
         ItemStorage.SIDED.registerForBlockEntity((port, side) -> ContainerStorage.of(port.items, side), DRONE_PORT.get());
         ItemStorage.SIDED.registerForBlockEntity((sink, side) -> sink.intake, SINK.get());
         ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());
+        // a building's ports pass items and fluids to and from the machines inside
+        ItemStorage.SIDED.registerForBlockEntity((port, side) -> port.items(side), BUILDING_PORT.get());
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((port, side) -> port.fluids(side), BUILDING_PORT.get());
     }
 }

@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-/** A drill or saw only cuts into a claim its company holds (or one it stands in). */
+/** A drill or saw only cuts into a claim its company holds (or one it stands in), and never into a building. */
 @Mixin(BlockBreakingKineticBlockEntity.class)
 public abstract class ClaimBreakerMixin {
     @Shadow
@@ -17,6 +17,6 @@ public abstract class ClaimBreakerMixin {
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lcom/zurrtum/create/content/kinetics/base/BlockBreakingKineticBlockEntity;canBreak(Lnet/minecraft/world/level/block/state/BlockState;F)Z"))
     private boolean siftec$claim(BlockBreakingKineticBlockEntity self, BlockState state, float hardness) {
-        return self.canBreak(state, hardness) && (breakingPos == null || Claims.machineMayBreak(self, breakingPos));
+        return self.canBreak(state, hardness) && (breakingPos == null || (Claims.machineMayBreak(self, breakingPos) && !com.meakaandre.siftec.building.Buildings.protectedAt(self.getLevel(), breakingPos)));
     }
 }

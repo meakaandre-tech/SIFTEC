@@ -14,7 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ClaimContraptionDrillMixin {
     @Inject(method = "visitNewPosition", at = @At("HEAD"), cancellable = true)
     private void siftec$claim(MovementContext context, BlockPos pos, CallbackInfo ci) {
-        if (context.world == null || context.world.isClientSide() || context.contraption == null || context.contraption.anchor == null) return;
-        if (Claims.crosses(context.world, context.contraption.anchor, pos)) ci.cancel();
+        if (context.world == null || context.world.isClientSide()) return;
+        if (context.contraption == null || context.contraption.anchor == null) {
+            if (com.meakaandre.siftec.building.Buildings.protectedAt(context.world, pos)) ci.cancel();
+            return;
+        }
+        if (Claims.crosses(context.world, context.contraption.anchor, pos) || com.meakaandre.siftec.building.Buildings.protectedAt(context.world, pos)) ci.cancel();
     }
 }

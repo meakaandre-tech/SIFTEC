@@ -38,6 +38,11 @@ Most of `src/main/resources` is generated. Edit the generators, not the JSON:
   ids of the game and the pack's mods), on an item of another mod that nothing unlocks or frees, and it deletes
   generated files that a run no longer writes.
 - `tools/import_art.py`: cuts the textures out of the sprite sheets in `tools/art`.
+- `tools/structures.py`: writes the structure templates of the Build Gun's buildings that are drawn in code
+  (`data/siftec/structure/building/<id>.nbt`). A building can also be built in game and saved with a Structure
+  Block: author it facing north (the player stands on its south side), with one `siftec:building_controller` and a
+  `siftec:building_port` (facing out, `kind` item_in, item_out, fluid_in or fluid_out) wherever belts and pipes
+  attach. The building's tab, cost and unlock are listed in `tools/content.py` (`BUILDINGS`).
 
 Run them from outside the repository, so nothing in the working directory shadows a module:
 
