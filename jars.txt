@@ -1,0 +1,2 @@
+total 1284
+-rw-r--r-- 1 runner runner 1314696 Oct 12 10:46 siftec-0.1.0+26.3.jar

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "ntgl",
+  "version": "3.1.8+26.3",
+  "name": "NukaTeam's Gun Lib",
+  "description": "Core for weapon mods. Fabric port.",
+  "authors": ["Jetug", "Dayton"],
+  "contributors": ["MrCrayfish", "MigaMi"],
+  "contact": {
+    "sources": "https://github.com/meakaandre-tech/nukateamgunlib"
+  },
+  "license": "LGPL-2.1",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.nukateam.ntgl.Ntgl"],
+    "client": ["com.nukateam.ntgl.client.NtglClient"]
+  },
+  "mixins": ["ntgl.mixins.json"],
+  "accessWidener": "ntgl.classtweaker",
+  "depends": {
+    "fabricloader": "*",
+    "fabric-api": "*",
+    "minecraft": ">=26.3- <26.4-",
+    "java": ">=25",
+    "geckolib": ">=5.5"
+  }
+}
