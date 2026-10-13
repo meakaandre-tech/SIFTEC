@@ -107,7 +107,7 @@ public final class BuildingTests {
     }
 
     /** Loads (and keeps loaded) an area and lays a stone floor at {@code y - 1}, with air above. */
-    static void platform(ServerLevel level, int x0, int z0, int x1, int z1, int y, int height) {
+    public static void platform(ServerLevel level, int x0, int z0, int x1, int z1, int y, int height) {
         for (int cx = x0 >> 4; cx <= x1 >> 4; cx++)
             for (int cz = z0 >> 4; cz <= z1 >> 4; cz++) {
                 level.setChunkForced(cx, cz, true);

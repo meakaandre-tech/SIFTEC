@@ -95,7 +95,7 @@ public final class AutomateTests {
             assembly(source, level, at.east(4), "siftec:object_scanner");
             assembly(source, level, at.east(4), "siftec:gas_mask");
             workshop(source, level, at.west(4));
-            poles(source, level, at.south(6));
+            poles(source, level, at.south(6).above(24));
         } catch (RuntimeException e) {
             report(source, "FAILED with " + e);
             Siftec.LOGGER.error("automate selftest", e);

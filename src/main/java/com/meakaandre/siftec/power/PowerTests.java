@@ -304,6 +304,8 @@ public final class PowerTests {
                             + "; nuclear plant " + status(level, nuke) + ", its waste " + (nuke == null ? "?" : nuke.output.getItem(0)) + ", rods left " + (nuke == null ? "?" : nuke.input.getItem(0))
                             + ", water left " + (nuke == null ? -1 : fluidMb(level, tank(nuke))) + " mB; constructor " + motor(level, con2) + "; " + grid(burner));
                         if (aug != null) aug.input.setItem(0, new ItemStack(item("siftec:alien_power_matrix"), 1));
+                        // only the Constructor runs on from here, so the coal lasts until the restart test
+                        setSpeed(level, motorA, 0);
                     }
                     if (ticks == 300) {
                         report(source, "G, the augmenter fed an Alien Power Matrix: " + status(level, aug) + "; " + grid(aug));
@@ -388,8 +390,7 @@ public final class PowerTests {
         if (players.isEmpty()) return 0;
         var player = players.get(0);
         if (n == 0) {
-            BlockPos s = new BlockPos(VX - 4, VY, VZ - 30);
-            floor(level, s, 100, 40);
+            com.meakaandre.siftec.building.BuildingTests.platform(level, VX - 12, VZ - 20, VX + 110, VZ + 30, VY, 18);
             String[] row = {"power_pole_mk1", "biomass_burner", "coal_generator", "fuel_generator", "geothermal_generator", "nuclear_power_plant",
                 "alien_power_augmenter", "power_storage", "power_pole_mk2", "power_pole_mk3", "power_tower", "constructor"};
             List<ControllerBlockEntity> built = new ArrayList<>();
@@ -399,6 +400,13 @@ public final class PowerTests {
                 BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
                 if (t == null) continue;
                 x += t.maxX;
+                if (def.vent() != null) {
+                    // a sulfur geyser under the Geothermal Generator: magma, the geyser, one block of water, then its open vent cell
+                    BlockPos v = new Placement(def, new BlockPos(x, VY, VZ), Direction.NORTH, false).at(def.vent()[0], def.vent()[1], def.vent()[2]);
+                    level.setBlockAndUpdate(v.below(3), Blocks.MAGMA_BLOCK.defaultBlockState());
+                    level.setBlockAndUpdate(v.below(1), Blocks.WATER.defaultBlockState());
+                    level.setBlockAndUpdate(v.below(2), Block.updateFromNeighbourShapes(Blocks.POTENT_SULFUR.defaultBlockState(), level, v.below(2)));
+                }
                 ControllerBlockEntity c = build(level, source, id, new BlockPos(x, VY, VZ), Direction.NORTH);
                 if (c != null) built.add(c);
                 x += t.maxX + 3;
@@ -427,9 +435,9 @@ public final class PowerTests {
             report(source, "view: " + built.size() + " power buildings built and wired");
         }
         switch (n) {
-            case 0 -> player.teleportTo(level, VX + 40.5, VY + 8, VZ + 26.5, java.util.Set.of(), 180f, 18f, true);
-            case 1 -> player.teleportTo(level, VX - 8.5, VY + 10, VZ + 9.5, java.util.Set.of(), 250f, 20f, true);
-            default -> player.teleportTo(level, VX + 9.5, VY + 4, VZ + 10.5, java.util.Set.of(), 180f, 12f, true);
+            case 0 -> player.teleportTo(level, VX + 40.5, VY + 9, VZ + 26.5, java.util.Set.of(), 180f, 14f, true);
+            case 1 -> player.teleportTo(level, VX - 8.5, VY + 12, VZ + 4.5, java.util.Set.of(), 255f, 18f, true);
+            default -> player.teleportTo(level, VX + 9.5, VY + 3, VZ + 9.5, java.util.Set.of(), 180f, 10f, true);
         }
         report(source, "view " + n + " ready");
         return 1;
@@ -467,7 +475,7 @@ public final class PowerTests {
             ControllerBlockEntity burner = build(level, source, "biomass_burner", burnAt, Direction.SOUTH);
             ControllerBlockEntity far = build(level, source, "constructor", farAt, Direction.SOUTH);
             ControllerBlockEntity branch = build(level, source, "constructor", branchAt, Direction.SOUTH);
-            if (burner != null) burner.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 4));
+            if (burner != null) burner.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 64));
             int[][] links = {{0, 1}, {1, 2}, {2, 3}, {3, 4}, {2, 5}};
             StringBuilder wired = new StringBuilder();
             for (int[] l : links) wired.append(wire(connector(level, towers[l[0]]), connector(level, towers[l[1]])) ? "+" : "-");
@@ -498,6 +506,11 @@ public final class PowerTests {
             public boolean tick() {
                 ticks++;
                 if (!settled) {
+                    // the chunks are new: count from when the ends really tick (up to a minute)
+                    if (ticks == 1 && !(level.shouldTickBlocksAt(burnAt) && level.shouldTickBlocksAt(farAt) && level.shouldTickBlocksAt(branchAt)) && ++waited < 1200) {
+                        ticks = 0;
+                        return false;
+                    }
                     if (!restart && ticks == 60) {
                         report(source, "chain all loaded: " + ends());
                         for (int i : middle) level.setChunkForced(t[i].getX() >> 4, t[i].getZ() >> 4, false);
@@ -529,7 +542,7 @@ public final class PowerTests {
                             if (burner != null && burner.tripped || step == 5) {
                                 report(source, tag + "burner out of fuel: tripped " + (burner != null && burner.tripped) + "; " + ends());
                                 if (burner != null) {
-                                    burner.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 8));
+                                    burner.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 64));
                                     BuildingPowerAccess.reset(level, burner);
                                 }
                                 step = 5;
