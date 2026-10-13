@@ -193,7 +193,8 @@ def sequence(base, out, steps, loops, name=None, n=1, transitional=None):
         elif step == "cut":
             seq.append({"type": "create:cutting", "ingredient": "$ingredient", "results": ["$result"]})
         elif isinstance(step, tuple):
-            seq.append({"type": "create:filling", "ingredient": "$ingredient", "fluid_ingredient": fl_in(step[1], step[2]), "results": ["$result"]})
+            # the Spout's recipe has one result, not a list
+            seq.append({"type": "create:filling", "ingredient": "$ingredient", "fluid_ingredient": fl_in(step[1], step[2]), "result": "$result"})
         else:
             seq.append({"type": "create:deploying", "target": "$ingredient", "ingredient": item(step), "results": ["$result"]})
     return add("sequenced_assembly", name or slug(out), {"type": "create:sequenced_assembly", "ingredient": item(base),
