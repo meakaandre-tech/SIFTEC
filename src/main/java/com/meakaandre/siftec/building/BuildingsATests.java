@@ -209,7 +209,8 @@ public final class BuildingsATests {
         Direction side = along.getClockWise();
         BlockPos motorPos = from.relative(side);
         level.setBlock(motorPos, block("create:creative_motor").defaultBlockState().setValue(BlockStateProperties.FACING, side.getOpposite()), Block.UPDATE_ALL);
-        if (level.getBlockEntity(motorPos) instanceof CreativeMotorBlockEntity motor) motor.generatedSpeed.setValue(128);
+        // 32 RPM: the company speed limit every company starts with, which the test belts answer to like any other
+        if (level.getBlockEntity(motorPos) instanceof CreativeMotorBlockEntity motor) motor.generatedSpeed.setValue(32);
         // which way a belt runs depends on the sign of its speed: turned round if it runs the wrong way
         later(level, 10, () -> {
             if (level.getBlockEntity(from) instanceof BeltBlockEntity b && b.getSpeed() != 0 && b.getMovementFacing() != along
@@ -217,6 +218,12 @@ public final class BuildingsATests {
                 motor.generatedSpeed.setValue(-motor.generatedSpeed.getValue());
             }
         });
+    }
+
+    /** A belt's speed, the way it runs and what it carries, for the report. */
+    private static String beltState(ServerLevel level, BlockPos pos, Item item) {
+        if (!(level.getBlockEntity(pos) instanceof BeltBlockEntity b)) return "no belt (" + level.getBlockState(pos).getBlock().getClass().getSimpleName() + ")";
+        return b.getSpeed() + " RPM toward " + b.getMovementFacing() + ", " + onBelt(level, pos, item) + " on it";
     }
 
     /** Puts one item on a belt's first block, as a funnel or chute would; false if it has no room there. */
@@ -299,7 +306,7 @@ public final class BuildingsATests {
         }
         expect(source, "SU follow Satisfactory's MW (1 MW = 204.8 SU)", Buildings.def("constructor").su() == 819 && Buildings.def("smelter").su() == 819
             && Buildings.def("miner_mk1").su() == 1024 && Buildings.def("miner_mk2").su() == 3072 && Buildings.def("miner_mk3").su() == 9216, "");
-        Buildings.Check locked = Buildings.check(level, at("miner_mk3", X + 130, Z), new Company(), wallet(Buildings.def("miner_mk3")), false);
+        Buildings.Check locked = Buildings.check(level, at("constructor", X + 130, Z), new Company(), wallet(Buildings.def("constructor")), false);
         expect(source, "a company without the milestone cannot build it", "siftec.build_gun.locked".equals(locked.reason), String.valueOf(locked.reason));
 
         // ---- Constructor making Iron Plate (3 Iron Ingot -> 2 Iron Plate, 6 s): fed by a belt at the back, out on a belt at the front
@@ -373,6 +380,11 @@ public final class BuildingsATests {
             for (int i = 0; i < 3; i++) start[2 + i] = made(level, minerSpots.get(i));
             start[5] = made(level, pm);
             report(source, "measuring from " + java.util.Arrays.toString(start));
+            report(source, "belts: constructor in " + beltState(level, conIn, Items.IRON_INGOT) + ", out " + beltState(level, conOut, item("create:iron_sheet"))
+                + "; basin " + count(level, basin, Items.IRON_INGOT) + " ingots " + count(level, basin, item("create:iron_sheet")) + " plates; smelter in "
+                + beltState(level, smIn, Items.RAW_IRON) + ", out " + beltState(level, smOut, Items.IRON_INGOT) + ", controller in "
+                + (controller(level, sm) == null ? "-" : controller(level, sm).input.getItem(0) + " out " + controller(level, sm).output.getItem(0))
+                + "; storage in " + beltState(level, stIn, Items.COBBLESTONE));
         });
         later(level, WARMUP + MINUTE, () -> {
             long crafts = made(level, con) - start[0];

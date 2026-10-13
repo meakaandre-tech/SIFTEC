@@ -288,7 +288,7 @@ key F1
 cmd siftec worldtest buildgun
 sleep 4
 keydown Control_L
-scroll 5
+sh xdotool click 5
 keyup Control_L
 sleep 3
 shot

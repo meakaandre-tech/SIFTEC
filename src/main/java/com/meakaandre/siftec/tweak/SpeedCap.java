@@ -37,9 +37,12 @@ public final class SpeedCap {
      * limit of the block it is joined to.
      */
     public static boolean tooFast(KineticBlockEntity current, KineticBlockEntity neighbour, float toNeighbour, float toCurrent) {
-        if (!(current.getLevel() instanceof ServerLevel)) return false;
+        if (!(current.getLevel() instanceof ServerLevel level)) return false;
         float a = Math.abs(toNeighbour), b = Math.abs(toCurrent);
         if (a <= START && b <= START) return false;
+        // the machines inside a Build Gun building turn at the speed its motor sets, whatever the company's limit
+        if (com.meakaandre.siftec.building.Buildings.protectedAt(level, current.getBlockPos())
+            && com.meakaandre.siftec.building.Buildings.protectedAt(level, neighbour.getBlockPos())) return false;
         Company mine = Ownership.of(current), theirs = Ownership.of(neighbour);
         if (mine == null) mine = theirs;
         if (theirs == null) theirs = mine;
