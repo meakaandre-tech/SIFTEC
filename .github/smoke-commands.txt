@@ -3,6 +3,7 @@ siftec selftest hub
 siftec selftest prefab
 siftec selftest buildings
 siftec selftest buildings_a
+siftec selftest power
 siftec selftest content
 siftec selftest state setup
 siftec selftest state check
@@ -23,10 +24,5 @@ siftec worldtest geyser natural 160
 siftec worldtest geyser wet 160
 siftec worldtest processor
 siftec worldtest automate
-siftec worldtest furnace setup
-siftec worldtest powerline setup
 siftec worldtest powerchain setup
-#sleep 30
-siftec worldtest furnace check
-siftec worldtest powerline check
-#sleep 190
+#sleep 220

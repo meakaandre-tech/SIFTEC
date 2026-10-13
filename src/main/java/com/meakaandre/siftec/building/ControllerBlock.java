@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * A building's control panel. Part of the building like its shell (only the Build Gun takes it away); using it
  * says what the building is doing. On a Constructor, using it with an item sets what it makes (its recipe filter),
- * and sneak-using it clears that.
+ * and sneak-using it clears that. Sneak-using a generator or Power Storage whose grid's fuse has blown resets it.
  */
 public class ControllerBlock extends Block implements EntityBlock {
     public ControllerBlock(Properties properties) {
@@ -49,6 +49,12 @@ public class ControllerBlock extends Block implements EntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (player instanceof ServerPlayer server && level.getBlockEntity(pos) instanceof ControllerBlockEntity controller) {
             BuildingDef def = Buildings.def(controller.buildingId);
+            // sneaking at a generator or Power Storage resets its grid's fuse, as Satisfactory's do
+            if (def != null && player.isShiftKeyDown() && controller.tripped && mayUse(server, controller)
+                && BuildingPower.resetFuse(server.level(), controller)) {
+                server.sendOverlayMessage(Component.translatable("siftec.power.fuse_reset"));
+                return InteractionResult.SUCCESS;
+            }
             if (def != null && player.isShiftKeyDown() && !controller.filter.isEmpty() && mayUse(server, controller)
                 && BuildingLogic.setFilter(level, controller, ItemStack.EMPTY)) {
                 server.sendOverlayMessage(Component.translatable("siftec.building.filter_cleared", def.name()));

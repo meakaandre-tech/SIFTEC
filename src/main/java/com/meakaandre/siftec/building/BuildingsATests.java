@@ -5,7 +5,6 @@ import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
-import com.meakaandre.siftec.engine.EngineBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.NodeType;
@@ -379,6 +378,22 @@ public final class BuildingsATests {
         put(level, source, company, ist);
         ControllerBlockEntity istc = controller(level, ist);
 
+        // ---- power (work package 6): the powered buildings stand still until they are on a grid with power. An Alien Power
+        // Augmenter (500 MW, no fuel) on a Power Pole Mk.3 gives it to them all.
+        ControllerBlockEntity aug = com.meakaandre.siftec.power.PowerTests.build(level, source, "alien_power_augmenter", new BlockPos(X + 60, Y, Z + 30), Direction.NORTH);
+        ControllerBlockEntity pole = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk3", new BlockPos(X + 60, Y, Z + 22), Direction.NORTH);
+        var poleConnector = com.meakaandre.siftec.power.PowerTests.connector(level, pole);
+        List<ControllerBlockEntity> powered = new ArrayList<>();
+        if (aug != null) powered.add(aug);
+        powered.add(cc);
+        powered.add(controller(level, sm));
+        for (Placement p : minerSpots) powered.add(controller(level, p));
+        int wired = 0;
+        for (ControllerBlockEntity c : powered) if (c != null && com.meakaandre.siftec.power.PowerTests.wire(com.meakaandre.siftec.power.PowerTests.connector(level, c), poleConnector)) wired++;
+        expect(source, "power: the Augmenter, Constructor, Smelter and miners are wired to a Power Pole Mk.3", wired == powered.size(), wired + " of " + powered.size());
+        later(level, 40, () -> expect(source, "power: the Constructor's New Age motor runs on the grid at 64 RPM, giving its 4 MW (819 SU)",
+            cc != null && cc.powered && motorTurns(level, cc), cc == null ? "no controller" : BuildingLogic.status(level, cc).getString()));
+
         // ---- the HUB: costs 20 Raw Iron from the player, gives the Build Gun, gives the iron back when picked up
         hubTest(source, level, company);
 
@@ -451,6 +466,13 @@ public final class BuildingsATests {
         });
     }
 
+    /** True if a building's first New Age motor turns at its 64 RPM. */
+    private static boolean motorTurns(ServerLevel level, ControllerBlockEntity c) {
+        List<BlockPos> motors = BuildingPower.motors(c);
+        return !motors.isEmpty() && level.getBlockEntity(motors.getFirst()) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k
+            && Math.abs(k.getSpeed()) == BuildingLogic.MOTOR_RPM;
+    }
+
     private static long made(ServerLevel level, Placement p) {
         ControllerBlockEntity c = controller(level, p);
         return c == null ? -1 : c.made;
@@ -504,11 +526,13 @@ public final class BuildingsATests {
             long rip = count(level, mixerBasin, item("siftec:reinforced_iron_plate"));
             expect(source, "HUB: the hand-cranked Press makes Iron Plate at the normal amount", plates == 2, plates + " plates");
             expect(source, "HUB: the hand-cranked Mixer makes Reinforced Iron Plate", rip == 1, rip + " Reinforced Iron Plate");
-            // the Biomass Burners burn Biomass, not coal, and give 6,144 SU
+            // the Biomass Burners burn Biomass, not coal, at Satisfactory's 180 MJ, and have a wire connector on top
             BlockPos b1 = spot.at(Templates.BURNER_1[0], Templates.BURNER_1[1], Templates.BURNER_1[2]);
-            if (level.getBlockEntity(b1) instanceof EngineBlockEntity burner) {
-                expect(source, "HUB: its Biomass Burners take Biomass and leaves, not coal", burner.accepts(new ItemStack(item("siftec:biomass")))
-                    && burner.accepts(new ItemStack(Items.OAK_LEAVES)) && !burner.accepts(new ItemStack(Items.COAL)) && burner.burnTime(new ItemStack(item("siftec:biomass"))) == 120, "");
+            if (level.getBlockEntity(b1) instanceof com.meakaandre.siftec.prefab.HubBurnerBlockEntity burner) {
+                expect(source, "HUB: its Biomass Burners take Biomass and leaves, not coal, and are wired from the top", com.meakaandre.siftec.prefab.HubBurnerBlockEntity.accepts(new ItemStack(item("siftec:biomass")))
+                    && com.meakaandre.siftec.prefab.HubBurnerBlockEntity.accepts(new ItemStack(Items.OAK_LEAVES)) && !com.meakaandre.siftec.prefab.HubBurnerBlockEntity.accepts(new ItemStack(Items.COAL))
+                    && BuildingPower.itemMj("biomass", new ItemStack(item("siftec:biomass"))) == 180
+                    && level.getBlockEntity(b1.above()) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector, String.valueOf(level.getBlockState(b1.above())));
             } else {
                 expect(source, "HUB: its first Biomass Burner stands", false, String.valueOf(level.getBlockState(b1)));
             }
@@ -592,9 +616,14 @@ public final class BuildingsATests {
         ControllerBlockEntity cc = controller(level, con);
         expect(source, "restart: the Constructor kept its recipe filter and count", cc != null && cc.filter.is(item("create:iron_sheet")) && cc.made > 0,
             cc == null ? "no controller" : cc.filter + ", " + cc.made + " made");
-        BlockPos motor = cc == null ? null : BuildingLogic.cell(cc, ModBlocks.BUILDING_MOTOR.get());
-        expect(source, "restart: its motor kept its speed and SU", motor != null && level.getBlockEntity(motor) instanceof MotorBlockEntity m && m.rpm == BuildingLogic.MOTOR_RPM && m.su == 819f,
-            motor == null ? "no motor" : String.valueOf(level.getBlockEntity(motor)));
+        List<BlockPos> motors = cc == null ? List.of() : BuildingPower.motors(cc);
+        expect(source, "restart: its New Age motor kept its speed", !motors.isEmpty() && level.getBlockEntity(motors.getFirst()) instanceof org.antarcticgardens.cna.content.motor.MotorBlockEntity m
+            && m.speedBehavior != null && m.speedBehavior.getValue() == (int) BuildingLogic.MOTOR_RPM, motors.isEmpty() ? "no motor" : String.valueOf(level.getBlockEntity(motors.getFirst())));
+        later(level, 60, () -> {
+            ControllerBlockEntity c2 = controller(level, con);
+            expect(source, "restart: the Constructor is back on its grid and its motor turns", c2 != null && c2.powered && motorTurns(level, c2),
+                c2 == null ? "no controller" : BuildingLogic.status(level, c2).getString());
+        });
         Placement mk1 = Buildings.snapToNode(level, at("miner_mk1", X + 41, Z + 3));
         ControllerBlockEntity mc = controller(level, mk1);
         long before = mc == null ? -1 : mc.made;

@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.equip;
 
-import com.meakaandre.siftec.power.PoleBlockEntity;
+import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -15,9 +15,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Riding Power Lines: use a wrench on a pole (after the Zipline research). The rider sits on an invisible carrier that the server slides from pole to
- * pole; at each pole it carries on down the line that runs straightest, and stops where there is none.
- * Sneak to drop off.
+ * Riding Power Lines: use a wrench on a Power Pole or Tower (after the Zipline research). The rider sits on an invisible
+ * carrier that the server slides along the wires from connector to connector; at each one it carries on down the wire
+ * that runs straightest, and stops where there is none. Sneak to drop off.
  */
 public final class Ziplines {
     private static final double SPEED = 0.9, HANG = 2.3;
@@ -40,16 +40,16 @@ public final class Ziplines {
     }
 
     private static Vec3 top(BlockPos pole) {
-        return new Vec3(pole.getX() + 0.5, pole.getY() + 0.95 - HANG, pole.getZ() + 0.5);
+        return new Vec3(pole.getX() + 0.5, pole.getY() + 0.5 - HANG, pole.getZ() + 0.5);
     }
 
     /** The pole down the line from this one that best continues the direction given, or null. */
     private static BlockPos next(ServerLevel level, BlockPos pole, Vec3 heading, BlockPos cameFrom, double leastDot) {
-        if (!(level.getBlockEntity(pole) instanceof PoleBlockEntity entity)) return null;
+        if (!(level.getBlockEntity(pole) instanceof AbstractElectricalConnector entity)) return null;
         BlockPos best = null;
         double bestDot = leastDot;
-        for (BlockPos offset : entity.lines) {
-            BlockPos other = pole.offset(offset);
+        for (BlockPos other : entity.getConnectorPositions().keySet()) {
+            BlockPos offset = other.subtract(pole);
             if (other.equals(cameFrom)) continue;
             Vec3 way = new Vec3(offset.getX(), 0, offset.getZ());
             if (way.lengthSqr() < 0.01) continue;

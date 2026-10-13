@@ -403,8 +403,8 @@ def carried_over():
     # what the old miners drilled with (Mk.2 Drilling Mud, Mk.3 Coolant); the Build Gun miners decide in work package 5
     mix("drilling_mud", items=["minecraft:clay_ball", "minecraft:gravel"], fluids=[("water", 250)], fluid_results=[("drilling mud", 500)])
     mix("coolant", fluids=[("diesel", 250), ("water", 250)], fluid_results=[("coolant", 500)])
-    # the Power Line: one Cable pressed flat (1.0 builds a Power Line from 1 Cable)
-    press("Cable", "siftec:power_line", name="power_line")
+    # a wire for the grid (New Age's copper wire): one Cable pressed flat, as 1.0 builds a Power Line from 1 Cable
+    press("Cable", "create_new_age:copper_wire", name="copper_wire")
     # brass, the pack's Caterium: crushed copper and zinc with a flux, then smelted
     under("mam_caterium_1")
     for flux, n in (("minecraft:sand", 1), ("Coal", 2), ("Sulfur", 3)):
@@ -523,12 +523,6 @@ WORKSHOP = [
     ("siftec:claim_marker", "5 Iron Rod, 5 Stone"),
     ("siftec:mam", _B["MAM"]),
     ("siftec:object_scanner", _E["Object Scanner"]),
-    ("siftec:power_line", _B["Power Line"]),
-    ("siftec:hub_engine", "5 Iron Sheet, 5 Iron Rod"),
-    ("siftec:power_pole", _B["Power Pole Mk.1"]),
-    ("siftec:furnace_engine", "15 Iron Sheet, 15 Iron Rod, 25 Wire"),
-    ("siftec:power_tower", _B["Power Tower"]),
-    ("siftec:power_storage", _B["Power Storage"]),
     ("siftec:speed_governor", "25 Quickwire, 2 Rotor, 2 Reinforced Iron Plate"),
     ("siftec:landing_pad", _B["U-Jelly Landing Pad"]),
     ("siftec:jetpack", _E["Jetpack"]),
@@ -545,7 +539,6 @@ WORKSHOP = [
     ("siftec:main_portal", _B["Main Portal"]),
     ("siftec:satellite_portal", _B["Satellite Portal"]),
     ("siftec:dimensional_depot", _B["Dimensional Depot Uploader"]),
-    ("siftec:geyser_engine", _B["Geothermal Generator"]),
     ("siftec:awesome_sink", _B["AWESOME Sink"]),
     ("siftec:awesome_shop", _B["AWESOME Shop"]),
     ("siftec:particle_accelerator", _B["Particle Accelerator"]),

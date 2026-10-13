@@ -1,0 +1,9 @@
+{
+  "feature": "create_new_age:thorium_ore",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 0
+    }
+  ]
+}

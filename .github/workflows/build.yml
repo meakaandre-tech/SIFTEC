@@ -32,6 +32,8 @@ jobs:
         run: |
           mkdir -p libs
           curl -fsSL -o libs/create-fly-26.3.jar https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
+          # Create: New Age (power: wires, connectors, motors, the reactor), the fork's fabric-26.3 build
+          curl -fsSL -o libs/create-new-age-26.3.jar https://github.com/meakaandre-tech/Create-New-Age/releases/download/fabric-26.3-latest/create-new-age-fabric-26.3.jar
           ls -l libs
       - name: Download Traveler's Backpack and its dependencies
         shell: bash
@@ -130,6 +132,7 @@ jobs:
             echo "fabric api: $fapiurl"
             if [ ! -f $root/.github/smoke-no-fabric-api ]; then curl -fsSL -o mods/fabric-api.jar "$fapiurl"; fi
             cp ../libs/create-fly-26.3.jar mods/
+            cp ../libs/create-new-age-26.3.jar mods/
             cp ../libs/tb/runtime/*.jar mods/ 2>/dev/null || echo "no Traveler's Backpack build for $mc"
             # what the pack's other ported mods have published (listed only; see .github/smoke-pack-mods)
             for r in createhypertubes creategunmod create-diesel-generators Create-Fly; do
@@ -294,4 +297,4 @@ jobs:
           sleep 3
           jar=$(ls build/libs/*.jar | grep -v sources | head -1)
           cp "$jar" siftec-26.3.jar
-          gh release create latest siftec-26.3.jar -R "${{ github.repository }}" --target "${GITHUB_SHA}" --title "SIFTEC (latest build)" --notes "Built from main at ${GITHUB_SHA}. Needs Create Fly and Fabric API; the pack adds Traveler's Backpack (with Forge Config API Port) as its backpack."
+          gh release create latest siftec-26.3.jar -R "${{ github.repository }}" --target "${GITHUB_SHA}" --title "SIFTEC (latest build)" --notes "Built from main at ${GITHUB_SHA}. Needs Create Fly, Create: New Age (meakaandre-tech/Create-New-Age, fabric-26.3) and Fabric API; the pack adds Traveler's Backpack (with Forge Config API Port) as its backpack."

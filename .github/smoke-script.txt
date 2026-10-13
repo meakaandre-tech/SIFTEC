@@ -16,7 +16,7 @@ cmd give @a minecraft:water_bucket
 cmd give @a minecraft:lava_bucket
 cmd give @a siftec:mead
 cmd give @a siftec:claim_marker
-cmd give @a siftec:power_pole
+cmd give @a create_new_age:copper_wire 16
 cmd give @a siftec:hub
 cmd give @a siftec:speed_governor
 sleep 3
@@ -332,5 +332,15 @@ cmd siftec worldtest buildings_a view 2
 sleep 4
 shot
 cmd siftec worldtest buildings_a view 3
+sleep 4
+shot
+cmd time set noon
+cmd siftec worldtest power view 0
+sleep 15
+shot
+cmd siftec worldtest power view 1
+sleep 4
+shot
+cmd siftec worldtest power view 2
 sleep 4
 shot

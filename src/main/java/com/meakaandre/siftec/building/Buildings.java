@@ -88,9 +88,17 @@ public final class Buildings {
             }
             BuildingDef def = new BuildingDef(o.get("id").getAsString(), Category.of(o.get("category").getAsString()), List.copyOf(cost),
                 o.has("unlock") ? o.get("unlock").getAsString() : "", o.has("dev") && o.get("dev").getAsBoolean(), node, nodeCell,
-                o.has("logic") ? o.get("logic").getAsString() : "", o.has("su") ? o.get("su").getAsInt() : 0, o.has("rate") ? o.get("rate").getAsInt() : 0);
+                o.has("logic") ? o.get("logic").getAsString() : "", o.has("su") ? o.get("su").getAsInt() : 0, o.has("rate") ? o.get("rate").getAsInt() : 0,
+                o.has("power") ? o.get("power").getAsString() : "", o.has("mw") ? o.get("mw").getAsDouble() : 0, o.has("water") ? o.get("water").getAsDouble() : 0,
+                o.has("lines") ? o.get("lines").getAsInt() : 0, cell(o, "vent"));
             DEFS.put(def.id(), def);
         }
+    }
+
+    private static int @Nullable [] cell(JsonObject o, String key) {
+        if (!o.has(key)) return null;
+        var a = o.getAsJsonArray(key);
+        return new int[]{a.get(0).getAsInt(), a.get(1).getAsInt(), a.get(2).getAsInt()};
     }
 
     public static @Nullable BuildingDef def(String id) {
@@ -171,6 +179,10 @@ public final class Buildings {
             if (cell.solid()) solid.add(pos.asLong());
         }
         if (p.def().node()) nodeUnder(level, p, t, check);
+        int[] vent = p.def().vent();
+        if (vent != null && com.meakaandre.siftec.geyser.Vents.findVent(level, p.at(vent[0], vent[1], vent[2])) == null) {
+            check.fail("siftec.power.no_geyser_place");
+        }
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, p.bounds(t))) {
             AABB box = entity.getBoundingBox();
             for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1e-4, box.maxY - 1e-4, box.maxZ - 1e-4))) {
@@ -320,6 +332,7 @@ public final class Buildings {
             controller.setChanged();
             BuildingLogic.placed(level, controller);
         }
+        com.meakaandre.siftec.power.PowerGrids.dirty();
         Siftec.LOGGER.info("SIFTEC: building {} placed at {} facing {}{} ({} blocks, {} refund stacks)", p.def().id(), controllerPos.toShortString(),
             p.facing(), p.flip() ? " flipped" : "", t.members.size(), refund.size());
         return check;
@@ -359,6 +372,7 @@ public final class Buildings {
         if (p != null) out.addAll(takeDown(level, p, controllerPos));
         if (level.getBlockState(controllerPos).getBlock() instanceof ControllerBlock) level.setBlock(controllerPos, Blocks.AIR.defaultBlockState(), SET);
         Siftec.LOGGER.info("SIFTEC: building {} at {} dismantled; {} stacks given back", controller.buildingId, controllerPos.toShortString(), out.size());
+        com.meakaandre.siftec.power.PowerGrids.dirty();
         return out;
     }
 
@@ -516,14 +530,35 @@ public final class Buildings {
             }
             return false;
         });
-        // nor wrenched off or turned
+        // nor wrenched off or turned; a wrench on a Power Pole or Tower rides its wires instead (the Zipline research)
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             if (level.isClientSide() || !player.getItemInHand(hand).is(com.zurrtum.create.AllItems.WRENCH)) return InteractionResult.PASS;
             BlockPos controller = BuildingIndex.controllerOf(level, hit.getBlockPos());
             if (controller == null) return InteractionResult.PASS;
+            if (player instanceof ServerPlayer rider && level.getBlockEntity(controller) instanceof ControllerBlockEntity c && c.def() != null
+                && c.def().power().equals("pole")) {
+                BlockPos connector = connectorOf(level, c);
+                if (!player.hasInfiniteMaterials() && !com.meakaandre.siftec.company.Companies.of(rider).hasToken("zipline")) {
+                    rider.sendOverlayMessage(Component.translatable("siftec.zipline.locked"));
+                } else if (connector == null || !com.meakaandre.siftec.equip.Ziplines.start(rider, connector)) {
+                    rider.sendOverlayMessage(Component.translatable("siftec.zipline.no_line"));
+                }
+                return InteractionResult.SUCCESS;
+            }
             if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.build_gun.part", nameAt(level, controller)));
             return InteractionResult.FAIL;
         });
+    }
+
+    /** The wire connector of a building (a pole's or tower's top), or null. */
+    public static @Nullable BlockPos connectorOf(Level level, ControllerBlockEntity c) {
+        Placement p = c.placement();
+        BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
+        if (t == null) return null;
+        for (BuildingTemplate.Cell cell : t.members) {
+            if (level.getBlockEntity(p.at(cell)) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector) return p.at(cell);
+        }
+        return null;
     }
 
     static Component nameAt(Level level, BlockPos controller) {

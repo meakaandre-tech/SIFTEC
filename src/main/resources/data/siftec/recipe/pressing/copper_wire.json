@@ -1,0 +1,9 @@
+{
+  "type": "create:pressing",
+  "ingredient": "siftec:cable",
+  "results": [
+    {
+      "id": "create_new_age:copper_wire"
+    }
+  ]
+}

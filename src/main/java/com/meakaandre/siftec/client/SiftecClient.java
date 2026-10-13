@@ -24,11 +24,9 @@ public class SiftecClient implements ClientModInitializer {
         // machines with a shaft through them, turning with the network
         BlockEntityRendererProvider<KineticBlockEntity, SingleKineticRenderState> shaft = ShaftRenderer::new;
         BlockEntityRendererRegistry.register(ModBlockEntities.EXTRACTOR.get(), shaft);
-        BlockEntityRendererRegistry.register(ModBlockEntities.POLE.get(), shaft);
         BlockEntityRendererRegistry.register(ModBlockEntities.PROCESSOR.get(), shaft);
-        BlockEntityRendererRegistry.register(ModBlockEntities.GEYSER_ENGINE.get(), shaft);
-        BlockEntityRendererRegistry.register(ModBlockEntities.POWER_STORAGE.get(), shaft);
-        BlockEntityRendererRegistry.register(ModBlockEntities.ENGINE.get(), shaft);
+        // a generator building's turbine, turning its generator coils
+        BlockEntityRendererRegistry.register(ModBlockEntities.TURBINE.get(), shaft);
         // the Speed Governor's two shaft halves turn at different speeds, like a Gearshift's
         BlockEntityRendererProvider<com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity,
             com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer.SplitShaftRenderState> split =
