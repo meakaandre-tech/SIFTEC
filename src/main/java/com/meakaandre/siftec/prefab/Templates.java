@@ -169,13 +169,20 @@ public final class Templates {
         return ModBlocks.HUB_BED.get().defaultBlockState().setValue(BedBlock.FACING, Direction.NORTH).setValue(BedBlock.PART, part);
     }
 
-    /** A burner pad at x: empty until the upgrade, then the burner in a housing with a chimney behind; its top stays open for a shaft. */
+    /** A Create: New Age wire connector standing on the block below it. */
+    private static BlockState connector() {
+        BlockState state = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath("create_new_age", "electrical_connector")).defaultBlockState();
+        return state.hasProperty(BlockStateProperties.FACING) ? state.setValue(BlockStateProperties.FACING, Direction.UP) : state;
+    }
+
+    /** A burner pad at x: empty until the upgrade, then the burner in a housing with a chimney behind and a wire connector on top. */
     private static void burner(Template t, int x, int from) {
         int M = HUB_MAX;
         t.set(0, M, x, 0, 21, s("orange"));
         t.set(0, from - 1, x, 1, 21, Template.AIR);
         t.set(from, M, x, 1, 21, ModBlocks.HUB_BURNER.get().defaultBlockState().setValue(Facing.FACING, Direction.SOUTH));
-        t.set(from, M, x, 2, 21, Template.AIR);
+        // its wire connector on top: wire it to a Power Pole, or to the other burner, to put it on a grid
+        t.set(from, M, x, 2, 21, connector());
         t.set(from, M, x - 1, 1, 21, s("metal"));
         t.set(from, M, x + 1, 1, 21, s("metal"));
         t.set(from, M, x, 1, 22, s("metal"));

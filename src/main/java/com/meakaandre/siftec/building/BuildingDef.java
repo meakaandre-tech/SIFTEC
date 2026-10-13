@@ -14,13 +14,19 @@ import java.util.List;
  * template leaves the node's cell ({@code nodeCell}, in the Build Gun frame) out, so the node stays where it is.
  * <p>
  * {@code logic} says how it works ({@link BuildingLogic}: "basin", "smelter", "miner", "portable_miner", "storage", or
- * "" for none), {@code su} the SU it draws (its motor gives exactly that), and {@code rate} a miner's items a minute
- * on a normal node.
+ * "" for none), {@code su} the SU it draws (its New Age motors give exactly that), and {@code rate} a miner's items a
+ * minute on a normal node.
+ * <p>
+ * Power ({@link BuildingPower}): {@code power} is its part in the grid ("" for a plain consumer or nothing, "pole",
+ * "storage", "augmenter", or a generator: "biomass", "coal", "fuel", "geothermal", "nuclear"), {@code mw} the
+ * megawatts a generator gives, {@code water} the m3 of water a minute it takes at full load, {@code lines} how many
+ * wires its connector takes, and {@code vent} the open cell a Geothermal Generator must stand over a geyser with.
  */
 public record BuildingDef(String id, Category category, List<Milestone.Cost> cost, String unlock, boolean dev, boolean node,
-                          int @Nullable [] nodeCell, String logic, int su, int rate) {
+                          int @Nullable [] nodeCell, String logic, int su, int rate, String power, double mw, double water, int lines,
+                          int @Nullable [] vent) {
     public BuildingDef(String id, Category category, List<Milestone.Cost> cost, String unlock, boolean dev, boolean node) {
-        this(id, category, cost, unlock, dev, node, node ? new int[]{0, 0, 1} : null, "", 0, 0);
+        this(id, category, cost, unlock, dev, node, node ? new int[]{0, 0, 1} : null, "", 0, 0, "", 0, 0, 0, null);
     }
 
     public String nameKey() {

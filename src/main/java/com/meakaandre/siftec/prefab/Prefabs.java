@@ -6,7 +6,6 @@ import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.config.SiftecConfig;
-import com.meakaandre.siftec.engine.EngineBlockEntity;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.hub.Milestone;
@@ -526,7 +525,7 @@ public final class Prefabs {
                 BlockPos pos = spot.at(local.getX(), local.getY(), local.getZ());
                 if (pos.equals(terminal)) continue;
                 if (level.getBlockEntity(pos) instanceof StorageBoxBlockEntity box) out.addAll(box.takeAll());
-                if (level.getBlockEntity(pos) instanceof EngineBlockEntity engine && !engine.fuel.getItem(0).isEmpty()) {
+                if (level.getBlockEntity(pos) instanceof HubBurnerBlockEntity engine && !engine.fuel.getItem(0).isEmpty()) {
                     out.add(engine.fuel.removeItemNoUpdate(0));
                     engine.setChanged();
                 }

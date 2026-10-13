@@ -7,7 +7,6 @@ import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
-import com.meakaandre.siftec.power.PoleBlockEntity;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.workshop.WorkshopBlockEntity;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCraftingRecipe;
@@ -45,10 +44,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Selftests for automation: the Power Line pressed from Cable only for a company that has it unlocked (and the old
+ * Selftests for automation: the grid's copper wire pressed from Cable (and the old
  * Workshop crafter route refused); the Manufacturer's second step for a part and for equipment, run step by step
  * through a sequenced assembly (as the Deployer asks for each step), for an unlocked and a locked company; a Workshop saved by the old automatic mode giving its parts back; and a machine's fake player and
- * a real Deployer stringing a Power Line between two poles. Every line of output starts with "SELFTEST automate".
+ * stringing New Age wire between two Power Poles. Every line of output starts with "SELFTEST automate".
  */
 public final class AutomateTests {
     private static final String YES = "selftest_auto_yes", NO = "selftest_auto_no";
@@ -96,8 +95,7 @@ public final class AutomateTests {
             assembly(source, level, at.east(4), "siftec:object_scanner");
             assembly(source, level, at.east(4), "siftec:gas_mask");
             workshop(source, level, at.west(4));
-            poles(source, level, at.south(4));
-            deployer(source, level, at.north(6));
+            poles(source, level, new BlockPos(x, 250, z + 6));
         } catch (RuntimeException e) {
             report(source, "FAILED with " + e);
             Siftec.LOGGER.error("automate selftest", e);
@@ -237,76 +235,42 @@ public final class AutomateTests {
     }
 
     /**
-     * A real Create Deployer facing east, holding Power Lines, with a Power Pole two blocks in front of it and another
-     * 12 blocks further east; it is made to act once, the way its own cycle does (the protected activate()).
+     * Wires strung by a machine: a fake player (what a Deployer uses) holding New Age copper wire uses it on a Power
+     * Pole Mk.1's connector and then on a second pole's 10 blocks east (joined), and on one 40 blocks east of that (too
+     * long: a wire between two buildings reaches 32 blocks). Also the copper wire pressed from Cable.
      */
-    private static void deployer(CommandSourceStack source, ServerLevel level, BlockPos at) {
-        net.minecraft.world.level.block.state.BlockState state = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:deployer")).defaultBlockState();
-        if (state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING)) {
-            state = state.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, Direction.EAST);
-        }
-        BlockPos a = at.east(2), b = at.east(14);
-        level.setBlockAndUpdate(at, state);
-        level.setBlockAndUpdate(a, ModBlocks.POWER_POLE.get().defaultBlockState());
-        level.setBlockAndUpdate(b, ModBlocks.POWER_POLE.get().defaultBlockState());
-        String result;
-        if (level.getBlockEntity(at) instanceof com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity deployer) {
-            try {
-                deployer.initHandler();
-                java.lang.reflect.Field field = com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.class.getDeclaredField("player");
-                field.setAccessible(true);
-                com.zurrtum.create.content.kinetics.deployer.DeployerPlayer player = (com.zurrtum.create.content.kinetics.deployer.DeployerPlayer) field.get(deployer);
-                player.cast().setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item("siftec:power_line"), 3));
-                java.lang.reflect.Method activate = com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.class.getDeclaredMethod("activate");
-                activate.setAccessible(true);
-                activate.invoke(deployer);
-                String la = level.getBlockEntity(a) instanceof PoleBlockEntity p ? p.lines.toString() : "missing";
-                String lb = level.getBlockEntity(b) instanceof PoleBlockEntity p ? p.lines.toString() : "missing";
-                result = "lines left in the Deployer " + player.cast().getMainHandItem().getCount() + "; pole in front " + la + ", pole 12 further " + lb;
-                player.cast().setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-            } catch (ReflectiveOperationException | RuntimeException e) {
-                result = "could not run: " + e;
-            }
-        } else {
-            result = "no deployer block entity";
-        }
-        report(source, "deployer: " + result);
-        for (BlockPos pos : List.of(a, b)) {
-            if (!(level.getBlockEntity(pos) instanceof PoleBlockEntity p)) continue;
-            for (BlockPos offset : new ArrayList<>(p.lines)) {
-                BlockPos other = pos.offset(offset);
-                p.unlink(other);
-                if (level.getBlockEntity(other) instanceof PoleBlockEntity q) q.unlink(pos);
-            }
-        }
-        for (BlockPos pos : List.of(at, a, b)) level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-    }
-
-    /** Two Power Poles 10 apart and one 40 away; a fake player (what a Deployer uses) holding Power Lines uses one on the first. */
     private static void poles(CommandSourceStack source, ServerLevel level, BlockPos at) {
-        BlockPos a = at, b = at.east(10), far = at.east(40);
-        for (BlockPos pos : List.of(a, b, far)) level.setBlockAndUpdate(pos, ModBlocks.POWER_POLE.get().defaultBlockState());
+        BlockPos a = at, b = at.east(10), far = at.east(50);
+        for (BlockPos p : List.of(a, b, far)) level.getChunk(p.getX() >> 4, p.getZ() >> 4);
+        var pa = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", a, Direction.SOUTH);
+        var pb = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", b, Direction.SOUTH);
+        var pf = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", far, Direction.SOUTH);
+        var ca = com.meakaandre.siftec.power.PowerTests.connector(level, pa);
+        var cb = com.meakaandre.siftec.power.PowerTests.connector(level, pb);
+        var cf = com.meakaandre.siftec.power.PowerTests.connector(level, pf);
+        if (ca == null || cb == null || cf == null) {
+            report(source, "poles: could not put the poles down");
+            return;
+        }
+        for (var c : List.of(ca, cb, cf)) if (c.getNetwork() == null) c.setNetwork(new org.antarcticgardens.cna.content.electricity.network.ElectricalNetwork(c));
         FakePlayer fake = FakePlayer.get(level);
         fake.setPos(a.getX() + 0.5, a.getY() + 1, a.getZ() + 0.5);
-        ItemStack lines = new ItemStack(item("siftec:power_line"), 2);
-        fake.setItemInHand(InteractionHand.MAIN_HAND, lines);
-        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(a), Direction.UP, a, false);
+        ItemStack wires = new ItemStack(item("create_new_age:copper_wire"), 4);
+        fake.setItemInHand(InteractionHand.MAIN_HAND, wires);
         List<String> results = new ArrayList<>();
-        for (int i = 0; i < 2; i++) results.add(lines.getItem().useOn(new UseOnContext(fake, InteractionHand.MAIN_HAND, hit)).toString());
-        String la = level.getBlockEntity(a) instanceof PoleBlockEntity p ? p.lines.toString() : "missing";
-        String lb = level.getBlockEntity(b) instanceof PoleBlockEntity p ? p.lines.toString() : "missing";
-        String lf = level.getBlockEntity(far) instanceof PoleBlockEntity p ? p.lines.toString() : "missing";
-        report(source, "poles: uses " + results + "; lines left in hand " + lines.getCount() + "; first pole " + la + ", pole 10 east " + lb + ", pole 40 east " + lf
-            + " (fake player counts as a machine: " + Companies.isFake(fake) + ")");
-        fake.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-        for (BlockPos pos : List.of(a, b, far)) {
-            if (!(level.getBlockEntity(pos) instanceof PoleBlockEntity p)) continue;
-            for (BlockPos offset : new ArrayList<>(p.lines)) {
-                BlockPos other = pos.offset(offset);
-                p.unlink(other);
-                if (level.getBlockEntity(other) instanceof PoleBlockEntity q) q.unlink(pos);
-            }
+        for (BlockPos target : List.of(ca.getBlockPos(), cb.getBlockPos(), cb.getBlockPos(), cf.getBlockPos())) {
+            BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
+            results.add(wires.getItem().useOn(new UseOnContext(fake, InteractionHand.MAIN_HAND, hit)).toString());
         }
-        for (BlockPos pos : List.of(a, b, far)) level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+        report(source, "poles: uses " + results + "; wire left in hand " + wires.getCount() + "; first pole joined to the second " + ca.isConnected(cb.getBlockPos())
+            + ", the second to the far one (50 blocks) " + cb.isConnected(cf.getBlockPos()) + " (fake player counts as a machine: " + Companies.isFake(fake) + ")");
+        fake.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        for (var c : List.of(pa, pb, pf)) if (c != null) com.meakaandre.siftec.building.Buildings.dismantle(level, c);
+        // the wire itself: one Cable pressed (1.0's Power Line is 1 Cable), only for a company that has it unlocked
+        boolean pressed = false;
+        for (RecipeHolder<?> holder : source.getServer().getRecipeManager().getRecipes()) {
+            if (holder.id().identifier().toString().equals("siftec:pressing/copper_wire")) pressed = true;
+        }
+        report(source, "poles: the copper wire is pressed from Cable: " + pressed);
     }
 }

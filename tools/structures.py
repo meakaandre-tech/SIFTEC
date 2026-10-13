@@ -135,6 +135,11 @@ def test_miner():
 CASE, DARK, GLASS, TRIM, BRASS = "create:copper_casing", "create:railway_casing", "create:framed_glass", "create:industrial_iron_block", "create:brass_casing"
 AIR = "minecraft:air"
 CONTROLLER = "siftec:building_controller[facing=south]"
+# work package 6: a powered building is turned by Create: New Age's motors on the grid, and joins the grid at the wire
+# connector on its roof (one wire, as Satisfactory's machines take one power line)
+MOTOR = "create_new_age:reinforced_motor[facing={}]"
+EXTENSION = "create_new_age:basic_motor_extension[facing={}]"
+CONNECTOR = "create_new_age:electrical_connector[facing=up,mode=inert]"
 
 
 class Frame:
@@ -191,10 +196,11 @@ def constructor():
     f.box(-2, 5, 0, 2, 5, 4, CASE)
     f.set(0, 1, 2, "create:basin")
     f.set(0, 3, 2, "create:mechanical_press[facing=west]")
-    f.set(1, 3, 2, "siftec:building_motor[facing=west]")
+    f.set(1, 3, 2, MOTOR.format("west"))
     f.set(1, 1, 0, CONTROLLER)
     f.port(0, 0, 0, "south", "item_out", (0, 1, 2))
     f.port(0, 0, 4, "north", "item_in", (0, 1, 2))
+    f.set(0, 6, 2, CONNECTOR)
     return f.done()
 
 
@@ -205,7 +211,7 @@ def smelter():
     f.box(-2, 0, 0, 2, 0, 4, DARK)
     f.walls(1, 4, CASE, GLASS)
     f.box(-2, 5, 0, 2, 5, 4, CASE)
-    f.set(-2, 1, 2, "siftec:building_motor[facing=east]")
+    f.set(-2, 1, 2, MOTOR.format("east"))
     f.set(-1, 1, 2, "create:encased_fan[facing=east]")
     f.set(0, 1, 2, "minecraft:lava")
     f.set(1, 1, 2, "create:depot")
@@ -215,10 +221,11 @@ def smelter():
     f.set(1, 1, 0, CONTROLLER)
     f.port(0, 0, 0, "south", "item_out", (1, 1, 0))
     f.port(0, 0, 4, "north", "item_in", (1, 1, 0))
+    f.set(0, 6, 2, CONNECTOR)
     return f.done()
 
 
-def miner(height, corner, deck, side):
+def miner(height, corner, deck, side, extension=False):
     # 5 wide, 5 deep: four legs round the node, a deck over it with the Drill pointing down at the node, the motor on the
     # Drill and a tower round them; a chute down to the output port at the front. The node's own cell is left out.
     f = Frame(5, 5)
@@ -231,9 +238,13 @@ def miner(height, corner, deck, side):
     f.set(0, 1, 2, "create:mechanical_drill[facing=down]")
     f.set(1, 1, 0, CONTROLLER)
     f.walls(2, height - 2, corner, side, -1, 1, 1, 3)
-    f.set(0, 2, 2, "siftec:building_motor[facing=down]")
+    f.set(0, 2, 2, MOTOR.format("down"))
+    if extension:
+        # Miner Mk.3's 45 MW is more than one motor gives: an extension behind it doubles it
+        f.set(0, 3, 2, EXTENSION.format("down"))
     f.set(0, 2, 1, "create:chute")
     f.box(-1, height - 1, 1, 1, height - 1, 3, corner)
+    f.set(0, height, 2, CONNECTOR)
     f.port(0, 0, 0, "south", "item_out", (1, 1, 0))
     return f.done()
 
@@ -268,11 +279,168 @@ def storage(depth, vaults):
     return f.done()
 
 
+# ---- work package 6: power. Each joins the grid at the wire connector on top (New Age's, wired by hand).
+TURBINE = "siftec:turbine[facing={}]"
+COIL = "create_new_age:generator_coil[axis=x]"
+TANK = "create:fluid_tank"
+# New Age's own reactor casing and glass draw as missing textures in the Fabric 26.3 port (its connected-texture models),
+# so the plant is built from Create's casings until that is fixed
+R_CASING, R_GLASS = "create:railway_casing", "create:framed_glass"
+
+
+def pole(height, column):
+    # one block wide: the controller at its foot, a column, the connector on top
+    f = Frame(1, 1)
+    f.set(0, 0, 0, CONTROLLER)
+    for y in range(1, height - 1):
+        f.set(0, y, 0, column)
+    f.set(0, height - 1, 0, CONNECTOR)
+    return f.done()
+
+
+def power_tower():
+    # 3 by 3, 13 high: four legs and a core of industrial iron up to a platform, the connector on top
+    f = Frame(3, 3)
+    f.box(-1, 0, 0, 1, 0, 2, DARK)
+    f.set(0, 0, 0, CONTROLLER)
+    for x in (-1, 1):
+        for z in (0, 2):
+            f.box(x, 1, z, x, 3, z, TRIM)
+    f.box(0, 1, 1, 0, 10, 1, TRIM)
+    f.box(-1, 11, 0, 1, 11, 2, DARK)
+    f.set(0, 12, 1, CONNECTOR)
+    return f.done()
+
+
+def power_storage():
+    # 3 by 3, 6 high: brass casing round a core of New Age's overcharged iron coils; the connector on the roof
+    f = Frame(3, 3)
+    f.box(-1, 0, 0, 1, 0, 2, DARK)
+    f.walls(1, 3, BRASS, GLASS)
+    f.box(0, 1, 1, 0, 3, 1, "create_new_age:overcharged_iron_wire_block")
+    f.box(-1, 4, 0, 1, 4, 2, BRASS)
+    f.set(1, 1, 0, CONTROLLER)
+    f.set(0, 5, 1, CONNECTOR)
+    return f.done()
+
+
+def biomass_burner():
+    # 3 by 3, 5 high: a fire behind glass with a chimney; fuel goes in at the back, the connector on the roof
+    f = Frame(3, 3)
+    f.box(-1, 0, 0, 1, 0, 2, DARK)
+    f.walls(1, 2, CASE, GLASS)
+    f.set(0, 1, 1, "minecraft:campfire[lit=false,signal_fire=false,waterlogged=false,facing=south]")
+    f.box(-1, 3, 0, 1, 3, 2, CASE)
+    f.set(0, 3, 1, TRIM)
+    f.set(1, 4, 2, TRIM)
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(0, 0, 2, "north", "item_in", (1, 1, 0))
+    f.set(-1, 4, 1, CONNECTOR)
+    return f.done()
+
+
+def turbine_hall(f, y, z):
+    """A turbine at x = 1 turning two generator coils toward the left, at height y and depth z."""
+    f.set(1, y, z, TURBINE.format("west"))
+    f.set(0, y, z, COIL)
+    f.set(-1, y, z, COIL)
+
+
+def coal_generator():
+    # 5 by 5, 8 high: two furnaces under a boiler (a fluid tank of water), and the turbine and coils above; coal in at the
+    # back left, water in at the back middle, the connector on the roof
+    f = Frame(5, 5)
+    f.box(-2, 0, 0, 2, 0, 4, DARK)
+    f.walls(1, 5, CASE, GLASS)
+    f.box(-2, 6, 0, 2, 6, 4, CASE)
+    f.set(-1, 1, 2, "minecraft:blast_furnace[facing=south,lit=false]")
+    f.set(1, 1, 2, "minecraft:blast_furnace[facing=south,lit=false]")
+    f.set(0, 1, 2, TANK)
+    turbine_hall(f, 3, 2)
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(-1, 0, 4, "north", "item_in", (1, 1, 0))
+    f.port(0, 0, 4, "north", "fluid_in", (0, 1, 2))
+    f.set(0, 7, 2, CONNECTOR)
+    return f.done()
+
+
+def fuel_generator():
+    # 5 by 5, 8 high: a fuel tank feeding the engine room, the turbine and coils above; fuel in at the back
+    f = Frame(5, 5)
+    f.box(-2, 0, 0, 2, 0, 4, DARK)
+    f.walls(1, 5, TRIM, GLASS)
+    f.box(-2, 6, 0, 2, 6, 4, TRIM)
+    f.set(-1, 1, 2, TANK)
+    f.set(1, 1, 2, "create:copper_casing")
+    turbine_hall(f, 3, 2)
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(-1, 0, 4, "north", "fluid_in", (-1, 1, 2))
+    f.set(0, 7, 2, CONNECTOR)
+    return f.done()
+
+
+def geothermal_generator():
+    # 5 by 5, 8 high, on four legs over a sulfur geyser: the vent cell under the middle is left as air, so the geyser
+    # breathes; an acid tank and the turbine inside, the acid out at the back
+    f = Frame(5, 5)
+    f.box(-2, 0, 0, 2, 0, 4, AIR)
+    for x in (-2, 2):
+        for z in (0, 4):
+            f.set(x, 0, z, CASE)
+    f.box(-2, 1, 0, 2, 1, 4, DARK)
+    f.walls(2, 5, CASE, GLASS)
+    f.box(-2, 6, 0, 2, 6, 4, CASE)
+    f.set(-1, 2, 2, TANK)
+    turbine_hall(f, 4, 2)
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(-1, 2, 4, "north", "fluid_out", (-1, 2, 2))
+    f.set(0, 7, 2, CONNECTOR)
+    return f.done()
+
+
+def nuclear_power_plant():
+    # 7 by 7, 10 high: reactor casing and glass round three reactor rods, a water tank, the turbine and coils; rods in
+    # and water in at the back, waste out at the front, the connector on the roof
+    f = Frame(7, 7)
+    f.box(-3, 0, 0, 3, 0, 6, DARK)
+    f.walls(1, 7, R_CASING, R_GLASS)
+    f.box(-3, 8, 0, 3, 8, 6, R_CASING)
+    f.box(0, 1, 3, 0, 3, 3, "create_new_age:reactor_rod")
+    f.set(-2, 1, 3, TANK)
+    turbine_hall(f, 5, 3)
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(0, 0, 0, "south", "item_out", (1, 1, 0))
+    f.port(0, 0, 6, "north", "item_in", (1, 1, 0))
+    f.port(-2, 0, 6, "north", "fluid_in", (-2, 1, 3))
+    f.set(0, 9, 3, CONNECTOR)
+    return f.done()
+
+
+def alien_power_augmenter():
+    # 5 by 5, 7 high: brass and reactor glass round a glowing core; Alien Power Matrices in at the back
+    f = Frame(5, 5)
+    f.box(-2, 0, 0, 2, 0, 4, DARK)
+    f.walls(1, 4, BRASS, R_GLASS)
+    f.box(-2, 5, 0, 2, 5, 4, BRASS)
+    f.set(0, 1, 2, "minecraft:sea_lantern")
+    f.set(0, 2, 2, "minecraft:end_rod[facing=up]")
+    f.set(0, 3, 2, "minecraft:sea_lantern")
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(0, 0, 4, "north", "item_in", (1, 1, 0))
+    f.set(0, 6, 2, CONNECTOR)
+    return f.done()
+
+
 BUILT = {"test_building": test_building, "test_miner": test_miner,
          "constructor": constructor, "smelter": smelter,
          "miner_mk1": lambda: miner(8, CASE, DARK, GLASS), "miner_mk2": lambda: miner(9, TRIM, DARK, GLASS),
-         "miner_mk3": lambda: miner(10, BRASS, TRIM, GLASS), "portable_miner": portable_miner,
-         "storage_container": lambda: storage(5, 1), "industrial_storage_container": lambda: storage(6, 2)}
+         "miner_mk3": lambda: miner(10, BRASS, TRIM, GLASS, extension=True), "portable_miner": portable_miner,
+         "storage_container": lambda: storage(5, 1), "industrial_storage_container": lambda: storage(6, 2),
+         "power_pole_mk1": lambda: pole(5, "create:andesite_casing"), "power_pole_mk2": lambda: pole(6, CASE),
+         "power_pole_mk3": lambda: pole(7, BRASS), "power_tower": power_tower, "power_storage": power_storage,
+         "biomass_burner": biomass_burner, "coal_generator": coal_generator, "fuel_generator": fuel_generator,
+         "geothermal_generator": geothermal_generator, "nuclear_power_plant": nuclear_power_plant,
+         "alien_power_augmenter": alien_power_augmenter}
 
 if __name__ == "__main__":
     for bid, make in BUILT.items():

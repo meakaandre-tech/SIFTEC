@@ -1,9 +1,0 @@
-{
-  "type": "create:pressing",
-  "ingredient": "siftec:cable",
-  "results": [
-    {
-      "id": "siftec:power_line"
-    }
-  ]
-}

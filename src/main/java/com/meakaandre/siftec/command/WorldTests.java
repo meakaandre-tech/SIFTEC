@@ -2,8 +2,6 @@ package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.NodeBlock;
-import com.meakaandre.siftec.engine.EngineBlockEntity;
-import com.meakaandre.siftec.geyser.GeyserEngineBlockEntity;
 import com.meakaandre.siftec.machine.ProcessorBlock;
 import com.meakaandre.siftec.machine.ProcessorBlockEntity;
 import com.meakaandre.siftec.machine.ProcessorRecipe;
@@ -13,8 +11,6 @@ import com.meakaandre.siftec.node.NodePlacer;
 import com.meakaandre.siftec.node.NodeSavedData;
 import com.meakaandre.siftec.node.NodeType;
 import com.meakaandre.siftec.node.Terrain;
-import com.meakaandre.siftec.power.PoleBlockEntity;
-import com.meakaandre.siftec.power.StorageBlockEntity;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -73,11 +69,8 @@ public final class WorldTests {
                 .then(Commands.literal("geyser").then(Commands.literal("build").then(seconds.executes(c -> geyser(c, null))))
                     .then(Commands.literal("natural").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::naturalGeyser)))
                     .then(Commands.literal("wet").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::wetGeyser))).then(geyserAt))
-                .then(Commands.literal("furnace").then(Commands.literal("setup").executes(c -> furnace(c, true))).then(Commands.literal("check").executes(c -> furnace(c, false))))
                 .then(Commands.literal("processor").executes(WorldTests::processor))
                 .then(Commands.literal("hubui").executes(WorldTests::hubUi))
-                .then(Commands.literal("powerline").then(Commands.literal("setup").executes(c -> powerline(c, true))).then(Commands.literal("check").executes(c -> powerline(c, false))))
-                .then(Commands.literal("powerchain").then(Commands.literal("setup").executes(c -> powerchain(c, false))).then(Commands.literal("restart").executes(c -> powerchain(c, true))))
                 .then(Commands.literal("geysers").then(Commands.argument("dx", IntegerArgumentType.integer()).then(Commands.argument("dz", IntegerArgumentType.integer())
                     .then(Commands.argument("half", IntegerArgumentType.integer(16, 1500)).executes(WorldTests::geyserSurvey)))));
             dispatcher.register(Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).then(worldtest));
@@ -88,19 +81,11 @@ public final class WorldTests {
                 if (monitor.tick()) it.remove();
             }
         });
-        ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
-            if (watchedChunk != null && chunk.getPos().equals(watchedChunk)) watchedLoads++;
-            CHAIN_LOADS.computeIfPresent(chunk.getPos().pack(), (k, v) -> v + 1);
-            allLoads++;
-        });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             MONITORS.clear();
             SITES.clear();
             NATURAL.clear();
             WET.clear();
-            CHAIN_LOADS.clear();
-            weakSource = null;
-            watchedChunk = null;
         });
     }
 
@@ -373,9 +358,10 @@ public final class WorldTests {
     }
 
     /**
-     * Watches a geyser with an engine on it for a while (a Power Storage on top of the engine) and reports: the
-     * eruptions and the time between them, whether the engine ran outside an eruption, the SU-seconds of each
-     * eruption, what the storage banked. {@code vent} null: builds a geyser beside spawn first.
+     * Watches a geyser with a Geothermal Generator over it for a while (a Power Storage wired to it through a pole) and
+     * reports: the eruptions and the time between them, whether the generator gave power outside an eruption, the
+     * SU-seconds each eruption gave, the acid it made and what the storage banked. {@code vent} null: builds a geyser
+     * beside spawn first. Whatever is in the generator's way is cleared first, as a player would.
      */
     private static int geyser(CommandContext<CommandSourceStack> context, BlockPos vent) {
         CommandSourceStack source = context.getSource();
@@ -394,80 +380,83 @@ public final class WorldTests {
             level.setBlockAndUpdate(base.above(2), Blocks.WATER.defaultBlockState());
             level.setBlockAndUpdate(base.above(1), Block.updateFromNeighbourShapes(Blocks.POTENT_SULFUR.defaultBlockState(), level, base.above(1)));
             vent = base.above(1);
-        } else {
-            // the chunk and the ones round it, so it is a fully ticking chunk and not only a loaded one
-            for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced((vent.getX() >> 4) + dx, (vent.getZ() >> 4) + dz, true);
-            level.getChunk(vent.getX() >> 4, vent.getZ() >> 4);
         }
+        // the chunks round it, so they are fully ticking chunks and not only loaded ones
+        for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced((vent.getX() >> 4) + dx, (vent.getZ() >> 4) + dz, true);
+        level.getChunk(vent.getX() >> 4, vent.getZ() >> 4);
         BlockPos forcedAt = vent;
         BlockState ventState = level.getBlockState(vent);
         if (!ventState.is(Blocks.POTENT_SULFUR)) {
             report(source, "geyser " + vent.toShortString() + ": no geyser there (" + ventState + ")");
-            level.setChunkForced(vent.getX() >> 4, vent.getZ() >> 4, false);
             return 0;
         }
         int depth = 0;
         while (depth < 6 && level.getFluidState(vent.above(depth + 1)).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) depth++;
-        BlockPos onWater = vent.above(depth + 1), engine = vent.above(depth + 2), store = engine.above();
-        boolean refused = GeyserEngineBlockEntity.blocksVent(level, onWater);
-        level.setBlockAndUpdate(engine, ModBlocks.GEYSER_ENGINE.get().defaultBlockState());
-        level.setBlockAndUpdate(store, ModBlocks.POWER_STORAGE.get().defaultBlockState());
-        // the engine turns at 64 RPM: it belongs to a company whose speed limit allows that (unowned blocks break past 32)
-        String company = fastCompany(source);
-        for (BlockPos at : new BlockPos[]{engine, store}) {
-            var be = level.getBlockEntity(at);
-            if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company);
+        BlockPos onWater = vent.above(depth + 1);
+        // the generator's vent cell (the middle of its bottom row, two in from the front) is the air over the water
+        BlockPos anchor = onWater.south(2);
+        for (int dx = -9; dx <= 9; dx++) {
+            for (int dz = -6; dz <= 4; dz++) {
+                for (int dy = 0; dy <= 13; dy++) {
+                    BlockPos p = anchor.offset(dx, dy, dz);
+                    if (!level.getBlockState(p).isAir() && !level.getFluidState(p).isSource()) level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState());
+                }
+            }
         }
+        var gen = com.meakaandre.siftec.power.PowerTests.build(level, source, "geothermal_generator", anchor, Direction.NORTH);
+        var store = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_storage", anchor.east(6), Direction.NORTH);
+        var pole = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", anchor.west(5), Direction.NORTH);
         BlockPos finalVent = vent;
         report(source, "geyser " + vent.toShortString() + ": state " + ventState.getValue(PotentSulfurBlock.STATE).getSerializedName() + ", water " + depth
-            + " deep; an engine right on the water would be refused: " + refused + "; engine found the vent: " + finalVent.equals(GeyserEngineBlockEntity.findVent(level, engine))
-            + "; watching " + seconds + " s; engine block " + level.getBlockState(engine) + " entity " + level.getBlockEntity(engine)
-            + (level.getBlockEntity(engine) instanceof GeyserEngineBlockEntity e ? " sees " + e.describe() : ""));
+            + " deep; generator placed " + (gen != null) + ", it finds the vent " + (gen != null && finalVent.equals(com.meakaandre.siftec.building.BuildingPower.vent(level, gen)))
+            + ", gas escapes " + com.meakaandre.siftec.geyser.Vents.gasEscapes(level, finalVent) + "; watching " + seconds + " s");
         MONITORS.add(new Monitor() {
             int ticks;
             long lastStart = -1;
             final List<Double> gaps = new ArrayList<>();
-            final List<Integer> runs = new ArrayList<>();
-            int eruptions, runningOutside, runningInside, current, inEruption;
-            final List<String> seen = new ArrayList<>();
-            boolean wasErupting;
-
+            final List<Double> bursts = new ArrayList<>();
+            int eruptions, givingOutside, givingInside;
+            double current;
+            boolean wasErupting, wired;
             int waited;
 
             @Override
             public boolean tick() {
+                if (!wired) {
+                    wired = true;
+                    var p = com.meakaandre.siftec.power.PowerTests.connector(level, pole);
+                    com.meakaandre.siftec.power.PowerTests.wire(com.meakaandre.siftec.power.PowerTests.connector(level, gen), p);
+                    com.meakaandre.siftec.power.PowerTests.wire(com.meakaandre.siftec.power.PowerTests.connector(level, store), p);
+                }
                 // the watch starts once the geyser's chunk really ticks (up to a minute after the chunk is forced)
                 if (ticks == 0 && !level.shouldTickBlocksAt(finalVent) && ++waited < 1200) return false;
                 ticks++;
                 BlockState state = level.getBlockState(finalVent);
                 boolean erupting = state.is(Blocks.POTENT_SULFUR) && state.getValue(PotentSulfurBlock.STATE) == PotentSulfurState.ERUPTING;
-                boolean running = level.getBlockEntity(engine) instanceof GeyserEngineBlockEntity e && e.running();
+                double gave = gen == null ? 0 : gen.lastGenerated;
                 if (erupting && !wasErupting) {
                     eruptions++;
                     if (lastStart >= 0) gaps.add((ticks - lastStart) / 20.0);
                     lastStart = ticks;
                 }
                 if (!erupting && wasErupting) {
-                    runs.add(current);
+                    bursts.add(Math.round(current / 20) * 1.0);
                     current = 0;
                 }
-                if (erupting && wasErupting && ++inEruption == 10 && seen.size() < 3 && level.getBlockEntity(engine) instanceof GeyserEngineBlockEntity e) seen.add(e.describe());
-                if (!erupting) inEruption = 0;
-                if (running) {
-                    current++;
-                    if (erupting) runningInside++;
-                    else runningOutside++;
+                if (gave > 0) {
+                    current += gave;
+                    if (erupting) givingInside++;
+                    else givingOutside++;
                 }
+                if (gen != null && !gen.running) gen.lastGenerated = 0;
                 wasErupting = erupting;
                 if (ticks < seconds * 20) return false;
-                String stored = level.getBlockEntity(store) instanceof StorageBlockEntity s ? String.format("%.0f SU-s, mode %d", s.stored, s.mode) : "missing";
-                List<Double> su = new ArrayList<>();
-                for (int run : runs) su.add(run / 20.0 * GeyserEngineBlockEntity.BURST_SU);
                 double min = gaps.stream().mapToDouble(Double::doubleValue).min().orElse(0), max = gaps.stream().mapToDouble(Double::doubleValue).max().orElse(0);
-                report(source, "geyser " + finalVent.toShortString() + " after " + seconds + " s (chunk ticking after " + waited / 20 + " s): " + eruptions + " eruptions, gaps " + gaps + " s (min " + min + ", max " + max
-                    + ", all within 20-70: " + gaps.stream().allMatch(g -> g >= 20 && g <= 70) + "); engine ran " + runningInside + " ticks during eruptions and " + runningOutside
-                    + " outside; SU-seconds per eruption " + su + "; storage on top banked " + stored + "; engine half a second into eruptions: " + seen + "; engine block now " + level.getBlockState(engine)
-                    + (level.getBlockEntity(engine) instanceof GeyserEngineBlockEntity e ? " sees " + e.describe() : " (no engine entity)"));
+                report(source, "geyser " + finalVent.toShortString() + " after " + seconds + " s (chunk ticking after " + waited / 20 + " s): " + eruptions + " eruptions, gaps " + gaps
+                    + " s (min " + min + ", max " + max + ", all within 20-70: " + gaps.stream().allMatch(g -> g >= 20 && g <= 70) + "); generator gave power " + givingInside
+                    + " ticks during eruptions and " + givingOutside + " outside; SU-seconds per eruption " + bursts + "; generator now " + (gen == null ? "missing"
+                    : com.meakaandre.siftec.building.BuildingLogic.status(level, gen).getString()) + "; storage " + (store == null ? "missing"
+                    : com.meakaandre.siftec.building.BuildingLogic.status(level, store).getString()));
                 for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced((forcedAt.getX() >> 4) + dx, (forcedAt.getZ() >> 4) + dz, false);
                 return true;
             }
@@ -488,50 +477,6 @@ public final class WorldTests {
             data.companies().put(company.id, company);
         }
         return company.id;
-    }
-
-    // ---- Furnace Engines
-
-    /**
-     * Two furnaces. The first is placed showing flames but with nothing in it (as a blueprint used to build them):
-     * its engine must give nothing. The second really burns, with three engines round it: only one may run on it.
-     * Also checks that a blueprint now stores a furnace unlit.
-     */
-    private static int furnace(CommandContext<CommandSourceStack> context, boolean setup) {
-        CommandSourceStack source = context.getSource();
-        ServerLevel level = source.getServer().overworld();
-        BlockPos base = site(level, -24, -24);
-        BlockPos fake = base, real = base.east(6);
-        BlockPos[] engines = {real.north(), real.south(), real.west()};
-        if (setup) {
-            level.setChunkForced(base.getX() >> 4, base.getZ() >> 4, true);
-            level.setChunkForced(real.getX() >> 4, real.getZ() >> 4, true);
-            BlockState lit = Blocks.FURNACE.defaultBlockState().setValue(AbstractFurnaceBlock.LIT, true);
-            report(source, "furnace: a blueprint keeps a burning furnace as lit=" + com.meakaandre.siftec.blueprint.Blueprints.tidy(lit).getValue(AbstractFurnaceBlock.LIT));
-            level.setBlockAndUpdate(fake, lit);
-            level.setBlockAndUpdate(fake.north(), ModBlocks.FURNACE_ENGINE.get().defaultBlockState());
-            level.setBlockAndUpdate(real, Blocks.FURNACE.defaultBlockState());
-            if (level.getBlockEntity(real) instanceof AbstractFurnaceBlockEntity furnace) {
-                furnace.setItem(0, new ItemStack(Items.COBBLESTONE, 64));
-                furnace.setItem(1, new ItemStack(Items.COAL_BLOCK, 4));
-            }
-            for (BlockPos at : engines) level.setBlockAndUpdate(at, ModBlocks.FURNACE_ENGINE.get().defaultBlockState());
-            return 1;
-        }
-        String fakeSu = level.getBlockEntity(fake.north()) instanceof EngineBlockEntity e ? e.providedSu() + " SU" : "missing";
-        int runningEngines = 0;
-        StringBuilder each = new StringBuilder();
-        for (BlockPos at : engines) {
-            if (level.getBlockEntity(at) instanceof EngineBlockEntity e) {
-                each.append(" ").append(e.providedSu());
-                if (e.providedSu() > 0) runningEngines++;
-            }
-        }
-        report(source, "furnace: engine on a furnace that shows flames with no fuel gives " + fakeSu + " (furnace lit=" + level.getBlockState(fake).getValue(AbstractFurnaceBlock.LIT)
-            + "); engines on one burning furnace:" + each + " -> " + runningEngines + " running");
-        level.setChunkForced(base.getX() >> 4, base.getZ() >> 4, false);
-        level.setChunkForced(real.getX() >> 4, real.getZ() >> 4, false);
-        return 1;
     }
 
     // ---- processors
@@ -576,65 +521,6 @@ public final class WorldTests {
         return 0;
     }
 
-    // ---- Power Lines
-
-    private static ChunkPos watchedChunk;
-    private static int watchedLoads, allLoads;
-
-    /**
-     * Setup: a Power Tower beside spawn and one 240 blocks away, linked; the far one's chunk is let go. Check: the
-     * far chunk is unloaded; a creative motor under the near tower is started and stopped five times; the far
-     * chunk must not be loaded by it.
-     */
-    private static int powerline(CommandContext<CommandSourceStack> context, boolean setup) {
-        CommandSourceStack source = context.getSource();
-        ServerLevel level = source.getServer().overworld();
-        BlockPos near = site(level, 24, 24);
-        BlockPos far = new BlockPos(near.getX() + 240, near.getY(), near.getZ());
-        if (setup) {
-            level.setChunkForced(near.getX() >> 4, near.getZ() >> 4, true);
-            level.setChunkForced(far.getX() >> 4, far.getZ() >> 4, true);
-            level.getChunk(far.getX() >> 4, far.getZ() >> 4);
-            level.setBlockAndUpdate(near, ModBlocks.POWER_TOWER.get().defaultBlockState());
-            level.setBlockAndUpdate(far, ModBlocks.POWER_TOWER.get().defaultBlockState());
-            level.setBlockAndUpdate(far.below(), ModBlocks.POWER_STORAGE.get().defaultBlockState());
-            if (level.getBlockEntity(near) instanceof PoleBlockEntity a && level.getBlockEntity(far) instanceof PoleBlockEntity b) {
-                a.link(far);
-                b.link(near);
-            }
-            level.setChunkForced(far.getX() >> 4, far.getZ() >> 4, false);
-            report(source, "powerline setup: towers at " + near.toShortString() + " and " + far.toShortString());
-            return 1;
-        }
-        ChunkPos farChunk = new ChunkPos(far.getX() >> 4, far.getZ() >> 4);
-        BlockState placed = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
-        BlockState motor = placed.hasProperty(BlockStateProperties.FACING) ? placed.setValue(BlockStateProperties.FACING, Direction.UP) : placed;
-        // a source under the near tower, on for a second and off for a second, five times (Create wires kinetics up on the next tick)
-        MONITORS.add(new Monitor() {
-            int ticks, waited, loadsBefore;
-            float seen;
-
-            @Override
-            public boolean tick() {
-                // first wait (up to a minute) until the far chunk has really been unloaded
-                if (watchedChunk == null) {
-                    if (level.hasChunk(farChunk.x(), farChunk.z()) && ++waited < 1200) return false;
-                    watchedChunk = farChunk;
-                    watchedLoads = 0;
-                    loadsBefore = allLoads;
-                }
-                if (ticks % 20 == 0 && ticks < 200) level.setBlockAndUpdate(near.below(), ticks % 40 == 0 ? motor : Blocks.AIR.defaultBlockState());
-                if (level.getBlockEntity(near) instanceof PoleBlockEntity p) seen = Math.max(seen, Math.abs(p.getSpeed()));
-                if (++ticks < 220) return false;
-                report(source, "powerline check: far chunk unloaded first " + (waited < 1200) + " (after " + waited / 20 + " s); five starts and stops of a source under the near tower (it turned at up to "
-                    + seen + " RPM) loaded the far chunk " + watchedLoads + " times (chunk loads in all meanwhile: " + (allLoads - loadsBefore) + ")");
-                watchedChunk = null;
-                level.setChunkForced(near.getX() >> 4, near.getZ() >> 4, false);
-                return true;
-            }
-        });
-        return 1;
-    }
     // ---- natural geysers: how many the world really makes
 
     /** Periodic geysers (potent sulfur over magma, water above) found by the surveys, nearest to spawn first. */
@@ -750,190 +636,4 @@ public final class WorldTests {
         return 1;
     }
 
-    // ---- a long Power Line whose middle is unloaded
-
-    /** Chunk loads of the chunks the chain test watches. */
-    private static final Map<Long, Integer> CHAIN_LOADS = new java.util.concurrent.ConcurrentHashMap<>();
-    /** Test only: the block entity at this position offers this much stress capacity per RPM instead of its own. */
-    public static volatile BlockPos weakSource;
-    public static volatile float weakCapacity;
-
-    /**
-     * Source, then five Power Towers 200 blocks apart (800 blocks), plus a branch from the middle tower: a creative
-     * motor under the first, an encased fan under the last and under the branch's end. The first and the two ends
-     * are kept loaded; the three in between are let go and must unload. Then: the far fans turn at the motor's RPM
-     * in one network with its capacity; speed, direction, stop and overstress all reach them; and the middle
-     * chunks are never loaded. After a restart: it works again with the middle still unloaded, and breaking the
-     * middle tower (its chunk loaded for that, on purpose) cuts both ends.
-     */
-    private static BlockPos[] chain(ServerLevel level) {
-        BlockPos o = origin(level);
-        BlockPos t0 = new BlockPos(o.getX() + 64, 200, o.getZ() + 400);
-        return new BlockPos[]{t0, t0.east(200), t0.east(400), t0.east(600), t0.east(800), t0.east(400).south(200)};
-    }
-
-    private static int powerchain(CommandContext<CommandSourceStack> context, boolean restart) {
-        CommandSourceStack source = context.getSource();
-        ServerLevel level = source.getServer().overworld();
-        BlockPos[] t = chain(level);
-        BlockPos motorAt = t[0].below(), farFan = t[4].below(), branchFan = t[5].below();
-        int[] middle = {1, 2, 3}, ends = {0, 4, 5};
-        for (int i : middle) CHAIN_LOADS.put(ChunkPos.pack(t[i]), 0);
-        if (!restart) {
-            for (BlockPos p : t) level.setChunkForced(p.getX() >> 4, p.getZ() >> 4, true);
-            for (BlockPos p : t) level.getChunk(p.getX() >> 4, p.getZ() >> 4);
-            String company = fastCompany(source);
-            BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP);
-            BlockState fan = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:encased_fan")).defaultBlockState().setValue(BlockStateProperties.FACING, Direction.DOWN);
-            for (BlockPos p : t) level.setBlockAndUpdate(p, ModBlocks.POWER_TOWER.get().defaultBlockState());
-            level.setBlockAndUpdate(motorAt, motor);
-            level.setBlockAndUpdate(farFan, fan);
-            level.setBlockAndUpdate(branchFan, fan);
-            for (BlockPos p : new BlockPos[]{t[0], t[1], t[2], t[3], t[4], t[5], motorAt, farFan, branchFan}) {
-                var be = level.getBlockEntity(p);
-                if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company);
-            }
-            int[][] links = {{0, 1}, {1, 2}, {2, 3}, {3, 4}, {2, 5}};
-            for (int[] l : links) {
-                if (level.getBlockEntity(t[l[0]]) instanceof PoleBlockEntity a && level.getBlockEntity(t[l[1]]) instanceof PoleBlockEntity b) {
-                    a.link(t[l[1]]);
-                    b.link(t[l[0]]);
-                }
-            }
-            report(source, "powerchain setup: towers " + java.util.Arrays.stream(t).map(BlockPos::toShortString).toList() + " (a branch from the middle one); motor under the first, fans under the far end and the branch end");
-        } else {
-            for (int i : ends) level.setChunkForced(t[i].getX() >> 4, t[i].getZ() >> 4, true);
-            report(source, "powerchain after restart: map of lines " + com.meakaandre.siftec.power.PowerGrid.get(level).describe(level) + "; middle chunks loaded " + middleLoaded(level, t));
-        }
-        MONITORS.add(new Monitor() {
-            int ticks, step, waited, allBefore;
-            boolean settled;
-
-            String fans() {
-                return "far fan " + speed(farFan) + " RPM" + (over(farFan) ? " OVERSTRESSED" : "") + ", branch fan " + speed(branchFan) + " RPM" + (over(branchFan) ? " OVERSTRESSED" : "");
-            }
-
-            float speed(BlockPos p) {
-                return level.getBlockEntity(p) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k ? k.getSpeed() : Float.NaN;
-            }
-
-            boolean over(BlockPos p) {
-                return level.getBlockEntity(p) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k && k.isOverStressed();
-            }
-
-            String network() {
-                if (!(level.getBlockEntity(motorAt) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity m) || !(level.getBlockEntity(farFan) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity f)) return "no motor/fan";
-                String far = f.hasNetwork() ? String.format("far fan's network capacity %.0f SU, stress %.0f SU", f.getOrCreateNetwork().calculateCapacity(), f.getOrCreateNetwork().calculateStress()) : "far fan has no network";
-                String src = level.getBlockEntity(t[4]) instanceof PoleBlockEntity p4 && p4.source != null ? p4.source.toShortString() : "none";
-                return "same network as the motor " + (m.network != null && m.network.equals(f.network)) + "; " + far + "; the motor offers " + m.calculateAddedStressCapacity() + " SU/RPM at " + m.getSpeed()
-                    + " RPM; last tower takes its rotation from " + src;
-            }
-
-            void setMotor(int rpm) {
-                if (level.getBlockEntity(motorAt) instanceof com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity m) m.generatedSpeed.setValue(rpm);
-            }
-
-            void capacity() {
-                if (level.getBlockEntity(motorAt) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity m && m.hasNetwork()) m.getOrCreateNetwork().updateCapacityFor(m, m.calculateAddedStressCapacity());
-            }
-
-            @Override
-            public boolean tick() {
-                ticks++;
-                if (!settled) {
-                    // the chunks are new: count from when the motor's and the far fan's chunks really tick (up to a minute)
-                    if (ticks == 1 && !(level.shouldTickBlocksAt(motorAt) && level.shouldTickBlocksAt(farFan) && level.shouldTickBlocksAt(branchFan)) && ++waited < 1200) {
-                        ticks = 0;
-                        return false;
-                    }
-                    if (!restart && ticks == 40) {
-                        report(source, "powerchain all loaded: " + fans() + "; " + network());
-                        for (int i : middle) level.setChunkForced(t[i].getX() >> 4, t[i].getZ() >> 4, false);
-                    }
-                    if (ticks < (restart ? 100 : 41)) return false;
-                    if (middleAnyLoaded(level, t) && ++waited < 2400) return false;
-                    settled = true;
-                    for (int i : middle) CHAIN_LOADS.put(ChunkPos.pack(t[i]), 0);
-                    allBefore = allLoads;
-                    ticks = 0;
-                    report(source, "powerchain middle unloaded " + !middleAnyLoaded(level, t) + " (after " + waited / 20 + " s): " + middleLoaded(level, t));
-                    return false;
-                }
-                if (ticks % 30 != 0) return false;
-                step++;
-                String tag = "powerchain" + (restart ? " after restart" : "") + " step " + step + ": ";
-                if (!restart) {
-                    switch (step) {
-                        case 1 -> {
-                            report(source, tag + "motor at 16 RPM: " + fans() + "; " + network() + "; middle " + middleLoaded(level, t));
-                            setMotor(24);
-                        }
-                        case 2 -> {
-                            report(source, tag + "motor set to 24 RPM: " + fans());
-                            setMotor(-16);
-                        }
-                        case 3 -> {
-                            report(source, tag + "motor reversed to -16 RPM: " + fans());
-                            setMotor(0);
-                        }
-                        case 4 -> {
-                            report(source, tag + "motor stopped: " + fans());
-                            setMotor(16);
-                        }
-                        case 5 -> {
-                            report(source, tag + "motor started at 16 RPM again: " + fans() + "; " + network());
-                            weakSource = motorAt;
-                            weakCapacity = 1;
-                            capacity();
-                        }
-                        case 6 -> {
-                            report(source, tag + "motor weakened to 1 SU/RPM (two fans need 2 each): " + fans() + "; motor overstressed " + over(motorAt) + "; " + network());
-                            weakSource = null;
-                            capacity();
-                        }
-                        default -> {
-                            report(source, tag + "motor back to full strength: " + fans() + "; middle " + middleLoaded(level, t) + "; loads of the middle chunks during all this " + CHAIN_LOADS
-                                + " (chunk loads anywhere meanwhile, other tests included: " + (allLoads - allBefore) + "); map of lines " + com.meakaandre.siftec.power.PowerGrid.get(level).describe(level));
-                            return true;
-                        }
-                    }
-                } else {
-                    switch (step) {
-                        case 1 -> {
-                            report(source, tag + "after the restart: " + fans() + "; " + network() + "; middle " + middleLoaded(level, t));
-                            setMotor(24);
-                        }
-                        case 2 -> {
-                            report(source, tag + "motor set to 24 RPM: " + fans() + "; middle loads so far " + CHAIN_LOADS);
-                            // break the middle tower, the branch point: its chunk is loaded for that, on purpose, and let go again
-                            level.setChunkForced(t[2].getX() >> 4, t[2].getZ() >> 4, true);
-                            level.getChunk(t[2].getX() >> 4, t[2].getZ() >> 4);
-                            level.destroyBlock(t[2], false);
-                            level.setChunkForced(t[2].getX() >> 4, t[2].getZ() >> 4, false);
-                        }
-                        case 3 -> report(source, tag + "middle tower broken (its chunk loaded for it): " + fans() + "; loads of the middle chunks " + CHAIN_LOADS
-                            + " (the broken tower's own chunk counts the one on purpose); map of lines " + com.meakaandre.siftec.power.PowerGrid.get(level).describe(level));
-                        default -> {
-                            report(source, tag + "a second later: " + fans() + "; middle " + middleLoaded(level, t) + "; chunk loads anywhere meanwhile: " + (allLoads - allBefore));
-                            for (BlockPos p : t) level.setChunkForced(p.getX() >> 4, p.getZ() >> 4, false);
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        });
-        return 1;
-    }
-
-    private static boolean middleAnyLoaded(ServerLevel level, BlockPos[] t) {
-        for (int i = 1; i <= 3; i++) if (level.hasChunk(t[i].getX() >> 4, t[i].getZ() >> 4)) return true;
-        return false;
-    }
-
-    private static String middleLoaded(ServerLevel level, BlockPos[] t) {
-        StringBuilder out = new StringBuilder("[");
-        for (int i = 1; i <= 3; i++) out.append(i > 1 ? ", " : "").append("tower ").append(i).append(' ').append(level.hasChunk(t[i].getX() >> 4, t[i].getZ() >> 4) ? "loaded" : "unloaded");
-        return out.append(']').toString();
-    }
 }

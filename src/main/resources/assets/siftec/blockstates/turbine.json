@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "siftec:block/turbine"
+    },
+    "facing=down": {
+      "model": "siftec:block/turbine",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "siftec:block/turbine",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "siftec:block/turbine",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "siftec:block/turbine",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "siftec:block/turbine",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

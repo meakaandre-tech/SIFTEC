@@ -46,7 +46,10 @@ import java.util.List;
  * <li>portable_miner: the same at the Portable Miner's rate, with no power, the ore dropping on the ground in front
  * (it stops while a full stack lies there).</li>
  * <li>storage: Item Vaults; nothing to run.</li>
+ * <li>power: the generators, Power Storage, poles and towers ({@link BuildingPower}).</li>
  * </ul>
+ * A powered building's New Age motors run while its grid has power ({@link BuildingPower}); "stopped" in its status
+ * means they do not.
  */
 public final class BuildingLogic {
     /** The speed a building's motor turns its machines at. */
@@ -57,11 +60,6 @@ public final class BuildingLogic {
     private static final float MINUTE = 1200f;
 
     private BuildingLogic() {
-    }
-
-    /** Until the buildings are wired to the grid (work package 6), every building's motor runs. */
-    static boolean powered(MotorBlockEntity motor) {
-        return true;
     }
 
     // ------------------------------------------------------------------------------------------------ the cells
@@ -87,19 +85,23 @@ public final class BuildingLogic {
 
     // ------------------------------------------------------------------------------------------------ placing
 
-    /** Called once the building has gone down: its motors start, its Basin's filter is the controller's. */
+    /**
+     * Called once the building has gone down: its New Age motors are set to the speed its machines turn at (a fan's
+     * the way that blows away from it), and its Basin's filter is the controller's. The motors only turn while the
+     * building's grid gives them power ({@link BuildingPower}).
+     */
     static void placed(ServerLevel level, ControllerBlockEntity c) {
         BuildingDef def = c.def();
         if (def == null) return;
-        List<BlockPos> motors = cells(c, com.meakaandre.siftec.registry.ModBlocks.BUILDING_MOTOR.get());
-        for (BlockPos pos : motors) {
-            if (!(level.getBlockEntity(pos) instanceof MotorBlockEntity motor)) continue;
-            float rpm = MOTOR_RPM;
+        for (BlockPos pos : BuildingPower.motors(c)) {
+            if (!(level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.motor.MotorBlockEntity motor)) continue;
+            int rpm = (int) MOTOR_RPM;
             // a fan turned the wrong way would suck instead of blow: the motor turns so it blows away from it
-            Direction toward = motor.getBlockState().getValue(MotorBlock.FACING);
+            Direction toward = motor.getBlockState().getValue(com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING);
             BlockState next = level.getBlockState(pos.relative(toward));
             if (next.getBlock() instanceof EncasedFanBlock) rpm *= next.getValue(EncasedFanBlock.FACING).getAxisDirection().getStep();
-            motor.configure(rpm, (float) def.su() / motors.size());
+            if (motor.speedBehavior != null) motor.speedBehavior.setValue(rpm);
+            motor.setChanged();
         }
         syncFilter(level, c);
     }
@@ -140,7 +142,9 @@ public final class BuildingLogic {
     /** What the input port may put into the controller: the Smelter takes the ores it smelts; nothing else takes anything. */
     static boolean accepts(ControllerBlockEntity c, ItemStack stack) {
         BuildingDef def = c.def();
-        return def != null && def.logic().equals("smelter") && MachineTimes.smelterTicks(stack) > 0;
+        if (def == null) return false;
+        if (def.logic().equals("smelter")) return MachineTimes.smelterTicks(stack) > 0;
+        return BuildingPower.acceptsFuel(def, stack);
     }
 
     private static boolean turning(Level level, @Nullable BlockPos machine) {
@@ -288,8 +292,8 @@ public final class BuildingLogic {
             default -> {
             }
         }
-        if (!def.logic().equals("storage") && !def.logic().isEmpty()) parts.add(Component.translatable("siftec.building.made", c.made));
-        if (def.su() > 0) parts.add(Component.translatable("siftec.building.su", def.su()));
+        if (!def.logic().equals("storage") && !def.logic().isEmpty() && !def.logic().equals("power")) parts.add(Component.translatable("siftec.building.made", c.made));
+        BuildingPower.status(level, c, def, parts);
         if (!c.problem.isEmpty()) parts.add(Component.translatable(c.problem));
         Component line = Component.empty();
         for (int i = 0; i < parts.size(); i++) {

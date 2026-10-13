@@ -6,13 +6,10 @@ import com.meakaandre.siftec.claim.ClaimMarkerBlock;
 import com.meakaandre.siftec.collect.Collectible;
 import com.meakaandre.siftec.collect.CollectibleBlock;
 import com.meakaandre.siftec.depot.DepotBlock;
-import com.meakaandre.siftec.geyser.GeyserEngineBlock;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.machine.ProcessorBlock;
 import com.meakaandre.siftec.sink.SinkBlock;
 import com.meakaandre.siftec.mam.MamBlock;
-import com.meakaandre.siftec.power.PoleBlock;
-import com.meakaandre.siftec.power.StorageBlock;
 import com.meakaandre.siftec.workshop.WorkshopBlock;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.node.NodeLook;
@@ -147,18 +144,14 @@ public class ModBlocks {
         com.meakaandre.siftec.building.ControllerBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0));
     public static final Supplier<com.meakaandre.siftec.building.PortBlock> BUILDING_PORT = hidden("building_port",
         com.meakaandre.siftec.building.PortBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0));
-    /** The motor inside a powered building, turning its machines (see building.MotorBlock). */
-    public static final Supplier<com.meakaandre.siftec.building.MotorBlock> BUILDING_MOTOR = hidden("building_motor",
-        com.meakaandre.siftec.building.MotorBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0).noOcclusion());
+    /** The turbine inside a generator building, turning its generator coils while it runs (see building.TurbineBlock). */
+    public static final Supplier<com.meakaandre.siftec.building.TurbineBlock> TURBINE = hidden("turbine",
+        com.meakaandre.siftec.building.TurbineBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0).noOcclusion());
 
     public static final Supplier<WorkshopBlock> EQUIPMENT_WORKSHOP = block("equipment_workshop", WorkshopBlock::new, ModBlocks::machine);
 
     public static final Supplier<DepotBlock> DIMENSIONAL_DEPOT = block("dimensional_depot", DepotBlock::new, ModBlocks::machine);
-    public static final Supplier<PoleBlock> POWER_POLE = block("power_pole", properties -> new PoleBlock(24, properties), ModBlocks::machine);
-    public static final Supplier<PoleBlock> POWER_TOWER = block("power_tower", properties -> new PoleBlock(256, properties), ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.governor.GovernorBlock> SPEED_GOVERNOR = block("speed_governor", com.meakaandre.siftec.governor.GovernorBlock::new, ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.engine.EngineBlock> FURNACE_ENGINE = block("furnace_engine", properties -> new com.meakaandre.siftec.engine.EngineBlock(false, properties), ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.engine.EngineBlock> HUB_ENGINE = block("hub_engine", properties -> new com.meakaandre.siftec.engine.EngineBlock(true, properties), ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.equip.LandingPadBlock> LANDING_PAD = block("landing_pad", com.meakaandre.siftec.equip.LandingPadBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.equip.RadarBlock> RADAR_TOWER = block("radar_tower", com.meakaandre.siftec.equip.RadarBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.drone.DronePortBlock> DRONE_PORT = block("drone_port", com.meakaandre.siftec.drone.DronePortBlock::new, ModBlocks::machine);
@@ -167,7 +160,6 @@ public class ModBlocks {
     public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER = block("blueprint_designer", properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(4, properties), ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER_MK3 = block("blueprint_designer_mk3", properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(8, properties), ModBlocks::machine);
     public static final Supplier<Block> STEEL_CASING = block("steel_casing", Block::new, () -> BlockBehaviour.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL));
-    public static final Supplier<StorageBlock> POWER_STORAGE = block("power_storage", StorageBlock::new, ModBlocks::machine);
 
     public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);
 
@@ -186,7 +178,6 @@ public class ModBlocks {
         }
     }
 
-    public static final Supplier<GeyserEngineBlock> GEYSER_ENGINE = block("geyser_engine", GeyserEngineBlock::new, ModBlocks::machine);
     public static final Supplier<ProcessorBlock> CONVERTER = block("converter", properties -> new ProcessorBlock("converter", properties), ModBlocks::machine);
     public static final Supplier<ProcessorBlock> PARTICLE_ACCELERATOR = block("particle_accelerator", properties -> new ProcessorBlock("particle_accelerator", properties), ModBlocks::machine);
     public static final Supplier<SinkBlock> AWESOME_SINK = block("awesome_sink", properties -> new SinkBlock(false, properties), ModBlocks::machine);

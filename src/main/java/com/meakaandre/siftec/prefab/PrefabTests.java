@@ -5,7 +5,6 @@ import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
-import com.meakaandre.siftec.engine.EngineBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
@@ -262,11 +261,11 @@ public final class PrefabTests {
 
         // ---- burners: fuel for both; whether they turn is checked a little later (check)
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
-            if (level.getBlockEntity(spotA.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) engine.addFuel(new ItemStack(biomass(), 8));
+            if (level.getBlockEntity(spotA.at(at[0], at[1], at[2])) instanceof HubBurnerBlockEntity engine) engine.addFuel(new ItemStack(biomass(), 8));
         }
         int coalIn = 0;
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
-            if (level.getBlockEntity(spotA.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) coalIn += engine.fuel.getItem(0).getCount();
+            if (level.getBlockEntity(spotA.at(at[0], at[1], at[2])) instanceof HubBurnerBlockEntity engine) coalIn += engine.fuel.getItem(0).getCount();
         }
 
         // ---- pick it up: the item, the storage and the fuel come back; nothing is left standing; the land is free again
@@ -291,8 +290,12 @@ public final class PrefabTests {
         Prefabs.Spot spotB = hubSpot(BX, BZ, Direction.NORTH);
         Prefabs.Check placedB = Prefabs.place(level, spotB, b, null);
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
-            if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) engine.addFuel(new ItemStack(biomass(), 16));
+            if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof HubBurnerBlockEntity engine) engine.addFuel(new ItemStack(biomass(), 16));
         }
+        // the two burners wired to each other, so they are a grid (they give power only to what the grid uses)
+        com.meakaandre.siftec.power.PowerTests.wire(
+            level.getBlockEntity(spotB.at(Templates.BURNER_1[0], Templates.BURNER_1[1] + 1, Templates.BURNER_1[2])) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector ca ? ca : null,
+            level.getBlockEntity(spotB.at(Templates.BURNER_2[0], Templates.BURNER_2[1] + 1, Templates.BURNER_2[2])) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector cb ? cb : null);
         report(source, "second company's HUB " + placedB.ok() + " (" + placedB.message().getString() + "), parts " + parts(level, spotB));
 
         // ---- the Wormhole Gateway: placed whole, a phase paid lights its ring, one per company, picked up and put back with its progress
@@ -337,11 +340,11 @@ public final class PrefabTests {
         Prefabs.Spot spotB = hubSpot(BX, BZ, Direction.NORTH);
         StringBuilder b = new StringBuilder();
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
-            if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) {
-                b.append(" burner ").append(engine.providedSu()).append(" SU at ").append(engine.getSpeed()).append(" RPM, ")
-                    .append(Component.translatable(engine.statusKey(), engine.fuel.getItem(0).getCount()).getString())
-                    .append(" (fuel ").append(engine.fuel.getItem(0)).append(", burning ").append(engine.burnLeft()).append(" more ticks, biomass burns ")
-                    .append(engine.burnTime(new ItemStack(biomass()))).append(", coal ").append(engine.burnTime(new ItemStack(Items.COAL))).append(", ticked ").append(engine.ticked).append(");");
+            if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof HubBurnerBlockEntity engine) {
+                b.append(" burner ").append(engine.status().getString()).append(" (fuel ").append(engine.fuel.getItem(0)).append(", banked ")
+                    .append(Math.round(engine.energy)).append(" SU-ticks, biomass ").append(com.meakaandre.siftec.building.BuildingPower.itemMj("biomass", new ItemStack(biomass())))
+                    .append(" MJ, coal ").append(com.meakaandre.siftec.building.BuildingPower.itemMj("biomass", new ItemStack(Items.COAL))).append(" MJ, grid ")
+                    .append(engine.grid == null ? "none" : engine.grid.describe()).append(");");
             } else {
                 b.append(" burner missing;");
             }

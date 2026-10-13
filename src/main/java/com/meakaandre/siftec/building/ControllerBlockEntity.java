@@ -50,6 +50,25 @@ public class ControllerBlockEntity extends BlockEntity {
     /** What a status line says is wrong right now ("" if nothing), as a lang key. */
     public String problem = "";
     public final SimpleContainer input = slots(), output = slots();
+    // ---- power (BuildingPower)
+    /** Banked energy in SU-ticks: a generator's fuel, a Power Storage's charge. */
+    public double energy;
+    /** Water owed by a generator, or acid made by the Geothermal Generator, in mB not yet drawn or put in its tank. */
+    public double fluidOwed;
+    /** This building's grid's fuse is blown (generators and Power Storage hold it). */
+    public boolean tripped;
+    /** A generator is giving power (its fires are lit, its turbine turns); the geyser under it is erupting. */
+    public boolean running, erupting;
+    /** Ticks an Alien Power Augmenter is still fed by its last Alien Power Matrix. */
+    public int fedTicks;
+    /** A consumer had power on its last tick. */
+    public boolean powered;
+    /** SU a generator gave on its last tick (a Power Storage: SU-ticks it took, negative when it gave). */
+    public double lastGenerated;
+    /** Its grid as last balanced, and its part in it. */
+    public com.meakaandre.siftec.power.@Nullable GridStats grid;
+    com.meakaandre.siftec.power.@Nullable PowerMember member;
+    @Nullable BuildingDef memberFor;
     /** Set while the building is taken down on purpose, so the controller's own removal does not count as breaking. */
     boolean removing;
     private int ticks;
@@ -148,6 +167,12 @@ public class ControllerBlockEntity extends BlockEntity {
         view.putFloat("Progress", progress);
         view.store("Input", ItemStack.OPTIONAL_CODEC, input.getItem(0));
         view.store("Output", ItemStack.OPTIONAL_CODEC, output.getItem(0));
+        view.putDouble("Energy", energy);
+        view.putDouble("FluidOwed", fluidOwed);
+        view.putBoolean("Tripped", tripped);
+        view.putBoolean("Running", running);
+        view.putBoolean("Erupting", erupting);
+        view.putInt("Fed", fedTicks);
     }
 
     @Override
@@ -167,5 +192,11 @@ public class ControllerBlockEntity extends BlockEntity {
         progress = view.getFloatOr("Progress", 0f);
         input.setItem(0, view.read("Input", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
         output.setItem(0, view.read("Output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
+        energy = view.getDoubleOr("Energy", 0);
+        fluidOwed = view.getDoubleOr("FluidOwed", 0);
+        tripped = view.getBooleanOr("Tripped", false);
+        running = view.getBooleanOr("Running", false);
+        erupting = view.getBooleanOr("Erupting", false);
+        fedTicks = view.getIntOr("Fed", 0);
     }
 }

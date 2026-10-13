@@ -645,10 +645,12 @@
       "items": [
         "create:encased_fan",
         "create:nozzle",
-        "siftec:power_line",
-        "siftec:hub_engine",
         "siftec:cable",
-        "siftec:wire"
+        "siftec:wire",
+        "create_new_age:copper_wire",
+        "create_new_age:incomplete_wire",
+        "create_new_age:copper_wire_block",
+        "create_new_age:electrical_connector"
       ],
       "tokens": [
         "scanner:copper"
@@ -678,9 +680,10 @@
         "create:depot",
         "create:millstone",
         "create:basin",
-        "siftec:power_pole",
         "siftec:reinforced_iron_plate",
-        "siftec:screw"
+        "siftec:screw",
+        "create_new_age:basic_motor",
+        "create_new_age:basic_motor_extension"
       ],
       "tokens": [
         "scanner:stone"
@@ -761,7 +764,6 @@
       "seconds": 0,
       "items": [
         "siftec:wormhole_gateway",
-        "siftec:furnace_engine",
         "create:flywheel",
         "siftec:biomass"
       ],
@@ -1158,7 +1160,9 @@
         "create:small_veridium_brick_wall",
         "create:cut_veridium_brick_slab",
         "create:cut_veridium_brick_stairs",
-        "create:cut_veridium_brick_wall"
+        "create:cut_veridium_brick_wall",
+        "create_new_age:lamp_post",
+        "create_new_age:street_light"
       ],
       "tokens": []
     },
@@ -1438,7 +1442,21 @@
         "travelersbackpack:tanks_upgrade",
         "travelersbackpack:backpack_tank",
         "travelersbackpack:hose_nozzle",
-        "travelersbackpack:hose"
+        "travelersbackpack:hose",
+        "create_new_age:generator_coil",
+        "create_new_age:carbon_brushes",
+        "create_new_age:redstone_magnet",
+        "create_new_age:layered_magnet",
+        "create_new_age:fluxuated_magnetite",
+        "create_new_age:netherite_magnet",
+        "create_new_age:magnetite_block",
+        "create_new_age:heat_pipe",
+        "create_new_age:heat_casing",
+        "create_new_age:heater",
+        "create_new_age:heat_pump",
+        "create_new_age:stirling_engine",
+        "create_new_age:basic_solar_heating_plate",
+        "create_new_age:advanced_solar_heating_plate"
       ],
       "tokens": [
         "scanner:coal"
@@ -1649,8 +1667,6 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:power_tower",
-        "siftec:power_storage",
         "create:windmill_bearing",
         "create:sail_frame",
         "create:mechanical_piston",
@@ -1668,7 +1684,21 @@
         "create:white_sail",
         "create:piston_extension_pole",
         "create:secondary_linear_chassis",
-        "create:elevator_contact"
+        "create:elevator_contact",
+        "create_new_age:advanced_motor",
+        "create_new_age:advanced_motor_extension",
+        "create_new_age:basic_energiser",
+        "create_new_age:advanced_energiser",
+        "create_new_age:overcharged_iron",
+        "create_new_age:overcharged_iron_sheet",
+        "create_new_age:overcharged_iron_wire",
+        "create_new_age:overcharged_iron_wire_block",
+        "create_new_age:overcharged_gold",
+        "create_new_age:overcharged_golden_sheet",
+        "create_new_age:overcharged_golden_wire",
+        "create_new_age:overcharged_golden_wire_block",
+        "create_new_age:copper_circuit",
+        "create_new_age:blank_circuit"
       ],
       "tokens": []
     },
@@ -1904,7 +1934,12 @@
         "siftec:modular_engine_core",
         "create:crafter_slot_cover",
         "create_hypertube:hypertube_junction",
-        "cgs:nailgun_splitter"
+        "cgs:nailgun_splitter",
+        "create_new_age:reinforced_motor",
+        "create_new_age:reinforced_energiser",
+        "create_new_age:overcharged_diamond",
+        "create_new_age:overcharged_diamond_wire",
+        "create_new_age:overcharged_diamond_wire_block"
       ],
       "tokens": []
     },
@@ -2359,7 +2394,13 @@
         "siftec:incomplete_uranium_fuel_rod",
         "siftec:magnetic_field_generator",
         "siftec:uranium_fuel_rod",
-        "siftec:uranium_fuel_rod_core"
+        "siftec:uranium_fuel_rod_core",
+        "create_new_age:reactor_casing",
+        "create_new_age:incomplete_reactor_casing",
+        "create_new_age:reactor_glass",
+        "create_new_age:reactor_rod",
+        "create_new_age:reactor_fuel_acceptor",
+        "create_new_age:reactor_heat_vent"
       ],
       "tokens": [
         "scanner:uranium"
@@ -2649,6 +2690,14 @@
     "create:schematic_and_quill",
     "create:schematic",
     "farmersdelight:wheat_dough",
+    "create_new_age:nuclear_fuel",
+    "create_new_age:incomplete_fuel",
+    "create_new_age:thorium",
+    "create_new_age:radioactive_thorium",
+    "create_new_age:thorium_ore",
+    "create_new_age:corium",
+    "create_new_age:solid_corium",
+    "create_new_age:incomplete_enchanted_golden_apple",
     "travelersbackpack:bat",
     "travelersbackpack:bee",
     "travelersbackpack:blaze",
@@ -2737,7 +2786,9 @@
         "mam_caterium_5",
         "mam_caterium_6",
         "mam_caterium_7",
-        "mam_caterium_8"
+        "mam_caterium_8",
+        "mam_caterium_9",
+        "mam_caterium_10"
       ]
     },
     {
@@ -2818,7 +2869,8 @@
         "mam_alien_7",
         "mam_alien_8",
         "mam_alien_9",
-        "mam_alien_10"
+        "mam_alien_10",
+        "mam_alien_11"
       ]
     }
   ],
@@ -3138,6 +3190,42 @@
       "tokens": [],
       "needs": [
         "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "mam_caterium_9",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 300
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "mam_caterium_10",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 50
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 200
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_7"
       ]
     },
     {
@@ -3963,9 +4051,7 @@
         }
       ],
       "seconds": 300,
-      "items": [
-        "siftec:geyser_engine"
-      ],
+      "items": [],
       "tokens": [],
       "needs": [
         "mam_sulfur_2"
@@ -4263,6 +4349,30 @@
         "siftec:charged_alien_power_matrix",
         "siftec:incomplete_alien_power_matrix"
       ],
+      "tokens": [],
+      "needs": [
+        "mam_alien_9"
+      ]
+    },
+    {
+      "id": "mam_alien_11",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:somersloop",
+          "count": 1
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 100
+        },
+        {
+          "item": "siftec:computer",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [],
       "tokens": [],
       "needs": [
         "mam_alien_9"
@@ -5423,7 +5533,7 @@
     "siftec:crafting/crushing_wheel": "advanced_steel_production",
     "siftec:crafting/pumpjack_crank": "oil_processing",
     "siftec:crafting/mechanical_crafter": "industrial_manufacturing",
-    "siftec:pressing/power_line": "hub_upgrade_2",
+    "siftec:pressing/copper_wire": "hub_upgrade_2",
     "siftec:mixing/brass_blend_with_sand": "mam_caterium_1",
     "siftec:mixing/brass_blend_with_coal": "mam_caterium_1",
     "siftec:mixing/brass_blend_with_sulfur": "mam_caterium_1",
@@ -6767,96 +6877,6 @@
       ]
     },
     {
-      "item": "siftec:power_line",
-      "cost": [
-        {
-          "item": "siftec:cable",
-          "count": 1
-        }
-      ]
-    },
-    {
-      "item": "siftec:hub_engine",
-      "cost": [
-        {
-          "item": "create:iron_sheet",
-          "count": 5
-        },
-        {
-          "item": "siftec:iron_rod",
-          "count": 5
-        }
-      ]
-    },
-    {
-      "item": "siftec:power_pole",
-      "cost": [
-        {
-          "item": "siftec:wire",
-          "count": 3
-        },
-        {
-          "item": "siftec:iron_rod",
-          "count": 1
-        },
-        {
-          "item": "#siftec:stones",
-          "count": 1
-        }
-      ]
-    },
-    {
-      "item": "siftec:furnace_engine",
-      "cost": [
-        {
-          "item": "create:iron_sheet",
-          "count": 15
-        },
-        {
-          "item": "siftec:iron_rod",
-          "count": 15
-        },
-        {
-          "item": "siftec:wire",
-          "count": 25
-        }
-      ]
-    },
-    {
-      "item": "siftec:power_tower",
-      "cost": [
-        {
-          "item": "#siftec:stones",
-          "count": 10
-        },
-        {
-          "item": "siftec:wire",
-          "count": 20
-        },
-        {
-          "item": "siftec:steel_beam",
-          "count": 20
-        }
-      ]
-    },
-    {
-      "item": "siftec:power_storage",
-      "cost": [
-        {
-          "item": "siftec:encased_industrial_beam",
-          "count": 5
-        },
-        {
-          "item": "siftec:modular_frame",
-          "count": 10
-        },
-        {
-          "item": "siftec:wire",
-          "count": 100
-        }
-      ]
-    },
-    {
       "item": "siftec:speed_governor",
       "cost": [
         {
@@ -7181,31 +7201,6 @@
         {
           "item": "siftec:wire",
           "count": 100
-        }
-      ]
-    },
-    {
-      "item": "siftec:geyser_engine",
-      "cost": [
-        {
-          "item": "siftec:motor",
-          "count": 10
-        },
-        {
-          "item": "siftec:modular_frame",
-          "count": 25
-        },
-        {
-          "item": "siftec:high_speed_connector",
-          "count": 25
-        },
-        {
-          "item": "create:copper_sheet",
-          "count": 50
-        },
-        {
-          "item": "siftec:wire",
-          "count": 250
         }
       ]
     },
@@ -8412,6 +8407,290 @@
       ],
       "unlock": "logistics_mk3",
       "logic": "storage"
+    },
+    {
+      "id": "power_pole_mk1",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:wire",
+          "count": 3
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 1
+        },
+        {
+          "item": "#siftec:stones",
+          "count": 1
+        }
+      ],
+      "unlock": "hub_upgrade_3",
+      "logic": "power",
+      "lines": 4,
+      "power": "pole"
+    },
+    {
+      "id": "power_pole_mk2",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 6
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 2
+        },
+        {
+          "item": "#siftec:stones",
+          "count": 2
+        }
+      ],
+      "unlock": "mam_caterium_9",
+      "logic": "power",
+      "lines": 7,
+      "power": "pole"
+    },
+    {
+      "id": "power_pole_mk3",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 2
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 2
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 3
+        }
+      ],
+      "unlock": "mam_caterium_10",
+      "logic": "power",
+      "lines": 10,
+      "power": "pole"
+    },
+    {
+      "id": "power_tower",
+      "category": "power",
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 10
+        },
+        {
+          "item": "siftec:wire",
+          "count": 20
+        },
+        {
+          "item": "siftec:steel_beam",
+          "count": 20
+        }
+      ],
+      "unlock": "expanded_power_infrastructure",
+      "logic": "power",
+      "lines": 10,
+      "power": "pole"
+    },
+    {
+      "id": "power_storage",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 5
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:wire",
+          "count": 100
+        }
+      ],
+      "unlock": "expanded_power_infrastructure",
+      "logic": "power",
+      "power": "storage"
+    },
+    {
+      "id": "biomass_burner",
+      "category": "power",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 15
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 15
+        },
+        {
+          "item": "siftec:wire",
+          "count": 25
+        }
+      ],
+      "unlock": "hub_upgrade_6",
+      "logic": "power",
+      "mw": 30,
+      "power": "biomass"
+    },
+    {
+      "id": "coal_generator",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 20
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 10
+        },
+        {
+          "item": "siftec:cable",
+          "count": 30
+        }
+      ],
+      "unlock": "coal_power",
+      "logic": "power",
+      "mw": 75,
+      "water": 45,
+      "power": "coal"
+    },
+    {
+      "id": "fuel_generator",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 15
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 15
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 30
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 50
+        },
+        {
+          "item": "siftec:quickwire",
+          "count": 50
+        }
+      ],
+      "unlock": "petroleum_power",
+      "logic": "power",
+      "mw": 250,
+      "power": "fuel"
+    },
+    {
+      "id": "geothermal_generator",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 10
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 25
+        },
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 25
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 50
+        },
+        {
+          "item": "siftec:wire",
+          "count": 250
+        }
+      ],
+      "unlock": "mam_sulfur_8",
+      "logic": "power",
+      "mw": 200,
+      "power": "geothermal",
+      "vent": [
+        0,
+        0,
+        2
+      ]
+    },
+    {
+      "id": "nuclear_power_plant",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:supercomputer",
+          "count": 10
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 25
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 100
+        },
+        {
+          "item": "siftec:cable",
+          "count": 200
+        },
+        {
+          "item": "#siftec:stones",
+          "count": 250
+        }
+      ],
+      "unlock": "nuclear_power",
+      "logic": "power",
+      "mw": 2500,
+      "water": 240,
+      "power": "nuclear"
+    },
+    {
+      "id": "alien_power_augmenter",
+      "category": "power",
+      "cost": [
+        {
+          "item": "siftec:somersloop",
+          "count": 10
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 50
+        },
+        {
+          "item": "siftec:cable",
+          "count": 100
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 50
+        },
+        {
+          "item": "siftec:motor",
+          "count": 25
+        },
+        {
+          "item": "siftec:computer",
+          "count": 10
+        }
+      ],
+      "unlock": "mam_alien_11",
+      "logic": "power",
+      "mw": 500,
+      "power": "augmenter"
     }
   ],
   "machine_ticks": {
@@ -8612,13 +8891,41 @@
     "minecraft:raw_copper": 40,
     "minecraft:raw_iron": 40
   },
-  "hub_burner": {
-    "su": 6144,
+  "mb_per_m3": 40,
+  "generator_fuel": {
+    "biomass": {
+      "#minecraft:leaves": 15,
+      "#minecraft:logs": 100,
+      "#siftec:mycelia": 20,
+      "siftec:biomass": 180,
+      "siftec:solid_biofuel": 450
+    },
+    "coal": {
+      "minecraft:coal": 300,
+      "siftec:compacted_coal": 630,
+      "siftec:petroleum_coke": 180
+    },
     "fuel": {
-      "#minecraft:leaves": 10,
-      "#minecraft:logs": 67,
-      "siftec:biomass": 120,
-      "siftec:solid_biofuel": 300
+      "createdieselgenerators:diesel": 750,
+      "createdieselgenerators:biodiesel": 750,
+      "siftec:turbofuel": 2000,
+      "siftec:rocket_fuel": 3600,
+      "siftec:ionized_fuel": 5000
+    },
+    "nuclear": {
+      "siftec:uranium_fuel_rod": {
+        "mj": 750000,
+        "waste": "siftec:uranium_waste",
+        "count": 10
+      },
+      "siftec:plutonium_fuel_rod": {
+        "mj": 1500000,
+        "waste": "siftec:plutonium_waste",
+        "count": 1
+      }
+    },
+    "augmenter": {
+      "siftec:alien_power_matrix": 1
     }
   }
 }

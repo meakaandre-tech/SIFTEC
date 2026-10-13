@@ -1,0 +1,7 @@
+{
+  "replace": true,
+  "values": [
+    "siftec:uranium_fuel_rod",
+    "siftec:plutonium_fuel_rod"
+  ]
+}

@@ -4,23 +4,39 @@ Spatial Interlink and Factory Technology Engineering Corporation: the custom mod
 Create modpack, where a company of players works through Satisfactory's tiers and milestones and builds a
 wormhole instead of a space elevator.
 
-Fabric, Minecraft 26.3, Java 25. Needs Fabric API and Create Fly (mod id `create`); the pack also runs
+Fabric, Minecraft 26.3, Java 25. Needs Fabric API, Create Fly (mod id `create`) and Create: New Age (mod id
+`create_new_age`, the fabric-26.3 build of meakaandre-tech/Create-New-Age); the pack also runs
 Create: Diesel Generators, Create: Gunsmithing, Create: Hypertubes and Farmer's Delight, which the mod's data
 names (recipes that name another mod load only when that mod is installed).
 
 What it adds: the HUB with milestones and wormhole phases, companies and land claims, per-company recipe and
-item locks, resource nodes, the Build Gun and its buildings, the MAM research trees, Power Poles and Power Storage,
-the Equipment Workshop, the AWESOME Sink and Shop, the backpack, blueprints, geothermal power, and the parts and
-fluids of Satisfactory's production chain.
+item locks, resource nodes, the Build Gun and its buildings, the MAM research trees, the power grid, the Equipment
+Workshop, the AWESOME Sink and Shop, the backpack, blueprints, and the parts and fluids of Satisfactory's production
+chain.
 
 The Build Gun's buildings are multiblocks with real Create machines inside (`building/`): the Constructor (a Press
 over a Basin, its recipe picked by the controller's filter), the Smelter (an Encased Fan blasting through lava onto a
 Depot), Miner Mk.1 to Mk.3 and the Portable Miner (a Drill over a node), and the Storage Containers (Item Vaults).
 Each keeps to Satisfactory's time per recipe and rate per minute (`BasinPace`, `BuildingLogic`), takes belts at its
-input ports and puts what it makes onto the belt at its output port, and is turned by a motor inside that gives the SU
-it draws (Satisfactory's MW at 1 MW = 204.8 SU). Every player starts with a HUB, which costs 20 Raw Iron to put down,
-hands out the Build Gun, and has a hand-cranked Craft Station (a Press and a Mixer over Basins) and two Biomass
-Burners.
+input ports and puts what it makes onto the belt at its output port, and is turned by Create: New Age motors inside
+that run on the power grid. Every player starts with a HUB, which costs 20 Raw Iron to put down, hands out the Build
+Gun, and has a hand-cranked Craft Station (a Press and a Mixer over Basins) and two Biomass Burners.
+
+## Power
+
+Power is Create: New Age electricity underneath and SU on top: Satisfactory's MW at **1 MW = 204.8 SU**, with FE
+following New Age's own SU-to-energy rate (6 FE a tick per MW at its default), so a New Age motor fed a building's FE
+gives exactly that building's SU. Every building, generator, pole and tower has a New Age wire connector on top;
+wires are New Age's, strung by hand (Power Towers reach 256 blocks tower to tower, building to building 32; a pole
+takes 4, 7 or 10 wires, a machine one). `power/PowerGrids.java` balances every wired network Satisfactory's way each
+tick, in place of New Age's own path-finding: generators give, and burn fuel for, only what is used; spare power
+charges Power Storage (100 MWh, 100 MW); a shortfall is covered from storage, and past that the fuse blows and the
+grid goes dark until it is reset (sneak-use a generator or Power Storage). Lines keep working over unloaded chunks
+(`power/WireMap.java`). The generators (`building/BuildingPower.java`): Biomass Burner 30 MW, Coal Generator 75 MW (with
+water), Fuel Generator 250 MW, Geothermal Generator (a burst at every eruption of the sulfur geyser under it, sulfuric
+acid as waste), Nuclear Power Plant 2,500 MW (Uranium and Plutonium Fuel Rods, Satisfactory's waste), and the Alien
+Power Augmenter (500 MW, +10% to its grid, +30% fed Alien Power Matrices). A New Age reactor a player builds burns the
+same rods.
 
 ## Building
 

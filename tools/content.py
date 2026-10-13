@@ -199,19 +199,19 @@ MILESTONES = [
      "Portable Miner, Wrench and Goggles, a Traveler's Backpack for every member (Leather: 27 slots)",
      [C + "wrench", C + "goggles", C + "mechanical_drill"], ["backpack"]),
     (0, "hub_upgrade_2", "HUB Upgrade 2", "20 Iron Rod, 10 Iron Sheet", "0:00",
-     "Smelter (Encased Fan), Wire and Cable, the first HUB Engine, copper nodes on the scanner",
-     [C + "encased_fan", C + "nozzle", "siftec:wire", "siftec:cable", "siftec:power_line", "siftec:hub_engine"], ["scanner:copper"]),
+     "Smelter (Encased Fan), Wire and Cable, the first HUB Biomass Burner, wires and wire connectors, copper nodes on the scanner",
+     [C + "encased_fan", C + "nozzle", "siftec:wire", "siftec:cable"], ["scanner:copper"]),
     (0, "hub_upgrade_3", "HUB Upgrade 3", "20 Iron Sheet, 20 Iron Rod, 20 Wire", "0:00",
      "Constructor (Press, Saw, Millstone, Basin), Screw, Reinforced Iron Plate, stone nodes on the scanner",
-     [C + "mechanical_press", C + "mechanical_saw", C + "depot", C + "millstone", C + "basin", "siftec:screw", "siftec:reinforced_iron_plate", "siftec:power_pole"],
+     [C + "mechanical_press", C + "mechanical_saw", C + "depot", C + "millstone", C + "basin", "siftec:screw", "siftec:reinforced_iron_plate"],
      ["scanner:stone"]),
     (0, "hub_upgrade_4", "HUB Upgrade 4", "75 Iron Sheet, 20 Cable, 10 Stone", "0:00",
      "Mechanical Belt and funnels, Backpack Crafting Upgrade", [C + "belt_connector", C + "andesite_funnel"], []),
     (0, "hub_upgrade_5", "HUB Upgrade 5", "75 Iron Rod, 50 Cable, 20 Stone", "0:00",
-     "Miner Mk.1, Item Vault, a second HUB Engine, Backpack Pickup and Furnace Upgrades", [C + "item_vault"], []),
+     "Miner Mk.1, Item Vault, a second HUB Biomass Burner, Backpack Pickup and Furnace Upgrades", [C + "item_vault"], []),
     (0, "hub_upgrade_6", "HUB Upgrade 6", "100 Iron Rod, 100 Iron Sheet, 100 Wire, 50 Stone", "0:00",
-     "Wormhole Gateway, Furnace Engine, flywheel, Biomass. Milestones lock the HUB from here on",
-     ["siftec:wormhole_gateway", "siftec:furnace_engine", C + "flywheel", "siftec:biomass"], []),
+     "Wormhole Gateway, Biomass Burner, flywheel, Biomass. Milestones lock the HUB from here on",
+     ["siftec:wormhole_gateway", C + "flywheel", "siftec:biomass"], []),
 
     (1, "base_building", "Base Building", "200 Stone, 100 Iron Sheet, 100 Iron Rod", "2:00",
      "Factory building blocks: girders, scaffolding, ladders, casings",
@@ -257,7 +257,7 @@ MILESTONES = [
      [C + "crushing_wheel", "siftec:encased_industrial_beam", "siftec:stator", "siftec:motor", "siftec:automated_wiring"], []),
     (4, "expanded_power_infrastructure", "Expanded Power Infrastructure", "100 Steel Beam, 50 Encased Industrial Beam, 200 Modular Frame, 2000 Wire", "5:00",
      "Power Tower, Power Storage, windmills, pistons, bearings and other contraption parts",
-     ["siftec:power_tower", "siftec:power_storage", C + "windmill_bearing", C + "sail_frame", C + "mechanical_piston", C + "sticky_mechanical_piston",
+     [C + "windmill_bearing", C + "sail_frame", C + "mechanical_piston", C + "sticky_mechanical_piston",
       C + "mechanical_bearing", C + "clockwork_bearing", C + "gantry_carriage", C + "gantry_shaft", C + "elevator_pulley", C + "linear_chassis",
       C + "radial_chassis", C + "super_glue", C + "sticker", C + "contraption_controls"] + SAILS, []),
     (4, "hypertubes", "Hypertubes", "500 Copper Sheet, 300 Steel Pipe, 50 Encased Industrial Beam", "10:00",
@@ -447,7 +447,7 @@ MAM = [
         ("AI Limiter", "100 Quickwire, 50 Copper Sheet", "3:00", "AI Limiter, Mechanical Arm", [3], ["siftec:ai_limiter", C + "mechanical_arm"], []),
         ("Power Switch", "50 Quickwire, 25 Rotor", "2:00", "Clutch, Gearshift, Sequenced Gearshift, Adjustable Chain Gearshift, Speed Governor", [2],
          [C + "clutch", C + "gearshift", C + "sequenced_gearshift", C + "adjustable_chain_gearshift", "siftec:speed_governor"], []),
-        ("Zipline", "100 Quickwire, 50 Cable", "2:00", "Use a Wrench on a Power Pole or Tower to ride its Power Lines", [2], [], ["zipline"]),
+        ("Zipline", "100 Quickwire, 50 Cable", "2:00", "Use a Wrench on a Power Pole or Tower to ride its wires", [2], [], ["zipline"]),
         ("High-Speed Connector", "500 Quickwire, 25 Plastic, 10 Computer", "5:00", "High-Speed Connector", [4], ["siftec:high_speed_connector"], []),
     ]),
     ("mycelia", "Mycelia", M + "brown_mushroom", [
@@ -492,7 +492,7 @@ MAM = [
         ("Heavy Weapons", "100 Gunpowder, 25 Motor, 10 Encased Industrial Beam", "5:00", "Gatling and Launcher", [4], ["cgs:gatling", "cgs:launcher"], []),
         ("Compacted Coal", "25 Coal, 25 Sulfur", "2:00", "Compacted Coal", [1], ["siftec:compacted_coal"], []),
         ("Turbofuel", "15 Compacted Coal, 20 createdieselgenerators:diesel_bucket", "5:00", "Turbofuel", [6], ["siftec:turbofuel_bucket"], []),
-        ("Geothermal Power", "50 Sulfur, 10 Heavy Modular Frame, 5 Supercomputer", "5:00", "Geyser Engine", [2], ["siftec:geyser_engine"], []),
+        ("Geothermal Power", "50 Sulfur, 10 Heavy Modular Frame, 5 Supercomputer", "5:00", "Geothermal Generator", [2], [], []),
     ]),
     ("alien", "Alien Technology", "siftec:mercer_sphere", [
         ("Mercer Sphere Analysis", "1 Mercer Sphere", "1:00", "The Object Scanner can find Mercer Spheres", [], [], ["object:mercer_sphere"]),
@@ -507,7 +507,9 @@ MAM = [
 # 1.0 MAM research that unlocks recipes and that the trees above did not have yet. Appended, so the nodes above keep
 # their ids; costs are 1.0's in the pack's names. Work package 8 rebuilds the trees from the MAM Research tab.
 _MAM_MORE = {
-    "caterium": [("Stun Rebar", "50 Quickwire, 10 Iron Rebar", "0:03", "Stun Rebar", [2], [], [])],
+    "caterium": [("Stun Rebar", "50 Quickwire, 10 Iron Rebar", "0:03", "Stun Rebar", [2], [], []),
+                 ("Power Poles Mk.2", "300 Quickwire", "0:03", "Power Pole Mk.2: seven wires", [2], [], []),
+                 ("Power Poles Mk.3", "50 High-Speed Connector, 200 Steel Pipe", "0:03", "Power Pole Mk.3: ten wires", [7], [], [])],
     "mycelia": [("Synthetic Polyester Fabric", "25 Fabric, 100 Polymer Resin", "0:03", "Fabric from Polymer Resin in the Refinery", [2], [], [])],
     "quartz": [("Shatter Rebar", "30 Quartz Crystal, 150 Iron Rebar", "0:03", "Shatter Rebar", [1], [], [])],
     "sulfur": [("Smokeless Powder", "100 Gunpowder, 50 Plastic", "0:03", "Smokeless Powder", [1], [], []),
@@ -515,7 +517,8 @@ _MAM_MORE = {
                ("Ionized Fuel", "1 Hard Drive, 100 Time Crystal, 200 Packaged Rocket Fuel", "0:03", "Ionized Fuel, packed and unpacked", [10], [], [])],
     "alien": [("SAM Reanimation", "20 SAM", "0:03", "Reanimated SAM", [], [], []),
               ("SAM Fluctuator", "10 Reanimated SAM, 100 Steel Pipe, 200 Wire", "0:03", "SAM Fluctuator", [8], [], []),
-              ("Alien Power Matrix", "50 Singularity Cell, 500 SAM Fluctuator, 100 Time Crystal", "0:03", "Alien Power Matrix (Quantum Encoder)", [9], [], [])],
+              ("Alien Power Matrix", "50 Singularity Cell, 500 SAM Fluctuator, 100 Time Crystal", "0:03", "Alien Power Matrix (Quantum Encoder)", [9], [], []),
+              ("Power Augmenter", "1 Somersloop, 100 SAM Fluctuator, 50 Computer", "0:03", "Alien Power Augmenter", [9], [], [])],
 }
 for _tree in MAM:
     _tree[3].extend(_MAM_MORE.get(_tree[0], []))
@@ -527,7 +530,8 @@ SAT_MAM = {"Hog Research": "mam_megafauna_1", "Hatcher Research": "mam_megafauna
            "Synthetic Polyester Fabric": "mam_mycelia_6", "Quartz Crystals": "mam_quartz_1", "Silica": "mam_quartz_2", "Crystal Oscillator": "mam_quartz_4",
            "Shatter Rebar": "mam_quartz_8", "Black Powder": "mam_sulfur_1", "Compacted Coal": "mam_sulfur_6", "Turbofuel": "mam_sulfur_7",
            "Smokeless Powder": "mam_sulfur_9", "Rocket Fuel": "mam_sulfur_10", "Ionized Fuel": "mam_sulfur_11", "SAM Reanimation": "mam_alien_8",
-           "SAM Fluctuator": "mam_alien_9", "Alien Power Matrix": "mam_alien_10"}
+           "SAM Fluctuator": "mam_alien_9", "Alien Power Matrix": "mam_alien_10",
+           "Power Poles Mk.2": "mam_caterium_9", "Power Poles Mk.3": "mam_caterium_10", "Power Augmenter": "mam_alien_11"}
 
 
 def unlock_id(unlock):
@@ -638,7 +642,7 @@ SHOP = [
 ]
 
 # Furnace burn times, in ticks (coal is 1600), after Satisfactory's energy values. A Blaze Burner burns anything a
-# furnace burns, so these heat boilers too, and the Furnace Engine runs off the furnace they burn in.
+# furnace burns, so these heat boilers too.
 FUELS = {"biomass": 960, "solid_biofuel": 2400, "compacted_coal": 3360, "petroleum_coke": 960}
 
 # ---------------------------------------------------------------------------------------------------
@@ -669,6 +673,7 @@ def _roofs():
 
 
 DG, G, H = "createdieselgenerators:", "cgs:", "create_hypertube:"
+NA = "create_new_age:"
 TB = "travelersbackpack:"
 MORE_LOCKS = {
     # factory building blocks
@@ -725,6 +730,25 @@ MORE_LOCKS = {
                      G + "rocket", G + "rocket_small", G + "launcher_auto", G + "ballistazooka", G + "blazegun", G + "steam_engine", G + "tank_empty",
                      G + "tank_lava", G + "tank_water", DG + "chemical_sprayer", DG + "chemical_sprayer_lighter", DG + "chemical_turret"],
 }
+# Create: New Age (the grid's wires and connectors, the motors players can put on it, its generators, the reactor).
+# Its own nuclear fuel and the thorium it is made from are switched off: reactors burn Satisfactory's fuel rods.
+for _mid, _items in {
+    "hub_upgrade_2": ["copper_wire", "incomplete_wire", "copper_wire_block", "electrical_connector"],
+    "hub_upgrade_3": ["basic_motor", "basic_motor_extension"],
+    "base_building": ["lamp_post", "street_light"],
+    "coal_power": ["generator_coil", "carbon_brushes", "redstone_magnet", "layered_magnet", "fluxuated_magnetite", "netherite_magnet", "magnetite_block",
+                   "heat_pipe", "heat_casing", "heater", "heat_pump", "stirling_engine", "basic_solar_heating_plate",
+                   "advanced_solar_heating_plate"],
+    "expanded_power_infrastructure": ["advanced_motor", "advanced_motor_extension", "basic_energiser", "advanced_energiser", "overcharged_iron",
+                                      "overcharged_iron_sheet", "overcharged_iron_wire", "overcharged_iron_wire_block", "overcharged_gold",
+                                      "overcharged_golden_sheet", "overcharged_golden_wire", "overcharged_golden_wire_block", "copper_circuit", "blank_circuit"],
+    "industrial_manufacturing": ["reinforced_motor", "reinforced_energiser", "overcharged_diamond", "overcharged_diamond_wire", "overcharged_diamond_wire_block"],
+    "nuclear_power": ["reactor_casing", "incomplete_reactor_casing", "reactor_glass", "reactor_rod", "reactor_fuel_acceptor", "reactor_heat_vent"],
+}.items():
+    MORE_LOCKS.setdefault(_mid, []).extend(NA + i for i in _items)
+DISABLED += [NA + i for i in ("nuclear_fuel", "incomplete_fuel", "thorium", "radioactive_thorium", "thorium_ore", "corium", "solid_corium",
+                              "incomplete_enchanted_golden_apple")]
+
 # Never locked: the starting kinetics, raw and crushed materials, crafting ingredients, food, fluids in buckets,
 # creative-only and contraption items, and what machines make on their own (packages, half-made parts)
 FREE = [C + i for i in (
@@ -763,7 +787,12 @@ DISABLED += TB_BACKPACKS + TB_TIER_UPGRADES + TB_SLEEPING_BAGS
 #           Satisfactory time), "smelter" (an Encased Fan blasting through lava onto a Depot, fed by the controller),
 #           "miner" (a Drill over a node: the ore comes out at Satisfactory's rate for its Mk and the node's purity),
 #           "portable_miner" (the same with no power, dropping the ore in front), "storage" (Item Vaults)
-#   su      the SU the building draws (Satisfactory's MW at 1 MW = 204.8 SU; the Power tab); its motor gives exactly that
+#           "power" (work package 6: generators, Power Storage, poles and towers; what it does is its "power" below)
+#   su      the SU the building draws (Satisfactory's MW at 1 MW = 204.8 SU; the Power tab); its New Age motors give exactly that
+#   power   its part in the power grid (building/BuildingPower.java): "pole", "storage", "augmenter", or a generator kind,
+#           "biomass", "coal", "fuel", "geothermal", "nuclear"; mw what a generator gives, water the m3 a minute of water it
+#           takes at full load, lines how many wires its connector takes (1 if not given), vent the open cell a
+#           Geothermal Generator stands over a geyser with
 #   rate    a miner's items a minute on a normal node (impure half, pure double)
 #   node    the cell (x, y, z in the Build Gun frame) that stands on the node: the template leaves it out
 MW = 204.8
@@ -785,13 +814,35 @@ BUILDINGS = [
     ("storage_container", "Storage Container", "logistics", BUILD_COSTS["Storage Container"], "hub_upgrade_5", False, {"logic": "storage"}),
     ("industrial_storage_container", "Industrial Storage Container", "logistics", BUILD_COSTS["Industrial Storage Container"], "logistics_mk3", False,
      {"logic": "storage"}),
+    # work package 6: power. Satisfactory 1.0's MW, unlocks and wires per connector (Power Pole Mk.1 4, Mk.2 7, Mk.3 10)
+    ("power_pole_mk1", "Power Pole Mk.1", "power", BUILD_COSTS["Power Pole Mk.1"], "hub_upgrade_3", False, {"logic": "power", "power": "pole", "lines": 4}),
+    ("power_pole_mk2", "Power Pole Mk.2", "power", BUILD_COSTS["Power Pole Mk.2"], "mam_caterium_9", False, {"logic": "power", "power": "pole", "lines": 7}),
+    ("power_pole_mk3", "Power Pole Mk.3", "power", BUILD_COSTS["Power Pole Mk.3"], "mam_caterium_10", False, {"logic": "power", "power": "pole", "lines": 10}),
+    ("power_tower", "Power Tower", "power", BUILD_COSTS["Power Tower"], "expanded_power_infrastructure", False, {"logic": "power", "power": "pole", "lines": 10}),
+    ("power_storage", "Power Storage", "power", BUILD_COSTS["Power Storage"], "expanded_power_infrastructure", False, {"logic": "power", "power": "storage"}),
+    ("biomass_burner", "Biomass Burner", "power", BUILD_COSTS["Biomass Burner"], "hub_upgrade_6", False, {"logic": "power", "power": "biomass", "mw": 30}),
+    ("coal_generator", "Coal Generator", "power", BUILD_COSTS["Coal-Powered Generator"], "coal_power", False,
+     {"logic": "power", "power": "coal", "mw": 75, "water": 45}),
+    ("fuel_generator", "Fuel Generator", "power", BUILD_COSTS["Fuel-Powered Generator"], "petroleum_power", False, {"logic": "power", "power": "fuel", "mw": 250}),
+    ("geothermal_generator", "Geothermal Generator", "power", BUILD_COSTS["Geothermal Generator"], "mam_sulfur_8", False,
+     {"logic": "power", "power": "geothermal", "mw": 200, "vent": (0, 0, 2)}),
+    ("nuclear_power_plant", "Nuclear Power Plant", "power", BUILD_COSTS["Nuclear Power Plant"], "nuclear_power", False,
+     {"logic": "power", "power": "nuclear", "mw": 2500, "water": 240}),
+    ("alien_power_augmenter", "Alien Power Augmenter", "power", BUILD_COSTS["Alien Power Augmenter"], "mam_alien_11", False,
+     {"logic": "power", "power": "augmenter", "mw": 500}),
 ]
 # Buildings that stand over a resource node and can only go down once its clump is mined (the miners, extractors)
 NODE_BUILDINGS = {b[0] for b in BUILDINGS if "node" in b[6]}
-# The HUB's own Biomass Burners (Satisfactory's HUB Biomass Burners, 30 MW each) and what they burn: Satisfactory's
-# energy (MJ) burnt at 30 MW, so a leaf lasts half a second and Biomass six. Ticks per item.
-HUB_BURNER_SU = round(30 * MW)
-BURNER_FUEL = {"#minecraft:leaves": 10, "#minecraft:logs": 67, "siftec:biomass": 120, "siftec:solid_biofuel": 300}
+# What the generators burn, at Satisfactory 1.0's energy in MJ (a fluid's per m3): the Biomass Burners (the HUB's two and
+# the building), the Coal Generator, the Fuel Generator, the Nuclear Power Plant (and a New Age reactor a player builds:
+# each rod leaves Satisfactory's waste), and the Alien Power Augmenter's Alien Power Matrix (it only keeps it fed).
+GENERATOR_FUEL = {
+    "biomass": {"#minecraft:leaves": 15, "#minecraft:logs": 100, "#siftec:mycelia": 20, "siftec:biomass": 180, "siftec:solid_biofuel": 450},
+    "coal": {"minecraft:coal": 300, "siftec:compacted_coal": 630, "siftec:petroleum_coke": 180},
+    "fuel": {"Fuel": 750, "Liquid Biofuel": 750, "Turbofuel": 2000, "Rocket Fuel": 3600, "Ionized Fuel": 5000},
+    "nuclear": {"siftec:uranium_fuel_rod": (750000, "siftec:uranium_waste", 10), "siftec:plutonium_fuel_rod": (1500000, "siftec:plutonium_waste", 1)},
+    "augmenter": {"siftec:alien_power_matrix": 1},
+}
 
 
 # ---------------------------------------------------------------------------------------------------

@@ -25,6 +25,9 @@ dependencies {
 
     // Create Fly, built from the pack-26.3 branch of the fork and downloaded by CI into libs/
     compileOnly files("libs/create-fly-26.3.jar")
+    // Create: New Age, built from the fabric-26.3 branch of the fork and downloaded by CI into libs/: the grid's wires,
+    // connectors, motors and reactor
+    compileOnly files("libs/create-new-age-26.3.jar")
     // Traveler's Backpack (and what it needs), downloaded by CI into libs/tb/compile; only the optional compat uses it
     compileOnly fileTree(dir: "libs/tb/compile", include: "*.jar")
     // the same JEI build Create Fly compiles against; only needed to compile, JEI itself is optional in game

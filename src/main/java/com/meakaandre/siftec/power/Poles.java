@@ -8,17 +8,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** The loaded Power Poles and Towers that are turning right now. The Hover Pack only flies near one. */
+/**
+ * The loaded wire connectors on a grid that has power right now (poles, towers, buildings), as the grids last saw
+ * them (once a second). The Hover Pack only flies near one.
+ */
 public final class Poles {
     private static final Map<ResourceKey<Level>, Set<BlockPos>> LIVE = new ConcurrentHashMap<>();
 
     private Poles() {
     }
 
-    public static void mark(Level level, BlockPos pos, boolean turning) {
-        Set<BlockPos> set = LIVE.computeIfAbsent(level.dimension(), k -> ConcurrentHashMap.newKeySet());
-        if (turning) set.add(pos.immutable());
-        else set.remove(pos);
+    static void set(Level level, Set<BlockPos> live) {
+        Set<BlockPos> copy = ConcurrentHashMap.newKeySet();
+        copy.addAll(live);
+        LIVE.put(level.dimension(), copy);
     }
 
     public static boolean near(Level level, double x, double y, double z, double range) {

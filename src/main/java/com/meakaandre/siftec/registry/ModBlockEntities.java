@@ -3,12 +3,9 @@ package com.meakaandre.siftec.registry;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlockEntity;
 import com.meakaandre.siftec.depot.DepotBlockEntity;
-import com.meakaandre.siftec.geyser.GeyserEngineBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.machine.ProcessorBlockEntity;
 import com.meakaandre.siftec.sink.SinkBlockEntity;
-import com.meakaandre.siftec.power.PoleBlockEntity;
-import com.meakaandre.siftec.power.StorageBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
@@ -43,16 +40,14 @@ public class ModBlockEntities {
     public static final Entry<HubBlockEntity> HUB = register("hub", HubBlockEntity::new, ModBlocks.HUB.get(), ModBlocks.WORMHOLE_GATEWAY.get());
 
     public static final Entry<DepotBlockEntity> DEPOT = register("dimensional_depot", DepotBlockEntity::new, ModBlocks.DIMENSIONAL_DEPOT.get());
-    public static final Entry<PoleBlockEntity> POLE = register("power_pole", PoleBlockEntity::new, ModBlocks.POWER_POLE.get(), ModBlocks.POWER_TOWER.get());
     public static final Entry<com.meakaandre.siftec.governor.GovernorBlockEntity> GOVERNOR = register("speed_governor", com.meakaandre.siftec.governor.GovernorBlockEntity::new, ModBlocks.SPEED_GOVERNOR.get());
-    public static final Entry<com.meakaandre.siftec.engine.EngineBlockEntity> ENGINE = register("engine", com.meakaandre.siftec.engine.EngineBlockEntity::new, ModBlocks.FURNACE_ENGINE.get(), ModBlocks.HUB_ENGINE.get(), ModBlocks.HUB_BURNER.get());
+    /** The HUB's Biomass Burners, generators on the grid of the connector on top. */
+    public static final Entry<com.meakaandre.siftec.prefab.HubBurnerBlockEntity> HUB_BURNER = register("hub_burner", com.meakaandre.siftec.prefab.HubBurnerBlockEntity::new, ModBlocks.HUB_BURNER.get());
     /** The HUB's Personal Storage Box. */
     public static final Entry<com.meakaandre.siftec.prefab.StorageBoxBlockEntity> STORAGE_BOX = register("personal_storage", com.meakaandre.siftec.prefab.StorageBoxBlockEntity::new, ModBlocks.PERSONAL_STORAGE.get());
     public static final Entry<com.meakaandre.siftec.drone.DronePortBlockEntity> DRONE_PORT = register("drone_port", com.meakaandre.siftec.drone.DronePortBlockEntity::new, ModBlocks.DRONE_PORT.get());
     public static final Entry<com.meakaandre.siftec.blueprint.DesignerBlockEntity> DESIGNER = register("blueprint_designer", com.meakaandre.siftec.blueprint.DesignerBlockEntity::new, ModBlocks.BLUEPRINT_DESIGNER.get(), ModBlocks.BLUEPRINT_DESIGNER_MK3.get());
-    public static final Entry<StorageBlockEntity> POWER_STORAGE = register("power_storage", StorageBlockEntity::new, ModBlocks.POWER_STORAGE.get());
 
-    public static final Entry<GeyserEngineBlockEntity> GEYSER_ENGINE = register("geyser_engine", GeyserEngineBlockEntity::new, ModBlocks.GEYSER_ENGINE.get());
 
     public static final Entry<ProcessorBlockEntity> PROCESSOR = register("processor", ProcessorBlockEntity::new, ModBlocks.CONVERTER.get(), ModBlocks.PARTICLE_ACCELERATOR.get());
     /** Only holds what the Workshop's removed automatic mode had in it, until it is given back. */
@@ -61,7 +56,7 @@ public class ModBlockEntities {
 
     public static final Entry<com.meakaandre.siftec.building.ControllerBlockEntity> BUILDING_CONTROLLER = register("building_controller", com.meakaandre.siftec.building.ControllerBlockEntity::new, ModBlocks.BUILDING_CONTROLLER.get());
     public static final Entry<com.meakaandre.siftec.building.PortBlockEntity> BUILDING_PORT = register("building_port", com.meakaandre.siftec.building.PortBlockEntity::new, ModBlocks.BUILDING_PORT.get());
-    public static final Entry<com.meakaandre.siftec.building.MotorBlockEntity> BUILDING_MOTOR = register("building_motor", com.meakaandre.siftec.building.MotorBlockEntity::new, ModBlocks.BUILDING_MOTOR.get());
+    public static final Entry<com.meakaandre.siftec.building.TurbineBlockEntity> TURBINE = register("turbine", com.meakaandre.siftec.building.TurbineBlockEntity::new, ModBlocks.TURBINE.get());
 
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
         Entry<T> entry = new Entry<>();
@@ -74,7 +69,7 @@ public class ModBlockEntities {
         // belts, funnels, chutes and hoppers can take a powered miner's output
         // parts pushed into a HUB or Gateway go toward the company's active milestone
         ItemStorage.SIDED.registerForBlockEntity((hub, side) -> hub.intake, HUB.get());
-        ItemStorage.SIDED.registerForBlockEntity((engine, side) -> ContainerStorage.of(engine.fuel, side), ENGINE.get());
+        ItemStorage.SIDED.registerForBlockEntity((burner, side) -> ContainerStorage.of(burner.fuel, side), HUB_BURNER.get());
         ItemStorage.SIDED.registerForBlockEntity((box, side) -> ContainerStorage.of(box.items, side), STORAGE_BOX.get());
         ItemStorage.SIDED.registerForBlockEntity((port, side) -> ContainerStorage.of(port.items, side), DRONE_PORT.get());
         ItemStorage.SIDED.registerForBlockEntity((sink, side) -> sink.intake, SINK.get());
