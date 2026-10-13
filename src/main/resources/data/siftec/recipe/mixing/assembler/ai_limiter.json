@@ -1,0 +1,36 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire"
+  ],
+  "results": [
+    {
+      "id": "siftec:ai_limiter"
+    }
+  ],
+  "processing_time": 240
+}

@@ -1,0 +1,15 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:aluminum_casing",
+      "count": 2
+    }
+  ],
+  "processing_time": 40
+}

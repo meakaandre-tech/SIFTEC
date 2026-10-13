@@ -1,0 +1,17 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:rubber",
+    "siftec:rubber"
+  ],
+  "results": [
+    {
+      "id": "siftec:cable",
+      "count": 11
+    }
+  ],
+  "processing_time": 480
+}

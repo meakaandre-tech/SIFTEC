@@ -1,0 +1,25 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 3240,
+      "fluid": "siftec:sulfuric_acid"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:iron_ingot",
+      "count": 10
+    }
+  ],
+  "processing_time": 120
+}

@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:iron_rod"
+  ],
+  "results": [
+    {
+      "id": "siftec:iron_rebar"
+    }
+  ],
+  "processing_time": 80
+}

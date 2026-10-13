@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/incomplete_flexible_framework",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 6316136
+      }
+    ]
+  }
+}

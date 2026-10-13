@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "create:iron_sheet"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 38880,
+      "fluid": "siftec:nitrogen"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 9720,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:nitric_acid",
+      "amount": 9720
+    }
+  ],
+  "processing_time": 120
+}

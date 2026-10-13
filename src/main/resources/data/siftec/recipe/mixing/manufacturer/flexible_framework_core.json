@@ -1,0 +1,23 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber"
+  ],
+  "results": [
+    {
+      "id": "siftec:flexible_framework_core"
+    }
+  ],
+  "processing_time": 320
+}

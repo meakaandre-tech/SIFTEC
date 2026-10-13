@@ -1,0 +1,15 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot"
+  ],
+  "results": [
+    {
+      "id": "create:iron_sheet",
+      "count": 2
+    }
+  ],
+  "processing_time": 120
+}

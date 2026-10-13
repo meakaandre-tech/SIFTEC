@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke"
+  ],
+  "results": [
+    {
+      "id": "minecraft:copper_ingot",
+      "count": 12
+    }
+  ],
+  "processing_time": 240
+}

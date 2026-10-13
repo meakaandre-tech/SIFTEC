@@ -1,0 +1,31 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:aluminum_casing"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 8100,
+      "fluid": "siftec:sulfuric_acid"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 6480,
+      "fluid": "siftec:alumina_solution"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:battery"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "minecraft:water",
+      "amount": 4860
+    }
+  ],
+  "processing_time": 60
+}

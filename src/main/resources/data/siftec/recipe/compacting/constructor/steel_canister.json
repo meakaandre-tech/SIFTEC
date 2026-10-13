@@ -1,0 +1,16 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel"
+  ],
+  "results": [
+    {
+      "id": "siftec:empty_canister",
+      "count": 4
+    }
+  ],
+  "processing_time": 120
+}

@@ -1,0 +1,15 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:steel_beam",
+      "count": 3
+    }
+  ],
+  "processing_time": 160
+}

@@ -1,0 +1,45 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:ballistic_warp_drive_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_ballistic_warp_drive"
+  },
+  "result": {
+    "id": "siftec:ballistic_warp_drive"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:thermal_propulsion_rocket",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:singularity_cell",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:superposition_oscillator",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:dark_matter_crystal",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

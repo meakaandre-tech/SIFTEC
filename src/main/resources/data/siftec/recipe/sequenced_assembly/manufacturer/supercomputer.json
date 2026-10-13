@@ -1,0 +1,45 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:supercomputer_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_supercomputer"
+  },
+  "result": {
+    "id": "siftec:supercomputer"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:computer",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:ai_limiter",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:high_speed_connector",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:plastic",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

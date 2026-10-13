@@ -1,0 +1,21 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:filling",
+  "ingredient": "siftec:empty_canister",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 3240,
+    "fluid": "createdieselgenerators:diesel"
+  },
+  "result": {
+    "id": "siftec:packaged_fuel"
+  },
+  "processing_time": 30
+}

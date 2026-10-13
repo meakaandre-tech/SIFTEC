@@ -1,0 +1,17 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:iron_rebar",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire"
+  ],
+  "results": [
+    {
+      "id": "siftec:stun_rebar"
+    }
+  ],
+  "processing_time": 120
+}

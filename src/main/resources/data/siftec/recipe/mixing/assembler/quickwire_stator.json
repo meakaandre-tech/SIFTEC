@@ -1,0 +1,31 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire"
+  ],
+  "results": [
+    {
+      "id": "siftec:stator",
+      "count": 2
+    }
+  ],
+  "processing_time": 300
+}

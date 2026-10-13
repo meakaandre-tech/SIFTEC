@@ -1,0 +1,50 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 6480,
+      "fluid": "siftec:nitric_acid"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:quartz_crystal",
+      "count": 15
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:dissolved_silica",
+      "amount": 38880
+    }
+  ],
+  "processing_time": 240
+}

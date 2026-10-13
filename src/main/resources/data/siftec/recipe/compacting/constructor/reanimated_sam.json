@@ -1,0 +1,15 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:sam",
+    "siftec:sam",
+    "siftec:sam",
+    "siftec:sam"
+  ],
+  "results": [
+    {
+      "id": "siftec:reanimated_sam"
+    }
+  ],
+  "processing_time": 40
+}

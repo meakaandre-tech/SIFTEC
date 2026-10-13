@@ -1,0 +1,45 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:plutonium_fuel_rod_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_plutonium_fuel_rod"
+  },
+  "result": {
+    "id": "siftec:plutonium_fuel_rod"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:encased_plutonium_cell",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:steel_beam",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:electromagnetic_control_rod",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:heat_sink",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron"
+  ],
+  "results": [
+    {
+      "id": "minecraft:copper_ingot",
+      "count": 10
+    }
+  ],
+  "processing_time": 120
+}

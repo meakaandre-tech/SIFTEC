@@ -1,0 +1,29 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw"
+  ],
+  "results": [
+    {
+      "id": "siftec:reinforced_iron_plate"
+    }
+  ],
+  "processing_time": 240
+}

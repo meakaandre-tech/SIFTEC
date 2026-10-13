@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "create:brass_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:wire",
+      "count": 8
+    }
+  ],
+  "processing_time": 80
+}

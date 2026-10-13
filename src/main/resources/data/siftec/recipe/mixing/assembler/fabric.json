@@ -1,0 +1,17 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "#siftec:mycelia",
+    "siftec:biomass",
+    "siftec:biomass",
+    "siftec:biomass",
+    "siftec:biomass",
+    "siftec:biomass"
+  ],
+  "results": [
+    {
+      "id": "siftec:fabric"
+    }
+  ],
+  "processing_time": 80
+}

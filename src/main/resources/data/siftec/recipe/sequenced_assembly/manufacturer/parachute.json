@@ -1,0 +1,29 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:parachute_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_parachute"
+  },
+  "result": {
+    "id": "siftec:parachute"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:fabric",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:cable",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

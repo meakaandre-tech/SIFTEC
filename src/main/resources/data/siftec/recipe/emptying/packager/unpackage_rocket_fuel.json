@@ -1,0 +1,12 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:packaged_rocket_fuel",
+  "result": {
+    "id": "siftec:empty_fluid_tank"
+  },
+  "fluid_result": {
+    "id": "siftec:rocket_fuel",
+    "amount": 6480
+  },
+  "processing_time": 20
+}

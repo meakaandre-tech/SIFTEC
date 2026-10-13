@@ -1,0 +1,16 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:iron_rebar",
+    "siftec:iron_rebar",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal"
+  ],
+  "results": [
+    {
+      "id": "siftec:shatter_rebar"
+    }
+  ],
+  "processing_time": 240
+}

@@ -1,0 +1,34 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 19440,
+      "fluid": "createdieselgenerators:diesel"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:plastic",
+      "count": 12
+    }
+  ],
+  "processing_time": 240
+}

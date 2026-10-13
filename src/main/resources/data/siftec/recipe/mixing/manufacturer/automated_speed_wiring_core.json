@@ -1,0 +1,51 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:stator",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire"
+  ],
+  "results": [
+    {
+      "id": "siftec:automated_speed_wiring_core"
+    }
+  ],
+  "processing_time": 640
+}

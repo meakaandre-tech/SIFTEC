@@ -1,0 +1,36 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 38880,
+      "fluid": "siftec:dissolved_silica"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 32400,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:silica",
+      "count": 27
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "minecraft:water",
+      "amount": 25920
+    }
+  ],
+  "processing_time": 120
+}

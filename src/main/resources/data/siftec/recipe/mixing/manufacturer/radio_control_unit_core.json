@@ -1,0 +1,43 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:aluminum_casing",
+    "siftec:computer"
+  ],
+  "results": [
+    {
+      "id": "siftec:radio_control_unit_core"
+    }
+  ],
+  "processing_time": 960
+}

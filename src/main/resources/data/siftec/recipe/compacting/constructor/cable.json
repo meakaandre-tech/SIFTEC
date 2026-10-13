@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:wire",
+    "siftec:wire"
+  ],
+  "results": [
+    {
+      "id": "siftec:cable"
+    }
+  ],
+  "processing_time": 40
+}

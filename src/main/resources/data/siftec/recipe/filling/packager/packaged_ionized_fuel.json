@@ -1,0 +1,13 @@
+{
+  "type": "create:filling",
+  "ingredient": "siftec:empty_fluid_tank",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 6480,
+    "fluid": "siftec:ionized_fuel"
+  },
+  "result": {
+    "id": "siftec:packaged_ionized_fuel"
+  },
+  "processing_time": 30
+}

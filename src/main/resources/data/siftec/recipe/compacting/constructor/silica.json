@@ -1,0 +1,15 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz"
+  ],
+  "results": [
+    {
+      "id": "siftec:silica",
+      "count": 5
+    }
+  ],
+  "processing_time": 160
+}

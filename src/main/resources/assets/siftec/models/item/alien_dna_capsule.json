@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "siftec:item/alien_dna_capsule"
+  }
+}

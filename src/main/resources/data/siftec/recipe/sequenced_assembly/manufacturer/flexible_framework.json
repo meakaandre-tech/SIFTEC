@@ -1,0 +1,38 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:flexible_framework_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_flexible_framework"
+  },
+  "result": {
+    "id": "siftec:versatile_framework",
+    "count": 2
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:modular_frame",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:steel_beam",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:rubber",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

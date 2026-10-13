@@ -1,0 +1,32 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:encased_plutonium_cell",
+    "siftec:pressure_conversion_cube"
+  ],
+  "results": [
+    {
+      "id": "siftec:plutonium_fuel_rod"
+    }
+  ],
+  "processing_time": 2400
+}

@@ -1,0 +1,19 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet"
+  ],
+  "results": [
+    {
+      "id": "siftec:heat_sink"
+    }
+  ],
+  "processing_time": 160
+}

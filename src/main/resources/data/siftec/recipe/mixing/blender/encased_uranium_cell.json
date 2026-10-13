@@ -1,0 +1,39 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 25920,
+      "fluid": "siftec:sulfuric_acid"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:encased_uranium_cell",
+      "count": 5
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:sulfuric_acid",
+      "amount": 6480
+    }
+  ],
+  "processing_time": 240
+}

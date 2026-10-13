@@ -1,0 +1,54 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:infused_uranium_cell_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_infused_uranium_cell"
+  },
+  "result": {
+    "id": "siftec:encased_uranium_cell",
+    "count": 4
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:uranium",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:silica",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "cgs:sulfur",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:quickwire",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:computer",
+    "siftec:computer",
+    "siftec:battery",
+    "siftec:battery",
+    "siftec:battery",
+    "siftec:battery",
+    "siftec:battery",
+    "siftec:battery",
+    "siftec:battery",
+    "siftec:battery",
+    "siftec:battery",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire"
+  ],
+  "results": [
+    {
+      "id": "siftec:super_state_computer_core"
+    }
+  ],
+  "processing_time": 500
+}

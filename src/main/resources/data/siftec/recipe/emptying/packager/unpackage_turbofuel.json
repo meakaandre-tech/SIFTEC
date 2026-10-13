@@ -1,0 +1,12 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:packaged_turbofuel",
+  "result": {
+    "id": "siftec:empty_canister"
+  },
+  "fluid_result": {
+    "id": "siftec:turbofuel",
+    "amount": 3240
+  },
+  "processing_time": 60
+}

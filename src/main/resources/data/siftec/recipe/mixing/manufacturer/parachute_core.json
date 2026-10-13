@@ -1,0 +1,38 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable"
+  ],
+  "results": [
+    {
+      "id": "siftec:parachute_core"
+    }
+  ]
+}

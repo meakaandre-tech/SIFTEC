@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/incomplete_uranium_fuel_unit",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 6316136
+      }
+    ]
+  }
+}

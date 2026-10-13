@@ -1,0 +1,13 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:plastic",
+    "siftec:plastic"
+  ],
+  "results": [
+    {
+      "id": "siftec:plastic_smart_plating_core"
+    }
+  ],
+  "processing_time": 480
+}

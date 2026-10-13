@@ -1,0 +1,11 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:charged_neural_quantum_processor",
+  "result": {
+    "id": "siftec:neural_quantum_processor"
+  },
+  "fluid_result": {
+    "id": "siftec:dark_matter_residue",
+    "amount": 81000
+  }
+}

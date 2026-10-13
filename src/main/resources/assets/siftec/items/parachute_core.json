@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/parachute_core",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 9474200
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:biomass",
+    "siftec:biomass",
+    "siftec:biomass",
+    "siftec:biomass",
+    "siftec:biomass"
+  ],
+  "results": [
+    {
+      "id": "minecraft:coal",
+      "count": 6
+    }
+  ],
+  "processing_time": 160
+}

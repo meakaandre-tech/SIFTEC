@@ -1,0 +1,45 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs",
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "minecraft:coal",
+    "minecraft:coal"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 12960,
+      "fluid": "createdieselgenerators:diesel"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 9720,
+      "fluid": "siftec:nitrogen"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:compacted_coal"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:rocket_fuel",
+      "amount": 19440
+    }
+  ],
+  "processing_time": 48
+}

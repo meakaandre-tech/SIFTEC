@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:aluminum_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:iron_rod",
+      "count": 7
+    }
+  ],
+  "processing_time": 160
+}

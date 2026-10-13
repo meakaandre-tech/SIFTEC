@@ -1,0 +1,42 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:aluminum_casing",
+      "count": 15
+    }
+  ],
+  "processing_time": 160
+}

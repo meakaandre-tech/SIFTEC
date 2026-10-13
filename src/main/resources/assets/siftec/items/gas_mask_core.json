@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/gas_mask_core",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 9474200
+      }
+    ]
+  }
+}

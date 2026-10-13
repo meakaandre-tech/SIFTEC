@@ -1,0 +1,28 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 19440,
+      "fluid": "siftec:turbofuel"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 3240,
+      "fluid": "siftec:nitric_acid"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:compacted_coal"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:rocket_fuel",
+      "amount": 32400
+    }
+  ],
+  "processing_time": 120
+}

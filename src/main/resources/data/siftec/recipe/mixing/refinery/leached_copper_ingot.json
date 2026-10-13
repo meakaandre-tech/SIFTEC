@@ -1,0 +1,29 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper",
+    "minecraft:raw_copper"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 16200,
+      "fluid": "siftec:sulfuric_acid"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:copper_ingot",
+      "count": 22
+    }
+  ],
+  "processing_time": 240
+}

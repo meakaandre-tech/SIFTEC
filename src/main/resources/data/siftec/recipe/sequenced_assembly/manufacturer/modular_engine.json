@@ -1,0 +1,37 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:modular_engine_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_modular_engine"
+  },
+  "result": {
+    "id": "siftec:modular_engine"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:motor",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:rubber",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:smart_plating",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

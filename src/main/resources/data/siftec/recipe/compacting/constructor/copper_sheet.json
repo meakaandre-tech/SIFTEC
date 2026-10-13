@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot"
+  ],
+  "results": [
+    {
+      "id": "create:copper_sheet"
+    }
+  ],
+  "processing_time": 120
+}

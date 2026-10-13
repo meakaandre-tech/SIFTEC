@@ -1,0 +1,31 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 16200,
+      "fluid": "siftec:heavy_oil_residue"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 32400,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "createdieselgenerators:diesel",
+      "amount": 32400
+    }
+  ],
+  "processing_time": 120
+}

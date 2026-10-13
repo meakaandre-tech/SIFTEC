@@ -1,0 +1,14 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:plastic",
+    "siftec:plastic"
+  ],
+  "results": [
+    {
+      "id": "siftec:empty_canister",
+      "count": 4
+    }
+  ],
+  "processing_time": 80
+}

@@ -1,0 +1,56 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 16200,
+      "fluid": "siftec:sulfuric_acid"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 19440,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:aluminum_scrap",
+      "count": 30
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "minecraft:water",
+      "amount": 16200
+    }
+  ],
+  "processing_time": 120
+}

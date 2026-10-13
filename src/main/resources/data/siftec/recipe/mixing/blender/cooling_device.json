@@ -1,0 +1,25 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:heat_sink",
+    "siftec:heat_sink",
+    "siftec:heat_sink",
+    "siftec:heat_sink",
+    "siftec:motor"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 77760,
+      "fluid": "siftec:nitrogen"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:cooling_system",
+      "count": 2
+    }
+  ],
+  "processing_time": 480
+}

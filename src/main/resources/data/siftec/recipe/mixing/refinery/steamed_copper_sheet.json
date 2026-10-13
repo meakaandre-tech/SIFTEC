@@ -1,0 +1,23 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 9720,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "results": [
+    {
+      "id": "create:copper_sheet",
+      "count": 3
+    }
+  ],
+  "processing_time": 160
+}

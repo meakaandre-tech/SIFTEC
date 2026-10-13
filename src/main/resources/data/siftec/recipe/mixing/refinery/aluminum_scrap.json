@@ -1,0 +1,28 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:coal",
+    "minecraft:coal"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 12960,
+      "fluid": "siftec:alumina_solution"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:aluminum_scrap",
+      "count": 6
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "minecraft:water",
+      "amount": 6480
+    }
+  ],
+  "processing_time": 20
+}

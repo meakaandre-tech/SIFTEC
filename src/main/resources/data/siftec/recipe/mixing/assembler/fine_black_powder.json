@@ -1,0 +1,23 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "cgs:sulfur",
+    "siftec:compacted_coal",
+    "siftec:compacted_coal"
+  ],
+  "results": [
+    {
+      "id": "minecraft:gunpowder",
+      "count": 6
+    }
+  ],
+  "processing_time": 160
+}

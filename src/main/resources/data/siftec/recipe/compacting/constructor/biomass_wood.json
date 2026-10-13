@@ -1,0 +1,16 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "#minecraft:logs",
+    "#minecraft:logs"
+  ],
+  "results": [
+    {
+      "id": "siftec:biomass",
+      "count": 20
+    }
+  ],
+  "processing_time": 80
+}

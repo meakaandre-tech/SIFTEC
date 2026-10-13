@@ -1,0 +1,32 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:stator",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable"
+  ],
+  "results": [
+    {
+      "id": "siftec:automated_wiring"
+    }
+  ],
+  "processing_time": 480
+}

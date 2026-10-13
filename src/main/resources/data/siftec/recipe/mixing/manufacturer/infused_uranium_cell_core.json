@@ -1,0 +1,43 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:uranium",
+    "siftec:silica",
+    "siftec:silica",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire"
+  ],
+  "results": [
+    {
+      "id": "siftec:infused_uranium_cell_core"
+    }
+  ],
+  "processing_time": 240
+}

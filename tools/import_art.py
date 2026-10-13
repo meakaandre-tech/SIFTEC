@@ -26,7 +26,7 @@ ITEM_SHEETS = {
         "electromagnetic_control_rod smart_plating versatile_framework automated_wiring modular_engine adaptive_control_unit "
         "assembly_director_system magnetic_field_generator thermal_propulsion_rocket nuclear_pasta biochemical_sculptor "
         "ballistic_warp_drive ai_expansion_server incomplete_ai_expansion_server blue_power_slug yellow_power_slug purple_power_slug "
-        "power_shard somersloop mercer_sphere hard_drive dna_capsule sam reanimated_sam sam_fluctuator ficsite_trigon time_crystal "
+        "power_shard somersloop mercer_sphere hard_drive alien_dna_capsule sam reanimated_sam sam_fluctuator ficsite_trigon time_crystal "
         "dark_matter_crystal excited_photonic_matter singularity_cell superposition_oscillator incomplete_superposition_oscillator "
         "neural_quantum_processor incomplete_neural_quantum_processor",
     "items_gear.png": "jetpack hover_pack parachute hazmat_suit gas_mask blade_runners gas_filter iodine_infused_filter node_scanner "

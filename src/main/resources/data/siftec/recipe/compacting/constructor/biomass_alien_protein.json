@@ -1,0 +1,17 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:alien_protein"
+  ],
+  "results": [
+    {
+      "id": "siftec:biomass",
+      "count": 50
+    },
+    {
+      "id": "siftec:biomass",
+      "count": 50
+    }
+  ],
+  "processing_time": 80
+}

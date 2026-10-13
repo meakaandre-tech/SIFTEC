@@ -1,0 +1,49 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic"
+  ],
+  "results": [
+    {
+      "id": "siftec:ai_limiter",
+      "count": 2
+    }
+  ],
+  "processing_time": 300
+}

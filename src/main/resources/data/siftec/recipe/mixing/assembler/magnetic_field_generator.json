@@ -1,0 +1,19 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:versatile_framework",
+    "siftec:versatile_framework",
+    "siftec:versatile_framework",
+    "siftec:versatile_framework",
+    "siftec:versatile_framework",
+    "siftec:electromagnetic_control_rod",
+    "siftec:electromagnetic_control_rod"
+  ],
+  "results": [
+    {
+      "id": "siftec:magnetic_field_generator",
+      "count": 2
+    }
+  ],
+  "processing_time": 2400
+}

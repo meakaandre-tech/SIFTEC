@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/uranium_fuel_rod_core",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 9474200
+      }
+    ]
+  }
+}

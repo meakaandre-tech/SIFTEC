@@ -1,0 +1,18 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire"
+  ],
+  "results": [
+    {
+      "id": "siftec:iodine_infused_filter_core"
+    }
+  ],
+  "processing_time": 320
+}

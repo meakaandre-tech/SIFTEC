@@ -1,0 +1,12 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:packaged_nitrogen_gas",
+  "result": {
+    "id": "siftec:empty_fluid_tank"
+  },
+  "fluid_result": {
+    "id": "siftec:nitrogen",
+    "amount": 12960
+  },
+  "processing_time": 20
+}

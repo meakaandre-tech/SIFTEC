@@ -1,0 +1,12 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:packaged_alumina_solution",
+  "result": {
+    "id": "siftec:empty_canister"
+  },
+  "fluid_result": {
+    "id": "siftec:alumina_solution",
+    "amount": 3240
+  },
+  "processing_time": 10
+}

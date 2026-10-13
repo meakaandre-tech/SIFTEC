@@ -1,0 +1,27 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:time_crystal"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 51840,
+      "fluid": "siftec:rocket_fuel"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:compacted_coal",
+      "count": 2
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:ionized_fuel",
+      "amount": 51840
+    }
+  ],
+  "processing_time": 480
+}

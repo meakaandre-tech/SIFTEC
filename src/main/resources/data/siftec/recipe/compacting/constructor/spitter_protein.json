@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:bone"
+  ],
+  "results": [
+    {
+      "id": "siftec:alien_protein"
+    }
+  ],
+  "processing_time": 60
+}

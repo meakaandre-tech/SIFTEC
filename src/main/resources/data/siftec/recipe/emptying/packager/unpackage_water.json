@@ -1,0 +1,12 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:packaged_water",
+  "result": {
+    "id": "siftec:empty_canister"
+  },
+  "fluid_result": {
+    "id": "minecraft:water",
+    "amount": 3240
+  },
+  "processing_time": 10
+}

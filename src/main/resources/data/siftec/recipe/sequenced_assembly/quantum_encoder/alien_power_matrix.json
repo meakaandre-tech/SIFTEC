@@ -1,0 +1,49 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:alien_power_matrix_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_alien_power_matrix"
+  },
+  "result": {
+    "id": "siftec:charged_alien_power_matrix"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:filling",
+      "ingredient": "$ingredient",
+      "fluid_ingredient": {
+        "type": "fluid_stack",
+        "amount": 77760,
+        "fluid": "siftec:excited_photonic_matter"
+      },
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:sam_fluctuator",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:time_crystal",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:superposition_oscillator",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

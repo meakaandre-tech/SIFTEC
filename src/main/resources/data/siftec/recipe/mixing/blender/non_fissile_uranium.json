@@ -1,0 +1,56 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:uranium_waste",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 19440,
+      "fluid": "siftec:nitric_acid"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 19440,
+      "fluid": "siftec:sulfuric_acid"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:non_fissile_uranium",
+      "count": 20
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "minecraft:water",
+      "amount": 19440
+    }
+  ],
+  "processing_time": 480
+}

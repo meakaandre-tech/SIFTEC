@@ -1,0 +1,49 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:neural_quantum_processor_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_neural_quantum_processor"
+  },
+  "result": {
+    "id": "siftec:charged_neural_quantum_processor"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:filling",
+      "ingredient": "$ingredient",
+      "fluid_ingredient": {
+        "type": "fluid_stack",
+        "amount": 81000,
+        "fluid": "siftec:excited_photonic_matter"
+      },
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:time_crystal",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:supercomputer",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:ficsite_trigon",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

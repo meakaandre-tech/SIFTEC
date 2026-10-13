@@ -1,0 +1,46 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:singularity_cell_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_singularity_cell"
+  },
+  "result": {
+    "id": "siftec:singularity_cell",
+    "count": 10
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:nuclear_pasta",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:dark_matter_crystal",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "create:iron_sheet",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "#siftec:stones",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

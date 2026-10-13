@@ -1,0 +1,16 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:fabric",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "create:iron_sheet"
+  ],
+  "results": [
+    {
+      "id": "siftec:gas_filter_core"
+    }
+  ],
+  "processing_time": 160
+}

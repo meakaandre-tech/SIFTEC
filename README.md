@@ -31,8 +31,13 @@ Most of `src/main/resources` is generated. Edit the generators, not the JSON:
 - `tools/content.py`: parts, fluids, milestones, wormhole phases, MAM research, which item each milestone
   unlocks (including every item of the other mods: `MORE_LOCKS` and `FREE`), switched-off items, furnace
   fuels, the Converter and Particle Accelerator, the AWESOME Sink and Shop.
-- `tools/recipes.py`: every recipe the mod adds, the Hard Drive alternates, the recipes it removes from
-  other mods (`REMOVED`) and the Equipment Workshop's build costs.
+- `tools/satisfactory.py`: Satisfactory 1.0's recipes, build costs, milestones, MAM costs and sink points, written by
+  `tools/import_satisfactory.py` from the game export SatisfactoryTools publishes. Never edited by hand.
+- `tools/recipes.py`: every recipe the mod adds (1.0's at Satisfactory amounts, on the Create machines of each
+  building, and the pack's own), the Hard Drive alternates, the recipes it removes from other mods (`REMOVED`) and the
+  Equipment Workshop's build costs.
+- `tools/check_recipes.py`: the checkers (reachability, automatability, conflicts). `gen_assets.py` runs them and
+  stops on an error; the CI runs the generator and fails if the committed files differ from what it writes.
 - `tools/gen_assets.py`: turns those into `siftec_content.json`, the recipes, models, blockstates, loot
   tables and the lang file. It stops on an unknown item id (checked against `tools/known_ids.txt`, the item
   ids of the game and the pack's mods), on an item of another mod that nothing unlocks or frees, and it deletes
@@ -48,4 +53,4 @@ Run them from outside the repository, so nothing in the working directory shadow
 
     cd /tmp && python3 -I -B /path/to/SIFTEC/tools/gen_assets.py
 
-The design is in `design/design.txt` and `design/recipes.txt`.
+The design is in the SIFTEC Master Design doc; `design/design.txt` is the old design, kept as a reference.
