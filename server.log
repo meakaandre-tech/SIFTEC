@@ -1,0 +1,1164 @@
+Downloading Minecraft server
+Installing Fabric Loader 0.19.5(26.3) on the server
+Downloading required files
+Downloading library org.ow2.asm:asm:9.10.1
+Downloading library org.ow2.asm:asm-analysis:9.10.1
+Downloading library org.ow2.asm:asm-commons:9.10.1
+Downloading library org.ow2.asm:asm-tree:9.10.1
+Downloading library org.ow2.asm:asm-util:9.10.1
+Downloading library net.fabricmc:sponge-mixin:0.17.4+mixin.0.8.7
+Downloading library net.fabricmc:fabric-loader:0.19.5
+Generating server launch JAR
+Unpacking 26.3/server-26.3.jar (versions:26.3) to versions/26.3/server-26.3.jar
+Unpacking at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar (libraries:at.yawk.lz4:lz4-java:1.10.1) to libraries/at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar
+Unpacking com/azure/azure-json/1.4.0/azure-json-1.4.0.jar (libraries:com.azure:azure-json:1.4.0) to libraries/com/azure/azure-json/1.4.0/azure-json-1.4.0.jar
+Unpacking com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar (libraries:com.github.oshi:oshi-core:6.9.0) to libraries/com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar
+Unpacking com/google/code/gson/gson/2.14.0/gson-2.14.0.jar (libraries:com.google.code.gson:gson:2.14.0) to libraries/com/google/code/gson/gson/2.14.0/gson-2.14.0.jar
+Unpacking com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar (libraries:com.google.guava:failureaccess:1.0.3) to libraries/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar
+Unpacking com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar (libraries:com.google.guava:guava:33.6.0-jre) to libraries/com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar
+Unpacking com/microsoft/azure/msal4j/1.24.1/msal4j-1.24.1.jar (libraries:com.microsoft.azure:msal4j:1.24.1) to libraries/com/microsoft/azure/msal4j/1.24.1/msal4j-1.24.1.jar
+Unpacking com/mojang/authlib/10.0.77/authlib-10.0.77.jar (libraries:com.mojang:authlib:10.0.77) to libraries/com/mojang/authlib/10.0.77/authlib-10.0.77.jar
+Unpacking com/mojang/brigadier/1.3.11/brigadier-1.3.11.jar (libraries:com.mojang:brigadier:1.3.11) to libraries/com/mojang/brigadier/1.3.11/brigadier-1.3.11.jar
+Unpacking com/mojang/datafixerupper/10.0.21/datafixerupper-10.0.21.jar (libraries:com.mojang:datafixerupper:10.0.21) to libraries/com/mojang/datafixerupper/10.0.21/datafixerupper-10.0.21.jar
+Unpacking com/mojang/jtracy/1.14.38/jtracy-1.14.38.jar (libraries:com.mojang:jtracy:1.14.38) to libraries/com/mojang/jtracy/1.14.38/jtracy-1.14.38.jar
+Unpacking com/mojang/logging/1.7.12/logging-1.7.12.jar (libraries:com.mojang:logging:1.7.12) to libraries/com/mojang/logging/1.7.12/logging-1.7.12.jar
+Unpacking commons-io/commons-io/2.20.0/commons-io-2.20.0.jar (libraries:commons-io:commons-io:2.20.0) to libraries/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar
+Unpacking io/netty/netty-buffer/4.2.16.Final/netty-buffer-4.2.16.Final.jar (libraries:io.netty:netty-buffer:4.2.16.Final) to libraries/io/netty/netty-buffer/4.2.16.Final/netty-buffer-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-base/4.2.16.Final/netty-codec-base-4.2.16.Final.jar (libraries:io.netty:netty-codec-base:4.2.16.Final) to libraries/io/netty/netty-codec-base/4.2.16.Final/netty-codec-base-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-compression/4.2.16.Final/netty-codec-compression-4.2.16.Final.jar (libraries:io.netty:netty-codec-compression:4.2.16.Final) to libraries/io/netty/netty-codec-compression/4.2.16.Final/netty-codec-compression-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-http/4.2.16.Final/netty-codec-http-4.2.16.Final.jar (libraries:io.netty:netty-codec-http:4.2.16.Final) to libraries/io/netty/netty-codec-http/4.2.16.Final/netty-codec-http-4.2.16.Final.jar
+Unpacking io/netty/netty-common/4.2.16.Final/netty-common-4.2.16.Final.jar (libraries:io.netty:netty-common:4.2.16.Final) to libraries/io/netty/netty-common/4.2.16.Final/netty-common-4.2.16.Final.jar
+Unpacking io/netty/netty-handler/4.2.16.Final/netty-handler-4.2.16.Final.jar (libraries:io.netty:netty-handler:4.2.16.Final) to libraries/io/netty/netty-handler/4.2.16.Final/netty-handler-4.2.16.Final.jar
+Unpacking io/netty/netty-resolver/4.2.16.Final/netty-resolver-4.2.16.Final.jar (libraries:io.netty:netty-resolver:4.2.16.Final) to libraries/io/netty/netty-resolver/4.2.16.Final/netty-resolver-4.2.16.Final.jar
+Unpacking io/netty/netty-transport/4.2.16.Final/netty-transport-4.2.16.Final.jar (libraries:io.netty:netty-transport:4.2.16.Final) to libraries/io/netty/netty-transport/4.2.16.Final/netty-transport-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-classes-epoll/4.2.16.Final/netty-transport-classes-epoll-4.2.16.Final.jar (libraries:io.netty:netty-transport-classes-epoll:4.2.16.Final) to libraries/io/netty/netty-transport-classes-epoll/4.2.16.Final/netty-transport-classes-epoll-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-classes-kqueue/4.2.16.Final/netty-transport-classes-kqueue-4.2.16.Final.jar (libraries:io.netty:netty-transport-classes-kqueue:4.2.16.Final) to libraries/io/netty/netty-transport-classes-kqueue/4.2.16.Final/netty-transport-classes-kqueue-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-x86_64.jar (libraries:io.netty:netty-transport-native-epoll:4.2.16.Final:linux-x86_64) to libraries/io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-x86_64.jar
+Unpacking io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-aarch_64.jar (libraries:io.netty:netty-transport-native-epoll:4.2.16.Final:linux-aarch_64) to libraries/io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-aarch_64.jar
+Unpacking io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-x86_64.jar (libraries:io.netty:netty-transport-native-kqueue:4.2.16.Final:osx-x86_64) to libraries/io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-x86_64.jar
+Unpacking io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-aarch_64.jar (libraries:io.netty:netty-transport-native-kqueue:4.2.16.Final:osx-aarch_64) to libraries/io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-aarch_64.jar
+Unpacking io/netty/netty-transport-native-unix-common/4.2.16.Final/netty-transport-native-unix-common-4.2.16.Final.jar (libraries:io.netty:netty-transport-native-unix-common:4.2.16.Final) to libraries/io/netty/netty-transport-native-unix-common/4.2.16.Final/netty-transport-native-unix-common-4.2.16.Final.jar
+Unpacking it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar (libraries:it.unimi.dsi:fastutil:8.5.18) to libraries/it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar
+Unpacking net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar (libraries:net.java.dev.jna:jna:5.17.0) to libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar
+Unpacking net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar (libraries:net.java.dev.jna:jna-platform:5.17.0) to libraries/net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar
+Unpacking net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar (libraries:net.sf.jopt-simple:jopt-simple:5.0.4) to libraries/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar
+Unpacking org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar (libraries:org.apache.commons:commons-lang3:3.20.0) to libraries/org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar
+Unpacking org/apache/logging/log4j/log4j-api/2.26.0/log4j-api-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-api:2.26.0) to libraries/org/apache/logging/log4j/log4j-api/2.26.0/log4j-api-2.26.0.jar
+Unpacking org/apache/logging/log4j/log4j-core/2.26.0/log4j-core-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-core:2.26.0) to libraries/org/apache/logging/log4j/log4j-core/2.26.0/log4j-core-2.26.0.jar
+Unpacking org/apache/logging/log4j/log4j-slf4j2-impl/2.26.0/log4j-slf4j2-impl-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-slf4j2-impl:2.26.0) to libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.26.0/log4j-slf4j2-impl-2.26.0.jar
+Unpacking org/joml/joml/1.10.9/joml-1.10.9.jar (libraries:org.joml:joml:1.10.9) to libraries/org/joml/joml/1.10.9/joml-1.10.9.jar
+Unpacking org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar (libraries:org.jspecify:jspecify:1.0.0) to libraries/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar
+Unpacking org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar (libraries:org.slf4j:slf4j-api:2.0.17) to libraries/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar
+Starting net.fabricmc.loader.impl.game.minecraft.BundlerClassPathCapture
+[22:53:59] [main/INFO]: Loading Minecraft 26.3 with Fabric Loader 0.19.5
+[22:53:59] [main/INFO]: Mappings not present!
+[22:53:59] [main/WARN]: Warnings were found!
+ - Mod 'Forge Config API Port' (forgeconfigapiport) 26.3.1 recommends any version of modmenu, which is missing!
+	 - You should install any version of modmenu for the optimal experience.
+ - Mod 'Mielon's The Sift' (the_sift) 1.1.2 recommends version 4.13.0 or later of lambdynlights, which is missing!
+	 - You should install version 4.13.0 or later of lambdynlights for the optimal experience.
+[22:53:59] [main/INFO]: Loading 56 mods:
+	- cgs 1.4.9+26.3
+	- create 6.0.9-1
+	- create_hypertube 0.6.0+26.3
+	- create_new_age 1.2.1+26.3
+	- createdieselgenerators 1.3.15+26.3
+	- fabric-api 0.161.0+26.3
+	   |-- fabric-advancement-api-v1 1.0.0+38c7a2d55d
+	   |-- fabric-api-base 2.0.6+fcdff87f5d
+	   |-- fabric-api-lookup-api-v1 2.0.24+3434d6d95d
+	   |-- fabric-biome-api-v1 20.0.9+74ed1ea55d
+	   |-- fabric-block-api-v1 3.1.0+0ae6f9115d
+	   |-- fabric-block-getter-api-v2 2.0.9+3434d6d95d
+	   |-- fabric-command-api-v2 3.1.2+fcdff87f5d
+	   |-- fabric-content-registries-v0 15.0.4+74ed1ea55d
+	   |-- fabric-convention-tags-v2 4.10.3+6b5b47fd5d
+	   |-- fabric-crash-report-info-v1 1.0.7+fcdff87f5d
+	   |-- fabric-creative-tab-api-v1 5.0.21+fcdff87f5d
+	   |-- fabric-data-attachment-api-v1 2.2.30+3434d6d95d
+	   |-- fabric-data-generation-api-v1 27.2.4+427eab975d
+	   |-- fabric-debug-api-v1 1.0.4+3434d6d95d
+	   |-- fabric-dimensions-v1 5.1.19+47f74c985d
+	   |-- fabric-entity-events-v1 6.0.4+3434d6d95d
+	   |-- fabric-events-interaction-v0 5.3.6+3434d6d95d
+	   |-- fabric-game-rule-api-v1 4.0.10+3434d6d95d
+	   |-- fabric-item-api-v1 14.7.0+cf6bc2db5d
+	   |-- fabric-lifecycle-events-v1 4.1.9+ffef5f675d
+	   |-- fabric-loot-api-v3 4.0.8+4068fd645d
+	   |-- fabric-menu-api-v1 2.0.27+ed66f0a35d
+	   |-- fabric-message-api-v1 7.0.10+3434d6d95d
+	   |-- fabric-networking-api-v1 6.3.8+fcdff87f5d
+	   |-- fabric-object-builder-api-v1 24.1.9+3434d6d95d
+	   |-- fabric-particles-v1 5.0.24+3434d6d95d
+	   |-- fabric-permission-api-v1 1.0.8+fcdff87f5d
+	   |-- fabric-recipe-api-v1 10.0.8+fcdff87f5d
+	   |-- fabric-registry-sync-v0 8.0.1+fcdff87f5d
+	   |-- fabric-rendering-fluids-v1 6.0.6+3434d6d95d
+	   |-- fabric-resource-conditions-api-v1 6.1.5+3434d6d95d
+	   |-- fabric-resource-loader-v0 3.3.26+4fc5413f5d
+	   |-- fabric-resource-loader-v1 3.0.4+fcdff87f5d
+	   |-- fabric-serialization-api-v1 2.0.7+74ed1ea55d
+	   |-- fabric-tag-api-v1 2.1.10+fcdff87f5d
+	   |-- fabric-transfer-api-v1 8.0.25+fcdff87f5d
+	   \-- fabric-transitive-access-wideners-v1 8.1.16+52268a0e5d
+	- fabricloader 0.19.5
+	   \-- mixinextras 0.5.5
+	- farmersdelight 26.3-3.6.27+refabricated
+	- forgeconfigapiport 26.3.1
+	   |-- com_electronwill_night-config_core 3.8.4
+	   \-- com_electronwill_night-config_toml 3.8.4
+	- geckolib 5.5.7
+	- java 25
+	- minecraft 26.3
+	- ntgl 3.1.8+26.3
+	- siftec 0.1.0+26.3
+	- the_sift 1.1.2
+	- travelersbackpack 11.4.1
+[22:53:59] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/net/fabricmc/sponge-mixin/0.17.4+mixin.0.8.7/sponge-mixin-0.17.4+mixin.0.8.7.jar Service=Knot/Fabric Env=SERVER
+[22:54:00] [main/WARN]: Error loading class: net/minecraft/client/gui/screens/recipebook/GhostSlots (java.lang.ClassNotFoundException: net/minecraft/client/gui/screens/recipebook/GhostSlots)
+[22:54:00] [main/WARN]: @Mixin target net.minecraft.client.gui.screens.recipebook.GhostSlots was not found farmersdelight.mixins.json:refabricated.GhostSlotsInvoker from mod farmersdelight
+[22:54:00] [main/WARN]: Error loading class: net/minecraft/client/gui/GuiGraphicsExtractor (java.lang.ClassNotFoundException: net/minecraft/client/gui/GuiGraphicsExtractor)
+[22:54:00] [main/WARN]: @Mixin target net.minecraft.client.gui.GuiGraphicsExtractor was not found farmersdelight.mixins.json:refabricated.GuiGraphicsExtractorAccessor from mod farmersdelight
+[22:54:00] [main/INFO]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.joml.MemUtil$MemUtilUnsafe (file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/org/joml/joml/1.10.9/joml-1.10.9.jar)
+WARNING: Please consider reporting this to the maintainers of class org.joml.MemUtil$MemUtilUnsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[22:54:06] [main/INFO]: [STDERR]: Failed to read config file: /home/runner/work/SIFTEC/SIFTEC/server/./config/create/server.json
+[22:54:06] [main/INFO]: [STDERR]: java.nio.file.NoSuchFileException: ./config/create/server.json
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:92)
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixFileSystemProvider.newFileChannel(UnixFileSystemProvider.java:213)
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:244)
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newByteChannel(Files.java:357)
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newByteChannel(Files.java:399)
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.spi.FileSystemProvider.newInputStream(FileSystemProvider.java:371)
+[22:54:06] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newInputStream(Files.java:154)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.FileUtils.lambda$readFileToString$14(FileUtils.java:2768)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.IOUtils.toString(IOUtils.java:3204)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.IOUtils.toString(IOUtils.java:3179)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.FileUtils.readFileToString(FileUtils.java:2768)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.read(Builder.java:136)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.<init>(Builder.java:36)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.create(Builder.java:49)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.create(Builder.java:44)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.infrastructure.config.AllConfigs.register(AllConfigs.java:28)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.Create.onInitialize(Create.java:62)
+[22:54:06] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.FabricLoaderImpl.invokeEntrypoints(FabricLoaderImpl.java:409)
+[22:54:06] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.game.minecraft.Hooks.startServer(Hooks.java:63)
+[22:54:06] [main/INFO]: [STDERR]: 	at knot//net.minecraft.server.Main.main(Main.java:114)
+[22:54:06] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:517)
+[22:54:06] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+[22:54:06] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.knot.KnotServer.main(KnotServer.java:23)
+[22:54:06] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.server.FabricServerLauncher.main(FabricServerLauncher.java:69)
+[22:54:06] [main/INFO]: [STDERR]: 	at net.fabricmc.installer.ServerLauncher.main(ServerLauncher.java:69)
+[22:54:07] [main/INFO]: Loaded config farmersdelight-common.json
+[22:54:07] [main/INFO]: SIFTEC: Traveler's Backpack found; each player is given one, raised by milestones and bound to them
+[22:54:08] [main/INFO]: The Sift initialized.
+[22:54:08] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:water for Water (Fluid Amount Required: 81000) with the ID 0
+[22:54:08] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:lava for Lava (Fluid Amount Required: 81000) with the ID 1
+[22:54:08] [main/INFO]: Registered the FluidEffect with Unique ID of travelersbackpack:potion for block.travelersbackpack.potion_still (Fluid Amount Required: 27000) with the ID 2
+[22:54:08] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:milk for Air (Fluid Amount Required: 81000) with the ID 3
+[22:54:08] [main/INFO]: Environment: Environment[discoveryUrl=https://discovery.minecraftservices.com/minecraft/client, name=PROD]
+[22:54:08] [main/INFO]: Created 13 recipes which will be injected into the game
+[22:54:08] [main/INFO]: Found new data pack create:dynamic_data, loading it automatically
+[22:54:08] [Worker-Main-3/INFO]: No existing world data, creating new world
+[22:54:09] [Worker-Main-2/INFO]: Loaded 3546 advancements
+[22:54:10] [main/INFO]: Applied 258 biome modifications to 61 of 77 new biomes in 6.551 ms
+[22:54:10] [Server thread/INFO]: SIFTEC settings: spawn_free_radius=64, member_cooldown_hours=24
+[22:54:10] [Server thread/INFO]: Starting minecraft server version 26.3
+[22:54:10] [Server thread/INFO]: Loading properties
+[22:54:10] [Server thread/INFO]: Default game type: CREATIVE
+[22:54:10] [Server thread/INFO]: Generating keypair
+[22:54:10] [Server thread/INFO]: Starting Minecraft server on *:25565
+[22:54:10] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[22:54:10] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[22:54:10] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[22:54:10] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[22:54:10] [Server thread/INFO]: Preparing level "world"
+[22:54:10] [Server thread/INFO]: Selecting global world spawn...
+[22:54:13] [Server thread/INFO]: Loading 0 persistent chunks...
+[22:54:13] [Server thread/INFO]: Preparing spawn area: 100%
+[22:54:13] [Server thread/INFO]: Time elapsed: 2759 ms
+[22:54:13] [Server thread/INFO]: Done (2.912s)! For help, type "help"
+[22:54:13] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[22:54:13] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[22:54:13] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[22:54:13] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+[22:54:13] [Server thread/INFO]: SIFTEC: took the old saved force-load off 0 claimed chunks; claims now load only while a member is online
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTrimRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.common.ServerActions
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SingleItemRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTransformRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.RotationPropagator
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.CollectingNeighborUpdater$MultiNeighborUpdate
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.PlayerAdvancements
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.network.config.SynchronizeRegistriesTask
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.chunk.LevelChunkSection$1BlockCounter
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ServerboundSelectKnownPacks
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RemoteSlot$Synchronized
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.ExperimentalRedstoneWireEvaluator
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerHandshakePacketListenerImpl
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.BlockItemTagAppender
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistriesDatapackGenerator
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.Swim
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener
+[22:54:13] [Server thread/INFO]: Force-loading class com.jesz.createdieselgenerators.world.OilChunksSavedData
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.commands.DebugConfigCommand
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.HashedStack$ActualItem
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.WalkNodeEvaluator
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.TransmuteRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ConfigurationProtocols
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerLoginPacketListenerImpl
+[22:54:13] [Server thread/INFO]: Force-loading class org.antarcticgardens.cna.content.electricity.network.NetworkEnergyStorage
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.entity.PersistentEntitySectionManager$Callback
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.commands.execution.CommandQueueEntry
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RecipeBookType
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider$1
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.stats.ServerRecipeBook
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.gametest.framework.GameTestServer
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.BundlePacket
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.util.ParticleUtils
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.CompoundContainer
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender$1
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.stats.RecipeBookSettings
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.pump.PumpBlockEntity$PumpFluidTransferBehaviour
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.PacketEncoder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagsProvider
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SimpleCookingRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SpecialRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.level.ServerEntity
+[22:54:13] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.util.BackpackDeathHelper
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.stats.RecipeBookSettings$TypeSettings
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapedRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.tags.TagBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.food.FoodData
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.ServerExplosion
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltInventory
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeOutput
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.foundation.recipe.trie.RecipeTrie
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.KineticNetwork
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.DeployerHandler
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.block.RailState
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.PacketDecoder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.dedicated.ServerWatchdog
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapelessRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.CustomCraftingRecipeBuilder
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.item.enchantment.EnchantmentHelper
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.GiveGiftToHero
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.advancements.packs.VanillaAdventureAdvancements
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.ManualApplicationHelper
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.BlockLootSubProvider
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltTunnelInteractionHandler
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.game.GameProtocols
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.commands.execution.tasks.BuildContexts
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.WorkAtComposter
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingProvider
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonSittingPhase
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistryPatchGenerator
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.level.ChunkMap$TrackedEntity
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.server.network.PlayerChunkSender
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.item.Item$TooltipContext$2
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache$ProviderCache
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.StartAttacking
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.PathfindingContext
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.fan.processing.FanProcessing
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.FluidPropagator
+[22:54:13] [Server thread/INFO]: Force-loading class com.mojang.brigadier.context.ContextChain
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.PathFinder
+[22:54:13] [Server thread/INFO]: Force-loading class org.antarcticgardens.cna.content.electricity.network.ElectricalNetwork
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.codec.IdDispatchCodec
+[22:54:13] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.DataProvider
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.EntityLootSubProvider
+[22:54:13] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ClientboundCustomQueryPacket
+[22:54:13] [Server thread/INFO]: [MixinAudit] audit finished
+[22:54:17] [Server thread/INFO]: SELFTEST owner setup: set 48 -> 48, set 200 -> 64 (limit 64); set 48 -> 48, set 200 -> 64 (limit 64);
+[22:54:17] [Server thread/INFO]: System chat: SELFTEST owner setup: set 48 -> 48, set 200 -> 64 (limit 64); set 48 -> 48, set 200 -> 64 (limit 64);
+[22:54:17] [Server thread/INFO]: SELFTEST drone setup: a trip needs 1 fire charge(s)
+[22:54:17] [Server thread/INFO]: System chat: SELFTEST drone setup: a trip needs 1 fire charge(s)
+[22:54:17] [Server thread/INFO]: SELFTEST setup Node[x=-47, z=-227, type=IRON, purity=IMPURE, y=-2147483648] core at -47, 63, -227
+[22:54:17] [Server thread/INFO]: System chat: SELFTEST setup Node[x=-47, z=-227, type=IRON, purity=IMPURE, y=-2147483648] core at -47, 63, -227
+[22:54:18] [Server thread/INFO]: SELFTEST setup Node[x=16, z=96, type=COPPER, purity=NORMAL, y=-2147483648] core at 16, 63, 96
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST setup Node[x=16, z=96, type=COPPER, purity=NORMAL, y=-2147483648] core at 16, 63, 96
+[22:54:18] [Server thread/INFO]: SELFTEST hub: 114 milestones and phases, 201 parts
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST hub: 114 milestones and phases, 201 parts
+[22:54:18] [Server thread/INFO]: SELFTEST hub: ids not present in this install: []
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST hub: ids not present in this install: []
+[22:54:18] [Server thread/INFO]: SELFTEST hub: screen buttons checked true; view paid 7 of 300 (server 7 of 300), done 6, tier 1 open true, lock 40
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST hub: screen buttons checked true; view paid 7 of 300 (server 7 of 300), done 6, tier 1 open true, lock 40
+[22:54:18] [Server thread/INFO]: SELFTEST hub: two members pay x1.5; tier 1 open true; tier 3 open false; coal power needs phase_1; backpack given true; scanner copper true; speed cap 32
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST hub: two members pay x1.5; tier 1 open true; tier 3 open false; coal power needs phase_1; backpack given true; scanner copper true; speed cap 32
+[22:54:18] [Server thread/INFO]: SELFTEST recipes: 414 SIFTEC recipes loaded; removed recipes gone true; fluids [heavy_oil_residue, alumina_solution, sulfuric_acid, nitrogen, nitric_acid, dark_matter_residue, ignimbrite, turbofuel, vinegar, mead, rocket_fuel, ionized_fuel, dissolved_silica, excited_photonic_matter, drilling_mud, coolant]
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST recipes: 414 SIFTEC recipes loaded; removed recipes gone true; fluids [heavy_oil_residue, alumina_solution, sulfuric_acid, nitrogen, nitric_acid, dark_matter_residue, ignimbrite, turbofuel, vinegar, mead, rocket_fuel, ionized_fuel, dissolved_silica, excited_photonic_matter, drilling_mud, coolant]
+[22:54:18] [Server thread/INFO]: SELFTEST food: minecraft:golden_carrot SIMPLE [CARROT]; minecraft:pumpkin_pie SIMPLE [PUMPKIN]; minecraft:bread RAW []
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST food: minecraft:golden_carrot SIMPLE [CARROT]; minecraft:pumpkin_pie SIMPLE [PUMPKIN]; minecraft:bread RAW []
+[22:54:18] [Server thread/INFO]: SELFTEST alternates: 105 in the pool; a company that has only done Tier 0 could be offered [alt_biocoal, alt_cast_screw, alt_charcoal, alt_iron_pipe, alt_iron_wire]
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST alternates: 105 in the pool; a company that has only done Tier 0 could be offered [alt_biocoal, alt_cast_screw, alt_charcoal, alt_iron_pipe, alt_iron_wire]
+[22:54:18] [Server thread/INFO]: SELFTEST hub: Create's speed limit now reads 256
+[22:54:18] [Server thread/INFO]: System chat: SELFTEST hub: Create's speed limit now reads 256
+[22:54:23] [Server thread/INFO]: SELFTEST prefab test sites ready; the test runs in two seconds
+[22:54:23] [Server thread/INFO]: System chat: SELFTEST prefab test sites ready; the test runs in two seconds
+[22:54:24] [Server thread/INFO]: SELFTEST buildings test site ready; the test runs in two seconds
+[22:54:24] [Server thread/INFO]: System chat: SELFTEST buildings test site ready; the test runs in two seconds
+[22:54:27] [Server thread/INFO]: SELFTEST buildings_a test site ready; the test runs in two seconds
+[22:54:27] [Server thread/INFO]: System chat: SELFTEST buildings_a test site ready; the test runs in two seconds
+[22:54:28] [Server thread/INFO]: SIFTEC: building coal_generator placed at -61, 221, -182 facing south (137 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SIFTEC: building power_pole_mk1 placed at -52, 220, -186 facing south (5 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SIFTEC: building constructor placed at -45, 221, -182 facing south (118 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SIFTEC: building biomass_burner placed at -61, 221, -162 facing south (37 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SIFTEC: building power_storage placed at -55, 221, -162 facing south (46 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SIFTEC: building alien_power_augmenter placed at -49, 221, -162 facing south (118 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SIFTEC: building nuclear_power_plant placed at -39, 221, -162 facing south (274 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SIFTEC: building power_pole_mk3 placed at -48, 220, -170 facing south (7 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SIFTEC: building constructor placed at -29, 221, -162 facing south (118 blocks, 0 refund stacks)
+[22:54:28] [Server thread/INFO]: SELFTEST power setup: coal generator true, pole true, constructor true, player motors true true; burner true, storage true, augmenter true, nuclear plant true, pole Mk.3 true, constructor true; the generator's water 8000 mB
+[22:54:28] [Server thread/INFO]: System chat: SELFTEST power setup: coal generator true, pole true, constructor true, player motors true true; burner true, storage true, augmenter true, nuclear plant true, pole Mk.3 true, constructor true; the generator's water 8000 mB
+[22:54:28] [Server thread/INFO]: SELFTEST content fuels: minecraft:coal=1600 siftec:biomass=960 siftec:solid_biofuel=2400 siftec:compacted_coal=3360 siftec:petroleum_coke=960
+[22:54:28] [Server thread/INFO]: System chat: SELFTEST content fuels: minecraft:coal=1600 siftec:biomass=960 siftec:solid_biofuel=2400 siftec:compacted_coal=3360 siftec:petroleum_coke=960
+[22:54:28] [Server thread/INFO]: SELFTEST content item locks: cgs:flintlock=mam_sulfur_1 cgs:revolver=mam_sulfur_4 create:cut_granite=base_building create:deployer=part_assembly create:mechanical_crafter=industrial_manufacturing create:brass_ingot=mam_caterium_1 createdieselgenerators:pumpjack_crank=oil_processing farmersdelight:wheat_dough=disabled create:shaft=free
+[22:54:28] [Server thread/INFO]: System chat: SELFTEST content item locks: cgs:flintlock=mam_sulfur_1 cgs:revolver=mam_sulfur_4 create:cut_granite=base_building create:deployer=part_assembly create:mechanical_crafter=industrial_manufacturing create:brass_ingot=mam_caterium_1 createdieselgenerators:pumpjack_crank=oil_processing farmersdelight:wheat_dough=disabled create:shaft=free
+[22:54:28] [Server thread/INFO]: SELFTEST content recipe locks: siftec:mixing/gunpowder_with_coal=mam_sulfur_1 siftec:mixing/lava_from_magma_block=mam_sulfur_2 siftec:mixing/refinery/sulfuric_acid=control_system_development siftec:crafting/deployer=part_assembly siftec:compacting/constructor/steel_beam=basic_steel_production siftec:compacting/constructor/iron_plate=null siftec:mixing/manufacturer/computer_core=industrial_manufacturing siftec:mixing/assembler/bolted_iron_plate=alt_bolted_iron_plate siftec:filling/packager/packaged_fuel=fluid_packaging
+[22:54:28] [Server thread/INFO]: System chat: SELFTEST content recipe locks: siftec:mixing/gunpowder_with_coal=mam_sulfur_1 siftec:mixing/lava_from_magma_block=mam_sulfur_2 siftec:mixing/refinery/sulfuric_acid=control_system_development siftec:crafting/deployer=part_assembly siftec:compacting/constructor/steel_beam=basic_steel_production siftec:compacting/constructor/iron_plate=null siftec:mixing/manufacturer/computer_core=industrial_manufacturing siftec:mixing/assembler/bolted_iron_plate=alt_bolted_iron_plate siftec:filling/packager/packaged_fuel=fluid_packaging
+[22:54:29] [Server thread/INFO]: SELFTEST content crafter cache: nothing done: none everything done: siftec:crafting/deployer nothing done: none
+[22:54:29] [Server thread/INFO]: System chat: SELFTEST content crafter cache: nothing done: none everything done: siftec:crafting/deployer nothing done: none
+[22:54:29] [Server thread/INFO]: SIFTEC: companies was in the old one-string format (68090 characters); it is saved as an NBT tree from now on
+[22:54:29] [Server thread/ERROR]: SIFTEC: COULD NOT READ data/siftec/companies.dat. The data is kept on disk and will not be overwritten; the game runs without it until the file is fixed.
+com.google.gson.JsonSyntaxException: java.io.EOFException: End of input at line 1 column 20 path $.companies.oops
+	at knot//com.google.gson.internal.Streams.parse(Streams.java:58)
+	at knot//com.google.gson.JsonParser.parseReader(JsonParser.java:144)
+	at knot//com.google.gson.JsonParser.parseReader(JsonParser.java:110)
+	at knot//com.google.gson.JsonParser.parseString(JsonParser.java:92)
+	at knot//com.meakaandre.siftec.save.JsonSavedData.read(JsonSavedData.java:141)
+	at knot//com.meakaandre.siftec.save.JsonSavedData$2.decode(JsonSavedData.java:123)
+	at knot//com.mojang.serialization.Decoder.parse(Decoder.java:18)
+	at knot//com.meakaandre.siftec.claim.StateSelfTest.codecTests(StateSelfTest.java:205)
+	at knot//com.meakaandre.siftec.claim.StateSelfTest.setup(StateSelfTest.java:89)
+	at knot//com.meakaandre.siftec.claim.StateSelfTest.lambda$register$1(StateSelfTest.java:60)
+	at knot//com.mojang.brigadier.context.ContextChain.runExecutable$mixinextras$wrapped$10(ContextChain.java:73)
+	at knot//com.mojang.brigadier.context.ContextChain.mixinextras$bridge$runExecutable$mixinextras$wrapped$10$11(ContextChain.java)
+	at knot//com.mojang.brigadier.context.ContextChain.wrapMethod$zjj000$fabric-entity-events-v1$onRunExecutable(ContextChain.java:1057)
+	at knot//com.mojang.brigadier.context.ContextChain.runExecutable(ContextChain.java)
+	at knot//net.minecraft.commands.execution.tasks.ExecuteCommand.execute(ExecuteCommand.java:29)
+	at knot//net.minecraft.commands.execution.tasks.ExecuteCommand.execute(ExecuteCommand.java:13)
+	at knot//net.minecraft.commands.execution.UnboundEntryAction.lambda$bind$0(UnboundEntryAction.java:8)
+	at knot//net.minecraft.commands.execution.CommandQueueEntry.execute$mixinextras$wrapped$8(CommandQueueEntry.java:8)
+	at knot//net.minecraft.commands.execution.CommandQueueEntry.mixinextras$bridge$execute$mixinextras$wrapped$8$9(CommandQueueEntry.java)
+	at knot//net.minecraft.commands.execution.CommandQueueEntry.wrapMethod$zji000$fabric-entity-events-v1$onExecute(CommandQueueEntry.java:549)
+	at knot//net.minecraft.commands.execution.CommandQueueEntry.execute(CommandQueueEntry.java)
+	at knot//net.minecraft.commands.execution.ExecutionContext.runCommandQueue(ExecutionContext.java:106)
+	at knot//net.minecraft.commands.Commands.executeCommandInContext(Commands.java:438)
+	at knot//net.minecraft.commands.Commands.performCommand(Commands.java:370)
+	at knot//net.minecraft.commands.Commands.performPrefixedCommand(Commands.java:356)
+	at knot//net.minecraft.server.dedicated.DedicatedServer.handleConsoleInputs(DedicatedServer.java:412)
+	at knot//net.minecraft.server.dedicated.DedicatedServer.tickConnection(DedicatedServer.java:402)
+	at knot//net.minecraft.server.MinecraftServer.tickChildren(MinecraftServer.java:1127)
+	at knot//net.minecraft.server.MinecraftServer.tickServer(MinecraftServer.java:980)
+	at knot//net.minecraft.server.dedicated.DedicatedServer.tickServer(DedicatedServer.java:278)
+	at knot//net.minecraft.server.MinecraftServer.processPacketsAndTick(MinecraftServer.java:1013)
+	at knot//net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:752)
+	at knot//net.minecraft.server.MinecraftServer.lambda$spin$0(MinecraftServer.java:310)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+Caused by: java.io.EOFException: End of input at line 1 column 20 path $.companies.oops
+	at knot//com.google.gson.stream.JsonReader.nextNonWhitespace(JsonReader.java:1605)
+	at knot//com.google.gson.stream.JsonReader.doPeek(JsonReader.java:646)
+	at knot//com.google.gson.stream.JsonReader.peek(JsonReader.java:545)
+	at knot//com.google.gson.internal.bind.JsonElementTypeAdapter.read(JsonElementTypeAdapter.java:102)
+	at knot//com.google.gson.internal.Streams.parse(Streams.java:48)
+	... 33 more
+[22:54:29] [Server thread/ERROR]: SIFTEC: NOT saving companies because the file could not be read when the world loaded. Fix or restore data/siftec/companies.dat (a copy is kept as companies.dat.broken-*) and restart; changes made now will be lost.
+[22:54:29] [Server thread/INFO]: SELFTEST state codec: tree round trip true (68090 chars as JSON); old string format loads true; unreadable file kept and not overwritten true; claim flags and positions true
+[22:54:29] [Server thread/INFO]: System chat: SELFTEST state codec: tree round trip true (68090 chars as JSON); old string format loads true; unreadable file kept and not overwritten true; claim flags and positions true
+[22:54:29] [Server thread/WARN]: SIFTEC: dropped an unreadable item from backpack slot 1: Unknown registry key in ResourceKey[minecraft:root / minecraft:item]: nosuchmod:thing
+[22:54:29] [Server thread/INFO]: SELFTEST state backpack codec: slots kept true; unreadable item skipped, others in place true; old list format loads true
+[22:54:29] [Server thread/INFO]: System chat: SELFTEST state backpack codec: slots kept true; unreadable item skipped, others in place true; old list format loads true
+[22:54:29] [Server thread/INFO]: SELFTEST state save: companies 72880 chars, claims 161285 chars as JSON (the old one-string limit was 65535)
+[22:54:29] [Server thread/INFO]: System chat: SELFTEST state save: companies 72880 chars, claims 161285 chars as JSON (the old one-string limit was 65535)
+[22:54:30] [Server thread/INFO]: SELFTEST state claims setup: marker A claimed 9, marker B claimed 9
+[22:54:30] [Server thread/INFO]: System chat: SELFTEST state claims setup: marker A claimed 9, marker B claimed 9
+[22:54:31] [Server thread/INFO]: SELFTEST state budget: first HUB claimed 25, second HUB claims nothing; then 4 markers until the budget of 61 chunks was used (61); HUB next to another company's land refused true
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST state budget: first HUB claimed 25, second HUB claims nothing; then 4 markers until the budget of 61 chunks was used (61); HUB next to another company's land refused true
+[22:54:31] [Server thread/INFO]: SELFTEST state spawn: radius 64, spawn in zone true, 300 blocks out in zone false, a marker at spawn claimed 0
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST state spawn: radius 64, spawn in zone true, 300 blocks out in zone false, a marker at spawn claimed 0
+[22:54:31] [Server thread/INFO]: SELFTEST state loading: member online 4 chunks loaded; after the last member left 0; with the real player list 0
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST state loading: member online 4 chunks loaded; after the last member left 0; with the real player list 0
+[22:54:31] [Server thread/INFO]: SELFTEST state kick: by a member false, by the founder true; members 1; multiplier right after 1.5; may rejoin false; 15 parts paid at x2.0 become 8 at x1.0
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST state kick: by a member false, by the founder true; members 1; multiplier right after 1.5; may rejoin false; 15 parts paid at x2.0 become 8 at x1.0
+[22:54:31] [Server thread/INFO]: SELFTEST state check: marker replaced by setblock released its claim true; after an explosion the marker is still there true, its claim true, a block in the claim true
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST state check: marker replaced by setblock released its claim true; after an explosion the marker is still there true, its claim true, a block in the claim true
+[22:54:31] [Server thread/INFO]: SELFTEST state check: HUB removed released its claim true
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST state check: HUB removed released its claim true
+[22:54:31] [Server thread/INFO]: SELFTEST world scan iron: at 224,~,-107 distance 148 on land in 76 ms, 14 biome samples
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST world scan iron: at 224,~,-107 distance 148 on land in 76 ms, 14 biome samples
+[22:54:31] [Server thread/INFO]: SELFTEST world scan copper: at 16,~,96 distance 151 on land in 0 ms, 0 biome samples
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST world scan copper: at 16,~,96 distance 151 on land in 0 ms, 0 biome samples
+[22:54:31] [Server thread/INFO]: SELFTEST world scan stone: at 25,~,-202 distance 184 on land in 0 ms, 0 biome samples
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST world scan stone: at 25,~,-202 distance 184 on land in 0 ms, 0 biome samples
+[22:54:31] [Server thread/INFO]: SELFTEST world scan coal: at 90,~,-61 distance 30 on land in 0 ms, 0 biome samples
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST world scan coal: at 90,~,-61 distance 30 on land in 0 ms, 0 biome samples
+[22:54:31] [Server thread/INFO]: SELFTEST world scan zinc: at 415,~,577 distance 687 on land in 299 ms, 124 biome samples
+[22:54:31] [Server thread/INFO]: System chat: SELFTEST world scan zinc: at 415,~,577 distance 687 on land in 299 ms, 124 biome samples
+[22:54:34] [Server thread/INFO]: SELFTEST world scan oil: at -108,~,2268 distance 2309 on land in 2490 ms, 1076 biome samples
+[22:54:34] [Server thread/INFO]: System chat: SELFTEST world scan oil: at -108,~,2268 distance 2309 on land in 2490 ms, 1076 biome samples
+[22:54:34] [Server thread/INFO]: SELFTEST world scan bauxite: at -843,~,-187 distance 952 on land in 0 ms, 0 biome samples
+[22:54:34] [Server thread/INFO]: System chat: SELFTEST world scan bauxite: at -843,~,-187 distance 952 on land in 0 ms, 0 biome samples
+[22:54:34] [Server thread/INFO]: SELFTEST world scan nitrogen: at 477,~,-210 distance 421 on land in 0 ms, 0 biome samples
+[22:54:34] [Server thread/INFO]: System chat: SELFTEST world scan nitrogen: at 477,~,-210 distance 421 on land in 0 ms, 0 biome samples
+[22:54:34] [Server thread/INFO]: SELFTEST world scan uranium: at 2014,~,622 distance 2026 on land in 1 ms, 0 biome samples
+[22:54:34] [Server thread/INFO]: System chat: SELFTEST world scan uranium: at 2014,~,622 distance 2026 on land in 1 ms, 0 biome samples
+[22:54:36] [Server thread/INFO]: SELFTEST world scan sam: at 2907,~,1432 distance 3169 on land in 1988 ms, 880 biome samples
+[22:54:36] [Server thread/INFO]: System chat: SELFTEST world scan sam: at 2907,~,1432 distance 3169 on land in 1988 ms, 880 biome samples
+[22:54:36] [Server thread/INFO]: SELFTEST world scan sulfur: at 1341,13,319 distance 1294 on land in 317 ms, 53238 biome samples
+[22:54:36] [Server thread/INFO]: System chat: SELFTEST world scan sulfur: at 1341,13,319 distance 1294 on land in 317 ms, 53238 biome samples
+[22:54:36] [Server thread/INFO]: SELFTEST world census radius 2000 (961 cells) in 396 ms: 476 nodes {IRON=121, COPPER=117, STONE=97, COAL=64, ZINC=2, OIL=2, BAUXITE=8, NITROGEN=14, URANIUM=1, SULFUR=50}; not on land / over water / outside a sulfur cave: 0 []
+[22:54:36] [Server thread/INFO]: System chat: SELFTEST world census radius 2000 (961 cells) in 396 ms: 476 nodes {IRON=121, COPPER=117, STONE=97, COAL=64, ZINC=2, OIL=2, BAUXITE=8, NITROGEN=14, URANIUM=1, SULFUR=50}; not on land / over water / outside a sulfur cave: 0 []
+[22:54:36] [Server thread/INFO]: SELFTEST world scanner results checked 82, on land 82
+[22:54:36] [Server thread/INFO]: System chat: SELFTEST world scanner results checked 82, on land 82
+[22:54:36] [Server thread/INFO]: SELFTEST world collectible spots within 1000: 137, on land 137
+[22:54:36] [Server thread/INFO]: System chat: SELFTEST world collectible spots within 1000: 137, on land 137
+[22:54:38] [Server thread/INFO]: SELFTEST world place iron Node[x=224, z=-107, type=IRON, purity=NORMAL, y=-2147483648]: core at 224, 121, -107 on siftec:tuff_patch, solid under the mound 25/25; iron (tuff patch) at y 120: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 9 fill blocks; node iron_node normal; clump 20/20 blocks: 8 stone, 4 ore, 8 raw
+[22:54:38] [Server thread/INFO]: System chat: SELFTEST world place iron Node[x=224, z=-107, type=IRON, purity=NORMAL, y=-2147483648]: core at 224, 121, -107 on siftec:tuff_patch, solid under the mound 25/25; iron (tuff patch) at y 120: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 9 fill blocks; node iron_node normal; clump 20/20 blocks: 8 stone, 4 ore, 8 raw
+[22:54:39] [Server thread/INFO]: SELFTEST world place sulfur Node[x=1341, z=319, type=SULFUR, purity=IMPURE, y=13]: core at 1341, 32, 319 on siftec:sulfur_patch, solid under the mound 25/25; sulfur (sulfur patch) at y 31: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node sulfur_node impure; clump 17/17 blocks: 14 stone, 3 ore, 0 raw
+[22:54:39] [Server thread/INFO]: System chat: SELFTEST world place sulfur Node[x=1341, z=319, type=SULFUR, purity=IMPURE, y=13]: core at 1341, 32, 319 on siftec:sulfur_patch, solid under the mound 25/25; sulfur (sulfur patch) at y 31: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node sulfur_node impure; clump 17/17 blocks: 14 stone, 3 ore, 0 raw
+[22:54:40] [Server thread/INFO]: SELFTEST world place quartz Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648]: core at 218, 91, 154 on siftec:netherrack_patch, solid under the mound 25/25; quartz (netherrack patch) at y 90: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node quartz_node impure; clump 18/18 blocks: 12 stone, 6 ore, 0 raw
+[22:54:40] [Server thread/INFO]: System chat: SELFTEST world place quartz Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648]: core at 218, 91, 154 on siftec:netherrack_patch, solid under the mound 25/25; quartz (netherrack patch) at y 90: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node quartz_node impure; clump 18/18 blocks: 12 stone, 6 ore, 0 raw
+[22:54:41] [Server thread/INFO]: SELFTEST world PASS site coal normal at 90,-61: coal (stone patch) at y 126: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node coal_node normal; clump 18/18 blocks: 6 stone, 8 ore, 4 raw
+[22:54:41] [Server thread/INFO]: System chat: SELFTEST world PASS site coal normal at 90,-61: coal (stone patch) at y 126: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node coal_node normal; clump 18/18 blocks: 6 stone, 8 ore, 4 raw
+[22:54:41] [Server thread/INFO]: SELFTEST world PASS site iron impure at -47,-227: iron (tuff patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 252 fill blocks; node iron_node impure; clump 16/16 blocks: 12 stone, 4 ore, 0 raw
+[22:54:41] [Server thread/INFO]: System chat: SELFTEST world PASS site iron impure at -47,-227: iron (tuff patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 252 fill blocks; node iron_node impure; clump 16/16 blocks: 12 stone, 4 ore, 0 raw
+[22:54:41] [Server thread/INFO]: SELFTEST world PASS site stone normal at 25,-202: calcite (calcite patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 163 fill blocks; node calcite_node normal; clump 16/16 blocks: 16 stone, 0 ore, 0 raw
+[22:54:41] [Server thread/INFO]: System chat: SELFTEST world PASS site stone normal at 25,-202: calcite (calcite patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 163 fill blocks; node calcite_node normal; clump 16/16 blocks: 16 stone, 0 ore, 0 raw
+[22:54:41] [Server thread/INFO]: SELFTEST world PASS site copper normal at 16,96: copper (granite patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 933 fill blocks; node copper_node normal; clump 18/18 blocks: 6 stone, 6 ore, 6 raw
+[22:54:41] [Server thread/INFO]: System chat: SELFTEST world PASS site copper normal at 16,96: copper (granite patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 933 fill blocks; node copper_node normal; clump 18/18 blocks: 6 stone, 6 ore, 6 raw
+[22:54:42] [Server thread/INFO]: SELFTEST world PASS site iron normal at 152,-209: iron (tuff patch) at y 150: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 21 fill blocks; node iron_node normal; clump 19/19 blocks: 7 stone, 8 ore, 4 raw
+[22:54:42] [Server thread/INFO]: System chat: SELFTEST world PASS site iron normal at 152,-209: iron (tuff patch) at y 150: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 21 fill blocks; node iron_node normal; clump 19/19 blocks: 7 stone, 8 ore, 4 raw
+[22:54:42] [Server thread/INFO]: SELFTEST world PASS site iron normal at 224,-107: iron (tuff patch) at y 120: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 9 fill blocks; node iron_node normal; clump 20/20 blocks: 8 stone, 4 ore, 8 raw
+[22:54:42] [Server thread/INFO]: System chat: SELFTEST world PASS site iron normal at 224,-107: iron (tuff patch) at y 120: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 9 fill blocks; node iron_node normal; clump 20/20 blocks: 8 stone, 4 ore, 8 raw
+[22:54:43] [Server thread/INFO]: SELFTEST world PASS site iron impure at 230,76: iron (tuff patch) at y 119: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 6 fill blocks; node iron_node impure; clump 18/18 blocks: 15 stone, 2 ore, 1 raw
+[22:54:43] [Server thread/INFO]: System chat: SELFTEST world PASS site iron impure at 230,76: iron (tuff patch) at y 119: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 6 fill blocks; node iron_node impure; clump 18/18 blocks: 15 stone, 2 ore, 1 raw
+[22:54:44] [Server thread/INFO]: SELFTEST world PASS site coal impure at -32,-332: coal (stone patch) at y 68: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node coal_node impure; clump 20/20 blocks: 16 stone, 4 ore, 0 raw
+[22:54:44] [Server thread/INFO]: System chat: SELFTEST world PASS site coal impure at -32,-332: coal (stone patch) at y 68: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node coal_node impure; clump 20/20 blocks: 16 stone, 4 ore, 0 raw
+[22:54:45] [Server thread/INFO]: SELFTEST world PASS site stone normal at 195,-336: scorchia (scorchia patch) at y 189: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 19 fill blocks; node scorchia_node normal; clump 17/17 blocks: 17 stone, 0 ore, 0 raw
+[22:54:45] [Server thread/INFO]: System chat: SELFTEST world PASS site stone normal at 195,-336: scorchia (scorchia patch) at y 189: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 19 fill blocks; node scorchia_node normal; clump 17/17 blocks: 17 stone, 0 ore, 0 raw
+[22:54:46] [Server thread/INFO]: SELFTEST world PASS site copper normal at 315,-337: copper (granite patch) at y 152: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 21 fill blocks; node copper_node normal; clump 18/18 blocks: 10 stone, 4 ore, 4 raw
+[22:54:46] [Server thread/INFO]: System chat: SELFTEST world PASS site copper normal at 315,-337: copper (granite patch) at y 152: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 21 fill blocks; node copper_node normal; clump 18/18 blocks: 10 stone, 4 ore, 4 raw
+[22:54:46] [Server thread/INFO]: SELFTEST world PASS site iron normal at 321,-35: iron (tuff patch) at y 163: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node iron_node normal; clump 18/18 blocks: 5 stone, 9 ore, 4 raw
+[22:54:46] [Server thread/INFO]: System chat: SELFTEST world PASS site iron normal at 321,-35: iron (tuff patch) at y 163: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node iron_node normal; clump 18/18 blocks: 5 stone, 9 ore, 4 raw
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS site copper impure at 337,81: copper (granite patch) at y 90: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 45 fill blocks; node copper_node impure; clump 18/18 blocks: 14 stone, 3 ore, 1 raw
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS site copper impure at 337,81: copper (granite patch) at y 90: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 45 fill blocks; node copper_node impure; clump 18/18 blocks: 14 stone, 3 ore, 1 raw
+[22:54:47] [Server thread/INFO]: SELFTEST world pads: 12 sites placed in 6738 ms
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world pads: 12 sites placed in 6738 ms
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS a normal iron node within 256 blocks of spawn
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS a normal iron node within 256 blocks of spawn
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS a normal copper node within 256 blocks of spawn
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS a normal copper node within 256 blocks of spawn
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS a normal stone node within 256 blocks of spawn
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS a normal stone node within 256 blocks of spawn
+[22:54:47] [Server thread/INFO]: SELFTEST world pads result: 15 passed, 0 failed
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world pads result: 15 passed, 0 failed
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS patch stone_patch is unbreakable: hardness -1.0, piston IMMOVEABLE, create:non_movable true, a Create drill could break it false
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS patch stone_patch is unbreakable: hardness -1.0, piston IMMOVEABLE, create:non_movable true, a Create drill could break it false
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS node coal_node can be mined and drilled but not moved: hardness 3.0, piston IMMOVEABLE, create:non_movable true
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS node coal_node can be mined and drilled but not moved: hardness 3.0, piston IMMOVEABLE, create:non_movable true
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS a survival player cannot dig the patch (progress per tick 0.0)
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS a survival player cannot dig the patch (progress per tick 0.0)
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS two power-6 explosions: patch blocks 37 -> 37, node coal_node (the clump may go: 0 blocks left)
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS two power-6 explosions: patch blocks 37 -> 37, node coal_node (the clump may go: 0 blocks left)
+[22:54:47] [Server thread/INFO]: SELFTEST world PASS a node of each purity to mine: {IMPURE=Node[x=218, z=277, type=COAL, purity=IMPURE, y=-2147483648], NORMAL=Node[x=-352, z=-481, type=COAL, purity=NORMAL, y=-2147483648], PURE=Node[x=193, z=-748, type=STONE, purity=PURE, y=-2147483648]}
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world PASS a node of each purity to mine: {IMPURE=Node[x=218, z=277, type=COAL, purity=IMPURE, y=-2147483648], NORMAL=Node[x=-352, z=-481, type=COAL, purity=NORMAL, y=-2147483648], PURE=Node[x=193, z=-748, type=STONE, purity=PURE, y=-2147483648]}
+[22:54:47] [Server thread/INFO]: SELFTEST world regrow control: vanilla coal ore mined by the same fake player: removed true, dropped {minecraft:coal=1}
+[22:54:47] [Server thread/INFO]: System chat: SELFTEST world regrow control: vanilla coal ore mined by the same fake player: removed true, dropped {minecraft:coal=1}
+[22:54:52] [Server thread/INFO]: SELFTEST world showroom: 23 node looks: impure with clump, normal, pure, and mined, at y 200 from -14, 200, 16
+[22:54:52] [Server thread/INFO]: System chat: SELFTEST world showroom: 23 node looks: impure with clump, normal, pure, and mined, at y 200 from -14, 200, 16
+[22:54:52] [Server thread/INFO]: System chat: The nearest minecraft:sulfur_caves is at [1152, 18, 768] (1330 blocks away)
+[22:54:52] [Server thread/INFO]: Locating element minecraft:sulfur_caves took 38 ms
+[22:54:54] [Server thread/INFO]: SELFTEST world geysers survey x -404..596 z -532..468 (1.00 km2): 4096 chunks, 0 with sulfur caves below (biome sampled in 1303 ms), 0 chunks generated and searched in 0 ms; potent sulfur 0 (0 inside the area, 0.0 per 1000x1000), periodic geysers (magma under, water over) 0; kinds {}; nearest periodic to spawn none; first: []
+[22:54:54] [Server thread/INFO]: System chat: SELFTEST world geysers survey x -404..596 z -532..468 (1.00 km2): 4096 chunks, 0 with sulfur caves below (biome sampled in 1303 ms), 0 chunks generated and searched in 0 ms; potent sulfur 0 (0 inside the area, 0.0 per 1000x1000), periodic geysers (magma under, water over) 0; kinds {}; nearest periodic to spawn none; first: []
+[22:55:02] [Server thread/INFO]: SELFTEST world geysers survey x 896..1896 z -232..768 (1.00 km2): 4032 chunks, 154 with sulfur caves below (biome sampled in 1365 ms), 279 chunks generated and searched in 7286 ms; potent sulfur 62 (36 inside the area, 36.0 per 1000x1000), periodic geysers (magma under, water over) 0; kinds {dry/over sulfur/no water/covered=2, dry/over sulfur_patch/no water/covered=1, wet/over cinnabar/water/covered=5, wet/over deepslate/water/covered=17, wet/over stone/water/covered=1, wet/over sulfur/water/covered=36}; nearest periodic to spawn none; first: [1340, 32, 318 dry over sulfur_patch water 0 covered snowy_taiga 1292m, 1342, 33, 319 dry over sulfur water 0 covered snowy_taiga 1294m, 1341, 33, 320 dry over sulfur water 0 covered snowy_taiga 1294m, 1240, -3, 720 wet over deepslate water 1 covered sulfur_caves 1369m, 1241, 3, 736 wet over deepslate water 1 covered sulfur_caves 1379m, 1260, -16, 711 wet over sulfur water 2 covered sulfur_caves 1381m, 1257, 1, 740 wet over deepslate water 2 covered sulfur_caves 1394m, 1270, -6, 733 wet over sulfur water 1 covered sulfur_caves 1401m, 1266, -51, 777 wet over deepslate water 2 covered frozen_ocean 1422m, 1279, -49, 778 wet over deepslate water 1 covered frozen_ocean 1434m, 1276, -34, 768 wet over sulfur water 2 covered sulfur_caves 1426m, 1280, -50, 771 wet over deepslate water 2 covered frozen_ocean 1431m, 1280, -50, 782 wet over deepslate water 2 covered frozen_ocean 1437m, 1295, -9, 772 wet over sulfur water 1 covered sulfur_caves 1444m]
+[22:55:02] [Server thread/INFO]: System chat: SELFTEST world geysers survey x 896..1896 z -232..768 (1.00 km2): 4032 chunks, 154 with sulfur caves below (biome sampled in 1365 ms), 279 chunks generated and searched in 7286 ms; potent sulfur 62 (36 inside the area, 36.0 per 1000x1000), periodic geysers (magma under, water over) 0; kinds {dry/over sulfur/no water/covered=2, dry/over sulfur_patch/no water/covered=1, wet/over cinnabar/water/covered=5, wet/over deepslate/water/covered=17, wet/over stone/water/covered=1, wet/over sulfur/water/covered=36}; nearest periodic to spawn none; first: [1340, 32, 318 dry over sulfur_patch water 0 covered snowy_taiga 1292m, 1342, 33, 319 dry over sulfur water 0 covered snowy_taiga 1294m, 1341, 33, 320 dry over sulfur water 0 covered snowy_taiga 1294m, 1240, -3, 720 wet over deepslate water 1 covered sulfur_caves 1369m, 1241, 3, 736 wet over deepslate water 1 covered sulfur_caves 1379m, 1260, -16, 711 wet over sulfur water 2 covered sulfur_caves 1381m, 1257, 1, 740 wet over deepslate water 2 covered sulfur_caves 1394m, 1270, -6, 733 wet over sulfur water 1 covered sulfur_caves 1401m, 1266, -51, 777 wet over deepslate water 2 covered frozen_ocean 1422m, 1279, -49, 778 wet over deepslate water 1 covered frozen_ocean 1434m, 1276, -34, 768 wet over sulfur water 2 covered sulfur_caves 1426m, 1280, -50, 771 wet over deepslate water 2 covered frozen_ocean 1431m, 1280, -50, 782 wet over deepslate water 2 covered frozen_ocean 1437m, 1295, -9, 772 wet over sulfur water 1 covered sulfur_caves 1444m]
+[22:55:07] [Server thread/INFO]: SELFTEST world geysers survey x -1904..-904 z -2032..-1032 (1.00 km2): 3969 chunks, 75 with sulfur caves below (biome sampled in 1444 ms), 121 chunks generated and searched in 3194 ms; potent sulfur 28 (27 inside the area, 27.0 per 1000x1000), periodic geysers (magma under, water over) 2; kinds {dormant/over magma_block/water/open sky=1, wet/over andesite/water/covered=1, wet/over cinnabar/water/covered=2, wet/over deepslate/water/covered=7, wet/over gravel/water/covered=1, wet/over magma_block/water/covered=1, wet/over sulfur/water/covered=13, wet/over tuff/water/covered=2}; nearest periodic to spawn -1416, 69, -1127 (1867m); first: [-1454, -10, -1138 wet over deepslate water 1 covered forest 1904m, -1451, 4, -1140 wet over sulfur water 1 covered sulfur_caves 1903m, -1416, 69, -1127 dormant over magma_block water 1 open forest 1867m, -1483, -6, -1137 wet over deepslate water 2 covered sulfur_caves 1927m, -1500, 16, -1094 wet over sulfur water 2 covered sulfur_caves 1917m, -1477, -5, -1105 wet over sulfur water 1 covered sulfur_caves 1904m, -1479, 21, -1110 wet over sulfur water 1 covered sulfur_caves 1909m, -1463, -6, -1120 wet over cinnabar water 1 covered sulfur_caves 1901m, -1470, -5, -1105 wet over sulfur water 1 covered sulfur_caves 1898m, -1463, 16, -1108 wet over sulfur water 2 covered sulfur_caves 1894m, -1463, -5, -1101 wet over cinnabar water 1 covered sulfur_caves 1890m, -1470, 25, -1090 wet over sulfur water 2 covered sulfur_caves 1890m, -1464, 28, -1099 wet over magma_block water 2 covered sulfur_caves 1890m, -1467, -9, -1077 wet over deepslate water 1 covered forest 1880m]
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST world geysers survey x -1904..-904 z -2032..-1032 (1.00 km2): 3969 chunks, 75 with sulfur caves below (biome sampled in 1444 ms), 121 chunks generated and searched in 3194 ms; potent sulfur 28 (27 inside the area, 27.0 per 1000x1000), periodic geysers (magma under, water over) 2; kinds {dormant/over magma_block/water/open sky=1, wet/over andesite/water/covered=1, wet/over cinnabar/water/covered=2, wet/over deepslate/water/covered=7, wet/over gravel/water/covered=1, wet/over magma_block/water/covered=1, wet/over sulfur/water/covered=13, wet/over tuff/water/covered=2}; nearest periodic to spawn -1416, 69, -1127 (1867m); first: [-1454, -10, -1138 wet over deepslate water 1 covered forest 1904m, -1451, 4, -1140 wet over sulfur water 1 covered sulfur_caves 1903m, -1416, 69, -1127 dormant over magma_block water 1 open forest 1867m, -1483, -6, -1137 wet over deepslate water 2 covered sulfur_caves 1927m, -1500, 16, -1094 wet over sulfur water 2 covered sulfur_caves 1917m, -1477, -5, -1105 wet over sulfur water 1 covered sulfur_caves 1904m, -1479, 21, -1110 wet over sulfur water 1 covered sulfur_caves 1909m, -1463, -6, -1120 wet over cinnabar water 1 covered sulfur_caves 1901m, -1470, -5, -1105 wet over sulfur water 1 covered sulfur_caves 1898m, -1463, 16, -1108 wet over sulfur water 2 covered sulfur_caves 1894m, -1463, -5, -1101 wet over cinnabar water 1 covered sulfur_caves 1890m, -1470, 25, -1090 wet over sulfur water 2 covered sulfur_caves 1890m, -1464, 28, -1099 wet over magma_block water 2 covered sulfur_caves 1890m, -1467, -9, -1077 wet over deepslate water 1 covered forest 1880m]
+[22:55:07] [Server thread/INFO]: SIFTEC: building geothermal_generator placed at 121, 163, -54 facing north (123 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_storage placed at 127, 163, -54 facing north (46 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 placed at 115, 162, -54 facing north (5 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SELFTEST world geyser 120, 160, -56: state dormant, water 1 deep; generator placed true, it finds the vent true, gas escapes true; watching 160 s
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST world geyser 120, 160, -56: state dormant, water 1 deep; generator placed true, it finds the vent true, gas escapes true; watching 160 s
+[22:55:07] [Server thread/INFO]: SELFTEST world geyser natural: the nearest periodic geyser the surveys found, at -1416, 69, -1127, 1867 blocks from spawn
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST world geyser natural: the nearest periodic geyser the surveys found, at -1416, 69, -1127, 1867 blocks from spawn
+[22:55:07] [Server thread/INFO]: SIFTEC: building geothermal_generator placed at -1415, 72, -1125 facing north (123 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_storage placed at -1409, 72, -1125 facing north (46 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 placed at -1421, 71, -1125 facing north (5 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SELFTEST world geyser -1416, 69, -1127: state dormant, water 1 deep; generator placed true, it finds the vent true, gas escapes true; watching 160 s
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST world geyser -1416, 69, -1127: state dormant, water 1 deep; generator placed true, it finds the vent true, gas escapes true; watching 160 s
+[22:55:07] [Server thread/INFO]: SELFTEST world geyser wet: vent 1150, 12, 755 was wet over sulfur; with a magma block put under it, it is dormant
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST world geyser wet: vent 1150, 12, 755 was wet over sulfur; with a magma block put under it, it is dormant
+[22:55:07] [Server thread/INFO]: SIFTEC: building geothermal_generator placed at 1151, 15, 757 facing north (123 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_storage placed at 1157, 15, 757 facing north (46 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 placed at 1145, 14, 757 facing north (5 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SELFTEST world geyser 1150, 12, 755: state dormant, water 1 deep; generator placed true, it finds the vent true, gas escapes true; watching 160 s
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST world geyser 1150, 12, 755: state dormant, water 1 deep; generator placed true, it finds the vent true, gas escapes true; watching 160 s
+[22:55:07] [Server thread/INFO]: SELFTEST world processor converter recipe [Cost[key=siftec:reanimated_sam, count=1], Cost[key=create:raw_zinc, count=15]]: plentiful ingredient took 5 slots, the other 4; ready to run: true
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST world processor converter recipe [Cost[key=siftec:reanimated_sam, count=1], Cost[key=create:raw_zinc, count=15]]: plentiful ingredient took 5 slots, the other 4; ready to run: true
+[22:55:07] [Server thread/INFO]: SELFTEST automate machines unlocked company: press on Cable -> [1 create_new_age:copper_wire], crafter on the Portable Miner grid -> refused; locked company: press on Cable -> refused, crafter on the Portable Miner grid -> refused
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST automate machines unlocked company: press on Cable -> [1 create_new_age:copper_wire], crafter on the Portable Miner grid -> refused; locked company: press on Cable -> refused, crafter on the Portable Miner grid -> refused
+[22:55:07] [Server thread/INFO]: SELFTEST automate assembly siftec:adaptive_control_unit: unlocked company: 1 siftec:adaptive_control_unit after 4 steps from 5 parts; locked company: refused at step 1 of 4
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST automate assembly siftec:adaptive_control_unit: unlocked company: 1 siftec:adaptive_control_unit after 4 steps from 5 parts; locked company: refused at step 1 of 4
+[22:55:07] [Server thread/INFO]: SELFTEST automate assembly siftec:modular_engine: unlocked company: 1 siftec:modular_engine after 3 steps from 4 parts; locked company: refused at step 1 of 3
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST automate assembly siftec:modular_engine: unlocked company: 1 siftec:modular_engine after 3 steps from 4 parts; locked company: refused at step 1 of 3
+[22:55:07] [Server thread/INFO]: SELFTEST automate assembly siftec:object_scanner: unlocked company: 1 siftec:object_scanner after 3 steps from 4 parts; locked company: refused at step 1 of 3
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST automate assembly siftec:object_scanner: unlocked company: 1 siftec:object_scanner after 3 steps from 4 parts; locked company: refused at step 1 of 3
+[22:55:07] [Server thread/INFO]: SELFTEST automate assembly siftec:gas_mask: unlocked company: 1 siftec:gas_mask after 3 steps from 4 parts; locked company: refused at step 1 of 3
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST automate assembly siftec:gas_mask: unlocked company: 1 siftec:gas_mask after 3 steps from 4 parts; locked company: refused at step 1 of 3
+[22:55:07] [Server thread/INFO]: SELFTEST automate workshop: loaded 5 items from the old save; takes items from belts: false; gave back true (4 Wire, 1 Node Scanner); left 0
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST automate workshop: loaded 5 items from the old save; takes items from belts: false; gave back true (4 Wire, 1 Node Scanner); left 0
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 placed at 40, 250, -34 facing south (5 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 placed at 50, 250, -34 facing south (5 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 placed at 90, 250, -34 facing south (5 blocks, 0 refund stacks)
+[22:55:07] [Server thread/INFO]: SELFTEST automate poles: uses [Success[swingSource=PREDICTED, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], Success[swingSource=NONE, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], Success[swingSource=PREDICTED, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], Fail[]]; wire left in hand 3; first pole joined to the second true, the second to the far one (50 blocks) false (fake player counts as a machine: true)
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST automate poles: uses [Success[swingSource=PREDICTED, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], Success[swingSource=NONE, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], Success[swingSource=PREDICTED, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], Fail[]]; wire left in hand 3; first pole joined to the second true, the second to the far one (50 blocks) false (fake player counts as a machine: true)
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 at 40, 250, -34 dismantled; 1 stacks given back
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 at 50, 250, -34 dismantled; 0 stacks given back
+[22:55:07] [Server thread/INFO]: SIFTEC: building power_pole_mk1 at 90, 250, -34 dismantled; 0 stacks given back
+[22:55:07] [Server thread/INFO]: SELFTEST automate poles: the copper wire is pressed from Cable: true
+[22:55:07] [Server thread/INFO]: System chat: SELFTEST automate poles: the copper wire is pressed from Cable: true
+[22:55:09] [Server thread/INFO]: SIFTEC: building power_tower placed at 160, 200, 368 facing south (41 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SIFTEC: building power_tower placed at 360, 200, 368 facing south (41 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SIFTEC: building power_tower placed at 560, 200, 368 facing south (41 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SIFTEC: building power_tower placed at 760, 200, 368 facing south (41 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SIFTEC: building power_tower placed at 960, 200, 368 facing south (41 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SIFTEC: building power_tower placed at 560, 200, 568 facing south (41 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SIFTEC: building biomass_burner placed at 153, 201, 368 facing south (37 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SIFTEC: building constructor placed at 965, 201, 368 facing south (118 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SIFTEC: building constructor placed at 565, 201, 568 facing south (118 blocks, 0 refund stacks)
+[22:55:09] [Server thread/INFO]: SELFTEST power chain setup: towers [160, 200, 368, 360, 200, 368, 560, 200, 368, 760, 200, 368, 960, 200, 368, 560, 200, 568]; wires ++++++++
+[22:55:09] [Server thread/INFO]: System chat: SELFTEST power chain setup: towers [160, 200, 368, 360, 200, 368, 560, 200, 368, 760, 200, 368, 960, 200, 368, 560, 200, 568]; wires ++++++++
+[22:55:09] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 53620ms or 1072 ticks behind
+[22:55:10] [Server thread/INFO]: SELFTEST power wired grid 1: generator-pole true, pole-constructor true, pole-motors true true; a fifth wire on the Mk.1 pole: siftec.power.lines_full; a second wire on the Constructor: siftec.power.lines_full; reach between two building connectors 32, between two plain New Age connectors 16, tower to tower 256
+[22:55:10] [Server thread/INFO]: System chat: SELFTEST power wired grid 1: generator-pole true, pole-constructor true, pole-motors true true; a fifth wire on the Mk.1 pole: siftec.power.lines_full; a second wire on the Constructor: siftec.power.lines_full; reach between two building connectors 32, between two plain New Age connectors 16, tower to tower 256
+[22:55:10] [Server thread/INFO]: SELFTEST power wired grid 2: true true true true true
+[22:55:10] [Server thread/INFO]: System chat: SELFTEST power wired grid 2: true true true true true
+[22:55:10] [Server thread/INFO]: SELFTEST world PASS regrow coal impure: cleared 17 clump blocks, mined coal_node by hand, its loot for a pickaxe is [1 minecraft:coal] (expected 1 minecraft:coal), dropped {minecraft:coal=1}; mode SURVIVAL, instabuild false, right tool true, loot [1 minecraft:coal], into the player's inventory 0, items within 16 0
+[22:55:10] [Server thread/INFO]: System chat: SELFTEST world PASS regrow coal impure: cleared 17 clump blocks, mined coal_node by hand, its loot for a pickaxe is [1 minecraft:coal] (expected 1 minecraft:coal), dropped {minecraft:coal=1}; mode SURVIVAL, instabuild false, right tool true, loot [1 minecraft:coal], into the player's inventory 0, items within 16 0
+[22:55:10] [Server thread/INFO]: SELFTEST world PASS regrow coal normal: cleared 18 clump blocks, mined coal_node by hand, its loot for a pickaxe is [1 minecraft:coal] (expected 1 minecraft:coal), dropped {minecraft:coal=1}; mode SURVIVAL, instabuild false, right tool true, loot [1 minecraft:coal], into the player's inventory 0, items within 16 0
+[22:55:10] [Server thread/INFO]: System chat: SELFTEST world PASS regrow coal normal: cleared 18 clump blocks, mined coal_node by hand, its loot for a pickaxe is [1 minecraft:coal] (expected 1 minecraft:coal), dropped {minecraft:coal=1}; mode SURVIVAL, instabuild false, right tool true, loot [1 minecraft:coal], into the player's inventory 0, items within 16 0
+[22:55:10] [Server thread/INFO]: SELFTEST world PASS regrow crimsite pure: cleared 18 clump blocks, mined crimsite_node by hand, its loot for a pickaxe is [1 create:crimsite] (expected 1 create:crimsite), dropped {create:crimsite=1}; mode SURVIVAL, instabuild false, right tool true, loot [1 create:crimsite], into the player's inventory 0, items within 16 0
+[22:55:10] [Server thread/INFO]: System chat: SELFTEST world PASS regrow crimsite pure: cleared 18 clump blocks, mined crimsite_node by hand, its loot for a pickaxe is [1 create:crimsite] (expected 1 create:crimsite), dropped {create:crimsite=1}; mode SURVIVAL, instabuild false, right tool true, loot [1 create:crimsite], into the player's inventory 0, items within 16 0
+[22:55:10] [Server thread/INFO]: SELFTEST world PASS clump andesite at 798, 71, -739: 15 clump blocks, the test miner is refused: siftec.build_gun.clump
+[22:55:10] [Server thread/INFO]: System chat: SELFTEST world PASS clump andesite at 798, 71, -739: 15 clump blocks, the test miner is refused: siftec.build_gun.clump
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS clump mined by hand (15 blocks): the test miner fits: Right-click to build the Test Miner. R rotate, F flip, Ctrl nudge
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS clump mined by hand (15 blocks): the test miner fits: Right-click to build the Test Miner. R rotate, F flip, Ctrl nudge
+[22:55:11] [Server thread/INFO]: SIFTEC: building test_miner placed at 798, 72, -738 facing north (13 blocks, 0 refund stacks)
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS test miner placed over the node, which stays: andesite_node
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS test miner placed over the node, which stays: andesite_node
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS a second miner on the same node is refused: siftec.build_gun.clump
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS a second miner on the same node is refused: siftec.build_gun.clump
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS the test miner off any node is refused: siftec.build_gun.no_node
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS the test miner off any node is refused: siftec.build_gun.no_node
+[22:55:11] [Server thread/INFO]: SELFTEST world clump result: 5 passed, 0 failed
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world clump result: 5 passed, 0 failed
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS regrow coal: mined node is coal_node_depleted, unbreakable (hardness -1.0), purity kept
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS regrow coal: mined node is coal_node_depleted, unbreakable (hardness -1.0), purity kept
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS regrow coal: mined node is coal_node_depleted, unbreakable (hardness -1.0), purity kept
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS regrow coal: mined node is coal_node_depleted, unbreakable (hardness -1.0), purity kept
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS regrow crimsite: mined node is crimsite_node_depleted, unbreakable (hardness -1.0), purity kept
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS regrow crimsite: mined node is crimsite_node_depleted, unbreakable (hardness -1.0), purity kept
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS node broken without a player (as a drill does): mined true, dropped {minecraft:coal=1}, grew back after 20 ticks, now coal_node
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS node broken without a player (as a drill does): mined true, dropped {minecraft:coal=1}, grew back after 20 ticks, now coal_node
+[22:55:11] [Server thread/INFO]: SELFTEST world break result: 5 passed, 0 failed
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world break result: 5 passed, 0 failed
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS regrow crimsite pure: grew back in 11 ticks (its purity's regrowth is 10), now crimsite_node
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS regrow crimsite pure: grew back in 11 ticks (its purity's regrowth is 10), now crimsite_node
+[22:55:11] [Server thread/INFO]: SELFTEST world PASS regrow coal normal: grew back in 21 ticks (its purity's regrowth is 20), now coal_node
+[22:55:11] [Server thread/INFO]: System chat: SELFTEST world PASS regrow coal normal: grew back in 21 ticks (its purity's regrowth is 20), now coal_node
+[22:55:12] [Server thread/INFO]: SELFTEST prefab sizes: HUB 14 x 26 x 28, Gateway 48 x 54 x 60 (blocks: HUB 2384, Gateway 7096)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab sizes: HUB 14 x 26 x 28, Gateway 48 x 54 x 60 (blocks: HUB 2384, Gateway 7096)
+[22:55:12] [Server thread/INFO]: SELFTEST prefab refused: blocked true (1 in the way), no ground true, spawn area true
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab refused: blocked true (1 in the way), no ground true, spawn area true
+[22:55:12] [Server thread/INFO]: SIFTEC: HUB built at 2000, 231, 1995 facing north (level 0) for Selftest HUB A
+[22:55:12] [Server thread/INFO]: SELFTEST prefab placed true (Right-click to build the HUB here. Sneak and right-click to turn it), controller true, claims land true, parts at upgrade 0 TC......
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab placed true (Right-click to build the HUB here. Sneak and right-click to turn it), controller true, claims land true, parts at upgrade 0 TC......
+[22:55:12] [Server thread/INFO]: SELFTEST prefab refused on another company's land true (That land belongs to Selftest HUB A)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab refused on another company's land true (That land belongs to Selftest HUB A)
+[22:55:12] [Server thread/INFO]: SELFTEST prefab parts per upgrade (T terminal, C craft station, S storage, 1 burner, B beds, 2 burner, D dock, F freighter): TC...... 1:TCS..... 2:TCS1.... 3:TCS1.... 4:TCS1B... 5:TCS1B2.. 6:TCS1B2DF; built level 7
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab parts per upgrade (T terminal, C craft station, S storage, 1 burner, B beds, 2 burner, D dock, F freighter): TC...... 1:TCS..... 2:TCS1.... 3:TCS1.... 4:TCS1B... 5:TCS1B2.. 6:TCS1B2DF; built level 7
+[22:55:12] [Server thread/INFO]: SELFTEST prefab terminal: Base Building paid by belt true, freighter away for 2400 ticks (milestone 120 s): parts TCS1B2D. while away, TCS1B2DF when back
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab terminal: Base Building paid by belt true, freighter away for 2400 ticks (milestone 120 s): parts TCS1B2D. while away, TCS1B2DF when back
+[22:55:12] [Server thread/INFO]: SIFTEC: HUB at 2000, 231, 1995 picked up; 4 stacks given back
+[22:55:12] [Server thread/INFO]: SELFTEST prefab picked up: HUB items (none any more) 0, iron rods 10 of 10, diamonds 3 of 3, biomass 16 of 16; parts left standing 0; land released true; progress kept true
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab picked up: HUB items (none any more) 0, iron rods 10 of 10, diamonds 3 of 3, biomass 16 of 16; parts left standing 0; land released true; progress kept true
+[22:55:12] [Server thread/INFO]: SIFTEC: HUB built at 2005, 231, 2000 facing east (level 7) for Selftest HUB A
+[22:55:12] [Server thread/INFO]: SELFTEST prefab placed again facing east true: parts TCS1B2DF, claims again true, terminal faces west, level 7
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab placed again facing east true: parts TCS1B2DF, claims again true, terminal faces west, level 7
+[22:55:12] [Server thread/INFO]: SIFTEC: HUB built at 2400, 231, 1995 facing north (level 7) for Selftest HUB B
+[22:55:12] [Server thread/INFO]: SELFTEST prefab second company's HUB true (Right-click to build the HUB here. Sneak and right-click to turn it), parts TCS1B2DF
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab second company's HUB true (Right-click to build the HUB here. Sneak and right-click to turn it), parts TCS1B2DF
+[22:55:12] [Server thread/INFO]: SIFTEC: GATEWAY built at 2000, 231, 2093 facing north (level 0) for Selftest HUB A
+[22:55:12] [Server thread/INFO]: SIFTEC: GATEWAY at 2000, 231, 2093 picked up; 1 stacks given back
+[22:55:12] [Server thread/INFO]: SIFTEC: GATEWAY built at 2000, 231, 2093 facing north (level 1) for Selftest HUB A
+[22:55:12] [Server thread/INFO]: SELFTEST prefab gateway placed true (Right-click to build the Wormhole Gateway here. Sneak and right-click to turn it), rings ooooo -> phase 1 paid true -> *oooo; second gateway refused true; picked up: items 1, parts left 0; placed again true with rings *oooo
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab gateway placed true (Right-click to build the Wormhole Gateway here. Sneak and right-click to turn it), rings ooooo -> phase 1 paid true -> *oooo; second gateway refused true; picked up: items 1, parts left 0; placed again true with rings *oooo
+[22:55:12] [Server thread/INFO]: SELFTEST prefab old single-block HUB: block entity true, structure false
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST prefab old single-block HUB: block entity true, structure false
+[22:55:12] [Server thread/INFO]: SIFTEC: HUB at 2030, 231, 1970 picked up; 0 stacks given back
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS test building is listed (22 buildings)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS test building is listed (22 buildings)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS test building is a dev building in the Production tab
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS test building is a dev building in the Production tab
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS template reads
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS template reads
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS template shape (45 cells, 44 members, 2 ports, 3 x 5 x 3)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS template shape (45 cells, 44 members, 2 ports, 3 x 5 x 3)
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building placed at 3000, 230, 2000 facing north (44 blocks, 0 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS creative skips the cost (Right-click to build the Test Building. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS creative skips the cost (Right-click to build the Test Building. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building at 3000, 230, 2000 dismantled; 0 stacks given back
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS a survival player cannot place a dev building (siftec.build_gun.dev)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS a survival player cannot place a dev building (siftec.build_gun.dev)
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building placed at 3000, 230, 2000 facing north (44 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS places and takes the cost (Right-click to build the Test Building. R rotate, F flip, Ctrl nudge; left 0 sheets, 1 rods)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS places and takes the cost (Right-click to build the Test Building. R rotate, F flip, Ctrl nudge; left 0 sheets, 1 rods)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS every block stands (44 of 44)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS every block stands (44 of 44)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS controller remembers the building (test_building refund 2 stacks)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS controller remembers the building (test_building refund 2 stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS every block is listed under the controller (44 listed)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS every block is listed under the controller (44 listed)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS input port feeds the basin (took 3, basin has 3)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS input port feeds the basin (took 3, basin has 3)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS ports only work on their outward face
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS ports only work on their outward face
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS output port takes nothing in (inserted 0)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS output port takes nothing in (inserted 0)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS a hand cannot break the core block
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS a hand cannot break the core block
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS an explosion leaves it whole (44 of 44)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS an explosion leaves it whole (44 of 44)
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building placed at 3012, 230, 2000 facing east flipped (44 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS rotates and flips (Right-click to build the Test Building. R rotate, F flip, Ctrl nudge; in port faces west)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS rotates and flips (Right-click to build the Test Building. R rotate, F flip, Ctrl nudge; in port faces west)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS flipped: its right column is on the other side (3012, 231, 1999)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS flipped: its right column is on the other side (3012, 231, 1999)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS refuses blocked space (29 in the way)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS refuses blocked space (29 in the way)
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building placed at 3003, 230, 2000 facing north (44 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS nudged a block at a time until clear, then places (15 in the way after one nudge; Right-click to build the Test Building. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS nudged a block at a time until clear, then places (15 in the way after one nudge; Right-click to build the Test Building. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS a block in the inside space is in the way (1 in the way)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS a block in the inside space is in the way (1 in the way)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS refuses without the full cost (Missing 1 Iron Sheet)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS refuses without the full cost (Missing 1 Iron Sheet)
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building at 3000, 230, 2000 dismantled; 3 stacks given back
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS dismantles with refund (3 stacks: 2 sheets, 4 rods, 3 ingots)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS dismantles with refund (3 stacks: 2 sheets, 4 rods, 3 ingots)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings PASS dismantling leaves nothing (0 blocks left, 0 listed)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings PASS dismantling leaves nothing (0 blocks left, 0 listed)
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building placed at 2988, 230, 2000 facing west (44 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building placed at 2988, 230, 2012 facing north (44 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS portable_miner is listed with its tab, unlock and logic, and its template reads (PRODUCTION hub_upgrade_1 portable_miner su 0)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS portable_miner is listed with its tab, unlock and logic, and its template reads (PRODUCTION hub_upgrade_1 portable_miner su 0)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk1 is listed with its tab, unlock and logic, and its template reads (PRODUCTION hub_upgrade_5 miner su 1024)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk1 is listed with its tab, unlock and logic, and its template reads (PRODUCTION hub_upgrade_5 miner su 1024)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk2 is listed with its tab, unlock and logic, and its template reads (PRODUCTION advanced_steel_production miner su 3072)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk2 is listed with its tab, unlock and logic, and its template reads (PRODUCTION advanced_steel_production miner su 3072)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk3 is listed with its tab, unlock and logic, and its template reads (PRODUCTION leading_edge_production miner su 9216)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk3 is listed with its tab, unlock and logic, and its template reads (PRODUCTION leading_edge_production miner su 9216)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS smelter is listed with its tab, unlock and logic, and its template reads (PRODUCTION hub_upgrade_2 smelter su 819)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS smelter is listed with its tab, unlock and logic, and its template reads (PRODUCTION hub_upgrade_2 smelter su 819)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS constructor is listed with its tab, unlock and logic, and its template reads (PRODUCTION hub_upgrade_3 basin su 819)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS constructor is listed with its tab, unlock and logic, and its template reads (PRODUCTION hub_upgrade_3 basin su 819)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS storage_container is listed with its tab, unlock and logic, and its template reads (LOGISTICS hub_upgrade_5 storage su 0)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS storage_container is listed with its tab, unlock and logic, and its template reads (LOGISTICS hub_upgrade_5 storage su 0)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS industrial_storage_container is listed with its tab, unlock and logic, and its template reads (LOGISTICS logistics_mk3 storage su 0)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS industrial_storage_container is listed with its tab, unlock and logic, and its template reads (LOGISTICS logistics_mk3 storage su 0)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS SU follow Satisfactory's MW (1 MW = 204.8 SU)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS SU follow Satisfactory's MW (1 MW = 204.8 SU)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS a company without the milestone cannot build it (siftec.build_gun.locked)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS a company without the milestone cannot build it (siftec.build_gun.locked)
+[22:55:12] [Server thread/INFO]: SIFTEC: building constructor placed at 3601, 231, 2400 facing north (118 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS constructor goes down and its cost is paid (Right-click to build the Constructor. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS constructor goes down and its cost is paid (Right-click to build the Constructor. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS the Constructor's Basin takes its filter
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS the Constructor's Basin takes its filter
+[22:55:12] [Server thread/INFO]: SIFTEC: building smelter placed at 3621, 231, 2400 facing north (121 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS smelter goes down and its cost is paid (Right-click to build the Smelter. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS smelter goes down and its cost is paid (Right-click to build the Smelter. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk1 snaps onto the node it is aimed near (3640, 230, 2402)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk1 snaps onto the node it is aimed near (3640, 230, 2402)
+[22:55:12] [Server thread/INFO]: SIFTEC: building miner_mk1 placed at 3641, 231, 2402 facing north (81 blocks, 3 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk1 goes down and its cost is paid (Right-click to build the Miner Mk.1. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk1 goes down and its cost is paid (Right-click to build the Miner Mk.1. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk2 snaps onto the node it is aimed near (3655, 230, 2402)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk2 snaps onto the node it is aimed near (3655, 230, 2402)
+[22:55:12] [Server thread/INFO]: SIFTEC: building miner_mk2 placed at 3656, 231, 2402 facing north (89 blocks, 5 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk2 goes down and its cost is paid (Right-click to build the Miner Mk.2. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk2 goes down and its cost is paid (Right-click to build the Miner Mk.2. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk3 snaps onto the node it is aimed near (3670, 230, 2402)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk3 snaps onto the node it is aimed near (3670, 230, 2402)
+[22:55:12] [Server thread/INFO]: SIFTEC: building miner_mk3 placed at 3671, 231, 2402 facing north (98 blocks, 6 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk3 goes down and its cost is paid (Right-click to build the Miner Mk.3. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk3 goes down and its cost is paid (Right-click to build the Miner Mk.3. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS a miner off any node is refused (siftec.build_gun.no_node)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS a miner off any node is refused (siftec.build_gun.no_node)
+[22:55:12] [Server thread/INFO]: SIFTEC: building portable_miner placed at 3690, 232, 2400 facing north (14 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS portable_miner goes down and its cost is paid (Right-click to build the Portable Miner. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS portable_miner goes down and its cost is paid (Right-click to build the Portable Miner. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SIFTEC: building storage_container placed at 3706, 231, 2400 facing north (43 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS storage_container goes down and its cost is paid (Right-click to build the Storage Container. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS storage_container goes down and its cost is paid (Right-click to build the Storage Container. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SIFTEC: building industrial_storage_container placed at 3716, 231, 2400 facing north (52 blocks, 2 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS industrial_storage_container goes down and its cost is paid (Right-click to build the Industrial Storage Container. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS industrial_storage_container goes down and its cost is paid (Right-click to build the Industrial Storage Container. R rotate, F flip, Ctrl nudge)
+[22:55:12] [Server thread/INFO]: SIFTEC: building alien_power_augmenter placed at 3661, 231, 2430 facing north (118 blocks, 0 refund stacks)
+[22:55:12] [Server thread/INFO]: SIFTEC: building power_pole_mk3 placed at 3660, 230, 2422 facing north (7 blocks, 0 refund stacks)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS power: the Augmenter, Constructor, Smelter and miners are wired to a Power Pole Mk.3 (6 of 6)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS power: the Augmenter, Constructor, Smelter and miners are wired to a Power Pole Mk.3 (6 of 6)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: a Build Gun building in the Special tab, unlocked from the start, costing 20 Raw Iron, and there is no HUB item ([Cost[key=minecraft:raw_iron, count=20]], item minecraft:air)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: a Build Gun building in the Special tab, unlocked from the start, costing 20 Raw Iron, and there is no HUB item ([Cost[key=minecraft:raw_iron, count=20]], item minecraft:air)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: the Build Gun refuses it without 20 Raw Iron (Building the HUB takes 20 Raw Iron from your inventory)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: the Build Gun refuses it without 20 Raw Iron (Building the HUB takes 20 Raw Iron from your inventory)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: with 20 Raw Iron the Build Gun's hologram is green (Right-click to build the HUB here. Sneak and right-click to turn it)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: with 20 Raw Iron the Build Gun's hologram is green (Right-click to build the HUB here. Sneak and right-click to turn it)
+[22:55:12] [Server thread/INFO]: SIFTEC: HUB built at 3640, 231, 2375 facing south (level 7) for Selftest Buildings A
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: built with the Build Gun for 20 Raw Iron, and it hands out no Build Gun (HUB true, raw iron left 5, guns 1)
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: built with the Build Gun for 20 Raw Iron, and it hands out no Build Gun (HUB true, raw iron left 5, guns 1)
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: the Build Gun's dismantle mode finds it from its terminal, its Craft Station and its shell (shell block Block{siftec:prefab_step})
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: the Build Gun's dismantle mode finds it from its terminal, its Craft Station and its shell (shell block Block{siftec:prefab_step})
+[22:55:12] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: the Craft Station cannot be broken by hand
+[22:55:12] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: the Craft Station cannot be broken by hand
+[22:55:12] [Server thread/INFO]: SIFTEC: building test_building lost its controller at 2988, 230, 2012; it comes down and drops its refund
+[22:55:13] [Server thread/INFO]: SELFTEST world PASS regrow coal impure: grew back in 41 ticks (its purity's regrowth is 40), now coal_node
+[22:55:13] [Server thread/INFO]: System chat: SELFTEST world PASS regrow coal impure: grew back in 41 ticks (its purity's regrowth is 40), now coal_node
+[22:55:13] [Server thread/INFO]: SELFTEST world regrow result: 10 passed, 0 failed
+[22:55:13] [Server thread/INFO]: System chat: SELFTEST world regrow result: 10 passed, 0 failed
+[22:55:13] [Server thread/INFO]: SELFTEST power A, a Constructor alone: constructor Constructor: right-click it with an item to pick what it makes, 0 made, draws 819 SU, grid: 819 of 15,360 SU used, 14,541 SU spare / motor 64 RPM giving 820 SU; generator Coal Generator: gives 819 SU of 15,360 SU, grid: 819 of 15,360 SU used, 14,541 SU spare; capacity 15360.0 SU, produced 819.0 SU, demand 819.0 SU, stored 0 of 0 SU-ticks, boost 0.00, 1 generators, 1 consumers, 0 stores, 5 connectors, tripped false
+[22:55:13] [Server thread/INFO]: System chat: SELFTEST power A, a Constructor alone: constructor Constructor: right-click it with an item to pick what it makes, 0 made, draws 819 SU, grid: 819 of 15,360 SU used, 14,541 SU spare / motor 64 RPM giving 820 SU; generator Coal Generator: gives 819 SU of 15,360 SU, grid: 819 of 15,360 SU used, 14,541 SU spare; capacity 15360.0 SU, produced 819.0 SU, demand 819.0 SU, stored 0 of 0 SU-ticks, boost 0.00, 1 generators, 1 consumers, 0 stores, 5 connectors, tripped false
+[22:55:13] [Server thread/INFO]: SIFTEC: building test_building at 2988, 230, 2000 broke (its block at 2987, 233, 2000 is gone); it comes down and drops its refund
+[22:55:13] [Server thread/INFO]: SIFTEC: building test_building at 2988, 230, 2000 dismantled; 2 stacks given back
+[22:55:13] [Server thread/INFO]: SELFTEST buildings_a PASS power: the Constructor's New Age motor runs on the grid at 64 RPM, giving its 4 MW (819 SU) (Constructor: makes Iron Sheet, 0 made, draws 819 SU, grid: 14,950 of 102,400 SU used, 87,450 SU spare)
+[22:55:13] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS power: the Constructor's New Age motor runs on the grid at 64 RPM, giving its 4 MW (819 SU) (Constructor: makes Iron Sheet, 0 made, draws 819 SU, grid: 14,950 of 102,400 SU used, 87,450 SU spare)
+[22:55:14] [Server thread/INFO]: SELFTEST buildings PASS breaks with refund from its core block (0 blocks left, dropped 2 sheets and 4 rods)
+[22:55:14] [Server thread/INFO]: System chat: SELFTEST buildings PASS breaks with refund from its core block (0 blocks left, dropped 2 sheets and 4 rods)
+[22:55:14] [Server thread/INFO]: SELFTEST buildings PASS losing the controller takes the rest down with refund (0 blocks left, dropped 2 sheets and 4 rods)
+[22:55:14] [Server thread/INFO]: System chat: SELFTEST buildings PASS losing the controller takes the rest down with refund (0 blocks left, dropped 2 sheets and 4 rods)
+[22:55:14] [Server thread/INFO]: SELFTEST buildings result: 25 passed, 0 failed
+[22:55:14] [Server thread/INFO]: System chat: SELFTEST buildings result: 25 passed, 0 failed
+[22:55:14] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: the Craft Station does nothing until cranked
+[22:55:14] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: the Craft Station does nothing until cranked
+[22:55:16] [Server thread/INFO]: SELFTEST power chain all loaded (after 5 s): far constructor powered true (motor 0 RPM giving 0 SU), branch constructor powered true (motor 0 RPM giving 0 SU); burner Biomass Burner: gives 1,638 SU of 6,144 SU, grid: 1,638 of 6,144 SU used, 4,506 SU spare
+[22:55:16] [Server thread/INFO]: System chat: SELFTEST power chain all loaded (after 5 s): far constructor powered true (motor 0 RPM giving 0 SU), branch constructor powered true (motor 0 RPM giving 0 SU); burner Biomass Burner: gives 1,638 SU of 6,144 SU, grid: 1,638 of 6,144 SU used, 4,506 SU spare
+[22:55:16] [Server thread/INFO]: SELFTEST power chain middle unloaded true (after 0 s): [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[22:55:16] [Server thread/INFO]: System chat: SELFTEST power chain middle unloaded true (after 0 s): [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[22:55:16] [Server thread/INFO]: RecipeTrie of depth 4 with 175 nodes built with 234 variants, 172 ingredients, and 200 recipes
+[22:55:16] [Server thread/INFO]: SELFTEST power B, and a player's reinforced motor at 64 RPM (8,192 SU): generator Coal Generator: gives 9,011 SU of 15,360 SU, grid: 9,011 of 15,360 SU used, 6,349 SU spare; player motor motor 64 RPM giving 8192 SU; constructor motor 64 RPM giving 820 SU
+[22:55:16] [Server thread/INFO]: System chat: SELFTEST power B, and a player's reinforced motor at 64 RPM (8,192 SU): generator Coal Generator: gives 9,011 SU of 15,360 SU, grid: 9,011 of 15,360 SU used, 6,349 SU spare; player motor motor 64 RPM giving 8192 SU; constructor motor 64 RPM giving 820 SU
+[22:55:16] [Server thread/INFO]: RecipeTrie of depth 7 with 1138 nodes built with 825 variants, 633 ingredients, and 1091 recipes
+[22:55:16] [Server thread/INFO]: SELFTEST buildings_a at 100: constructor 0 made, basin 2 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 0, out belt 32.0 RPM toward south, 0 on it, end 0, on the ground 0 | smelter 0 made, out port pushed 0, out belt 32.0 RPM toward south, 0 on it, end 0, on the ground 0 | storage in belt 32.0 RPM toward south, 4 on it
+[22:55:16] [Server thread/INFO]: System chat: SELFTEST buildings_a at 100: constructor 0 made, basin 2 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 0, out belt 32.0 RPM toward south, 0 on it, end 0, on the ground 0 | smelter 0 made, out port pushed 0, out belt 32.0 RPM toward south, 0 on it, end 0, on the ground 0 | storage in belt 32.0 RPM toward south, 4 on it
+[22:55:17] [Server thread/INFO]: SELFTEST power chain step 1: middle unloaded: far constructor powered true (motor 64 RPM giving 820 SU), branch constructor powered true (motor 64 RPM giving 820 SU); burner Biomass Burner: gives 1,638 SU of 6,144 SU, grid: 1,638 of 6,144 SU used, 4,506 SU spare; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[22:55:17] [Server thread/INFO]: System chat: SELFTEST power chain step 1: middle unloaded: far constructor powered true (motor 64 RPM giving 820 SU), branch constructor powered true (motor 64 RPM giving 820 SU); burner Biomass Burner: gives 1,638 SU of 6,144 SU, grid: 1,638 of 6,144 SU used, 4,506 SU spare; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[22:55:18] [Server thread/INFO]: SELFTEST power C, a second motor: 17,203 SU on 15,360: tripped true; constructor Constructor: right-click it with an item to pick what it makes, 0 made, needs 819 SU: no power, grid: FUSE BLOWN (0 of 0 SU, 0 SU spare) / motor 0 RPM giving 0 SU; generator Coal Generator: gives 0 SU of 15,360 SU, FUSE BLOWN: the grid used more than it makes. Sneak-use a generator or Power Storage to reset it; second motor motor 0 RPM giving 0 SU
+[22:55:18] [Server thread/INFO]: System chat: SELFTEST power C, a second motor: 17,203 SU on 15,360: tripped true; constructor Constructor: right-click it with an item to pick what it makes, 0 made, needs 819 SU: no power, grid: FUSE BLOWN (0 of 0 SU, 0 SU spare) / motor 0 RPM giving 0 SU; generator Coal Generator: gives 0 SU of 15,360 SU, FUSE BLOWN: the grid used more than it makes. Sneak-use a generator or Power Storage to reset it; second motor motor 0 RPM giving 0 SU
+[22:55:18] [Server thread/INFO]: SELFTEST power C, reset at the generator while the grid is still too big: reset true
+[22:55:18] [Server thread/INFO]: System chat: SELFTEST power C, reset at the generator while the grid is still too big: reset true
+[22:55:19] [Server thread/INFO]: SELFTEST power chain step 2: burner out of fuel: tripped true; far constructor powered false (motor 0 RPM giving 0 SU), branch constructor powered false (motor 0 RPM giving 0 SU); burner Biomass Burner: gives 0 SU of 6,144 SU, FUSE BLOWN: the grid used more than it makes. Sneak-use a generator or Power Storage to reset it, out of fuel
+[22:55:19] [Server thread/INFO]: System chat: SELFTEST power chain step 2: burner out of fuel: tripped true; far constructor powered false (motor 0 RPM giving 0 SU), branch constructor powered false (motor 0 RPM giving 0 SU); burner Biomass Burner: gives 0 SU of 6,144 SU, FUSE BLOWN: the grid used more than it makes. Sneak-use a generator or Power Storage to reset it, out of fuel
+[22:55:19] [Server thread/INFO]: SELFTEST power D, a moment after the reset: tripped again true; capacity 0.0 SU, produced 0.0 SU, demand 17203.0 SU, stored 0 of 0 SU-ticks, boost 0.00, 1 generators, 3 consumers, 0 stores, 5 connectors, tripped true
+[22:55:19] [Server thread/INFO]: System chat: SELFTEST power D, a moment after the reset: tripped again true; capacity 0.0 SU, produced 0.0 SU, demand 17203.0 SU, stored 0 of 0 SU-ticks, boost 0.00, 1 generators, 3 consumers, 0 stores, 5 connectors, tripped true
+[22:55:19] [Server thread/INFO]: SELFTEST power D, the second motor stopped and the fuse reset: true
+[22:55:19] [Server thread/INFO]: System chat: SELFTEST power D, the second motor stopped and the fuse reset: true
+[22:55:21] [Server thread/INFO]: SELFTEST power chain step 6: refuelled and reset: far constructor powered true (motor 64 RPM giving 820 SU), branch constructor powered true (motor 64 RPM giving 820 SU); burner Biomass Burner: gives 1,638 SU of 6,144 SU, grid: 1,638 of 6,144 SU used, 4,506 SU spare
+[22:55:21] [Server thread/INFO]: System chat: SELFTEST power chain step 6: refuelled and reset: far constructor powered true (motor 64 RPM giving 820 SU), branch constructor powered true (motor 64 RPM giving 820 SU); burner Biomass Burner: gives 1,638 SU of 6,144 SU, grid: 1,638 of 6,144 SU used, 4,506 SU spare
+[22:55:22] [Server thread/INFO]: SELFTEST power E, running again: tripped false; constructor Constructor: right-click it with an item to pick what it makes, 0 made, draws 819 SU, grid: 9,011 of 15,360 SU used, 6,349 SU spare / motor 64 RPM giving 820 SU; generator Coal Generator: gives 9,011 SU of 15,360 SU, grid: 9,011 of 15,360 SU used, 6,349 SU spare; coal burnt 1, water left 7891 mB
+[22:55:22] [Server thread/INFO]: System chat: SELFTEST power E, running again: tripped false; constructor Constructor: right-click it with an item to pick what it makes, 0 made, draws 819 SU, grid: 9,011 of 15,360 SU used, 6,349 SU spare / motor 64 RPM giving 820 SU; generator Coal Generator: gives 9,011 SU of 15,360 SU, grid: 9,011 of 15,360 SU used, 6,349 SU spare; coal burnt 1, water left 7891 mB
+[22:55:22] [Server thread/INFO]: SELFTEST power F, the second grid: burner Biomass Burner: gives 195 SU of 6,144 SU, grid: 819 of 672,358 SU used, 671,539 SU spare, storage 72.5 SUh of 20,480 SUh; storage Power Storage: stores 72.5 SUh of 20,480 SUh, grid: 819 of 672,358 SU used, 671,539 SU spare, storage 72.5 SUh of 20,480 SUh; augmenter Alien Power Augmenter: gives 102,400 SU and +10% to its grid's generators, grid: 819 of 672,358 SU used, 671,539 SU spare, storage 72.5 SUh of 20,480 SUh; nuclear plant Nuclear Power Plant: gives 16,219 SU of 512,000 SU, grid: 819 of 672,358 SU used, 671,539 SU spare, storage 72.5 SUh of 20,480 SUh, its waste 10 siftec:uranium_waste, rods left 1 siftec:uranium_fuel_rod, water left 7936 mB; constructor motor 64 RPM giving 820 SU; capacity 672358.4 SU, produced 21299.0 SU, demand 819.0 SU, stored 5222400 of 1474560000 SU-ticks, boost 0.10, 3 generators, 1 consumers, 1 stores, 6 connectors, tripped false
+[22:55:22] [Server thread/INFO]: System chat: SELFTEST power F, the second grid: burner Biomass Burner: gives 195 SU of 6,144 SU, grid: 819 of 672,358 SU used, 671,539 SU spare, storage 72.5 SUh of 20,480 SUh; storage Power Storage: stores 72.5 SUh of 20,480 SUh, grid: 819 of 672,358 SU used, 671,539 SU spare, storage 72.5 SUh of 20,480 SUh; augmenter Alien Power Augmenter: gives 102,400 SU and +10% to its grid's generators, grid: 819 of 672,358 SU used, 671,539 SU spare, storage 72.5 SUh of 20,480 SUh; nuclear plant Nuclear Power Plant: gives 16,219 SU of 512,000 SU, grid: 819 of 672,358 SU used, 671,539 SU spare, storage 72.5 SUh of 20,480 SUh, its waste 10 siftec:uranium_waste, rods left 1 siftec:uranium_fuel_rod, water left 7936 mB; constructor motor 64 RPM giving 820 SU; capacity 672358.4 SU, produced 21299.0 SU, demand 819.0 SU, stored 5222400 of 1474560000 SU-ticks, boost 0.10, 3 generators, 1 consumers, 1 stores, 6 connectors, tripped false
+[22:55:23] [Server thread/INFO]: SELFTEST power chain step 7: loads of the middle chunks meanwhile {98784247830=0, 98784247843=0, 98784247855=0} (chunk loads anywhere, other tests included: 0); 38 connectors, 30 wires
+[22:55:23] [Server thread/INFO]: System chat: SELFTEST power chain step 7: loads of the middle chunks meanwhile {98784247830=0, 98784247843=0, 98784247855=0} (chunk loads anywhere, other tests included: 0); 38 connectors, 30 wires
+[22:55:24] [Server thread/INFO]: SELFTEST power G, the augmenter fed an Alien Power Matrix: Alien Power Augmenter: gives 102,400 SU and +30% to its grid's generators, grid: 819 of 775,987 SU used, 775,168 SU spare, storage 83.9 SUh of 20,480 SUh; capacity 775987.2 SU, produced 21299.0 SU, demand 819.0 SU, stored 6041600 of 1474560000 SU-ticks, boost 0.30, 3 generators, 1 consumers, 1 stores, 6 connectors, tripped false
+[22:55:24] [Server thread/INFO]: System chat: SELFTEST power G, the augmenter fed an Alien Power Matrix: Alien Power Augmenter: gives 102,400 SU and +30% to its grid's generators, grid: 819 of 775,987 SU used, 775,168 SU spare, storage 83.9 SUh of 20,480 SUh; capacity 775987.2 SU, produced 21299.0 SU, demand 819.0 SU, stored 6041600 of 1474560000 SU-ticks, boost 0.30, 3 generators, 1 consumers, 1 stores, 6 connectors, tripped false
+[22:55:24] [Server thread/INFO]: SELFTEST power New Age reactor fuel: uranium rod true, plutonium rod true, New Age's own fuel false
+[22:55:24] [Server thread/INFO]: System chat: SELFTEST power New Age reactor fuel: uranium rod true, plutonium rod true, New Age's own fuel false
+[22:55:24] [Server thread/INFO]: SELFTEST power wires: 38 connectors, 30 wires
+[22:55:24] [Server thread/INFO]: System chat: SELFTEST power wires: 38 connectors, 30 wires
+[22:55:26] [Server thread/INFO]: SELFTEST buildings_a at 300: constructor 2 made, basin 7 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 4, out belt 32.0 RPM toward south, 2 on it, end 2, on the ground 0 | smelter 3 made, out port pushed 3, out belt 32.0 RPM toward south, 0 on it, end 3, on the ground 0 | storage in belt 32.0 RPM toward south, 4 on it
+[22:55:26] [Server thread/INFO]: System chat: SELFTEST buildings_a at 300: constructor 2 made, basin 7 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 4, out belt 32.0 RPM toward south, 2 on it, end 2, on the ground 0 | smelter 3 made, out port pushed 3, out belt 32.0 RPM toward south, 0 on it, end 3, on the ground 0 | storage in belt 32.0 RPM toward south, 4 on it
+[22:55:26] [Server thread/INFO]: SELFTEST buildings_a measuring from [2, 3, 10, 7, 25, 5, 0, 0]
+[22:55:26] [Server thread/INFO]: System chat: SELFTEST buildings_a measuring from [2, 3, 10, 7, 25, 5, 0, 0]
+[22:55:26] [Server thread/INFO]: SELFTEST buildings_a belts: constructor in 32.0 RPM toward south, 4 on it, out 32.0 RPM toward south, 2 on it; basin 7 ingots 0 plates; smelter in 32.0 RPM toward south, 4 on it, out 32.0 RPM toward south, 0 on it, controller in 8 minecraft:raw_iron out 0 minecraft:air; storage in 32.0 RPM toward south, 4 on it
+[22:55:26] [Server thread/INFO]: System chat: SELFTEST buildings_a belts: constructor in 32.0 RPM toward south, 4 on it, out 32.0 RPM toward south, 2 on it; basin 7 ingots 0 plates; smelter in 32.0 RPM toward south, 4 on it, out 32.0 RPM toward south, 0 on it, controller in 8 minecraft:raw_iron out 0 minecraft:air; storage in 32.0 RPM toward south, 4 on it
+[22:55:36] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: the hand-cranked Press makes Iron Plate at the normal amount (2 plates)
+[22:55:36] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: the hand-cranked Press makes Iron Plate at the normal amount (2 plates)
+[22:55:36] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: the hand-cranked Mixer makes Reinforced Iron Plate (1 Reinforced Iron Plate)
+[22:55:36] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: the hand-cranked Mixer makes Reinforced Iron Plate (1 Reinforced Iron Plate)
+[22:55:36] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: its Biomass Burners take Biomass and leaves, not coal, and are wired from the top (Block{create_new_age:electrical_connector}[facing=up,mode=inert])
+[22:55:36] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: its Biomass Burners take Biomass and leaves, not coal, and are wired from the top (Block{create_new_age:electrical_connector}[facing=up,mode=inert])
+[22:55:36] [Server thread/INFO]: SIFTEC: HUB at 3640, 231, 2375 picked up; 3 stacks given back
+[22:55:36] [Server thread/INFO]: SELFTEST buildings_a PASS HUB: the Build Gun takes it down and gives back its 20 Raw Iron and the Craft Station's contents, and no HUB item (20 raw iron, 2 plates, terminal Block{minecraft:air})
+[22:55:36] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS HUB: the Build Gun takes it down and gives back its 20 Raw Iron and the Craft Station's contents, and no HUB item (20 raw iron, 2 plates, terminal Block{minecraft:air})
+[22:55:36] [Server thread/INFO]: SELFTEST buildings_a at 500: constructor 4 made, basin 12 ingots 1 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 7, out belt 32.0 RPM toward south, 1 on it, end 6, on the ground 0 | smelter 7 made, out port pushed 7, out belt 32.0 RPM toward south, 0 on it, end 7, on the ground 0 | storage in belt 32.0 RPM toward south, 4 on it
+[22:55:36] [Server thread/INFO]: System chat: SELFTEST buildings_a at 500: constructor 4 made, basin 12 ingots 1 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 7, out belt 32.0 RPM toward south, 1 on it, end 6, on the ground 0 | smelter 7 made, out port pushed 7, out belt 32.0 RPM toward south, 0 on it, end 7, on the ground 0 | storage in belt 32.0 RPM toward south, 4 on it
+[22:55:46] [Server thread/INFO]: SELFTEST buildings_a at 700: constructor 5 made, basin 20 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 10, out belt 32.0 RPM toward south, 1 on it, end 9, on the ground 0 | smelter 15 made, out port pushed 13, out belt 32.0 RPM toward south, 2 on it, end 11, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:55:46] [Server thread/INFO]: System chat: SELFTEST buildings_a at 700: constructor 5 made, basin 20 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 10, out belt 32.0 RPM toward south, 1 on it, end 9, on the ground 0 | smelter 15 made, out port pushed 13, out belt 32.0 RPM toward south, 2 on it, end 11, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:55:56] [Server thread/INFO]: SELFTEST buildings_a at 900: constructor 7 made, basin 25 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 14, out belt 32.0 RPM toward south, 2 on it, end 12, on the ground 0 | smelter 19 made, out port pushed 19, out belt 32.0 RPM toward south, 4 on it, end 15, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:55:56] [Server thread/INFO]: System chat: SELFTEST buildings_a at 900: constructor 7 made, basin 25 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 14, out belt 32.0 RPM toward south, 2 on it, end 12, on the ground 0 | smelter 19 made, out port pushed 19, out belt 32.0 RPM toward south, 4 on it, end 15, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:56:06] [Server thread/INFO]: SELFTEST buildings_a at 1100: constructor 9 made, basin 31 ingots 1 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 17, out belt 32.0 RPM toward south, 1 on it, end 16, on the ground 0 | smelter 23 made, out port pushed 23, out belt 32.0 RPM toward south, 3 on it, end 20, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:56:06] [Server thread/INFO]: System chat: SELFTEST buildings_a at 1100: constructor 9 made, basin 31 ingots 1 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 17, out belt 32.0 RPM toward south, 1 on it, end 16, on the ground 0 | smelter 23 made, out port pushed 23, out belt 32.0 RPM toward south, 3 on it, end 20, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:56:16] [Server thread/INFO]: SELFTEST buildings_a at 1300: constructor 10 made, basin 39 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 20, out belt 32.0 RPM toward south, 1 on it, end 19, on the ground 0 | smelter 27 made, out port pushed 27, out belt 32.0 RPM toward south, 0 on it, end 27, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:56:16] [Server thread/INFO]: System chat: SELFTEST buildings_a at 1300: constructor 10 made, basin 39 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 20, out belt 32.0 RPM toward south, 1 on it, end 19, on the ground 0 | smelter 27 made, out port pushed 27, out belt 32.0 RPM toward south, 0 on it, end 27, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a at 1500: constructor 12 made, basin 44 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 24, out belt 32.0 RPM toward south, 2 on it, end 22, on the ground 0 | smelter 35 made, out port pushed 32, out belt 32.0 RPM toward south, 1 on it, end 31, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a at 1500: constructor 12 made, basin 44 ingots 0 plates, in belt 32.0 RPM toward south, 4 on it, out port pushed 24, out belt 32.0 RPM toward south, 2 on it, end 22, on the ground 0 | smelter 35 made, out port pushed 32, out belt 32.0 RPM toward south, 1 on it, end 31, on the ground 0 | storage in belt 32.0 RPM toward south, 0 on it
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Constructor: 10 Iron Plate recipes a minute (6 s each) (10 recipes)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Constructor: 10 Iron Plate recipes a minute (6 s each) (10 recipes)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Constructor: its plates come out on the belt at the front (24 plates on the belt and in the Basin at its end)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Constructor: its plates come out on the belt at the front (24 plates on the belt and in the Basin at its end)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Smelter: 30 Iron Ingot a minute (2 s each) (32 ingots)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Smelter: 30 Iron Ingot a minute (2 s each) (32 ingots)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Smelter: its ingots come out on the belt at the front (32 on the belt and in the Basin at its end)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Smelter: its ingots come out on the belt at the front (32 on the belt and in the Basin at its end)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk1 on a NORMAL node really breaks it, 30 to 61 times a minute (purity regrows it every 20 ticks, the Mk breaks it in 10) (40 breaks, 40 depletions seen on the node)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk1 on a NORMAL node really breaks it, 30 to 61 times a minute (purity regrows it every 20 ticks, the Mk breaks it in 10) (40 breaks, 40 depletions seen on the node)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk1: its Fortune 0 gives 1.0 to 1.0 items a break, and nothing without a break (40 items from 40 breaks (1.00 a break))
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk1: its Fortune 0 gives 1.0 to 1.0 items a break, and nothing without a break (40 items from 40 breaks (1.00 a break))
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk1: the node is still there (grown or growing back) and its ore reaches the chest (Block{siftec:iron_node_depleted}[purity=normal])
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk1: the node is still there (grown or growing back) and its ore reaches the chest (Block{siftec:iron_node_depleted}[purity=normal])
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk2 on a IMPURE node really breaks it, 20 to 31 times a minute (purity regrows it every 40 ticks, the Mk breaks it in 5) (27 breaks, 27 depletions seen on the node)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk2 on a IMPURE node really breaks it, 20 to 31 times a minute (purity regrows it every 40 ticks, the Mk breaks it in 5) (27 breaks, 27 depletions seen on the node)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk2: its Fortune 3 gives 1.5 to 3.0 items a break, and nothing without a break (61 items from 27 breaks (2.26 a break))
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk2: its Fortune 3 gives 1.5 to 3.0 items a break, and nothing without a break (61 items from 27 breaks (2.26 a break))
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk2: the node is still there (grown or growing back) and its ore reaches the chest (Block{siftec:iron_node_depleted}[purity=impure])
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk2: the node is still there (grown or growing back) and its ore reaches the chest (Block{siftec:iron_node_depleted}[purity=impure])
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk3 on a PURE node really breaks it, 63 to 121 times a minute (purity regrows it every 10 ticks, the Mk breaks it in 2) (100 breaks, 100 depletions seen on the node)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk3 on a PURE node really breaks it, 63 to 121 times a minute (purity regrows it every 10 ticks, the Mk breaks it in 2) (100 breaks, 100 depletions seen on the node)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk3: its Fortune 5 gives 2.2 to 4.2 items a break, and nothing without a break (323 items from 100 breaks (3.23 a break))
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk3: its Fortune 5 gives 2.2 to 4.2 items a break, and nothing without a break (323 items from 100 breaks (3.23 a break))
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS miner_mk3: the node is still there (grown or growing back) and its ore reaches the chest (Block{siftec:copper_node_depleted}[purity=pure])
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS miner_mk3: the node is still there (grown or growing back) and its ore reaches the chest (Block{siftec:copper_node_depleted}[purity=pure])
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Portable Miner on a normal node: breaks it 16 to 21 times a minute (40 ticks each, after 20 to regrow), one ore each (20 breaks, 20 items, 20 depletions seen)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Portable Miner on a normal node: breaks it 16 to 21 times a minute (40 ticks each, after 20 to regrow), one ore each (20 breaks, 20 items, 20 depletions seen)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Portable Miner: the ore lies on the ground in front (25 lying there)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Portable Miner: the ore lies on the ground in front (25 lying there)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Storage Container: the belt fills it and its front port empties it into a chest (30 in the chest of 30)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Storage Container: the belt fills it and its front port empties it into a chest (30 in the chest of 30)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Industrial Storage Container: two vault blocks hold twice a Storage Container (40 slots)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Industrial Storage Container: two vault blocks hold twice a Storage Container (40 slots)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS a building's status line reads (Constructor: makes Iron Sheet, 12 made, draws 819 SU, grid: 14,950 of 102,400 SU used, 87,450 SU spare)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS a building's status line reads (Constructor: makes Iron Sheet, 12 made, draws 819 SU, grid: 14,950 of 102,400 SU used, 87,450 SU spare)
+[22:56:26] [Server thread/INFO]: SIFTEC: building smelter at 3621, 231, 2400 dismantled; 6 stacks given back
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a PASS Smelter dismantles with its cost and contents (6 stacks back, 5 rods)
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS Smelter dismantles with its cost and contents (6 stacks back, 5 rods)
+[22:56:26] [Server thread/INFO]: SELFTEST buildings_a result: 55 passed, 0 failed
+[22:56:26] [Server thread/INFO]: System chat: SELFTEST buildings_a result: 55 passed, 0 failed
+[22:57:49] [Server thread/INFO]: SELFTEST world geyser 120, 160, -56 after 160 s (chunk ticking after 0 s): 3 eruptions, gaps [45.0, 45.0] s (min 45.0, max 45.0, all within 20-70: true); generator gave power 60 ticks during eruptions and 0 outside; SU-seconds per eruption [20480.0, 20480.0, 20480.0]; generator now Geothermal Generator: gives 0 SU of 409,600 SU, grid: 0 of 0 SU used, 0 SU spare, storage 17.1 SUh of 20,480 SUh, waiting for the next eruption; storage Power Storage: stores 17.1 SUh of 20,480 SUh, grid: 0 of 0 SU used, 0 SU spare, storage 17.1 SUh of 20,480 SUh
+[22:57:49] [Server thread/INFO]: System chat: SELFTEST world geyser 120, 160, -56 after 160 s (chunk ticking after 0 s): 3 eruptions, gaps [45.0, 45.0] s (min 45.0, max 45.0, all within 20-70: true); generator gave power 60 ticks during eruptions and 0 outside; SU-seconds per eruption [20480.0, 20480.0, 20480.0]; generator now Geothermal Generator: gives 0 SU of 409,600 SU, grid: 0 of 0 SU used, 0 SU spare, storage 17.1 SUh of 20,480 SUh, waiting for the next eruption; storage Power Storage: stores 17.1 SUh of 20,480 SUh, grid: 0 of 0 SU used, 0 SU spare, storage 17.1 SUh of 20,480 SUh
+[22:57:49] [Server thread/INFO]: SELFTEST world geyser -1416, 69, -1127 after 160 s (chunk ticking after 0 s): 4 eruptions, gaps [44.0, 36.0, 30.0] s (min 30.0, max 44.0, all within 20-70: true); generator gave power 80 ticks during eruptions and 0 outside; SU-seconds per eruption [20480.0, 20480.0, 20480.0, 20480.0]; generator now Geothermal Generator: gives 0 SU of 409,600 SU, grid: 0 of 0 SU used, 0 SU spare, storage 22.8 SUh of 20,480 SUh, waiting for the next eruption; storage Power Storage: stores 22.8 SUh of 20,480 SUh, grid: 0 of 0 SU used, 0 SU spare, storage 22.8 SUh of 20,480 SUh
+[22:57:49] [Server thread/INFO]: System chat: SELFTEST world geyser -1416, 69, -1127 after 160 s (chunk ticking after 0 s): 4 eruptions, gaps [44.0, 36.0, 30.0] s (min 30.0, max 44.0, all within 20-70: true); generator gave power 80 ticks during eruptions and 0 outside; SU-seconds per eruption [20480.0, 20480.0, 20480.0, 20480.0]; generator now Geothermal Generator: gives 0 SU of 409,600 SU, grid: 0 of 0 SU used, 0 SU spare, storage 22.8 SUh of 20,480 SUh, waiting for the next eruption; storage Power Storage: stores 22.8 SUh of 20,480 SUh, grid: 0 of 0 SU used, 0 SU spare, storage 22.8 SUh of 20,480 SUh
+[22:57:49] [Server thread/INFO]: SELFTEST world geyser 1150, 12, 755 after 160 s (chunk ticking after 0 s): 3 eruptions, gaps [50.0, 50.0] s (min 50.0, max 50.0, all within 20-70: true); generator gave power 60 ticks during eruptions and 0 outside; SU-seconds per eruption [20480.0, 20480.0, 20480.0]; generator now Geothermal Generator: gives 0 SU of 409,600 SU, grid: 0 of 0 SU used, 0 SU spare, storage 17.1 SUh of 20,480 SUh, waiting for the next eruption; storage Power Storage: stores 17.1 SUh of 20,480 SUh, grid: 0 of 0 SU used, 0 SU spare, storage 17.1 SUh of 20,480 SUh
+[22:57:49] [Server thread/INFO]: System chat: SELFTEST world geyser 1150, 12, 755 after 160 s (chunk ticking after 0 s): 3 eruptions, gaps [50.0, 50.0] s (min 50.0, max 50.0, all within 20-70: true); generator gave power 60 ticks during eruptions and 0 outside; SU-seconds per eruption [20480.0, 20480.0, 20480.0]; generator now Geothermal Generator: gives 0 SU of 409,600 SU, grid: 0 of 0 SU used, 0 SU spare, storage 17.1 SUh of 20,480 SUh, waiting for the next eruption; storage Power Storage: stores 17.1 SUh of 20,480 SUh, grid: 0 of 0 SU used, 0 SU spare, storage 17.1 SUh of 20,480 SUh
+[22:59:06] [Server thread/INFO]: Player838[/127.0.0.1:58942] logged in with entity id 956 at (102.5, 142.0, -24.5)
+[22:59:06] [Server thread/INFO]: System chat: Player838 joined the game
+[22:59:46] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:noon
+[22:59:46] [Server thread/INFO]: System chat: Set the weather to clear
+[22:59:46] [Server thread/INFO]: System chat: Set Player838's game mode to Survival Mode
+[22:59:46] [Server thread/INFO]: SELFTEST prefab joined: the player has 1 Build Gun, a HUB item false; HUB block has an item false; spawns with the gun true
+[22:59:46] [Server thread/INFO]: System chat: SELFTEST prefab joined: the player has 1 Build Gun, a HUB item false; HUB block has an item false; spawns with the gun true
+[22:59:46] [Server thread/INFO]: System chat: Removed 1 item(s) from player Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Heavy Oil Residue Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Alumina Solution Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Sulfuric Acid Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Nitrogen Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Nitric Acid Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Dark Matter Residue Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Ignimbrite Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Turbofuel Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Vinegar Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Mead Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Water Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Player838 has made the advancement [Hot Stuff]
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Lava Bucket] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Mead] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Claim Marker] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 16 [Copper Wire] to Player838
+[22:59:46] [Server thread/INFO]: System chat: Gave 1 [Speed Governor] to Player838
+[22:59:53] [Server thread/INFO]: SELFTEST world hubui terminal for Player838's Company
+[22:59:53] [Server thread/INFO]: System chat: SELFTEST world hubui terminal for Player838's Company
+[22:59:53] [Server thread/INFO]: System chat: Gave 10 [Iron Rod] to Player838
+[22:59:53] [Server thread/INFO]: System chat: Gave 5 [Iron Sheet] to Player838
+[23:00:04] [Server thread/INFO]: SIFTEC: gave Player838 a Traveler's Backpack, tier 0
+[23:00:37] [Server thread/INFO]: SELFTEST prefab sathub ground 0: parts ........
+[23:00:37] [Server thread/INFO]: System chat: SELFTEST prefab sathub ground 0: parts ........
+[23:00:37] [Server thread/INFO]: System chat: Removed 36 item(s) from player Player838
+[23:00:37] [Server thread/INFO]: System chat: Replaced 1 slot(s) on Player838 with [Build Gun]
+[23:00:37] [Server thread/INFO]: System chat: Gave 20 [Raw Iron] to Player838
+[23:00:37] [Server thread/INFO]: SELFTEST buildings gun tab SPECIAL hub
+[23:00:37] [Server thread/INFO]: System chat: SELFTEST buildings gun tab SPECIAL hub
+[23:00:37] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 2268ms or 45 ticks behind
+[23:00:43] [Server thread/INFO]: SELFTEST prefab sathub obstacle 0: parts ........
+[23:00:43] [Server thread/INFO]: System chat: SELFTEST prefab sathub obstacle 0: parts ........
+[23:00:46] [Server thread/INFO]: SELFTEST prefab sathub clear 0: parts ........
+[23:00:46] [Server thread/INFO]: System chat: SELFTEST prefab sathub clear 0: parts ........
+[23:00:49] [Server thread/INFO]: SIFTEC: HUB built at -2000, 231, 1995 facing north (level 1) for Player838's Company
+[23:00:52] [Server thread/INFO]: SELFTEST prefab the player's HUB was on the spot
+[23:00:52] [Server thread/INFO]: System chat: SELFTEST prefab the player's HUB was on the spot
+[23:00:52] [Server thread/INFO]: SELFTEST prefab placed by the player: structure true, parts TCS....., Raw Iron left 0 (of 20), gamemode SURVIVAL, claims true
+[23:00:52] [Server thread/INFO]: System chat: SELFTEST prefab placed by the player: structure true, parts TCS....., Raw Iron left 0 (of 20), gamemode SURVIVAL, claims true
+[23:00:53] [Server thread/INFO]: SELFTEST buildings gun tab PRODUCTION 
+[23:00:53] [Server thread/INFO]: System chat: SELFTEST buildings gun tab PRODUCTION 
+[23:00:54] [Server thread/INFO]: System chat: Removed 1 item(s) from player Player838
+[23:00:54] [Server thread/INFO]: System chat: Set Player838's game mode to Spectator Mode
+[23:00:54] [Server thread/INFO]: SELFTEST prefab sathub level 0: parts TC......
+[23:00:54] [Server thread/INFO]: System chat: SELFTEST prefab sathub level 0: parts TC......
+[23:00:54] [Server thread/INFO]: SELFTEST prefab sathub outside 0: parts TC......
+[23:00:54] [Server thread/INFO]: System chat: SELFTEST prefab sathub outside 0: parts TC......
+[23:01:01] [Server thread/INFO]: SELFTEST prefab sathub level 3: parts TCS1....
+[23:01:01] [Server thread/INFO]: System chat: SELFTEST prefab sathub level 3: parts TCS1....
+[23:01:04] [Server thread/INFO]: SELFTEST prefab sathub level 7: parts TCS1B2DF
+[23:01:04] [Server thread/INFO]: System chat: SELFTEST prefab sathub level 7: parts TCS1B2DF
+[23:01:07] [Server thread/INFO]: SELFTEST prefab sathub side 0: parts TCS1B2DF
+[23:01:07] [Server thread/INFO]: System chat: SELFTEST prefab sathub side 0: parts TCS1B2DF
+[23:01:12] [Server thread/INFO]: SELFTEST prefab sathub inside 0: parts TCS1B2DF
+[23:01:12] [Server thread/INFO]: System chat: SELFTEST prefab sathub inside 0: parts TCS1B2DF
+[23:01:15] [Server thread/INFO]: System chat: Set Player838's game mode to Survival Mode
+[23:01:15] [Server thread/INFO]: SELFTEST prefab sathub terminal 0: parts TCS1B2DF
+[23:01:15] [Server thread/INFO]: System chat: SELFTEST prefab sathub terminal 0: parts TCS1B2DF
+[23:01:20] [Server thread/INFO]: SELFTEST prefab bed: block HubBedBlock, use Success[swingSource=SERVER_ONLY, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], respawn point -2006, 231, 1988 (bed at -2006, 231, 1988), set to the bed true
+[23:01:20] [Server thread/INFO]: System chat: SELFTEST prefab bed: block HubBedBlock, use Success[swingSource=SERVER_ONLY, itemContext=ItemContext[wasItemInteraction=true, heldItemTransformedTo=null]], respawn point -2006, 231, 1988 (bed at -2006, 231, 1988), set to the bed true
+[23:01:21] [Server thread/INFO]: System chat: Set Player838's game mode to Spectator Mode
+[23:01:21] [Server thread/INFO]: SIFTEC: GATEWAY built at -2000, 231, 1953 facing north (level 0) for Player838's Company
+[23:01:21] [Server thread/INFO]: SELFTEST prefab sathub gateway placed true Right-click to build the Wormhole Gateway here. Sneak and right-click to turn it
+[23:01:21] [Server thread/INFO]: System chat: SELFTEST prefab sathub gateway placed true Right-click to build the Wormhole Gateway here. Sneak and right-click to turn it
+[23:01:21] [Server thread/INFO]: SELFTEST prefab sathub gateway 0: parts TCS1B2DF
+[23:01:21] [Server thread/INFO]: System chat: SELFTEST prefab sathub gateway 0: parts TCS1B2DF
+[23:01:29] [Server thread/INFO]: SELFTEST prefab sathub gateway 3: parts TCS1B2DF
+[23:01:29] [Server thread/INFO]: System chat: SELFTEST prefab sathub gateway 3: parts TCS1B2DF
+[23:01:32] [Server thread/INFO]: SELFTEST prefab sathub gateway 5: parts TCS1B2DF
+[23:01:32] [Server thread/INFO]: System chat: SELFTEST prefab sathub gateway 5: parts TCS1B2DF
+[23:01:35] [Server thread/INFO]: SELFTEST prefab check: the second company's HUB burners: burner HUB Biomass Burner: gives 0 SU of 6,144 SU, 15 fuel left, grid: 0 of 12,288 SU used, 12,288 SU spare (fuel 15 siftec:biomass, banked 737280 SU-ticks, biomass 180.0 MJ, coal 0.0 MJ, grid capacity 12288.0 SU, produced 0.0 SU, demand 0.0 SU, stored 0 of 0 SU-ticks, boost 0.00, 2 generators, 0 consumers, 0 stores, 2 connectors, tripped false); burner HUB Biomass Burner: gives 0 SU of 6,144 SU, 15 fuel left, grid: 0 of 12,288 SU used, 12,288 SU spare (fuel 15 siftec:biomass, banked 737280 SU-ticks, biomass 180.0 MJ, coal 0.0 MJ, grid capacity 12288.0 SU, produced 0.0 SU, demand 0.0 SU, stored 0 of 0 SU-ticks, boost 0.00, 2 generators, 0 consumers, 0 stores, 2 connectors, tripped false); first company's terminal ticked 7634; terminal ticked 7634, blocks tick here true, entity ticking true, chunk forced true
+[23:01:35] [Server thread/INFO]: System chat: SELFTEST prefab check: the second company's HUB burners: burner HUB Biomass Burner: gives 0 SU of 6,144 SU, 15 fuel left, grid: 0 of 12,288 SU used, 12,288 SU spare (fuel 15 siftec:biomass, banked 737280 SU-ticks, biomass 180.0 MJ, coal 0.0 MJ, grid capacity 12288.0 SU, produced 0.0 SU, demand 0.0 SU, stored 0 of 0 SU-ticks, boost 0.00, 2 generators, 0 consumers, 0 stores, 2 connectors, tripped false); burner HUB Biomass Burner: gives 0 SU of 6,144 SU, 15 fuel left, grid: 0 of 12,288 SU used, 12,288 SU spare (fuel 15 siftec:biomass, banked 737280 SU-ticks, biomass 180.0 MJ, coal 0.0 MJ, grid capacity 12288.0 SU, produced 0.0 SU, demand 0.0 SU, stored 0 of 0 SU-ticks, boost 0.00, 2 generators, 0 consumers, 0 stores, 2 connectors, tripped false); first company's terminal ticked 7634; terminal ticked 7634, blocks tick here true, entity ticking true, chunk forced true
+[23:01:35] [Server thread/INFO]: System chat: Set Player838's game mode to Survival Mode
+[23:01:35] [Server thread/INFO]: System chat: No items were found on player Player838
+[23:01:35] [Server thread/INFO]: SELFTEST tb setup: before HUB Upgrade 1 wearing false (-), tier -1, storage slots 0, upgrade slots 0, backpack items in inventory 0; no backpack yet true
+[23:01:35] [Server thread/INFO]: System chat: SELFTEST tb setup: before HUB Upgrade 1 wearing false (-), tier -1, storage slots 0, upgrade slots 0, backpack items in inventory 0; no backpack yet true
+[23:01:41] [Server thread/INFO]: SIFTEC: gave Player838 a Traveler's Backpack, tier 0
+[23:01:41] [Server thread/INFO]: SELFTEST tb give: after HUB Upgrade 1 wearing true (travelersbackpack:standard), tier 0, storage slots 27, upgrade slots 2, backpack items in inventory 0; exactly one, worn, Leather true
+[23:01:41] [Server thread/INFO]: System chat: SELFTEST tb give: after HUB Upgrade 1 wearing true (travelersbackpack:standard), tier 0, storage slots 27, upgrade slots 2, backpack items in inventory 0; exactly one, worn, Leather true
+[23:01:54] [Server thread/INFO]: SELFTEST tb recipes: Traveler's Backpack recipes left 16 (all upgrades: true []), removed ones present 0; backpack not craftable true
+[23:01:54] [Server thread/INFO]: System chat: SELFTEST tb recipes: Traveler's Backpack recipes left 16 (all upgrades: true []), removed ones present 0; backpack not craftable true
+[23:01:54] [Server thread/INFO]: SELFTEST tb bound: unequip false, swap false, still worn and no backpack item true; place Fail[], no block true; death would drop or place it false; bound true
+[23:01:54] [Server thread/INFO]: System chat: SELFTEST tb bound: unequip false, swap false, still worn and no backpack item true; place Fail[], no block true; death would drop or place it false; bound true
+[23:01:54] [Server thread/INFO]: SIFTEC: unpacked an extra Traveler's Backpack of Player838 (1 stacks)
+[23:01:54] [Server thread/INFO]: SIFTEC: unpacked an extra Traveler's Backpack of Player838 (0 stacks)
+[23:01:54] [Server thread/INFO]: SELFTEST tb strays: own backpack put back on with its gold true; extra backpacks unpacked (emeralds 3) and gone true; wearing true (travelersbackpack:standard), tier 0, storage slots 27, upgrade slots 2, backpack items in inventory 0
+[23:01:54] [Server thread/INFO]: System chat: SELFTEST tb strays: own backpack put back on with its gold true; extra backpacks unpacked (emeralds 3) and gone true; wearing true (travelersbackpack:standard), tier 0, storage slots 27, upgrade slots 2, backpack items in inventory 0
+[23:01:54] [Server thread/INFO]: SIFTEC: moved 2 stacks out of Player838's old backpack rows
+[23:01:54] [Server thread/INFO]: SELFTEST tb migrate: old rows moved into the Traveler's Backpack: diamonds 4, redstone 20, old store gone true; ok true
+[23:01:54] [Server thread/INFO]: System chat: SELFTEST tb migrate: old rows moved into the Traveler's Backpack: diamonds 4, redstone 20, old store gone true; ok true
+[23:01:54] [Server thread/INFO]: SELFTEST tb pay: siftec:iron_rod counted from the backpack 10, taken 4, left in it 6; ok true
+[23:01:54] [Server thread/INFO]: System chat: SELFTEST tb pay: siftec:iron_rod counted from the backpack 10, taken 4, left in it 6; ok true
+[23:01:56] [Server thread/INFO]: SELFTEST tb locked: crafting upgrade needs hub_upgrade_4; before it: craftable false, fits an upgrade slot false; after: craftable true, fits true; ok true (survival true)
+[23:01:56] [Server thread/INFO]: System chat: SELFTEST tb locked: crafting upgrade needs hub_upgrade_4; before it: craftable false, fits an upgrade slot false; after: craftable true, fits true; ok true (survival true)
+[23:01:58] [Server thread/INFO]: SIFTEC: raised Player838's Traveler's Backpack from tier 0 to 1
+[23:01:58] [Server thread/INFO]: SELFTEST tb offline: company reached tier 1 while away; worn tier while away 0, after the join check 1; applied at login true
+[23:01:58] [Server thread/INFO]: System chat: SELFTEST tb offline: company reached tier 1 while away; worn tier while away 0, after the join check 1; applied at login true
+[23:02:00] [Server thread/INFO]: SELFTEST tb upgrade crafting: installed true; wearing true (travelersbackpack:standard), tier 1, storage slots 45, upgrade slots 3, backpack items in inventory 0
+[23:02:00] [Server thread/INFO]: System chat: SELFTEST tb upgrade crafting: installed true; wearing true (travelersbackpack:standard), tier 1, storage slots 45, upgrade slots 3, backpack items in inventory 0
+[23:02:06] [Server thread/INFO]: SIFTEC: raised Player838's Traveler's Backpack from tier 1 to 4
+[23:02:06] [Server thread/INFO]: SELFTEST tb tier 4: company tier 4, wearing true (travelersbackpack:standard), tier 4, storage slots 99, upgrade slots 6, backpack items in inventory 0; raised (never lowered) true
+[23:02:06] [Server thread/INFO]: System chat: SELFTEST tb tier 4: company tier 4, wearing true (travelersbackpack:standard), tier 4, storage slots 99, upgrade slots 6, backpack items in inventory 0; raised (never lowered) true
+[23:02:14] [Server thread/INFO]: System chat: Set Player838's game mode to Spectator Mode
+[23:02:14] [Server thread/INFO]: System chat: Applied effect Night Vision to Player838
+[23:02:14] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:noon
+[23:02:14] [Server thread/INFO]: System chat: Set the weather to clear
+[23:02:14] [Server thread/INFO]: SELFTEST world look at 96.5 201.5 26.5 in minecraft:overworld from 146.0 236.5 -23.0
+[23:02:14] [Server thread/INFO]: System chat: SELFTEST world look at 96.5 201.5 26.5 in minecraft:overworld from 146.0 236.5 -23.0
+[23:02:24] [Server thread/INFO]: SELFTEST world look at -13.5 201.5 16.5 in minecraft:overworld from -10.3 202.7 13.3
+[23:02:24] [Server thread/INFO]: System chat: SELFTEST world look at -13.5 201.5 16.5 in minecraft:overworld from -10.3 202.7 13.3
+[23:02:27] [Server thread/INFO]: SELFTEST world look at -3.5 201.5 16.5 in minecraft:overworld from -0.3 202.7 13.3
+[23:02:27] [Server thread/INFO]: System chat: SELFTEST world look at -3.5 201.5 16.5 in minecraft:overworld from -0.3 202.7 13.3
+[23:02:30] [Server thread/INFO]: SELFTEST world look at 36.5 201.5 16.5 in minecraft:overworld from 39.7 202.7 13.3
+[23:02:30] [Server thread/INFO]: System chat: SELFTEST world look at 36.5 201.5 16.5 in minecraft:overworld from 39.7 202.7 13.3
+[23:02:33] [Server thread/INFO]: SELFTEST world look at 126.5 201.5 16.5 in minecraft:overworld from 129.7 202.7 13.3
+[23:02:33] [Server thread/INFO]: System chat: SELFTEST world look at 126.5 201.5 16.5 in minecraft:overworld from 129.7 202.7 13.3
+[23:02:36] [Server thread/INFO]: SELFTEST world look at 136.5 201.5 16.5 in minecraft:overworld from 139.7 202.7 13.3
+[23:02:36] [Server thread/INFO]: System chat: SELFTEST world look at 136.5 201.5 16.5 in minecraft:overworld from 139.7 202.7 13.3
+[23:02:40] [Server thread/INFO]: SELFTEST world look at 176.5 201.5 16.5 in minecraft:overworld from 179.7 202.7 13.3
+[23:02:40] [Server thread/INFO]: System chat: SELFTEST world look at 176.5 201.5 16.5 in minecraft:overworld from 179.7 202.7 13.3
+[23:02:43] [Server thread/INFO]: SELFTEST world look at 196.5 201.5 16.5 in minecraft:overworld from 199.7 202.7 13.3
+[23:02:43] [Server thread/INFO]: System chat: SELFTEST world look at 196.5 201.5 16.5 in minecraft:overworld from 199.7 202.7 13.3
+[23:02:46] [Server thread/INFO]: SELFTEST world look at -13.5 201.5 26.5 in minecraft:overworld from -10.3 202.7 23.3
+[23:02:46] [Server thread/INFO]: System chat: SELFTEST world look at -13.5 201.5 26.5 in minecraft:overworld from -10.3 202.7 23.3
+[23:02:49] [Server thread/INFO]: SELFTEST world look at 6.5 201.5 26.5 in minecraft:overworld from 9.7 202.7 23.3
+[23:02:49] [Server thread/INFO]: System chat: SELFTEST world look at 6.5 201.5 26.5 in minecraft:overworld from 9.7 202.7 23.3
+[23:02:52] [Server thread/INFO]: SELFTEST world look at 66.5 201.5 26.5 in minecraft:overworld from 69.7 202.7 23.3
+[23:02:52] [Server thread/INFO]: System chat: SELFTEST world look at 66.5 201.5 26.5 in minecraft:overworld from 69.7 202.7 23.3
+[23:02:56] [Server thread/INFO]: SELFTEST world look at 146.5 201.5 26.5 in minecraft:overworld from 149.7 202.7 23.3
+[23:02:56] [Server thread/INFO]: System chat: SELFTEST world look at 146.5 201.5 26.5 in minecraft:overworld from 149.7 202.7 23.3
+[23:02:59] [Server thread/INFO]: SELFTEST world look at 156.5 201.5 26.5 in minecraft:overworld from 159.7 202.7 23.3
+[23:02:59] [Server thread/INFO]: System chat: SELFTEST world look at 156.5 201.5 26.5 in minecraft:overworld from 159.7 202.7 23.3
+[23:03:02] [Server thread/INFO]: SELFTEST world look at 166.5 201.5 26.5 in minecraft:overworld from 169.7 202.7 23.3
+[23:03:02] [Server thread/INFO]: System chat: SELFTEST world look at 166.5 201.5 26.5 in minecraft:overworld from 169.7 202.7 23.3
+[23:03:05] [Server thread/INFO]: SELFTEST world look at 186.5 201.5 26.5 in minecraft:overworld from 189.7 202.7 23.3
+[23:03:05] [Server thread/INFO]: System chat: SELFTEST world look at 186.5 201.5 26.5 in minecraft:overworld from 189.7 202.7 23.3
+[23:03:08] [Server thread/INFO]: SELFTEST world look at 206.5 201.5 26.5 in minecraft:overworld from 209.7 202.7 23.3
+[23:03:08] [Server thread/INFO]: System chat: SELFTEST world look at 206.5 201.5 26.5 in minecraft:overworld from 209.7 202.7 23.3
+[23:03:11] [Server thread/INFO]: SELFTEST world look at -13.5 201.5 36.5 in minecraft:overworld from -10.3 202.7 33.3
+[23:03:11] [Server thread/INFO]: System chat: SELFTEST world look at -13.5 201.5 36.5 in minecraft:overworld from -10.3 202.7 33.3
+[23:03:15] [Server thread/INFO]: SELFTEST world look at -13.5 201.5 46.5 in minecraft:overworld from -10.3 202.7 43.3
+[23:03:15] [Server thread/INFO]: System chat: SELFTEST world look at -13.5 201.5 46.5 in minecraft:overworld from -10.3 202.7 43.3
+[23:03:18] [Server thread/INFO]: SELFTEST world look at 126.5 201.5 46.5 in minecraft:overworld from 129.7 202.7 43.3
+[23:03:18] [Server thread/INFO]: System chat: SELFTEST world look at 126.5 201.5 46.5 in minecraft:overworld from 129.7 202.7 43.3
+[23:03:21] [Server thread/INFO]: SELFTEST world look at 224.5 121.5 -106.5 in minecraft:overworld from 229.4 124.5 -111.4
+[23:03:21] [Server thread/INFO]: System chat: SELFTEST world look at 224.5 121.5 -106.5 in minecraft:overworld from 229.4 124.5 -111.4
+[23:03:21] [Server thread/INFO]: SELFTEST world look node iron Node[x=224, z=-107, type=IRON, purity=NORMAL, y=-2147483648]: iron (tuff patch) at y 120: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 9 fill blocks; node iron_node normal; clump 20/20 blocks: 8 stone, 4 ore, 8 raw
+[23:03:21] [Server thread/INFO]: System chat: SELFTEST world look node iron Node[x=224, z=-107, type=IRON, purity=NORMAL, y=-2147483648]: iron (tuff patch) at y 120: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 9 fill blocks; node iron_node normal; clump 20/20 blocks: 8 stone, 4 ore, 8 raw
+[23:03:31] [Server thread/INFO]: SELFTEST world look at 16.5 63.5 96.5 in minecraft:overworld from 21.4 66.5 91.6
+[23:03:31] [Server thread/INFO]: System chat: SELFTEST world look at 16.5 63.5 96.5 in minecraft:overworld from 21.4 66.5 91.6
+[23:03:31] [Server thread/INFO]: SELFTEST world look node copper Node[x=16, z=96, type=COPPER, purity=NORMAL, y=-2147483648]: copper (granite patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 933 fill blocks; node copper_node normal; clump 18/18 blocks: 6 stone, 6 ore, 6 raw
+[23:03:31] [Server thread/INFO]: System chat: SELFTEST world look node copper Node[x=16, z=96, type=COPPER, purity=NORMAL, y=-2147483648]: copper (granite patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 933 fill blocks; node copper_node normal; clump 18/18 blocks: 6 stone, 6 ore, 6 raw
+[23:03:42] [Server thread/INFO]: SELFTEST world look at 25.5 63.5 -201.5 in minecraft:overworld from 30.4 66.5 -206.4
+[23:03:42] [Server thread/INFO]: System chat: SELFTEST world look at 25.5 63.5 -201.5 in minecraft:overworld from 30.4 66.5 -206.4
+[23:03:42] [Server thread/INFO]: SELFTEST world look node stone Node[x=25, z=-202, type=STONE, purity=NORMAL, y=-2147483648]: calcite (calcite patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 163 fill blocks; node calcite_node normal; clump 16/16 blocks: 16 stone, 0 ore, 0 raw
+[23:03:42] [Server thread/INFO]: System chat: SELFTEST world look node stone Node[x=25, z=-202, type=STONE, purity=NORMAL, y=-2147483648]: calcite (calcite patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 163 fill blocks; node calcite_node normal; clump 16/16 blocks: 16 stone, 0 ore, 0 raw
+[23:03:52] [Server thread/INFO]: SELFTEST world look at 90.5 127.5 -60.5 in minecraft:overworld from 95.4 130.5 -65.4
+[23:03:52] [Server thread/INFO]: System chat: SELFTEST world look at 90.5 127.5 -60.5 in minecraft:overworld from 95.4 130.5 -65.4
+[23:03:52] [Server thread/INFO]: SELFTEST world look node coal Node[x=90, z=-61, type=COAL, purity=NORMAL, y=-2147483648]: coal (stone patch) at y 126: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node coal_node normal; clump 0/18 blocks: 0 stone, 0 ore, 0 raw
+[23:03:52] [Server thread/INFO]: System chat: SELFTEST world look node coal Node[x=90, z=-61, type=COAL, purity=NORMAL, y=-2147483648]: coal (stone patch) at y 126: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node coal_node normal; clump 0/18 blocks: 0 stone, 0 ore, 0 raw
+[23:04:04] [Server thread/INFO]: SELFTEST world look at -107.5 63.5 2268.5 in minecraft:overworld from -102.6 66.5 2263.6
+[23:04:04] [Server thread/INFO]: System chat: SELFTEST world look at -107.5 63.5 2268.5 in minecraft:overworld from -102.6 66.5 2263.6
+[23:04:04] [Server thread/INFO]: SELFTEST world look node oil Node[x=-108, z=2268, type=OIL, purity=PURE, y=-2147483648]: oil (basalt patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 35 fill blocks; node oil_well pure; clump 19/19 blocks: 4 stone, 15 ore, 0 raw
+[23:04:04] [Server thread/INFO]: System chat: SELFTEST world look node oil Node[x=-108, z=2268, type=OIL, purity=PURE, y=-2147483648]: oil (basalt patch) at y 62: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 35 fill blocks; node oil_well pure; clump 19/19 blocks: 4 stone, 15 ore, 0 raw
+[23:04:13] [Server thread/INFO]: SELFTEST world look at 1341.5 32.5 319.5 in minecraft:overworld from 1344.7 33.5 316.3
+[23:04:13] [Server thread/INFO]: System chat: SELFTEST world look at 1341.5 32.5 319.5 in minecraft:overworld from 1344.7 33.5 316.3
+[23:04:13] [Server thread/INFO]: SELFTEST world look node sulfur Node[x=1341, z=319, type=SULFUR, purity=IMPURE, y=13]: sulfur (sulfur patch) at y 31: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node sulfur_node impure; clump 17/17 blocks: 14 stone, 3 ore, 0 raw
+[23:04:13] [Server thread/INFO]: System chat: SELFTEST world look node sulfur Node[x=1341, z=319, type=SULFUR, purity=IMPURE, y=13]: sulfur (sulfur patch) at y 31: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node sulfur_node impure; clump 17/17 blocks: 14 stone, 3 ore, 0 raw
+[23:04:24] [Server thread/INFO]: SELFTEST world look at 218.5 91.5 154.5 in minecraft:the_nether from 223.4 94.5 149.6
+[23:04:24] [Server thread/INFO]: System chat: SELFTEST world look at 218.5 91.5 154.5 in minecraft:the_nether from 223.4 94.5 149.6
+[23:04:24] [Server thread/INFO]: SELFTEST world look node quartz Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648]: quartz (netherrack patch) at y 90: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node quartz_node impure; clump 18/18 blocks: 12 stone, 6 ore, 0 raw
+[23:04:24] [Server thread/INFO]: System chat: SELFTEST world look node quartz Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648]: quartz (netherrack patch) at y 90: 37/37 patch blocks level, 0 above that level, 0 with air or fluid under, 0 fill blocks; node quartz_node impure; clump 18/18 blocks: 12 stone, 6 ore, 0 raw
+[23:04:24] [Server thread/INFO]: System chat: Player838 has made the advancement [We Need to Go Deeper]
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:27] [Worker-Main-2/WARN]: Skipping Entity with id minecraft:piglin_brute
+[23:04:34] [Server thread/INFO]: SELFTEST world look at 798.5 71.5 -738.5 in minecraft:overworld from 802.7 74.0 -742.7
+[23:04:34] [Server thread/INFO]: System chat: SELFTEST world look at 798.5 71.5 -738.5 in minecraft:overworld from 802.7 74.0 -742.7
+[23:04:43] [Server thread/INFO]: SELFTEST world look at 798.5 71.5 -738.5 in minecraft:overworld from 802.7 74.0 -734.3
+[23:04:43] [Server thread/INFO]: System chat: SELFTEST world look at 798.5 71.5 -738.5 in minecraft:overworld from 802.7 74.0 -734.3
+[23:04:51] [Server thread/INFO]: System chat: Removed effect Night Vision from Player838
+[23:04:51] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:noon
+[23:04:52] [Server thread/INFO]: System chat: Marked 4 chunks in minecraft:overworld from [62, 62] to [63, 63] to be force loaded
+[23:04:56] [Server thread/INFO]: System chat: Successfully filled 289 block(s)
+[23:04:56] [Server thread/INFO]: System chat: Changed the block at 1000, 181, 1000
+[23:04:56] [Server thread/INFO]: System chat: Changed the block at 1002, 181, 1000
+[23:04:56] [Server thread/INFO]: System chat: Changed the block at 1004, 181, 1000
+[23:04:56] [Server thread/INFO]: System chat: Teleported Player838 to 1002.500000, 181.000000, 997.600000
+[23:05:06] [Server thread/INFO]: System chat: Teleported Player838 to 1001.300000, 180.600000, 998.300000
+[23:05:10] [Server thread/INFO]: System chat: Teleported Player838 to 1002.500000, 182.000000, 993.500000
+[23:05:13] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:midnight
+[23:05:16] [Server thread/INFO]: System chat: Teleported Player838 to 1002.500000, 181.000000, 997.600000
+[23:05:19] [Server thread/INFO]: System chat: Set Player838's game mode to Survival Mode
+[23:05:19] [Server thread/INFO]: SELFTEST tb death setup: 7 gold and 3 emeralds in the backpack, 2 sticks in the hotbar; wearing true (travelersbackpack:standard), tier 4, storage slots 99, upgrade slots 6, backpack items in inventory 0
+[23:05:19] [Server thread/INFO]: System chat: SELFTEST tb death setup: 7 gold and 3 emeralds in the backpack, 2 sticks in the hotbar; wearing true (travelersbackpack:standard), tier 4, storage slots 99, upgrade slots 6, backpack items in inventory 0
+[23:05:19] [Server thread/INFO]: Player Player838 standing on air - force-sending blocks below
+[23:05:21] [Server thread/INFO]: System chat: Player838 was killed
+[23:05:21] [Server thread/INFO]: Created new backpack backup file for Player838 with unique ID travelersbackpack.standard_13.10.2026-23.05.21.dat
+[23:05:21] [Server thread/INFO]: System chat: Killed Player838
+[23:05:31] [Server thread/INFO]: SELFTEST tb death: respawned by the test false, dead now false; wearing true (travelersbackpack:standard), tier 4, storage slots 99, upgrade slots 6, backpack items in inventory 0; in it gold 7 emerald 3; backpacks on the ground 0, sticks dropped 0; survives death with its contents true
+[23:05:31] [Server thread/INFO]: System chat: SELFTEST tb death: respawned by the test false, dead now false; wearing true (travelersbackpack:standard), tier 4, storage slots 99, upgrade slots 6, backpack items in inventory 0; in it gold 7 emerald 3; backpacks on the ground 0, sticks dropped 0; survives death with its contents true
+[23:05:35] [Server thread/INFO]: System chat: Set Player838's game mode to Creative Mode
+[23:05:35] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:noon
+[23:05:35] [Server thread/INFO]: SELFTEST buildings gun test ready
+[23:05:35] [Server thread/INFO]: System chat: SELFTEST buildings gun test ready
+[23:05:42] [Server thread/INFO]: SIFTEC: building test_building placed at 1100, 181, 998 facing north (44 blocks, 0 refund stacks)
+[23:05:47] [Server thread/INFO]: SIFTEC: building test_building at 1100, 181, 998 dismantled; 0 stacks given back
+[23:05:56] [Server thread/INFO]: SIFTEC: building test_building placed at 1100, 181, 996 facing north (44 blocks, 0 refund stacks)
+[23:05:59] [Server thread/INFO]: System chat: Teleported Player838 to 1100.500000, 181.000000, 1000.500000
+[23:06:03] [Server thread/INFO]: SIFTEC: building test_building at 1100, 181, 996 dismantled; 0 stacks given back
+[23:06:05] [Server thread/INFO]: SELFTEST buildings gun uses: [placed test_building 1100 181 998, dismantled test_building, placed test_building 1100 181 996, dismantled test_building]
+[23:06:05] [Server thread/INFO]: System chat: SELFTEST buildings gun uses: [placed test_building 1100 181 998, dismantled test_building, placed test_building 1100 181 996, dismantled test_building]
+[23:06:05] [Server thread/INFO]: SELFTEST buildings PASS client: the gun built twice and dismantled twice (2 built, 2 dismantled)
+[23:06:05] [Server thread/INFO]: System chat: SELFTEST buildings PASS client: the gun built twice and dismantled twice (2 built, 2 dismantled)
+[23:06:05] [Server thread/INFO]: SELFTEST buildings PASS client: two nudges forward moved it two blocks north (1100, 181, 998 then 1100, 181, 996)
+[23:06:05] [Server thread/INFO]: System chat: SELFTEST buildings PASS client: two nudges forward moved it two blocks north (1100, 181, 998 then 1100, 181, 996)
+[23:06:05] [Server thread/INFO]: SELFTEST buildings client result: 2 passed, 0 failed
+[23:06:05] [Server thread/INFO]: System chat: SELFTEST buildings client result: 2 passed, 0 failed
+[23:06:07] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:noon
+[23:06:08] [Server thread/INFO]: SIFTEC: building portable_miner placed at 1201, 183, 999 facing north (14 blocks, 0 refund stacks)
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view: portable_miner built at 1201, 181, 1000
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view: portable_miner built at 1201, 181, 1000
+[23:06:08] [Server thread/INFO]: SIFTEC: building miner_mk1 placed at 1208, 182, 1000 facing north (81 blocks, 0 refund stacks)
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view: miner_mk1 built at 1207, 181, 1000
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view: miner_mk1 built at 1207, 181, 1000
+[23:06:08] [Server thread/INFO]: SIFTEC: building miner_mk2 placed at 1215, 182, 1000 facing north (89 blocks, 0 refund stacks)
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view: miner_mk2 built at 1214, 181, 1000
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view: miner_mk2 built at 1214, 181, 1000
+[23:06:08] [Server thread/INFO]: SIFTEC: building miner_mk3 placed at 1222, 182, 1000 facing north (98 blocks, 0 refund stacks)
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view: miner_mk3 built at 1221, 181, 1000
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view: miner_mk3 built at 1221, 181, 1000
+[23:06:08] [Server thread/INFO]: SIFTEC: building constructor placed at 1229, 182, 1000 facing north (118 blocks, 0 refund stacks)
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view: constructor built at 1228, 181, 1000
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view: constructor built at 1228, 181, 1000
+[23:06:08] [Server thread/INFO]: SIFTEC: building smelter placed at 1236, 182, 1000 facing north (121 blocks, 0 refund stacks)
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view: smelter built at 1235, 181, 1000
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view: smelter built at 1235, 181, 1000
+[23:06:08] [Server thread/INFO]: SIFTEC: building storage_container placed at 1242, 182, 1000 facing north (43 blocks, 0 refund stacks)
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view: storage_container built at 1241, 181, 1000
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view: storage_container built at 1241, 181, 1000
+[23:06:08] [Server thread/INFO]: SIFTEC: building industrial_storage_container placed at 1247, 182, 1000 facing north (52 blocks, 0 refund stacks)
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view: industrial_storage_container built at 1246, 181, 1000
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view: industrial_storage_container built at 1246, 181, 1000
+[23:06:08] [Server thread/INFO]: SELFTEST buildings_a view 0 ready
+[23:06:08] [Server thread/INFO]: System chat: SELFTEST buildings_a view 0 ready
+[23:06:08] [Server thread/INFO]: Player Player838 standing on air - force-sending blocks below
+[23:06:22] [Server thread/INFO]: SELFTEST buildings_a view 1 ready
+[23:06:22] [Server thread/INFO]: System chat: SELFTEST buildings_a view 1 ready
+[23:06:27] [Server thread/INFO]: SELFTEST buildings_a view 2 ready
+[23:06:27] [Server thread/INFO]: System chat: SELFTEST buildings_a view 2 ready
+[23:06:31] [Server thread/INFO]: SELFTEST buildings_a view 3 ready
+[23:06:31] [Server thread/INFO]: System chat: SELFTEST buildings_a view 3 ready
+[23:06:35] [Server thread/INFO]: System chat: Set minecraft:overworld to time marker minecraft:noon
+[23:06:36] [Server thread/INFO]: SIFTEC: building power_pole_mk1 placed at 1300, 181, 1000 facing north (5 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building biomass_burner placed at 1305, 182, 1000 facing north (37 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building coal_generator placed at 1311, 182, 1000 facing north (137 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building fuel_generator placed at 1318, 182, 1000 facing north (136 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building geothermal_generator placed at 1325, 182, 1000 facing north (123 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building nuclear_power_plant placed at 1333, 182, 1000 facing north (274 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building alien_power_augmenter placed at 1341, 182, 1000 facing north (118 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building power_storage placed at 1347, 182, 1000 facing north (46 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building power_pole_mk2 placed at 1350, 181, 1000 facing north (6 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building power_pole_mk3 placed at 1353, 181, 1000 facing north (7 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building power_tower placed at 1357, 181, 1000 facing north (41 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SIFTEC: building constructor placed at 1364, 182, 1000 facing north (118 blocks, 0 refund stacks)
+[23:06:36] [Server thread/INFO]: SELFTEST power view: 12 power buildings built and wired
+[23:06:36] [Server thread/INFO]: System chat: SELFTEST power view: 12 power buildings built and wired
+[23:06:36] [Server thread/INFO]: SELFTEST power view 0 ready
+[23:06:36] [Server thread/INFO]: System chat: SELFTEST power view 0 ready
+[23:06:51] [Server thread/INFO]: SELFTEST power view 1 ready
+[23:06:51] [Server thread/INFO]: System chat: SELFTEST power view 1 ready
+[23:06:52] [Server thread/INFO]: Player Player838 standing on air - force-sending blocks below
+[23:06:55] [Server thread/INFO]: SELFTEST power view 2 ready
+[23:06:55] [Server thread/INFO]: System chat: SELFTEST power view 2 ready
+[23:07:00] [Server thread/INFO]: Player838 lost connection: Disconnected
+[23:07:00] [Server thread/INFO]: System chat: Player838 left the game
+[23:07:04] [Server thread/INFO]: System chat: Stopping the server
+[23:07:04] [Server thread/INFO]: Stopping server
+[23:07:04] [Server thread/INFO]: Saving players
+[23:07:04] [Server thread/INFO]: Saving worlds
+[23:07:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[23:07:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[23:07:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[23:07:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+EXIT 0
