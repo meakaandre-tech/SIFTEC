@@ -43,10 +43,12 @@ public class ControllerBlockEntity extends BlockEntity {
     public @Nullable BlockPos node;
     /** The game time before which the machines may not start their next recipe (Satisfactory's time per recipe). */
     public long nextCraft;
-    /** How many recipes the building has started (or items a miner has mined), for the status line and the selftests. */
+    /** How many recipes the building has started (or how many times a miner has broken its node), for the status line and the selftests. */
     public long made;
-    /** A miner's progress toward its next item, in items a minute times ticks. */
+    /** The Portable Miner's ticks into breaking its node. */
     public float progress;
+    /** Items a miner has got from its node (every block it broke, with its Fortune). */
+    public long mined;
     /** What a status line says is wrong right now ("" if nothing), as a lang key. */
     public String problem = "";
     public final SimpleContainer input = slots(), output = slots();
@@ -165,6 +167,7 @@ public class ControllerBlockEntity extends BlockEntity {
         view.putLong("NextCraft", nextCraft);
         view.putLong("Made", made);
         view.putFloat("Progress", progress);
+        view.putLong("Mined", mined);
         view.store("Input", ItemStack.OPTIONAL_CODEC, input.getItem(0));
         view.store("Output", ItemStack.OPTIONAL_CODEC, output.getItem(0));
         view.putDouble("Energy", energy);
@@ -190,6 +193,7 @@ public class ControllerBlockEntity extends BlockEntity {
         nextCraft = view.getLongOr("NextCraft", 0L);
         made = view.getLongOr("Made", 0L);
         progress = view.getFloatOr("Progress", 0f);
+        mined = view.getLongOr("Mined", 0L);
         input.setItem(0, view.read("Input", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
         output.setItem(0, view.read("Output", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
         energy = view.getDoubleOr("Energy", 0);

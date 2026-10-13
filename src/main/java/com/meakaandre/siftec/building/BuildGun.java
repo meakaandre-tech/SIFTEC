@@ -2,6 +2,7 @@ package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.prefab.Prefabs;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -97,11 +98,25 @@ public final class BuildGun {
     /** The gun was used (right click): build at the hologram, or in dismantle mode take down the building aimed at. */
     public static void use(ServerPlayer player) {
         if (Companies.isFake(player)) return;
+        act(player);
+    }
+
+    static void act(ServerPlayer player) {
+        act(player, Companies.of(player));
+    }
+
+    /** What a use does, for a player of a company (the selftests use a fake player for their own company). */
+    static void act(ServerPlayer player, Company company) {
         Selection sel = selection(player);
         ServerLevel level = player.level();
         if (sel.dismantle) {
             BlockHitResult hit = aimed(player);
             ControllerBlockEntity controller = hit == null ? null : controllerAt(level, hit.getBlockPos());
+            HubBlockEntity hub = controller != null || hit == null ? null : Prefabs.hubAt(level, hit.getBlockPos());
+            if (hub != null) {
+                takeDownHub(player, hub, company);
+                return;
+            }
             if (controller == null) {
                 player.sendOverlayMessage(Component.translatable("siftec.build_gun.dismantle_aim"));
                 return;
@@ -128,10 +143,58 @@ public final class BuildGun {
             player.sendOverlayMessage(Component.translatable("siftec.prefab.aim", Buildings.RANGE));
             return;
         }
-        Buildings.Check check = Buildings.place(level, p, Companies.of(player), player.getInventory(), player.hasInfiniteMaterials());
-        if (check.ok()) used("placed " + def.id() + " " + p.anchor().getX() + " " + p.anchor().getY() + " " + p.anchor().getZ());
-        player.sendOverlayMessage(check.ok() ? Component.translatable("siftec.prefab.placed", def.name()) : check.message());
-        if (!check.ok()) player.containerMenu.broadcastFullState();
+        boolean ok;
+        Component message;
+        if (def.hub()) {
+            // the HUB goes down as its structure (prefab/Prefabs.java), built in parts as its upgrades are done; its 20 Raw
+            // Iron is taken from the player and comes back when it is dismantled
+            Prefabs.Check check = Prefabs.place(level, hubSpot(p), company, player);
+            ok = check.ok();
+            message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
+        } else {
+            Buildings.Check check = Buildings.place(level, p, company, player.getInventory(), player.hasInfiniteMaterials());
+            ok = check.ok();
+            message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
+        }
+        if (ok) used("placed " + def.id() + " " + p.anchor().getX() + " " + p.anchor().getY() + " " + p.anchor().getZ());
+        // the HUB says itself what land it claimed
+        if (!ok || !def.hub()) player.sendOverlayMessage(message);
+        if (!ok) player.containerMenu.broadcastFullState();
+    }
+
+    /** Dismantles a HUB for a player of its company: its 20 Raw Iron and everything in it come back. False if refused. */
+    static boolean takeDownHub(ServerPlayer player, HubBlockEntity hub, Company company) {
+        Component refused = player.hasInfiniteMaterials() || hub.companyId.isEmpty() || company.id.equals(hub.companyId) ? null
+            : Component.translatable("siftec.build_gun.not_yours");
+        if (refused != null) {
+            player.sendOverlayMessage(refused);
+            return false;
+        }
+        ServerLevel level = player.level();
+        Prefabs.give(level, player, hub.getBlockPos(), Prefabs.dismantle(level, hub));
+        used("dismantled hub");
+        player.sendOverlayMessage(Component.translatable("siftec.build_gun.dismantled", Component.translatable("block.siftec.hub")));
+        return true;
+    }
+
+    /** Where the HUB structure goes for a Build Gun placement: the same front edge and facing (it cannot be flipped). */
+    public static Prefabs.Spot hubSpot(Placement p) {
+        return new Prefabs.Spot(Prefabs.Kind.HUB, p.anchor(), p.facing());
+    }
+
+    /** The server's verdict on the HUB at a spot: the structure's own check, the land rules, and the 20 Raw Iron. */
+    static Prefabs.Check hubCheck(ServerPlayer player, Placement p) {
+        return hubCheck(player, p, Companies.of(player));
+    }
+
+    static Prefabs.Check hubCheck(ServerPlayer player, Placement p, Company company) {
+        boolean creative = player.hasInfiniteMaterials();
+        Prefabs.Check check = Prefabs.check(player.level(), hubSpot(p), company, creative);
+        if (check.ok() && !creative) {
+            var missing = Prefabs.missing(player, Prefabs.hubCost());
+            if (missing != null) check.fail("siftec.prefab.cost", missing.count(), missing.icon().getHoverName());
+        }
+        return check;
     }
 
     public static @Nullable ControllerBlockEntity controllerAt(Level level, BlockPos pos) {
@@ -142,9 +205,13 @@ public final class BuildGun {
 
     /** Null if the player may take the building down: their company's, nobody's, or they are in creative. */
     static @Nullable Component mayDismantle(ServerPlayer player, ControllerBlockEntity controller) {
-        if (player.hasInfiniteMaterials() || controller.companyId.isEmpty()) return null;
+        return mayDismantle(player, controller.companyId);
+    }
+
+    static @Nullable Component mayDismantle(ServerPlayer player, String companyId) {
+        if (player.hasInfiniteMaterials() || companyId == null || companyId.isEmpty()) return null;
         Company mine = Companies.of(player);
-        if (mine.id.equals(controller.companyId)) return null;
+        if (mine.id.equals(companyId)) return null;
         return Component.translatable("siftec.build_gun.not_yours");
     }
 
@@ -162,9 +229,16 @@ public final class BuildGun {
             if (sel.dismantle) {
                 BlockHitResult hit = aimed(player);
                 ControllerBlockEntity controller = hit == null ? null : controllerAt(player.level(), hit.getBlockPos());
+                HubBlockEntity hub = controller != null || hit == null ? null : Prefabs.hubAt(player.level(), hit.getBlockPos());
                 Placement p = controller == null ? null : controller.placement();
                 BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
-                if (p == null || t == null) {
+                if (hub != null) {
+                    AABB box = Prefabs.bounds(new Prefabs.Spot(Prefabs.Kind.HUB, hub.anchor, hub.facing));
+                    Component refused = mayDismantle(player, hub.companyId);
+                    view = BuildGunPayloads.View.of(refused == null, refused != null ? refused
+                            : Component.translatable("siftec.build_gun.dismantle_hint", Component.translatable("block.siftec.hub")),
+                        BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1, box.maxY - 1, box.maxZ - 1));
+                } else if (p == null || t == null) {
                     view = BuildGunPayloads.View.of(false, Component.translatable("siftec.build_gun.dismantle_aim"), null, null);
                 } else {
                     AABB box = p.bounds(t);
@@ -175,8 +249,13 @@ public final class BuildGun {
             } else {
                 Placement p = sel.spot;
                 if (p == null || !reachable(player, p)) continue;
-                Buildings.Check check = Buildings.check(player.level(), p, Companies.of(player), player.getInventory(), player.hasInfiniteMaterials());
-                view = BuildGunPayloads.View.of(check.ok(), check.message(), p.anchor(), p.anchor());
+                if (p.def().hub()) {
+                    Prefabs.Check check = hubCheck(player, p);
+                    view = BuildGunPayloads.View.of(check.ok(), check.message(), p.anchor(), p.anchor());
+                } else {
+                    Buildings.Check check = Buildings.check(player.level(), p, Companies.of(player), player.getInventory(), player.hasInfiniteMaterials());
+                    view = BuildGunPayloads.View.of(check.ok(), check.message(), p.anchor(), p.anchor());
+                }
             }
             if (view.equals(SENT.get(player.getUUID()))) continue;
             SENT.put(player.getUUID(), view);

@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
 
-/** What a miner standing on a node needs. */
+/** The node under a block standing on one (the Resource Well Extractor's). Miners really mine their node: see building.BuildingLogic. */
 public final class Mining {
     private Mining() {
     }
@@ -27,31 +27,5 @@ public final class Mining {
         else if (below.getBlock() instanceof DepletedNodeBlock depleted) type = depleted.look.type();
         else return Optional.empty();
         return NodeMap.near(server, pos.getX(), pos.getZ(), 0, type);
-    }
-
-    /** Adds one item to the output slot. False if it is full. */
-    public static boolean produce(OutputContainer output, Node node) {
-        Item item = com.meakaandre.siftec.node.NodeLook.of(node).output();
-        if (item == Items.AIR) return false;
-        ItemStack stack = output.get();
-        if (stack.isEmpty()) {
-            output.set(new ItemStack(item));
-            return true;
-        }
-        if (!stack.is(item) || stack.getCount() >= stack.getMaxStackSize()) return false;
-        stack.grow(1);
-        return true;
-    }
-
-    public static boolean isFull(OutputContainer output) {
-        ItemStack stack = output.get();
-        return !stack.isEmpty() && stack.getCount() >= stack.getMaxStackSize();
-    }
-
-    public static void give(OutputContainer output, Player player) {
-        ItemStack stack = output.get();
-        if (stack.isEmpty()) return;
-        output.set(ItemStack.EMPTY);
-        player.getInventory().placeItemBackInInventory(stack, net.minecraft.util.Prediction.SERVER_ONLY);
     }
 }

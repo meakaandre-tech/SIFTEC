@@ -88,9 +88,9 @@ public final class Buildings {
             }
             BuildingDef def = new BuildingDef(o.get("id").getAsString(), Category.of(o.get("category").getAsString()), List.copyOf(cost),
                 o.has("unlock") ? o.get("unlock").getAsString() : "", o.has("dev") && o.get("dev").getAsBoolean(), node, nodeCell,
-                o.has("logic") ? o.get("logic").getAsString() : "", o.has("su") ? o.get("su").getAsInt() : 0, o.has("rate") ? o.get("rate").getAsInt() : 0,
+                o.has("logic") ? o.get("logic").getAsString() : "", o.has("su") ? o.get("su").getAsInt() : 0, o.has("break") ? o.get("break").getAsInt() : 0, o.has("fortune") ? o.get("fortune").getAsInt() : 0,
                 o.has("power") ? o.get("power").getAsString() : "", o.has("mw") ? o.get("mw").getAsDouble() : 0, o.has("water") ? o.get("water").getAsDouble() : 0,
-                o.has("lines") ? o.get("lines").getAsInt() : 0, cell(o, "vent"));
+                o.has("lines") ? o.get("lines").getAsInt() : 0, cell(o, "vent"), o.has("prefab") ? o.get("prefab").getAsString() : "");
             DEFS.put(def.id(), def);
         }
     }

@@ -785,30 +785,35 @@ DISABLED += TB_BACKPACKS + TB_TIER_UPGRADES + TB_SLEEPING_BAGS
 # The last field says how the building works (building/BuildingLogic.java):
 #   logic   "basin" (a Press or Mixer over a Basin, its recipe set by the controller's filter and paced to the recipe's
 #           Satisfactory time), "smelter" (an Encased Fan blasting through lava onto a Depot, fed by the controller),
-#           "miner" (a Drill over a node: the ore comes out at Satisfactory's rate for its Mk and the node's purity),
-#           "portable_miner" (the same with no power, dropping the ore in front), "storage" (Item Vaults)
+#           "miner" (a Drill over a node that really mines it: it breaks the node block once it has regrown, and what the
+#           block drops is the output), "portable_miner" (the same with no power, dropping it in front), "storage" (Item Vaults)
 #           "power" (work package 6: generators, Power Storage, poles and towers; what it does is its "power" below)
 #   su      the SU the building draws (Satisfactory's MW at 1 MW = 204.8 SU; the Power tab); its New Age motors give exactly that
 #   power   its part in the power grid (building/BuildingPower.java): "pole", "storage", "augmenter", or a generator kind,
 #           "biomass", "coal", "fuel", "geothermal", "nuclear"; mw what a generator gives, water the m3 a minute of water it
 #           takes at full load, lines how many wires its connector takes (1 if not given), vent the open cell a
 #           Geothermal Generator stands over a geyser with
-#   rate    a miner's items a minute on a normal node (impure half, pure double)
+#   break   a miner's ticks to break the regrown node (the Mk's speed; the node's purity sets how fast it regrows)
+#   fortune a miner's built-in Fortune (vanilla's ore formula, extended past III)
 #   node    the cell (x, y, z in the Build Gun frame) that stands on the node: the template leaves it out
+#   prefab  a structure the Build Gun puts down through prefab/Prefabs.java instead of a structure template ("hub": the
+#           HUB, built in parts as its upgrades are done; its cost comes back when it is dismantled)
 MW = 204.8
 BUILD_TABS = ("production", "power", "logistics", "foundations", "special")
 BUILDINGS = [
+    # every player spawns with the Build Gun and builds the HUB with it first: Satisfactory's 20 Iron Ore (Raw Iron)
+    ("hub", "The HUB", "special", BUILD_COSTS["The HUB"], "", False, {"prefab": "hub"}),
     ("test_building", "Test Building", "production", "2 Iron Sheet, 4 Iron Rod", "", True, {}),
     ("test_miner", "Test Miner", "production", "2 Iron Sheet", "", True, {"node": (0, 0, 1)}),
     # work package 5
     ("portable_miner", "Portable Miner", "production", EQUIPMENT_COSTS["Portable Miner"], "hub_upgrade_1", False,
-     {"logic": "portable_miner", "rate": 20, "node": (0, 0, 1)}),
+     {"logic": "portable_miner", "break": 40, "node": (0, 0, 1)}),
     ("miner_mk1", "Miner Mk.1", "production", BUILD_COSTS["Miner Mk.1"], "hub_upgrade_5", False,
-     {"logic": "miner", "su": round(5 * MW), "rate": 60, "node": (0, 0, 2)}),
+     {"logic": "miner", "su": round(5 * MW), "break": 10, "node": (0, 0, 2)}),
     ("miner_mk2", "Miner Mk.2", "production", BUILD_COSTS["Miner Mk.2"], "advanced_steel_production", False,
-     {"logic": "miner", "su": round(15 * MW), "rate": 120, "node": (0, 0, 2)}),
+     {"logic": "miner", "su": round(15 * MW), "break": 5, "fortune": 3, "node": (0, 0, 2)}),
     ("miner_mk3", "Miner Mk.3", "production", BUILD_COSTS["Miner Mk.3"], "leading_edge_production", False,
-     {"logic": "miner", "su": round(45 * MW), "rate": 240, "node": (0, 0, 2)}),
+     {"logic": "miner", "su": round(45 * MW), "break": 2, "fortune": 5, "node": (0, 0, 2)}),
     ("smelter", "Smelter", "production", BUILD_COSTS["Smelter"], "hub_upgrade_2", False, {"logic": "smelter", "su": round(4 * MW)}),
     ("constructor", "Constructor", "production", BUILD_COSTS["Constructor"], "hub_upgrade_3", False, {"logic": "basin", "su": round(4 * MW)}),
     ("storage_container", "Storage Container", "logistics", BUILD_COSTS["Storage Container"], "hub_upgrade_5", False, {"logic": "storage"}),

@@ -59,7 +59,7 @@ public final class BuildGunClient {
     private static @Nullable Placement frozen, shown;
     private static BuildGunPayloads.@Nullable Select sent;
     private static BuildGunPayloads.@Nullable View verdict;
-    private static int ticks, lastColor;
+    private static int ticks, lastColor, lastRebuild;
     private static List<BlockPos> shape = List.of(), blocked = List.of();
     private static Component localMessage = Component.empty();
     private static boolean localOk;
@@ -209,7 +209,7 @@ public final class BuildGunClient {
         BuildingDef def = current(mc);
         Placement spot = null;
         if (!dismantle && def != null) {
-            spot = nudge && frozen != null && frozen.def() == def ? frozen : BuildGun.aim(player, def, turns, flip);
+            spot = nudge && frozen != null && frozen.def() == def ? frozen : BuildGun.aim(player, def, turns, flip && !def.hub());
         }
         send(def, spot);
         Outliner outliner = Outliner.getInstance();
@@ -237,13 +237,23 @@ public final class BuildGunClient {
                 : Component.translatable("siftec.build_gun.overlay", tab(), def.name(), Component.translatable("siftec.prefab.aim", Buildings.RANGE)));
             return;
         }
-        boolean rebuild = !spot.equals(shown) || ticks % 10 == 0;
+        // the HUB is a big structure: its ground and space are checked at most every third tick, and twice a second
+        boolean rebuild = def.hub() ? (!spot.equals(shown) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10 : !spot.equals(shown) || ticks % 10 == 0;
         if (rebuild) {
-            Buildings.Check check = Buildings.check(mc.level, spot, null, player.getInventory(), player.hasInfiniteMaterials());
-            shape = cells(spot);
-            blocked = new ArrayList<>(check.blocked);
-            localOk = check.ok();
-            localMessage = check.message();
+            lastRebuild = ticks;
+            if (def.hub()) {
+                com.meakaandre.siftec.prefab.Prefabs.Check check = com.meakaandre.siftec.prefab.Prefabs.check(mc.level, BuildGun.hubSpot(spot), null, false);
+                shape = hubCells(spot);
+                blocked = new ArrayList<>(check.blocked);
+                localOk = check.ok();
+                localMessage = check.message();
+            } else {
+                Buildings.Check check = Buildings.check(mc.level, spot, null, player.getInventory(), player.hasInfiniteMaterials());
+                shape = cells(spot);
+                blocked = new ArrayList<>(check.blocked);
+                localOk = check.ok();
+                localMessage = check.message();
+            }
         }
         BuildGunPayloads.View v = verdict;
         boolean same = v != null && v.min().equals(spot.anchor());
@@ -277,6 +287,19 @@ public final class BuildGunClient {
         List<BlockPos> out = new ArrayList<>();
         if (t == null) return out;
         for (BuildingTemplate.Cell cell : t.members) out.add(p.at(cell));
+        return out;
+    }
+
+    /** Every block the HUB will ever have, in the world. */
+    private static List<BlockPos> hubCells(Placement p) {
+        com.meakaandre.siftec.prefab.Prefabs.Spot spot = BuildGun.hubSpot(p);
+        com.meakaandre.siftec.prefab.Template t = spot.kind().template();
+        List<BlockPos> out = new ArrayList<>();
+        for (long key : t.keys()) {
+            if (!t.solidAtAnyLevel(key)) continue;
+            BlockPos local = BlockPos.of(key);
+            out.add(spot.at(local.getX(), local.getY(), local.getZ()));
+        }
         return out;
     }
 

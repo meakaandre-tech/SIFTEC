@@ -40,11 +40,11 @@ import java.util.List;
  * {@link BasinPace} keeps the Press to Satisfactory's time per recipe. The ports work on the Basin.</li>
  * <li>smelter: an Encased Fan blowing through lava onto a Depot. The controller takes ore in at its input port, puts
  * it on the Depot a few at a time with Satisfactory's time per item, and takes the ingots off into its output.</li>
- * <li>miner: a Drill pointing down at the node. While the Drill turns, ore comes out at Satisfactory's rate for the
- * miner's Mk and the node's purity, into the controller's output, which the output port puts on a belt. The Drill
- * itself never breaks the node.</li>
- * <li>portable_miner: the same at the Portable Miner's rate, with no power, the ore dropping on the ground in front
- * (it stops while a full stack lies there).</li>
+ * <li>miner: a Drill pointing down at the node. The Drill really mines it: it breaks the node block once it has
+ * regrown, at its Mk's speed and with its built-in Fortune, and what the block drops goes into the controller's output,
+ * which the output port puts on a belt. The node regrows at its purity's rate.</li>
+ * <li>portable_miner: the same with no power and no Fortune, slower, the ore dropping on the ground in front (it stops
+ * while a full stack lies there).</li>
  * <li>storage: Item Vaults; nothing to run.</li>
  * <li>power: the generators, Power Storage, poles and towers ({@link BuildingPower}).</li>
  * </ul>
@@ -56,8 +56,6 @@ public final class BuildingLogic {
     public static final float MOTOR_RPM = 64;
     /** Items the Smelter puts on its Depot at once (the Depot holds one stack; a few at a time keeps the gaps short). */
     static final int SMELTER_BATCH = 4;
-    /** Ticks in a minute: rates are items a minute. */
-    private static final float MINUTE = 1200f;
 
     private BuildingLogic() {
     }
@@ -163,48 +161,155 @@ public final class BuildingLogic {
         return null;
     }
 
-    /** Items a minute this miner gets from its node right now (0 without a node). */
-    public static float rate(Level level, ControllerBlockEntity c) {
-        BuildingDef def = c.def();
-        NodeAt node = nodeAt(level, c.node);
-        return def == null || node == null ? 0 : def.rate() * node.purity().multiplier;
-    }
+    // ------------------------------------------------------------------------------------------------ miners
 
+    /**
+     * A miner really mines its node. Its Drill breaks the node block once it has regrown (Create's own breaking, with the
+     * cracks showing; the Mk sets how fast, {@link BuildingDef#breakTicks}), and what the block drops is the output: the
+     * node's loot, with the miner's built-in Fortune ({@link BuildingDef#fortune}) by vanilla's ore formula. The node
+     * then goes depleted and regrows at its purity's rate ({@link com.meakaandre.siftec.node.NodeRegrowth}), so purity caps
+     * every miner. Nothing is ever made without a block being broken. The Portable Miner has no power: its controller
+     * breaks the node the same way at its own speed, the ore dropping on the ground in front.
+     */
     private static void mine(ServerLevel level, ControllerBlockEntity c, BuildingDef def, boolean powered) {
         NodeAt node = nodeAt(level, c.node);
         if (node == null) {
             c.problem = "siftec.building.no_node";
             return;
         }
-        if (powered && !turning(level, cell(c, create("mechanical_drill")))) {
+        BlockPos drillPos = cell(c, create("mechanical_drill"));
+        if (powered && !turning(level, drillPos)) {
             c.problem = "siftec.building.stopped";
             return;
         }
-        Item item = node.look().output();
-        if (item == Items.AIR) return;
-        ItemStack one = new ItemStack(item);
-        if (powered ? !fits(c.output.getItem(0), one) : groundFull(level, c, item)) {
+        if (!room(level, c)) {
             c.problem = "siftec.building.full";
             return;
         }
         c.problem = "";
-        c.progress += def.rate() * node.purity().multiplier;
-        if (c.progress < MINUTE) return;
-        c.progress -= MINUTE;
-        c.made++;
+        BlockState state = level.getBlockState(c.node);
+        boolean regrown = state.getBlock() instanceof NodeBlock;
         if (powered) {
-            ItemStack out = c.output.getItem(0);
-            if (out.isEmpty()) c.output.setItem(0, one);
-            else out.grow(1);
-            c.output.setChanged();
-        } else {
-            BlockPos at = dropSpot(c);
-            if (at == null) return;
-            ItemEntity entity = new ItemEntity(level, at.getX() + 0.5, at.getY() + 0.1, at.getZ() + 0.5, one);
-            entity.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
-            level.addFreshEntity(entity);
+            // the Drill only looks for a block to break every half second after its last one: a regrown node is started at once
+            if (regrown && drillPos != null && level.getBlockEntity(drillPos) instanceof com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity drill
+                && ((com.meakaandre.siftec.mixin.building.BreakerAccessor) drill).siftec$ticksUntilNextProgress() == -1) {
+                drill.destroyNextTick();
+            }
+            return;
         }
+        // the Portable Miner: ten crack stages over its break time, as a Drill shows them
+        if (!regrown) {
+            c.progress = 0;
+            return;
+        }
+        int total = Math.max(1, def.breakTicks());
+        c.progress++;
+        int stage = (int) (c.progress * 10 / total);
+        level.destroyBlockProgress(breakerId(c), c.node, stage >= 10 ? -1 : stage);
+        if (c.progress < total) return;
+        c.progress = 0;
+        mined(level, c, state);
+    }
+
+    /** True if the miner can take one more break's drops (its output slot, or the ground in front of a Portable Miner). */
+    static boolean room(Level level, ControllerBlockEntity c) {
+        NodeAt node = nodeAt(level, c.node);
+        BuildingDef def = c.def();
+        if (node == null || def == null) return false;
+        Item item = node.look().output();
+        if (def.logic().equals("portable_miner")) return item == Items.AIR || !groundFull(level, c, item);
+        ItemStack out = c.output.getItem(0);
+        // a break gives at most Fortune + 1 of the node's drop
+        return out.isEmpty() || out.is(item) && out.getCount() + def.fortune() + 1 <= out.getMaxStackSize();
+    }
+
+    private static int breakerId(ControllerBlockEntity c) {
+        return -1000 - (int) (c.getBlockPos().asLong() & 0x3FFFFFFF);
+    }
+
+    /** The miner a Drill belongs to, if it is the Drill of a miner and points at that miner's node. */
+    public static @Nullable ControllerBlockEntity minerOf(Level level, BlockPos drill, @Nullable BlockPos breaking) {
+        BlockPos controller = BuildingIndex.controllerOf(level, drill);
+        if (controller == null || !(level.getBlockEntity(controller) instanceof ControllerBlockEntity c)) return null;
+        BuildingDef def = c.def();
+        if (def == null || !def.logic().equals("miner") || c.node == null || breaking != null && !breaking.equals(c.node)) return null;
+        return c;
+    }
+
+    /** Whether a miner's Drill may break its node now: the node has regrown and the output has room. */
+    public static boolean mayBreak(Level level, ControllerBlockEntity c, BlockState state) {
+        return state.getBlock() instanceof NodeBlock node && !node.look.fluid() && room(level, c);
+    }
+
+    /**
+     * The speed a miner's Drill breaks its node at, in Create's terms (it takes 10 stages, each waiting hardness / speed
+     * ticks and moving speed / hardness stages), chosen so the whole break takes the Mk's {@link BuildingDef#breakTicks}.
+     */
+    public static float breakSpeed(ControllerBlockEntity c, float hardness) {
+        BuildingDef def = c.def();
+        int ticks = def == null ? 10 : Math.max(1, def.breakTicks());
+        float h = Math.max(hardness, 0.01f);
+        if (ticks >= 10) {
+            int wait = ticks / 10 - 1;
+            return wait <= 0 ? h * 1.5f : h / (wait + 0.5f);
+        }
+        int step = (10 + ticks - 1) / ticks;
+        return h * (step + 0.5f);
+    }
+
+    /**
+     * The node block was broken by the miner: what it drops (its loot, mined with the miner's Fortune) goes to the output
+     * (on the ground in front of a Portable Miner), and the node is taken out, so it goes depleted and regrows.
+     */
+    public static void mined(ServerLevel level, ControllerBlockEntity c, BlockState state) {
+        BlockPos pos = c.node;
+        BuildingDef def = c.def();
+        if (pos == null || def == null) return;
+        List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(state, level, pos, null, null, tool(level, def.fortune()));
+        level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+        level.destroyBlockProgress(breakerId(c), pos, -1);
+        level.levelEvent(net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, pos, net.minecraft.world.level.block.Block.getId(state));
+        int n = 0;
+        for (ItemStack drop : drops) {
+            if (drop.isEmpty()) continue;
+            n += drop.getCount();
+            if (def.logic().equals("portable_miner")) {
+                BlockPos at = dropSpot(c);
+                if (at == null) continue;
+                ItemEntity entity = new ItemEntity(level, at.getX() + 0.5, at.getY() + 0.1, at.getZ() + 0.5, drop);
+                entity.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                level.addFreshEntity(entity);
+            } else {
+                ItemStack out = c.output.getItem(0);
+                if (out.isEmpty()) {
+                    c.output.setItem(0, drop);
+                } else if (ItemStack.isSameItemSameComponents(out, drop)) {
+                    int fit = Math.min(drop.getCount(), out.getMaxStackSize() - out.getCount());
+                    out.grow(fit);
+                    drop.shrink(fit);
+                }
+                // nothing is lost: what does not fit (another drop of a node with two) goes out of the output port's front
+                if (!drop.isEmpty()) {
+                    BlockPos at = c.placement() == null ? c.getBlockPos() : c.placement().at(0, 0, -1);
+                    net.minecraft.world.Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, drop);
+                }
+                c.output.setChanged();
+            }
+        }
+        c.made++;
+        c.mined += n;
         c.setChanged();
+    }
+
+    /** The pickaxe a miner mines with: one that can break any node, with the miner's built-in Fortune. */
+    private static ItemStack tool(ServerLevel level, int fortune) {
+        ItemStack pick = new ItemStack(Items.NETHERITE_PICKAXE);
+        if (fortune > 0) {
+            var holder = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.FORTUNE);
+            pick.enchant(holder, fortune);
+        }
+        return pick;
     }
 
     private static boolean fits(ItemStack slot, ItemStack one) {
@@ -275,7 +380,9 @@ public final class BuildingLogic {
             case "miner", "portable_miner" -> {
                 NodeAt node = nodeAt(level, c.node);
                 parts.add(node == null ? Component.translatable("siftec.building.no_node")
-                    : Component.translatable("siftec.building.node", NodeBlock.label(node.look().type(), node.purity()), formatRate(rate(level, c))));
+                    : Component.translatable("siftec.building.node", NodeBlock.label(node.look().type(), node.purity()), formatRate(def.breakTicks() / 20f)));
+                if (def.fortune() > 0) parts.add(Component.translatable("siftec.building.fortune", def.fortune()));
+                if (node != null) parts.add(Component.translatable("siftec.building.mined", c.mined));
             }
             case "storage" -> {
                 int used = 0, total = 0;

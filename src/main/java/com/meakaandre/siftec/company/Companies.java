@@ -30,10 +30,6 @@ public final class Companies {
             CompanyData data = CompanyData.get(player.level().getServer());
             of(player);
             SpeedCap.recompute(player.level().getServer());
-            if (data.gotHub().add(player.getUUID().toString())) {
-                data.setDirty();
-                player.getInventory().placeItemBackInInventory(new ItemStack(ModBlocks.HUB.get()), Prediction.SERVER_ONLY);
-            }
         });
         // valuable changes (payments, the cloud, points) are written within a few seconds instead of at the next autosave
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {

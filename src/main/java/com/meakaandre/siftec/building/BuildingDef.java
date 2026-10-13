@@ -14,19 +14,28 @@ import java.util.List;
  * template leaves the node's cell ({@code nodeCell}, in the Build Gun frame) out, so the node stays where it is.
  * <p>
  * {@code logic} says how it works ({@link BuildingLogic}: "basin", "smelter", "miner", "portable_miner", "storage", or
- * "" for none), {@code su} the SU it draws (its New Age motors give exactly that), and {@code rate} a miner's items a
- * minute on a normal node.
+ * "" for none), {@code su} the SU it draws (its New Age motors give exactly that). A miner really mines its node:
+ * {@code breakTicks} is how long its drill takes to break the node once it has regrown (its Mk's speed; the node's
+ * purity sets the regrowth) and {@code fortune} its built-in Fortune (Mk.2 III, Mk.3 V).
  * <p>
  * Power ({@link BuildingPower}): {@code power} is its part in the grid ("" for a plain consumer or nothing, "pole",
  * "storage", "augmenter", or a generator: "biomass", "coal", "fuel", "geothermal", "nuclear"), {@code mw} the
  * megawatts a generator gives, {@code water} the m3 of water a minute it takes at full load, {@code lines} how many
  * wires its connector takes, and {@code vent} the open cell a Geothermal Generator must stand over a geyser with.
+ * <p>
+ * {@code prefab} names a structure the Build Gun puts down through {@link com.meakaandre.siftec.prefab.Prefabs} instead
+ * of a structure template ("hub": the HUB), or is "" for an ordinary building.
  */
 public record BuildingDef(String id, Category category, List<Milestone.Cost> cost, String unlock, boolean dev, boolean node,
-                          int @Nullable [] nodeCell, String logic, int su, int rate, String power, double mw, double water, int lines,
-                          int @Nullable [] vent) {
+                          int @Nullable [] nodeCell, String logic, int su, int breakTicks, int fortune, String power, double mw, double water, int lines,
+                          int @Nullable [] vent, String prefab) {
     public BuildingDef(String id, Category category, List<Milestone.Cost> cost, String unlock, boolean dev, boolean node) {
-        this(id, category, cost, unlock, dev, node, node ? new int[]{0, 0, 1} : null, "", 0, 0, "", 0, 0, 0, null);
+        this(id, category, cost, unlock, dev, node, node ? new int[]{0, 0, 1} : null, "", 0, 0, 0, "", 0, 0, 0, null, "");
+    }
+
+    /** The HUB: put down by the Build Gun through {@link com.meakaandre.siftec.prefab.Prefabs}. */
+    public boolean hub() {
+        return prefab.equals("hub");
     }
 
     public String nameKey() {

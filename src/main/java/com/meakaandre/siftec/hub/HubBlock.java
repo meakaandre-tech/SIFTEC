@@ -70,6 +70,11 @@ public class HubBlock extends Block implements EntityBlock {
             return InteractionResult.SUCCESS;
         }
         Component name = Component.translatable(gateway ? "block.siftec.wormhole_gateway" : "block.siftec.hub");
+        if (player.isShiftKeyDown() && !gateway) {
+            // the HUB is a Build Gun building: only the gun's dismantle mode takes it down
+            server.sendOverlayMessage(Component.translatable("siftec.prefab.hub_gun"));
+            return InteractionResult.SUCCESS;
+        }
         if (player.isShiftKeyDown()) {
             long now = level.getGameTime();
             long[] armed = ARMED.get(player.getUUID());
@@ -84,8 +89,6 @@ public class HubBlock extends Block implements EntityBlock {
             server.sendOverlayMessage(Component.translatable("siftec.prefab.dismantled", name));
             return InteractionResult.SUCCESS;
         }
-        // the HUB hands every member of its company a Build Gun, as Satisfactory's HUB does
-        if (!gateway && hub.prefab) Prefabs.giveBuildGun(server);
         HubMenu.open(server, mine, pos, gateway);
         return InteractionResult.SUCCESS;
     }
