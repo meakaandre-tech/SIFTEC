@@ -283,7 +283,9 @@ def storage(depth, vaults):
 TURBINE = "siftec:turbine[facing={}]"
 COIL = "create_new_age:generator_coil[axis=x]"
 TANK = "create:fluid_tank"
-R_CASING, R_GLASS = "create_new_age:reactor_casing", "create_new_age:reactor_glass"
+# New Age's own reactor casing and glass draw as missing textures in the Fabric 26.3 port (its connected-texture models),
+# so the plant is built from Create's casings until that is fixed
+R_CASING, R_GLASS = "create:railway_casing", "create:framed_glass"
 
 
 def pole(height, column):

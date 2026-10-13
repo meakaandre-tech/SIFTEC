@@ -490,7 +490,7 @@ public final class PowerTests {
         }
         MONITORS.add(new Monitor() {
             int ticks, step, waited, allBefore;
-            boolean settled;
+            boolean settled, reported;
 
             ControllerBlockEntity at(BlockPos anchor, String id) {
                 return controllerAt(level, anchor, id);
@@ -511,11 +511,14 @@ public final class PowerTests {
                         ticks = 0;
                         return false;
                     }
-                    if (!restart && ticks == 60) {
-                        report(source, "chain all loaded: " + ends());
+                    // and until the line is one grid: its new chunks' connectors have to tick once to join (up to a minute)
+                    ControllerBlockEntity far = at(farAt, "constructor");
+                    if (!restart && !reported && (far != null && far.powered || ticks >= 1200)) {
+                        reported = true;
+                        report(source, "chain all loaded (after " + ticks / 20 + " s): " + ends());
                         for (int i : middle) level.setChunkForced(t[i].getX() >> 4, t[i].getZ() >> 4, false);
                     }
-                    if (ticks < (restart ? 100 : 61)) return false;
+                    if (restart ? ticks < 100 : !reported) return false;
                     if (middleAnyLoaded(level, t) && ++waited < 2400) return false;
                     settled = true;
                     for (int i : middle) LOADS.put(ChunkPos.pack(t[i]), 0);

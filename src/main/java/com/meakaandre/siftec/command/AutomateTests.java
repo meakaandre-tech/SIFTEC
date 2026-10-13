@@ -95,7 +95,7 @@ public final class AutomateTests {
             assembly(source, level, at.east(4), "siftec:object_scanner");
             assembly(source, level, at.east(4), "siftec:gas_mask");
             workshop(source, level, at.west(4));
-            poles(source, level, at.south(6).above(24));
+            poles(source, level, new BlockPos(x, 250, z + 6));
         } catch (RuntimeException e) {
             report(source, "FAILED with " + e);
             Siftec.LOGGER.error("automate selftest", e);
@@ -241,6 +241,7 @@ public final class AutomateTests {
      */
     private static void poles(CommandSourceStack source, ServerLevel level, BlockPos at) {
         BlockPos a = at, b = at.east(10), far = at.east(50);
+        for (BlockPos p : List.of(a, b, far)) level.getChunk(p.getX() >> 4, p.getZ() >> 4);
         var pa = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", a, Direction.SOUTH);
         var pb = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", b, Direction.SOUTH);
         var pf = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", far, Direction.SOUTH);
