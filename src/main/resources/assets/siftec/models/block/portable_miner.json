@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/cross",
-  "textures": {
-    "cross": "siftec:block/portable_miner_side",
-    "particle": "siftec:block/portable_miner_side"
-  }
-}

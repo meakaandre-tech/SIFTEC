@@ -28,7 +28,6 @@ def item_def(name, model, tint=None):
 
 lang = {
     "itemGroup.siftec": "SIFTEC",
-    "block.siftec.portable_miner": "Portable Miner",
     "item.siftec.node_scanner": "Node Scanner",
     "item.siftec.raw_bauxite": "Raw Bauxite",
     "item.siftec.sam": "SAM",
@@ -261,13 +260,12 @@ for style, (name, tex) in PREFAB.items():
     else:
         write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": tex}})
 ROT = (("north", 0), ("east", 90), ("south", 180), ("west", 270))
-lang.update({"block.siftec.hub_bed": "HUB Bunk", "block.siftec.craft_bench": "Craft Bench", "block.siftec.personal_storage": "Personal Storage Box",
-             "block.siftec.hub_burner": "HUB Burner"})
+lang.update({"block.siftec.hub_bed": "HUB Bunk", "block.siftec.personal_storage": "Personal Storage Box",
+             "block.siftec.hub_burner": "HUB Biomass Burner"})
 write(f"{A}/blockstates/hub_bed.json", {"variants": {f"facing={d},part={part}": ({"model": f"minecraft:block/orange_bed_{part}", "y": y} if y else {"model": f"minecraft:block/orange_bed_{part}"})
                                                      for d, y in ROT for part in ("foot", "head")}})
-write(f"{A}/blockstates/craft_bench.json", {"variants": {"": {"model": "minecraft:block/crafting_table"}}})
 write(f"{A}/blockstates/personal_storage.json", {"variants": {"": {"model": "minecraft:block/barrel"}}})
-# the built-in burners look like the HUB Engine they are
+# the built-in Biomass Burners borrow the HUB Engine's look until they have their own
 write(f"{A}/blockstates/hub_burner.json", {"variants": {f"facing={d}": ({"model": "siftec:block/hub_engine", "y": y} if y else {"model": "siftec:block/hub_engine"}) for d, y in ROT}})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "beds.json"), {"replace": False, "values": ["siftec:hub_bed"]})
 lang.update({
@@ -289,6 +287,10 @@ lang.update({
     "siftec.prefab.part": "Part of the %s: sneak and use its terminal twice to pick up the whole structure",
     "siftec.claim.hub_too_close": "Too close to another company's land: a claiming HUB must be more than %s chunks from another company's HUB",
     "siftec.claim.hub_extra": "HUB placed. Your company's first HUB already holds its land, so this one claims nothing",
+    "siftec.prefab.cost": "Building the HUB takes %s %s from your inventory",
+    "siftec.prefab.build_gun": "The HUB gave you a Build Gun",
+    "siftec.prefab.welcome": "You have a HUB: hold it and right-click the ground to build it (it takes 20 Raw Iron). It gives you the Build Gun",
+    "siftec.burner.fuel": "The HUB's Biomass Burners burn leaves, logs, Biomass and Solid Biofuel",
 })
 lang["siftec.sift.closed"] = "The Sift is closed to you until your company finishes Wormhole Phase 5"
 PRESERVE_ICONS = {"pickled_tomato": ("Pickled Tomato", 0xC84030), "pickled_onion": ("Pickled Onion", 0xD8C8A8), "pickled_cabbage": ("Pickled Cabbage", 0x90B850),
@@ -318,15 +320,6 @@ write(f"{A}/blockstates/speed_governor.json", {"variants": {
     "axis=z": {"model": "create:block/gearshift/block", "x": 90, "y": 180}}})
 item_def("speed_governor", "create:block/gearshift/item")
 
-write(f"{A}/blockstates/portable_miner.json", {"variants": {"": {"model": "siftec:block/portable_miner"}}})
-def box(frm, to, tex):
-    return {"from": frm, "to": to, "faces": {f: {"texture": tex} for f in ("north", "south", "east", "west", "up", "down")}}
-write(f"{A}/models/block/portable_miner.json", {"parent": "minecraft:block/block", "textures": {
-    "particle": "create:block/andesite_casing", "body": "create:block/andesite_casing", "drill": "minecraft:block/iron_block"},
-    "elements": [box([3, 6, 3], [13, 14, 13], "#body"), box([6, 0, 6], [10, 6, 10], "#drill"),
-                 box([3, 0, 3], [5, 6, 5], "#drill"), box([11, 0, 3], [13, 6, 5], "#drill"),
-                 box([3, 0, 11], [5, 6, 13], "#drill"), box([11, 0, 11], [13, 6, 13], "#drill")]})
-item_def("portable_miner", "siftec:block/portable_miner")
 
 # plain items
 for name, tex in {"node_scanner": "minecraft:item/recovery_compass_16", "raw_bauxite": "minecraft:item/brick",
@@ -597,7 +590,7 @@ built = recipes.build()
 SOURCES = {"createdieselgenerators:crude_oil": ["createdieselgenerators:pumpjack_crank", "createdieselgenerators:pumpjack_bearing"],
            "createdieselgenerators:diesel": ["createdieselgenerators:distillation_controller", "createdieselgenerators:crude_oil"],
            "createdieselgenerators:biodiesel": ["siftec:solid_biofuel", "siftec:recipe/mixing/liquid_biofuel"],
-           "siftec:nitrogen": ["siftec:resource_well_extractor"], "siftec:sam": ["siftec:portable_miner"], "siftec:raw_bauxite": ["siftec:portable_miner"],
+           "siftec:nitrogen": ["siftec:resource_well_extractor"], "siftec:sam": ["siftec:building/portable_miner"], "siftec:raw_bauxite": ["siftec:building/portable_miner"],
            "#c:ingots/steel": ["cgs:steel_ingot"]}
 for ore in ("iron", "copper", "zinc", "gold"):
     SOURCES[f"create:crushed_raw_{ore}"] = [C + "crushing_wheel"]
@@ -632,6 +625,10 @@ for path, body in built.items():
             SOURCES[o] = sorted(inputs_of(body)) + ["siftec:recipe/" + path]
 for path, mid in data["recipe_locks"].items():
     lock_of["siftec:recipe/" + path.split(":", 1)[1]] = mid
+# the Build Gun's buildings count as what unlocks them (a node's resource needs a miner on the node)
+for _b in content.BUILDINGS:
+    if _b[4]:
+        lock_of["siftec:building/" + _b[0]] = _b[4]
 
 
 def needs_of(things, seen=None):
@@ -691,7 +688,8 @@ write(f"{D}/loot_table/blocks/equipment_workshop.json", {"type": "minecraft:bloc
       "entries": [{"type": "minecraft:item", "name": "siftec:equipment_workshop"}]}]})
 # ---- Build Gun and its buildings (building/BuildGun.java, building/Buildings.java)
 data["buildings"] = []
-for bid, bname, tab, cost, unlock, dev in content.BUILDINGS:
+LOGICS = {"basin", "smelter", "miner", "portable_miner", "storage"}
+for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if tab not in content.BUILD_TABS:
         raise SystemExit(f"building {bid}: unknown Build Gun tab {tab!r}")
     if unlock and unlock not in by_id:
@@ -703,9 +701,29 @@ for bid, bname, tab, cost, unlock, dev in content.BUILDINGS:
     b = {"id": bid, "category": tab, "cost": [{"item": c, "count": n} for c, n in parsed]}
     if unlock: b["unlock"] = unlock
     if dev: b["dev"] = True
-    if bid in content.NODE_BUILDINGS: b["node"] = True
+    if bid in content.NODE_BUILDINGS:
+        b["node"] = True
+        b["node_cell"] = list(extra["node"])
+    if extra.get("logic"):
+        if extra["logic"] not in LOGICS:
+            raise SystemExit(f"building {bid}: unknown logic {extra['logic']!r}")
+        b["logic"] = extra["logic"]
+    for k in ("su", "rate"):
+        if k in extra: b[k] = extra[k]
     data["buildings"].append(b)
     lang[f"siftec.building.{bid}"] = bname
+# Satisfactory's time for each machine recipe a building paces (building/MachineTimes.java), in ticks, and the Smelter's
+# time per item for the vanilla smelting its fan runs
+data["machine_ticks"] = {}
+for path, body in sorted(built.items()):
+    if path in recipes.SATISFACTORY and body["type"] in ("create:compacting", "create:mixing") and "processing_time" in body:
+        data["machine_ticks"]["siftec:" + path] = body["processing_time"]
+data["smelter_ticks"] = {}
+for key, name, building, alt, secs, ins, outs, unlock in content.sat_recipes():
+    if building == "Smelter" and name in ("Iron Ingot", "Copper Ingot"):
+        (k, n, a), = ins
+        data["smelter_ticks"][recipes.item(n)] = round(secs * 20 / a)
+data["hub_burner"] = {"su": content.HUB_BURNER_SU, "fuel": content.BURNER_FUEL}
 lang["item.siftec.build_gun"] = "Build Gun"
 item_def("build_gun", "create:item/handheld_worldshaper/item")
 lang.update({"block.siftec.building_controller": "Building Controller", "block.siftec.building_port": "Building Port",
@@ -734,7 +752,27 @@ lang.update({
     "siftec.build_gun.building": "building",
     "siftec.building.controller": "%s",
     "siftec.building.unknown": "Unknown building %s",
+    "siftec.building.status": "%s: %s",
+    "siftec.building.made": "%s made",
+    "siftec.building.su": "draws %s SU",
+    "siftec.building.filter": "makes %s",
+    "siftec.building.no_filter": "right-click it with an item to pick what it makes",
+    "siftec.building.filter_set": "The %s makes %s now",
+    "siftec.building.filter_cleared": "The %s's recipe filter is cleared",
+    "siftec.building.filter_refused": "The %s cannot make that",
+    "siftec.building.node": "on %s, %s a minute",
+    "siftec.building.no_node": "no node under it",
+    "siftec.building.full": "output full",
+    "siftec.building.stopped": "not turning",
+    "siftec.building.storage": "%s of %s slots used",
+    "block.siftec.building_motor": "Building Motor",
 })
+# the motor inside each powered building (a stand-in for Create: New Age's electric motor, work package 6)
+write(f"{A}/models/block/building_motor.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
+    "top": "create:block/gearbox", "bottom": "create:block/gearbox", "side": "create:block/andesite_casing"}})
+write(f"{A}/blockstates/building_motor.json", {"variants": {f"facing={d}": {"model": "siftec:block/building_motor", **turn}
+      for d, turn in {"up": {}, "down": {"x": 180}, "north": {"x": 90}, "south": {"x": 90, "y": 180}, "east": {"x": 90, "y": 90}, "west": {"x": 90, "y": 270}}.items()}})
+item_def("building_motor", "siftec:block/building_motor")
 # the controller: a control panel; the ports: a casing with a coloured face pointing out (Andre draws the real ones)
 write(f"{A}/blockstates/building_controller.json", {"variants": {f"facing={d}": ({"model": "siftec:block/building_controller", "y": y} if y else {"model": "siftec:block/building_controller"}) for d, y in ROT}})
 write(f"{A}/models/block/building_controller.json", {"parent": "minecraft:block/cube", "textures": {"particle": "create:block/brass_casing",
@@ -811,7 +849,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # machines drop themselves
-for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "radar_tower", "furnace_engine", "hub_engine", "geyser_engine", "claim_marker", "portable_miner", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage", "speed_governor"):
+for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "radar_tower", "furnace_engine", "hub_engine", "geyser_engine", "claim_marker", "resource_well_extractor", "dimensional_depot", "power_pole", "power_tower", "power_storage", "speed_governor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -819,12 +857,12 @@ for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:portable_miner", "siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:furnace_engine", "siftec:hub_engine", "siftec:landing_pad", "siftec:radar_tower", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop", "siftec:uranium_ore"]
+      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:power_pole", "siftec:power_tower", "siftec:power_storage", "siftec:speed_governor", "siftec:furnace_engine", "siftec:hub_engine", "siftec:landing_pad", "siftec:radar_tower", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:geyser_engine", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop", "siftec:uranium_ore"]
       + sorted(f"siftec:{b}" for b in NODE_IDS if b != "oil_well" and DEPOSIT[b[:-len("_node")]][3])})
 # Create's contraptions never move what has to stay put: the HUB and Gateway shells, claim markers, patches and nodes.
 # (Drills skip patches, depleted and fluid nodes, which are unbreakable; a node that can be mined is drilled and grows back.)
 write(os.path.join(ROOT, "data", "create", "tags", "block", "non_movable.json"), {"replace": False, "values":
-      ["siftec:hub", "siftec:wormhole_gateway"] + [f"siftec:prefab_{k}" for k in PREFAB] + ["siftec:hub_bed", "siftec:craft_bench", "siftec:personal_storage",
+      ["siftec:hub", "siftec:wormhole_gateway"] + [f"siftec:prefab_{k}" for k in PREFAB] + ["siftec:hub_bed", "siftec:personal_storage",
        "siftec:hub_burner", "siftec:claim_marker"] + [f"siftec:{k}_patch" for k in STONE] + sorted(f"siftec:{b}" for b in NODE_IDS)
       + sorted(f"siftec:{b}_depleted" for b in NODE_IDS if b != "oil_well" and DEPOSIT[b[:-len("_node")]][3])})
 
@@ -838,7 +876,7 @@ def has(kind, name):
 FRONTED = {"hub", "mam", "awesome_shop", "resource_well_extractor", "converter",
            "particle_accelerator", "furnace_engine", "hub_engine", "geyser_engine", "power_storage", "crash_site_block"}
 # drawn as a post or a tripod on a clear background: shown as two crossed planes, like a flower
-CROSSED = {"portable_miner", "power_pole", "power_tower"}
+CROSSED = {"power_pole", "power_tower"}
 # blocks that turn to face whoever placed them; the Crash Site Pod is set down by world generation, so it does not
 TURNS = FRONTED - {"crash_site_block"}
 # these share a block class with one that turns, so they have the same facing, though nothing on them shows it
@@ -847,7 +885,7 @@ for bid in ("wormhole_gateway", "awesome_sink"):
 for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "block")) if f.endswith("_side.png")} if os.path.isdir(os.path.join(TEX, "block")) else []):
     if bid in SLUG_MODELS:
         continue  # the slugs have their own model (above)
-    if bid == "speed_governor" or bid.endswith("_node") or bid in NODE_IDS or bid == "node_rock" or bid.startswith("miner_mk"):
+    if bid == "speed_governor" or bid.endswith("_node") or bid in NODE_IDS or bid == "node_rock" or bid.startswith("miner_mk") or bid == "portable_miner":
         continue  # the governor keeps Create's gearshift model; nodes look like ore blocks; old node and miner art is unused
     t = lambda face: f"siftec:block/{bid}_{face}"
     if bid in CROSSED:

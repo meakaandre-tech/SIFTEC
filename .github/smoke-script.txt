@@ -288,7 +288,7 @@ key F1
 cmd siftec worldtest buildgun
 sleep 4
 keydown Control_L
-scroll 5
+sh xdotool click 5
 keyup Control_L
 sleep 3
 shot
@@ -321,3 +321,16 @@ key u
 sleep 2
 cmd siftec worldtest buildgun check
 sleep 2
+cmd time set noon
+cmd siftec worldtest buildings_a view 0
+sleep 15
+shot
+cmd siftec worldtest buildings_a view 1
+sleep 4
+shot
+cmd siftec worldtest buildings_a view 2
+sleep 4
+shot
+cmd siftec worldtest buildings_a view 3
+sleep 4
+shot

@@ -197,7 +197,7 @@ TOOLBOXES = [C + c + "_toolbox" for c in "white orange magenta light_blue yellow
 MILESTONES = [
     (0, "hub_upgrade_1", "HUB Upgrade 1", "10 Iron Rod", "0:00",
      "Portable Miner, Wrench and Goggles, a Traveler's Backpack for every member (Leather: 27 slots)",
-     ["siftec:portable_miner", C + "wrench", C + "goggles", C + "mechanical_drill"], ["backpack"]),
+     [C + "wrench", C + "goggles", C + "mechanical_drill"], ["backpack"]),
     (0, "hub_upgrade_2", "HUB Upgrade 2", "20 Iron Rod, 10 Iron Sheet", "0:00",
      "Smelter (Encased Fan), Wire and Cable, the first HUB Engine, copper nodes on the scanner",
      [C + "encased_fan", C + "nozzle", "siftec:wire", "siftec:cable", "siftec:power_line", "siftec:hub_engine"], ["scanner:copper"]),
@@ -758,13 +758,40 @@ DISABLED += TB_BACKPACKS + TB_TIER_UPGRADES + TB_SLEEPING_BAGS
 # MAM node that unlocks it ("" = from the start), and whether it is a dev building (only in creative). Each has a
 # structure template, src/main/resources/data/siftec/structure/building/<id>.nbt: built in game and saved with a
 # Structure Block, or written by tools/structures.py. Work packages 5 and 9 add the real buildings here.
+# The last field says how the building works (building/BuildingLogic.java):
+#   logic   "basin" (a Press or Mixer over a Basin, its recipe set by the controller's filter and paced to the recipe's
+#           Satisfactory time), "smelter" (an Encased Fan blasting through lava onto a Depot, fed by the controller),
+#           "miner" (a Drill over a node: the ore comes out at Satisfactory's rate for its Mk and the node's purity),
+#           "portable_miner" (the same with no power, dropping the ore in front), "storage" (Item Vaults)
+#   su      the SU the building draws (Satisfactory's MW at 1 MW = 204.8 SU; the Power tab); its motor gives exactly that
+#   rate    a miner's items a minute on a normal node (impure half, pure double)
+#   node    the cell (x, y, z in the Build Gun frame) that stands on the node: the template leaves it out
+MW = 204.8
 BUILD_TABS = ("production", "power", "logistics", "foundations", "special")
 BUILDINGS = [
-    ("test_building", "Test Building", "production", "2 Iron Sheet, 4 Iron Rod", "", True),
-    ("test_miner", "Test Miner", "production", "2 Iron Sheet", "", True),
+    ("test_building", "Test Building", "production", "2 Iron Sheet, 4 Iron Rod", "", True, {}),
+    ("test_miner", "Test Miner", "production", "2 Iron Sheet", "", True, {"node": (0, 0, 1)}),
+    # work package 5
+    ("portable_miner", "Portable Miner", "production", EQUIPMENT_COSTS["Portable Miner"], "hub_upgrade_1", False,
+     {"logic": "portable_miner", "rate": 20, "node": (0, 0, 1)}),
+    ("miner_mk1", "Miner Mk.1", "production", BUILD_COSTS["Miner Mk.1"], "hub_upgrade_5", False,
+     {"logic": "miner", "su": round(5 * MW), "rate": 60, "node": (0, 0, 2)}),
+    ("miner_mk2", "Miner Mk.2", "production", BUILD_COSTS["Miner Mk.2"], "advanced_steel_production", False,
+     {"logic": "miner", "su": round(15 * MW), "rate": 120, "node": (0, 0, 2)}),
+    ("miner_mk3", "Miner Mk.3", "production", BUILD_COSTS["Miner Mk.3"], "leading_edge_production", False,
+     {"logic": "miner", "su": round(45 * MW), "rate": 240, "node": (0, 0, 2)}),
+    ("smelter", "Smelter", "production", BUILD_COSTS["Smelter"], "hub_upgrade_2", False, {"logic": "smelter", "su": round(4 * MW)}),
+    ("constructor", "Constructor", "production", BUILD_COSTS["Constructor"], "hub_upgrade_3", False, {"logic": "basin", "su": round(4 * MW)}),
+    ("storage_container", "Storage Container", "logistics", BUILD_COSTS["Storage Container"], "hub_upgrade_5", False, {"logic": "storage"}),
+    ("industrial_storage_container", "Industrial Storage Container", "logistics", BUILD_COSTS["Industrial Storage Container"], "logistics_mk3", False,
+     {"logic": "storage"}),
 ]
 # Buildings that stand over a resource node and can only go down once its clump is mined (the miners, extractors)
-NODE_BUILDINGS = {"test_miner"}
+NODE_BUILDINGS = {b[0] for b in BUILDINGS if "node" in b[6]}
+# The HUB's own Biomass Burners (Satisfactory's HUB Biomass Burners, 30 MW each) and what they burn: Satisfactory's
+# energy (MJ) burnt at 30 MW, so a leaf lasts half a second and Biomass six. Ticks per item.
+HUB_BURNER_SU = round(30 * MW)
+BURNER_FUEL = {"#minecraft:leaves": 10, "#minecraft:logs": 67, "siftec:biomass": 120, "siftec:solid_biofuel": 300}
 
 
 # ---------------------------------------------------------------------------------------------------

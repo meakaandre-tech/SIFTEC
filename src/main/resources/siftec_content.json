@@ -620,7 +620,6 @@
       ],
       "seconds": 0,
       "items": [
-        "siftec:portable_miner",
         "create:wrench",
         "create:goggles",
         "create:mechanical_drill"
@@ -6687,19 +6686,6 @@
   ],
   "workshop": [
     {
-      "item": "siftec:portable_miner",
-      "cost": [
-        {
-          "item": "create:iron_sheet",
-          "count": 2
-        },
-        {
-          "item": "siftec:iron_rod",
-          "count": 4
-        }
-      ]
-    },
-    {
       "item": "siftec:node_scanner",
       "cost": [
         {
@@ -6730,15 +6716,6 @@
         {
           "item": "siftec:wire",
           "count": 1500
-        }
-      ]
-    },
-    {
-      "item": "siftec:hub",
-      "cost": [
-        {
-          "item": "minecraft:raw_iron",
-          "count": 20
         }
       ]
     },
@@ -8236,7 +8213,412 @@
         }
       ],
       "dev": true,
-      "node": true
+      "node": true,
+      "node_cell": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "portable_miner",
+      "category": "production",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 4
+        }
+      ],
+      "unlock": "hub_upgrade_1",
+      "node": true,
+      "node_cell": [
+        0,
+        0,
+        1
+      ],
+      "logic": "portable_miner",
+      "rate": 20
+    },
+    {
+      "id": "miner_mk1",
+      "category": "production",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 12
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 4
+        },
+        {
+          "item": "#siftec:stones",
+          "count": 10
+        }
+      ],
+      "unlock": "hub_upgrade_5",
+      "node": true,
+      "node_cell": [
+        0,
+        0,
+        2
+      ],
+      "logic": "miner",
+      "su": 1024,
+      "rate": 60
+    },
+    {
+      "id": "miner_mk2",
+      "category": "production",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 4
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 8
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 10
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 20
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 10
+        }
+      ],
+      "unlock": "advanced_steel_production",
+      "node": true,
+      "node_cell": [
+        0,
+        0,
+        2
+      ],
+      "logic": "miner",
+      "su": 3072,
+      "rate": 120
+    },
+    {
+      "id": "miner_mk3",
+      "category": "production",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 6
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 12
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 50
+        },
+        {
+          "item": "siftec:supercomputer",
+          "count": 5
+        },
+        {
+          "item": "siftec:fused_modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:turbo_motor",
+          "count": 3
+        }
+      ],
+      "unlock": "leading_edge_production",
+      "node": true,
+      "node_cell": [
+        0,
+        0,
+        2
+      ],
+      "logic": "miner",
+      "su": 9216,
+      "rate": 240
+    },
+    {
+      "id": "smelter",
+      "category": "production",
+      "cost": [
+        {
+          "item": "siftec:iron_rod",
+          "count": 5
+        },
+        {
+          "item": "siftec:wire",
+          "count": 8
+        }
+      ],
+      "unlock": "hub_upgrade_2",
+      "logic": "smelter",
+      "su": 819
+    },
+    {
+      "id": "constructor",
+      "category": "production",
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 2
+        },
+        {
+          "item": "siftec:cable",
+          "count": 8
+        }
+      ],
+      "unlock": "hub_upgrade_3",
+      "logic": "basin",
+      "su": 819
+    },
+    {
+      "id": "storage_container",
+      "category": "logistics",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 10
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 10
+        }
+      ],
+      "unlock": "hub_upgrade_5",
+      "logic": "storage"
+    },
+    {
+      "id": "industrial_storage_container",
+      "category": "logistics",
+      "cost": [
+        {
+          "item": "siftec:steel_beam",
+          "count": 20
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 20
+        }
+      ],
+      "unlock": "logistics_mk3",
+      "logic": "storage"
     }
-  ]
+  ],
+  "machine_ticks": {
+    "siftec:compacting/constructor/alien_dna_capsule": 120,
+    "siftec:compacting/constructor/aluminum_beam": 160,
+    "siftec:compacting/constructor/aluminum_casing": 40,
+    "siftec:compacting/constructor/aluminum_rod": 160,
+    "siftec:compacting/constructor/biocoal": 160,
+    "siftec:compacting/constructor/biomass_alien_protein": 80,
+    "siftec:compacting/constructor/biomass_leaves": 100,
+    "siftec:compacting/constructor/biomass_mycelia": 80,
+    "siftec:compacting/constructor/biomass_wood": 80,
+    "siftec:compacting/constructor/cable": 40,
+    "siftec:compacting/constructor/cast_screw": 480,
+    "siftec:compacting/constructor/caterium_wire": 80,
+    "siftec:compacting/constructor/charcoal": 80,
+    "siftec:compacting/constructor/copper_powder": 120,
+    "siftec:compacting/constructor/copper_sheet": 120,
+    "siftec:compacting/constructor/empty_canister": 80,
+    "siftec:compacting/constructor/empty_fluid_tank": 20,
+    "siftec:compacting/constructor/ficsite_trigon": 120,
+    "siftec:compacting/constructor/hatcher_protein": 60,
+    "siftec:compacting/constructor/hog_protein": 60,
+    "siftec:compacting/constructor/iron_pipe": 240,
+    "siftec:compacting/constructor/iron_plate": 120,
+    "siftec:compacting/constructor/iron_rebar": 80,
+    "siftec:compacting/constructor/iron_rod": 80,
+    "siftec:compacting/constructor/iron_wire": 480,
+    "siftec:compacting/constructor/quartz_crystal": 160,
+    "siftec:compacting/constructor/quickwire": 100,
+    "siftec:compacting/constructor/reanimated_sam": 40,
+    "siftec:compacting/constructor/screw": 120,
+    "siftec:compacting/constructor/silica": 160,
+    "siftec:compacting/constructor/solid_biofuel": 80,
+    "siftec:compacting/constructor/spitter_protein": 60,
+    "siftec:compacting/constructor/steel_beam": 80,
+    "siftec:compacting/constructor/steel_canister": 120,
+    "siftec:compacting/constructor/steel_pipe": 120,
+    "siftec:compacting/constructor/steel_rod": 100,
+    "siftec:compacting/constructor/steel_screw": 240,
+    "siftec:compacting/constructor/stinger_protein": 60,
+    "siftec:compacting/constructor/wire": 80,
+    "siftec:compacting/smelter/pure_aluminum_ingot": 40,
+    "siftec:mixing/assembler/adhered_iron_plate": 320,
+    "siftec:mixing/assembler/ai_limiter": 240,
+    "siftec:mixing/assembler/alclad_aluminum_sheet": 120,
+    "siftec:mixing/assembler/alclad_casing": 160,
+    "siftec:mixing/assembler/assembly_director_system": 1600,
+    "siftec:mixing/assembler/automated_wiring": 480,
+    "siftec:mixing/assembler/black_powder": 80,
+    "siftec:mixing/assembler/bolted_frame": 480,
+    "siftec:mixing/assembler/bolted_iron_plate": 240,
+    "siftec:mixing/assembler/caterium_circuit_board": 960,
+    "siftec:mixing/assembler/cheap_silica": 160,
+    "siftec:mixing/assembler/circuit_board": 160,
+    "siftec:mixing/assembler/coated_iron_canister": 80,
+    "siftec:mixing/assembler/coated_iron_plate": 160,
+    "siftec:mixing/assembler/compacted_coal": 240,
+    "siftec:mixing/assembler/copper_rotor": 320,
+    "siftec:mixing/assembler/crystal_computer": 720,
+    "siftec:mixing/assembler/electric_motor": 320,
+    "siftec:mixing/assembler/electrode_circuit_board": 240,
+    "siftec:mixing/assembler/electromagnetic_connection_rod": 300,
+    "siftec:mixing/assembler/electromagnetic_control_rod": 600,
+    "siftec:mixing/assembler/encased_industrial_beam": 200,
+    "siftec:mixing/assembler/encased_industrial_pipe": 300,
+    "siftec:mixing/assembler/encased_plutonium_cell": 240,
+    "siftec:mixing/assembler/fabric": 80,
+    "siftec:mixing/assembler/fine_black_powder": 160,
+    "siftec:mixing/assembler/fused_quickwire": 160,
+    "siftec:mixing/assembler/fused_wire": 400,
+    "siftec:mixing/assembler/heat_exchanger": 120,
+    "siftec:mixing/assembler/heat_sink": 160,
+    "siftec:mixing/assembler/insulated_cable": 240,
+    "siftec:mixing/assembler/magnetic_field_generator": 2400,
+    "siftec:mixing/assembler/modular_frame": 1200,
+    "siftec:mixing/assembler/motor": 240,
+    "siftec:mixing/assembler/oc_supercomputer": 400,
+    "siftec:mixing/assembler/plastic_ai_limiter": 300,
+    "siftec:mixing/assembler/plutonium_fuel_unit": 2400,
+    "siftec:mixing/assembler/pressure_conversion_cube": 1200,
+    "siftec:mixing/assembler/quickwire_cable": 480,
+    "siftec:mixing/assembler/quickwire_stator": 300,
+    "siftec:mixing/assembler/reinforced_iron_plate": 240,
+    "siftec:mixing/assembler/rotor": 300,
+    "siftec:mixing/assembler/shatter_rebar": 240,
+    "siftec:mixing/assembler/silicon_circuit_board": 480,
+    "siftec:mixing/assembler/smart_plating": 600,
+    "siftec:mixing/assembler/stator": 240,
+    "siftec:mixing/assembler/steel_rotor": 240,
+    "siftec:mixing/assembler/steeled_frame": 1200,
+    "siftec:mixing/assembler/stitched_iron_plate": 640,
+    "siftec:mixing/assembler/stun_rebar": 120,
+    "siftec:mixing/assembler/versatile_framework": 480,
+    "siftec:mixing/blender/battery": 60,
+    "siftec:mixing/blender/biochemical_sculptor": 2400,
+    "siftec:mixing/blender/cooling_device": 480,
+    "siftec:mixing/blender/cooling_system": 200,
+    "siftec:mixing/blender/diluted_fuel": 120,
+    "siftec:mixing/blender/distilled_silica": 120,
+    "siftec:mixing/blender/encased_uranium_cell": 240,
+    "siftec:mixing/blender/fertile_uranium": 240,
+    "siftec:mixing/blender/fused_modular_frame": 800,
+    "siftec:mixing/blender/heat_fused_frame": 400,
+    "siftec:mixing/blender/instant_scrap": 120,
+    "siftec:mixing/blender/nitric_acid": 120,
+    "siftec:mixing/blender/nitro_rocket_fuel": 48,
+    "siftec:mixing/blender/non_fissile_uranium": 480,
+    "siftec:mixing/blender/rocket_fuel": 120,
+    "siftec:mixing/blender/turbo_blend_fuel": 160,
+    "siftec:mixing/foundry/aluminum_ingot": 80,
+    "siftec:mixing/foundry/basic_iron_ingot": 240,
+    "siftec:mixing/foundry/coke_steel_ingot": 240,
+    "siftec:mixing/foundry/compacted_steel_ingot": 480,
+    "siftec:mixing/foundry/copper_alloy_ingot": 120,
+    "siftec:mixing/foundry/fused_quartz_crystal": 400,
+    "siftec:mixing/foundry/iron_alloy_ingot": 240,
+    "siftec:mixing/foundry/molded_beam": 240,
+    "siftec:mixing/foundry/molded_steel_pipe": 120,
+    "siftec:mixing/foundry/solid_steel_ingot": 60,
+    "siftec:mixing/foundry/steel_cast_plate": 80,
+    "siftec:mixing/foundry/steel_ingot": 80,
+    "siftec:mixing/foundry/tempered_caterium_ingot": 160,
+    "siftec:mixing/foundry/tempered_copper_ingot": 240,
+    "siftec:mixing/manufacturer/adaptive_control_unit_core": 1200,
+    "siftec:mixing/manufacturer/automated_speed_wiring_core": 640,
+    "siftec:mixing/manufacturer/ballistic_warp_drive_core": 1200,
+    "siftec:mixing/manufacturer/caterium_computer_core": 320,
+    "siftec:mixing/manufacturer/classic_battery_core": 160,
+    "siftec:mixing/manufacturer/computer_core": 480,
+    "siftec:mixing/manufacturer/crystal_oscillator_core": 2400,
+    "siftec:mixing/manufacturer/flexible_framework_core": 320,
+    "siftec:mixing/manufacturer/gas_filter_core": 160,
+    "siftec:mixing/manufacturer/heavy_encased_frame_core": 1280,
+    "siftec:mixing/manufacturer/heavy_flexible_frame_core": 320,
+    "siftec:mixing/manufacturer/heavy_modular_frame_core": 600,
+    "siftec:mixing/manufacturer/high_speed_connector_core": 320,
+    "siftec:mixing/manufacturer/infused_uranium_cell_core": 240,
+    "siftec:mixing/manufacturer/insulated_crystal_oscillator_core": 640,
+    "siftec:mixing/manufacturer/iodine_infused_filter_core": 320,
+    "siftec:mixing/manufacturer/modular_engine_core": 1200,
+    "siftec:mixing/manufacturer/plastic_smart_plating_core": 480,
+    "siftec:mixing/manufacturer/plutonium_fuel_rod_core": 4800,
+    "siftec:mixing/manufacturer/radio_connection_unit_core": 320,
+    "siftec:mixing/manufacturer/radio_control_system_core": 800,
+    "siftec:mixing/manufacturer/radio_control_unit_core": 960,
+    "siftec:mixing/manufacturer/rigor_motor_core": 960,
+    "siftec:mixing/manufacturer/sam_fluctuator_core": 120,
+    "siftec:mixing/manufacturer/silicon_high_speed_connector_core": 800,
+    "siftec:mixing/manufacturer/singularity_cell_core": 1200,
+    "siftec:mixing/manufacturer/super_state_computer_core": 500,
+    "siftec:mixing/manufacturer/supercomputer_core": 640,
+    "siftec:mixing/manufacturer/thermal_propulsion_rocket_core": 2400,
+    "siftec:mixing/manufacturer/turbo_electric_motor_core": 1280,
+    "siftec:mixing/manufacturer/turbo_motor_core": 640,
+    "siftec:mixing/manufacturer/turbo_pressure_motor_core": 640,
+    "siftec:mixing/manufacturer/uranium_fuel_rod_core": 3000,
+    "siftec:mixing/manufacturer/uranium_fuel_unit_core": 6000,
+    "siftec:mixing/quantum_encoder/alien_power_matrix_core": 480,
+    "siftec:mixing/quantum_encoder/ficsonium_fuel_rod_core": 480,
+    "siftec:mixing/quantum_encoder/neural_quantum_processor_core": 400,
+    "siftec:mixing/quantum_encoder/superposition_oscillator_core": 240,
+    "siftec:mixing/refinery/alumina_solution": 120,
+    "siftec:mixing/refinery/aluminum_scrap": 20,
+    "siftec:mixing/refinery/coated_cable": 160,
+    "siftec:mixing/refinery/diluted_packaged_fuel": 40,
+    "siftec:mixing/refinery/electrode_aluminum_scrap": 80,
+    "siftec:mixing/refinery/fuel": 120,
+    "siftec:mixing/refinery/heavy_oil_residue": 120,
+    "siftec:mixing/refinery/ionized_fuel": 480,
+    "siftec:mixing/refinery/leached_caterium_ingot": 200,
+    "siftec:mixing/refinery/leached_copper_ingot": 240,
+    "siftec:mixing/refinery/leached_iron_ingot": 120,
+    "siftec:mixing/refinery/liquid_biofuel": 80,
+    "siftec:mixing/refinery/petroleum_coke": 120,
+    "siftec:mixing/refinery/plastic": 120,
+    "siftec:mixing/refinery/polyester_fabric": 40,
+    "siftec:mixing/refinery/polymer_resin": 120,
+    "siftec:mixing/refinery/pure_caterium_ingot": 100,
+    "siftec:mixing/refinery/pure_copper_ingot": 480,
+    "siftec:mixing/refinery/pure_iron_ingot": 240,
+    "siftec:mixing/refinery/pure_quartz_crystal": 160,
+    "siftec:mixing/refinery/quartz_purification": 240,
+    "siftec:mixing/refinery/recycled_plastic": 240,
+    "siftec:mixing/refinery/recycled_rubber": 240,
+    "siftec:mixing/refinery/residual_fuel": 120,
+    "siftec:mixing/refinery/residual_plastic": 120,
+    "siftec:mixing/refinery/residual_rubber": 120,
+    "siftec:mixing/refinery/rubber": 120,
+    "siftec:mixing/refinery/sloppy_alumina": 60,
+    "siftec:mixing/refinery/smokeless_powder": 120,
+    "siftec:mixing/refinery/steamed_copper_sheet": 160,
+    "siftec:mixing/refinery/sulfuric_acid": 120,
+    "siftec:mixing/refinery/turbo_heavy_fuel": 160,
+    "siftec:mixing/refinery/turbofuel": 320
+  },
+  "smelter_ticks": {
+    "minecraft:raw_copper": 40,
+    "minecraft:raw_iron": 40
+  },
+  "hub_burner": {
+    "su": 6144,
+    "fuel": {
+      "#minecraft:leaves": 10,
+      "#minecraft:logs": 67,
+      "siftec:biomass": 120,
+      "siftec:solid_biofuel": 300
+    }
+  }
 }

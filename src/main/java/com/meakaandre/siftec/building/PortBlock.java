@@ -1,26 +1,28 @@
 package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.registry.ModBlockEntities;
+import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A building's input or output, as in Satisfactory: belts, funnels and pipes attach only here, on the face that
  * points out of the building ({@code facing}). An input passes what it is given to its target inside (a basin, a
  * depot, a tank); an output lets things be taken from its target.
+ * <p>
+ * Like Satisfactory's, an item input takes what a belt runs into it, and an item output puts what its target has
+ * made onto the belt (or into the inventory) in front of it, one item at a time.
  */
-public class PortBlock extends Block implements EntityBlock {
+public class PortBlock extends Block implements IBE<PortBlockEntity> {
     public enum Kind implements StringRepresentable {
         ITEM_IN, ITEM_OUT, FLUID_IN, FLUID_OUT;
 
@@ -47,8 +49,13 @@ public class PortBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new PortBlockEntity(ModBlockEntities.BUILDING_PORT.get(), pos, state);
+    public Class<PortBlockEntity> getBlockEntityClass() {
+        return PortBlockEntity.class;
+    }
+
+    @Override
+    public BlockEntityType<? extends PortBlockEntity> getBlockEntityType() {
+        return ModBlockEntities.BUILDING_PORT.get();
     }
 
     @Override

@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "siftec:portable_miner",
     "siftec:resource_well_extractor",
     "siftec:dimensional_depot",
     "siftec:power_pole",

@@ -6,12 +6,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /**
  * The two structures, at Satisfactory's size with the player 1.8 blocks tall (one metre is one block).
  * <p>
  * HUB: 14 wide, 26 long, 28 high with the FICSIT Freighter docked (the wiki's 14 x 26 x 28 m). From the front: the
- * entrance steps, the terminal hall (HUB Terminal, Craft Bench, Personal Storage Box), the living quarters (bunk
+ * entrance steps, the terminal hall (HUB Terminal, Craft Station, Personal Storage Box), the living quarters (bunk
  * beds, lockers, desk, washroom) and the burner deck at the back (two burners), with the freighter's dock tower
  * over the deck. Levels are the HUB upgrades done (0 to 6); level 7 is upgrade 6 with the freighter docked.
  * <p>
@@ -25,8 +26,14 @@ public final class Templates {
     /** Where the terminal stands in each structure. */
     public static final int[] HUB_TERMINAL = {0, 1, 5}, GATEWAY_TERMINAL = {0, 1, 7};
     /** Spots of the HUB's parts, for the tests. */
-    public static final int[] STORAGE = {3, 1, 4}, BENCH = {-4, 1, 4}, BURNER_1 = {-4, 1, 21}, BURNER_2 = {3, 1, 21}, BED = {-6, 1, 12},
+    public static final int[] STORAGE = {3, 1, 4}, BURNER_1 = {-4, 1, 21}, BURNER_2 = {3, 1, 21}, BED = {-6, 1, 12},
         TOWER = {-1, 10, 22}, FREIGHTER = {0, 22, 20};
+    /**
+     * The Craft Station (Satisfactory's Craft Bench, Create's way): a Press over a Basin and a Mixer over a Basin on the
+     * terminal hall's left, each turned by its own hand crank (the Mixer's through a cogwheel beside it).
+     */
+    public static final int[] PRESS_BASIN = {-5, 1, 4}, PRESS = {-5, 3, 4}, PRESS_CRANK = {-6, 3, 4},
+        MIXER_BASIN = {-3, 1, 4}, MIXER = {-3, 3, 4}, MIXER_COG = {-2, 3, 4}, MIXER_CRANK = {-2, 4, 4};
     /** One block of each gateway ring (phase 1 to 5), and of the crown. */
     public static final int[][] RINGS = {{-7, 10, 26}, {-7, 19, 26}, {-7, 28, 26}, {-7, 37, 26}, {-7, 46, 26}};
     public static final int[] CROWN = {-6, 58, 21};
@@ -83,10 +90,15 @@ public final class Templates {
         t.box(0, M, -1, 1, 6, 1, 2, 6, metal);
         t.set(0, M, 0, 2, 6, lamp);
         t.box(0, M, -1, 3, 6, 1, 3, 6, orange);
-        // the Craft Bench between two counters
-        t.set(0, M, -5, 1, 4, metal);
-        t.set(0, M, BENCH[0], BENCH[1], BENCH[2], ModBlocks.CRAFT_BENCH.get().defaultBlockState());
-        t.set(0, M, -3, 1, 4, metal);
+        // the Craft Station: by hand only, at the same amounts as the buildings
+        t.set(0, M, PRESS_BASIN[0], PRESS_BASIN[1], PRESS_BASIN[2], create("basin"));
+        t.set(0, M, PRESS[0], PRESS[1], PRESS[2], create("mechanical_press", BlockStateProperties.HORIZONTAL_FACING, Direction.WEST));
+        t.set(0, M, PRESS_CRANK[0], PRESS_CRANK[1], PRESS_CRANK[2], create("hand_crank", BlockStateProperties.FACING, Direction.WEST));
+        t.set(0, M, -4, 1, 4, metal);
+        t.set(0, M, MIXER_BASIN[0], MIXER_BASIN[1], MIXER_BASIN[2], create("basin"));
+        t.set(0, M, MIXER[0], MIXER[1], MIXER[2], create("mechanical_mixer"));
+        t.set(0, M, MIXER_COG[0], MIXER_COG[1], MIXER_COG[2], create("cogwheel", BlockStateProperties.AXIS, Direction.Axis.Y));
+        t.set(0, M, MIXER_CRANK[0], MIXER_CRANK[1], MIXER_CRANK[2], create("hand_crank", BlockStateProperties.FACING, Direction.UP));
         // the Personal Storage Box (HUB Upgrade 1) between two counters
         t.set(0, M, 2, 1, 4, metal);
         t.set(0, 0, STORAGE[0], STORAGE[1], STORAGE[2], air);
@@ -136,6 +148,21 @@ public final class Templates {
         t.box(6, M, -2, 20, 20, 1, 20, 24, white);
         freighter(t);
         return t;
+    }
+
+    private static BlockState create(String id) {
+        return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath("create", id)).defaultBlockState();
+    }
+
+    /** A Create block for the Craft Station, with one property set (Create's own blocks use the vanilla properties). */
+    private static <T extends Comparable<T>> BlockState create(String id, net.minecraft.world.level.block.state.properties.Property<T> property, T value) {
+        BlockState state = create(id);
+        return state.hasProperty(property) ? state.setValue(property, value) : state;
+    }
+
+    /** The Craft Station's spots, for the HUB to protect and the tests to look at. */
+    public static int[][] station() {
+        return new int[][]{PRESS_BASIN, PRESS, PRESS_CRANK, MIXER_BASIN, MIXER, MIXER_COG, MIXER_CRANK};
     }
 
     private static BlockState bed(BedPart part) {

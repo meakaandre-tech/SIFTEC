@@ -9,9 +9,18 @@ Create: Diesel Generators, Create: Gunsmithing, Create: Hypertubes and Farmer's 
 names (recipes that name another mod load only when that mod is installed).
 
 What it adds: the HUB with milestones and wormhole phases, companies and land claims, per-company recipe and
-item locks, resource nodes and miners, the MAM research trees, Power Poles and Power Storage, the Equipment
-Workshop, the AWESOME Sink and Shop, the backpack, blueprints, geothermal power, and the parts and fluids of
-Satisfactory's production chain.
+item locks, resource nodes, the Build Gun and its buildings, the MAM research trees, Power Poles and Power Storage,
+the Equipment Workshop, the AWESOME Sink and Shop, the backpack, blueprints, geothermal power, and the parts and
+fluids of Satisfactory's production chain.
+
+The Build Gun's buildings are multiblocks with real Create machines inside (`building/`): the Constructor (a Press
+over a Basin, its recipe picked by the controller's filter), the Smelter (an Encased Fan blasting through lava onto a
+Depot), Miner Mk.1 to Mk.3 and the Portable Miner (a Drill over a node), and the Storage Containers (Item Vaults).
+Each keeps to Satisfactory's time per recipe and rate per minute (`BasinPace`, `BuildingLogic`), takes belts at its
+input ports and puts what it makes onto the belt at its output port, and is turned by a motor inside that gives the SU
+it draws (Satisfactory's MW at 1 MW = 204.8 SU). Every player starts with a HUB, which costs 20 Raw Iron to put down,
+hands out the Build Gun, and has a hand-cranked Craft Station (a Press and a Mixer over Basins) and two Biomass
+Burners.
 
 ## Building
 

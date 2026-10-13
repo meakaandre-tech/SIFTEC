@@ -2,6 +2,7 @@
 siftec selftest check
 siftec selftest prefab restart
 siftec selftest buildings restart
+siftec selftest buildings_a restart
 siftec node find oil
 execute in minecraft:the_nether run siftec selftest nether
 siftec selftest state verify

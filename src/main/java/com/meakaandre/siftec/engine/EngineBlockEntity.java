@@ -27,7 +27,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
     public final SimpleContainer fuel = new SimpleContainer(1) {
         @Override
         public boolean canPlaceItem(int slot, ItemStack stack) {
-            return FuelUtil.isFuel(stack);
+            return accepts(stack);
         }
 
         @Override
@@ -56,11 +56,22 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         return capacity;
     }
 
+    /** A HUB Biomass Burner (built into the HUB structure) rather than a HUB Engine or Furnace Engine. */
+    public boolean biomassBurner() {
+        return getBlockState().getBlock() instanceof com.meakaandre.siftec.prefab.HubBurnerBlock;
+    }
+
+    /** What it burns: a HUB Biomass Burner only leaves, logs, Biomass and Solid Biofuel; a HUB Engine any fuel. */
+    public boolean accepts(ItemStack stack) {
+        return biomassBurner() ? com.meakaandre.siftec.building.MachineTimes.burnerTicks(stack) > 0 : FuelUtil.isFuel(stack);
+    }
+
     private boolean hubKind() {
         return getBlockState().getBlock() instanceof EngineBlock block && block.hub;
     }
 
     public void addFuel(ItemStack held) {
+        if (!accepts(held)) return;
         ItemStack inside = fuel.getItem(0);
         if (inside.isEmpty()) {
             fuel.setItem(0, held.copyAndClear());
@@ -161,6 +172,8 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
      * server, which used up a HUB Engine's fuel without running it.
      */
     public int burnTime(ItemStack stack) {
+        // a HUB Biomass Burner burns each item for Satisfactory's energy at its 30 MW
+        if (biomassBurner()) return com.meakaandre.siftec.building.MachineTimes.burnerTicks(stack);
         net.minecraft.world.item.component.CookingFuel cooking = stack.get(net.minecraft.core.component.DataComponents.COOKING_FUEL);
         if (cooking == null || !(level instanceof net.minecraft.server.level.ServerLevel server)) return 0;
         try {
@@ -212,7 +225,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
                 if (left != null) net.minecraft.world.Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.1, worldPosition.getZ() + 0.5, left.create());
             }
             if (allowed && burn == 0) status = NO_FUEL;
-            target = allowed && burn > 0 ? HUB_SU : 0;
+            target = allowed && burn > 0 ? (biomassBurner() ? com.meakaandre.siftec.building.MachineTimes.burnerSu() : HUB_SU) : 0;
         } else {
             target = furnacePower();
         }

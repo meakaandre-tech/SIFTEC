@@ -46,6 +46,8 @@ public class Siftec implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(server -> com.meakaandre.siftec.owner.RecipeLocks.forget());
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> com.meakaandre.siftec.owner.RecipeLocks.forget());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.owner.RecipeLocks.forget());
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> com.meakaandre.siftec.building.MachineTimes.forget());
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.building.MachineTimes.forget());
         Backpack.register();
         // the pack's backpack is Traveler's Backpack; SIFTEC still loads without it (no backpack then)
         if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("travelersbackpack")) com.meakaandre.siftec.compat.TravelersBackpackCompat.register();

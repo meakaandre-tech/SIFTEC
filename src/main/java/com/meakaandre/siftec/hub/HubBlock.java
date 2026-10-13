@@ -84,6 +84,8 @@ public class HubBlock extends Block implements EntityBlock {
             server.sendOverlayMessage(Component.translatable("siftec.prefab.dismantled", name));
             return InteractionResult.SUCCESS;
         }
+        // the HUB hands every member of its company a Build Gun, as Satisfactory's HUB does
+        if (!gateway && hub.prefab) Prefabs.giveBuildGun(server);
         HubMenu.open(server, mine, pos, gateway);
         return InteractionResult.SUCCESS;
     }

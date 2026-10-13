@@ -77,8 +77,18 @@ public final class Buildings {
             for (JsonElement c : o.getAsJsonArray("cost")) {
                 cost.add(new Milestone.Cost(c.getAsJsonObject().get("item").getAsString(), c.getAsJsonObject().get("count").getAsInt()));
             }
+            boolean node = o.has("node") && o.get("node").getAsBoolean();
+            int[] nodeCell = null;
+            if (node) {
+                nodeCell = new int[]{0, 0, 1};
+                if (o.has("node_cell")) {
+                    var a = o.getAsJsonArray("node_cell");
+                    nodeCell = new int[]{a.get(0).getAsInt(), a.get(1).getAsInt(), a.get(2).getAsInt()};
+                }
+            }
             BuildingDef def = new BuildingDef(o.get("id").getAsString(), Category.of(o.get("category").getAsString()), List.copyOf(cost),
-                o.has("unlock") ? o.get("unlock").getAsString() : "", o.has("dev") && o.get("dev").getAsBoolean(), o.has("node") && o.get("node").getAsBoolean());
+                o.has("unlock") ? o.get("unlock").getAsString() : "", o.has("dev") && o.get("dev").getAsBoolean(), node, nodeCell,
+                o.has("logic") ? o.get("logic").getAsString() : "", o.has("su") ? o.get("su").getAsInt() : 0, o.has("rate") ? o.get("rate").getAsInt() : 0);
             DEFS.put(def.id(), def);
         }
     }
@@ -196,21 +206,51 @@ public final class Buildings {
      * leaves out), and only once the node's clump is mined away. Applies in creative too: the clump is part of the world.
      */
     private static void nodeUnder(Level level, Placement p, BuildingTemplate t, Check check) {
-        AABB box = p.bounds(t);
-        BlockPos node = null;
-        for (BlockPos pos : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
-            var block = level.getBlockState(pos).getBlock();
-            if (block instanceof com.meakaandre.siftec.block.NodeBlock || block instanceof com.meakaandre.siftec.block.DepletedNodeBlock) {
-                node = pos.immutable();
-                break;
-            }
-        }
+        BlockPos node = nodeIn(level, p, t);
         if (node == null) {
             check.fail("siftec.build_gun.no_node", p.def().name());
             return;
         }
         int left = com.meakaandre.siftec.node.NodePlacer.clumpLeft(level, node);
         if (left > 0) check.fail("siftec.build_gun.clump", left);
+    }
+
+    static boolean isNode(BlockState state) {
+        var block = state.getBlock();
+        return block instanceof com.meakaandre.siftec.block.NodeBlock node && !node.look.fluid()
+            || block instanceof com.meakaandre.siftec.block.DepletedNodeBlock;
+    }
+
+    /** The node a node building stands over: in its node cell, or else anywhere in its box (grown or mined). */
+    public static @Nullable BlockPos nodeIn(Level level, Placement p, BuildingTemplate t) {
+        int[] c = p.def().nodeCell();
+        if (c != null && isNode(level.getBlockState(p.at(c[0], c[1], c[2])))) return p.at(c[0], c[1], c[2]).immutable();
+        AABB box = p.bounds(t);
+        for (BlockPos pos : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
+            if (isNode(level.getBlockState(pos))) return pos.immutable();
+        }
+        return null;
+    }
+
+    /**
+     * A node building is moved so its node cell lands on the nearest node within three blocks of where it was aimed
+     * (the same height or one above or below), so the player need not line it up by hand. Anything else is left as it is.
+     */
+    public static Placement snapToNode(Level level, Placement p) {
+        int[] c = p.def().nodeCell();
+        if (!p.def().node() || c == null) return p;
+        BlockPos aim = p.at(c[0], c[1], c[2]);
+        BlockPos best = null;
+        double bestDist = Double.MAX_VALUE;
+        for (BlockPos pos : BlockPos.betweenClosed(aim.offset(-3, -1, -3), aim.offset(3, 1, 3))) {
+            if (!level.isLoaded(pos) || !isNode(level.getBlockState(pos))) continue;
+            double d = pos.distSqr(aim);
+            if (d < bestDist) {
+                bestDist = d;
+                best = pos.immutable();
+            }
+        }
+        return best == null ? p : p.moved(best.getX() - aim.getX(), best.getY() - aim.getY(), best.getZ() - aim.getZ());
     }
 
     private static void land(ServerLevel level, Placement p, BuildingTemplate t, Company company, Check check) {
@@ -261,6 +301,13 @@ public final class Buildings {
                 port.setChanged();
             }
         }
+        // the machines inside are the company's, so they run the recipes it has unlocked
+        if (company != null) {
+            for (BuildingTemplate.Cell cell : t.members) {
+                BlockEntity be = level.getBlockEntity(p.at(cell));
+                if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company.id);
+            }
+        }
         if (level.getBlockEntity(controllerPos) instanceof ControllerBlockEntity controller) {
             controller.buildingId = p.def().id();
             controller.anchor = p.anchor();
@@ -269,7 +316,9 @@ public final class Buildings {
             controller.companyId = company == null ? "" : company.id;
             controller.refund.clear();
             controller.refund.addAll(refund);
+            controller.node = p.def().node() ? nodeIn(level, p, t) : null;
             controller.setChanged();
+            BuildingLogic.placed(level, controller);
         }
         Siftec.LOGGER.info("SIFTEC: building {} placed at {} facing {}{} ({} blocks, {} refund stacks)", p.def().id(), controllerPos.toShortString(),
             p.facing(), p.flip() ? " flipped" : "", t.members.size(), refund.size());
@@ -305,6 +354,7 @@ public final class Buildings {
         Placement p = controller.placement();
         List<ItemStack> out = new ArrayList<>(copy(controller.refund));
         controller.refund.clear();
+        out.addAll(controller.takeContents());
         BlockPos controllerPos = controller.getBlockPos().immutable();
         if (p != null) out.addAll(takeDown(level, p, controllerPos));
         if (level.getBlockState(controllerPos).getBlock() instanceof ControllerBlock) level.setBlock(controllerPos, Blocks.AIR.defaultBlockState(), SET);
@@ -346,11 +396,14 @@ public final class Buildings {
     }
 
     /** Everything a block holds: a vanilla container's slots, or what its item storage lets out. Ports and the controller hold nothing. */
-    private static List<ItemStack> contents(ServerLevel level, BlockPos pos) {
+    public static List<ItemStack> contents(ServerLevel level, BlockPos pos) {
         List<ItemStack> out = new ArrayList<>();
         BlockEntity be = level.getBlockEntity(pos);
         if (be == null || be instanceof PortBlockEntity || be instanceof ControllerBlockEntity) return out;
-        if (be instanceof Container container) {
+        // a Basin keeps its input and output in one inventory that its item storage only lets the output out of
+        Container container = be instanceof Container c ? c
+            : be instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity basin ? basin.itemCapability : null;
+        if (container != null) {
             for (int i = 0; i < container.getContainerSize(); i++) {
                 ItemStack stack = container.removeItemNoUpdate(i);
                 if (!stack.isEmpty()) out.add(stack);
@@ -457,7 +510,10 @@ public final class Buildings {
         PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
             BlockPos controller = BuildingIndex.controllerOf(level, pos);
             if (controller == null) return true;
-            if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.build_gun.part", nameAt(level, controller)));
+            if (player instanceof ServerPlayer server) {
+                boolean hub = level.getBlockState(controller).getBlock() instanceof com.meakaandre.siftec.hub.HubBlock;
+                server.sendOverlayMessage(Component.translatable(hub ? "siftec.prefab.part" : "siftec.build_gun.part", nameAt(level, controller)));
+            }
             return false;
         });
         // nor wrenched off or turned
@@ -472,6 +528,8 @@ public final class Buildings {
 
     static Component nameAt(Level level, BlockPos controller) {
         if (level.getBlockEntity(controller) instanceof ControllerBlockEntity c && def(c.buildingId) != null) return def(c.buildingId).name();
+        // the HUB's Craft Station is listed under the HUB's terminal
+        if (level.getBlockState(controller).getBlock() instanceof com.meakaandre.siftec.hub.HubBlock) return Component.translatable("block.siftec.hub");
         return Component.translatable("siftec.build_gun.building");
     }
 

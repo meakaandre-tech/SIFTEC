@@ -129,7 +129,150 @@ def test_miner():
     return structure(c)
 
 
-BUILT = {"test_building": test_building, "test_miner": test_miner}
+# ---- work package 5: the first buildings. Satisfactory's shapes in Create's casings: orange (copper casing) and dark grey
+# (railway casing) with framed glass to see the machines, industrial iron for trim. Belts attach at ground level: every
+# port is in the bottom row, on the front (outputs) or the back (inputs), as Satisfactory's machines have them.
+CASE, DARK, GLASS, TRIM, BRASS = "create:copper_casing", "create:railway_casing", "create:framed_glass", "create:industrial_iron_block", "create:brass_casing"
+AIR = "minecraft:air"
+CONTROLLER = "siftec:building_controller[facing=south]"
+
+
+class Frame:
+    """A template drawn in the Build Gun frame: x to the right of the middle column, y up from the bottom row, z from the
+    front row (where the player stands) away. Directions in block states are as built facing north: south is the front."""
+
+    def __init__(self, width, depth):
+        assert width % 2 == 1, "a building is an odd number of blocks wide, so it has a middle column"
+        self.w, self.d = width, depth
+        self.cells, self.nbt = {}, {}
+
+    def file(self, x, y, z):
+        return (x + self.w // 2, y, self.d - 1 - z)
+
+    def set(self, x, y, z, spec):
+        self.cells[self.file(x, y, z)] = spec
+
+    def box(self, x0, y0, z0, x1, y1, z1, spec):
+        for x in range(min(x0, x1), max(x0, x1) + 1):
+            for y in range(min(y0, y1), max(y0, y1) + 1):
+                for z in range(min(z0, z1), max(z0, z1) + 1):
+                    self.set(x, y, z, spec)
+
+    def walls(self, y0, y1, corner, side, x0=None, x1=None, z0=0, z1=None):
+        """The outer walls from y0 to y1: corner pillars and side panels, the inside left as air."""
+        x0 = -(self.w // 2) if x0 is None else x0
+        x1 = self.w // 2 if x1 is None else x1
+        z1 = self.d - 1 if z1 is None else z1
+        for x in range(x0, x1 + 1):
+            for z in range(z0, z1 + 1):
+                edge_x, edge_z = x in (x0, x1), z in (z0, z1)
+                for y in range(y0, y1 + 1):
+                    self.set(x, y, z, corner if edge_x and edge_z else side if edge_x or edge_z else AIR)
+
+    def port(self, x, y, z, facing, kind, target):
+        """A port facing out of the building, feeding or draining the cell at target (Build Gun frame)."""
+        self.set(x, y, z, f"siftec:building_port[facing={facing},kind={kind}]")
+        self.nbt[self.file(x, y, z)] = {"Target": IntArray(self.file(*target))}
+
+    def void(self, x, y, z):
+        """A cell that is not part of the building (a node it stands over)."""
+        self.set(x, y, z, "minecraft:structure_void")
+
+    def done(self):
+        return structure(self.cells, self.nbt)
+
+
+def constructor():
+    # 5 wide, 5 deep, 6 high: a Mechanical Press over a Basin in the middle, turned by the motor beside it; input at the
+    # back, output at the front, both on the Basin. The controller's panel is on the front, right of the output.
+    f = Frame(5, 5)
+    f.box(-2, 0, 0, 2, 0, 4, DARK)
+    f.walls(1, 4, CASE, GLASS)
+    f.box(-2, 5, 0, 2, 5, 4, CASE)
+    f.set(0, 1, 2, "create:basin")
+    f.set(0, 3, 2, "create:mechanical_press[facing=west]")
+    f.set(1, 3, 2, "siftec:building_motor[facing=west]")
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(0, 0, 0, "south", "item_out", (0, 1, 2))
+    f.port(0, 0, 4, "north", "item_in", (0, 1, 2))
+    return f.done()
+
+
+def smelter():
+    # 5 wide, 5 deep, 6 high: the motor in the left wall turns an Encased Fan that blows through a lava cell onto a Depot
+    # (Create's bulk blasting). The controller feeds the Depot and takes the ingots off; the ports work on the controller.
+    f = Frame(5, 5)
+    f.box(-2, 0, 0, 2, 0, 4, DARK)
+    f.walls(1, 4, CASE, GLASS)
+    f.box(-2, 5, 0, 2, 5, 4, CASE)
+    f.set(-2, 1, 2, "siftec:building_motor[facing=east]")
+    f.set(-1, 1, 2, "create:encased_fan[facing=east]")
+    f.set(0, 1, 2, "minecraft:lava")
+    f.set(1, 1, 2, "create:depot")
+    # the lava is closed in on every side but the fan's and the Depot's
+    for at in ((0, 2, 2), (0, 1, 1), (0, 1, 3)):
+        f.set(*at, TRIM)
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(0, 0, 0, "south", "item_out", (1, 1, 0))
+    f.port(0, 0, 4, "north", "item_in", (1, 1, 0))
+    return f.done()
+
+
+def miner(height, corner, deck, side):
+    # 5 wide, 5 deep: four legs round the node, a deck over it with the Drill pointing down at the node, the motor on the
+    # Drill and a tower round them; a chute down to the output port at the front. The node's own cell is left out.
+    f = Frame(5, 5)
+    f.box(-2, 0, 0, 2, 0, 4, AIR)
+    for x in (-2, 2):
+        for z in (0, 4):
+            f.set(x, 0, z, corner)
+    f.void(0, 0, 2)
+    f.box(-2, 1, 0, 2, 1, 4, deck)
+    f.set(0, 1, 2, "create:mechanical_drill[facing=down]")
+    f.set(1, 1, 0, CONTROLLER)
+    f.walls(2, height - 2, corner, side, -1, 1, 1, 3)
+    f.set(0, 2, 2, "siftec:building_motor[facing=down]")
+    f.set(0, 2, 1, "create:chute")
+    f.box(-1, height - 1, 1, 1, height - 1, 3, corner)
+    f.port(0, 0, 0, "south", "item_out", (1, 1, 0))
+    return f.done()
+
+
+def portable_miner():
+    # 3 by 3, 3 high: a small drill rig with no power on four legs over the node; the ore drops on the ground in front
+    f = Frame(3, 3)
+    f.box(-1, 0, 0, 1, 0, 2, AIR)
+    for x in (-1, 1):
+        for z in (0, 2):
+            f.set(x, 0, z, "create:andesite_casing")
+    f.void(0, 0, 1)
+    f.box(-1, 1, 0, 1, 1, 2, "create:andesite_casing")
+    f.set(0, 1, 1, "create:mechanical_drill[facing=down]")
+    f.box(-1, 2, 0, 1, 2, 2, AIR)
+    f.set(0, 2, 1, CONTROLLER)
+    return f.done()
+
+
+def storage(depth, vaults):
+    # 3 wide: Item Vaults along the middle, closed in; output at the front and input at the back, both on the vault
+    f = Frame(3, depth)
+    f.box(-1, 0, 0, 1, 0, depth - 1, DARK)
+    f.walls(1, 1, CASE, CASE)
+    f.box(-1, 2, 0, 1, 2, depth - 1, CASE)
+    for z in range(2, 2 + vaults):
+        f.set(0, 1, z, "create:item_vault[axis=z,large=false]")
+    f.set(0, 1, 0, GLASS)
+    f.set(1, 1, 0, CONTROLLER)
+    f.port(0, 0, 0, "south", "item_out", (0, 1, 2))
+    f.port(0, 0, depth - 1, "north", "item_in", (0, 1, 2))
+    return f.done()
+
+
+BUILT = {"test_building": test_building, "test_miner": test_miner,
+         "constructor": constructor, "smelter": smelter,
+         "miner_mk1": lambda: miner(8, CASE, DARK, GLASS), "miner_mk2": lambda: miner(9, TRIM, DARK, GLASS),
+         "miner_mk3": lambda: miner(10, BRASS, TRIM, GLASS), "portable_miner": portable_miner,
+         "storage_container": lambda: storage(5, 1), "industrial_storage_container": lambda: storage(6, 2)}
 
 if __name__ == "__main__":
     for bid, make in BUILT.items():

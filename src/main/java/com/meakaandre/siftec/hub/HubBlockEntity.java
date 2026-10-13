@@ -30,6 +30,8 @@ public class HubBlockEntity extends BlockEntity {
     public @Nullable Direction facing;
     public int[] legs;
     public int builtLevel;
+    /** What putting the HUB down cost (its 20 Raw Iron): given back when it is picked up. */
+    public final java.util.List<ItemStack> refund = new java.util.ArrayList<>();
     private int clock;
     /** Ticks run, for the self-test. */
     public long ticked;
@@ -60,6 +62,7 @@ public class HubBlockEntity extends BlockEntity {
             view.putInt("Level", builtLevel);
             if (legs != null) view.putIntArray("Legs", legs);
         }
+        if (!refund.isEmpty()) view.store("Refund", ItemStack.OPTIONAL_CODEC.listOf(), new java.util.ArrayList<>(refund));
     }
 
     @Override
@@ -72,6 +75,8 @@ public class HubBlockEntity extends BlockEntity {
         facing = Direction.from2DDataValue(view.getIntOr("Facing", 2));
         builtLevel = view.getIntOr("Level", 0);
         legs = view.getIntArray("Legs").orElse(null);
+        refund.clear();
+        for (ItemStack stack : view.read("Refund", ItemStack.OPTIONAL_CODEC.listOf()).orElse(java.util.List.of())) if (!stack.isEmpty()) refund.add(stack);
         if (anchor == null) prefab = false;
     }
 
