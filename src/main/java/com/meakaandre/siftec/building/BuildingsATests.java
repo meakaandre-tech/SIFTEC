@@ -220,6 +220,16 @@ public final class BuildingsATests {
         });
     }
 
+    private static long pushed(ServerLevel level, BlockPos port) {
+        return level.getBlockEntity(port) instanceof PortBlockEntity p ? p.pushed : -1;
+    }
+
+    private static int ground(ServerLevel level, BlockPos near, Item item) {
+        int n = 0;
+        for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(near).inflate(4))) if (e.getItem().is(item)) n += e.getItem().getCount();
+        return n;
+    }
+
     /** A belt's speed, the way it runs and what it carries, for the report. */
     private static String beltState(ServerLevel level, BlockPos pos, Item item) {
         if (!(level.getBlockEntity(pos) instanceof BeltBlockEntity b)) return "no belt (" + level.getBlockState(pos).getBlock().getClass().getSimpleName() + ")";
@@ -371,6 +381,17 @@ public final class BuildingsATests {
 
         // ---- the HUB: costs 20 Raw Iron from the player, gives the Build Gun, gives the iron back when picked up
         hubTest(source, level, company);
+
+        // ---- every ten seconds, where the belt-fed buildings' items are (for working out a failure)
+        for (int t = 100; t <= WARMUP + MINUTE; t += 200) {
+            final int at = t;
+            later(level, t, () -> report(source, "at " + at + ": constructor " + made(level, con) + " made, basin " + count(level, basin, Items.IRON_INGOT) + " ingots "
+                + count(level, basin, item("create:iron_sheet")) + " plates, in belt " + beltState(level, conIn, Items.IRON_INGOT) + ", out port pushed " + pushed(level, con.at(0, 0, 0))
+                + ", out belt " + beltState(level, conOut, item("create:iron_sheet")) + ", end " + count(level, con.at(0, 0, -7), item("create:iron_sheet"))
+                + ", on the ground " + ground(level, conOutEnd, item("create:iron_sheet")) + " | smelter " + made(level, sm) + " made, out port pushed "
+                + pushed(level, sm.at(0, 0, 0)) + ", out belt " + beltState(level, smOut, Items.IRON_INGOT) + ", end " + count(level, sm.at(0, 0, -7), Items.IRON_INGOT)
+                + ", on the ground " + ground(level, smOutEnd, Items.IRON_INGOT) + " | storage in belt " + beltState(level, stIn, Items.COBBLESTONE)));
+        }
 
         // ---- measure: what each building has made over a minute once it has settled
         long[] start = new long[8];
@@ -551,9 +572,9 @@ public final class BuildingsATests {
             }
         }
         switch (n) {
-            case 0 -> player.teleportTo(level, VX + 13.5, VY + 5, VZ + 17.5, java.util.Set.of(), 180f, 12f, true);
-            case 1 -> player.teleportTo(level, VX + 37.5, VY + 5, VZ + 19.5, java.util.Set.of(), 180f, 12f, true);
-            case 2 -> player.teleportTo(level, VX + 37.5, VY + 6, VZ - 24.5, java.util.Set.of(), 0f, 14f, true);
+            case 0 -> player.teleportTo(level, VX + 12.5, VY + 4, VZ + 12.5, java.util.Set.of(), 180f, 14f, true);
+            case 1 -> player.teleportTo(level, VX + 36.5, VY + 4, VZ + 12.5, java.util.Set.of(), 180f, 14f, true);
+            case 2 -> player.teleportTo(level, VX + 36.5, VY + 5, VZ - 17.5, java.util.Set.of(), 0f, 16f, true);
             default -> player.teleportTo(level, VX + 31.5, VY + 3, VZ + 8.5, java.util.Set.of(), 180f, 10f, true);
         }
         report(source, "view " + n + " ready");
