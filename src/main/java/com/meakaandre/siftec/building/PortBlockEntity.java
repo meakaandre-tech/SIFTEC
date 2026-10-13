@@ -6,10 +6,12 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
@@ -66,6 +68,11 @@ public class PortBlockEntity extends SmartBlockEntity {
 
     public @Nullable Storage<ItemVariant> items(@Nullable Direction side) {
         if (!serves(side, false)) return null;
+        // a Basin lets its ingredients out as well as what it has made: an output port only takes what it has made
+        if (kind() == PortBlock.Kind.ITEM_OUT && level.getBlockEntity(target) instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity basin) {
+            var slots = ContainerStorage.of(basin.itemCapability, null).getSlots();
+            return FilteringStorage.extractOnlyOf(new CombinedStorage<>(new java.util.ArrayList<>(slots.subList(9, Math.min(18, slots.size())))));
+        }
         Storage<ItemVariant> inner = ItemStorage.SIDED.find(level, target, out());
         if (inner == null) return null;
         return kind() == PortBlock.Kind.ITEM_IN ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
@@ -110,12 +117,12 @@ public class PortBlockEntity extends SmartBlockEntity {
         Direction out = out();
         Storage<ItemVariant> from = items(out);
         if (from == null) return;
-        ItemVariant next = null;
-        for (StorageView<ItemVariant> view : from.nonEmptyViews()) {
-            next = view.getResource();
-            break;
+        // the first thing it can really take (a view it cannot take from, an input slot behind the same storage, is skipped)
+        ItemVariant next;
+        try (Transaction tx = Transaction.openOuter()) {
+            next = StorageUtil.findExtractableResource(from, tx);
         }
-        if (next == null) return;
+        if (next == null || next.isBlank()) return;
         BlockPos front = worldPosition.relative(out);
         DirectBeltInputBehaviour belt = BlockEntityBehaviour.get(level, front, DirectBeltInputBehaviour.TYPE);
         if (belt != null) {
