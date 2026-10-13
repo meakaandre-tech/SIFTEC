@@ -1,5 +1,7 @@
 package com.meakaandre.siftec.building;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -74,7 +76,19 @@ public final class BuildingTests {
                 .then(Commands.literal("selftest").then(Commands.literal("buildings").executes(BuildingTests::run)
                     .then(Commands.literal("restart").executes(BuildingTests::restart))))
                 .then(Commands.literal("worldtest").then(Commands.literal("buildgun").executes(BuildingTests::gunSetup)
-                    .then(Commands.literal("check").executes(BuildingTests::gunCheck))))));
+                    .then(Commands.literal("check").executes(BuildingTests::gunCheck)))
+                    .then(Commands.literal("guntab").then(Commands.argument("tab", StringArgumentType.word()).executes(c -> gunTab(c, ""))
+                        .then(Commands.argument("building", StringArgumentType.word()).executes(c -> gunTab(c, StringArgumentType.getString(c, "building")))))))));
+    }
+
+    /** Puts every player's Build Gun on a tab, with a building picked or nothing picked. */
+    private static int gunTab(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx, String building) {
+        Category tab = Category.of(StringArgumentType.getString(ctx, "tab"));
+        for (net.minecraft.server.level.ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) {
+            net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, new BuildGunPayloads.Tab(tab.ordinal(), building));
+        }
+        report(ctx.getSource(), "gun tab " + tab + " " + building);
+        return 1;
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {

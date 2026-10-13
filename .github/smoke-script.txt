@@ -70,25 +70,8 @@ cmd clear @a
 cmd item replace entity @a weapon.mainhand with siftec:build_gun
 cmd give @a minecraft:raw_iron 20
 sleep 2
-click 640 360
-sleep 1
-keydown Tab
-sleep 0.15
-keyup Tab
-sleep 0.4
-keydown Tab
-sleep 0.15
-keyup Tab
-sleep 0.4
-keydown Tab
-sleep 0.15
-keyup Tab
-sleep 0.4
-keydown Tab
-sleep 0.15
-keyup Tab
-sleep 0.4
-sleep 5
+cmd siftec worldtest guntab special hub
+sleep 6
 shot
 cmd siftec worldtest sathub obstacle
 sleep 3
@@ -99,9 +82,7 @@ key u
 sleep 3
 cmd siftec selftest prefab placed
 sleep 1
-key Tab
-sleep 0.5
-click 640 360
+cmd siftec worldtest guntab production
 sleep 1
 cmd clear @a
 cmd gamemode spectator @a

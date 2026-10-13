@@ -76,6 +76,7 @@ public final class BuildGunClient {
         ClientTickEvents.START_CLIENT_TICK.register(BuildGunClient::keys);
         ClientTickEvents.END_CLIENT_TICK.register(BuildGunClient::hologram);
         ClientPlayNetworking.registerGlobalReceiver(BuildGunPayloads.View.TYPE, (payload, context) -> Minecraft.getInstance().execute(() -> verdict = payload));
+        ClientPlayNetworking.registerGlobalReceiver(BuildGunPayloads.Tab.TYPE, (payload, context) -> Minecraft.getInstance().execute(() -> tab(payload)));
     }
 
     private static boolean holding(Minecraft mc) {
@@ -131,7 +132,6 @@ public final class BuildGunClient {
         }
         while (NEXT_TAB.consumeClick()) {
             category = (category + 1) % Category.values().length;
-            com.meakaandre.siftec.Siftec.LOGGER.info("Build Gun tab: {}", Category.values()[category]);
             dismantle = false;
             nudge = false;
             frozen = null;
@@ -176,6 +176,17 @@ public final class BuildGunClient {
         }
         // left click cancels, and never mines with the gun
         while (o.keyAttack.consumeClick()) cancel();
+    }
+
+    /** The smoke run's tab: see {@link BuildGunPayloads.Tab}. */
+    private static void tab(BuildGunPayloads.Tab payload) {
+        Minecraft mc = Minecraft.getInstance();
+        category = Math.floorMod(payload.category(), Category.values().length);
+        selected = !payload.building().isEmpty();
+        List<BuildingDef> defs = list(mc);
+        for (int i = 0; i < defs.size(); i++) if (defs.get(i).id().equals(payload.building())) picked[category] = i;
+        dismantle = nudge = false;
+        frozen = null;
     }
 
     private static void flip() {

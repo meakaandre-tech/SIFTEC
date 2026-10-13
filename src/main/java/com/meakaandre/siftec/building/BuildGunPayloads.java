@@ -62,4 +62,24 @@ public final class BuildGunPayloads {
             return TYPE;
         }
     }
+
+    /**
+     * Server to client, from the smoke run's {@code /siftec worldtest guntab}: puts the gun on a tab, with a building
+     * picked or with nothing picked (an empty building). Key presses under the CI's virtual display are not reliable
+     * enough to count Tabs.
+     */
+    public record Tab(int category, String building) implements CustomPacketPayload {
+        public static final Type<Tab> TYPE = new Type<>(Siftec.id("build_gun_tab"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, Tab> STREAM_CODEC = StreamCodec.of(
+            (buf, p) -> {
+                buf.writeVarInt(p.category);
+                buf.writeUtf(p.building);
+            },
+            buf -> new Tab(buf.readVarInt(), buf.readUtf(64)));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
 }

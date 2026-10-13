@@ -268,6 +268,7 @@ public final class BuildGun {
     public static void register() {
         PayloadTypeRegistry.serverboundPlay().register(BuildGunPayloads.Select.TYPE, BuildGunPayloads.Select.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BuildGunPayloads.View.TYPE, BuildGunPayloads.View.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(BuildGunPayloads.Tab.TYPE, BuildGunPayloads.Tab.STREAM_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(BuildGunPayloads.Select.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();
             Selection sel = selection(player);
