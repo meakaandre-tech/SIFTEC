@@ -8184,6 +8184,17 @@
   },
   "buildings": [
     {
+      "id": "hub",
+      "category": "special",
+      "cost": [
+        {
+          "item": "minecraft:raw_iron",
+          "count": 20
+        }
+      ],
+      "prefab": "hub"
+    },
+    {
       "id": "test_building",
       "category": "production",
       "cost": [
@@ -8236,7 +8247,7 @@
         1
       ],
       "logic": "portable_miner",
-      "rate": 20
+      "break": 40
     },
     {
       "id": "miner_mk1",
@@ -8264,7 +8275,7 @@
       ],
       "logic": "miner",
       "su": 1024,
-      "rate": 60
+      "break": 10
     },
     {
       "id": "miner_mk2",
@@ -8300,7 +8311,8 @@
       ],
       "logic": "miner",
       "su": 3072,
-      "rate": 120
+      "break": 5,
+      "fortune": 3
     },
     {
       "id": "miner_mk3",
@@ -8340,7 +8352,8 @@
       ],
       "logic": "miner",
       "su": 9216,
-      "rate": 240
+      "break": 2,
+      "fortune": 5
     },
     {
       "id": "smelter",

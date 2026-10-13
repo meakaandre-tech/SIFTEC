@@ -128,7 +128,7 @@ public final class Prefabs {
             return Component.translatable("siftec.prefab.hint", Component.translatable(spot.kind.key()));
         }
 
-        void fail(String reason, Object... args) {
+        public void fail(String reason, Object... args) {
             if (this.reason != null) return;
             this.reason = reason;
             this.args = args;
@@ -337,18 +337,12 @@ public final class Prefabs {
         boolean creative = player != null && player.hasInfiniteMaterials();
         Check check = check(level, spot, company, creative);
         if (!check.ok()) return check;
-        // the HUB costs Satisfactory's 20 Iron Ore (Raw Iron), from the player's inventory; it comes back when picked up
+        // the HUB costs Satisfactory's 20 Iron Ore (Raw Iron), from the player's inventory; it comes back when dismantled
         List<Milestone.Cost> cost = spot.kind == Kind.HUB && player != null && !creative ? hubCost() : List.of();
-        for (Milestone.Cost c : cost) {
-            if (!c.present()) continue;
-            int have = 0;
-            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                if (c.matches(player.getInventory().getItem(i))) have += player.getInventory().getItem(i).getCount();
-            }
-            if (have < c.count()) {
-                check.fail("siftec.prefab.cost", c.count(), c.icon().getHoverName());
-                return check;
-            }
+        Milestone.Cost missing = player == null ? null : missing(player, cost);
+        if (missing != null) {
+            check.fail("siftec.prefab.cost", missing.count(), missing.icon().getHoverName());
+            return check;
         }
         List<ItemStack> paid = new ArrayList<>();
         for (Milestone.Cost c : cost) {
@@ -392,7 +386,6 @@ public final class Prefabs {
             hub.setChanged();
         }
         indexMachines(level, spot, target, terminal, company.id);
-        if (spot.kind == Kind.HUB && player != null) giveBuildGun(player);
         if (spot.kind == Kind.HUB) {
             int chunks = Claims.claimForHub(level, company, terminal);
             if (player != null) {
@@ -470,13 +463,52 @@ public final class Prefabs {
         return out;
     }
 
-    /** The HUB hands out the Build Gun: to a player of its company who has none. */
+    /** A cost the player does not carry enough of (null if they carry it all), as the HUB's 20 Raw Iron is checked. */
+    public static Milestone.@Nullable Cost missing(ServerPlayer player, List<Milestone.Cost> cost) {
+        for (Milestone.Cost c : cost) {
+            if (!c.present()) continue;
+            int have = 0;
+            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+                if (c.matches(player.getInventory().getItem(i))) have += player.getInventory().getItem(i).getCount();
+            }
+            if (have < c.count()) return c;
+        }
+        return null;
+    }
+
+    /**
+     * Every player spawns with the Build Gun (it is never crafted): one is given to a player who has none when they
+     * join and when they respawn. The first thing they build with it is the HUB.
+     */
     public static void giveBuildGun(ServerPlayer player) {
+        if (com.meakaandre.siftec.company.Companies.isFake(player)) return;
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             if (player.getInventory().getItem(i).getItem() instanceof com.meakaandre.siftec.building.BuildGunItem) return;
         }
         player.getInventory().placeItemBackInInventory(new ItemStack(com.meakaandre.siftec.registry.ModItems.BUILD_GUN.get()), Prediction.SERVER_ONLY);
         player.sendSystemMessage(Component.translatable("siftec.prefab.build_gun"));
+    }
+
+    /**
+     * The HUB structure a block belongs to (its terminal, a part of its shell or a machine of its Craft Station), or
+     * null. Looks through the HUB terminals in the loaded chunks near the block.
+     */
+    public static @Nullable HubBlockEntity hubAt(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof HubBlockEntity own) return own.prefab && !own.gateway() ? own : null;
+        BlockPos indexed = com.meakaandre.siftec.building.BuildingIndex.controllerOf(level, pos);
+        if (indexed != null && level.getBlockEntity(indexed) instanceof HubBlockEntity hub) return hub.prefab && !hub.gateway() ? hub : null;
+        if (!isPart(level.getBlockState(pos))) return null;
+        int reach = Templates.hub().width() + Templates.hub().length();
+        for (int cx = (pos.getX() - reach) >> 4; cx <= (pos.getX() + reach) >> 4; cx++) {
+            for (int cz = (pos.getZ() - reach) >> 4; cz <= (pos.getZ() + reach) >> 4; cz++) {
+                if (!level.hasChunk(cx, cz)) continue;
+                for (net.minecraft.world.level.block.entity.BlockEntity be : level.getChunk(cx, cz).getBlockEntities().values()) {
+                    if (!(be instanceof HubBlockEntity hub) || !hub.prefab || hub.gateway() || hub.anchor == null || hub.facing == null) continue;
+                    if (bounds(new Spot(Kind.HUB, hub.anchor, hub.facing)).contains(Vec3.atCenterOf(pos))) return hub;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -510,7 +542,8 @@ public final class Prefabs {
         BlockPos terminal = hub.getBlockPos().immutable();
         if (!(hub.getBlockState().getBlock() instanceof HubBlock block)) return out;
         Kind kind = Kind.of(block);
-        out.add(new ItemStack(kind.block()));
+        // the Gateway comes back as its item; the HUB has none (it is built with the Build Gun), only its cost comes back
+        if (kind == Kind.GATEWAY) out.add(new ItemStack(kind.block()));
         for (ItemStack paid : hub.refund) out.add(paid.copy());
         hub.refund.clear();
         Company company = CompanyData.get(level.getServer()).byId(hub.companyId);
@@ -591,9 +624,9 @@ public final class Prefabs {
 
     public static void register() {
         PayloadTypeRegistry.clientboundPlay().register(PreviewPayload.TYPE, PreviewPayload.STREAM_CODEC);
-        // every player starts with the HUB, as Satisfactory's pioneers land with its parts: one is given to a player who has
-        // none while their company has no HUB standing
-        net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.JOIN.register(Prefabs::starterHub);
+        // every player spawns with the Build Gun, and gets another if they have lost theirs when they join or respawn
+        net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.JOIN.register(Prefabs::giveBuildGun);
+        net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> giveBuildGun(newPlayer));
         // a part cannot be mined, not even in creative: the structure is picked up from its terminal
         PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
             if (!isPart(state)) return true;
@@ -625,15 +658,6 @@ public final class Prefabs {
             SENT.clear();
             forget();
         });
-    }
-
-    static void starterHub(ServerPlayer player) {
-        if (Companies.isFake(player)) return;
-        Company company = Companies.of(player);
-        if (company == null || Claims.hasClaimingHub(player.level().getServer(), company)) return;
-        if (player.getInventory().countItem(ModBlocks.HUB.get().asItem()) > 0) return;
-        player.getInventory().placeItemBackInInventory(new ItemStack(ModBlocks.HUB.get()), Prediction.SERVER_ONLY);
-        player.sendSystemMessage(Component.translatable("siftec.prefab.welcome"));
     }
 
     private static boolean isGatewayPart(Level level, BlockPos pos) {

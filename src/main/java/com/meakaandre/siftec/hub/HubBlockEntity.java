@@ -120,4 +120,9 @@ public class HubBlockEntity extends BlockEntity {
             return;
         }
     }
+
+    /** True for the Wormhole Gateway's terminal, false for the HUB's. */
+    public boolean gateway() {
+        return getBlockState().getBlock() instanceof HubBlock hub && hub.gateway;
+    }
 }

@@ -343,8 +343,10 @@ public final class BuildingsATests {
         feeder(level, smIn, Direction.SOUTH, new ItemStack(Items.RAW_IRON), 4, 200);
 
         // ---- miners on hand-made nodes, each aimed a little off and snapped onto its node; their ore goes into a chest
-        Object[][] miners = {{"miner_mk1", NodeType.IRON, Purity.NORMAL, 60f}, {"miner_mk2", NodeType.IRON, Purity.IMPURE, 60f},
-            {"miner_mk3", NodeType.COPPER, Purity.PURE, 480f}};
+        // id, node, purity, and the items a break gives on average: Mk.1 none extra, Mk.2 Fortune III (2.2 on average by
+        // vanilla's ore formula), Mk.3 Fortune V (3.14)
+        Object[][] miners = {{"miner_mk1", NodeType.IRON, Purity.NORMAL, 1f, 1f}, {"miner_mk2", NodeType.IRON, Purity.IMPURE, 1.5f, 3f},
+            {"miner_mk3", NodeType.COPPER, Purity.PURE, 2.2f, 4.2f}};
         List<Placement> minerSpots = new ArrayList<>();
         for (int i = 0; i < miners.length; i++) {
             int x = X + 40 + 15 * i;
@@ -361,10 +363,28 @@ public final class BuildingsATests {
         Buildings.Check offNode = Buildings.check(level, at("miner_mk1", X + 130, Z + 10), company, wallet(Buildings.def("miner_mk1")), false);
         expect(source, "a miner off any node is refused", "siftec.build_gun.no_node".equals(offNode.reason), String.valueOf(offNode.reason));
 
-        // ---- Portable Miner on a normal copper node: 20 a minute, dropped in front
+        // ---- Portable Miner on a normal copper node: it breaks the node about 20 times a minute, the ore dropped in front
         BlockPos pmNode = node(level, NodeType.COPPER, Purity.NORMAL, X + 90, Z);
         Placement pm = Buildings.snapToNode(level, at("portable_miner", X + 90, Z + 2));
         put(level, source, company, pm);
+
+        // ---- every miner really mines: count each time its node block goes from grown to depleted, seen from outside
+        List<BlockPos> watched = new ArrayList<>();
+        for (Placement p : minerSpots) {
+            int[] cell = p.def().nodeCell();
+            watched.add(p.at(cell[0], cell[1], cell[2]));
+        }
+        watched.add(pmNode);
+        long[] depletions = new long[watched.size()];
+        boolean[] wasGrown = new boolean[watched.size()];
+        boolean[] counting = {false};
+        EVERY_TICK.add(() -> {
+            for (int i = 0; i < watched.size(); i++) {
+                boolean grown = level.getBlockState(watched.get(i)).getBlock() instanceof NodeBlock;
+                if (counting[0] && wasGrown[i] && !grown && level.getBlockState(watched.get(i)).getBlock() instanceof com.meakaandre.siftec.block.DepletedNodeBlock) depletions[i]++;
+                wasGrown[i] = grown;
+            }
+        });
 
         // ---- Storage Containers: a belt into the back of one; its front port fills a chest
         Placement st = at("storage_container", X + 105, Z);
@@ -409,12 +429,15 @@ public final class BuildingsATests {
         }
 
         // ---- measure: what each building has made over a minute once it has settled
-        long[] start = new long[8];
+        long[] start = new long[8], startItems = new long[4];
         later(level, WARMUP, () -> {
             start[0] = made(level, con);
             start[1] = made(level, sm);
             for (int i = 0; i < 3; i++) start[2 + i] = made(level, minerSpots.get(i));
             start[5] = made(level, pm);
+            for (int i = 0; i < 3; i++) startItems[i] = mined(level, minerSpots.get(i));
+            startItems[3] = mined(level, pm);
+            counting[0] = true;
             report(source, "measuring from " + java.util.Arrays.toString(start));
             report(source, "belts: constructor in " + beltState(level, conIn, Items.IRON_INGOT) + ", out " + beltState(level, conOut, item("create:iron_sheet"))
                 + "; basin " + count(level, basin, Items.IRON_INGOT) + " ingots " + count(level, basin, item("create:iron_sheet")) + " plates; smelter in "
@@ -431,22 +454,35 @@ public final class BuildingsATests {
             expect(source, "Smelter: 30 Iron Ingot a minute (2 s each)", ingots >= 26 && ingots <= 34, ingots + " ingots");
             long chest = count(level, sm.at(0, 0, -7), Items.IRON_INGOT) + onBelt(level, smOut, Items.IRON_INGOT);
             expect(source, "Smelter: its ingots come out on the belt at the front", chest >= 20, chest + " on the belt and in the Basin at its end");
+            counting[0] = false;
             for (int i = 0; i < 3; i++) {
                 Placement p = minerSpots.get(i);
-                long got = made(level, p) - start[2 + i];
-                float rate = (Float) miners[i][3];
-                expect(source, miners[i][0] + " on a " + miners[i][2] + " node: " + (int) rate + " a minute", Math.abs(got - rate) <= Math.max(2, rate / 60), got + " in a minute");
+                Purity purity = (Purity) miners[i][2];
+                long breaks = made(level, p) - start[2 + i], items = mined(level, p) - startItems[i];
+                BuildingDef d = p.def();
+                // a break needs the node grown back first: purity caps the breaks, the Mk's break time slows them a little
+                int regrow = com.meakaandre.siftec.node.NodeRegrowth.ticks(purity);
+                long most = 1200 / regrow + 1, least = (long) (1200f / (regrow + d.breakTicks() + 4) * 0.85f);
+                expect(source, miners[i][0] + " on a " + purity + " node really breaks it, " + least + " to " + most + " times a minute (purity regrows it every "
+                    + regrow + " ticks, the Mk breaks it in " + d.breakTicks() + ")", breaks >= least && breaks <= most && Math.abs(breaks - depletions[i]) <= 1,
+                    breaks + " breaks, " + depletions[i] + " depletions seen on the node");
+                float per = breaks == 0 ? 0 : items / (float) breaks;
+                float lo = (Float) miners[i][3], hi = (Float) miners[i][4];
+                expect(source, miners[i][0] + ": its Fortune " + d.fortune() + " gives " + lo + " to " + hi + " items a break, and nothing without a break",
+                    breaks > 0 && per >= lo && per <= hi, items + " items from " + breaks + " breaks (" + String.format(java.util.Locale.ROOT, "%.2f", per) + " a break)");
                 ControllerBlockEntity mc = controller(level, p);
-                expect(source, miners[i][0] + ": the node is still there (its drill never breaks it) and the ore reaches the chest",
-                    mc != null && mc.node != null && level.getBlockState(mc.node).getBlock() instanceof NodeBlock
+                BlockState nodeNow = mc == null || mc.node == null ? null : level.getBlockState(mc.node);
+                expect(source, miners[i][0] + ": the node is still there (grown or growing back) and its ore reaches the chest",
+                    nodeNow != null && (nodeNow.getBlock() instanceof NodeBlock || nodeNow.getBlock() instanceof com.meakaandre.siftec.block.DepletedNodeBlock)
                         && count(level, p.at(0, 0, -1), ((NodeType) miners[i][1]) == NodeType.IRON ? Items.RAW_IRON : Items.RAW_COPPER) > 0,
-                    mc == null ? "no controller" : String.valueOf(mc.node));
+                    mc == null ? "no controller" : String.valueOf(nodeNow));
             }
-            long dug = made(level, pm) - start[5];
-            expect(source, "Portable Miner on a normal node: 20 a minute", Math.abs(dug - 20) <= 2, dug + " in a minute");
+            long dug = made(level, pm) - start[5], dugItems = mined(level, pm) - startItems[3];
+            expect(source, "Portable Miner on a normal node: breaks it 16 to 21 times a minute (40 ticks each, after 20 to regrow), one ore each",
+                dug >= 16 && dug <= 21 && dugItems == dug && Math.abs(dug - depletions[3]) <= 1, dug + " breaks, " + dugItems + " items, " + depletions[3] + " depletions seen");
             int lying = 0;
             for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(pm.at(0, 0, -1)).inflate(1.5))) if (e.getItem().is(Items.RAW_COPPER)) lying += e.getItem().getCount();
-            expect(source, "Portable Miner: the ore lies on the ground in front", lying >= 20, lying + " lying there");
+            expect(source, "Portable Miner: the ore lies on the ground in front", lying >= 16, lying + " lying there");
             long stored = count(level, stChest, Items.COBBLESTONE) + count(level, BuildingLogic.cell(controller(level, st), block("create:item_vault")), Items.COBBLESTONE);
             expect(source, "Storage Container: the belt fills it and its front port empties it into a chest", stored == 30 && count(level, stChest, Items.COBBLESTONE) > 0,
                 count(level, stChest, Items.COBBLESTONE) + " in the chest of " + stored);
@@ -473,6 +509,11 @@ public final class BuildingsATests {
             && Math.abs(k.getSpeed()) == BuildingLogic.MOTOR_RPM;
     }
 
+    private static long mined(ServerLevel level, Placement p) {
+        ControllerBlockEntity c = controller(level, p);
+        return c == null ? 0 : c.mined;
+    }
+
     private static long made(ServerLevel level, Placement p) {
         ControllerBlockEntity c = controller(level, p);
         return c == null ? -1 : c.made;
@@ -487,18 +528,46 @@ public final class BuildingsATests {
         // the smoke server's default is creative, which would skip the cost
         fake.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         fake.getInventory().clearContent();
-        fake.getInventory().setItem(0, new ItemStack(Items.RAW_IRON, 19));
-        Prefabs.Check poor = Prefabs.place(level, spot, company, fake);
-        expect(source, "HUB: refused without 20 Raw Iron", !poor.ok() && "siftec.prefab.cost".equals(poor.reason) && fake.getInventory().countItem(Items.RAW_IRON) == 19,
-            poor.message().getString());
-        fake.getInventory().setItem(0, new ItemStack(Items.RAW_IRON, 25));
-        Prefabs.Check placed = Prefabs.place(level, spot, company, fake);
+        fake.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.meakaandre.siftec.registry.ModItems.BUILD_GUN.get()));
+        fake.getInventory().setItem(1, new ItemStack(Items.RAW_IRON, 19));
+        // the HUB is a Build Gun building like any other: listed in the Special tab, put down with the gun
+        BuildingDef hubDef = Buildings.def("hub");
+        expect(source, "HUB: a Build Gun building in the Special tab, unlocked from the start, costing 20 Raw Iron, and there is no HUB item",
+            hubDef != null && hubDef.hub() && Buildings.of(Category.SPECIAL, false).contains(hubDef) && hubDef.unlock().isEmpty()
+                && hubDef.cost().size() == 1 && hubDef.cost().getFirst().count() == 20 && ModBlocks.HUB.get().asItem() == Items.AIR,
+            hubDef == null ? "not listed" : hubDef.cost() + ", item " + ModBlocks.HUB.get().asItem());
+        if (hubDef == null) return;
+        Placement at = new Placement(hubDef, spot.anchor(), spot.facing(), false);
+        // the gun only builds at a hologram near the player: the fake player stands at the HUB's front edge
+        BlockPos stand = spot.anchor().relative(spot.facing().getOpposite(), 3);
+        fake.setPos(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5);
+        BuildGun.select(fake, "hub", false, at);
+        Prefabs.Check verdict = BuildGun.hubCheck(fake, at, company);
+        BuildGun.act(fake, company);
+        boolean none = !(level.getBlockEntity(spot.terminal()) instanceof HubBlockEntity);
+        expect(source, "HUB: the Build Gun refuses it without 20 Raw Iron", none && "siftec.prefab.cost".equals(verdict.reason) && fake.getInventory().countItem(Items.RAW_IRON) == 19,
+            verdict.message().getString());
+        fake.getInventory().setItem(1, new ItemStack(Items.RAW_IRON, 25));
+        expect(source, "HUB: with 20 Raw Iron the Build Gun's hologram is green", BuildGun.hubCheck(fake, at, company).ok(), BuildGun.hubCheck(fake, at, company).message().getString());
+        BuildGun.act(fake, company);
         HubBlockEntity hub = level.getBlockEntity(spot.terminal()) instanceof HubBlockEntity h ? h : null;
-        boolean gun = false;
-        for (int i = 0; i < fake.getInventory().getContainerSize(); i++) gun |= fake.getInventory().getItem(i).getItem() instanceof BuildGunItem;
-        expect(source, "HUB: placed for 20 Raw Iron and it gives the Build Gun", placed.ok() && hub != null && fake.getInventory().countItem(Items.RAW_IRON) == 5 && gun,
-            placed.message().getString() + "; raw iron left " + fake.getInventory().countItem(Items.RAW_IRON) + ", gun " + gun);
+        int guns = 0;
+        for (int i = 0; i < fake.getInventory().getContainerSize(); i++) if (fake.getInventory().getItem(i).getItem() instanceof BuildGunItem) guns++;
+        expect(source, "HUB: built with the Build Gun for 20 Raw Iron, and it hands out no Build Gun", hub != null && hub.prefab && fake.getInventory().countItem(Items.RAW_IRON) == 5 && guns == 1,
+            "HUB " + (hub != null) + ", raw iron left " + fake.getInventory().countItem(Items.RAW_IRON) + ", guns " + guns);
         if (hub == null) return;
+        // the gun finds the HUB from any of its blocks, to take it down: its terminal, its Craft Station, a block of its shell
+        BlockPos wall = null;
+        for (long key : Templates.hub().keys()) {
+            BlockState part = Templates.hub().at(key, hub.builtLevel);
+            if (part == null || part.isAir() || !Prefabs.isPart(part) || part.getBlock() instanceof com.meakaandre.siftec.hub.HubBlock) continue;
+            BlockPos local = BlockPos.of(key);
+            wall = spot.at(local.getX(), local.getY(), local.getZ());
+            break;
+        }
+        expect(source, "HUB: the Build Gun's dismantle mode finds it from its terminal, its Craft Station and its shell",
+            Prefabs.hubAt(level, spot.terminal()) == hub && Prefabs.hubAt(level, spot.at(Templates.PRESS_BASIN[0], Templates.PRESS_BASIN[1], Templates.PRESS_BASIN[2])) == hub
+                && wall != null && Prefabs.hubAt(level, wall) == hub, "shell block " + (wall == null ? "none" : level.getBlockState(wall)));
 
         // the Craft Station: protected like the HUB, run by hand with the hand cranks
         BlockPos press = spot.at(Templates.PRESS[0], Templates.PRESS[1], Templates.PRESS[2]);
@@ -536,15 +605,13 @@ public final class BuildingsATests {
             } else {
                 expect(source, "HUB: its first Biomass Burner stands", false, String.valueOf(level.getBlockState(b1)));
             }
-            List<ItemStack> back = Prefabs.dismantle(level, hub);
-            int iron = 0, hubs = 0, sheets = 0;
-            for (ItemStack s : back) {
-                if (s.is(Items.RAW_IRON)) iron += s.getCount();
-                if (s.is(ModBlocks.HUB.get().asItem())) hubs += s.getCount();
-                if (s.is(item("create:iron_sheet"))) sheets += s.getCount();
-            }
-            expect(source, "HUB: picked up, it gives back its 20 Raw Iron, the HUB and the Craft Station's contents", iron == 20 && hubs == 1 && sheets == 2
-                && !BuildingIndex.isMember(level, pressBasin) && level.getBlockState(press).isAir(), iron + " raw iron, " + hubs + " HUB, " + sheets + " plates");
+            fake.getInventory().clearContent();
+            boolean down = BuildGun.takeDownHub(fake, hub, company);
+            int iron = fake.getInventory().countItem(Items.RAW_IRON), sheets = fake.getInventory().countItem(item("create:iron_sheet"));
+            expect(source, "HUB: the Build Gun takes it down and gives back its 20 Raw Iron and the Craft Station's contents, and no HUB item",
+                down && iron == 20 && sheets == 2 && !BuildingIndex.isMember(level, pressBasin) && level.getBlockState(press).isAir()
+                    && !(level.getBlockEntity(spot.terminal()) instanceof HubBlockEntity),
+                iron + " raw iron, " + sheets + " plates, terminal " + level.getBlockState(spot.terminal()));
         });
     }
 

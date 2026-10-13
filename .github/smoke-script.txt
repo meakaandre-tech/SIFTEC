@@ -1,6 +1,7 @@
 cmd time set noon
 cmd weather clear
 cmd gamemode survival @a
+cmd siftec selftest prefab gun
 cmd clear @a
 cmd give @a siftec:heavy_oil_residue_bucket
 cmd give @a siftec:alumina_solution_bucket
@@ -17,7 +18,6 @@ cmd give @a minecraft:lava_bucket
 cmd give @a siftec:mead
 cmd give @a siftec:claim_marker
 cmd give @a create_new_age:copper_wire 16
-cmd give @a siftec:hub
 cmd give @a siftec:speed_governor
 sleep 3
 key e
@@ -67,7 +67,10 @@ sleep 1
 cmd gamemode survival @a
 cmd siftec worldtest sathub ground
 cmd clear @a
-cmd item replace entity @a weapon.mainhand with siftec:hub 2
+cmd item replace entity @a weapon.mainhand with siftec:build_gun
+cmd give @a minecraft:raw_iron 20
+sleep 2
+cmd siftec worldtest guntab special hub
 sleep 6
 shot
 cmd siftec worldtest sathub obstacle
@@ -78,6 +81,8 @@ sleep 3
 key u
 sleep 3
 cmd siftec selftest prefab placed
+sleep 1
+cmd siftec worldtest guntab production
 sleep 1
 cmd clear @a
 cmd gamemode spectator @a

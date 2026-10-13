@@ -17,10 +17,14 @@ chain.
 The Build Gun's buildings are multiblocks with real Create machines inside (`building/`): the Constructor (a Press
 over a Basin, its recipe picked by the controller's filter), the Smelter (an Encased Fan blasting through lava onto a
 Depot), Miner Mk.1 to Mk.3 and the Portable Miner (a Drill over a node), and the Storage Containers (Item Vaults).
-Each keeps to Satisfactory's time per recipe and rate per minute (`BasinPace`, `BuildingLogic`), takes belts at its
-input ports and puts what it makes onto the belt at its output port, and is turned by Create: New Age motors inside
-that run on the power grid. Every player starts with a HUB, which costs 20 Raw Iron to put down, hands out the Build
-Gun, and has a hand-cranked Craft Station (a Press and a Mixer over Basins) and two Biomass Burners.
+The machines keep to Satisfactory's time per recipe (`BasinPace`, `BuildingLogic`), take belts at their input ports
+and put what they make onto the belt at the output port, and are turned by Create: New Age motors inside that run on
+the power grid. A miner really mines its node: its Drill breaks the regrown node block and what the block drops is the
+output. The Mk sets how fast it breaks it (Mk.1 half a second, Mk.2 a quarter, Mk.3 a tenth, the unpowered Portable
+Miner two seconds) and its built-in Fortune (Mk.2 III, Mk.3 V, by vanilla's ore formula); the node's purity sets how
+fast it regrows, which caps every miner. Every player spawns with the Build Gun, and the first thing they build with it
+is the HUB (Special tab, 20 Raw Iron, given back when it is dismantled), which has a hand-cranked Craft Station (a Press
+and a Mixer over Basins) and two Biomass Burners.
 
 ## Power
 

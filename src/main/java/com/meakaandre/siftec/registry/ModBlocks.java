@@ -91,7 +91,8 @@ public class ModBlocks {
     public static final Supplier<ExtractorBlock> RESOURCE_WELL_EXTRACTOR = block("resource_well_extractor", ExtractorBlock::new, ModBlocks::machine);
 
     /** The HUB Terminal and the Wormhole Gateway's terminal; their items place the whole structure (see prefab.Prefabs). */
-    public static final Supplier<HubBlock> HUB = prefab("hub", com.meakaandre.siftec.prefab.Prefabs.Kind.HUB, properties -> new HubBlock(false, properties));
+    /** The HUB's terminal. The HUB has no item: every player builds it with the Build Gun (it is listed in content BUILDINGS). */
+    public static final Supplier<HubBlock> HUB = blockOnly("hub", properties -> new HubBlock(false, properties), ModBlocks::machine);
     public static final Supplier<HubBlock> WORMHOLE_GATEWAY = prefab("wormhole_gateway", com.meakaandre.siftec.prefab.Prefabs.Kind.GATEWAY, properties -> new HubBlock(true, properties));
 
     /**
@@ -201,7 +202,7 @@ public class ModBlocks {
         return () -> block;
     }
 
-    /** The HUB and Wormhole Gateway: the item is a {@link com.meakaandre.siftec.prefab.PrefabItem}, which places the whole structure. */
+    /** The Wormhole Gateway: the item is a {@link com.meakaandre.siftec.prefab.PrefabItem}, which places the whole structure. */
     private static Supplier<HubBlock> prefab(String name, com.meakaandre.siftec.prefab.Prefabs.Kind kind, Function<BlockBehaviour.Properties, HubBlock> factory) {
         Identifier id = Siftec.id(name);
         ResourceKey<Block> blockKey = ResourceKey.create(Registries.BLOCK, id);

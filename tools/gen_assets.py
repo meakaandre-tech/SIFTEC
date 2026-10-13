@@ -121,8 +121,10 @@ for look, (t, patch, tex, drop) in DEPOSIT.items():
     item_def(b, f"siftec:block/{b}")
     if not drop:
         continue
-    # mining the node gives its resource; the node itself grows back (node/NodeRegrowth.java)
-    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": drop}]}]})
+    # mining the node gives its resource, more with Fortune by vanilla's ore formula (a pickaxe's, or a miner's built-in
+    # Fortune III or V); the node itself grows back (node/NodeRegrowth.java)
+    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": drop,
+          "modifier": [{"type": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"}]}]}]})
     # the depleted node: a low stub of bare patch stone where the ore was
     lang[f"block.siftec.{b}_depleted"] = f"{name} Node (mined)"
     write(f"{A}/models/block/{b}_depleted.json", {"parent": "minecraft:block/block", "textures": {"particle": side, "side": side, "top": top},
@@ -289,13 +291,13 @@ lang.update({
     "siftec.prefab.no_sleep": "The HUB's bunks cannot be slept in here",
     "siftec.prefab.placed": "%s built",
     "siftec.prefab.dismantle_confirm": "Sneak and use it again to pick up the whole %s. Its contents come with it and progress is kept",
+    "siftec.prefab.hub_gun": "Take the HUB down with the Build Gun's dismantle mode (X): its 20 Raw Iron and contents come back",
     "siftec.prefab.dismantled": "%s picked up",
     "siftec.prefab.part": "Part of the %s: sneak and use its terminal twice to pick up the whole structure",
     "siftec.claim.hub_too_close": "Too close to another company's land: a claiming HUB must be more than %s chunks from another company's HUB",
     "siftec.claim.hub_extra": "HUB placed. Your company's first HUB already holds its land, so this one claims nothing",
     "siftec.prefab.cost": "Building the HUB takes %s %s from your inventory",
-    "siftec.prefab.build_gun": "The HUB gave you a Build Gun",
-    "siftec.prefab.welcome": "You have a HUB: hold it and right-click the ground to build it (it takes 20 Raw Iron). It gives you the Build Gun",
+    "siftec.prefab.build_gun": "You have a Build Gun: build the HUB with it first (Tab to the Special tab, 20 Raw Iron)",
     "siftec.burner.fuel": "The HUB's Biomass Burners burn leaves, logs, Biomass and Solid Biofuel",
 })
 lang["siftec.sift.closed"] = "The Sift is closed to you until your company finishes Wormhole Phase 5"
@@ -701,7 +703,7 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
         raise SystemExit(f"building {bid}: unknown Build Gun tab {tab!r}")
     if unlock and unlock not in by_id:
         raise SystemExit(f"building {bid}: unlocked by {unlock!r}, which is no milestone or MAM node")
-    if not os.path.exists(os.path.join(D, "structure", "building", bid + ".nbt")):
+    if not extra.get("prefab") and not os.path.exists(os.path.join(D, "structure", "building", bid + ".nbt")):
         raise SystemExit(f"building {bid}: no template at data/siftec/structure/building/{bid}.nbt (run tools/structures.py)")
     parsed = content.parse_cost(cost)
     for c, n in parsed: check(c, "building " + bid)
@@ -715,7 +717,7 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
         if extra["logic"] not in LOGICS:
             raise SystemExit(f"building {bid}: unknown logic {extra['logic']!r}")
         b["logic"] = extra["logic"]
-    for k in ("su", "rate", "mw", "water", "lines"):
+    for k in ("su", "break", "fortune", "mw", "water", "lines"):
         if k in extra: b[k] = extra[k]
     if "power" in extra:
         if extra["power"] not in POWERS:
@@ -723,6 +725,10 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
         b["power"] = extra["power"]
     if "vent" in extra:
         b["vent"] = list(extra["vent"])
+    if extra.get("prefab"):
+        if extra["prefab"] != "hub":
+            raise SystemExit(f"building {bid}: unknown prefab {extra['prefab']!r}")
+        b["prefab"] = extra["prefab"]
     data["buildings"].append(b)
     lang[f"siftec.building.{bid}"] = bname
 # Satisfactory's time for each machine recipe a building paces (building/MachineTimes.java), in ticks, and the Smelter's
@@ -778,6 +784,7 @@ lang.update({
     "siftec.build_gun.overlay_none": "%s | Ctrl + Scroll to pick a building, Tab for the next tab",
     "siftec.build_gun.overlay_dismantle": "Dismantle | %s",
     "siftec.build_gun.fits": "Right-click to build the %s. R rotate, F flip, Ctrl nudge",
+    "siftec.build_gun.fits_hub": "Right-click to build the HUB. R rotate, Ctrl nudge",
     "siftec.build_gun.blocked": "%s blocks are in the way (marked red)",
     "siftec.build_gun.missing": "Missing %s %s",
     "siftec.build_gun.no_template": "The %s building has no template yet",
@@ -800,7 +807,9 @@ lang.update({
     "siftec.building.filter_set": "The %s makes %s now",
     "siftec.building.filter_cleared": "The %s's recipe filter is cleared",
     "siftec.building.filter_refused": "The %s cannot make that",
-    "siftec.building.node": "on %s, %s a minute",
+    "siftec.building.node": "on %s, breaks it in %s s once it regrows",
+    "siftec.building.fortune": "Fortune %s",
+    "siftec.building.mined": "%s mined",
     "siftec.building.no_node": "no node under it",
     "siftec.building.full": "output full",
     "siftec.building.stopped": "not turning",
@@ -883,7 +892,9 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
     write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
         "top": "minecraft:block/lodestone_top", "side": top, "bottom": top}})
-    item_def(b, f"siftec:block/{b}")
+    # the HUB is built with the Build Gun and has no item; the Gateway is still an item
+    if b != "hub":
+        item_def(b, f"siftec:block/{b}")
 
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 

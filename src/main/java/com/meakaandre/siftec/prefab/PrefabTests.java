@@ -67,7 +67,8 @@ public final class PrefabTests {
                     .then(Commands.literal("check").executes(PrefabTests::check))
                     .then(Commands.literal("restart").executes(PrefabTests::restart))
                     .then(Commands.literal("bed").executes(PrefabTests::bed))
-                    .then(Commands.literal("placed").executes(PrefabTests::placed))))
+                    .then(Commands.literal("placed").executes(PrefabTests::placed))
+                    .then(Commands.literal("gun").executes(PrefabTests::gun))))
                 .then(Commands.literal("worldtest").then(Commands.literal("sathub")
                     .then(Commands.argument("stage", StringArgumentType.word())
                         .executes(c -> stage(c, StringArgumentType.getString(c, "stage"), 0))
@@ -272,7 +273,7 @@ public final class PrefabTests {
         AABB boundsA = Prefabs.bounds(spotA);
         List<ItemStack> back1 = Prefabs.dismantle(level, hub);
         boolean released = Claims.at(level, spotA.terminal()) == null;
-        report(source, "picked up: HUB items " + count(back1, ModBlocks.HUB.get().asItem()) + ", iron rods " + count(back1, com.meakaandre.siftec.registry.ModItems.PARTS.get("iron_rod"))
+        report(source, "picked up: HUB items (none any more) " + back1.stream().filter(st -> st.getItem().builtInRegistryHolder().key().identifier().getPath().equals("hub")).count() + ", iron rods " + count(back1, com.meakaandre.siftec.registry.ModItems.PARTS.get("iron_rod"))
             + " of 10, diamonds " + count(back1, Items.DIAMOND) + " of 3, biomass " + count(back1, biomass()) + " of " + coalIn
             + "; parts left standing " + partsIn(level, boundsA) + "; land released " + released + "; progress kept " + a.has("hub_upgrade_6"));
 
@@ -487,7 +488,25 @@ public final class PrefabTests {
         return 1;
     }
 
-    /** After the client player clicked with a HUB: is the HUB there, and was the item used up (survival)? */
+    /** Right after the client player joined: they have the Build Gun (every player spawns with it) and no HUB item. */
+    private static int gun(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        List<ServerPlayer> players = source.getServer().getPlayerList().getPlayers();
+        if (players.isEmpty()) return 0;
+        ServerPlayer player = players.get(0);
+        int guns = 0;
+        boolean hubItem = false;
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack st = player.getInventory().getItem(i);
+            if (st.getItem() instanceof com.meakaandre.siftec.building.BuildGunItem) guns += st.getCount();
+            if (!st.isEmpty() && st.getItem().builtInRegistryHolder().key().identifier().toString().equals("siftec:hub")) hubItem = true;
+        }
+        report(source, "joined: the player has " + guns + " Build Gun, a HUB item " + hubItem + "; HUB block has an item " + (ModBlocks.HUB.get().asItem() != Items.AIR)
+            + "; spawns with the gun " + (guns == 1 && !hubItem));
+        return 1;
+    }
+
+    /** After the client player built the HUB with the Build Gun: is it there, and were its 20 Raw Iron taken (survival)? */
     private static int placed(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
@@ -495,7 +514,7 @@ public final class PrefabTests {
         if (players.isEmpty()) return 0;
         ServerPlayer player = players.get(0);
         HubBlockEntity hub = terminal(level, view());
-        int items = player.getInventory().countItem(ModBlocks.HUB.get().asItem());
+        int items = player.getInventory().countItem(Items.RAW_IRON);
         String found = hub != null ? "on the spot" : "not found";
         if (hub == null) {
             BlockPos at = view().terminal();
@@ -510,7 +529,7 @@ public final class PrefabTests {
             }
         }
         report(source, "the player's HUB was " + found);
-        report(source, "placed by the player: structure " + (hub != null && hub.prefab) + ", parts " + parts(level, view()) + ", HUB items left " + items
+        report(source, "placed by the player: structure " + (hub != null && hub.prefab) + ", parts " + parts(level, view()) + ", Raw Iron left " + items + " (of 20)"
             + ", gamemode " + player.gameMode() + ", claims " + (Claims.at(level, view().terminal()) != null));
         return 1;
     }
