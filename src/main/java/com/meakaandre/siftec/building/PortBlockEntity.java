@@ -45,7 +45,7 @@ public class PortBlockEntity extends SmartBlockEntity {
         behaviours.add(new DirectBeltInputBehaviour(this).onlyInsertWhen(this::beltCanInsert).setInsertionHandler(this::fromBelt));
     }
 
-    private @Nullable PortBlock.Kind kind() {
+    private PortBlock.@Nullable Kind kind() {
         BlockState state = getBlockState();
         return state.hasProperty(PortBlock.KIND) ? state.getValue(PortBlock.KIND) : null;
     }
