@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/non_fissile_uranium",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 7389296
+      }
+    ]
+  }
+}

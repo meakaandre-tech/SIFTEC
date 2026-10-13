@@ -1,9 +1,0 @@
-{
-  "type": "create:pressing",
-  "ingredient": "siftec:aluminum_ingot",
-  "results": [
-    {
-      "id": "siftec:aluminum_casing"
-    }
-  ]
-}

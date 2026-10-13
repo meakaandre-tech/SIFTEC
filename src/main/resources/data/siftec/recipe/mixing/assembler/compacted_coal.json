@@ -1,0 +1,30 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur"
+  ],
+  "results": [
+    {
+      "id": "siftec:compacted_coal",
+      "count": 5
+    }
+  ],
+  "processing_time": 240
+}

@@ -1,0 +1,15 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:iron_ingot",
+    "#c:ingots/steel"
+  ],
+  "results": [
+    {
+      "id": "create:iron_sheet",
+      "count": 3
+    }
+  ],
+  "processing_time": 80
+}

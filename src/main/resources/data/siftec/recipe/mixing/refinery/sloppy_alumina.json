@@ -1,0 +1,30 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 32400,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:alumina_solution",
+      "amount": 38880
+    }
+  ],
+  "processing_time": 60
+}

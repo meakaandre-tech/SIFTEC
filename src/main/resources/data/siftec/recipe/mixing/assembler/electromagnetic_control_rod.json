@@ -1,0 +1,17 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:stator",
+    "siftec:stator",
+    "siftec:stator",
+    "siftec:ai_limiter",
+    "siftec:ai_limiter"
+  ],
+  "results": [
+    {
+      "id": "siftec:electromagnetic_control_rod",
+      "count": 2
+    }
+  ],
+  "processing_time": 600
+}

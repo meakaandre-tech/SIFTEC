@@ -1,0 +1,11 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:charged_alien_power_matrix",
+  "result": {
+    "id": "siftec:alien_power_matrix"
+  },
+  "fluid_result": {
+    "id": "siftec:dark_matter_residue",
+    "amount": 77760
+  }
+}

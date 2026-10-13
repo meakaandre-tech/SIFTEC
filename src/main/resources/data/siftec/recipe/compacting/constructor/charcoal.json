@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "#minecraft:logs"
+  ],
+  "results": [
+    {
+      "id": "minecraft:coal",
+      "count": 10
+    }
+  ],
+  "processing_time": 80
+}

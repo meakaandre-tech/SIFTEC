@@ -1,0 +1,20 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones"
+  ],
+  "results": [
+    {
+      "id": "siftec:encased_industrial_beam"
+    }
+  ],
+  "processing_time": 200
+}

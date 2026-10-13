@@ -1,0 +1,36 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:circuit_board",
+    "siftec:circuit_board",
+    "siftec:circuit_board",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic"
+  ],
+  "results": [
+    {
+      "id": "siftec:computer_core"
+    }
+  ],
+  "processing_time": 480
+}

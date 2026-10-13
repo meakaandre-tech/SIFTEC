@@ -1,0 +1,23 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke"
+  ],
+  "results": [
+    {
+      "id": "siftec:circuit_board"
+    }
+  ],
+  "processing_time": 240
+}

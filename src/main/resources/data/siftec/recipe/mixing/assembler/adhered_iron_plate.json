@@ -1,0 +1,15 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "siftec:rubber"
+  ],
+  "results": [
+    {
+      "id": "siftec:reinforced_iron_plate"
+    }
+  ],
+  "processing_time": 320
+}

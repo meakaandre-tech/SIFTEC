@@ -1,0 +1,51 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke"
+  ],
+  "results": [
+    {
+      "id": "cgs:steel_ingot",
+      "count": 20
+    }
+  ],
+  "processing_time": 240
+}

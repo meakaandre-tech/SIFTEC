@@ -1,0 +1,22 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe"
+  ],
+  "results": [
+    {
+      "id": "siftec:sam_fluctuator_core"
+    }
+  ],
+  "processing_time": 120
+}

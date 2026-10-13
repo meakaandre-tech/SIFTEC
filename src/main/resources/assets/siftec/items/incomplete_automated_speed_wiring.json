@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/incomplete_automated_speed_wiring",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 6316136
+      }
+    ]
+  }
+}

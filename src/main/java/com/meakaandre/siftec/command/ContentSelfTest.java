@@ -46,8 +46,9 @@ final class ContentSelfTest {
         }
         report(source, "SELFTEST content item locks:" + locks);
         StringBuilder recipes = new StringBuilder();
-        for (String id : new String[]{"siftec:mixing/gunpowder_with_coal", "siftec:mixing/lava_from_magma_block", "siftec:mixing/sulfuric_acid",
-            "siftec:crafting/deployer", "siftec:compacting/steel_beam"}) {
+        for (String id : new String[]{"siftec:mixing/gunpowder_with_coal", "siftec:mixing/lava_from_magma_block", "siftec:mixing/refinery/sulfuric_acid",
+            "siftec:crafting/deployer", "siftec:compacting/constructor/steel_beam", "siftec:compacting/constructor/iron_plate",
+            "siftec:mixing/manufacturer/computer_core", "siftec:mixing/assembler/bolted_iron_plate", "siftec:filling/packager/packaged_fuel"}) {
             var holder = source.getServer().getRecipeManager().getRecipes().stream().filter(h -> h.id().identifier().toString().equals(id)).findFirst();
             recipes.append(' ').append(id).append('=').append(holder.isEmpty() ? "missing" : RecipeLocks.lockOf(source.getServer(), holder.get().value()));
         }

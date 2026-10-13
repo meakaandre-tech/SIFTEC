@@ -1,0 +1,22 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "#minecraft:leaves",
+    "#minecraft:leaves",
+    "#minecraft:leaves",
+    "#minecraft:leaves",
+    "#minecraft:leaves",
+    "#minecraft:leaves",
+    "#minecraft:leaves",
+    "#minecraft:leaves",
+    "#minecraft:leaves",
+    "#minecraft:leaves"
+  ],
+  "results": [
+    {
+      "id": "siftec:biomass",
+      "count": 5
+    }
+  ],
+  "processing_time": 100
+}

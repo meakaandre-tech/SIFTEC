@@ -45,10 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Selftests for automation: the Power Line pressed from Cable and a Workshop item made in a Mechanical Crafter only
- * for a company that has them unlocked; a big build's sub-assembly and the build itself run step by step through a
- * sequenced assembly (as the Deployer asks for each step) and through the Mechanical Crafter, for an unlocked and a
- * locked company; a Workshop saved by the old automatic mode giving its parts back; and a machine's fake player and
+ * Selftests for automation: the Power Line pressed from Cable only for a company that has it unlocked (and the old
+ * Workshop crafter route refused); the Manufacturer's second step for a part and for equipment, run step by step
+ * through a sequenced assembly (as the Deployer asks for each step), for an unlocked and a locked company; a Workshop saved by the old automatic mode giving its parts back; and a machine's fake player and
  * a real Deployer stringing a Power Line between two poles. Every line of output starts with "SELFTEST automate".
  */
 public final class AutomateTests {
@@ -90,13 +89,12 @@ public final class AutomateTests {
         level.setChunkForced(x >> 4, z >> 4, true);
         try {
             machines(source, level, at);
-            assembly(source, level, at.east(4), "siftec:gateway_coil");
-            assembly(source, level, at.east(4), "siftec:wormhole_gateway");
-            // a shortened line: three Deployers (Reinforced Iron Plate, Wire Spool, Screw Bundle), two loops
+            // the Manufacturer's second step: its Core takes one Deployer step per kind of part
+            assembly(source, level, at.east(4), "siftec:adaptive_control_unit");
+            assembly(source, level, at.east(4), "siftec:modular_engine");
+            // equipment made by machine the same way (Reinforced Iron Plate, Wire, Screw; then Fabric, Copper Sheet, Steel Pipe)
             assembly(source, level, at.east(4), "siftec:object_scanner");
-            crafted(source, level, at.east(4), "siftec:gas_mask");
-            crafted(source, level, at.east(4), "siftec:accelerator_segment");
-            crafted(source, level, at.east(4), "siftec:particle_accelerator");
+            assembly(source, level, at.east(4), "siftec:gas_mask");
             workshop(source, level, at.west(4));
             poles(source, level, at.south(4));
             deployer(source, level, at.north(6));
@@ -111,7 +109,7 @@ public final class AutomateTests {
         return 1;
     }
 
-    /** A Mechanical Press and a Mechanical Crafter, each asking for its recipe as it does while it ticks. */
+    /** A Mechanical Press asking for its recipe as it does while it ticks, and a Mechanical Crafter that no recipe of the pack's uses any more. */
     private static void machines(CommandSourceStack source, ServerLevel level, BlockPos at) {
         level.setBlockAndUpdate(at, BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:mechanical_press")).defaultBlockState());
         level.setBlockAndUpdate(at.east(), BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:mechanical_crafter")).defaultBlockState());
@@ -121,7 +119,7 @@ public final class AutomateTests {
             return;
         }
         SingleRecipeInput cable = new SingleRecipeInput(new ItemStack(item("siftec:cable")));
-        // the Portable Miner's crafter recipe: 1 Mechanical Drill, 2 Iron Sheet, 4 Iron Rod, three to a row
+        // what the old Workshop route crafted a Portable Miner from (1 Mechanical Drill, 2 Iron Sheet, 4 Iron Rod): refused now
         ItemStack drill = new ItemStack(item("create:mechanical_drill")), sheet = new ItemStack(item("create:iron_sheet")), rod = new ItemStack(item("siftec:iron_rod"));
         CraftingInput grid = CraftingInput.of(3, 3, List.of(drill, sheet, sheet, rod, rod, rod, rod, ItemStack.EMPTY, ItemStack.EMPTY));
         StringBuilder said = new StringBuilder();
@@ -205,48 +203,6 @@ public final class AutomateTests {
             said.append(company.equals(YES) ? "unlocked company: " : "; locked company: ").append(outcome);
         }
         report(source, "assembly " + made + ": " + said);
-        level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
-    }
-
-    /** The Mechanical Crafter recipe that makes the item, its grid laid out as the crafters hold it. */
-    private static void crafted(CommandSourceStack source, ServerLevel level, BlockPos at, String made) {
-        MechanicalCraftingRecipe recipe = null;
-        for (RecipeHolder<?> holder : source.getServer().getRecipeManager().getRecipes()) {
-            if (holder.value() instanceof MechanicalCraftingRecipe r && holder.id().identifier().getNamespace().equals("siftec")
-                && BuiltInRegistries.ITEM.getKey(r.result().item().value()).toString().equals(made)) recipe = r;
-        }
-        if (recipe == null) {
-            report(source, "crafter " + made + ": no Mechanical Crafter recipe makes it");
-            return;
-        }
-        List<ItemStack> cells = new ArrayList<>();
-        int parts = 0;
-        for (java.util.Optional<Ingredient> cell : recipe.raw().ingredients()) {
-            ItemStack stack = cell.map(AutomateTests::first).orElse(ItemStack.EMPTY);
-            if (!stack.isEmpty()) parts++;
-            cells.add(stack);
-        }
-        CraftingInput grid = CraftingInput.of(recipe.raw().width(), recipe.raw().height(), cells);
-        level.setBlockAndUpdate(at, BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:mechanical_crafter")).defaultBlockState());
-        BlockEntity crafter = level.getBlockEntity(at);
-        if (crafter == null) {
-            report(source, "crafter: no block entity");
-            return;
-        }
-        StringBuilder said = new StringBuilder();
-        for (String company : List.of(YES, NO)) {
-            crafter.setAttached(Ownership.OWNER, company);
-            String result;
-            Ownership.ticking(crafter);
-            try {
-                result = level.recipeAccess().getRecipeFor(com.zurrtum.create.AllRecipeTypes.MECHANICAL_CRAFTING, grid, level)
-                    .map(h -> h.value().assemble(grid).toString()).orElse("refused");
-            } finally {
-                Ownership.ticking(null);
-            }
-            said.append(company.equals(YES) ? "unlocked company: " : "; locked company: ").append(result);
-        }
-        report(source, "crafter " + made + " (" + recipe.raw().width() + " by " + recipe.raw().height() + ", " + parts + " parts): " + said);
         level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
     }
 

@@ -1,0 +1,24 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:reinforced_iron_plate",
+    "siftec:reinforced_iron_plate",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe"
+  ],
+  "results": [
+    {
+      "id": "siftec:modular_frame",
+      "count": 3
+    }
+  ],
+  "processing_time": 1200
+}

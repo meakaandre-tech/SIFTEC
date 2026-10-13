@@ -1,0 +1,14 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:fused_modular_frame",
+    "siftec:radio_control_unit",
+    "siftec:radio_control_unit"
+  ],
+  "results": [
+    {
+      "id": "siftec:pressure_conversion_cube"
+    }
+  ],
+  "processing_time": 1200
+}

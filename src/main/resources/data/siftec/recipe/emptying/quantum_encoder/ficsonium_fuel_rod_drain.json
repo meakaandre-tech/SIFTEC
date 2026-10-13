@@ -1,0 +1,11 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:charged_ficsonium_fuel_rod",
+  "result": {
+    "id": "siftec:ficsonium_fuel_rod"
+  },
+  "fluid_result": {
+    "id": "siftec:dark_matter_residue",
+    "amount": 64800
+  }
+}

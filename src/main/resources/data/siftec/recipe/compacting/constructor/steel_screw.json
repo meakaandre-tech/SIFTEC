@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "siftec:steel_beam"
+  ],
+  "results": [
+    {
+      "id": "siftec:screw",
+      "count": 52
+    }
+  ],
+  "processing_time": 240
+}

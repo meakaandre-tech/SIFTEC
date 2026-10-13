@@ -1,0 +1,18 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:brass_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot",
+    "minecraft:copper_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:quickwire",
+      "count": 12
+    }
+  ],
+  "processing_time": 160
+}

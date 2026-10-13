@@ -1,0 +1,42 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire"
+  ],
+  "results": [
+    {
+      "id": "siftec:reinforced_iron_plate",
+      "count": 3
+    }
+  ],
+  "processing_time": 640
+}

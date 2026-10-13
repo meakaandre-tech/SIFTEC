@@ -1,0 +1,29 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:time_crystal",
+    "siftec:time_crystal",
+    "siftec:time_crystal",
+    "siftec:time_crystal",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon",
+    "siftec:ficsite_trigon"
+  ],
+  "results": [
+    {
+      "id": "siftec:neural_quantum_processor_core"
+    }
+  ],
+  "processing_time": 400
+}

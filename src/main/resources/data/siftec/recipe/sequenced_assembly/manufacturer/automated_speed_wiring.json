@@ -1,0 +1,38 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:automated_speed_wiring_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_automated_speed_wiring"
+  },
+  "result": {
+    "id": "siftec:automated_wiring",
+    "count": 4
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:stator",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:wire",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:high_speed_connector",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire",
+    "siftec:quickwire"
+  ],
+  "results": [
+    {
+      "id": "siftec:circuit_board",
+      "count": 7
+    }
+  ],
+  "processing_time": 960
+}

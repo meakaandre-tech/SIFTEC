@@ -1,0 +1,40 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs",
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 6480,
+      "fluid": "createdieselgenerators:diesel"
+    },
+    {
+      "type": "fluid_stack",
+      "amount": 12960,
+      "fluid": "siftec:heavy_oil_residue"
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "siftec:turbofuel",
+      "amount": 19440
+    }
+  ],
+  "processing_time": 160
+}

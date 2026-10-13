@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/encased_plutonium_cell",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 4243648
+      }
+    ]
+  }
+}

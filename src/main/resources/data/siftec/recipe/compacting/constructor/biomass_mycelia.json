@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "#siftec:mycelia"
+  ],
+  "results": [
+    {
+      "id": "siftec:biomass",
+      "count": 10
+    }
+  ],
+  "processing_time": 80
+}

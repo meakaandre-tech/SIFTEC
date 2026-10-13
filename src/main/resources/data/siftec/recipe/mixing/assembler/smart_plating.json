@@ -1,0 +1,13 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:reinforced_iron_plate",
+    "siftec:rotor"
+  ],
+  "results": [
+    {
+      "id": "siftec:smart_plating"
+    }
+  ],
+  "processing_time": 600
+}

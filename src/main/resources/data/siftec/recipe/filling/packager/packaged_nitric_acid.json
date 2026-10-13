@@ -1,0 +1,13 @@
+{
+  "type": "create:filling",
+  "ingredient": "siftec:empty_fluid_tank",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 3240,
+    "fluid": "siftec:nitric_acid"
+  },
+  "result": {
+    "id": "siftec:packaged_nitric_acid"
+  },
+  "processing_time": 40
+}

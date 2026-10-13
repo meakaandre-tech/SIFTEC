@@ -1,0 +1,24 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:dark_matter_crystal",
+    "siftec:dark_matter_crystal",
+    "siftec:dark_matter_crystal",
+    "siftec:dark_matter_crystal",
+    "siftec:dark_matter_crystal",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet"
+  ],
+  "results": [
+    {
+      "id": "siftec:superposition_oscillator_core"
+    }
+  ],
+  "processing_time": 240
+}

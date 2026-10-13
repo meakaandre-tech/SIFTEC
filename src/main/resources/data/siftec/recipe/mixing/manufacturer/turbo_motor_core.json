@@ -1,0 +1,41 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:cooling_system",
+    "siftec:cooling_system",
+    "siftec:cooling_system",
+    "siftec:radio_control_unit",
+    "siftec:motor",
+    "siftec:motor",
+    "siftec:motor",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber"
+  ],
+  "results": [
+    {
+      "id": "siftec:turbo_motor_core"
+    }
+  ],
+  "processing_time": 640
+}

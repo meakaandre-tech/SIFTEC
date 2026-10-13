@@ -1,0 +1,38 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:crystal_oscillator_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_crystal_oscillator"
+  },
+  "result": {
+    "id": "siftec:crystal_oscillator",
+    "count": 2
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:quartz_crystal",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:cable",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:reinforced_iron_plate",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

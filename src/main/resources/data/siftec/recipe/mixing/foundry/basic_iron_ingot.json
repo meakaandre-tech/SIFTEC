@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "minecraft:raw_iron",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones"
+  ],
+  "results": [
+    {
+      "id": "minecraft:iron_ingot",
+      "count": 10
+    }
+  ],
+  "processing_time": 240
+}

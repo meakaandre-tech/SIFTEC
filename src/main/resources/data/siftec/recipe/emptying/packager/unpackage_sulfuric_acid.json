@@ -1,0 +1,12 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:packaged_sulfuric_acid",
+  "result": {
+    "id": "siftec:empty_canister"
+  },
+  "fluid_result": {
+    "id": "siftec:sulfuric_acid",
+    "amount": 3240
+  },
+  "processing_time": 20
+}

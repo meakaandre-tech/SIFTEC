@@ -1,0 +1,25 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:modular_frame",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam",
+    "siftec:steel_beam"
+  ],
+  "results": [
+    {
+      "id": "siftec:versatile_framework",
+      "count": 2
+    }
+  ],
+  "processing_time": 480
+}

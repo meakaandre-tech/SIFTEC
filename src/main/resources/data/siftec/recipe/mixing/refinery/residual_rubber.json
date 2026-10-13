@@ -1,0 +1,24 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:polymer_resin",
+    "siftec:polymer_resin",
+    "siftec:polymer_resin",
+    "siftec:polymer_resin"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 12960,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:rubber",
+      "count": 2
+    }
+  ],
+  "processing_time": 120
+}

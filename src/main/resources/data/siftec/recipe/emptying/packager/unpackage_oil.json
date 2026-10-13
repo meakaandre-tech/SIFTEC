@@ -1,0 +1,20 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:emptying",
+  "ingredient": "siftec:packaged_oil",
+  "result": {
+    "id": "siftec:empty_canister"
+  },
+  "fluid_result": {
+    "id": "createdieselgenerators:crude_oil",
+    "amount": 3240
+  },
+  "processing_time": 20
+}

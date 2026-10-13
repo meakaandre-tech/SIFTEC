@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/incomplete_modular_engine",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 6316136
+      }
+    ]
+  }
+}

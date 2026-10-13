@@ -1,0 +1,13 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:copper_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:wire",
+      "count": 2
+    }
+  ],
+  "processing_time": 80
+}

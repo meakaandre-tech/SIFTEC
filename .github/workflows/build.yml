@@ -19,6 +19,14 @@ jobs:
           distribution: temurin
           java-version: 25
       - uses: gradle/actions/setup-gradle@v4
+      - name: Generated data matches the generators, and the recipe checkers pass
+        shell: bash
+        run: |
+          # tools/gen_assets.py writes src/main/resources and runs tools/check_recipes.py (reachability,
+          # automatability, conflicts); it stops on a checker error, and the committed files must be what it writes
+          (cd /tmp && python3 -I -B "$GITHUB_WORKSPACE/tools/gen_assets.py")
+          git status --porcelain
+          test -z "$(git status --porcelain)"
       - name: Download Create Fly
         shell: bash
         run: |

@@ -1,0 +1,17 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz",
+    "minecraft:quartz"
+  ],
+  "results": [
+    {
+      "id": "siftec:quartz_crystal",
+      "count": 3
+    }
+  ],
+  "processing_time": 160
+}

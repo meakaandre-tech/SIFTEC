@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:iron_ingot"
+  ],
+  "results": [
+    {
+      "id": "siftec:iron_rod"
+    }
+  ],
+  "processing_time": 80
+}

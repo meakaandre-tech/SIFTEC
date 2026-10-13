@@ -1,0 +1,41 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw",
+    "siftec:screw"
+  ],
+  "results": [
+    {
+      "id": "siftec:rotor"
+    }
+  ],
+  "processing_time": 300
+}

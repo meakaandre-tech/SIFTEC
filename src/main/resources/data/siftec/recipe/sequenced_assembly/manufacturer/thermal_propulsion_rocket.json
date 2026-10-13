@@ -1,0 +1,46 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:thermal_propulsion_rocket_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_thermal_propulsion_rocket"
+  },
+  "result": {
+    "id": "siftec:thermal_propulsion_rocket",
+    "count": 2
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:modular_engine",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:turbo_motor",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:cooling_system",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:fused_modular_frame",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

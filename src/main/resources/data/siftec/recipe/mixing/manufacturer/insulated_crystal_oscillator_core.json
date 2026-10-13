@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber",
+    "siftec:rubber"
+  ],
+  "results": [
+    {
+      "id": "siftec:insulated_crystal_oscillator_core"
+    }
+  ],
+  "processing_time": 640
+}

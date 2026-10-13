@@ -1,0 +1,21 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke"
+  ],
+  "results": [
+    {
+      "id": "create:brass_ingot",
+      "count": 3
+    }
+  ],
+  "processing_time": 160
+}

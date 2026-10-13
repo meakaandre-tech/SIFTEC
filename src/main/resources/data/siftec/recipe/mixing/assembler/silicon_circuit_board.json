@@ -1,0 +1,34 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica"
+  ],
+  "results": [
+    {
+      "id": "siftec:circuit_board",
+      "count": 5
+    }
+  ],
+  "processing_time": 480
+}

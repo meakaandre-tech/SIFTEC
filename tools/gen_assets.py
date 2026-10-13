@@ -145,6 +145,11 @@ write(os.path.join(ROOT, "data", "siftec", "tags", "item", "stones.json"), {"rep
       ["minecraft:stone", "minecraft:cobblestone", "minecraft:cobbled_deepslate", "minecraft:deepslate", "minecraft:blackstone", "minecraft:basalt"]
       + [STONE[k][1] for k in STONE_KINDS]})
 lang["siftec.tag.stones"] = "any stone"
+# Satisfactory's Mycelia is any mushroom; the Stinger's remains are what spiders drop (content.SAT_NAMES)
+write(os.path.join(ROOT, "data", "siftec", "tags", "item", "mycelia.json"), {"replace": False, "values": ["minecraft:brown_mushroom", "minecraft:red_mushroom"]})
+write(os.path.join(ROOT, "data", "siftec", "tags", "item", "spider_remains.json"), {"replace": False, "values": ["minecraft:spider_eye", "minecraft:string"]})
+lang["siftec.tag.mycelia"] = "any mushroom"
+lang["siftec.tag.spider_remains"] = "spider eye or string"
 
 # miners and the extractor: Create casings until real models are picked
 lang.update({"block.siftec.dimensional_depot": "Dimensional Depot", "siftec.depot.title": "Cloud: %s", "siftec.depot.count": "%s in the cloud",
@@ -397,15 +402,6 @@ for mid, more in content.MORE_LOCKS.items():
     for i in more:
         check(i, mid)
         by_id[mid]["items"].append(i)
-# the machine routes' sub-assemblies unlock with the build they go into
-parts_ids = {"siftec:" + pid for pid, _, _, _ in content.PARTS}
-for mid, more in content.ASSEMBLY_LOCKS.items():
-    if mid not in by_id:
-        raise SystemExit(f"ASSEMBLY_LOCKS: no milestone {mid}")
-    for i in more:
-        if i not in parts_ids:
-            raise SystemExit(f"ASSEMBLY_LOCKS: {i} is not a part")
-        by_id[mid]["items"].append(i)
 # locked by default: every item of those mods has to be unlocked by something, or be left free on purpose
 placed = {}
 for m in data["milestones"] + data["milestones_mam"]:
@@ -481,24 +477,25 @@ for cid in ("blue_power_slug", "yellow_power_slug", "purple_power_slug"):
     tex = f"siftec:block/{bid}_side"
     write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/block", "ambientocclusion": False,
           "textures": {"particle": tex, "slug": tex}, "elements": elements})
-# ---- Converter and Particle Accelerator
+# ---- Converter and Particle Accelerator: 1.0's recipes (content.PROCESSORS), alternates with their lock
 data["processors"] = {}
 names_table = content.names()
+
+
+def _item_id(name):
+    return name if ":" in name else names_table[name]
+
+
 for pid, (pname, recipe_list) in content.PROCESSORS.items():
     out = []
-    for items, fluid_in, result, seconds in recipe_list:
-        r = {"in": [{"item": i, "count": c} for i, c in content.parse_cost(items)], "seconds": seconds}
-        if fluid_in: r["fluid_in"] = {"fluid": recipes.FLUID_IDS[fluid_in[0]], "mb": fluid_in[1]}
-        if isinstance(result, tuple): r["fluid_out"] = {"fluid": recipes.FLUID_IDS[result[0]], "mb": result[1]}
-        else:
-            (rid, rc), = content.parse_cost(result)
-            r["out"] = {"item": rid, "count": rc}
-        out.append(r)
-    for aid, aname, machine, items, fluid_in, result, seconds, text in content.ALT_PROCESSORS:
-        if machine != pid: continue
-        (rid, rc), = content.parse_cost(result)
-        r = {"in": [{"item": i, "count": c} for i, c in content.parse_cost(items)], "seconds": seconds, "out": {"item": rid, "count": rc}, "alt": "alt_" + aid}
-        if fluid_in: r["fluid_in"] = {"fluid": recipes.FLUID_IDS[fluid_in[0]], "mb": fluid_in[1]}
+    for p in recipe_list:
+        r = {"in": [{"item": _item_id(n), "count": c} for n, c in p["in"]], "seconds": round(p["seconds"])}
+        for n, c in p["in"]: check(_item_id(n), pid)
+        if p["fluid_in"]: r["fluid_in"] = {"fluid": recipes.FLUID_IDS[p["fluid_in"][0]], "mb": p["fluid_in"][1]}
+        if p["out"]: r["out"] = {"item": _item_id(p["out"][0]), "count": p["out"][1]}
+        if p.get("also"): r["also"] = {"item": _item_id(p["also"][0]), "count": p["also"][1]}
+        if p["fluid_out"]: r["fluid_out"] = {"fluid": recipes.FLUID_IDS[p["fluid_out"][0]], "mb": p["fluid_out"][1]}
+        if p["alt"]: r["alt"] = "alt_" + p["alt"]
         out.append(r)
     data["processors"][pid] = out
     lang[f"block.siftec.{pid}"] = pname
@@ -511,7 +508,7 @@ for pid, (pname, recipe_list) in content.PROCESSORS.items():
 lang.update({"siftec.processor.selected": "Making: %s", "siftec.processor.fluid": "%s mB of %s"})
 
 # ---- AWESOME Sink and Shop
-data["sink_points"] = {names_table[n]: p for n, p in content.SINK_POINTS.items()}
+data["sink_points"] = {_item_id(n): p for n, p in content.SINK_POINTS.items()}
 data["shop"] = [{"item": i, "count": c, "price": p} for i, c, p in content.SHOP]
 for i, c, p in content.SHOP: check(i, "shop")
 lang.update({"block.siftec.awesome_sink": "AWESOME Sink", "block.siftec.awesome_shop": "AWESOME Shop", "siftec.sink.points": "AWESOME points: %s",
@@ -589,7 +586,7 @@ C = "create:"
 MACHINE_OF = {"create:cutting": [C + "mechanical_saw"], "create:deploying": [C + "deployer"], "create:mixing": [C + "mechanical_mixer", C + "basin"],
               "create:compacting": [C + "mechanical_press", C + "basin"], "create:splashing": [C + "encased_fan"], "create:haunting": [C + "encased_fan"],
               "create:mechanical_crafting": [C + "mechanical_crafter"], "create:pressing": [C + "mechanical_press"], "create:milling": [C + "millstone"],
-              "create:crushing": [C + "crushing_wheel"], "create:filling": [C + "spout"], "create:sandpaper_polishing": [C + "sand_paper"],
+              "create:crushing": [C + "crushing_wheel"], "create:filling": [C + "spout"], "create:emptying": [C + "item_drain"], "create:sandpaper_polishing": [C + "sand_paper"],
               "create:sequenced_assembly": [C + "deployer", C + "mechanical_press"], "create:item_application": [],
               "createdieselgenerators:bulk_fermenting": ["createdieselgenerators:bulk_fermenter"],
               "minecraft:smelting": [], "minecraft:blasting": [], "minecraft:crafting_shaped": [], "minecraft:crafting_shapeless": []}
@@ -660,16 +657,28 @@ for aid, info in recipes.ALTS.items():
     data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(used)})
     lang[f"siftec.alt.alt_{aid}"] = info["name"]
     lang[f"siftec.alt.alt_{aid}.text"] = info["text"]
-for aid, aname, machine, items, fluid_in, result, seconds, text in content.ALT_PROCESSORS:
-    used = {i for i, c in content.parse_cost(items)} | {i for i, c in content.parse_cost(result)} | {"siftec:" + machine}
-    if fluid_in: used.add(recipes.FLUID_IDS[fluid_in[0]])
-    data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(used)})
-    lang[f"siftec.alt.alt_{aid}"] = aname
-    lang[f"siftec.alt.alt_{aid}.text"] = text
+for machine, (pname, recipe_list) in content.PROCESSORS.items():
+    for p in recipe_list:
+        if not p["alt"]: continue
+        used = {_item_id(n) for n, c in p["in"]} | {"siftec:" + machine}
+        if p["fluid_in"]: used.add(recipes.FLUID_IDS[p["fluid_in"][0]])
+        data["alternates"].append({"id": "alt_" + p["alt"], "requires": needs_of(used)})
+        lang[f"siftec.alt.alt_{p['alt']}"] = p["name"]
+        made_text = ", ".join(x for x in (f"{p['out'][1]} {p['out'][0]}" if p["out"] else "", f"{p['also'][1]} {p['also'][0]}" if p.get("also") else "",
+                                           f"{p['fluid_out'][1]} mB {p['fluid_out'][0]}" if p["fluid_out"] else "") if x)
+        took = ", ".join([f"{c} {n}" for n, c in p["in"]] + ([f"{p['fluid_in'][1]} mB {p['fluid_in'][0]}"] if p["fluid_in"] else []))
+        lang[f"siftec.alt.alt_{p['alt']}.text"] = f"{took} makes {made_text} ({pname})"
 print("alternates:", len(data["alternates"]), "; with nothing required:", [a["id"] for a in data["alternates"] if not a["requires"]])
 print("recipes locked to a milestone:", len(data["recipe_locks"]), "of", len(recipes.build()))
 data["removed_recipes"] = recipes.REMOVED
 data["workshop"] = [{"item": i, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]} for i, cost in recipes.WORKSHOP]
+# 1.0 build costs of every building the Build Gun will place, under its 1.0 name, for work packages 5 and 9
+data["build_costs"] = {}
+for bname, cost in sorted(content.BUILD_COSTS.items()):
+    if cost is None:
+        raise SystemExit(f"build cost of {bname}: it takes something the pack leaves out")
+    data["build_costs"][bname] = [{"item": c, "count": n} for c, n in content.parse_cost(cost)]
+    for c, n in content.parse_cost(cost): check(c, "build cost " + bname)
 lang.update({"block.siftec.equipment_workshop": "Equipment Workshop", "siftec.workshop.title": "Equipment Workshop",
              "siftec.workshop.click": "Click to build from the parts in your inventory", "siftec.workshop.missing": "You are missing parts for that",
              "siftec.workshop.built": "Built %s",
@@ -747,6 +756,14 @@ item_def("building_port", "siftec:block/building_port_item_in")
 if UNKNOWN:
     raise SystemExit("unknown item ids (not items of the game or of the pack's mods):\n  " + "\n  ".join(UNKNOWN))
 write(os.path.join(ROOT, "siftec_content.json"), data)
+# ---- the recipe checkers (tools/check_recipes.py): reachability, automatability, conflicts
+import check_recipes
+_errors, _notes, _summary = check_recipes.check(data)
+print(_summary)
+for _n in _notes:
+    print("  note:", _n)
+if _errors:
+    raise SystemExit("recipe checkers failed:\n  " + "\n  ".join(_errors))
 
 # ---- HUB and Wormhole Gateway
 lang.update({

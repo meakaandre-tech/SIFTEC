@@ -1,0 +1,17 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic",
+    "siftec:plastic"
+  ],
+  "results": [
+    {
+      "id": "siftec:circuit_board"
+    }
+  ],
+  "processing_time": 160
+}

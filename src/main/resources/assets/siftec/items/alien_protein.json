@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/alien_protein",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 14708928
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:rigor_motor_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_rigor_motor"
+  },
+  "result": {
+    "id": "siftec:motor",
+    "count": 6
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:rotor",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:stator",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:crystal_oscillator",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

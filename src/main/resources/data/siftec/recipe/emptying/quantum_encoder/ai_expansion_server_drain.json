@@ -1,0 +1,11 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:charged_ai_expansion_server",
+  "result": {
+    "id": "siftec:ai_expansion_server"
+  },
+  "fluid_result": {
+    "id": "siftec:dark_matter_residue",
+    "amount": 81000
+  }
+}

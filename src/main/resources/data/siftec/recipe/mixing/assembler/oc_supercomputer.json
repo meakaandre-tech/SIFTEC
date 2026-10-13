@@ -1,0 +1,15 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:radio_control_unit",
+    "siftec:radio_control_unit",
+    "siftec:cooling_system",
+    "siftec:cooling_system"
+  ],
+  "results": [
+    {
+      "id": "siftec:supercomputer"
+    }
+  ],
+  "processing_time": 400
+}

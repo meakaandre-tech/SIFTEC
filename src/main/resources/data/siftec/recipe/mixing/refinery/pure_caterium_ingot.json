@@ -1,0 +1,21 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "create:raw_zinc",
+    "create:raw_zinc"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 6480,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "results": [
+    {
+      "id": "create:brass_ingot"
+    }
+  ],
+  "processing_time": 100
+}

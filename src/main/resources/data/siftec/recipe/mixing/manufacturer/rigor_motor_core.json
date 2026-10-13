@@ -1,0 +1,15 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:rotor",
+    "siftec:rotor",
+    "siftec:stator",
+    "siftec:stator"
+  ],
+  "results": [
+    {
+      "id": "siftec:rigor_motor_core"
+    }
+  ],
+  "processing_time": 960
+}

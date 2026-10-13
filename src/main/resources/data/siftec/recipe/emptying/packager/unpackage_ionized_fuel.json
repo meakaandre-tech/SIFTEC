@@ -1,0 +1,12 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:packaged_ionized_fuel",
+  "result": {
+    "id": "siftec:empty_fluid_tank"
+  },
+  "fluid_result": {
+    "id": "siftec:ionized_fuel",
+    "amount": 6480
+  },
+  "processing_time": 30
+}

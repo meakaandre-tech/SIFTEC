@@ -1,0 +1,11 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:charged_superposition_oscillator",
+  "result": {
+    "id": "siftec:superposition_oscillator"
+  },
+  "fluid_result": {
+    "id": "siftec:dark_matter_residue",
+    "amount": 81000
+  }
+}

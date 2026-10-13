@@ -60,6 +60,9 @@
       "id": "rubber"
     },
     {
+      "id": "polymer_resin"
+    },
+    {
       "id": "petroleum_coke",
       "fuel": "cooking/time_petroleum_coke"
     },
@@ -79,7 +82,7 @@
       "id": "adaptive_control_unit"
     },
     {
-      "id": "crushed_bauxite"
+      "id": "empty_canister"
     },
     {
       "id": "aluminum_scrap"
@@ -95,6 +98,9 @@
     },
     {
       "id": "radio_control_unit"
+    },
+    {
+      "id": "battery"
     },
     {
       "id": "iodine_infused_filter"
@@ -113,9 +119,6 @@
     },
     {
       "id": "empty_fluid_tank"
-    },
-    {
-      "id": "packaged_nitrogen_gas"
     },
     {
       "id": "heat_sink"
@@ -140,6 +143,30 @@
     },
     {
       "id": "nuclear_pasta"
+    },
+    {
+      "id": "encased_uranium_cell"
+    },
+    {
+      "id": "uranium_fuel_rod"
+    },
+    {
+      "id": "uranium_waste"
+    },
+    {
+      "id": "non_fissile_uranium"
+    },
+    {
+      "id": "plutonium_pellet"
+    },
+    {
+      "id": "encased_plutonium_cell"
+    },
+    {
+      "id": "plutonium_fuel_rod"
+    },
+    {
+      "id": "plutonium_waste"
     },
     {
       "id": "reanimated_sam"
@@ -175,7 +202,22 @@
       "id": "ballistic_warp_drive"
     },
     {
-      "id": "dna_capsule"
+      "id": "dark_matter_crystal"
+    },
+    {
+      "id": "ficsonium"
+    },
+    {
+      "id": "ficsonium_fuel_rod"
+    },
+    {
+      "id": "alien_power_matrix"
+    },
+    {
+      "id": "alien_protein"
+    },
+    {
+      "id": "alien_dna_capsule"
     },
     {
       "id": "quickwire"
@@ -191,9 +233,6 @@
     },
     {
       "id": "gas_filter"
-    },
-    {
-      "id": "power_shard"
     },
     {
       "id": "silica"
@@ -212,6 +251,18 @@
       "id": "brass_blend"
     },
     {
+      "id": "smokeless_powder"
+    },
+    {
+      "id": "iron_rebar"
+    },
+    {
+      "id": "stun_rebar"
+    },
+    {
+      "id": "shatter_rebar"
+    },
+    {
       "id": "blue_power_slug"
     },
     {
@@ -219,6 +270,9 @@
     },
     {
       "id": "purple_power_slug"
+    },
+    {
+      "id": "power_shard"
     },
     {
       "id": "mercer_sphere"
@@ -230,133 +284,328 @@
       "id": "hard_drive"
     },
     {
-      "id": "excited_photonic_matter"
+      "id": "packaged_alumina_solution"
     },
     {
-      "id": "dark_matter_crystal"
+      "id": "packaged_fuel"
     },
     {
-      "id": "incomplete_superposition_oscillator"
+      "id": "packaged_heavy_oil_residue"
     },
     {
-      "id": "incomplete_neural_quantum_processor"
+      "id": "packaged_ionized_fuel"
+    },
+    {
+      "id": "packaged_liquid_biofuel"
+    },
+    {
+      "id": "packaged_nitric_acid"
+    },
+    {
+      "id": "packaged_nitrogen_gas"
+    },
+    {
+      "id": "packaged_oil"
+    },
+    {
+      "id": "packaged_rocket_fuel"
+    },
+    {
+      "id": "packaged_sulfuric_acid"
+    },
+    {
+      "id": "packaged_turbofuel"
+    },
+    {
+      "id": "packaged_water"
+    },
+    {
+      "id": "adaptive_control_unit_core"
+    },
+    {
+      "id": "incomplete_adaptive_control_unit"
+    },
+    {
+      "id": "ballistic_warp_drive_core"
+    },
+    {
+      "id": "incomplete_ballistic_warp_drive"
+    },
+    {
+      "id": "computer_core"
+    },
+    {
+      "id": "incomplete_computer"
+    },
+    {
+      "id": "crystal_oscillator_core"
+    },
+    {
+      "id": "incomplete_crystal_oscillator"
+    },
+    {
+      "id": "gas_filter_core"
+    },
+    {
+      "id": "incomplete_gas_filter"
+    },
+    {
+      "id": "heavy_modular_frame_core"
+    },
+    {
+      "id": "incomplete_heavy_modular_frame"
+    },
+    {
+      "id": "high_speed_connector_core"
+    },
+    {
+      "id": "incomplete_high_speed_connector"
+    },
+    {
+      "id": "iodine_infused_filter_core"
+    },
+    {
+      "id": "incomplete_iodine_infused_filter"
+    },
+    {
+      "id": "modular_engine_core"
+    },
+    {
+      "id": "incomplete_modular_engine"
+    },
+    {
+      "id": "plutonium_fuel_rod_core"
+    },
+    {
+      "id": "incomplete_plutonium_fuel_rod"
+    },
+    {
+      "id": "radio_control_unit_core"
+    },
+    {
+      "id": "incomplete_radio_control_unit"
+    },
+    {
+      "id": "sam_fluctuator_core"
+    },
+    {
+      "id": "incomplete_sam_fluctuator"
+    },
+    {
+      "id": "singularity_cell_core"
+    },
+    {
+      "id": "incomplete_singularity_cell"
+    },
+    {
+      "id": "supercomputer_core"
+    },
+    {
+      "id": "incomplete_supercomputer"
+    },
+    {
+      "id": "thermal_propulsion_rocket_core"
+    },
+    {
+      "id": "incomplete_thermal_propulsion_rocket"
+    },
+    {
+      "id": "turbo_motor_core"
+    },
+    {
+      "id": "incomplete_turbo_motor"
+    },
+    {
+      "id": "uranium_fuel_rod_core"
+    },
+    {
+      "id": "incomplete_uranium_fuel_rod"
+    },
+    {
+      "id": "automated_speed_wiring_core"
+    },
+    {
+      "id": "incomplete_automated_speed_wiring"
+    },
+    {
+      "id": "caterium_computer_core"
+    },
+    {
+      "id": "incomplete_caterium_computer"
+    },
+    {
+      "id": "classic_battery_core"
+    },
+    {
+      "id": "incomplete_classic_battery"
+    },
+    {
+      "id": "flexible_framework_core"
+    },
+    {
+      "id": "incomplete_flexible_framework"
+    },
+    {
+      "id": "heavy_encased_frame_core"
+    },
+    {
+      "id": "incomplete_heavy_encased_frame"
+    },
+    {
+      "id": "heavy_flexible_frame_core"
+    },
+    {
+      "id": "incomplete_heavy_flexible_frame"
+    },
+    {
+      "id": "infused_uranium_cell_core"
+    },
+    {
+      "id": "incomplete_infused_uranium_cell"
+    },
+    {
+      "id": "insulated_crystal_oscillator_core"
+    },
+    {
+      "id": "incomplete_insulated_crystal_oscillator"
+    },
+    {
+      "id": "plastic_smart_plating_core"
+    },
+    {
+      "id": "incomplete_plastic_smart_plating"
+    },
+    {
+      "id": "radio_connection_unit_core"
+    },
+    {
+      "id": "incomplete_radio_connection_unit"
+    },
+    {
+      "id": "radio_control_system_core"
+    },
+    {
+      "id": "incomplete_radio_control_system"
+    },
+    {
+      "id": "rigor_motor_core"
+    },
+    {
+      "id": "incomplete_rigor_motor"
+    },
+    {
+      "id": "silicon_high_speed_connector_core"
+    },
+    {
+      "id": "incomplete_silicon_high_speed_connector"
+    },
+    {
+      "id": "super_state_computer_core"
+    },
+    {
+      "id": "incomplete_super_state_computer"
+    },
+    {
+      "id": "turbo_electric_motor_core"
+    },
+    {
+      "id": "incomplete_turbo_electric_motor"
+    },
+    {
+      "id": "turbo_pressure_motor_core"
+    },
+    {
+      "id": "incomplete_turbo_pressure_motor"
+    },
+    {
+      "id": "uranium_fuel_unit_core"
+    },
+    {
+      "id": "incomplete_uranium_fuel_unit"
     },
     {
       "id": "incomplete_ai_expansion_server"
     },
     {
-      "id": "gateway_coil"
+      "id": "charged_ai_expansion_server"
     },
     {
-      "id": "gateway_frame"
+      "id": "alien_power_matrix_core"
     },
     {
-      "id": "landing_cushion"
+      "id": "incomplete_alien_power_matrix"
     },
     {
-      "id": "jetpack_thruster"
+      "id": "charged_alien_power_matrix"
     },
     {
-      "id": "hazmat_lining"
+      "id": "ficsonium_fuel_rod_core"
     },
     {
-      "id": "hover_thruster"
+      "id": "incomplete_ficsonium_fuel_rod"
     },
     {
-      "id": "drone_port_module"
+      "id": "charged_ficsonium_fuel_rod"
     },
     {
-      "id": "accelerator_segment"
+      "id": "neural_quantum_processor_core"
     },
     {
-      "id": "converter_core"
+      "id": "incomplete_neural_quantum_processor"
     },
     {
-      "id": "portal_module"
+      "id": "charged_neural_quantum_processor"
     },
     {
-      "id": "geyser_core"
+      "id": "superposition_oscillator_core"
     },
     {
-      "id": "extractor_pump"
+      "id": "incomplete_superposition_oscillator"
     },
     {
-      "id": "designer_frame"
+      "id": "charged_superposition_oscillator"
     },
     {
-      "id": "mask_lining"
-    },
-    {
-      "id": "screw_bundle"
-    },
-    {
-      "id": "wire_spool"
-    },
-    {
-      "id": "iron_bundle"
-    },
-    {
-      "id": "quickwire_coil"
-    },
-    {
-      "id": "silica_bundle"
-    },
-    {
-      "id": "incomplete_furnace_engine"
-    },
-    {
-      "id": "incomplete_mam"
+      "id": "object_scanner_core"
     },
     {
       "id": "incomplete_object_scanner"
     },
     {
-      "id": "incomplete_gateway_coil"
-    },
-    {
-      "id": "incomplete_gateway_frame"
-    },
-    {
-      "id": "incomplete_wormhole_gateway"
-    },
-    {
-      "id": "incomplete_landing_cushion"
-    },
-    {
-      "id": "incomplete_landing_pad"
-    },
-    {
-      "id": "incomplete_awesome_sink"
-    },
-    {
-      "id": "incomplete_awesome_shop"
-    },
-    {
-      "id": "incomplete_blueprint_designer"
-    },
-    {
-      "id": "incomplete_power_storage"
-    },
-    {
-      "id": "incomplete_speed_governor"
-    },
-    {
-      "id": "incomplete_blade_runners"
-    },
-    {
-      "id": "incomplete_dimensional_depot"
-    },
-    {
-      "id": "incomplete_jetpack_thruster"
+      "id": "jetpack_core"
     },
     {
       "id": "incomplete_jetpack"
     },
     {
-      "id": "incomplete_radar_tower"
+      "id": "parachute_core"
     },
     {
-      "id": "incomplete_designer_frame"
+      "id": "incomplete_parachute"
+    },
+    {
+      "id": "gas_mask_core"
+    },
+    {
+      "id": "incomplete_gas_mask"
+    },
+    {
+      "id": "hazmat_suit_core"
+    },
+    {
+      "id": "incomplete_hazmat_suit"
+    },
+    {
+      "id": "hover_pack_core"
+    },
+    {
+      "id": "incomplete_hover_pack"
+    },
+    {
+      "id": "blade_runners_core"
+    },
+    {
+      "id": "incomplete_blade_runners"
     }
   ],
   "milestones": [
@@ -397,10 +646,10 @@
       "items": [
         "create:encased_fan",
         "create:nozzle",
-        "siftec:wire",
-        "siftec:cable",
         "siftec:power_line",
-        "siftec:hub_engine"
+        "siftec:hub_engine",
+        "siftec:cable",
+        "siftec:wire"
       ],
       "tokens": [
         "scanner:copper"
@@ -430,9 +679,9 @@
         "create:depot",
         "create:millstone",
         "create:basin",
-        "siftec:screw",
+        "siftec:power_pole",
         "siftec:reinforced_iron_plate",
-        "siftec:power_pole"
+        "siftec:screw"
       ],
       "tokens": [
         "scanner:stone"
@@ -515,9 +764,7 @@
         "siftec:wormhole_gateway",
         "siftec:furnace_engine",
         "create:flywheel",
-        "siftec:biomass",
-        "siftec:wire_spool",
-        "siftec:iron_bundle"
+        "siftec:biomass"
       ],
       "tokens": []
     },
@@ -980,7 +1227,8 @@
         "create:green_toolbox",
         "create:red_toolbox",
         "create:black_toolbox",
-        "siftec:screw_bundle"
+        "siftec:object_scanner_core",
+        "siftec:incomplete_object_scanner"
       ],
       "tokens": [
         "backpack:iron"
@@ -1011,11 +1259,9 @@
       "items": [
         "create:deployer",
         "create:copper_sheet",
-        "siftec:rotor",
         "siftec:modular_frame",
-        "siftec:smart_plating",
-        "siftec:gateway_coil",
-        "siftec:gateway_frame"
+        "siftec:rotor",
+        "siftec:smart_plating"
       ],
       "tokens": []
     },
@@ -1038,10 +1284,10 @@
       ],
       "seconds": 180,
       "items": [
-        "siftec:solid_biofuel",
         "create:mechanical_harvester",
         "create:mechanical_plough",
         "create:tree_fertilizer",
+        "siftec:solid_biofuel",
         "travelersbackpack:feeding_upgrade",
         "travelersbackpack:smoker_upgrade"
       ],
@@ -1067,8 +1313,7 @@
       "seconds": 240,
       "items": [
         "create:weighted_ejector",
-        "siftec:landing_pad",
-        "siftec:landing_cushion"
+        "siftec:landing_pad"
       ],
       "tokens": []
     },
@@ -1217,7 +1462,7 @@
           "count": 200
         },
         {
-          "item": "siftec:iron_rod",
+          "item": "create:iron_sheet",
           "count": 400
         }
       ],
@@ -1360,12 +1605,12 @@
           "count": 100
         },
         {
-          "item": "siftec:rotor",
-          "count": 200
-        },
-        {
           "item": "siftec:modular_frame",
           "count": 100
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 200
         },
         {
           "item": "#siftec:stones",
@@ -1375,10 +1620,10 @@
       "seconds": 600,
       "items": [
         "create:crushing_wheel",
+        "siftec:automated_wiring",
         "siftec:encased_industrial_beam",
-        "siftec:stator",
         "siftec:motor",
-        "siftec:automated_wiring"
+        "siftec:stator"
       ],
       "tokens": []
     },
@@ -1387,12 +1632,12 @@
       "tier": 4,
       "cost": [
         {
-          "item": "siftec:steel_beam",
-          "count": 100
-        },
-        {
           "item": "siftec:encased_industrial_beam",
           "count": 50
+        },
+        {
+          "item": "siftec:steel_beam",
+          "count": 100
         },
         {
           "item": "siftec:modular_frame",
@@ -1433,16 +1678,16 @@
       "tier": 4,
       "cost": [
         {
-          "item": "create:copper_sheet",
-          "count": 500
+          "item": "siftec:encased_industrial_beam",
+          "count": 50
         },
         {
           "item": "siftec:steel_pipe",
           "count": 300
         },
         {
-          "item": "siftec:encased_industrial_beam",
-          "count": 50
+          "item": "create:copper_sheet",
+          "count": 500
         }
       ],
       "seconds": 600,
@@ -1476,7 +1721,8 @@
       "seconds": 300,
       "items": [
         "siftec:jetpack",
-        "siftec:jetpack_thruster"
+        "siftec:jetpack_core",
+        "siftec:incomplete_jetpack"
       ],
       "tokens": [
         "backpack:diamond"
@@ -1503,7 +1749,7 @@
           "count": 500
         }
       ],
-      "seconds": 720,
+      "seconds": 600,
       "items": [
         "createdieselgenerators:pumpjack_bearing",
         "createdieselgenerators:pumpjack_crank",
@@ -1511,10 +1757,11 @@
         "createdieselgenerators:pumpjack_hole",
         "createdieselgenerators:distillation_controller",
         "create:fluid_valve",
-        "siftec:plastic",
-        "siftec:rubber",
-        "siftec:petroleum_coke",
         "siftec:circuit_board",
+        "siftec:petroleum_coke",
+        "siftec:plastic",
+        "siftec:polymer_resin",
+        "siftec:rubber",
         "createdieselgenerators:asphalt_block",
         "createdieselgenerators:asphalt_slab",
         "createdieselgenerators:asphalt_stairs",
@@ -1533,23 +1780,19 @@
       "tier": 5,
       "cost": [
         {
-          "item": "siftec:heavy_modular_frame",
-          "count": 50
-        },
-        {
-          "item": "siftec:computer",
-          "count": 100
-        },
-        {
-          "item": "siftec:encased_industrial_beam",
+          "item": "siftec:rubber",
           "count": 200
         },
         {
-          "item": "siftec:rubber",
+          "item": "siftec:encased_industrial_beam",
+          "count": 300
+        },
+        {
+          "item": "siftec:modular_frame",
           "count": 400
         }
       ],
-      "seconds": 900,
+      "seconds": 300,
       "items": [],
       "tokens": [
         "cap:128"
@@ -1572,12 +1815,18 @@
           "count": 1000
         }
       ],
-      "seconds": 480,
+      "seconds": 300,
       "items": [
         "create:spout",
         "create:item_drain",
         "create:portable_fluid_interface",
         "createdieselgenerators:canister",
+        "siftec:empty_canister",
+        "siftec:packaged_fuel",
+        "siftec:packaged_heavy_oil_residue",
+        "siftec:packaged_liquid_biofuel",
+        "siftec:packaged_oil",
+        "siftec:packaged_water",
         "createdieselgenerators:oil_barrel"
       ],
       "tokens": []
@@ -1603,7 +1852,7 @@
           "count": 200
         }
       ],
-      "seconds": 480,
+      "seconds": 600,
       "items": [
         "createdieselgenerators:diesel_engine",
         "createdieselgenerators:large_diesel_engine",
@@ -1624,28 +1873,36 @@
       "cost": [
         {
           "item": "siftec:motor",
-          "count": 100
+          "count": 200
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 200
         },
         {
           "item": "siftec:plastic",
-          "count": 200
-        },
-        {
-          "item": "siftec:rubber",
-          "count": 200
+          "count": 400
         },
         {
           "item": "siftec:cable",
           "count": 1000
         }
       ],
-      "seconds": 720,
+      "seconds": 900,
       "items": [
         "create:mechanical_crafter",
-        "siftec:computer",
-        "siftec:heavy_modular_frame",
-        "siftec:modular_engine",
         "siftec:adaptive_control_unit",
+        "siftec:adaptive_control_unit_core",
+        "siftec:computer",
+        "siftec:computer_core",
+        "siftec:heavy_modular_frame",
+        "siftec:heavy_modular_frame_core",
+        "siftec:incomplete_adaptive_control_unit",
+        "siftec:incomplete_computer",
+        "siftec:incomplete_heavy_modular_frame",
+        "siftec:incomplete_modular_engine",
+        "siftec:modular_engine",
+        "siftec:modular_engine_core",
         "create:crafter_slot_cover",
         "create_hypertube:hypertube_junction",
         "cgs:nailgun_splitter"
@@ -1657,28 +1914,26 @@
       "tier": 6,
       "cost": [
         {
-          "item": "siftec:computer",
-          "count": 50
+          "item": "siftec:motor",
+          "count": 250
         },
         {
-          "item": "siftec:heavy_modular_frame",
-          "count": 100
-        },
-        {
-          "item": "siftec:steel_beam",
+          "item": "siftec:encased_industrial_beam",
           "count": 500
         },
         {
+          "item": "siftec:steel_beam",
+          "count": 1000
+        },
+        {
           "item": "siftec:steel_pipe",
-          "count": 600
+          "count": 1000
         }
       ],
-      "seconds": 900,
+      "seconds": 600,
       "items": [
         "create:track",
         "create:track_station",
-        "create:track_signal",
-        "create:track_observer",
         "create:controls",
         "create:schedule",
         "create:portable_storage_interface",
@@ -1711,23 +1966,72 @@
       "tier": 6,
       "cost": [
         {
+          "item": "siftec:heavy_modular_frame",
+          "count": 50
+        },
+        {
           "item": "siftec:plastic",
           "count": 1000
         },
         {
           "item": "siftec:rubber",
           "count": 1000
-        },
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 50
         }
       ],
-      "seconds": 600,
+      "seconds": 300,
       "items": [],
       "tokens": [
         "pumps:2"
       ]
+    },
+    {
+      "id": "ficsit_blueprints_mk2",
+      "tier": 6,
+      "cost": [
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 100
+        },
+        {
+          "item": "siftec:computer",
+          "count": 100
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 400
+        },
+        {
+          "item": "#siftec:stones",
+          "count": 1500
+        }
+      ],
+      "seconds": 600,
+      "items": [],
+      "tokens": []
+    },
+    {
+      "id": "railway_signalling",
+      "tier": 6,
+      "cost": [
+        {
+          "item": "siftec:computer",
+          "count": 50
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 400
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 1000
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "create:track_signal",
+        "create:track_observer"
+      ],
+      "tokens": []
     },
     {
       "id": "bauxite_refinement",
@@ -1735,7 +2039,7 @@
       "cost": [
         {
           "item": "siftec:computer",
-          "count": 50
+          "count": 100
         },
         {
           "item": "siftec:heavy_modular_frame",
@@ -1743,7 +2047,7 @@
         },
         {
           "item": "siftec:motor",
-          "count": 200
+          "count": 250
         },
         {
           "item": "siftec:rubber",
@@ -1752,12 +2056,11 @@
       ],
       "seconds": 600,
       "items": [
-        "siftec:crushed_bauxite",
-        "siftec:aluminum_scrap",
-        "siftec:aluminum_ingot",
         "siftec:alclad_aluminum_sheet",
         "siftec:aluminum_casing",
-        "siftec:radio_control_unit"
+        "siftec:aluminum_ingot",
+        "siftec:aluminum_scrap",
+        "siftec:packaged_alumina_solution"
       ],
       "tokens": [
         "scanner:bauxite",
@@ -1770,18 +2073,18 @@
       "cost": [
         {
           "item": "siftec:alclad_aluminum_sheet",
-          "count": 100
-        },
-        {
-          "item": "siftec:encased_industrial_beam",
           "count": 200
         },
         {
+          "item": "siftec:encased_industrial_beam",
+          "count": 400
+        },
+        {
           "item": "siftec:reinforced_iron_plate",
-          "count": 300
+          "count": 600
         }
       ],
-      "seconds": 60,
+      "seconds": 300,
       "items": [],
       "tokens": [
         "cap:192"
@@ -1792,25 +2095,28 @@
       "tier": 7,
       "cost": [
         {
-          "item": "siftec:aluminum_casing",
+          "item": "siftec:gas_filter",
           "count": 50
+        },
+        {
+          "item": "siftec:aluminum_casing",
+          "count": 100
         },
         {
           "item": "siftec:quickwire",
           "count": 500
-        },
-        {
-          "item": "siftec:gas_filter",
-          "count": 50
         }
       ],
       "seconds": 300,
       "items": [
         "siftec:hazmat_suit",
+        "siftec:incomplete_iodine_infused_filter",
         "siftec:iodine_infused_filter",
+        "siftec:iodine_infused_filter_core",
+        "siftec:hazmat_suit_core",
+        "siftec:incomplete_hazmat_suit",
         "travelersbackpack:lantern_upgrade",
-        "travelersbackpack:jukebox_upgrade",
-        "siftec:hazmat_lining"
+        "travelersbackpack:jukebox_upgrade"
       ],
       "tokens": []
     },
@@ -1819,8 +2125,8 @@
       "tier": 7,
       "cost": [
         {
-          "item": "siftec:motor",
-          "count": 200
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 100
         },
         {
           "item": "siftec:heavy_modular_frame",
@@ -1831,18 +2137,54 @@
           "count": 100
         },
         {
-          "item": "siftec:alclad_aluminum_sheet",
-          "count": 200
+          "item": "siftec:motor",
+          "count": 250
         }
       ],
       "seconds": 300,
       "items": [
         "siftec:hover_pack",
-        "siftec:hover_thruster"
+        "siftec:hover_pack_core",
+        "siftec:incomplete_hover_pack"
       ],
       "tokens": [
         "backpack:netherite"
       ]
+    },
+    {
+      "id": "control_system_development",
+      "tier": 7,
+      "cost": [
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 200
+        },
+        {
+          "item": "siftec:aluminum_casing",
+          "count": 400
+        },
+        {
+          "item": "siftec:computer",
+          "count": 200
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 1000
+        }
+      ],
+      "seconds": 900,
+      "items": [
+        "siftec:assembly_director_system",
+        "siftec:battery",
+        "siftec:incomplete_radio_control_unit",
+        "siftec:incomplete_supercomputer",
+        "siftec:packaged_sulfuric_acid",
+        "siftec:radio_control_unit",
+        "siftec:radio_control_unit_core",
+        "siftec:supercomputer",
+        "siftec:supercomputer_core"
+      ],
+      "tokens": []
     },
     {
       "id": "aeronautical_engineering",
@@ -1865,7 +2207,7 @@
           "count": 300
         }
       ],
-      "seconds": 900,
+      "seconds": 600,
       "items": [
         "siftec:drone_port",
         "siftec:cardboard_drone",
@@ -1877,8 +2219,6 @@
         "create:redstone_requester",
         "create:factory_gauge",
         "create:chain_conveyor",
-        "siftec:supercomputer",
-        "siftec:assembly_director_system",
         "create:cardboard",
         "create:cardboard_block",
         "create:bound_cardboard_block",
@@ -1887,8 +2227,7 @@
         "create:cardboard_leggings",
         "create:cardboard_boots",
         "create:cardboard_sword",
-        "create:package_filter",
-        "siftec:drone_port_module"
+        "create:package_filter"
       ],
       "tokens": [
         "scanner:sulfur"
@@ -1908,23 +2247,21 @@
         },
         {
           "item": "siftec:alclad_aluminum_sheet",
-          "count": 200
+          "count": 400
         },
         {
           "item": "siftec:wire",
-          "count": 300
+          "count": 3000
         }
       ],
       "seconds": 900,
       "items": [
         "siftec:resource_well_extractor",
-        "siftec:empty_fluid_tank",
-        "siftec:packaged_nitrogen_gas",
-        "siftec:heat_sink",
         "siftec:cooling_system",
+        "siftec:empty_fluid_tank",
         "siftec:fused_modular_frame",
-        "siftec:electromagnetic_control_rod",
-        "siftec:extractor_pump"
+        "siftec:heat_sink",
+        "siftec:packaged_nitrogen_gas"
       ],
       "tokens": [
         "scanner:nitrogen"
@@ -1949,9 +2286,12 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:turbo_motor",
+        "siftec:incomplete_thermal_propulsion_rocket",
+        "siftec:incomplete_turbo_motor",
         "siftec:thermal_propulsion_rocket",
-        "siftec:magnetic_field_generator"
+        "siftec:thermal_propulsion_rocket_core",
+        "siftec:turbo_motor",
+        "siftec:turbo_motor_core"
       ],
       "tokens": []
     },
@@ -1960,29 +2300,67 @@
       "tier": 8,
       "cost": [
         {
-          "item": "siftec:electromagnetic_control_rod",
-          "count": 400
-        },
-        {
-          "item": "siftec:cooling_system",
-          "count": 400
+          "item": "siftec:turbo_motor",
+          "count": 50
         },
         {
           "item": "siftec:fused_modular_frame",
+          "count": 100
+        },
+        {
+          "item": "siftec:cooling_system",
           "count": 200
         },
         {
-          "item": "siftec:turbo_motor",
-          "count": 100
+          "item": "siftec:quickwire",
+          "count": 2500
         }
       ],
       "seconds": 1200,
       "items": [
         "siftec:particle_accelerator",
         "siftec:copper_powder",
-        "siftec:pressure_conversion_cube",
+        "siftec:encased_plutonium_cell",
+        "siftec:incomplete_plutonium_fuel_rod",
+        "siftec:non_fissile_uranium",
         "siftec:nuclear_pasta",
-        "siftec:accelerator_segment"
+        "siftec:packaged_nitric_acid",
+        "siftec:plutonium_fuel_rod",
+        "siftec:plutonium_fuel_rod_core",
+        "siftec:plutonium_pellet",
+        "siftec:pressure_conversion_cube"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "nuclear_power",
+      "tier": 8,
+      "cost": [
+        {
+          "item": "siftec:supercomputer",
+          "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 200
+        },
+        {
+          "item": "siftec:cable",
+          "count": 1000
+        },
+        {
+          "item": "#siftec:stones",
+          "count": 2000
+        }
+      ],
+      "seconds": 900,
+      "items": [
+        "siftec:electromagnetic_control_rod",
+        "siftec:encased_uranium_cell",
+        "siftec:incomplete_uranium_fuel_rod",
+        "siftec:magnetic_field_generator",
+        "siftec:uranium_fuel_rod",
+        "siftec:uranium_fuel_rod_core"
       ],
       "tokens": [
         "scanner:uranium"
@@ -2005,16 +2383,13 @@
           "count": 500
         }
       ],
-      "seconds": 300,
+      "seconds": 900,
       "items": [
         "siftec:converter",
-        "siftec:reanimated_sam",
-        "siftec:sam_fluctuator",
+        "siftec:biochemical_sculptor",
         "siftec:ficsite_ingot",
         "siftec:ficsite_trigon",
-        "siftec:time_crystal",
-        "siftec:biochemical_sculptor",
-        "siftec:converter_core"
+        "siftec:time_crystal"
       ],
       "tokens": [
         "scanner:sam"
@@ -2030,7 +2405,7 @@
         },
         {
           "item": "siftec:ficsite_trigon",
-          "count": 10
+          "count": 100
         },
         {
           "item": "siftec:turbo_motor",
@@ -2041,11 +2416,20 @@
           "count": 400
         }
       ],
-      "seconds": 900,
+      "seconds": 1200,
       "items": [
-        "siftec:superposition_oscillator",
+        "siftec:ai_expansion_server",
+        "siftec:charged_ai_expansion_server",
+        "siftec:charged_neural_quantum_processor",
+        "siftec:charged_superposition_oscillator",
+        "siftec:dark_matter_crystal",
+        "siftec:incomplete_ai_expansion_server",
+        "siftec:incomplete_neural_quantum_processor",
+        "siftec:incomplete_superposition_oscillator",
         "siftec:neural_quantum_processor",
-        "siftec:ai_expansion_server"
+        "siftec:neural_quantum_processor_core",
+        "siftec:superposition_oscillator",
+        "siftec:superposition_oscillator_core"
       ],
       "tokens": []
     },
@@ -2070,10 +2454,9 @@
           "count": 500
         }
       ],
-      "seconds": 1200,
+      "seconds": 900,
       "items": [
-        "siftec:blueprint_designer_mk3",
-        "siftec:designer_frame"
+        "siftec:blueprint_designer_mk3"
       ],
       "tokens": []
     },
@@ -2098,13 +2481,16 @@
           "count": 1000
         }
       ],
-      "seconds": 1200,
+      "seconds": 600,
       "items": [
         "siftec:main_portal",
         "siftec:satellite_portal",
-        "siftec:singularity_cell",
         "siftec:ballistic_warp_drive",
-        "siftec:portal_module"
+        "siftec:ballistic_warp_drive_core",
+        "siftec:incomplete_ballistic_warp_drive",
+        "siftec:incomplete_singularity_cell",
+        "siftec:singularity_cell",
+        "siftec:singularity_cell_core"
       ],
       "tokens": []
     },
@@ -2122,15 +2508,21 @@
         },
         {
           "item": "siftec:alclad_aluminum_sheet",
-          "count": 1000
+          "count": 5000
         },
         {
           "item": "create:iron_sheet",
-          "count": 2000
+          "count": 10000
         }
       ],
-      "seconds": 1200,
-      "items": [],
+      "seconds": 600,
+      "items": [
+        "siftec:charged_ficsonium_fuel_rod",
+        "siftec:ficsonium",
+        "siftec:ficsonium_fuel_rod",
+        "siftec:ficsonium_fuel_rod_core",
+        "siftec:incomplete_ficsonium_fuel_rod"
+      ],
       "tokens": [
         "cap:256"
       ]
@@ -2345,7 +2737,8 @@
         "mam_caterium_4",
         "mam_caterium_5",
         "mam_caterium_6",
-        "mam_caterium_7"
+        "mam_caterium_7",
+        "mam_caterium_8"
       ]
     },
     {
@@ -2356,7 +2749,8 @@
         "mam_mycelia_2",
         "mam_mycelia_3",
         "mam_mycelia_4",
-        "mam_mycelia_5"
+        "mam_mycelia_5",
+        "mam_mycelia_6"
       ]
     },
     {
@@ -2391,7 +2785,8 @@
         "mam_quartz_4",
         "mam_quartz_5",
         "mam_quartz_6",
-        "mam_quartz_7"
+        "mam_quartz_7",
+        "mam_quartz_8"
       ]
     },
     {
@@ -2405,7 +2800,10 @@
         "mam_sulfur_5",
         "mam_sulfur_6",
         "mam_sulfur_7",
-        "mam_sulfur_8"
+        "mam_sulfur_8",
+        "mam_sulfur_9",
+        "mam_sulfur_10",
+        "mam_sulfur_11"
       ]
     },
     {
@@ -2418,7 +2816,10 @@
         "mam_alien_4",
         "mam_alien_5",
         "mam_alien_6",
-        "mam_alien_7"
+        "mam_alien_7",
+        "mam_alien_8",
+        "mam_alien_9",
+        "mam_alien_10"
       ]
     }
   ],
@@ -2433,7 +2834,9 @@
         }
       ],
       "seconds": 30,
-      "items": [],
+      "items": [
+        "siftec:alien_protein"
+      ],
       "tokens": [],
       "needs": []
     },
@@ -2452,7 +2855,7 @@
       ],
       "seconds": 60,
       "items": [
-        "siftec:dna_capsule"
+        "siftec:alien_dna_capsule"
       ],
       "tokens": [],
       "needs": [
@@ -2480,6 +2883,7 @@
       "items": [
         "cgs:nailgun",
         "create:copper_backtank",
+        "siftec:iron_rebar",
         "cgs:nail"
       ],
       "tokens": [],
@@ -2518,7 +2922,7 @@
       "tree": "megafauna",
       "cost": [
         {
-          "item": "siftec:dna_capsule",
+          "item": "siftec:alien_dna_capsule",
           "count": 5
         },
         {
@@ -2631,8 +3035,8 @@
       ],
       "seconds": 180,
       "items": [
-        "siftec:ai_limiter",
-        "create:mechanical_arm"
+        "create:mechanical_arm",
+        "siftec:ai_limiter"
       ],
       "tokens": [],
       "needs": [
@@ -2658,8 +3062,7 @@
         "create:gearshift",
         "create:sequenced_gearshift",
         "create:adjustable_chain_gearshift",
-        "siftec:speed_governor",
-        "siftec:quickwire_coil"
+        "siftec:speed_governor"
       ],
       "tokens": [],
       "needs": [
@@ -2707,7 +3110,9 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:high_speed_connector"
+        "siftec:high_speed_connector",
+        "siftec:high_speed_connector_core",
+        "siftec:incomplete_high_speed_connector"
       ],
       "tokens": [],
       "needs": [
@@ -2715,11 +3120,33 @@
       ]
     },
     {
+      "id": "mam_caterium_8",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 50
+        },
+        {
+          "item": "siftec:iron_rebar",
+          "count": 10
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:stun_rebar"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_2"
+      ]
+    },
+    {
       "id": "mam_mycelia_1",
       "tree": "mycelia",
       "cost": [
         {
-          "item": "#c:mushrooms",
+          "item": "#siftec:mycelia",
           "count": 5
         }
       ],
@@ -2733,7 +3160,7 @@
       "tree": "mycelia",
       "cost": [
         {
-          "item": "#c:mushrooms",
+          "item": "#siftec:mycelia",
           "count": 25
         },
         {
@@ -2769,7 +3196,9 @@
       ],
       "seconds": 120,
       "items": [
-        "siftec:parachute"
+        "siftec:parachute",
+        "siftec:parachute_core",
+        "siftec:incomplete_parachute"
       ],
       "tokens": [],
       "needs": [
@@ -2821,10 +3250,33 @@
       ],
       "seconds": 180,
       "items": [
-        "siftec:gas_filter",
         "siftec:gas_mask",
-        "siftec:mask_lining"
+        "siftec:gas_filter",
+        "siftec:gas_filter_core",
+        "siftec:incomplete_gas_filter",
+        "siftec:gas_mask_core",
+        "siftec:incomplete_gas_mask"
       ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_2"
+      ]
+    },
+    {
+      "id": "mam_mycelia_6",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "siftec:fabric",
+          "count": 25
+        },
+        {
+          "item": "siftec:polymer_resin",
+          "count": 100
+        }
+      ],
+      "seconds": 3,
+      "items": [],
       "tokens": [],
       "needs": [
         "mam_mycelia_2"
@@ -2867,7 +3319,7 @@
           "count": 20
         },
         {
-          "item": "createdieselgenerators:canister",
+          "item": "siftec:empty_canister",
           "count": 5
         }
       ],
@@ -2905,7 +3357,7 @@
           "count": 10
         },
         {
-          "item": "createdieselgenerators:canister",
+          "item": "siftec:empty_canister",
           "count": 5
         }
       ],
@@ -3094,9 +3546,9 @@
       ],
       "seconds": 30,
       "items": [
-        "siftec:quartz_crystal",
         "create:sand_paper",
-        "create:red_sand_paper"
+        "create:red_sand_paper",
+        "siftec:quartz_crystal"
       ],
       "tokens": [],
       "needs": []
@@ -3174,7 +3626,9 @@
       ],
       "seconds": 180,
       "items": [
-        "siftec:crystal_oscillator"
+        "siftec:crystal_oscillator",
+        "siftec:crystal_oscillator_core",
+        "siftec:incomplete_crystal_oscillator"
       ],
       "tokens": [],
       "needs": [
@@ -3223,7 +3677,8 @@
       "seconds": 120,
       "items": [
         "siftec:blade_runners",
-        "siftec:silica_bundle"
+        "siftec:blade_runners_core",
+        "siftec:incomplete_blade_runners"
       ],
       "tokens": [],
       "needs": [
@@ -3250,6 +3705,28 @@
       "tokens": [],
       "needs": [
         "mam_quartz_5"
+      ]
+    },
+    {
+      "id": "mam_quartz_8",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:quartz_crystal",
+          "count": 30
+        },
+        {
+          "item": "siftec:iron_rebar",
+          "count": 150
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:shatter_rebar"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_1"
       ]
     },
     {
@@ -3461,7 +3938,8 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:turbofuel_bucket"
+        "siftec:turbofuel_bucket",
+        "siftec:packaged_turbofuel"
       ],
       "tokens": [],
       "needs": [
@@ -3487,12 +3965,85 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:geyser_engine",
-        "siftec:geyser_core"
+        "siftec:geyser_engine"
       ],
       "tokens": [],
       "needs": [
         "mam_sulfur_2"
+      ]
+    },
+    {
+      "id": "mam_sulfur_9",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "minecraft:gunpowder",
+          "count": 100
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:smokeless_powder"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_1"
+      ]
+    },
+    {
+      "id": "mam_sulfur_10",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "siftec:hard_drive",
+          "count": 1
+        },
+        {
+          "item": "siftec:empty_fluid_tank",
+          "count": 10
+        },
+        {
+          "item": "siftec:packaged_turbofuel",
+          "count": 100
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:packaged_rocket_fuel"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_7"
+      ]
+    },
+    {
+      "id": "mam_sulfur_11",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "siftec:hard_drive",
+          "count": 1
+        },
+        {
+          "item": "siftec:time_crystal",
+          "count": 100
+        },
+        {
+          "item": "siftec:packaged_rocket_fuel",
+          "count": 200
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:packaged_ionized_fuel"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_10"
       ]
     },
     {
@@ -3644,6 +4195,79 @@
       "needs": [
         "mam_alien_6"
       ]
+    },
+    {
+      "id": "mam_alien_8",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:sam",
+          "count": 20
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:reanimated_sam"
+      ],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_alien_9",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:reanimated_sam",
+          "count": 10
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 100
+        },
+        {
+          "item": "siftec:wire",
+          "count": 200
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:incomplete_sam_fluctuator",
+        "siftec:sam_fluctuator",
+        "siftec:sam_fluctuator_core"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_alien_8"
+      ]
+    },
+    {
+      "id": "mam_alien_10",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:singularity_cell",
+          "count": 50
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 500
+        },
+        {
+          "item": "siftec:time_crystal",
+          "count": 100
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:alien_power_matrix",
+        "siftec:alien_power_matrix_core",
+        "siftec:charged_alien_power_matrix",
+        "siftec:incomplete_alien_power_matrix"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_alien_9"
+      ]
     }
   ],
   "processors": {
@@ -3651,12 +4275,203 @@
       {
         "in": [
           {
-            "item": "siftec:aluminum_ingot",
-            "count": 4
+            "item": "siftec:reanimated_sam",
+            "count": 1
           },
+          {
+            "item": "create:raw_zinc",
+            "count": 15
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "siftec:raw_bauxite",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "minecraft:raw_copper",
+            "count": 18
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "siftec:raw_bauxite",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "minecraft:raw_copper",
+            "count": 15
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "create:raw_zinc",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "minecraft:quartz",
+            "count": 12
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "create:raw_zinc",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "minecraft:raw_iron",
+            "count": 18
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "minecraft:coal",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "#siftec:stones",
+            "count": 36
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "minecraft:coal",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "minecraft:quartz",
+            "count": 10
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "minecraft:raw_copper",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "cgs:sulfur",
+            "count": 12
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "minecraft:raw_copper",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 5
+          }
+        ],
+        "seconds": 6,
+        "fluid_out": {
+          "fluid": "siftec:dark_matter_residue",
+          "mb": 400
+        }
+      },
+      {
+        "in": [],
+        "seconds": 3,
+        "fluid_out": {
+          "fluid": "siftec:excited_photonic_matter",
+          "mb": 400
+        }
+      },
+      {
+        "in": [
           {
             "item": "siftec:reanimated_sam",
             "count": 2
+          },
+          {
+            "item": "siftec:aluminum_ingot",
+            "count": 4
+          }
+        ],
+        "seconds": 2,
+        "out": {
+          "item": "siftec:ficsite_ingot",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 3
+          },
+          {
+            "item": "create:brass_ingot",
+            "count": 4
+          }
+        ],
+        "seconds": 4,
+        "out": {
+          "item": "siftec:ficsite_ingot",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 4
+          },
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 24
           }
         ],
         "seconds": 6,
@@ -3668,14 +4483,137 @@
       {
         "in": [
           {
-            "item": "minecraft:coal",
-            "count": 8
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "#siftec:stones",
+            "count": 24
           }
         ],
-        "seconds": 4,
+        "seconds": 6,
         "out": {
-          "item": "minecraft:diamond",
-          "count": 1
+          "item": "minecraft:raw_iron",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "cgs:sulfur",
+            "count": 2
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "minecraft:stone",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "siftec:raw_bauxite",
+            "count": 10
+          }
+        ],
+        "seconds": 6,
+        "fluid_out": {
+          "fluid": "siftec:nitrogen",
+          "mb": 480
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "create:raw_zinc",
+            "count": 12
+          }
+        ],
+        "seconds": 6,
+        "fluid_out": {
+          "fluid": "siftec:nitrogen",
+          "mb": 480
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "siftec:raw_bauxite",
+            "count": 10
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "minecraft:quartz",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "minecraft:coal",
+            "count": 24
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "minecraft:quartz",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "minecraft:coal",
+            "count": 20
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "cgs:sulfur",
+          "count": 12
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:reanimated_sam",
+            "count": 1
+          },
+          {
+            "item": "minecraft:raw_iron",
+            "count": 30
+          }
+        ],
+        "seconds": 6,
+        "out": {
+          "item": "cgs:sulfur",
+          "count": 12
         }
       },
       {
@@ -3696,50 +4634,49 @@
           {
             "item": "siftec:reanimated_sam",
             "count": 1
+          },
+          {
+            "item": "siftec:raw_bauxite",
+            "count": 48
           }
         ],
-        "seconds": 3,
+        "seconds": 6,
         "out": {
-          "item": "siftec:excited_photonic_matter",
-          "count": 2
+          "item": "siftec:uranium",
+          "count": 12
         }
       },
       {
         "in": [
           {
-            "item": "siftec:reanimated_sam",
-            "count": 1
-          }
-        ],
-        "seconds": 3,
-        "fluid_out": {
-          "fluid": "siftec:dark_matter_residue",
-          "mb": 250
-        }
-      },
-      {
-        "in": [
+            "item": "siftec:packaged_rocket_fuel",
+            "count": 12
+          },
           {
-            "item": "siftec:petroleum_coke",
+            "item": "siftec:dark_matter_crystal",
             "count": 4
           }
         ],
-        "seconds": 4,
+        "seconds": 3,
         "out": {
-          "item": "minecraft:diamond",
-          "count": 1
+          "item": "siftec:compacted_coal",
+          "count": 2
         },
-        "alt": "alt_petroleum_diamond"
+        "fluid_out": {
+          "fluid": "siftec:ionized_fuel",
+          "mb": 400
+        },
+        "alt": "alt_dark_ion_fuel"
       },
       {
         "in": [
           {
             "item": "minecraft:coal",
-            "count": 4
+            "count": 8
           },
           {
             "item": "siftec:quartz_crystal",
-            "count": 1
+            "count": 3
           }
         ],
         "seconds": 4,
@@ -3747,58 +4684,73 @@
           "item": "minecraft:diamond",
           "count": 1
         },
-        "alt": "alt_pink_diamond"
-      },
-      {
-        "in": [
-          {
-            "item": "minecraft:iron_ingot",
-            "count": 8
-          },
-          {
-            "item": "siftec:reanimated_sam",
-            "count": 4
-          }
-        ],
-        "seconds": 6,
-        "out": {
-          "item": "siftec:ficsite_ingot",
-          "count": 1
-        },
-        "alt": "alt_iron_ficsite_ingot"
-      },
-      {
-        "in": [
-          {
-            "item": "create:brass_ingot",
-            "count": 4
-          },
-          {
-            "item": "siftec:reanimated_sam",
-            "count": 3
-          }
-        ],
-        "seconds": 6,
-        "out": {
-          "item": "siftec:ficsite_ingot",
-          "count": 1
-        },
-        "alt": "alt_brass_ficsite_ingot"
+        "alt": "alt_pink_diamonds"
       }
     ],
     "particle_accelerator": [
       {
         "in": [
           {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ],
+        "seconds": 2,
+        "fluid_in": {
+          "fluid": "siftec:dark_matter_residue",
+          "mb": 200
+        },
+        "out": {
+          "item": "siftec:dark_matter_crystal",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "minecraft:coal",
+            "count": 20
+          }
+        ],
+        "seconds": 2,
+        "out": {
+          "item": "minecraft:diamond",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:plutonium_waste",
+            "count": 1
+          },
+          {
+            "item": "siftec:singularity_cell",
+            "count": 1
+          }
+        ],
+        "seconds": 6,
+        "fluid_in": {
+          "fluid": "siftec:dark_matter_residue",
+          "mb": 800
+        },
+        "out": {
+          "item": "siftec:ficsonium",
+          "count": 1
+        }
+      },
+      {
+        "in": [
+          {
             "item": "siftec:copper_powder",
-            "count": 8
+            "count": 200
           },
           {
             "item": "siftec:pressure_conversion_cube",
             "count": 1
           }
         ],
-        "seconds": 12,
+        "seconds": 120,
         "out": {
           "item": "siftec:nuclear_pasta",
           "count": 1
@@ -3807,19 +4759,50 @@
       {
         "in": [
           {
-            "item": "minecraft:diamond",
-            "count": 1
+            "item": "siftec:non_fissile_uranium",
+            "count": 100
+          },
+          {
+            "item": "siftec:uranium_waste",
+            "count": 25
           }
         ],
-        "seconds": 4,
+        "seconds": 60,
+        "out": {
+          "item": "siftec:plutonium_pellet",
+          "count": 30
+        }
+      },
+      {
+        "in": [
+          {
+            "item": "minecraft:coal",
+            "count": 12
+          },
+          {
+            "item": "#siftec:stones",
+            "count": 24
+          }
+        ],
+        "seconds": 3,
+        "out": {
+          "item": "minecraft:diamond",
+          "count": 1
+        },
+        "alt": "alt_cloudy_diamonds"
+      },
+      {
+        "in": [],
+        "seconds": 3,
         "fluid_in": {
           "fluid": "siftec:dark_matter_residue",
-          "mb": 250
+          "mb": 400
         },
         "out": {
           "item": "siftec:dark_matter_crystal",
           "count": 1
-        }
+        },
+        "alt": "alt_dark_matter_crystallization"
       },
       {
         "in": [
@@ -3828,58 +4811,191 @@
             "count": 1
           }
         ],
-        "seconds": 4,
+        "seconds": 2,
+        "fluid_in": {
+          "fluid": "siftec:dark_matter_residue",
+          "mb": 200
+        },
         "out": {
           "item": "siftec:dark_matter_crystal",
           "count": 2
         },
-        "alt": "alt_dark_matter_trap",
+        "alt": "alt_dark_matter_trap"
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:non_fissile_uranium",
+            "count": 150
+          },
+          {
+            "item": "siftec:aluminum_casing",
+            "count": 20
+          }
+        ],
+        "seconds": 120,
+        "out": {
+          "item": "siftec:encased_plutonium_cell",
+          "count": 20
+        },
+        "alt": "alt_instant_plutonium_cell"
+      },
+      {
+        "in": [],
+        "seconds": 3,
         "fluid_in": {
-          "fluid": "siftec:dark_matter_residue",
-          "mb": 250
-        }
+          "fluid": "createdieselgenerators:crude_oil",
+          "mb": 400
+        },
+        "out": {
+          "item": "minecraft:diamond",
+          "count": 2
+        },
+        "alt": "alt_oil_based_diamonds"
+      },
+      {
+        "in": [
+          {
+            "item": "siftec:petroleum_coke",
+            "count": 24
+          }
+        ],
+        "seconds": 2,
+        "out": {
+          "item": "minecraft:diamond",
+          "count": 1
+        },
+        "alt": "alt_petroleum_diamonds"
+      },
+      {
+        "in": [
+          {
+            "item": "minecraft:coal",
+            "count": 30
+          },
+          {
+            "item": "siftec:packaged_turbofuel",
+            "count": 2
+          }
+        ],
+        "seconds": 3,
+        "out": {
+          "item": "minecraft:diamond",
+          "count": 3
+        },
+        "alt": "alt_turbo_diamonds"
       }
     ]
   },
   "sink_points": {
-    "create:iron_sheet": 6,
-    "siftec:iron_rod": 4,
-    "siftec:screw": 2,
-    "siftec:wire": 6,
+    "siftec:ai_expansion_server": 597652,
+    "siftec:ai_limiter": 920,
+    "siftec:adaptive_control_unit": 76368,
+    "siftec:alclad_aluminum_sheet": 266,
+    "siftec:alien_power_matrix": 210,
+    "siftec:aluminum_casing": 393,
+    "siftec:aluminum_ingot": 131,
+    "siftec:aluminum_scrap": 27,
+    "siftec:assembly_director_system": 500176,
+    "siftec:automated_wiring": 1440,
+    "siftec:ballistic_warp_drive": 2895334,
+    "siftec:battery": 465,
+    "siftec:raw_bauxite": 8,
+    "siftec:biochemical_sculptor": 301778,
+    "siftec:biomass": 12,
+    "minecraft:gunpowder": 14,
     "siftec:cable": 24,
+    "create:brass_ingot": 42,
+    "create:raw_zinc": 7,
+    "siftec:circuit_board": 696,
+    "minecraft:coal": 3,
+    "siftec:compacted_coal": 28,
+    "siftec:computer": 8352,
+    "siftec:cooling_system": 12006,
+    "minecraft:copper_ingot": 6,
+    "minecraft:raw_copper": 3,
+    "siftec:copper_powder": 72,
     "create:copper_sheet": 24,
+    "siftec:crystal_oscillator": 3072,
+    "siftec:dark_matter_crystal": 1780,
+    "minecraft:diamond": 240,
+    "siftec:electromagnetic_control_rod": 2560,
+    "siftec:empty_canister": 60,
+    "siftec:empty_fluid_tank": 170,
+    "siftec:encased_industrial_beam": 528,
+    "siftec:encased_uranium_cell": 147,
+    "siftec:fabric": 140,
+    "siftec:ficsite_ingot": 1936,
+    "siftec:ficsite_trigon": 1291,
+    "siftec:fused_modular_frame": 62840,
+    "siftec:gas_filter": 608,
+    "siftec:heat_sink": 2804,
+    "siftec:heavy_modular_frame": 10800,
+    "siftec:high_speed_connector": 3776,
+    "siftec:iodine_infused_filter": 2274,
+    "minecraft:iron_ingot": 2,
+    "minecraft:raw_iron": 1,
+    "create:iron_sheet": 6,
+    "siftec:iron_rebar": 8,
+    "siftec:iron_rod": 4,
+    "minecraft:stone": 2,
+    "siftec:magnetic_field_generator": 11000,
+    "siftec:modular_engine": 9960,
+    "siftec:modular_frame": 408,
+    "siftec:motor": 1520,
+    "siftec:neural_quantum_processor": 248034,
+    "siftec:nuclear_pasta": 538976,
+    "siftec:packaged_alumina_solution": 160,
+    "siftec:packaged_fuel": 270,
+    "siftec:packaged_heavy_oil_residue": 180,
+    "siftec:packaged_ionized_fuel": 5246,
+    "siftec:packaged_liquid_biofuel": 370,
+    "siftec:packaged_nitric_acid": 412,
+    "siftec:packaged_nitrogen_gas": 312,
+    "siftec:packaged_oil": 180,
+    "siftec:packaged_rocket_fuel": 1028,
+    "siftec:packaged_sulfuric_acid": 152,
+    "siftec:packaged_turbofuel": 570,
+    "siftec:packaged_water": 130,
+    "siftec:petroleum_coke": 20,
+    "siftec:plastic": 75,
+    "siftec:plutonium_fuel_rod": 153184,
+    "siftec:polymer_resin": 12,
+    "siftec:pressure_conversion_cube": 255088,
+    "siftec:quartz_crystal": 50,
+    "siftec:quickwire": 17,
+    "siftec:radio_control_unit": 32352,
+    "minecraft:quartz": 15,
+    "siftec:reanimated_sam": 160,
     "siftec:reinforced_iron_plate": 120,
     "siftec:rotor": 140,
-    "siftec:modular_frame": 408,
-    "siftec:smart_plating": 520,
-    "siftec:steel_beam": 64,
-    "siftec:steel_pipe": 24,
-    "siftec:versatile_framework": 1176,
-    "siftec:encased_industrial_beam": 632,
-    "siftec:stator": 240,
-    "siftec:motor": 1520,
-    "siftec:automated_wiring": 1440,
-    "siftec:plastic": 75,
     "siftec:rubber": 60,
-    "siftec:circuit_board": 696,
-    "siftec:computer": 8352,
-    "siftec:heavy_modular_frame": 10800,
-    "siftec:modular_engine": 9960,
-    "siftec:adaptive_control_unit": 76368,
-    "siftec:aluminum_casing": 393,
-    "siftec:alclad_aluminum_sheet": 266,
-    "siftec:radio_control_unit": 32352,
+    "siftec:sam": 20,
+    "siftec:sam_fluctuator": 1968,
+    "siftec:screw": 2,
+    "siftec:shatter_rebar": 332,
+    "siftec:silica": 20,
+    "siftec:singularity_cell": 114675,
+    "siftec:smart_plating": 520,
+    "siftec:smokeless_powder": 58,
+    "siftec:solid_biofuel": 48,
+    "siftec:stator": 240,
+    "siftec:steel_beam": 64,
+    "cgs:steel_ingot": 8,
+    "siftec:steel_pipe": 24,
+    "siftec:stun_rebar": 186,
+    "cgs:sulfur": 11,
     "siftec:supercomputer": 97352,
-    "siftec:cooling_system": 12006,
-    "siftec:fused_modular_frame": 62840,
+    "siftec:superposition_oscillator": 37292,
+    "siftec:thermal_propulsion_rocket": 728508,
+    "siftec:time_crystal": 960,
     "siftec:turbo_motor": 240496,
-    "siftec:quickwire": 17,
-    "siftec:ai_limiter": 920,
-    "siftec:high_speed_connector": 3776,
-    "siftec:crystal_oscillator": 3072,
-    "siftec:dna_capsule": 1000,
-    "siftec:hard_drive": 5000,
-    "siftec:power_shard": 5000
+    "siftec:uranium": 35,
+    "siftec:uranium_fuel_rod": 43468,
+    "siftec:versatile_framework": 1176,
+    "siftec:wire": 6,
+    "siftec:hard_drive": 1000,
+    "siftec:object_scanner": 1400
   },
   "shop": [
     {
@@ -4030,6 +5146,22 @@
       "color": 14721072
     },
     {
+      "id": "rocket_fuel",
+      "color": 14704672
+    },
+    {
+      "id": "ionized_fuel",
+      "color": 15790192
+    },
+    {
+      "id": "dissolved_silica",
+      "color": 14737648
+    },
+    {
+      "id": "excited_photonic_matter",
+      "color": 16777184
+    },
+    {
       "id": "drilling_mud",
       "color": 9071178
     },
@@ -4039,48 +5171,228 @@
     }
   ],
   "recipe_locks": {
-    "siftec:cutting/alt_iron_wire": "alt_iron_wire",
-    "siftec:deploying/alt_stitched_iron_plate": "alt_stitched_iron_plate",
-    "siftec:deploying/alt_bolted_frame": "alt_bolted_frame",
-    "siftec:deploying/alt_copper_rotor": "alt_copper_rotor",
-    "siftec:mixing/alt_solid_steel_ingot": "alt_solid_steel_ingot",
-    "siftec:compacting/alt_cast_screw": "alt_cast_screw",
-    "siftec:cutting/alt_steel_screw": "alt_steel_screw",
-    "siftec:deploying/alt_steel_rotor": "alt_steel_rotor",
-    "siftec:deploying/alt_steeled_frame": "alt_steeled_frame",
-    "siftec:deploying/alt_encased_industrial_pipe": "alt_encased_industrial_pipe",
-    "siftec:mixing/alt_coke_steel_ingot": "alt_coke_steel_ingot",
-    "siftec:mixing/alt_recycled_plastic": "alt_recycled_plastic",
-    "siftec:mixing/alt_recycled_rubber": "alt_recycled_rubber",
-    "siftec:mixing/alt_residual_rubber": "alt_residual_rubber",
-    "siftec:deploying/alt_adhered_iron_plate": "alt_adhered_iron_plate",
-    "siftec:mixing/alt_coated_cable": "alt_coated_cable",
-    "siftec:mixing/alt_insulated_cable": "alt_insulated_cable",
-    "siftec:mechanical_crafting/alt_plastic_smart_plating": "alt_plastic_smart_plating",
-    "siftec:mechanical_crafting/alt_flexible_framework": "alt_flexible_framework",
-    "siftec:mechanical_crafting/alt_heavy_encased_frame": "alt_heavy_encased_frame",
-    "siftec:mixing/alt_fused_quickwire": "alt_fused_quickwire",
-    "siftec:deploying/alt_quickwire_cable": "alt_quickwire_cable",
-    "siftec:deploying/alt_quickwire_stator": "alt_quickwire_stator",
-    "siftec:deploying/alt_caterium_circuit_board": "alt_caterium_circuit_board",
-    "siftec:mechanical_crafting/alt_caterium_computer": "alt_caterium_computer",
-    "siftec:mechanical_crafting/alt_automated_speed_wiring": "alt_automated_speed_wiring",
-    "siftec:deploying/alt_silicon_circuit_board": "alt_silicon_circuit_board",
-    "siftec:deploying/alt_crystal_computer": "alt_crystal_computer",
-    "siftec:mechanical_crafting/alt_rigor_motor": "alt_rigor_motor",
-    "siftec:mechanical_crafting/alt_insulated_crystal_oscillator": "alt_insulated_crystal_oscillator",
-    "siftec:mixing/alt_compacted_steel_ingot": "alt_compacted_steel_ingot",
-    "siftec:mixing/alt_turbo_heavy_fuel": "alt_turbo_heavy_fuel",
-    "siftec:mixing/alt_electrode_aluminum_scrap": "alt_electrode_aluminum_scrap",
-    "siftec:compacting/alt_pure_aluminum_ingot": "alt_pure_aluminum_ingot",
-    "siftec:deploying/alt_heat_exchanger": "alt_heat_exchanger",
-    "siftec:mixing/alt_cooling_device": "alt_cooling_device",
-    "siftec:mechanical_crafting/alt_radio_control_system": "alt_radio_control_system",
-    "siftec:deploying/alt_electric_motor": "alt_electric_motor",
-    "siftec:deploying/alt_electromagnetic_connection_rod": "alt_electromagnetic_connection_rod",
-    "siftec:deploying/alt_oc_supercomputer": "alt_oc_supercomputer",
-    "siftec:mechanical_crafting/alt_turbo_electric_motor": "alt_turbo_electric_motor",
-    "siftec:mixing/alt_heat_fused_frame": "alt_heat_fused_frame",
+    "siftec:compacting/constructor/alien_dna_capsule": "mam_megafauna_2",
+    "siftec:compacting/constructor/aluminum_casing": "bauxite_refinement",
+    "siftec:compacting/constructor/biomass_alien_protein": "mam_megafauna_2",
+    "siftec:compacting/constructor/biomass_leaves": "hub_upgrade_6",
+    "siftec:compacting/constructor/biomass_mycelia": "mam_mycelia_1",
+    "siftec:compacting/constructor/biomass_wood": "hub_upgrade_6",
+    "siftec:compacting/constructor/cable": "hub_upgrade_2",
+    "siftec:compacting/constructor/copper_powder": "particle_enrichment",
+    "siftec:compacting/constructor/copper_sheet": "part_assembly",
+    "siftec:compacting/constructor/empty_canister": "fluid_packaging",
+    "siftec:compacting/constructor/empty_fluid_tank": "advanced_aluminum_production",
+    "siftec:compacting/constructor/ficsite_trigon": "matter_conversion",
+    "siftec:compacting/constructor/hatcher_protein": "mam_megafauna_1",
+    "siftec:compacting/constructor/hog_protein": "mam_megafauna_1",
+    "siftec:compacting/constructor/iron_rebar": "mam_megafauna_3",
+    "siftec:compacting/constructor/quartz_crystal": "mam_quartz_1",
+    "siftec:compacting/constructor/quickwire": "mam_caterium_2",
+    "siftec:compacting/constructor/reanimated_sam": "mam_alien_8",
+    "siftec:compacting/constructor/screw": "hub_upgrade_3",
+    "siftec:compacting/constructor/silica": "mam_quartz_2",
+    "siftec:compacting/constructor/solid_biofuel": "obstacle_clearing",
+    "siftec:compacting/constructor/spitter_protein": "mam_megafauna_1",
+    "siftec:compacting/constructor/steel_beam": "basic_steel_production",
+    "siftec:compacting/constructor/steel_pipe": "basic_steel_production",
+    "siftec:compacting/constructor/stinger_protein": "mam_megafauna_1",
+    "siftec:compacting/constructor/wire": "hub_upgrade_2",
+    "siftec:compacting/constructor/aluminum_beam": "alt_aluminum_beam",
+    "siftec:compacting/constructor/cast_screw": "alt_cast_screw",
+    "siftec:compacting/constructor/caterium_wire": "alt_caterium_wire",
+    "siftec:compacting/constructor/iron_pipe": "alt_iron_pipe",
+    "siftec:compacting/constructor/iron_wire": "alt_iron_wire",
+    "siftec:compacting/constructor/steel_canister": "alt_steel_canister",
+    "siftec:compacting/constructor/steel_screw": "alt_steel_screw",
+    "siftec:compacting/smelter/pure_aluminum_ingot": "alt_pure_aluminum_ingot",
+    "siftec:mixing/assembler/ai_limiter": "mam_caterium_4",
+    "siftec:mixing/assembler/alclad_aluminum_sheet": "bauxite_refinement",
+    "siftec:mixing/assembler/assembly_director_system": "control_system_development",
+    "siftec:mixing/assembler/automated_wiring": "advanced_steel_production",
+    "siftec:mixing/assembler/circuit_board": "oil_processing",
+    "siftec:mixing/assembler/electromagnetic_control_rod": "nuclear_power",
+    "siftec:mixing/assembler/encased_industrial_beam": "advanced_steel_production",
+    "siftec:mixing/assembler/encased_plutonium_cell": "particle_enrichment",
+    "siftec:mixing/assembler/fabric": "mam_mycelia_2",
+    "siftec:mixing/assembler/heat_sink": "advanced_aluminum_production",
+    "siftec:mixing/assembler/magnetic_field_generator": "nuclear_power",
+    "siftec:mixing/assembler/modular_frame": "part_assembly",
+    "siftec:mixing/assembler/motor": "advanced_steel_production",
+    "siftec:mixing/assembler/pressure_conversion_cube": "particle_enrichment",
+    "siftec:mixing/assembler/reinforced_iron_plate": "hub_upgrade_3",
+    "siftec:mixing/assembler/rotor": "part_assembly",
+    "siftec:mixing/assembler/shatter_rebar": "mam_quartz_8",
+    "siftec:mixing/assembler/smart_plating": "part_assembly",
+    "siftec:mixing/assembler/stator": "advanced_steel_production",
+    "siftec:mixing/assembler/stun_rebar": "mam_caterium_8",
+    "siftec:mixing/assembler/versatile_framework": "basic_steel_production",
+    "siftec:mixing/assembler/adhered_iron_plate": "alt_adhered_iron_plate",
+    "siftec:mixing/assembler/alclad_casing": "alt_alclad_casing",
+    "siftec:mixing/assembler/bolted_frame": "alt_bolted_frame",
+    "siftec:mixing/assembler/bolted_iron_plate": "alt_bolted_iron_plate",
+    "siftec:mixing/assembler/caterium_circuit_board": "alt_caterium_circuit_board",
+    "siftec:mixing/assembler/cheap_silica": "alt_cheap_silica",
+    "siftec:mixing/assembler/coated_iron_canister": "alt_coated_iron_canister",
+    "siftec:mixing/assembler/compacted_coal": "mam_sulfur_6",
+    "siftec:mixing/assembler/copper_rotor": "alt_copper_rotor",
+    "siftec:mixing/assembler/crystal_computer": "alt_crystal_computer",
+    "siftec:mixing/assembler/electric_motor": "alt_electric_motor",
+    "siftec:mixing/assembler/electrode_circuit_board": "alt_electrode_circuit_board",
+    "siftec:mixing/assembler/electromagnetic_connection_rod": "alt_electromagnetic_connection_rod",
+    "siftec:mixing/assembler/encased_industrial_pipe": "alt_encased_industrial_pipe",
+    "siftec:mixing/assembler/fused_quickwire": "alt_fused_quickwire",
+    "siftec:mixing/assembler/fused_wire": "alt_fused_wire",
+    "siftec:mixing/assembler/heat_exchanger": "alt_heat_exchanger",
+    "siftec:mixing/assembler/insulated_cable": "alt_insulated_cable",
+    "siftec:mixing/assembler/oc_supercomputer": "alt_oc_supercomputer",
+    "siftec:mixing/assembler/plastic_ai_limiter": "alt_plastic_ai_limiter",
+    "siftec:mixing/assembler/plutonium_fuel_unit": "alt_plutonium_fuel_unit",
+    "siftec:mixing/assembler/quickwire_cable": "alt_quickwire_cable",
+    "siftec:mixing/assembler/quickwire_stator": "alt_quickwire_stator",
+    "siftec:mixing/assembler/silicon_circuit_board": "alt_silicon_circuit_board",
+    "siftec:mixing/assembler/steel_rotor": "alt_steel_rotor",
+    "siftec:mixing/assembler/steeled_frame": "alt_steeled_frame",
+    "siftec:mixing/assembler/stitched_iron_plate": "alt_stitched_iron_plate",
+    "siftec:mixing/foundry/aluminum_ingot": "bauxite_refinement",
+    "siftec:mixing/foundry/steel_ingot": "basic_steel_production",
+    "siftec:mixing/foundry/coke_steel_ingot": "alt_coke_steel_ingot",
+    "siftec:mixing/foundry/compacted_steel_ingot": "alt_compacted_steel_ingot",
+    "siftec:mixing/foundry/fused_quartz_crystal": "alt_fused_quartz_crystal",
+    "siftec:mixing/foundry/molded_beam": "alt_molded_beam",
+    "siftec:mixing/foundry/molded_steel_pipe": "alt_molded_steel_pipe",
+    "siftec:mixing/foundry/solid_steel_ingot": "alt_solid_steel_ingot",
+    "siftec:mixing/foundry/tempered_caterium_ingot": "alt_tempered_caterium_ingot",
+    "siftec:mixing/manufacturer/adaptive_control_unit_core": "industrial_manufacturing",
+    "seq:adaptive_control_unit": "industrial_manufacturing",
+    "siftec:mixing/manufacturer/ballistic_warp_drive_core": "spatial_energy_regulation",
+    "seq:ballistic_warp_drive": "spatial_energy_regulation",
+    "siftec:mixing/manufacturer/computer_core": "industrial_manufacturing",
+    "seq:computer": "industrial_manufacturing",
+    "siftec:mixing/manufacturer/crystal_oscillator_core": "mam_quartz_4",
+    "seq:crystal_oscillator": "mam_quartz_4",
+    "siftec:mixing/manufacturer/gas_filter_core": "mam_mycelia_5",
+    "seq:gas_filter": "mam_mycelia_5",
+    "siftec:mixing/manufacturer/heavy_modular_frame_core": "industrial_manufacturing",
+    "seq:heavy_modular_frame": "industrial_manufacturing",
+    "siftec:mixing/manufacturer/high_speed_connector_core": "mam_caterium_7",
+    "seq:high_speed_connector": "mam_caterium_7",
+    "siftec:mixing/manufacturer/iodine_infused_filter_core": "hazmat_suit",
+    "seq:iodine_infused_filter": "hazmat_suit",
+    "siftec:mixing/manufacturer/modular_engine_core": "industrial_manufacturing",
+    "seq:modular_engine": "industrial_manufacturing",
+    "siftec:mixing/manufacturer/plutonium_fuel_rod_core": "particle_enrichment",
+    "seq:plutonium_fuel_rod": "particle_enrichment",
+    "siftec:mixing/manufacturer/radio_control_unit_core": "control_system_development",
+    "seq:radio_control_unit": "control_system_development",
+    "siftec:mixing/manufacturer/sam_fluctuator_core": "mam_alien_9",
+    "seq:sam_fluctuator": "mam_alien_9",
+    "siftec:mixing/manufacturer/singularity_cell_core": "spatial_energy_regulation",
+    "seq:singularity_cell": "spatial_energy_regulation",
+    "siftec:mixing/manufacturer/supercomputer_core": "control_system_development",
+    "seq:supercomputer": "control_system_development",
+    "siftec:mixing/manufacturer/thermal_propulsion_rocket_core": "leading_edge_production",
+    "seq:thermal_propulsion_rocket": "leading_edge_production",
+    "siftec:mixing/manufacturer/turbo_motor_core": "leading_edge_production",
+    "seq:turbo_motor": "leading_edge_production",
+    "siftec:mixing/manufacturer/uranium_fuel_rod_core": "nuclear_power",
+    "seq:uranium_fuel_rod": "nuclear_power",
+    "seq:automated_wiring": "advanced_steel_production",
+    "seq:battery": "control_system_development",
+    "seq:versatile_framework": "basic_steel_production",
+    "seq:encased_uranium_cell": "nuclear_power",
+    "seq:smart_plating": "part_assembly",
+    "seq:motor": "advanced_steel_production",
+    "siftec:mixing/refinery/alumina_solution": "bauxite_refinement",
+    "siftec:mixing/refinery/aluminum_scrap": "bauxite_refinement",
+    "siftec:mixing/refinery/fuel": "oil_processing",
+    "siftec:mixing/refinery/ionized_fuel": "mam_sulfur_11",
+    "siftec:mixing/refinery/petroleum_coke": "oil_processing",
+    "siftec:mixing/refinery/plastic": "oil_processing",
+    "siftec:mixing/refinery/residual_plastic": "oil_processing",
+    "siftec:mixing/refinery/residual_rubber": "oil_processing",
+    "siftec:mixing/refinery/rubber": "oil_processing",
+    "siftec:mixing/refinery/smokeless_powder": "mam_sulfur_9",
+    "siftec:mixing/refinery/coated_cable": "alt_coated_cable",
+    "siftec:mixing/refinery/diluted_packaged_fuel": "alt_diluted_packaged_fuel",
+    "siftec:mixing/refinery/electrode_aluminum_scrap": "alt_electrode_aluminum_scrap",
+    "siftec:mixing/refinery/heavy_oil_residue": "alt_heavy_oil_residue",
+    "siftec:mixing/refinery/leached_caterium_ingot": "alt_leached_caterium_ingot",
+    "siftec:mixing/refinery/polyester_fabric": "mam_mycelia_6",
+    "siftec:mixing/refinery/polymer_resin": "alt_polymer_resin",
+    "siftec:mixing/refinery/pure_caterium_ingot": "alt_pure_caterium_ingot",
+    "siftec:mixing/refinery/pure_quartz_crystal": "alt_pure_quartz_crystal",
+    "siftec:mixing/refinery/quartz_purification": "alt_quartz_purification",
+    "siftec:mixing/refinery/recycled_plastic": "alt_recycled_plastic",
+    "siftec:mixing/refinery/recycled_rubber": "alt_recycled_rubber",
+    "siftec:mixing/refinery/steamed_copper_sheet": "alt_steamed_copper_sheet",
+    "siftec:mixing/refinery/turbo_heavy_fuel": "alt_turbo_heavy_fuel",
+    "siftec:mixing/refinery/turbofuel": "mam_sulfur_7",
+    "siftec:mixing/blender/battery": "control_system_development",
+    "siftec:mixing/blender/biochemical_sculptor": "matter_conversion",
+    "siftec:mixing/blender/cooling_system": "advanced_aluminum_production",
+    "siftec:mixing/blender/encased_uranium_cell": "nuclear_power",
+    "siftec:mixing/blender/fused_modular_frame": "advanced_aluminum_production",
+    "siftec:mixing/blender/non_fissile_uranium": "particle_enrichment",
+    "siftec:mixing/blender/rocket_fuel": "mam_sulfur_10",
+    "siftec:mixing/blender/cooling_device": "alt_cooling_device",
+    "siftec:mixing/blender/distilled_silica": "alt_distilled_silica",
+    "siftec:mixing/blender/fertile_uranium": "alt_fertile_uranium",
+    "siftec:mixing/blender/heat_fused_frame": "alt_heat_fused_frame",
+    "siftec:mixing/blender/instant_scrap": "alt_instant_scrap",
+    "siftec:mixing/blender/nitro_rocket_fuel": "alt_nitro_rocket_fuel",
+    "siftec:mixing/blender/turbo_blend_fuel": "alt_turbo_blend_fuel",
+    "siftec:filling/packager/packaged_alumina_solution": "bauxite_refinement",
+    "siftec:filling/packager/packaged_fuel": "fluid_packaging",
+    "siftec:filling/packager/packaged_heavy_oil_residue": "fluid_packaging",
+    "siftec:filling/packager/packaged_ionized_fuel": "mam_sulfur_11",
+    "siftec:filling/packager/packaged_liquid_biofuel": "fluid_packaging",
+    "siftec:filling/packager/packaged_nitric_acid": "particle_enrichment",
+    "siftec:filling/packager/packaged_nitrogen_gas": "advanced_aluminum_production",
+    "siftec:filling/packager/packaged_oil": "fluid_packaging",
+    "siftec:filling/packager/packaged_rocket_fuel": "mam_sulfur_10",
+    "siftec:filling/packager/packaged_sulfuric_acid": "control_system_development",
+    "siftec:filling/packager/packaged_turbofuel": "mam_sulfur_7",
+    "siftec:filling/packager/packaged_water": "fluid_packaging",
+    "siftec:emptying/packager/unpackage_alumina_solution": "bauxite_refinement",
+    "siftec:emptying/packager/unpackage_fuel": "fluid_packaging",
+    "siftec:emptying/packager/unpackage_heavy_oil_residue": "fluid_packaging",
+    "siftec:emptying/packager/unpackage_ionized_fuel": "mam_sulfur_11",
+    "siftec:emptying/packager/unpackage_liquid_biofuel": "fluid_packaging",
+    "siftec:emptying/packager/unpackage_nitric_acid": "particle_enrichment",
+    "siftec:emptying/packager/unpackage_nitrogen_gas": "advanced_aluminum_production",
+    "siftec:emptying/packager/unpackage_oil": "fluid_packaging",
+    "siftec:emptying/packager/unpackage_rocket_fuel": "mam_sulfur_10",
+    "siftec:emptying/packager/unpackage_sulfuric_acid": "control_system_development",
+    "siftec:emptying/packager/unpackage_turbofuel": "alt_unpackage_turbofuel",
+    "siftec:emptying/packager/unpackage_water": "fluid_packaging",
+    "seq:charged_ai_expansion_server": "quantum_encoding",
+    "siftec:emptying/quantum_encoder/ai_expansion_server_drain": "quantum_encoding",
+    "siftec:mixing/quantum_encoder/alien_power_matrix_core": "mam_alien_10",
+    "seq:charged_alien_power_matrix": "mam_alien_10",
+    "siftec:emptying/quantum_encoder/alien_power_matrix_drain": "mam_alien_10",
+    "siftec:mixing/quantum_encoder/ficsonium_fuel_rod_core": "peak_efficiency",
+    "seq:charged_ficsonium_fuel_rod": "peak_efficiency",
+    "siftec:emptying/quantum_encoder/ficsonium_fuel_rod_drain": "peak_efficiency",
+    "siftec:mixing/quantum_encoder/neural_quantum_processor_core": "quantum_encoding",
+    "seq:charged_neural_quantum_processor": "quantum_encoding",
+    "siftec:emptying/quantum_encoder/neural_quantum_processor_drain": "quantum_encoding",
+    "siftec:mixing/quantum_encoder/superposition_oscillator_core": "quantum_encoding",
+    "seq:charged_superposition_oscillator": "quantum_encoding",
+    "siftec:emptying/quantum_encoder/superposition_oscillator_drain": "quantum_encoding",
+    "siftec:mixing/manufacturer/object_scanner_core": "field_research",
+    "seq:object_scanner": "field_research",
+    "siftec:mixing/manufacturer/jetpack_core": "jetpack",
+    "seq:jetpack": "jetpack",
+    "siftec:mixing/manufacturer/parachute_core": "mam_mycelia_3",
+    "seq:parachute": "mam_mycelia_3",
+    "siftec:mixing/manufacturer/gas_mask_core": "mam_mycelia_5",
+    "seq:gas_mask": "mam_mycelia_5",
+    "siftec:mixing/manufacturer/hazmat_suit_core": "hazmat_suit",
+    "seq:hazmat_suit": "hazmat_suit",
+    "siftec:mixing/manufacturer/hover_pack_core": "hover_pack",
+    "seq:hover_pack": "hover_pack",
+    "siftec:mixing/manufacturer/blade_runners_core": "mam_quartz_6",
+    "seq:blade_runners": "mam_quartz_6",
     "siftec:bulk_fermenting/vinegar": "mam_nutrients_1",
     "siftec:bulk_fermenting/mead": "mam_nutrients_3",
     "siftec:filling/mead": "mam_nutrients_3",
@@ -4097,12 +5409,6 @@
     "siftec:mixing/melon_jam": "mam_nutrients_2",
     "siftec:milling/biomass_from_straw": "hub_upgrade_6",
     "siftec:milling/biomass_from_bark": "hub_upgrade_6",
-    "siftec:cutting/wire": "hub_upgrade_2",
-    "siftec:compacting/cable": "hub_upgrade_2",
-    "siftec:cutting/screw": "hub_upgrade_3",
-    "siftec:deploying/reinforced_iron_plate": "hub_upgrade_3",
-    "siftec:milling/biomass_from_leaves": "hub_upgrade_6",
-    "siftec:milling/biomass_from_logs": "hub_upgrade_6",
     "siftec:milling/biomass_from_wheat_seeds": "hub_upgrade_6",
     "siftec:milling/biomass_from_beetroot_seeds": "hub_upgrade_6",
     "siftec:milling/biomass_from_melon_seeds": "hub_upgrade_6",
@@ -4111,170 +5417,73 @@
     "siftec:cutting/biomass_from_sugar_cane": "hub_upgrade_6",
     "siftec:cutting/biomass_from_cactus": "hub_upgrade_6",
     "siftec:cutting/biomass_from_short_grass": "hub_upgrade_6",
-    "siftec:deploying/rotor": "part_assembly",
-    "siftec:deploying/modular_frame": "part_assembly",
-    "siftec:deploying/smart_plating": "part_assembly",
-    "siftec:compacting/solid_biofuel": "obstacle_clearing",
-    "siftec:crafting/copper_sheet_by_hand": "part_assembly",
-    "siftec:crafting/wire_by_hand": "hub_upgrade_2",
-    "siftec:crafting/cable_by_hand": "hub_upgrade_2",
-    "siftec:crafting/screw_by_hand": "hub_upgrade_3",
-    "siftec:crafting/reinforced_iron_plate_by_hand": "hub_upgrade_3",
-    "siftec:crafting/rotor_by_hand": "part_assembly",
-    "siftec:crafting/modular_frame_by_hand": "part_assembly",
-    "siftec:crafting/smart_plating_by_hand": "part_assembly",
-    "siftec:crafting/solid_biofuel_by_hand": "obstacle_clearing",
     "siftec:crafting/flywheel": "hub_upgrade_6",
     "siftec:crafting/deployer": "part_assembly",
     "siftec:crafting/nailgun": "mam_megafauna_3",
-    "siftec:mixing/steel_ingot": "basic_steel_production",
-    "siftec:compacting/steel_beam": "basic_steel_production",
     "siftec:crafting/hammer": "enhanced_asset_security",
     "siftec:crafting/crushing_wheel": "advanced_steel_production",
-    "siftec:cutting/steel_pipe": "basic_steel_production",
-    "siftec:deploying/versatile_framework": "basic_steel_production",
-    "siftec:deploying/encased_industrial_beam": "advanced_steel_production",
-    "siftec:deploying/stator": "advanced_steel_production",
-    "siftec:deploying/motor": "advanced_steel_production",
-    "siftec:deploying/automated_wiring": "advanced_steel_production",
-    "siftec:mixing/plastic": "oil_processing",
-    "siftec:mixing/rubber": "oil_processing",
     "siftec:crafting/pumpjack_crank": "oil_processing",
-    "siftec:compacting/petroleum_coke": "oil_processing",
-    "siftec:deploying/circuit_board": "oil_processing",
-    "siftec:pressing/canister": "fluid_packaging",
     "siftec:crafting/mechanical_crafter": "industrial_manufacturing",
-    "siftec:mechanical_crafting/computer": "industrial_manufacturing",
-    "siftec:mechanical_crafting/heavy_modular_frame": "industrial_manufacturing",
-    "siftec:mechanical_crafting/modular_engine": "industrial_manufacturing",
-    "siftec:mechanical_crafting/adaptive_control_unit": "industrial_manufacturing",
-    "siftec:crushing/crushed_bauxite": "bauxite_refinement",
-    "siftec:mixing/alumina_solution": "mam_quartz_2",
-    "siftec:mixing/aluminum_scrap": "bauxite_refinement",
-    "siftec:mixing/aluminum_ingot": "bauxite_refinement",
-    "siftec:deploying/alclad_aluminum_sheet": "bauxite_refinement",
-    "siftec:pressing/aluminum_casing": "bauxite_refinement",
-    "siftec:mechanical_crafting/radio_control_unit": "bauxite_refinement",
-    "siftec:mechanical_crafting/iodine_infused_filter": "hazmat_suit",
-    "siftec:mechanical_crafting/supercomputer": "aeronautical_engineering",
-    "siftec:deploying/assembly_director_system": "aeronautical_engineering",
-    "siftec:deploying/electromagnetic_control_rod": "advanced_aluminum_production",
-    "siftec:deploying/magnetic_field_generator": "leading_edge_production",
-    "siftec:cutting/empty_fluid_tank": "advanced_aluminum_production",
-    "siftec:filling/packaged_nitrogen_gas": "advanced_aluminum_production",
-    "siftec:deploying/heat_sink": "advanced_aluminum_production",
-    "siftec:mixing/cooling_system": "advanced_aluminum_production",
-    "siftec:mixing/fused_modular_frame": "advanced_aluminum_production",
-    "siftec:mechanical_crafting/turbo_motor": "leading_edge_production",
-    "siftec:mechanical_crafting/thermal_propulsion_rocket": "leading_edge_production",
-    "siftec:crushing/copper_powder": "particle_enrichment",
-    "siftec:compacting/pressure_conversion_cube": "particle_enrichment",
-    "siftec:haunting/reanimated_sam": "matter_conversion",
-    "siftec:mechanical_crafting/sam_fluctuator": "matter_conversion",
-    "siftec:cutting/ficsite_trigon": "matter_conversion",
-    "siftec:mixing/biochemical_sculptor": "matter_conversion",
-    "seq:superposition_oscillator": "quantum_encoding",
-    "seq:neural_quantum_processor": "quantum_encoding",
-    "seq:ai_expansion_server": "quantum_encoding",
-    "siftec:mechanical_crafting/singularity_cell": "spatial_energy_regulation",
-    "siftec:mechanical_crafting/ballistic_warp_drive": "spatial_energy_regulation",
-    "siftec:milling/biomass_from_rotten_flesh": "mam_megafauna_1",
-    "siftec:milling/biomass_from_string": "mam_megafauna_1",
-    "siftec:milling/biomass_from_spider_eye": "mam_megafauna_1",
-    "siftec:cutting/biomass_from_bone": "mam_megafauna_1",
-    "siftec:compacting/dna_capsule_from_rotten_flesh": "mam_megafauna_2",
-    "siftec:compacting/dna_capsule_from_bone": "mam_megafauna_2",
-    "siftec:compacting/dna_capsule_from_string": "mam_megafauna_2",
-    "siftec:compacting/dna_capsule_from_spider_eye": "mam_megafauna_2",
+    "siftec:pressing/power_line": "hub_upgrade_2",
     "siftec:mixing/brass_blend_with_sand": "mam_caterium_1",
     "siftec:mixing/brass_blend_with_coal": "mam_caterium_1",
     "siftec:mixing/brass_blend_with_sulfur": "mam_caterium_1",
     "siftec:smelting/brass_ingot_from_blend": "mam_caterium_1",
     "siftec:blasting/brass_ingot_from_blend": "mam_caterium_1",
-    "siftec:cutting/quickwire": "mam_caterium_2",
     "siftec:deploying/electron_tube": "mam_caterium_3",
     "siftec:deploying/precision_mechanism": "mam_caterium_3",
-    "siftec:deploying/ai_limiter": "mam_caterium_4",
-    "siftec:mechanical_crafting/high_speed_connector": "mam_caterium_7",
-    "siftec:deploying/fabric_from_brown_mushroom": "mam_mycelia_2",
-    "siftec:milling/biomass_from_brown_mushroom": "mam_mycelia_1",
-    "siftec:deploying/fabric_from_red_mushroom": "mam_mycelia_2",
-    "siftec:milling/biomass_from_red_mushroom": "mam_mycelia_1",
-    "siftec:mechanical_crafting/gas_filter": "mam_mycelia_5",
-    "siftec:pressing/power_shard_from_blue_slug": "mam_slugs_1",
-    "siftec:pressing/power_shard_from_yellow_slug": "mam_slugs_1",
-    "siftec:pressing/power_shard_from_purple_slug": "mam_slugs_1",
-    "siftec:deploying/synthetic_power_shard": "mam_slugs_1",
-    "siftec:milling/silica": "mam_quartz_2",
-    "siftec:sandpaper_polishing/quartz_crystal": "mam_quartz_1",
-    "siftec:mechanical_crafting/crystal_oscillator": "mam_quartz_4",
     "siftec:mixing/ignimbrite": "mam_sulfur_2",
-    "siftec:compacting/compacted_coal": "mam_sulfur_6",
-    "siftec:mixing/turbofuel": "mam_sulfur_7",
     "siftec:item_application/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:deploying/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:item_application/steel_casing_from_stripped_woods": "basic_steel_production",
     "siftec:deploying/steel_casing_from_stripped_woods": "basic_steel_production",
-    "siftec:pressing/power_line": "hub_upgrade_2",
-    "siftec:mechanical_crafting/workshop_portable_miner": "hub_upgrade_1",
-    "siftec:mechanical_crafting/workshop_hub_engine": "hub_upgrade_2",
-    "siftec:mechanical_crafting/workshop_power_pole": "hub_upgrade_3",
-    "siftec:mechanical_crafting/workshop_power_tower": "expanded_power_infrastructure",
-    "siftec:mechanical_crafting/workshop_parachute": "mam_mycelia_3",
-    "siftec:mechanical_crafting/workshop_cardboard_drone": "aeronautical_engineering",
-    "siftec:compacting/screw_bundle": "field_research",
-    "siftec:compacting/wire_spool": "hub_upgrade_6",
-    "siftec:compacting/quickwire_coil": "mam_caterium_5",
-    "siftec:compacting/silica_bundle": "mam_quartz_6",
-    "siftec:compacting/iron_bundle": "hub_upgrade_6",
-    "seq:furnace_engine": "hub_upgrade_6",
-    "seq:mam": "field_research",
-    "seq:object_scanner": "field_research",
-    "seq:gateway_coil": "part_assembly",
-    "seq:gateway_frame": "part_assembly",
-    "seq:wormhole_gateway": "hub_upgrade_6",
-    "seq:landing_cushion": "jump_pads",
-    "seq:landing_pad": "jump_pads",
-    "seq:awesome_sink": "resource_sink_bonus_program",
-    "seq:awesome_shop": "resource_sink_bonus_program",
-    "seq:blueprint_designer": "ficsit_blueprints",
-    "seq:power_storage": "expanded_power_infrastructure",
-    "seq:speed_governor": "mam_caterium_5",
-    "seq:blade_runners": "mam_quartz_6",
-    "seq:dimensional_depot": "mam_alien_2",
-    "seq:jetpack_thruster": "jetpack",
-    "seq:jetpack": "jetpack",
-    "seq:radar_tower": "mam_quartz_7",
-    "seq:designer_frame": "ficsit_blueprints_mk3",
-    "siftec:mechanical_crafting/mask_lining": "mam_mycelia_5",
-    "siftec:mechanical_crafting/gas_mask": "mam_mycelia_5",
-    "siftec:mechanical_crafting/hazmat_lining": "hazmat_suit",
-    "siftec:mechanical_crafting/hazmat_suit": "hazmat_suit",
-    "siftec:mechanical_crafting/hover_thruster": "hover_pack",
-    "siftec:mechanical_crafting/hover_pack": "hover_pack",
-    "siftec:mechanical_crafting/drone_port_module": "aeronautical_engineering",
-    "siftec:mechanical_crafting/drone_port": "aeronautical_engineering",
-    "siftec:mechanical_crafting/accelerator_segment": "particle_enrichment",
-    "siftec:mechanical_crafting/particle_accelerator": "particle_enrichment",
-    "siftec:mechanical_crafting/converter_core": "matter_conversion",
-    "siftec:mechanical_crafting/converter": "matter_conversion",
-    "siftec:mechanical_crafting/portal_module": "spatial_energy_regulation",
-    "siftec:mechanical_crafting/satellite_portal": "spatial_energy_regulation",
-    "siftec:mechanical_crafting/main_portal": "spatial_energy_regulation",
-    "siftec:mechanical_crafting/geyser_core": "mam_sulfur_8",
-    "siftec:mechanical_crafting/geyser_engine": "mam_sulfur_8",
-    "siftec:mechanical_crafting/extractor_pump": "advanced_aluminum_production",
-    "siftec:mechanical_crafting/resource_well_extractor": "advanced_aluminum_production",
-    "siftec:mechanical_crafting/blueprint_designer_mk3": "ficsit_blueprints_mk3",
-    "siftec:mixing/liquid_biofuel": "fluid_packaging",
-    "siftec:mixing/sulfuric_acid": "aeronautical_engineering",
-    "siftec:mixing/nitric_acid": "particle_enrichment",
+    "siftec:mixing/assembler/black_powder": "mam_sulfur_1",
+    "siftec:sequenced_assembly/manufacturer/adaptive_control_unit": "industrial_manufacturing",
+    "siftec:sequenced_assembly/manufacturer/ballistic_warp_drive": "spatial_energy_regulation",
+    "siftec:sequenced_assembly/manufacturer/computer": "industrial_manufacturing",
+    "siftec:sequenced_assembly/manufacturer/crystal_oscillator": "mam_quartz_4",
+    "siftec:sequenced_assembly/manufacturer/gas_filter": "mam_mycelia_5",
+    "siftec:sequenced_assembly/manufacturer/heavy_modular_frame": "industrial_manufacturing",
+    "siftec:sequenced_assembly/manufacturer/high_speed_connector": "mam_caterium_7",
+    "siftec:sequenced_assembly/manufacturer/iodine_infused_filter": "hazmat_suit",
+    "siftec:sequenced_assembly/manufacturer/modular_engine": "industrial_manufacturing",
+    "siftec:sequenced_assembly/manufacturer/plutonium_fuel_rod": "particle_enrichment",
+    "siftec:sequenced_assembly/manufacturer/radio_control_unit": "control_system_development",
+    "siftec:sequenced_assembly/manufacturer/sam_fluctuator": "mam_alien_9",
+    "siftec:sequenced_assembly/manufacturer/singularity_cell": "spatial_energy_regulation",
+    "siftec:sequenced_assembly/manufacturer/supercomputer": "control_system_development",
+    "siftec:sequenced_assembly/manufacturer/thermal_propulsion_rocket": "leading_edge_production",
+    "siftec:sequenced_assembly/manufacturer/turbo_motor": "leading_edge_production",
+    "siftec:sequenced_assembly/manufacturer/uranium_fuel_rod": "nuclear_power",
+    "siftec:mixing/refinery/liquid_biofuel": "fluid_packaging",
+    "siftec:mixing/refinery/residual_fuel": "oil_processing",
+    "siftec:mixing/refinery/sulfuric_acid": "control_system_development",
+    "siftec:mixing/blender/nitric_acid": "particle_enrichment",
+    "siftec:sequenced_assembly/quantum_encoder/ai_expansion_server": "quantum_encoding",
+    "siftec:sequenced_assembly/quantum_encoder/alien_power_matrix": "mam_alien_10",
+    "siftec:sequenced_assembly/quantum_encoder/ficsonium_fuel_rod": "peak_efficiency",
+    "siftec:sequenced_assembly/quantum_encoder/neural_quantum_processor": "quantum_encoding",
+    "siftec:sequenced_assembly/quantum_encoder/superposition_oscillator": "quantum_encoding",
+    "siftec:sequenced_assembly/manufacturer/object_scanner": "field_research",
+    "siftec:sequenced_assembly/manufacturer/jetpack": "jetpack",
+    "siftec:sequenced_assembly/manufacturer/parachute": "mam_mycelia_3",
+    "siftec:sequenced_assembly/manufacturer/gas_mask": "mam_mycelia_5",
+    "siftec:sequenced_assembly/manufacturer/hazmat_suit": "hazmat_suit",
+    "siftec:sequenced_assembly/manufacturer/hover_pack": "hover_pack",
+    "siftec:sequenced_assembly/manufacturer/blade_runners": "mam_quartz_6",
     "siftec:mixing/gunpowder_with_coal": "mam_sulfur_1",
     "siftec:mixing/gunpowder_with_charcoal": "mam_sulfur_1",
     "siftec:filling/fire_charge": "mam_sulfur_2",
     "siftec:compacting/magma_block": "mam_sulfur_2",
     "siftec:mixing/lava_from_magma_block": "mam_sulfur_2",
     "siftec:filling/tnt": "mam_sulfur_3",
+    "siftec:mixing/gypsum_from_calcite": "control_system_development",
+    "siftec:mixing/acid_leached_iron": "control_system_development",
+    "siftec:mixing/acid_leached_copper": "control_system_development",
+    "siftec:mixing/acid_leached_zinc": "control_system_development",
+    "siftec:mixing/sulfur_from_acid": "control_system_development",
+    "siftec:crafting/toxic_shot": "control_system_development",
+    "siftec:deploying/toxic_shot": "control_system_development",
     "siftec:mixing/kitchen_apple_cider": "mam_nutrients_5",
     "siftec:mixing/kitchen_baked_cod_stew": "mam_nutrients_5",
     "siftec:mixing/kitchen_beef_stew": "mam_nutrients_5",
@@ -4353,17 +5562,105 @@
     "siftec:deploying/kitchen_wild_tomatoes": "mam_nutrients_5",
     "siftec:deploying/kitchen_wither_rose": "mam_nutrients_5",
     "siftec:deploying/kitchen_tag_dough": "mam_nutrients_5",
-    "siftec:mixing/alt_iron_alloy_ingot": "alt_iron_alloy_ingot",
-    "siftec:cutting/alt_steel_rod": "alt_steel_rod",
-    "siftec:splashing/alt_pure_iron_ingot": "alt_pure_iron_ingot",
-    "siftec:splashing/alt_pure_copper_ingot": "alt_pure_copper_ingot",
-    "siftec:smelting/alt_biocoal": "alt_biocoal",
-    "siftec:blasting/alt_biocoal": "alt_biocoal",
-    "siftec:deploying/alt_coated_iron_plate": "alt_coated_iron_plate",
-    "siftec:mixing/alt_sloppy_alumina": "alt_sloppy_alumina",
-    "siftec:mixing/alt_diluted_fuel": "alt_diluted_fuel"
+    "siftec:compacting/constructor/aluminum_rod": "alt_aluminum_rod",
+    "siftec:compacting/constructor/biocoal": "alt_biocoal",
+    "siftec:compacting/constructor/charcoal": "alt_charcoal",
+    "siftec:compacting/constructor/steel_rod": "alt_steel_rod",
+    "siftec:mixing/assembler/coated_iron_plate": "alt_coated_iron_plate",
+    "siftec:mixing/assembler/fine_black_powder": "alt_fine_black_powder",
+    "siftec:mixing/foundry/basic_iron_ingot": "alt_basic_iron_ingot",
+    "siftec:mixing/foundry/copper_alloy_ingot": "alt_copper_alloy_ingot",
+    "siftec:mixing/foundry/iron_alloy_ingot": "alt_iron_alloy_ingot",
+    "siftec:mixing/foundry/steel_cast_plate": "alt_steel_cast_plate",
+    "siftec:mixing/foundry/tempered_copper_ingot": "alt_tempered_copper_ingot",
+    "siftec:mixing/manufacturer/automated_speed_wiring_core": "alt_automated_speed_wiring",
+    "siftec:sequenced_assembly/manufacturer/automated_speed_wiring": "alt_automated_speed_wiring",
+    "siftec:mixing/manufacturer/caterium_computer_core": "alt_caterium_computer",
+    "siftec:sequenced_assembly/manufacturer/caterium_computer": "alt_caterium_computer",
+    "siftec:mixing/manufacturer/classic_battery_core": "alt_classic_battery",
+    "siftec:sequenced_assembly/manufacturer/classic_battery": "alt_classic_battery",
+    "siftec:mixing/manufacturer/flexible_framework_core": "alt_flexible_framework",
+    "siftec:sequenced_assembly/manufacturer/flexible_framework": "alt_flexible_framework",
+    "siftec:mixing/manufacturer/heavy_encased_frame_core": "alt_heavy_encased_frame",
+    "siftec:sequenced_assembly/manufacturer/heavy_encased_frame": "alt_heavy_encased_frame",
+    "siftec:mixing/manufacturer/heavy_flexible_frame_core": "alt_heavy_flexible_frame",
+    "siftec:sequenced_assembly/manufacturer/heavy_flexible_frame": "alt_heavy_flexible_frame",
+    "siftec:mixing/manufacturer/infused_uranium_cell_core": "alt_infused_uranium_cell",
+    "siftec:sequenced_assembly/manufacturer/infused_uranium_cell": "alt_infused_uranium_cell",
+    "siftec:mixing/manufacturer/insulated_crystal_oscillator_core": "alt_insulated_crystal_oscillator",
+    "siftec:sequenced_assembly/manufacturer/insulated_crystal_oscillator": "alt_insulated_crystal_oscillator",
+    "siftec:mixing/manufacturer/plastic_smart_plating_core": "alt_plastic_smart_plating",
+    "siftec:sequenced_assembly/manufacturer/plastic_smart_plating": "alt_plastic_smart_plating",
+    "siftec:mixing/manufacturer/radio_connection_unit_core": "alt_radio_connection_unit",
+    "siftec:sequenced_assembly/manufacturer/radio_connection_unit": "alt_radio_connection_unit",
+    "siftec:mixing/manufacturer/radio_control_system_core": "alt_radio_control_system",
+    "siftec:sequenced_assembly/manufacturer/radio_control_system": "alt_radio_control_system",
+    "siftec:mixing/manufacturer/rigor_motor_core": "alt_rigor_motor",
+    "siftec:sequenced_assembly/manufacturer/rigor_motor": "alt_rigor_motor",
+    "siftec:mixing/manufacturer/silicon_high_speed_connector_core": "alt_silicon_high_speed_connector",
+    "siftec:sequenced_assembly/manufacturer/silicon_high_speed_connector": "alt_silicon_high_speed_connector",
+    "siftec:mixing/manufacturer/super_state_computer_core": "alt_super_state_computer",
+    "siftec:sequenced_assembly/manufacturer/super_state_computer": "alt_super_state_computer",
+    "siftec:mixing/manufacturer/turbo_electric_motor_core": "alt_turbo_electric_motor",
+    "siftec:sequenced_assembly/manufacturer/turbo_electric_motor": "alt_turbo_electric_motor",
+    "siftec:mixing/manufacturer/turbo_pressure_motor_core": "alt_turbo_pressure_motor",
+    "siftec:sequenced_assembly/manufacturer/turbo_pressure_motor": "alt_turbo_pressure_motor",
+    "siftec:mixing/manufacturer/uranium_fuel_unit_core": "alt_uranium_fuel_unit",
+    "siftec:sequenced_assembly/manufacturer/uranium_fuel_unit": "alt_uranium_fuel_unit",
+    "siftec:mixing/refinery/leached_copper_ingot": "alt_leached_copper_ingot",
+    "siftec:mixing/refinery/leached_iron_ingot": "alt_leached_iron_ingot",
+    "siftec:mixing/refinery/pure_copper_ingot": "alt_pure_copper_ingot",
+    "siftec:mixing/refinery/pure_iron_ingot": "alt_pure_iron_ingot",
+    "siftec:mixing/refinery/sloppy_alumina": "alt_sloppy_alumina",
+    "siftec:mixing/blender/diluted_fuel": "alt_diluted_fuel"
   },
   "alternates": [
+    {
+      "id": "alt_aluminum_beam",
+      "requires": [
+        "hub_upgrade_3",
+        "bauxite_refinement"
+      ]
+    },
+    {
+      "id": "alt_aluminum_rod",
+      "requires": [
+        "hub_upgrade_3",
+        "bauxite_refinement"
+      ]
+    },
+    {
+      "id": "alt_biocoal",
+      "requires": [
+        "hub_upgrade_3",
+        "hub_upgrade_6"
+      ]
+    },
+    {
+      "id": "alt_cast_screw",
+      "requires": [
+        "hub_upgrade_3"
+      ]
+    },
+    {
+      "id": "alt_caterium_wire",
+      "requires": [
+        "hub_upgrade_3",
+        "mam_caterium_1"
+      ]
+    },
+    {
+      "id": "alt_charcoal",
+      "requires": [
+        "hub_upgrade_3"
+      ]
+    },
+    {
+      "id": "alt_iron_pipe",
+      "requires": [
+        "hub_upgrade_3"
+      ]
+    },
     {
       "id": "alt_iron_wire",
       "requires": [
@@ -4371,24 +5668,305 @@
       ]
     },
     {
-      "id": "alt_stitched_iron_plate",
+      "id": "alt_steel_canister",
       "requires": [
-        "part_assembly",
-        "hub_upgrade_2"
+        "basic_steel_production",
+        "hub_upgrade_3"
+      ]
+    },
+    {
+      "id": "alt_steel_rod",
+      "requires": [
+        "basic_steel_production",
+        "hub_upgrade_3"
+      ]
+    },
+    {
+      "id": "alt_steel_screw",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_pure_aluminum_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "bauxite_refinement"
+      ]
+    },
+    {
+      "id": "alt_adhered_iron_plate",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_alclad_casing",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "bauxite_refinement"
       ]
     },
     {
       "id": "alt_bolted_frame",
       "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_bolted_iron_plate",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_caterium_circuit_board",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "oil_processing",
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "alt_cheap_silica",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_coated_iron_canister",
+      "requires": [
+        "hub_upgrade_3",
         "part_assembly",
-        "hub_upgrade_3"
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_coated_iron_plate",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "oil_processing"
       ]
     },
     {
       "id": "alt_copper_rotor",
       "requires": [
+        "hub_upgrade_3",
         "part_assembly",
-        "hub_upgrade_3"
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_crystal_computer",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "oil_processing",
+        "mam_quartz_4"
+      ]
+    },
+    {
+      "id": "alt_electric_motor",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "nuclear_power",
+        "part_assembly"
+      ]
+    },
+    {
+      "id": "alt_electrode_circuit_board",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_electromagnetic_connection_rod",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "mam_caterium_7",
+        "advanced_steel_production"
+      ]
+    },
+    {
+      "id": "alt_encased_industrial_pipe",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_fine_black_powder",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "control_system_development",
+        "mam_sulfur_6"
+      ]
+    },
+    {
+      "id": "alt_fused_quickwire",
+      "requires": [
+        "hub_upgrade_3",
+        "mam_caterium_1",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_fused_wire",
+      "requires": [
+        "hub_upgrade_3",
+        "mam_caterium_1",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_heat_exchanger",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "bauxite_refinement",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_insulated_cable",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "oil_processing",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_oc_supercomputer",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "advanced_aluminum_production",
+        "control_system_development"
+      ]
+    },
+    {
+      "id": "alt_plastic_ai_limiter",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "oil_processing",
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "alt_plutonium_fuel_unit",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "particle_enrichment"
+      ]
+    },
+    {
+      "id": "alt_quickwire_cable",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "mam_caterium_2",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_quickwire_stator",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "alt_silicon_circuit_board",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "mam_quartz_2"
+      ]
+    },
+    {
+      "id": "alt_steel_rotor",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_steeled_frame",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_stitched_iron_plate",
+      "requires": [
+        "hub_upgrade_3",
+        "basic_steel_production",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_basic_iron_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_coke_steel_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_compacted_steel_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "mam_sulfur_6"
+      ]
+    },
+    {
+      "id": "alt_copper_alloy_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production"
+      ]
+    },
+    {
+      "id": "alt_fused_quartz_crystal",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production"
       ]
     },
     {
@@ -4400,6 +5978,22 @@
       ]
     },
     {
+      "id": "alt_molded_beam",
+      "requires": [
+        "basic_steel_production",
+        "hub_upgrade_3",
+        "coal_power"
+      ]
+    },
+    {
+      "id": "alt_molded_steel_pipe",
+      "requires": [
+        "basic_steel_production",
+        "hub_upgrade_3",
+        "coal_power"
+      ]
+    },
+    {
       "id": "alt_solid_steel_ingot",
       "requires": [
         "hub_upgrade_3",
@@ -4408,76 +6002,328 @@
       ]
     },
     {
-      "id": "alt_cast_screw",
+      "id": "alt_steel_cast_plate",
       "requires": [
+        "basic_steel_production",
         "hub_upgrade_3",
         "coal_power"
       ]
     },
     {
-      "id": "alt_steel_rod",
+      "id": "alt_tempered_caterium_ingot",
       "requires": [
         "hub_upgrade_3",
-        "basic_steel_production"
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
       ]
     },
     {
-      "id": "alt_steel_screw",
+      "id": "alt_tempered_copper_ingot",
       "requires": [
         "hub_upgrade_3",
-        "basic_steel_production"
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
       ]
     },
     {
-      "id": "alt_steel_rotor",
+      "id": "alt_automated_speed_wiring",
       "requires": [
+        "hub_upgrade_3",
         "part_assembly",
+        "basic_steel_production",
+        "mam_caterium_7",
+        "advanced_steel_production",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_caterium_computer",
+      "requires": [
         "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "oil_processing",
+        "mam_caterium_2"
+      ]
+    },
+    {
+      "id": "alt_classic_battery",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "control_system_development",
+        "part_assembly",
+        "bauxite_refinement",
+        "oil_processing",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_flexible_framework",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_heavy_encased_frame",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "advanced_steel_production"
+      ]
+    },
+    {
+      "id": "alt_heavy_flexible_frame",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "advanced_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_infused_uranium_cell",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "control_system_development",
+        "part_assembly",
+        "mam_caterium_2",
+        "mam_quartz_2"
+      ]
+    },
+    {
+      "id": "alt_insulated_crystal_oscillator",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "mam_caterium_4",
+        "mam_quartz_1",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_plastic_smart_plating",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_radio_connection_unit",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "advanced_aluminum_production",
+        "mam_caterium_7",
+        "mam_quartz_1"
+      ]
+    },
+    {
+      "id": "alt_radio_control_system",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "bauxite_refinement",
+        "oil_processing",
+        "mam_quartz_4"
+      ]
+    },
+    {
+      "id": "alt_rigor_motor",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "mam_quartz_4",
+        "advanced_steel_production"
+      ]
+    },
+    {
+      "id": "alt_silicon_high_speed_connector",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "oil_processing",
+        "mam_caterium_2",
+        "mam_quartz_2"
+      ]
+    },
+    {
+      "id": "alt_super_state_computer",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "control_system_development",
+        "industrial_manufacturing",
+        "nuclear_power",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_turbo_electric_motor",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "nuclear_power",
+        "advanced_steel_production",
+        "control_system_development"
+      ]
+    },
+    {
+      "id": "alt_turbo_pressure_motor",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "advanced_steel_production",
+        "advanced_aluminum_production",
+        "particle_enrichment"
+      ]
+    },
+    {
+      "id": "alt_uranium_fuel_unit",
+      "requires": [
+        "hub_upgrade_3",
+        "part_assembly",
+        "basic_steel_production",
+        "mam_quartz_4",
+        "nuclear_power"
+      ]
+    },
+    {
+      "id": "alt_coated_cable",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing",
+        "hub_upgrade_2"
+      ]
+    },
+    {
+      "id": "alt_diluted_packaged_fuel",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing",
+        "fluid_packaging"
+      ]
+    },
+    {
+      "id": "alt_electrode_aluminum_scrap",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "hub_upgrade_1",
+        "bauxite_refinement",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_heavy_oil_residue",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_leached_caterium_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "control_system_development"
+      ]
+    },
+    {
+      "id": "alt_leached_copper_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "control_system_development"
+      ]
+    },
+    {
+      "id": "alt_leached_iron_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "control_system_development"
+      ]
+    },
+    {
+      "id": "alt_polymer_resin",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_pure_caterium_ingot",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
         "basic_steel_production"
       ]
     },
     {
-      "id": "alt_steeled_frame",
+      "id": "alt_pure_copper_ingot",
       "requires": [
-        "part_assembly",
         "hub_upgrade_3",
-        "basic_steel_production"
-      ]
-    },
-    {
-      "id": "alt_encased_industrial_pipe",
-      "requires": [
-        "part_assembly",
+        "coal_power",
         "basic_steel_production"
       ]
     },
     {
       "id": "alt_pure_iron_ingot",
       "requires": [
-        "advanced_steel_production",
-        "hub_upgrade_2"
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production"
       ]
     },
     {
-      "id": "alt_pure_copper_ingot",
+      "id": "alt_pure_quartz_crystal",
       "requires": [
-        "advanced_steel_production",
-        "hub_upgrade_2"
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production"
       ]
     },
     {
-      "id": "alt_biocoal",
-      "requires": [
-        "obstacle_clearing"
-      ]
-    },
-    {
-      "id": "alt_coke_steel_ingot",
+      "id": "alt_quartz_purification",
       "requires": [
         "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
-        "oil_processing"
+        "advanced_aluminum_production",
+        "particle_enrichment"
       ]
     },
     {
@@ -4499,163 +6345,20 @@
       ]
     },
     {
-      "id": "alt_residual_rubber",
+      "id": "alt_sloppy_alumina",
       "requires": [
         "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
-        "oil_processing"
+        "hub_upgrade_1"
       ]
     },
     {
-      "id": "alt_coated_iron_plate",
-      "requires": [
-        "part_assembly",
-        "oil_processing"
-      ]
-    },
-    {
-      "id": "alt_adhered_iron_plate",
-      "requires": [
-        "part_assembly",
-        "oil_processing"
-      ]
-    },
-    {
-      "id": "alt_coated_cable",
-      "requires": [
-        "hub_upgrade_3",
-        "basic_steel_production",
-        "coal_power",
-        "oil_processing",
-        "hub_upgrade_2"
-      ]
-    },
-    {
-      "id": "alt_insulated_cable",
-      "requires": [
-        "hub_upgrade_3",
-        "basic_steel_production",
-        "oil_processing",
-        "hub_upgrade_2"
-      ]
-    },
-    {
-      "id": "alt_plastic_smart_plating",
-      "requires": [
-        "industrial_manufacturing",
-        "oil_processing",
-        "hub_upgrade_3",
-        "part_assembly"
-      ]
-    },
-    {
-      "id": "alt_flexible_framework",
-      "requires": [
-        "industrial_manufacturing",
-        "part_assembly",
-        "oil_processing",
-        "basic_steel_production"
-      ]
-    },
-    {
-      "id": "alt_heavy_encased_frame",
-      "requires": [
-        "industrial_manufacturing",
-        "advanced_steel_production",
-        "part_assembly",
-        "basic_steel_production"
-      ]
-    },
-    {
-      "id": "alt_fused_quickwire",
-      "requires": [
-        "hub_upgrade_3",
-        "mam_caterium_1",
-        "basic_steel_production"
-      ]
-    },
-    {
-      "id": "alt_quickwire_cable",
-      "requires": [
-        "part_assembly",
-        "mam_caterium_2",
-        "oil_processing"
-      ]
-    },
-    {
-      "id": "alt_quickwire_stator",
-      "requires": [
-        "part_assembly",
-        "mam_caterium_2",
-        "basic_steel_production"
-      ]
-    },
-    {
-      "id": "alt_caterium_circuit_board",
-      "requires": [
-        "part_assembly",
-        "oil_processing",
-        "mam_caterium_2"
-      ]
-    },
-    {
-      "id": "alt_caterium_computer",
-      "requires": [
-        "industrial_manufacturing",
-        "oil_processing",
-        "mam_caterium_2"
-      ]
-    },
-    {
-      "id": "alt_automated_speed_wiring",
-      "requires": [
-        "industrial_manufacturing",
-        "mam_caterium_7",
-        "advanced_steel_production",
-        "hub_upgrade_2"
-      ]
-    },
-    {
-      "id": "alt_silicon_circuit_board",
-      "requires": [
-        "part_assembly",
-        "mam_quartz_2"
-      ]
-    },
-    {
-      "id": "alt_crystal_computer",
-      "requires": [
-        "part_assembly",
-        "oil_processing",
-        "mam_quartz_4"
-      ]
-    },
-    {
-      "id": "alt_rigor_motor",
-      "requires": [
-        "industrial_manufacturing",
-        "mam_quartz_4",
-        "part_assembly",
-        "advanced_steel_production"
-      ]
-    },
-    {
-      "id": "alt_insulated_crystal_oscillator",
-      "requires": [
-        "industrial_manufacturing",
-        "mam_caterium_4",
-        "mam_quartz_1",
-        "oil_processing"
-      ]
-    },
-    {
-      "id": "alt_compacted_steel_ingot",
+      "id": "alt_steamed_copper_sheet",
       "requires": [
         "hub_upgrade_3",
         "coal_power",
-        "basic_steel_production",
-        "mam_sulfur_6"
+        "basic_steel_production"
       ]
     },
     {
@@ -4665,51 +6368,6 @@
         "coal_power",
         "basic_steel_production",
         "mam_sulfur_6",
-        "oil_processing"
-      ]
-    },
-    {
-      "id": "alt_sloppy_alumina",
-      "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
-        "bauxite_refinement"
-      ]
-    },
-    {
-      "id": "alt_electrode_aluminum_scrap",
-      "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
-        "bauxite_refinement",
-        "mam_quartz_2",
-        "oil_processing"
-      ]
-    },
-    {
-      "id": "alt_pure_aluminum_ingot",
-      "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "bauxite_refinement"
-      ]
-    },
-    {
-      "id": "alt_diluted_fuel",
-      "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
-        "oil_processing"
-      ]
-    },
-    {
-      "id": "alt_heat_exchanger",
-      "requires": [
-        "part_assembly",
-        "bauxite_refinement",
         "oil_processing"
       ]
     },
@@ -4724,45 +6382,31 @@
       ]
     },
     {
-      "id": "alt_radio_control_system",
+      "id": "alt_diluted_fuel",
       "requires": [
-        "industrial_manufacturing",
-        "bauxite_refinement",
-        "oil_processing",
-        "mam_quartz_4"
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "oil_processing"
       ]
     },
     {
-      "id": "alt_electric_motor",
+      "id": "alt_distilled_silica",
       "requires": [
-        "part_assembly",
-        "advanced_aluminum_production"
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production"
       ]
     },
     {
-      "id": "alt_electromagnetic_connection_rod",
+      "id": "alt_fertile_uranium",
       "requires": [
-        "part_assembly",
-        "mam_caterium_7",
-        "advanced_steel_production"
-      ]
-    },
-    {
-      "id": "alt_oc_supercomputer",
-      "requires": [
-        "part_assembly",
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
         "advanced_aluminum_production",
-        "bauxite_refinement"
-      ]
-    },
-    {
-      "id": "alt_turbo_electric_motor",
-      "requires": [
-        "industrial_manufacturing",
-        "advanced_aluminum_production",
-        "advanced_steel_production",
-        "bauxite_refinement",
-        "part_assembly"
+        "particle_enrichment",
+        "control_system_development"
       ]
     },
     {
@@ -4779,30 +6423,68 @@
       ]
     },
     {
-      "id": "alt_petroleum_diamond",
+      "id": "alt_instant_scrap",
       "requires": [
-        "matter_conversion",
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "hub_upgrade_1",
+        "control_system_development"
+      ]
+    },
+    {
+      "id": "alt_nitro_rocket_fuel",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "control_system_development",
+        "oil_processing",
+        "advanced_aluminum_production"
+      ]
+    },
+    {
+      "id": "alt_turbo_blend_fuel",
+      "requires": [
+        "hub_upgrade_3",
+        "coal_power",
+        "basic_steel_production",
+        "control_system_development",
         "oil_processing"
       ]
     },
     {
-      "id": "alt_pink_diamond",
+      "id": "alt_unpackage_turbofuel",
+      "requires": [
+        "fluid_packaging",
+        "mam_sulfur_7"
+      ]
+    },
+    {
+      "id": "alt_dark_ion_fuel",
+      "requires": [
+        "matter_conversion",
+        "quantum_encoding",
+        "mam_sulfur_10"
+      ]
+    },
+    {
+      "id": "alt_pink_diamonds",
       "requires": [
         "matter_conversion",
         "mam_quartz_1"
       ]
     },
     {
-      "id": "alt_iron_ficsite_ingot",
+      "id": "alt_cloudy_diamonds",
       "requires": [
-        "matter_conversion"
+        "particle_enrichment"
       ]
     },
     {
-      "id": "alt_brass_ficsite_ingot",
+      "id": "alt_dark_matter_crystallization",
       "requires": [
-        "mam_caterium_1",
-        "matter_conversion"
+        "particle_enrichment"
       ]
     },
     {
@@ -4810,6 +6492,34 @@
       "requires": [
         "particle_enrichment",
         "matter_conversion"
+      ]
+    },
+    {
+      "id": "alt_instant_plutonium_cell",
+      "requires": [
+        "bauxite_refinement",
+        "particle_enrichment"
+      ]
+    },
+    {
+      "id": "alt_oil_based_diamonds",
+      "requires": [
+        "oil_processing",
+        "particle_enrichment"
+      ]
+    },
+    {
+      "id": "alt_petroleum_diamonds",
+      "requires": [
+        "particle_enrichment",
+        "oil_processing"
+      ]
+    },
+    {
+      "id": "alt_turbo_diamonds",
+      "requires": [
+        "mam_sulfur_7",
+        "particle_enrichment"
       ]
     }
   ],
@@ -4980,10 +6690,6 @@
       "item": "siftec:portable_miner",
       "cost": [
         {
-          "item": "create:mechanical_drill",
-          "count": 1
-        },
-        {
           "item": "create:iron_sheet",
           "count": 2
         },
@@ -5031,12 +6737,8 @@
       "item": "siftec:hub",
       "cost": [
         {
-          "item": "create:iron_sheet",
-          "count": 10
-        },
-        {
-          "item": "siftec:iron_rod",
-          "count": 10
+          "item": "minecraft:raw_iron",
+          "count": 20
         }
       ]
     },
@@ -5114,7 +6816,7 @@
       "cost": [
         {
           "item": "siftec:wire",
-          "count": 1
+          "count": 3
         },
         {
           "item": "siftec:iron_rod",
@@ -5147,16 +6849,16 @@
       "item": "siftec:power_tower",
       "cost": [
         {
-          "item": "siftec:steel_beam",
-          "count": 5
-        },
-        {
           "item": "#siftec:stones",
           "count": 10
         },
         {
           "item": "siftec:wire",
-          "count": 10
+          "count": 20
+        },
+        {
+          "item": "siftec:steel_beam",
+          "count": 20
         }
       ]
     },
@@ -5164,16 +6866,16 @@
       "item": "siftec:power_storage",
       "cost": [
         {
-          "item": "siftec:wire",
-          "count": 20
+          "item": "siftec:encased_industrial_beam",
+          "count": 5
         },
         {
           "item": "siftec:modular_frame",
           "count": 10
         },
         {
-          "item": "siftec:stator",
-          "count": 5
+          "item": "siftec:wire",
+          "count": 100
         }
       ]
     },
@@ -5199,11 +6901,11 @@
       "cost": [
         {
           "item": "siftec:rotor",
-          "count": 20
+          "count": 2
         },
         {
           "item": "siftec:cable",
-          "count": 30
+          "count": 20
         },
         {
           "item": "siftec:biomass",
@@ -5215,20 +6917,20 @@
       "item": "siftec:jetpack",
       "cost": [
         {
-          "item": "siftec:plastic",
-          "count": 50
-        },
-        {
-          "item": "siftec:rubber",
-          "count": 50
-        },
-        {
-          "item": "siftec:circuit_board",
-          "count": 5
-        },
-        {
           "item": "siftec:motor",
           "count": 5
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 10
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 25
+        },
+        {
+          "item": "siftec:wire",
+          "count": 50
         }
       ]
     },
@@ -5296,11 +6998,11 @@
       "cost": [
         {
           "item": "siftec:fabric",
-          "count": 10
+          "count": 20
         },
         {
           "item": "siftec:cable",
-          "count": 5
+          "count": 10
         }
       ]
     },
@@ -5308,16 +7010,16 @@
       "item": "siftec:gas_mask",
       "cost": [
         {
-          "item": "siftec:rubber",
-          "count": 50
-        },
-        {
-          "item": "siftec:plastic",
-          "count": 100
-        },
-        {
           "item": "siftec:fabric",
           "count": 50
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 10
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 10
         }
       ]
     },
@@ -5325,16 +7027,20 @@
       "item": "siftec:radar_tower",
       "cost": [
         {
-          "item": "siftec:heavy_modular_frame",
+          "item": "siftec:computer",
           "count": 10
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 20
         },
         {
           "item": "siftec:crystal_oscillator",
-          "count": 10
+          "count": 25
         },
         {
           "item": "siftec:cable",
-          "count": 50
+          "count": 100
         }
       ]
     },
@@ -5343,7 +7049,7 @@
       "cost": [
         {
           "item": "siftec:modular_frame",
-          "count": 4
+          "count": 15
         },
         {
           "item": "siftec:cable",
@@ -5352,6 +7058,10 @@
         {
           "item": "#siftec:stones",
           "count": 100
+        },
+        {
+          "item": "siftec:steel_beam",
+          "count": 100
         }
       ]
     },
@@ -5359,15 +7069,19 @@
       "item": "siftec:blueprint_designer_mk3",
       "cost": [
         {
-          "item": "siftec:fused_modular_frame",
+          "item": "siftec:neural_quantum_processor",
           "count": 10
         },
         {
-          "item": "siftec:neural_quantum_processor",
-          "count": 5
+          "item": "siftec:fused_modular_frame",
+          "count": 20
         },
         {
-          "item": "#siftec:stones",
+          "item": "siftec:time_crystal",
+          "count": 50
+        },
+        {
+          "item": "siftec:ficsite_trigon",
           "count": 100
         }
       ]
@@ -5381,7 +7095,7 @@
         },
         {
           "item": "siftec:high_speed_connector",
-          "count": 10
+          "count": 20
         },
         {
           "item": "siftec:alclad_aluminum_sheet",
@@ -5401,10 +7115,6 @@
       "item": "siftec:cardboard_drone",
       "cost": [
         {
-          "item": "create:cardboard",
-          "count": 8
-        },
-        {
           "item": "siftec:motor",
           "count": 4
         },
@@ -5419,6 +7129,14 @@
         {
           "item": "siftec:ai_limiter",
           "count": 2
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 4
         }
       ]
     },
@@ -5427,11 +7145,11 @@
       "cost": [
         {
           "item": "siftec:turbo_motor",
-          "count": 25
+          "count": 5
         },
         {
           "item": "siftec:radio_control_unit",
-          "count": 25
+          "count": 10
         },
         {
           "item": "siftec:superposition_oscillator",
@@ -5439,11 +7157,11 @@
         },
         {
           "item": "siftec:sam_fluctuator",
-          "count": 20
+          "count": 25
         },
         {
           "item": "siftec:ficsite_trigon",
-          "count": 200
+          "count": 50
         }
       ]
     },
@@ -5451,24 +7169,20 @@
       "item": "siftec:satellite_portal",
       "cost": [
         {
-          "item": "siftec:turbo_motor",
-          "count": 5
-        },
-        {
           "item": "siftec:radio_control_unit",
-          "count": 10
+          "count": 5
         },
         {
           "item": "siftec:superposition_oscillator",
-          "count": 5
-        },
-        {
-          "item": "siftec:sam_fluctuator",
           "count": 10
         },
         {
+          "item": "siftec:sam_fluctuator",
+          "count": 25
+        },
+        {
           "item": "siftec:ficsite_trigon",
-          "count": 50
+          "count": 25
         }
       ]
     },
@@ -5480,12 +7194,16 @@
           "count": 1
         },
         {
-          "item": "siftec:modular_frame",
-          "count": 5
+          "item": "siftec:sam_fluctuator",
+          "count": 10
         },
         {
-          "item": "siftec:cable",
-          "count": 20
+          "item": "siftec:modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:wire",
+          "count": 100
         }
       ]
     },
@@ -5493,20 +7211,24 @@
       "item": "siftec:geyser_engine",
       "cost": [
         {
-          "item": "siftec:heavy_modular_frame",
-          "count": 20
-        },
-        {
-          "item": "siftec:supercomputer",
+          "item": "siftec:motor",
           "count": 10
         },
         {
-          "item": "siftec:steel_pipe",
+          "item": "siftec:modular_frame",
+          "count": 25
+        },
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 25
+        },
+        {
+          "item": "create:copper_sheet",
           "count": 50
         },
         {
-          "item": "siftec:rubber",
-          "count": 20
+          "item": "siftec:wire",
+          "count": 250
         }
       ]
     },
@@ -5536,11 +7258,11 @@
         },
         {
           "item": "create:iron_sheet",
-          "count": 5
+          "count": 10
         },
         {
           "item": "siftec:cable",
-          "count": 30
+          "count": 10
         }
       ]
     },
@@ -5548,28 +7270,24 @@
       "item": "siftec:particle_accelerator",
       "cost": [
         {
-          "item": "siftec:radio_control_unit",
-          "count": 25
-        },
-        {
-          "item": "siftec:electromagnetic_control_rod",
-          "count": 100
+          "item": "siftec:turbo_motor",
+          "count": 10
         },
         {
           "item": "siftec:supercomputer",
           "count": 10
         },
         {
+          "item": "siftec:fused_modular_frame",
+          "count": 25
+        },
+        {
           "item": "siftec:cooling_system",
           "count": 50
         },
         {
-          "item": "siftec:fused_modular_frame",
-          "count": 20
-        },
-        {
-          "item": "siftec:turbo_motor",
-          "count": 10
+          "item": "siftec:quickwire",
+          "count": 500
         }
       ]
     },
@@ -5582,15 +7300,15 @@
         },
         {
           "item": "siftec:cooling_system",
-          "count": 10
-        },
-        {
-          "item": "siftec:radio_control_unit",
           "count": 25
         },
         {
-          "item": "siftec:sam_fluctuator",
+          "item": "siftec:radio_control_unit",
           "count": 50
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 100
         }
       ]
     },
@@ -5598,24 +7316,900 @@
       "item": "siftec:resource_well_extractor",
       "cost": [
         {
-          "item": "siftec:aluminum_casing",
-          "count": 20
-        },
-        {
-          "item": "siftec:encased_industrial_beam",
-          "count": 20
-        },
-        {
-          "item": "siftec:motor",
+          "item": "siftec:steel_beam",
           "count": 10
         },
         {
-          "item": "siftec:rubber",
-          "count": 50
+          "item": "siftec:aluminum_casing",
+          "count": 10
         }
       ]
     }
   ],
+  "build_costs": {
+    "AWESOME Shop": [
+      {
+        "item": "siftec:screw",
+        "count": 200
+      },
+      {
+        "item": "create:iron_sheet",
+        "count": 10
+      },
+      {
+        "item": "siftec:cable",
+        "count": 10
+      }
+    ],
+    "AWESOME Sink": [
+      {
+        "item": "siftec:reinforced_iron_plate",
+        "count": 15
+      },
+      {
+        "item": "siftec:cable",
+        "count": 30
+      },
+      {
+        "item": "#siftec:stones",
+        "count": 45
+      }
+    ],
+    "Alien Power Augmenter": [
+      {
+        "item": "siftec:somersloop",
+        "count": 10
+      },
+      {
+        "item": "siftec:sam_fluctuator",
+        "count": 50
+      },
+      {
+        "item": "siftec:cable",
+        "count": 100
+      },
+      {
+        "item": "siftec:encased_industrial_beam",
+        "count": 50
+      },
+      {
+        "item": "siftec:motor",
+        "count": 25
+      },
+      {
+        "item": "siftec:computer",
+        "count": 10
+      }
+    ],
+    "Assembler": [
+      {
+        "item": "siftec:reinforced_iron_plate",
+        "count": 8
+      },
+      {
+        "item": "siftec:rotor",
+        "count": 4
+      },
+      {
+        "item": "siftec:cable",
+        "count": 10
+      }
+    ],
+    "Biomass Burner": [
+      {
+        "item": "create:iron_sheet",
+        "count": 15
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 15
+      },
+      {
+        "item": "siftec:wire",
+        "count": 25
+      }
+    ],
+    "Blender": [
+      {
+        "item": "siftec:computer",
+        "count": 10
+      },
+      {
+        "item": "siftec:heavy_modular_frame",
+        "count": 10
+      },
+      {
+        "item": "siftec:motor",
+        "count": 20
+      },
+      {
+        "item": "siftec:aluminum_casing",
+        "count": 50
+      }
+    ],
+    "Blueprint Designer Mk.1": [
+      {
+        "item": "siftec:modular_frame",
+        "count": 15
+      },
+      {
+        "item": "siftec:cable",
+        "count": 25
+      },
+      {
+        "item": "#siftec:stones",
+        "count": 100
+      },
+      {
+        "item": "siftec:steel_beam",
+        "count": 100
+      }
+    ],
+    "Blueprint Designer Mk.2": [
+      {
+        "item": "siftec:heavy_modular_frame",
+        "count": 10
+      },
+      {
+        "item": "siftec:computer",
+        "count": 20
+      },
+      {
+        "item": "siftec:rubber",
+        "count": 100
+      },
+      {
+        "item": "#siftec:stones",
+        "count": 100
+      }
+    ],
+    "Blueprint Designer Mk.3": [
+      {
+        "item": "siftec:neural_quantum_processor",
+        "count": 10
+      },
+      {
+        "item": "siftec:fused_modular_frame",
+        "count": 20
+      },
+      {
+        "item": "siftec:time_crystal",
+        "count": 50
+      },
+      {
+        "item": "siftec:ficsite_trigon",
+        "count": 100
+      }
+    ],
+    "Coal-Powered Generator": [
+      {
+        "item": "siftec:reinforced_iron_plate",
+        "count": 20
+      },
+      {
+        "item": "siftec:rotor",
+        "count": 10
+      },
+      {
+        "item": "siftec:cable",
+        "count": 30
+      }
+    ],
+    "Constructor": [
+      {
+        "item": "siftec:reinforced_iron_plate",
+        "count": 2
+      },
+      {
+        "item": "siftec:cable",
+        "count": 8
+      }
+    ],
+    "Converter": [
+      {
+        "item": "siftec:fused_modular_frame",
+        "count": 10
+      },
+      {
+        "item": "siftec:cooling_system",
+        "count": 25
+      },
+      {
+        "item": "siftec:radio_control_unit",
+        "count": 50
+      },
+      {
+        "item": "siftec:sam_fluctuator",
+        "count": 100
+      }
+    ],
+    "Dimensional Depot Uploader": [
+      {
+        "item": "siftec:mercer_sphere",
+        "count": 1
+      },
+      {
+        "item": "siftec:sam_fluctuator",
+        "count": 10
+      },
+      {
+        "item": "siftec:modular_frame",
+        "count": 10
+      },
+      {
+        "item": "siftec:wire",
+        "count": 100
+      }
+    ],
+    "Drone": [
+      {
+        "item": "siftec:motor",
+        "count": 4
+      },
+      {
+        "item": "siftec:alclad_aluminum_sheet",
+        "count": 10
+      },
+      {
+        "item": "siftec:radio_control_unit",
+        "count": 1
+      },
+      {
+        "item": "siftec:ai_limiter",
+        "count": 2
+      },
+      {
+        "item": "create:iron_sheet",
+        "count": 2
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 4
+      }
+    ],
+    "Drone Port": [
+      {
+        "item": "siftec:heavy_modular_frame",
+        "count": 20
+      },
+      {
+        "item": "siftec:high_speed_connector",
+        "count": 20
+      },
+      {
+        "item": "siftec:alclad_aluminum_sheet",
+        "count": 50
+      },
+      {
+        "item": "siftec:aluminum_casing",
+        "count": 50
+      },
+      {
+        "item": "siftec:radio_control_unit",
+        "count": 10
+      }
+    ],
+    "Equipment Workshop": [
+      {
+        "item": "create:iron_sheet",
+        "count": 6
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 4
+      }
+    ],
+    "Explorer": [
+      {
+        "item": "siftec:crystal_oscillator",
+        "count": 5
+      },
+      {
+        "item": "siftec:motor",
+        "count": 5
+      },
+      {
+        "item": "siftec:modular_frame",
+        "count": 10
+      },
+      {
+        "item": "siftec:steel_pipe",
+        "count": 15
+      }
+    ],
+    "Foundry": [
+      {
+        "item": "siftec:modular_frame",
+        "count": 10
+      },
+      {
+        "item": "siftec:rotor",
+        "count": 10
+      },
+      {
+        "item": "#siftec:stones",
+        "count": 20
+      }
+    ],
+    "Fuel-Powered Generator": [
+      {
+        "item": "siftec:motor",
+        "count": 15
+      },
+      {
+        "item": "siftec:encased_industrial_beam",
+        "count": 15
+      },
+      {
+        "item": "create:copper_sheet",
+        "count": 30
+      },
+      {
+        "item": "siftec:rubber",
+        "count": 50
+      },
+      {
+        "item": "siftec:quickwire",
+        "count": 50
+      }
+    ],
+    "Geothermal Generator": [
+      {
+        "item": "siftec:motor",
+        "count": 10
+      },
+      {
+        "item": "siftec:modular_frame",
+        "count": 25
+      },
+      {
+        "item": "siftec:high_speed_connector",
+        "count": 25
+      },
+      {
+        "item": "create:copper_sheet",
+        "count": 50
+      },
+      {
+        "item": "siftec:wire",
+        "count": 250
+      }
+    ],
+    "Industrial Storage Container": [
+      {
+        "item": "siftec:steel_beam",
+        "count": 20
+      },
+      {
+        "item": "siftec:steel_pipe",
+        "count": 20
+      }
+    ],
+    "Jump Pad": [
+      {
+        "item": "siftec:rotor",
+        "count": 2
+      },
+      {
+        "item": "create:iron_sheet",
+        "count": 15
+      },
+      {
+        "item": "siftec:cable",
+        "count": 10
+      }
+    ],
+    "Lookout Tower": [
+      {
+        "item": "create:iron_sheet",
+        "count": 5
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 5
+      }
+    ],
+    "MAM": [
+      {
+        "item": "siftec:reinforced_iron_plate",
+        "count": 5
+      },
+      {
+        "item": "siftec:cable",
+        "count": 15
+      },
+      {
+        "item": "siftec:wire",
+        "count": 45
+      }
+    ],
+    "Main Portal": [
+      {
+        "item": "siftec:turbo_motor",
+        "count": 5
+      },
+      {
+        "item": "siftec:radio_control_unit",
+        "count": 10
+      },
+      {
+        "item": "siftec:superposition_oscillator",
+        "count": 15
+      },
+      {
+        "item": "siftec:sam_fluctuator",
+        "count": 25
+      },
+      {
+        "item": "siftec:ficsite_trigon",
+        "count": 50
+      }
+    ],
+    "Manufacturer": [
+      {
+        "item": "siftec:motor",
+        "count": 10
+      },
+      {
+        "item": "siftec:modular_frame",
+        "count": 20
+      },
+      {
+        "item": "siftec:plastic",
+        "count": 50
+      },
+      {
+        "item": "siftec:cable",
+        "count": 50
+      }
+    ],
+    "Miner Mk.1": [
+      {
+        "item": "create:iron_sheet",
+        "count": 12
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 4
+      },
+      {
+        "item": "#siftec:stones",
+        "count": 10
+      }
+    ],
+    "Miner Mk.2": [
+      {
+        "item": "create:iron_sheet",
+        "count": 4
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 8
+      },
+      {
+        "item": "siftec:encased_industrial_beam",
+        "count": 10
+      },
+      {
+        "item": "siftec:steel_pipe",
+        "count": 20
+      },
+      {
+        "item": "siftec:modular_frame",
+        "count": 10
+      }
+    ],
+    "Miner Mk.3": [
+      {
+        "item": "create:iron_sheet",
+        "count": 6
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 12
+      },
+      {
+        "item": "siftec:steel_pipe",
+        "count": 50
+      },
+      {
+        "item": "siftec:supercomputer",
+        "count": 5
+      },
+      {
+        "item": "siftec:fused_modular_frame",
+        "count": 10
+      },
+      {
+        "item": "siftec:turbo_motor",
+        "count": 3
+      }
+    ],
+    "Nuclear Power Plant": [
+      {
+        "item": "siftec:supercomputer",
+        "count": 10
+      },
+      {
+        "item": "siftec:heavy_modular_frame",
+        "count": 25
+      },
+      {
+        "item": "siftec:alclad_aluminum_sheet",
+        "count": 100
+      },
+      {
+        "item": "siftec:cable",
+        "count": 200
+      },
+      {
+        "item": "#siftec:stones",
+        "count": 250
+      }
+    ],
+    "Oil Extractor": [
+      {
+        "item": "siftec:motor",
+        "count": 15
+      },
+      {
+        "item": "siftec:encased_industrial_beam",
+        "count": 20
+      },
+      {
+        "item": "siftec:cable",
+        "count": 60
+      }
+    ],
+    "Packager": [
+      {
+        "item": "siftec:steel_beam",
+        "count": 20
+      },
+      {
+        "item": "siftec:rubber",
+        "count": 10
+      },
+      {
+        "item": "siftec:plastic",
+        "count": 10
+      }
+    ],
+    "Particle Accelerator": [
+      {
+        "item": "siftec:turbo_motor",
+        "count": 10
+      },
+      {
+        "item": "siftec:supercomputer",
+        "count": 10
+      },
+      {
+        "item": "siftec:fused_modular_frame",
+        "count": 25
+      },
+      {
+        "item": "siftec:cooling_system",
+        "count": 50
+      },
+      {
+        "item": "siftec:quickwire",
+        "count": 500
+      }
+    ],
+    "Personal Storage Box": [
+      {
+        "item": "create:iron_sheet",
+        "count": 6
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 6
+      }
+    ],
+    "Power Line": [
+      {
+        "item": "siftec:cable",
+        "count": 1
+      }
+    ],
+    "Power Pole Mk.1": [
+      {
+        "item": "siftec:wire",
+        "count": 3
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 1
+      },
+      {
+        "item": "#siftec:stones",
+        "count": 1
+      }
+    ],
+    "Power Pole Mk.2": [
+      {
+        "item": "siftec:quickwire",
+        "count": 6
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 2
+      },
+      {
+        "item": "#siftec:stones",
+        "count": 2
+      }
+    ],
+    "Power Pole Mk.3": [
+      {
+        "item": "siftec:high_speed_connector",
+        "count": 2
+      },
+      {
+        "item": "siftec:steel_pipe",
+        "count": 2
+      },
+      {
+        "item": "siftec:rubber",
+        "count": 3
+      }
+    ],
+    "Power Storage": [
+      {
+        "item": "siftec:encased_industrial_beam",
+        "count": 5
+      },
+      {
+        "item": "siftec:modular_frame",
+        "count": 10
+      },
+      {
+        "item": "siftec:wire",
+        "count": 100
+      }
+    ],
+    "Power Tower": [
+      {
+        "item": "#siftec:stones",
+        "count": 10
+      },
+      {
+        "item": "siftec:wire",
+        "count": 20
+      },
+      {
+        "item": "siftec:steel_beam",
+        "count": 20
+      }
+    ],
+    "Quantum Encoder": [
+      {
+        "item": "siftec:turbo_motor",
+        "count": 20
+      },
+      {
+        "item": "siftec:supercomputer",
+        "count": 20
+      },
+      {
+        "item": "siftec:cooling_system",
+        "count": 50
+      },
+      {
+        "item": "siftec:time_crystal",
+        "count": 50
+      },
+      {
+        "item": "siftec:ficsite_trigon",
+        "count": 100
+      }
+    ],
+    "Radar Tower": [
+      {
+        "item": "siftec:computer",
+        "count": 10
+      },
+      {
+        "item": "siftec:heavy_modular_frame",
+        "count": 20
+      },
+      {
+        "item": "siftec:crystal_oscillator",
+        "count": 25
+      },
+      {
+        "item": "siftec:cable",
+        "count": 100
+      }
+    ],
+    "Refinery": [
+      {
+        "item": "siftec:motor",
+        "count": 10
+      },
+      {
+        "item": "siftec:encased_industrial_beam",
+        "count": 10
+      },
+      {
+        "item": "siftec:steel_pipe",
+        "count": 30
+      },
+      {
+        "item": "create:copper_sheet",
+        "count": 20
+      }
+    ],
+    "Resource Well Extractor": [
+      {
+        "item": "siftec:steel_beam",
+        "count": 10
+      },
+      {
+        "item": "siftec:aluminum_casing",
+        "count": 10
+      }
+    ],
+    "Resource Well Pressurizer": [
+      {
+        "item": "siftec:radio_control_unit",
+        "count": 10
+      },
+      {
+        "item": "siftec:heavy_modular_frame",
+        "count": 25
+      },
+      {
+        "item": "siftec:motor",
+        "count": 50
+      },
+      {
+        "item": "siftec:alclad_aluminum_sheet",
+        "count": 50
+      },
+      {
+        "item": "siftec:rubber",
+        "count": 100
+      }
+    ],
+    "Satellite Portal": [
+      {
+        "item": "siftec:radio_control_unit",
+        "count": 5
+      },
+      {
+        "item": "siftec:superposition_oscillator",
+        "count": 10
+      },
+      {
+        "item": "siftec:sam_fluctuator",
+        "count": 25
+      },
+      {
+        "item": "siftec:ficsite_trigon",
+        "count": 25
+      }
+    ],
+    "Smelter": [
+      {
+        "item": "siftec:iron_rod",
+        "count": 5
+      },
+      {
+        "item": "siftec:wire",
+        "count": 8
+      }
+    ],
+    "Space Elevator": [
+      {
+        "item": "#siftec:stones",
+        "count": 500
+      },
+      {
+        "item": "create:iron_sheet",
+        "count": 250
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 400
+      },
+      {
+        "item": "siftec:wire",
+        "count": 1500
+      }
+    ],
+    "Storage Container": [
+      {
+        "item": "create:iron_sheet",
+        "count": 10
+      },
+      {
+        "item": "siftec:iron_rod",
+        "count": 10
+      }
+    ],
+    "The HUB": [
+      {
+        "item": "minecraft:raw_iron",
+        "count": 20
+      }
+    ],
+    "Tractor": [
+      {
+        "item": "siftec:modular_frame",
+        "count": 5
+      },
+      {
+        "item": "siftec:rotor",
+        "count": 5
+      },
+      {
+        "item": "siftec:reinforced_iron_plate",
+        "count": 10
+      }
+    ],
+    "Truck": [
+      {
+        "item": "siftec:motor",
+        "count": 15
+      },
+      {
+        "item": "siftec:encased_industrial_beam",
+        "count": 20
+      },
+      {
+        "item": "siftec:modular_frame",
+        "count": 20
+      },
+      {
+        "item": "siftec:rubber",
+        "count": 50
+      }
+    ],
+    "Truck Station": [
+      {
+        "item": "siftec:modular_frame",
+        "count": 15
+      },
+      {
+        "item": "siftec:rotor",
+        "count": 20
+      },
+      {
+        "item": "siftec:cable",
+        "count": 50
+      }
+    ],
+    "U-Jelly Landing Pad": [
+      {
+        "item": "siftec:rotor",
+        "count": 2
+      },
+      {
+        "item": "siftec:cable",
+        "count": 20
+      },
+      {
+        "item": "siftec:biomass",
+        "count": 200
+      }
+    ],
+    "Water Extractor": [
+      {
+        "item": "create:copper_sheet",
+        "count": 20
+      },
+      {
+        "item": "siftec:reinforced_iron_plate",
+        "count": 10
+      },
+      {
+        "item": "siftec:rotor",
+        "count": 10
+      }
+    ]
+  },
   "buildings": [
     {
       "id": "test_building",

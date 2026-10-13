@@ -1,0 +1,19 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire",
+    "siftec:wire"
+  ],
+  "results": [
+    {
+      "id": "siftec:rotor"
+    }
+  ],
+  "processing_time": 240
+}

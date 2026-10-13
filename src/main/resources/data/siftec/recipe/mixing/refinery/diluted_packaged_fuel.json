@@ -1,0 +1,22 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:packaged_water",
+    "siftec:packaged_water"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 3240,
+      "fluid": "siftec:heavy_oil_residue"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:packaged_fuel",
+      "count": 2
+    }
+  ],
+  "processing_time": 40
+}

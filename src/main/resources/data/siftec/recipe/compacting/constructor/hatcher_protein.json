@@ -1,0 +1,12 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    "minecraft:gunpowder"
+  ],
+  "results": [
+    {
+      "id": "siftec:alien_protein"
+    }
+  ],
+  "processing_time": 60
+}

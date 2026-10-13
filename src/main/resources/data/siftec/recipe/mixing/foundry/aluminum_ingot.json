@@ -1,0 +1,24 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "siftec:aluminum_scrap",
+    "siftec:aluminum_scrap",
+    "siftec:aluminum_scrap",
+    "siftec:aluminum_scrap",
+    "siftec:aluminum_scrap",
+    "siftec:aluminum_scrap",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica"
+  ],
+  "results": [
+    {
+      "id": "siftec:aluminum_ingot",
+      "count": 4
+    }
+  ],
+  "processing_time": 80
+}

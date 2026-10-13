@@ -1,0 +1,25 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:coal",
+    "minecraft:coal"
+  ],
+  "results": [
+    {
+      "id": "cgs:steel_ingot",
+      "count": 3
+    }
+  ],
+  "processing_time": 60
+}

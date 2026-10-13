@@ -1,0 +1,33 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:silica",
+    "siftec:modular_frame",
+    "siftec:modular_frame",
+    "siftec:rotor",
+    "siftec:rotor"
+  ],
+  "results": [
+    {
+      "id": "siftec:blade_runners_core"
+    }
+  ]
+}

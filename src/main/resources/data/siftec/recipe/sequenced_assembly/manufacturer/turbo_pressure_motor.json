@@ -1,0 +1,46 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:turbo_pressure_motor_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_turbo_pressure_motor"
+  },
+  "result": {
+    "id": "siftec:turbo_motor",
+    "count": 2
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:motor",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:pressure_conversion_cube",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:packaged_nitrogen_gas",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:stator",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

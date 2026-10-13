@@ -1,0 +1,46 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:uranium_fuel_unit_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_uranium_fuel_unit"
+  },
+  "result": {
+    "id": "siftec:uranium_fuel_rod",
+    "count": 3
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:encased_uranium_cell",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:electromagnetic_control_rod",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:crystal_oscillator",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:rotor",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

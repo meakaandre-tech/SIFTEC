@@ -1,0 +1,18 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "siftec:plastic"
+  ],
+  "results": [
+    {
+      "id": "create:iron_sheet",
+      "count": 10
+    }
+  ],
+  "processing_time": 160
+}

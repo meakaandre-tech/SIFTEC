@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:heat_sink",
+    "siftec:heat_sink",
+    "siftec:heat_sink",
+    "siftec:high_speed_connector",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal"
+  ],
+  "results": [
+    {
+      "id": "siftec:radio_connection_unit_core"
+    }
+  ],
+  "processing_time": 320
+}

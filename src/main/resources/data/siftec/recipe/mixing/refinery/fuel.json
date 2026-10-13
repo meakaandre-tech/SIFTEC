@@ -1,0 +1,32 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createdieselgenerators"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 19440,
+      "fluid": "createdieselgenerators:crude_oil"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:polymer_resin",
+      "count": 3
+    }
+  ],
+  "fluid_results": [
+    {
+      "id": "createdieselgenerators:diesel",
+      "amount": 12960
+    }
+  ],
+  "processing_time": 120
+}

@@ -1,5 +1,8 @@
 """The pack's content tables: parts, milestones, wormhole phases. gen_assets.py turns these into the
-files the mod reads. Costs are written the way the design doc writes them ("20 Iron Rod, 10 Iron Sheet")."""
+files the mod reads. Costs are written the way the design doc writes them ("20 Iron Rod, 10 Iron Sheet").
+Satisfactory's own numbers (recipes, build costs, milestone costs and times, sink points) come from
+tools/satisfactory.py, the 1.0 game export; this file says what each Satisfactory name is in the pack."""
+import satisfactory as SF
 
 # ---------------------------------------------------------------------------------------------------
 # Parts that already exist in vanilla or another mod: name -> item id
@@ -13,15 +16,87 @@ ALIAS = {
     "Diamond": "minecraft:diamond", "Nether Quartz": "minecraft:quartz",
     "Raw Iron": "minecraft:raw_iron", "Raw Copper": "minecraft:raw_copper",
     "Raw Zinc": "create:raw_zinc", "Gunpowder": "minecraft:gunpowder", "Cardboard": "create:cardboard",
-    "Empty Canister": "createdieselgenerators:canister", "Mechanical Drill": "create:mechanical_drill",
-    # where Satisfactory takes Concrete, the pack takes any stone (stone nodes, or what any pickaxe digs up)
+    "Mechanical Drill": "create:mechanical_drill",
+    # what the nodes give that the mod adds itself (blocks and items outside PARTS)
+    "Raw Bauxite": "siftec:raw_bauxite", "Uranium": "siftec:uranium", "SAM": "siftec:sam",
+    # where Satisfactory takes Concrete or Limestone, the pack takes any stone (stone nodes, or what any pickaxe digs up)
     "Stone": "#siftec:stones",
 }
+
+# ---------------------------------------------------------------------------------------------------
+# Satisfactory's names in the pack (the Recipes tab's Parts table). Anything not listed keeps its Satisfactory name
+# and is a SIFTEC part (PARTS below) or a fluid (FLUIDS below).
+SAT_NAMES = {
+    "Iron Ore": "Raw Iron", "Copper Ore": "Raw Copper", "Raw Quartz": "Nether Quartz", "Bauxite": "Raw Bauxite",
+    "Iron Plate": "Iron Sheet", "Black Powder": "Gunpowder", "Diamonds": "Diamond",
+    # Caterium is brass (Food and Brass tab): its ingot is the Brass Ingot, and its ore the raw zinc that goes into brass
+    "Caterium Ingot": "Brass Ingot", "Caterium Ore": "Raw Zinc",
+    "Concrete": "Stone", "Limestone": "Stone",
+    "Leaves": "#minecraft:leaves", "Wood": "#minecraft:logs", "Mycelia": "#siftec:mycelia",
+    # the creatures' remains are mob drops (MAM Research tab, Alien Megafauna)
+    "Hog Remains": "minecraft:rotten_flesh", "Spitter Remains": "minecraft:bone", "Stinger Remains": "#siftec:spider_remains",
+    "Hatcher Remains": "minecraft:gunpowder",
+    # the wild plants are wild food (Nutrients tree)
+    "Paleberry": "minecraft:sweet_berries", "Beryl Nut": "minecraft:apple", "Bacon Agaric": "minecraft:glow_berries",
+    "Iodine-Infused Filter": "Iodine Infused Filter",
+    # Power Shards are gone: where a recipe or research takes them, it takes Time Crystals (as the Alien Power Matrix does)
+    "Power Shard": "Time Crystal",
+}
+# made from Limestone in the Converter: a block of plain stone
+SAT_OUTPUT_NAMES = {"Limestone": "minecraft:stone"}
+# Satisfactory fluids, by the name recipes.FLUID_IDS knows them by (Fuel is diesel, Liquid Biofuel is biodiesel)
+SAT_FLUIDS = {"Water": "water", "Crude Oil": "crude oil", "Fuel": "diesel", "Liquid Biofuel": "biodiesel", "Heavy Oil Residue": "heavy oil residue",
+              "Alumina Solution": "alumina solution", "Sulfuric Acid": "sulfuric acid", "Nitric Acid": "nitric acid", "Nitrogen Gas": "nitrogen",
+              "Turbofuel": "turbofuel", "Rocket Fuel": "rocket fuel", "Ionized Fuel": "ionized fuel", "Dissolved Silica": "dissolved silica",
+              "Dark Matter Residue": "dark matter residue", "Excited Photonic Matter": "excited photonic matter"}
+# 1 m3 of a Satisfactory fluid is this many mB. A Basin tank and a Spout hold 1000 mB, and the biggest single amount in
+# any 1.0 recipe is 25 m3 (Nitrogen Gas for the Fused Modular Frame and Cooling System, Excited Photonic Matter), so 40.
+MB_PER_M3 = 40
+# Satisfactory items the pack leaves out, and with them every recipe that makes or takes them: the Nobelisks and rifle
+# rounds (Gunsmithing's guns, TNT and grenades take their place), Explosive Rebar, the power slugs (Power Shards are
+# gone), the Portable Miner (a Build Gun building, not an item) and the Xeno-Zapper (the Xeno-Basher is Gunsmithing's).
+SAT_LEFT_OUT = {"Nobelisk", "Gas Nobelisk", "Pulse Nobelisk", "Cluster Nobelisk", "Nuke Nobelisk", "Rifle Ammo", "Homing Rifle Ammo",
+                "Turbo Rifle Ammo", "Explosive Rebar", "Blue Power Slug", "Yellow Power Slug", "Purple Power Slug", "Portable Miner",
+                "Xeno-Zapper"}
+# made in a recipe, these are left out too: Concrete is gone, and the Power Shard recipes with it
+SAT_NOT_MADE = {"Concrete", "Power Shard"}
+
+
+def sat_item(name, made=False):
+    """A Satisfactory item as the pack has it: ("item", part name, id or #tag) or ("fluid", fluid name), or None when it
+    is left out."""
+    if name in SAT_LEFT_OUT or (made and name in SAT_NOT_MADE):
+        return None
+    if name in SAT_FLUIDS:
+        return ("fluid", SAT_FLUIDS[name])
+    if made and name in SAT_OUTPUT_NAMES:
+        return ("item", SAT_OUTPUT_NAMES[name])
+    return ("item", SAT_NAMES.get(name, name))
+
+
+def slug(text):
+    return "".join(c if c.isalnum() else "_" for c in text.lower().replace("alternate: ", "").replace("-", "_")).strip("_").replace("__", "_")
+
+
+def sat_recipes():
+    """Every Satisfactory 1.0 machine recipe the pack keeps, with the pack's names: (key, name, building, alternate,
+    seconds, [(kind, name, amount)] in, [(kind, name, amount)] out, unlock)."""
+    out = []
+    for key, name, building, alt, secs, ins, outs, unlock in SF.RECIPES:
+        i = [sat_item(n) for n, _ in ins]
+        o = [sat_item(n, True) for n, _ in outs]
+        if None in i or None in o:
+            continue
+        out.append((key, name, building, alt, secs, [(a[0], a[1], n) for a, (_, n) in zip(i, ins)],
+                    [(a[0], a[1], n) for a, (_, n) in zip(o, outs)], unlock))
+    return out
+
 
 # ---------------------------------------------------------------------------------------------------
 # Custom parts: id, name, placeholder texture, tint (None = use the texture as it is).
 # Every look here is a stand-in built from a vanilla or Create texture until real art is picked.
 I, S, ROD, WIRE, NUG = "minecraft:item/iron_ingot", "create:item/iron_sheet", "minecraft:item/bone", "minecraft:item/string", "minecraft:item/iron_nugget"
+CAN, TANK = "minecraft:item/bucket", "minecraft:item/bucket"
 PARTS = [
     # tiers 0-2
     ("iron_rod", "Iron Rod", ROD, 0xB8B8C0), ("wire", "Wire", WIRE, 0xE0803C), ("cable", "Cable", "minecraft:item/lead", None),
@@ -36,24 +111,32 @@ PARTS = [
     ("motor", "Motor", "minecraft:item/minecart", 0xF0B050), ("automated_wiring", "Automated Wiring", "minecraft:item/redstone", 0xF0A040),
     # tiers 5-6
     ("plastic", "Plastic", S, 0x50A0E8), ("rubber", "Rubber", "minecraft:item/slime_ball", 0x404048),
+    ("polymer_resin", "Polymer Resin", "minecraft:item/glowstone_dust", 0x6A3A8A),
     ("petroleum_coke", "Petroleum Coke", "minecraft:item/coal", 0x9090A0), ("circuit_board", "Circuit Board", "create:item/integrated_circuit", None),
     ("computer", "Computer", "minecraft:item/comparator", None), ("heavy_modular_frame", "Heavy Modular Frame", "minecraft:item/glow_item_frame", None),
     ("modular_engine", "Modular Engine", "minecraft:item/furnace_minecart", None),
     ("adaptive_control_unit", "Adaptive Control Unit", "minecraft:item/repeater", None),
+    ("empty_canister", "Empty Canister", CAN, 0xD04030),
     # tiers 7-8
-    ("crushed_bauxite", "Crushed Bauxite", "create:item/crushed_raw_aluminum", None), ("aluminum_scrap", "Aluminum Scrap", NUG, 0xD0D8E8),
+    ("aluminum_scrap", "Aluminum Scrap", NUG, 0xD0D8E8),
     ("aluminum_ingot", "Aluminum Ingot", I, 0xE0E8F8), ("alclad_aluminum_sheet", "Alclad Aluminum Sheet", S, 0xE8D0B8),
     ("aluminum_casing", "Aluminum Casing", "create:item/sturdy_sheet", 0xE0E8F8), ("radio_control_unit", "Radio Control Unit", "create:item/transmitter", None),
+    ("battery", "Battery", "minecraft:item/redstone_torch", None),
     ("iodine_infused_filter", "Iodine Infused Filter", "create:item/filter", 0xB080E0),
     ("supercomputer", "Supercomputer", "minecraft:item/comparator", 0x60C0FF), ("assembly_director_system", "Assembly Director System", "create:item/linked_controller", None),
     ("electromagnetic_control_rod", "Electromagnetic Control Rod", "minecraft:item/blaze_rod", 0x80C0FF),
     ("magnetic_field_generator", "Magnetic Field Generator", "minecraft:item/recovery_compass_16", None),
-    ("empty_fluid_tank", "Empty Fluid Tank", "minecraft:item/bucket", 0xE0E8F8), ("packaged_nitrogen_gas", "Packaged Nitrogen Gas", "minecraft:item/powder_snow_bucket", None),
+    ("empty_fluid_tank", "Empty Fluid Tank", TANK, 0xE0E8F8),
     ("heat_sink", "Heat Sink", "minecraft:item/iron_door", 0xE8C8A8), ("cooling_system", "Cooling System", "minecraft:item/snowball", 0x90D0FF),
     ("fused_modular_frame", "Fused Modular Frame", "minecraft:item/glow_item_frame", 0xA0D0FF), ("turbo_motor", "Turbo Motor", "minecraft:item/tnt_minecart", None),
     ("thermal_propulsion_rocket", "Thermal Propulsion Rocket", "minecraft:item/firework_rocket", None),
     ("copper_powder", "Copper Powder", "minecraft:item/glowstone_dust", 0xE08050), ("pressure_conversion_cube", "Pressure Conversion Cube", "minecraft:item/netherite_scrap", None),
     ("nuclear_pasta", "Nuclear Pasta", "minecraft:item/nether_star", 0xE08050),
+    # the nuclear chain: uranium and plutonium as in Satisfactory (the New Age reactor burns the rods, work package 6)
+    ("encased_uranium_cell", "Encased Uranium Cell", "minecraft:item/emerald", 0x80F080), ("uranium_fuel_rod", "Uranium Fuel Rod", ROD, 0x60E060),
+    ("uranium_waste", "Uranium Waste", "minecraft:item/emerald", 0x408040), ("non_fissile_uranium", "Non-Fissile Uranium", "minecraft:item/glowstone_dust", 0x70C070),
+    ("plutonium_pellet", "Plutonium Pellet", "minecraft:item/slime_ball", 0x40A0A0), ("encased_plutonium_cell", "Encased Plutonium Cell", "minecraft:item/emerald", 0x40C0C0),
+    ("plutonium_fuel_rod", "Plutonium Fuel Rod", ROD, 0x40C0C0), ("plutonium_waste", "Plutonium Waste", "minecraft:item/emerald", 0x306060),
     # tier 9
     ("reanimated_sam", "Reanimated SAM", "minecraft:item/amethyst_shard", 0x80F0FF), ("sam_fluctuator", "SAM Fluctuator", "minecraft:item/echo_shard", None),
     ("ficsite_ingot", "Ficsite Ingot", I, 0xF8D048), ("ficsite_trigon", "Ficsite Trigon", "minecraft:item/prismarine_shard", 0xF8D048),
@@ -61,74 +144,45 @@ PARTS = [
     ("superposition_oscillator", "Superposition Oscillator", "minecraft:item/clock_00", None), ("neural_quantum_processor", "Neural-Quantum Processor", "minecraft:item/ender_eye", None),
     ("ai_expansion_server", "AI Expansion Server", "minecraft:item/music_disc_5", None), ("singularity_cell", "Singularity Cell", "minecraft:item/ender_pearl", 0x8040C0),
     ("ballistic_warp_drive", "Ballistic Warp Drive", "minecraft:item/trident", None),
+    ("dark_matter_crystal", "Dark Matter Crystal", "minecraft:item/amethyst_shard", 0x402060),
+    ("ficsonium", "Ficsonium", "minecraft:item/echo_shard", 0xF8D048), ("ficsonium_fuel_rod", "Ficsonium Fuel Rod", ROD, 0xF8D048),
+    ("alien_power_matrix", "Alien Power Matrix", "minecraft:item/heart_of_the_sea", None),
     # MAM parts
-    ("dna_capsule", "DNA Capsule", "minecraft:item/experience_bottle", None), ("quickwire", "Quickwire", WIRE, 0xF0C850),
+    ("alien_protein", "Alien Protein", "minecraft:item/rotten_flesh", 0xE070C0), ("alien_dna_capsule", "Alien DNA Capsule", "minecraft:item/experience_bottle", None),
+    ("quickwire", "Quickwire", WIRE, 0xF0C850),
     ("ai_limiter", "AI Limiter", "minecraft:item/compass_16", None), ("high_speed_connector", "High-Speed Connector", "minecraft:item/shears", 0xF0C850),
     ("fabric", "Fabric", "minecraft:item/paper", 0xD8C8A0), ("gas_filter", "Gas Filter", "create:item/filter", None),
-    ("power_shard", "Power Shard", "minecraft:item/amethyst_shard", 0x60E0FF), ("silica", "Silica", "minecraft:item/sugar", None),
+    ("silica", "Silica", "minecraft:item/sugar", None),
     ("quartz_crystal", "Quartz Crystal", "create:item/polished_rose_quartz", 0xF8F8FF), ("crystal_oscillator", "Crystal Oscillator", "minecraft:item/clock_00", 0xF8F0FF),
     ("compacted_coal", "Compacted Coal", "minecraft:item/coal", 0xC0C060), ("brass_blend", "Brass Blend", "create:item/crushed_raw_gold", None),
-    # collectibles
+    ("smokeless_powder", "Smokeless Powder", "minecraft:item/gunpowder", 0xD0D0D8),
+    ("iron_rebar", "Iron Rebar", ROD, 0x909098), ("stun_rebar", "Stun Rebar", ROD, 0xF0C850), ("shatter_rebar", "Shatter Rebar", ROD, 0xF8F8FF),
+    # collectibles. The power slugs and Power Shards go with overclocking (not this package's work): they are found, but
+    # nothing makes or takes them any more
     ("blue_power_slug", "Blue Power Slug", "minecraft:item/slime_ball", 0x50A0FF), ("yellow_power_slug", "Yellow Power Slug", "minecraft:item/slime_ball", 0xFFE050),
-    ("purple_power_slug", "Purple Power Slug", "minecraft:item/slime_ball", 0xC060FF),
+    ("purple_power_slug", "Purple Power Slug", "minecraft:item/slime_ball", 0xC060FF), ("power_shard", "Power Shard", "minecraft:item/amethyst_shard", 0x60E0FF),
     ("mercer_sphere", "Mercer Sphere", "minecraft:item/ender_pearl", 0xFF80C0), ("somersloop", "Somersloop", "minecraft:item/nautilus_shell", 0xFF6060),
     ("hard_drive", "Hard Drive", "minecraft:item/music_disc_11", None),
-    ("excited_photonic_matter", "Excited Photonic Matter", "minecraft:item/glowstone_dust", 0xFFFFFF),
-    ("dark_matter_crystal", "Dark Matter Crystal", "minecraft:item/amethyst_shard", 0x402060),
-    # half-built parts on a Quantum Encoder line
-    ("incomplete_superposition_oscillator", "Incomplete Superposition Oscillator", "minecraft:item/clock_00", 0x808080),
-    ("incomplete_neural_quantum_processor", "Incomplete Neural-Quantum Processor", "minecraft:item/ender_eye", 0x808080),
-    ("incomplete_ai_expansion_server", "Incomplete AI Expansion Server", "minecraft:item/music_disc_5", 0x808080),
-    # sub-assemblies on the machine routes for the big Workshop builds (recipes.workshop_by_machine); each is locked
-    # with the build it goes into (ASSEMBLY_LOCKS below)
-    ("gateway_coil", "Gateway Coil", "minecraft:item/lead", 0xE0803C), ("gateway_frame", "Gateway Frame", "minecraft:item/item_frame", 0xB8B8C0),
-    ("landing_cushion", "Landing Cushion", "minecraft:item/leather", 0x8CB060), ("jetpack_thruster", "Jetpack Thruster", "create:item/propeller", 0x50A0E8),
-    ("hazmat_lining", "Hazmat Lining", "minecraft:item/paper", 0xE8E040), ("hover_thruster", "Hover Thruster", "create:item/propeller", 0xE8D0B8),
-    ("drone_port_module", "Drone Port Module", "create:item/sturdy_sheet", 0x90C0E0),
-    ("accelerator_segment", "Accelerator Segment", "minecraft:item/nautilus_shell", 0x80C0FF),
-    ("converter_core", "Converter Core", "minecraft:item/heart_of_the_sea", None), ("portal_module", "Portal Module", "minecraft:item/end_crystal", None),
-    ("geyser_core", "Geyser Engine Core", "minecraft:item/magma_cream", None), ("extractor_pump", "Extractor Pump", "minecraft:item/hopper", 0xE0E8F8),
-    ("designer_frame", "Designer Frame", "minecraft:item/item_frame", 0xA0D0FF),
-    ("mask_lining", "Mask Lining", "minecraft:item/phantom_membrane", None),
-    # bundles: many of one cheap part pressed together in a Basin, so an assembly line takes a few big inputs instead
-    # of many small ones (recipes.BUNDLES); each unlocks with the first build whose line takes it
-    ("screw_bundle", "Screw Bundle", "minecraft:item/bundle", 0xA8B0C0), ("wire_spool", "Wire Spool", "minecraft:item/lead", 0xD07848),
-    ("iron_bundle", "Iron Bundle", "minecraft:item/bundle", 0xD8D8E0),
-    ("quickwire_coil", "Quickwire Coil", "minecraft:item/lead", 0xF0C850), ("silica_bundle", "Silica Bundle", "minecraft:item/bundle", 0xF0F0F8),
 ]
-# Half-built items on the machine routes' sequenced assembly lines: (what the line makes, its name, texture)
-for _rid, _name, _tex in (
-        ("furnace_engine", "Furnace Engine", "minecraft:item/minecart"), ("mam", "MAM", "minecraft:item/comparator"),
-        ("object_scanner", "Object Scanner", "minecraft:item/compass_16"), ("gateway_coil", "Gateway Coil", "minecraft:item/lead"),
-        ("gateway_frame", "Gateway Frame", "minecraft:item/item_frame"), ("wormhole_gateway", "Wormhole Gateway", "minecraft:item/end_crystal"),
-        ("landing_cushion", "Landing Cushion", "minecraft:item/leather"), ("landing_pad", "Landing Pad", "minecraft:item/leather"),
-        ("awesome_sink", "AWESOME Sink", "minecraft:item/hopper"), ("awesome_shop", "AWESOME Shop", "minecraft:item/emerald"),
-        ("blueprint_designer", "Blueprint Designer", "minecraft:item/map"), ("power_storage", "Power Storage", "minecraft:item/redstone"),
-        ("speed_governor", "Speed Governor", "minecraft:item/clock_00"), ("blade_runners", "Blade Runners", "minecraft:item/iron_boots"),
-        ("dimensional_depot", "Dimensional Depot", "minecraft:item/ender_pearl"),
-        ("jetpack_thruster", "Jetpack Thruster", "create:item/propeller"), ("jetpack", "Jetpack", "minecraft:item/elytra"),
-        ("radar_tower", "Radar Tower", "minecraft:item/compass_16"),
-        ("designer_frame", "Designer Frame", "minecraft:item/item_frame")):
-    PARTS.append(("incomplete_" + _rid, "Incomplete " + _name, _tex, 0x808080))
-# The sub-assemblies' milestones: the build's own, or the one that brings the machine that makes them when that comes
-# later (the Wormhole Gateway is HUB Upgrade 6, but its coils and frames need the Deployer from Part Assembly)
-ASSEMBLY_LOCKS = {
-    "hub_upgrade_6": ["siftec:wire_spool", "siftec:iron_bundle"], "field_research": ["siftec:screw_bundle"],
-    "mam_caterium_5": ["siftec:quickwire_coil"], "mam_quartz_6": ["siftec:silica_bundle"], "mam_mycelia_5": ["siftec:mask_lining"],
-    "part_assembly": ["siftec:gateway_coil", "siftec:gateway_frame"], "jump_pads": ["siftec:landing_cushion"],
-    "jetpack": ["siftec:jetpack_thruster"], "hazmat_suit": ["siftec:hazmat_lining"], "hover_pack": ["siftec:hover_thruster"],
-    "aeronautical_engineering": ["siftec:drone_port_module"], "particle_enrichment": ["siftec:accelerator_segment"],
-    "matter_conversion": ["siftec:converter_core"], "spatial_energy_regulation": ["siftec:portal_module"],
-    "mam_sulfur_8": ["siftec:geyser_core"], "advanced_aluminum_production": ["siftec:extractor_pump"],
-    "ficsit_blueprints_mk3": ["siftec:designer_frame"],
-}
+# Packaged fluids: one per Satisfactory package, each holding 1 m3 (MB_PER_M3 mB)
+PACKAGED = {}
+for _key, _name, _building, _alt, _secs, _ins, _outs, _unlock in SF.RECIPES:
+    if _building == "Packager" and _name.startswith("Packaged "):
+        _fluid = _name[len("Packaged "):]
+        PACKAGED[_fluid] = "packaged_" + slug(_fluid)
+        _tex, _tint = ("minecraft:item/bucket", 0xE0E8F8) if any(n == "Empty Fluid Tank" for n, _ in _ins) else ("minecraft:item/bucket", 0xD04030)
+        PARTS.append((PACKAGED[_fluid], _name, _tex, _tint))
+# Gone: the Wire Spool, Screw, Iron, Quickwire and Silica bundles; the old Workshop routes' sub-assemblies and their
+# half-built items; the DNA Capsule (now Satisfactory's Alien DNA Capsule); Excited Photonic Matter (a fluid in 1.0).
 
 # Custom fluids: id, name, colour. They look like tinted water until real textures are picked.
 FLUIDS = [
     ("heavy_oil_residue", "Heavy Oil Residue", 0x6A3A8A), ("alumina_solution", "Alumina Solution", 0xD8E0E8),
     ("sulfuric_acid", "Sulfuric Acid", 0xE8E040), ("nitrogen", "Nitrogen", 0xC8E8FF), ("nitric_acid", "Nitric Acid", 0xD8F0A0),
     ("dark_matter_residue", "Dark Matter Residue", 0x301848), ("ignimbrite", "Ignimbrite", 0xF08020), ("turbofuel", "Turbofuel", 0xD03030), ("vinegar", "Vinegar", 0xE8D8A0), ("mead", "Mead", 0xE0A030),
-    # what the miners drill with: Mk.1 takes water, Mk.2 Drilling Mud, Mk.3 Coolant
+    ("rocket_fuel", "Rocket Fuel", 0xE06020), ("ionized_fuel", "Ionized Fuel", 0xF0F070), ("dissolved_silica", "Dissolved Silica", 0xE0E0F0),
+    ("excited_photonic_matter", "Excited Photonic Matter", 0xFFFFE0),
+    # what the old miners drilled with: Mk.1 took water, Mk.2 Drilling Mud, Mk.3 Coolant (the Build Gun miners decide in WP 5)
     ("drilling_mud", "Drilling Mud", 0x8A6A4A), ("coolant", "Coolant", 0x40C8D8),
 ]
 
@@ -237,7 +291,7 @@ MILESTONES = [
 
     (7, "bauxite_refinement", "Bauxite Refinement", "50 Computer, 100 Heavy Modular Frame, 200 Motor, 500 Rubber", "10:00",
      "Aluminium chain and Radio Control Unit, bauxite and quartz nodes on the scanner",
-     ["siftec:crushed_bauxite", "siftec:aluminum_scrap", "siftec:aluminum_ingot", "siftec:alclad_aluminum_sheet", "siftec:aluminum_casing",
+     ["siftec:aluminum_scrap", "siftec:aluminum_ingot", "siftec:alclad_aluminum_sheet", "siftec:aluminum_casing",
       "siftec:radio_control_unit"], ["scanner:bauxite", "scanner:quartz"]),
     (7, "logistics_mk5", "Logistics Mk.5", "100 Alclad Aluminum Sheet, 200 Encased Industrial Beam, 300 Reinforced Iron Plate", "1:00",
      "Company speed limit raised to 192 RPM", [], ["cap:192"]),
@@ -277,6 +331,66 @@ MILESTONES = [
      "Company speed limit raised to 256 RPM", [], ["cap:256"]),
 ]
 
+# Satisfactory 1.0's cost and lock time for every milestone come from tools/satisfactory.py (Concrete as any stone,
+# Iron Plate as Iron Sheet); the list above says only what each unlocks in the pack. Four 1.0 milestones the old list
+# missed are added: FICSIT Blueprints Mk.2 and Railway Signalling (Tier 6), Control System Development (Tier 7) and
+# Nuclear Power (Tier 8). Recipes follow the milestone that unlocks them in 1.0 (recipes.py), so the parts moved with them.
+SAT_MILESTONES = {f"HUB Upgrade {n}": f"hub_upgrade_{n}" for n in range(1, 7)}
+SAT_MILESTONES.update({"Base Building": "base_building", "Logistics": "logistics", "Field Research": "field_research",
+    "Part Assembly": "part_assembly", "Obstacle Clearing": "obstacle_clearing", "Jump Pads": "jump_pads",
+    "Resource Sink Bonus Program": "resource_sink_bonus_program", "Logistics Mk.2": "logistics_mk2", "Coal Power": "coal_power",
+    "Vehicular Transport": "vehicular_transport", "Basic Steel Production": "basic_steel_production", "Enhanced Asset Security": "enhanced_asset_security",
+    "FICSIT Blueprints": "ficsit_blueprints", "Logistics Mk.3": "logistics_mk3", "Advanced Steel Production": "advanced_steel_production",
+    "Expanded Power Infrastructure": "expanded_power_infrastructure", "Hypertubes": "hypertubes", "Jetpack": "jetpack", "Oil Processing": "oil_processing",
+    "Logistics Mk.4": "logistics_mk4", "Fluid Packaging": "fluid_packaging", "Petroleum Power": "petroleum_power",
+    "Industrial Manufacturing": "industrial_manufacturing", "Monorail Train Technology": "monorail_train_technology",
+    "Pipeline Engineering Mk.2": "pipeline_engineering_mk2", "FICSIT Blueprints Mk.2": "ficsit_blueprints_mk2", "Railway Signalling": "railway_signalling",
+    "Bauxite Refinement": "bauxite_refinement", "Logistics Mk.5": "logistics_mk5", "Hazmat Suit": "hazmat_suit", "Hoverpack": "hover_pack",
+    "Control System Development": "control_system_development", "Aeronautical Engineering": "aeronautical_engineering", "Nuclear Power": "nuclear_power",
+    "Advanced Aluminum Production": "advanced_aluminum_production", "Leading-Edge Production": "leading_edge_production",
+    "Particle Enrichment": "particle_enrichment", "Matter Conversion": "matter_conversion", "Quantum Encoding": "quantum_encoding",
+    "FICSIT Blueprints Mk.3": "ficsit_blueprints_mk3", "Spatial Energy Regulation": "spatial_energy_regulation", "Peak Efficiency": "peak_efficiency"})
+_NEW = {  # id: (tier, name, unlock text, locked item ids, tokens), placed after the last milestone of its tier
+    "ficsit_blueprints_mk2": (6, "FICSIT Blueprints Mk.2", "Blueprint Designer Mk.2", [], []),
+    "railway_signalling": (6, "Railway Signalling", "Train signals and the train observer", [C + "track_signal", C + "track_observer"], []),
+    "control_system_development": (7, "Control System Development",
+                                   "Blender; Sulfuric Acid, Battery, Radio Control Unit, Supercomputer and Assembly Director System", [], []),
+    "nuclear_power": (8, "Nuclear Power", "Nuclear Power Plant; Encased Uranium Cell, Electromagnetic Control Rod, Uranium Fuel Rod and "
+                      "Magnetic Field Generator; uranium nodes on the scanner", [], ["scanner:uranium"]),
+}
+_TEXT = {  # unlock texts that named a recipe 1.0 gives with another milestone
+    "monorail_train_technology": "Train tracks, stations, controls and schedules",
+    "bauxite_refinement": "Aluminium chain, bauxite and quartz nodes on the scanner",
+    "aeronautical_engineering": "Drone Port and Cardboard Drone, Create's package network, sulfur nodes on the scanner",
+    "advanced_aluminum_production": "Resource Well extractor, packaged nitrogen, Heat Sink, Cooling System, Fused Modular Frame, nitrogen nodes on the scanner",
+    "leading_edge_production": "Miner Mk.3, Turbo Motor, Thermal Propulsion Rocket",
+    "particle_enrichment": "Particle Accelerator, Nitric Acid, Non-Fissile Uranium, plutonium, Copper Powder, Pressure Conversion Cube, Nuclear Pasta",
+    "matter_conversion": "Converter, Ficsite, Diamonds, Time Crystal, Biochemical Sculptor, Reanimated SAM, SAM Fluctuator, SAM nodes on the scanner",
+    "quantum_encoding": "Quantum Encoder, Excited Photonic Matter, Dark Matter, Superposition Oscillator, Neural-Quantum Processor, AI Expansion Server",
+    "peak_efficiency": "Belt Mk.6 speed, Ficsonium and the Ficsonium Fuel Rod",
+}
+
+
+def _sat_cost(cost):
+    return ", ".join(f"{n} {sat_item(name)[1]}" for name, n in cost)
+
+
+def _mmss(seconds):
+    return f"{int(seconds) // 60}:{int(seconds) % 60:02d}"
+
+
+MILESTONES = [(t, mid, name, cost, time, text, [i for i in items if i not in (C + "track_signal", C + "track_observer")],
+               [k for k in tokens if k != "scanner:uranium"]) for t, mid, name, cost, time, text, items, tokens in MILESTONES]
+for _mid, (_tier, _name, _text, _items, _tokens) in _NEW.items():
+    _at = max(i for i, m in enumerate(MILESTONES) if m[0] == _tier) + 1
+    MILESTONES.insert(_at, (_tier, _mid, _name, "", "0:00", _text, _items, _tokens))
+_by_sat = {SAT_MILESTONES[name]: (cost, secs) for tier, name, cost, secs, rec, bld, eq in SF.MILESTONES}
+if set(_by_sat) != {m[1] for m in MILESTONES}:
+    raise SystemExit(f"milestones: no 1.0 match for {sorted({m[1] for m in MILESTONES} ^ set(_by_sat))}")
+MILESTONES = [(t, mid, name, _sat_cost(_by_sat[mid][0]), _mmss(_by_sat[mid][1]), _TEXT.get(mid, text), items, tokens)
+              for t, mid, name, cost, time, text, items, tokens in MILESTONES]
+
+
 # Switched off for good: they can be neither crafted nor placed.
 DISABLED = [C + "water_wheel", C + "large_water_wheel", C + "blaze_cake", C + "blaze_cake_base", C + "creative_blaze_cake",
             "the_sift:sift_portal", "the_sift:sift_rift", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill",
@@ -314,7 +428,7 @@ def parse_cost(text):
 # ---------------------------------------------------------------------------------------------------
 # MAM research. Tree: (id, name, icon item, [nodes]); node: (name, cost, time, unlock text, needs, items, tokens).
 # "needs" lists the node numbers (1-based) that must be done first; None means the node above.
-# A cost may name a tag ("#c:mushrooms") for "any of these".
+# A cost may name a tag ("#siftec:mycelia") for "any of these".
 M = "minecraft:"
 MAM = [
     ("megafauna", "Alien Megafauna", M + "rotten_flesh", [
@@ -322,7 +436,7 @@ MAM = [
         ("Bio-Organic Properties", "10 minecraft:bone, 10 minecraft:string", "1:00", "DNA Capsule, for AWESOME Sink points", None, ["siftec:dna_capsule"], []),
         ("The Rebar Gun", "10 Reinforced Iron Plate, 25 Iron Rod, 50 Screw", "2:00", "Nailgun and Copper Backtank", None, ["cgs:nailgun", C + "copper_backtank"], []),
         ("Hostile Organism Detection", "10 minecraft:spider_eye, 10 Gunpowder, 25 Wire", "2:00", "The Object Scanner can find hostile mobs", None, [], ["object:mobs"]),
-        ("Inflated Pocket Dimension", "5 DNA Capsule, 3 minecraft:ender_pearl, 25 Cable", "3:00", "Backpack Void and Refill Upgrades", None, [], []),
+        ("Inflated Pocket Dimension", "5 Alien DNA Capsule, 3 minecraft:ender_pearl, 25 Cable", "3:00", "Backpack Void and Refill Upgrades", None, [], []),
     ]),
     ("caterium", "Caterium", C + "raw_zinc", [
         ("Caterium", "10 create:crushed_raw_zinc", "0:30", "Brass blend, Brass Ingot, Brass Sheet", [], ["siftec:brass_blend", C + "brass_ingot", C + "brass_sheet"], []),
@@ -337,8 +451,8 @@ MAM = [
         ("High-Speed Connector", "500 Quickwire, 25 Plastic, 10 Computer", "5:00", "High-Speed Connector", [4], ["siftec:high_speed_connector"], []),
     ]),
     ("mycelia", "Mycelia", M + "brown_mushroom", [
-        ("Mycelia", "5 #c:mushrooms", "0:30", "Biomass from mushrooms in the Millstone", [], [], []),
-        ("Fabric", "25 #c:mushrooms, 100 Biomass, 10 Rotor", "1:00", "Fabric", [1], ["siftec:fabric"], []),
+        ("Mycelia", "5 #siftec:mycelia", "0:30", "Biomass from mushrooms in the Millstone", [], [], []),
+        ("Fabric", "25 #siftec:mycelia, 100 Biomass, 10 Rotor", "1:00", "Fabric", [1], ["siftec:fabric"], []),
         ("Parachute", "10 Fabric, 10 Cable", "2:00", "Parachute", [2], ["siftec:parachute"], []),
         ("Diving Gear", "10 Fabric, 10 Copper Sheet", "2:00", "Diving Helmet and Diving Boots, then the netherite backtank and diving gear", [2],
          [C + "copper_diving_helmet", C + "copper_diving_boots", C + "netherite_diving_helmet", C + "netherite_diving_boots", C + "netherite_backtank"], []),
@@ -390,45 +504,130 @@ MAM = [
         ("Alien Energy Harvesting", "2 Somersloop, 10 Supercomputer", "5:00", "A machine can hold a Somersloop and Power Shards together", [6], [], ["amplifier:shards"]),
     ]),
 ]
+# 1.0 MAM research that unlocks recipes and that the trees above did not have yet. Appended, so the nodes above keep
+# their ids; costs are 1.0's in the pack's names. Work package 8 rebuilds the trees from the MAM Research tab.
+_MAM_MORE = {
+    "caterium": [("Stun Rebar", "50 Quickwire, 10 Iron Rebar", "0:03", "Stun Rebar", [2], [], [])],
+    "mycelia": [("Synthetic Polyester Fabric", "25 Fabric, 100 Polymer Resin", "0:03", "Fabric from Polymer Resin in the Refinery", [2], [], [])],
+    "quartz": [("Shatter Rebar", "30 Quartz Crystal, 150 Iron Rebar", "0:03", "Shatter Rebar", [1], [], [])],
+    "sulfur": [("Smokeless Powder", "100 Gunpowder, 50 Plastic", "0:03", "Smokeless Powder", [1], [], []),
+               ("Rocket Fuel", "1 Hard Drive, 10 Empty Fluid Tank, 100 Packaged Turbofuel", "0:03", "Rocket Fuel, packed and unpacked", [7], [], []),
+               ("Ionized Fuel", "1 Hard Drive, 100 Time Crystal, 200 Packaged Rocket Fuel", "0:03", "Ionized Fuel, packed and unpacked", [10], [], [])],
+    "alien": [("SAM Reanimation", "20 SAM", "0:03", "Reanimated SAM", [], [], []),
+              ("SAM Fluctuator", "10 Reanimated SAM, 100 Steel Pipe, 200 Wire", "0:03", "SAM Fluctuator", [8], [], []),
+              ("Alien Power Matrix", "50 Singularity Cell, 500 SAM Fluctuator, 100 Time Crystal", "0:03", "Alien Power Matrix (Quantum Encoder)", [9], [], [])],
+}
+for _tree in MAM:
+    _tree[3].extend(_MAM_MORE.get(_tree[0], []))
+# the 1.0 MAM node behind each recipe it unlocks, as a node of the trees above
+SAT_MAM = {"Hog Research": "mam_megafauna_1", "Hatcher Research": "mam_megafauna_1", "Spitter Research": "mam_megafauna_1",
+           "Stinger Research": "mam_megafauna_1", "Bio-Organic Properties": "mam_megafauna_2", "The Rebar Gun": "mam_megafauna_3",
+           "Caterium Ingots": "mam_caterium_1", "Quickwire": "mam_caterium_2", "AI Limiter": "mam_caterium_4", "High-Speed Connector": "mam_caterium_7",
+           "Stun Rebar": "mam_caterium_8", "Mycelia": "mam_mycelia_1", "Fabric": "mam_mycelia_2", "Gas Mask": "mam_mycelia_5",
+           "Synthetic Polyester Fabric": "mam_mycelia_6", "Quartz Crystals": "mam_quartz_1", "Silica": "mam_quartz_2", "Crystal Oscillator": "mam_quartz_4",
+           "Shatter Rebar": "mam_quartz_8", "Black Powder": "mam_sulfur_1", "Compacted Coal": "mam_sulfur_6", "Turbofuel": "mam_sulfur_7",
+           "Smokeless Powder": "mam_sulfur_9", "Rocket Fuel": "mam_sulfur_10", "Ionized Fuel": "mam_sulfur_11", "SAM Reanimation": "mam_alien_8",
+           "SAM Fluctuator": "mam_alien_9", "Alien Power Matrix": "mam_alien_10"}
 
+
+def unlock_id(unlock):
+    """The milestone or MAM node id behind a 1.0 unlock; None from the start, "drive" for the Hard Drive pool."""
+    kind, name = unlock
+    if kind == "start":
+        return None
+    if kind == "drive":
+        return "drive"
+    if kind in ("hub", "milestone"):
+        return SAT_MILESTONES[name]
+    if kind == "mam":
+        return SAT_MAM[name]
+    raise SystemExit(f"no unlock for {unlock}")
+
+
+# The Manufacturer and the Quantum Encoder build in two steps (Build Gun tab): a Mixer on a Basin takes all but one of
+# each input and makes the recipe's Core; then one loop of sequenced assembly adds the last one of each, as
+# "Incomplete <item>". The Quantum Encoder's Spout adds the Excited Photonic Matter in that loop, and its result comes
+# out Charged, for the Item Drain to take the Dark Matter Residue off. Each recipe, alternates too, has its own Core.
+TWO_STEP = ("Manufacturer", "Quantum Encoder")
+CORES = {}   # Satisfactory recipe key -> (core part id or None when every input is a single item, incomplete id, charged id or None)
+
+
+def _part_name(n):
+    return n if n in ALIAS or ":" in n else n
+
+
+for _key, _name, _building, _alt, _secs, _ins, _outs, _unlock in sat_recipes():
+    if _building not in TWO_STEP:
+        continue
+    _label = _name.replace("Alternate: ", "")
+    _id = slug(_label)
+    _items = [(n, a) for k, n, a in _ins if k == "item"]
+    _core = None
+    if any(a > 1 for n, a in _items):
+        _core = _id + "_core"
+        PARTS.append((_core, _label + " Core", "minecraft:item/magma_cream", 0x909098))
+    _inc = "incomplete_" + _id
+    PARTS.append((_inc, "Incomplete " + _label, "minecraft:item/magma_cream", 0x606068))
+    _charged = None
+    if _building == "Quantum Encoder":
+        _charged = "charged_" + _id
+        PARTS.append((_charged, "Charged " + _label, "minecraft:item/magma_cream", 0x402060))
+    CORES[_key] = (_core, _inc, _charged)
 
 # ---------------------------------------------------------------------------------------------------
-# The pack's own late-game machines. Each recipe: (name of what it makes, items in, fluid in, result, seconds at 32 RPM).
-# A result is "2 Part Name" or a fluid as ("fluid name", mB). The machine makes whichever recipe is selected on it.
-PROCESSORS = {
-    "converter": ("Converter", [
-        ("4 Aluminum Ingot, 2 Reanimated SAM", None, "1 Ficsite Ingot", 6),
-        ("8 Coal", None, "1 Diamond", 4),
-        ("2 Diamond", None, "1 Time Crystal", 10),
-        ("1 Reanimated SAM", None, "2 Excited Photonic Matter", 3),
-        ("1 Reanimated SAM", None, ("dark matter residue", 250), 3),
-    ]),
-    "particle_accelerator": ("Particle Accelerator", [
-        ("8 Copper Powder, 1 Pressure Conversion Cube", None, "1 Nuclear Pasta", 12),
-        ("1 Diamond", ("dark matter residue", 250), "1 Dark Matter Crystal", 4),
-    ]),
-}
+# The pack's own late-game machines, the Converter and the Particle Accelerator, with 1.0's recipes (alternates
+# included, each with "alt"). In: [(part, count)]; fluids as (fluid name, mB). The machine makes whichever recipe is
+# selected on it; how it does that is work package 9's.
+PROCESSORS = {"converter": ("Converter", []), "particle_accelerator": ("Particle Accelerator", [])}
+for _key, _name, _building, _alt, _secs, _ins, _outs, _unlock in sat_recipes():
+    if _building not in ("Converter", "Particle Accelerator"):
+        continue
+    _r = {"in": [(n, a) for k, n, a in _ins if k == "item"], "fluid_in": None, "out": None, "fluid_out": None, "seconds": _secs,
+          "alt": slug(_name) if unlock_id(_unlock) == "drive" else None, "name": _name.replace("Alternate: ", "")}
+    for k, n, a in _ins:
+        if k == "fluid":
+            _r["fluid_in"] = (n, round(a * MB_PER_M3))
+    for k, n, a in _outs:
+        if k == "fluid":
+            _r["fluid_out"] = (n, round(a * MB_PER_M3))
+        elif _r["out"] is None:
+            _r["out"] = (n, a)
+        else:
+            _r["also"] = (n, a)
+    PROCESSORS["converter" if _building == "Converter" else "particle_accelerator"][1].append(_r)
 
-# Alternates made in the pack's own machines: (id, name, machine, items in, fluid in, result, seconds, text).
-ALT_PROCESSORS = [
-    ("petroleum_diamond", "Petroleum Diamond", "converter", "4 Petroleum Coke", None, "1 Diamond", 4, "4 Petroleum Coke makes 1 Diamond (Converter)"),
-    ("pink_diamond", "Pink Diamond", "converter", "4 Coal, 1 Quartz Crystal", None, "1 Diamond", 4, "4 Coal + 1 Quartz Crystal makes 1 Diamond (Converter)"),
-    ("iron_ficsite_ingot", "Iron Ficsite Ingot", "converter", "8 Iron Ingot, 4 Reanimated SAM", None, "1 Ficsite Ingot", 6, "8 Iron Ingot + 4 Reanimated SAM makes 1 Ficsite Ingot (Converter)"),
-    ("brass_ficsite_ingot", "Brass Ficsite Ingot", "converter", "4 Brass Ingot, 3 Reanimated SAM", None, "1 Ficsite Ingot", 6, "4 Brass Ingot + 3 Reanimated SAM makes 1 Ficsite Ingot (Converter)"),
-    ("dark_matter_trap", "Dark Matter Trap", "particle_accelerator", "1 Time Crystal", ("dark matter residue", 250), "2 Dark Matter Crystal", 4,
-     "1 Time Crystal + 250 mB Dark Matter Residue makes 2 Dark Matter Crystal (Particle Accelerator)"),
-]
+# AWESOME Sink: points for one of each item, Satisfactory's own value for every Satisfactory part (where a part is the
+# same item as a vanilla one, Satisfactory's value wins). Anything not listed is worth 1. A spare Hard Drive is 1,000
+# (a SIFTEC rule: Satisfactory takes none).
+SINK_POINTS = {}
+for _sat, _info in sorted(SF.ITEMS.items()):
+    _pack = sat_item(_sat, True)
+    if _pack and _pack[0] == "item" and not _pack[1].startswith("#") and _info["sink"]:
+        SINK_POINTS.setdefault(_pack[1], _info["sink"])
+SINK_POINTS["Hard Drive"] = 1000
+SINK_POINTS["siftec:object_scanner"] = SINK_POINTS.pop("Object Scanner")
 
-# AWESOME Sink: points for one of each item. Anything not listed is worth 1.
-SINK_POINTS = {
-    "Iron Sheet": 6, "Iron Rod": 4, "Screw": 2, "Wire": 6, "Cable": 24, "Copper Sheet": 24, "Reinforced Iron Plate": 120,
-    "Rotor": 140, "Modular Frame": 408, "Smart Plating": 520, "Steel Beam": 64, "Steel Pipe": 24, "Versatile Framework": 1176,
-    "Encased Industrial Beam": 632, "Stator": 240, "Motor": 1520, "Automated Wiring": 1440, "Plastic": 75, "Rubber": 60, "Circuit Board": 696,
-    "Computer": 8352, "Heavy Modular Frame": 10800, "Modular Engine": 9960, "Adaptive Control Unit": 76368, "Aluminum Casing": 393,
-    "Alclad Aluminum Sheet": 266, "Radio Control Unit": 32352, "Supercomputer": 97352, "Cooling System": 12006, "Fused Modular Frame": 62840,
-    "Turbo Motor": 240496, "Quickwire": 17, "AI Limiter": 920, "High-Speed Connector": 3776, "Crystal Oscillator": 3072, "DNA Capsule": 1000,
-    "Hard Drive": 5000, "Power Shard": 5000,
-}
+
+# Build costs at Satisfactory 1.0's amounts, in the pack's names (Concrete is any stone). BUILD_COSTS is every
+# building the Build Gun will place, under its 1.0 name (work packages 5 and 9 give each its id in BUILDINGS);
+# EQUIPMENT_COSTS is what the Equipment Workshop builds.
+def sat_cost(cost):
+    """A 1.0 cost as the pack writes costs, or None when it takes something the pack leaves out. A Portable Miner in a
+    cost (the miners, the Drone) is a Build Gun building in the pack, not an item, so its own parts are paid instead."""
+    merged = {}
+    for n, a in cost:
+        for m, b in (SF.EQUIPMENT["Portable Miner"] if n == "Portable Miner" else [(n, 1)]):
+            merged[m] = merged.get(m, 0) + a * b
+    cost = list(merged.items())
+    parts = [sat_item(n) for n, _ in cost]
+    if None in parts or any(p[0] == "fluid" for p in parts):
+        return None
+    return ", ".join(f"{a} {p[1]}" for p, (_, a) in zip(parts, cost))
+
+
+BUILD_COSTS = {name: sat_cost(cost) for name, cost in SF.BUILDINGS.items()}
+EQUIPMENT_COSTS = {name: sat_cost(cost) for name, cost in SF.EQUIPMENT.items() if sat_cost(cost)}
+
 # AWESOME Shop: (item id, how many, price in points)
 SHOP = [
     (C + "potato_cannon", 1, 3000), (C + "extendo_grip", 1, 3000), (C + "wand_of_symmetry", 1, 5000), (C + "linked_controller", 1, 3000),
@@ -566,3 +765,64 @@ BUILDINGS = [
 ]
 # Buildings that stand over a resource node and can only go down once its clump is mined (the miners, extractors)
 NODE_BUILDINGS = {"test_miner"}
+
+
+# ---------------------------------------------------------------------------------------------------
+# Which milestone or MAM node unlocks each part: the 1.0 unlock of the earliest standard recipe that makes it (a HUB
+# milestone before a MAM node). A part only an alternate makes, or one made from the start, is not locked by itself.
+# The parts' old places in the lists above are replaced by these; anything else in those lists stays.
+def _part_locks():
+    table = names()
+    parts = {"siftec:" + p[0] for p in PARTS}
+    # MAM research opens at Field Research (Tier 1), so a MAM node counts as coming before Tier 2
+    order = {m[1]: (m[0] if m[0] < 2 else m[0] + 1) * 1000 + i for i, m in enumerate(MILESTONES)}
+    order.update({f"mam_{t[0]}_{k + 1}": 2000 for t in MAM for k in range(len(t[3]))})
+    found = {}
+    for key, name, building, alt, secs, ins, outs, unlock in sat_recipes():
+        uid = unlock_id(unlock)
+        if uid in (None, "drive") or name.startswith("Unpackage "):
+            continue  # unpacking gives the empty canister or tank back; it does not unlock them
+        made = [table.get(n, n) for k, n, a in outs if k == "item"]
+        if key in CORES:
+            made += ["siftec:" + p for p in CORES[key] if p]
+        for pid in made:
+            if pid in parts and (pid not in found or order[uid] < order[found[pid]]):
+                found[pid] = uid
+    return found
+
+
+PART_LOCKS = _part_locks()
+_GONE = {"siftec:dna_capsule"}
+MILESTONES = [(t, mid, name, cost, time, text, [i for i in items if i not in PART_LOCKS and i not in _GONE]
+               + sorted(p for p, m in PART_LOCKS.items() if m == mid), tokens) for t, mid, name, cost, time, text, items, tokens in MILESTONES]
+for _tree in MAM:
+    _tree[3][:] = [(n, cost, time, text, needs, [i for i in items if i not in PART_LOCKS and i not in _GONE]
+                    + sorted(p for p, m in PART_LOCKS.items() if m == f"mam_{_tree[0]}_{k + 1}"), tokens)
+                   for k, (n, cost, time, text, needs, items, tokens) in enumerate(_tree[3])]
+_nowhere = set(PART_LOCKS.values()) - {m[1] for m in MILESTONES} - {f"mam_{t[0]}_{k + 1}" for t in MAM for k in range(len(t[3]))}
+if _nowhere:
+    raise SystemExit(f"part locks name no milestone or MAM node: {sorted(_nowhere)}")
+
+# Equipment the Equipment Workshop builds by hand that machines can make too, the Manufacturer's way (recipes.py):
+# item id -> its 1.0 name. Each gets a Core and an Incomplete item, locked with the equipment.
+EQUIPMENT_BY_MACHINE = {"siftec:object_scanner": "Object Scanner", "siftec:jetpack": "Jetpack", "siftec:parachute": "Parachute",
+                        "siftec:gas_mask": "Gas Mask", "siftec:hazmat_suit": "Hazmat Suit", "siftec:hover_pack": "Hoverpack",
+                        "siftec:blade_runners": "Blade Runners"}
+EQUIPMENT_CORES, EQUIPMENT_LOCKS = {}, {}
+_unlocks_of = {i: m[1] for m in MILESTONES for i in m[6]}
+_unlocks_of.update({i: f"mam_{t[0]}_{k + 1}" for t in MAM for k, n in enumerate(t[3]) for i in n[5]})
+for _iid, _sat in EQUIPMENT_BY_MACHINE.items():
+    _rid = _iid.split(":")[1]
+    EQUIPMENT_CORES[_iid] = _rid + "_core"
+    PARTS.append((_rid + "_core", _sat + " Core", "minecraft:item/magma_cream", 0x909098))
+    PARTS.append(("incomplete_" + _rid, "Incomplete " + _sat, "minecraft:item/magma_cream", 0x606068))
+    EQUIPMENT_LOCKS[_iid] = _unlocks_of.get(_iid)
+    for _part in (_rid + "_core", "incomplete_" + _rid):
+        if _unlocks_of.get(_iid):
+            for _m, _ms in enumerate(MILESTONES):
+                if _ms[1] == _unlocks_of[_iid]:
+                    MILESTONES[_m] = _ms[:6] + (_ms[6] + ["siftec:" + _part],) + _ms[7:]
+            for _t in MAM:
+                for _k, _n in enumerate(_t[3]):
+                    if f"mam_{_t[0]}_{_k + 1}" == _unlocks_of[_iid]:
+                        _t[3][_k] = _n[:5] + (_n[5] + ["siftec:" + _part],) + _n[6:]

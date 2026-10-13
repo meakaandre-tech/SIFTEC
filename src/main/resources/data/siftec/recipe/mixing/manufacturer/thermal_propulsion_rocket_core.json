@@ -1,0 +1,22 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:modular_engine",
+    "siftec:modular_engine",
+    "siftec:modular_engine",
+    "siftec:modular_engine",
+    "siftec:turbo_motor",
+    "siftec:cooling_system",
+    "siftec:cooling_system",
+    "siftec:cooling_system",
+    "siftec:cooling_system",
+    "siftec:cooling_system",
+    "siftec:fused_modular_frame"
+  ],
+  "results": [
+    {
+      "id": "siftec:thermal_propulsion_rocket_core"
+    }
+  ],
+  "processing_time": 2400
+}
