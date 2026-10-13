@@ -131,6 +131,7 @@ public final class BuildGunClient {
         }
         while (NEXT_TAB.consumeClick()) {
             category = (category + 1) % Category.values().length;
+            com.meakaandre.siftec.Siftec.LOGGER.info("Build Gun tab: {}", Category.values()[category]);
             dismantle = false;
             nudge = false;
             frozen = null;

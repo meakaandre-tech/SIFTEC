@@ -282,7 +282,8 @@ public final class BuildingLogic {
             } else {
                 ItemStack out = c.output.getItem(0);
                 if (out.isEmpty()) {
-                    c.output.setItem(0, drop);
+                    c.output.setItem(0, drop.copy());
+                    drop.setCount(0);
                 } else if (ItemStack.isSameItemSameComponents(out, drop)) {
                     int fit = Math.min(drop.getCount(), out.getMaxStackSize() - out.getCount());
                     out.grow(fit);
