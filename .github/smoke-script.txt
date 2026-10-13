@@ -321,8 +321,9 @@ key u
 sleep 2
 cmd siftec worldtest buildgun check
 sleep 2
+cmd time set noon
 cmd siftec worldtest buildings_a view 0
-sleep 6
+sleep 15
 shot
 cmd siftec worldtest buildings_a view 1
 sleep 4
