@@ -9,6 +9,7 @@ import com.meakaandre.siftec.config.SiftecConfig;
 import com.meakaandre.siftec.engine.EngineBlockEntity;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.hub.HubBlockEntity;
+import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.registry.ModBlocks;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -337,6 +338,32 @@ public final class Prefabs {
         boolean creative = player != null && player.hasInfiniteMaterials();
         Check check = check(level, spot, company, creative);
         if (!check.ok()) return check;
+        // the HUB costs Satisfactory's 20 Iron Ore (Raw Iron), from the player's inventory; it comes back when picked up
+        List<Milestone.Cost> cost = spot.kind == Kind.HUB && player != null && !creative ? hubCost() : List.of();
+        for (Milestone.Cost c : cost) {
+            if (!c.present()) continue;
+            int have = 0;
+            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+                if (c.matches(player.getInventory().getItem(i))) have += player.getInventory().getItem(i).getCount();
+            }
+            if (have < c.count()) {
+                check.fail("siftec.prefab.cost", c.count(), c.icon().getHoverName());
+                return check;
+            }
+        }
+        List<ItemStack> paid = new ArrayList<>();
+        for (Milestone.Cost c : cost) {
+            if (!c.present()) continue;
+            int left = c.count();
+            for (int i = 0; i < player.getInventory().getContainerSize() && left > 0; i++) {
+                ItemStack stack = player.getInventory().getItem(i);
+                if (!c.matches(stack)) continue;
+                int n = Math.min(left, stack.getCount());
+                paid.add(stack.split(n));
+                left -= n;
+            }
+        }
+        if (!paid.isEmpty()) player.getInventory().setChanged();
         Template t = spot.kind.template();
         int target = levelOf(spot.kind, company, level.getServer());
         // inside space is cleared once, at the start; legs go down to the ground
@@ -361,8 +388,12 @@ public final class Prefabs {
             hub.legs = check.legs;
             hub.builtLevel = target;
             hub.companyId = company.id;
+            hub.refund.clear();
+            hub.refund.addAll(paid);
             hub.setChanged();
         }
+        indexMachines(level, spot, target, terminal, company.id);
+        if (spot.kind == Kind.HUB && player != null) giveBuildGun(player);
         if (spot.kind == Kind.HUB) {
             int chunks = Claims.claimForHub(level, company, terminal);
             if (player != null) {
@@ -426,6 +457,46 @@ public final class Prefabs {
         apply(level, spot, hub.builtLevel, target, hub.companyId);
         hub.builtLevel = target;
         hub.setChanged();
+        indexMachines(level, spot, target, hub.getBlockPos(), hub.companyId);
+    }
+
+    /** What the HUB costs to put down: Satisfactory's, from siftec_content.json ("build_costs", The HUB). */
+    public static List<Milestone.Cost> hubCost() {
+        List<Milestone.Cost> out = new ArrayList<>();
+        com.google.gson.JsonObject raw = com.meakaandre.siftec.hub.Milestones.raw();
+        if (raw == null || !raw.has("build_costs") || !raw.getAsJsonObject("build_costs").has("The HUB")) return out;
+        for (com.google.gson.JsonElement e : raw.getAsJsonObject("build_costs").getAsJsonArray("The HUB")) {
+            out.add(new Milestone.Cost(e.getAsJsonObject().get("item").getAsString(), e.getAsJsonObject().get("count").getAsInt()));
+        }
+        return out;
+    }
+
+    /** The HUB hands out the Build Gun: to a player of its company who has none. */
+    public static void giveBuildGun(ServerPlayer player) {
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            if (player.getInventory().getItem(i).getItem() instanceof com.meakaandre.siftec.building.BuildGunItem) return;
+        }
+        player.getInventory().placeItemBackInInventory(new ItemStack(com.meakaandre.siftec.registry.ModItems.BUILD_GUN.get()), Prediction.SERVER_ONLY);
+        player.sendSystemMessage(Component.translatable("siftec.prefab.build_gun"));
+    }
+
+    /**
+     * The real Create machines in a structure (the HUB's Craft Station) are listed in the building index under its
+     * terminal, so they are as safe as its shell, and belong to its company, so they run what it has unlocked.
+     */
+    static void indexMachines(ServerLevel level, Spot spot, int at, BlockPos terminal, String companyId) {
+        com.meakaandre.siftec.building.BuildingIndex index = com.meakaandre.siftec.building.BuildingIndex.get(level);
+        if (index == null) return;
+        Template t = spot.kind.template();
+        for (long key : t.keys()) {
+            BlockState state = t.at(key, at);
+            if (state == null || state.isAir() || isPart(state)) continue;
+            BlockPos local = BlockPos.of(key);
+            BlockPos pos = spot.at(local.getX(), local.getY(), local.getZ());
+            index.put(level, pos, terminal);
+            var be = level.getBlockEntity(pos);
+            if (be != null && !companyId.isEmpty()) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, companyId);
+        }
     }
 
     // ------------------------------------------------------------------------------------------------ picking up
@@ -441,6 +512,8 @@ public final class Prefabs {
         if (!(hub.getBlockState().getBlock() instanceof HubBlock block)) return out;
         Kind kind = Kind.of(block);
         out.add(new ItemStack(kind.block()));
+        for (ItemStack paid : hub.refund) out.add(paid.copy());
+        hub.refund.clear();
         Company company = CompanyData.get(level.getServer()).byId(hub.companyId);
         if (hub.prefab && hub.anchor != null && hub.facing != null) {
             Spot spot = new Spot(kind, hub.anchor, hub.facing);
@@ -457,7 +530,16 @@ public final class Prefabs {
                     out.add(engine.fuel.removeItemNoUpdate(0));
                     engine.setChanged();
                 }
-                if (isPart(level.getBlockState(pos))) remove.add(pos);
+                BlockState now = level.getBlockState(pos);
+                if (isPart(now)) {
+                    remove.add(pos);
+                } else if (now.getBlock() == built.getBlock()) {
+                    // the Craft Station's machines: unlisted, and what their Basins hold comes back
+                    com.meakaandre.siftec.building.BuildingIndex index = com.meakaandre.siftec.building.BuildingIndex.get(level);
+                    if (index != null) index.remove(level, pos, terminal);
+                    out.addAll(com.meakaandre.siftec.building.Buildings.contents(level, pos));
+                    remove.add(pos);
+                }
             }
             if (hub.legs != null) {
                 BlockState foundation = ModBlocks.PREFAB.get("foundation").get().defaultBlockState();
@@ -470,7 +552,16 @@ public final class Prefabs {
                     }
                 }
             }
+            // whatever a machine still drops as it goes (a Basin's input) is caught and given back too
+            AABB box = bounds(spot).inflate(1);
+            Set<UUID> before = new HashSet<>();
+            for (net.minecraft.world.entity.item.ItemEntity e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, box)) before.add(e.getUUID());
             for (BlockPos pos : remove) level.setBlock(pos, Blocks.AIR.defaultBlockState(), REMOVE_FLAGS);
+            for (net.minecraft.world.entity.item.ItemEntity e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, box)) {
+                if (before.contains(e.getUUID()) || e.getItem().isEmpty()) continue;
+                out.add(e.getItem().copy());
+                e.discard();
+            }
         }
         hub.prefab = false;
         level.setBlock(terminal, Blocks.AIR.defaultBlockState(), REMOVE_FLAGS);
@@ -501,6 +592,9 @@ public final class Prefabs {
 
     public static void register() {
         PayloadTypeRegistry.clientboundPlay().register(PreviewPayload.TYPE, PreviewPayload.STREAM_CODEC);
+        // every player starts with the HUB, as Satisfactory's pioneers land with its parts: one is given to a player who has
+        // none while their company has no HUB standing
+        net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.JOIN.register(Prefabs::starterHub);
         // a part cannot be mined, not even in creative: the structure is picked up from its terminal
         PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
             if (!isPart(state)) return true;
@@ -532,6 +626,15 @@ public final class Prefabs {
             SENT.clear();
             forget();
         });
+    }
+
+    static void starterHub(ServerPlayer player) {
+        if (Companies.isFake(player)) return;
+        Company company = Companies.of(player);
+        if (company == null || Claims.hasClaimingHub(player.level().getServer(), company)) return;
+        if (player.getInventory().countItem(ModBlocks.HUB.get().asItem()) > 0) return;
+        player.getInventory().placeItemBackInInventory(new ItemStack(ModBlocks.HUB.get()), Prediction.SERVER_ONLY);
+        player.sendSystemMessage(Component.translatable("siftec.prefab.welcome"));
     }
 
     private static boolean isGatewayPart(Level level, BlockPos pos) {

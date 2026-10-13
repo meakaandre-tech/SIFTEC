@@ -9,7 +9,6 @@ import com.meakaandre.siftec.machine.ProcessorBlockEntity;
 import com.meakaandre.siftec.sink.SinkBlockEntity;
 import com.meakaandre.siftec.power.PoleBlockEntity;
 import com.meakaandre.siftec.power.StorageBlockEntity;
-import com.meakaandre.siftec.block.PortableMinerBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
@@ -39,7 +38,6 @@ public class ModBlockEntities {
         }
     }
 
-    public static final Entry<PortableMinerBlockEntity> PORTABLE_MINER = register("portable_miner", PortableMinerBlockEntity::new, ModBlocks.PORTABLE_MINER.get());
     public static final Entry<ExtractorBlockEntity> EXTRACTOR = register("resource_well_extractor", ExtractorBlockEntity::new, ModBlocks.RESOURCE_WELL_EXTRACTOR.get());
 
     public static final Entry<HubBlockEntity> HUB = register("hub", HubBlockEntity::new, ModBlocks.HUB.get(), ModBlocks.WORMHOLE_GATEWAY.get());
@@ -63,6 +61,7 @@ public class ModBlockEntities {
 
     public static final Entry<com.meakaandre.siftec.building.ControllerBlockEntity> BUILDING_CONTROLLER = register("building_controller", com.meakaandre.siftec.building.ControllerBlockEntity::new, ModBlocks.BUILDING_CONTROLLER.get());
     public static final Entry<com.meakaandre.siftec.building.PortBlockEntity> BUILDING_PORT = register("building_port", com.meakaandre.siftec.building.PortBlockEntity::new, ModBlocks.BUILDING_PORT.get());
+    public static final Entry<com.meakaandre.siftec.building.MotorBlockEntity> BUILDING_MOTOR = register("building_motor", com.meakaandre.siftec.building.MotorBlockEntity::new, ModBlocks.BUILDING_MOTOR.get());
 
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
         Entry<T> entry = new Entry<>();
@@ -82,6 +81,8 @@ public class ModBlockEntities {
         ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());
         // a building's ports pass items and fluids to and from the machines inside
         ItemStorage.SIDED.registerForBlockEntity((port, side) -> port.items(side), BUILDING_PORT.get());
+        // what a building's ports reach when they point at its controller (a miner's ore, the Smelter's ore and ingots)
+        ItemStorage.SIDED.registerForBlockEntity((controller, side) -> controller.storage(), BUILDING_CONTROLLER.get());
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((port, side) -> port.fluids(side), BUILDING_PORT.get());
     }
 }

@@ -321,3 +321,15 @@ key u
 sleep 2
 cmd siftec worldtest buildgun check
 sleep 2
+cmd siftec worldtest buildings_a view 0
+sleep 6
+shot
+cmd siftec worldtest buildings_a view 1
+sleep 4
+shot
+cmd siftec worldtest buildings_a view 2
+sleep 4
+shot
+cmd siftec worldtest buildings_a view 3
+sleep 4
+shot

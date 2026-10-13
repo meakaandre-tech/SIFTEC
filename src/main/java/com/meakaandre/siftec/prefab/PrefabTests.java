@@ -123,11 +123,12 @@ public final class PrefabTests {
         return level.getBlockEntity(spot.terminal()) instanceof HubBlockEntity hub ? hub : null;
     }
 
-    /** Parts present: T terminal, C craft bench, S storage, 1 and 2 burners, B bed, D dock tower, F freighter. */
+    /** Parts present: T terminal, C Craft Station (Press and Mixer), S storage, 1 and 2 burners, B bed, D dock tower, F freighter. */
     private static String parts(ServerLevel level, Prefabs.Spot spot) {
         StringBuilder b = new StringBuilder();
         b.append(is(level, spot, Templates.HUB_TERMINAL, ModBlocks.HUB.get()) ? "T" : ".");
-        b.append(is(level, spot, Templates.BENCH, ModBlocks.CRAFT_BENCH.get()) ? "C" : ".");
+        b.append(level.getBlockState(spot.at(Templates.PRESS[0], Templates.PRESS[1], Templates.PRESS[2])).getBlock() instanceof com.zurrtum.create.content.kinetics.press.MechanicalPressBlock
+            && level.getBlockState(spot.at(Templates.MIXER[0], Templates.MIXER[1], Templates.MIXER[2])).getBlock() instanceof com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlock ? "C" : ".");
         b.append(is(level, spot, Templates.STORAGE, ModBlocks.PERSONAL_STORAGE.get()) ? "S" : ".");
         b.append(is(level, spot, Templates.BURNER_1, ModBlocks.HUB_BURNER.get()) ? "1" : ".");
         b.append(is(level, spot, Templates.BED, ModBlocks.HUB_BED.get()) ? "B" : ".");
@@ -151,6 +152,10 @@ public final class PrefabTests {
             }
         }
         return company.has(m.id());
+    }
+
+    private static Item biomass() {
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse("siftec:biomass"));
     }
 
     private static int count(List<ItemStack> stacks, Item item) {
@@ -234,7 +239,7 @@ public final class PrefabTests {
             Prefabs.refresh(hub);
             levels.append(" ").append(i).append(":").append(parts(level, spotA));
         }
-        report(source, "parts per upgrade (T terminal, C craft bench, S storage, 1 burner, B beds, 2 burner, D dock, F freighter): " + levels
+        report(source, "parts per upgrade (T terminal, C craft station, S storage, 1 burner, B beds, 2 burner, D dock, F freighter): " + levels
             + "; built level " + hub.builtLevel);
 
         // ---- Personal Storage keeps what is put in
@@ -257,7 +262,7 @@ public final class PrefabTests {
 
         // ---- burners: fuel for both; whether they turn is checked a little later (check)
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
-            if (level.getBlockEntity(spotA.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) engine.addFuel(new ItemStack(Items.COAL, 8));
+            if (level.getBlockEntity(spotA.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) engine.addFuel(new ItemStack(biomass(), 8));
         }
         int coalIn = 0;
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
@@ -269,7 +274,7 @@ public final class PrefabTests {
         List<ItemStack> back1 = Prefabs.dismantle(level, hub);
         boolean released = Claims.at(level, spotA.terminal()) == null;
         report(source, "picked up: HUB items " + count(back1, ModBlocks.HUB.get().asItem()) + ", iron rods " + count(back1, com.meakaandre.siftec.registry.ModItems.PARTS.get("iron_rod"))
-            + " of 10, diamonds " + count(back1, Items.DIAMOND) + " of 3, coal " + count(back1, Items.COAL) + " of " + coalIn
+            + " of 10, diamonds " + count(back1, Items.DIAMOND) + " of 3, biomass " + count(back1, biomass()) + " of " + coalIn
             + "; parts left standing " + partsIn(level, boundsA) + "; land released " + released + "; progress kept " + a.has("hub_upgrade_6"));
 
         // ---- put it down again, turned east: it claims again and comes back at the company's level
@@ -286,7 +291,7 @@ public final class PrefabTests {
         Prefabs.Spot spotB = hubSpot(BX, BZ, Direction.NORTH);
         Prefabs.Check placedB = Prefabs.place(level, spotB, b, null);
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
-            if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) engine.addFuel(new ItemStack(Items.COAL, 16));
+            if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) engine.addFuel(new ItemStack(biomass(), 16));
         }
         report(source, "second company's HUB " + placedB.ok() + " (" + placedB.message().getString() + "), parts " + parts(level, spotB));
 
@@ -335,8 +340,8 @@ public final class PrefabTests {
             if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof EngineBlockEntity engine) {
                 b.append(" burner ").append(engine.providedSu()).append(" SU at ").append(engine.getSpeed()).append(" RPM, ")
                     .append(Component.translatable(engine.statusKey(), engine.fuel.getItem(0).getCount()).getString())
-                    .append(" (fuel ").append(engine.fuel.getItem(0)).append(", burning ").append(engine.burnLeft()).append(" more ticks, coal burns ")
-                    .append(engine.burnTime(new ItemStack(Items.COAL))).append(", ticked ").append(engine.ticked).append(");");
+                    .append(" (fuel ").append(engine.fuel.getItem(0)).append(", burning ").append(engine.burnLeft()).append(" more ticks, biomass burns ")
+                    .append(engine.burnTime(new ItemStack(biomass()))).append(", coal ").append(engine.burnTime(new ItemStack(Items.COAL))).append(", ticked ").append(engine.ticked).append(");");
             } else {
                 b.append(" burner missing;");
             }

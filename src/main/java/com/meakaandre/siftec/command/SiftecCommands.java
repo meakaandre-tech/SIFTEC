@@ -5,7 +5,6 @@ import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
-import com.meakaandre.siftec.block.PortableMinerBlockEntity;
 import com.meakaandre.siftec.node.NodePlacer;
 import com.meakaandre.siftec.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
@@ -43,6 +42,7 @@ public final class SiftecCommands {
         WorldTests.register();
         com.meakaandre.siftec.prefab.PrefabTests.register();
         com.meakaandre.siftec.building.BuildingTests.register();
+        com.meakaandre.siftec.building.BuildingsATests.register();
         AutomateTests.register();
         NodeTests.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
@@ -96,13 +96,11 @@ public final class SiftecCommands {
             if (type == NodeType.IRON) powerTest(source, level, miner.above(8), setup);
             if (type == NodeType.IRON) ownerTest(source, level, miner.above(16), setup);
             if (type == NodeType.IRON) droneTest(source, level, miner.above(24), setup);
+            // the Build Gun's miners are tested by /siftec selftest buildings_a
             if (setup) {
-                level.setBlockAndUpdate(miner, ModBlocks.PORTABLE_MINER.get().defaultBlockState());
                 report(source, "SELFTEST setup " + node + " core at " + pos.toShortString());
             } else {
-                BlockEntity be = level.getBlockEntity(miner);
-                String made = be instanceof PortableMinerBlockEntity m ? m.output.get().toString() : "no block entity (" + level.getBlockState(miner) + ")";
-                report(source, "SELFTEST check " + node + ": " + made);
+                report(source, "SELFTEST check " + node + ": core still " + level.getBlockState(pos).getBlock().getClass().getSimpleName());
                 // the setup kept this chunk loaded until now; let it go
                 level.setChunkForced(node.x() >> 4, node.z() >> 4, false);
             }

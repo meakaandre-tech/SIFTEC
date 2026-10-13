@@ -43,7 +43,15 @@ public class EngineBlock extends KineticBlock implements IBE<EngineBlockEntity> 
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!hub || !FuelUtil.isFuel(stack)) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!hub) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!(level.getBlockEntity(pos) instanceof EngineBlockEntity e) || !e.accepts(stack)) {
+            // a HUB Biomass Burner says what it burns instead of taking coal
+            if (this instanceof com.meakaandre.siftec.prefab.HubBurnerBlock && FuelUtil.isFuel(stack) && player instanceof ServerPlayer server) {
+                server.sendOverlayMessage(Component.translatable("siftec.burner.fuel"));
+                return InteractionResult.SUCCESS;
+            }
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
         if (player instanceof ServerPlayer server) {
             withBlockEntityDo(level, pos, engine -> {
                 engine.addFuel(stack);

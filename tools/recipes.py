@@ -514,13 +514,12 @@ REMOVED += ["travelersbackpack:" + n for n in """
 
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked. Equipment and the
 # buildings 1.0 has cost what they cost in 1.0 (content.EQUIPMENT_COSTS and content.BUILD_COSTS, under the 1.0 name);
-# the buildings move to the Build Gun in work packages 5 and 9. The rest are the pack's own.
+# the buildings move to the Build Gun in work packages 5 and 9 (the Portable Miner has; the HUB is every player's to
+# start with and costs its 20 Raw Iron when it goes down). The rest are the pack's own.
 _B, _E = content.BUILD_COSTS, content.EQUIPMENT_COSTS
 WORKSHOP = [
-    ("siftec:portable_miner", _E["Portable Miner"]),
     ("siftec:node_scanner", "2 Iron Sheet, 4 Wire"),
     ("siftec:wormhole_gateway", _B["Space Elevator"]),
-    ("siftec:hub", _B["The HUB"]),
     ("siftec:claim_marker", "5 Iron Rod, 5 Stone"),
     ("siftec:mam", _B["MAM"]),
     ("siftec:object_scanner", _E["Object Scanner"]),

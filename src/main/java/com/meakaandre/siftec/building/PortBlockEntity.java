@@ -1,30 +1,58 @@
 package com.meakaandre.siftec.building;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
+import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * A port in the world: the cell inside the building it feeds or drains ({@code target}) and its controller. Only its
  * outward face takes or gives anything, and only the kind it is (items or fluids, in or out).
+ * <p>
+ * An item input takes items a belt carries into it (a belt ends at it as at a Depot); an item output pushes one item
+ * a tick from its target onto a belt, Depot or chute in front of it, or into an inventory there.
  */
-public class PortBlockEntity extends BlockEntity {
+public class PortBlockEntity extends SmartBlockEntity {
     public @Nullable BlockPos target;
     public @Nullable BlockPos controller;
+    /** Items pushed out of an output port, for the selftests. */
+    public long pushed;
 
     public PortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+    }
+
+    @Override
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
+        behaviours.add(new DirectBeltInputBehaviour(this).onlyInsertWhen(this::beltCanInsert).setInsertionHandler(this::fromBelt));
+    }
+
+    private @Nullable PortBlock.Kind kind() {
+        BlockState state = getBlockState();
+        return state.hasProperty(PortBlock.KIND) ? state.getValue(PortBlock.KIND) : null;
+    }
+
+    private Direction out() {
+        BlockState state = getBlockState();
+        return state.hasProperty(PortBlock.FACING) ? state.getValue(PortBlock.FACING) : Direction.SOUTH;
     }
 
     private boolean serves(@Nullable Direction side, boolean fluid) {
@@ -38,28 +66,90 @@ public class PortBlockEntity extends BlockEntity {
 
     public @Nullable Storage<ItemVariant> items(@Nullable Direction side) {
         if (!serves(side, false)) return null;
-        Storage<ItemVariant> inner = ItemStorage.SIDED.find(level, target, getBlockState().getValue(PortBlock.FACING));
+        Storage<ItemVariant> inner = ItemStorage.SIDED.find(level, target, out());
         if (inner == null) return null;
-        return getBlockState().getValue(PortBlock.KIND).input() ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
+        return kind() == PortBlock.Kind.ITEM_IN ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
     }
 
     public @Nullable Storage<FluidVariant> fluids(@Nullable Direction side) {
         if (!serves(side, true)) return null;
-        Storage<FluidVariant> inner = FluidStorage.SIDED.find(level, target, getBlockState().getValue(PortBlock.FACING));
+        Storage<FluidVariant> inner = FluidStorage.SIDED.find(level, target, out());
         if (inner == null) return null;
-        return getBlockState().getValue(PortBlock.KIND).input() ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
+        return kind() == PortBlock.Kind.FLUID_IN ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
+    }
+
+    // ------------------------------------------------------------------------------------------------ belts
+
+    /** A belt runs into an item input from outside: its items move against the way the port faces. */
+    private boolean beltCanInsert(Direction side) {
+        return kind() == PortBlock.Kind.ITEM_IN && side == out().getOpposite();
+    }
+
+    private ItemStack fromBelt(TransportedItemStack transported, Direction side, boolean simulate) {
+        ItemStack stack = transported.stack;
+        Storage<ItemVariant> into = beltCanInsert(side) ? items(out()) : null;
+        if (into == null || stack.isEmpty()) return stack;
+        long took;
+        try (Transaction tx = Transaction.openOuter()) {
+            took = into.insert(ItemVariant.of(stack), stack.getCount(), tx);
+            if (!simulate) tx.commit();
+        }
+        if (took <= 0) return stack;
+        return took >= stack.getCount() ? ItemStack.EMPTY : stack.copyWithCount(stack.getCount() - (int) took);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput view) {
-        super.saveAdditional(view);
+    public void tick() {
+        super.tick();
+        if (level == null || level.isClientSide() || kind() != PortBlock.Kind.ITEM_OUT) return;
+        push();
+    }
+
+    /** Puts one item from the target onto the belt (or Depot, chute, inventory) in front, if it has room. */
+    private void push() {
+        Direction out = out();
+        Storage<ItemVariant> from = items(out);
+        if (from == null) return;
+        ItemVariant next = null;
+        for (StorageView<ItemVariant> view : from.nonEmptyViews()) {
+            next = view.getResource();
+            break;
+        }
+        if (next == null) return;
+        BlockPos front = worldPosition.relative(out);
+        DirectBeltInputBehaviour belt = BlockEntityBehaviour.get(level, front, DirectBeltInputBehaviour.TYPE);
+        if (belt != null) {
+            if (!belt.canInsertFromSide(out)) return;
+            ItemStack one = next.toStack(1);
+            if (!belt.handleInsertion(one.copy(), out, true).isEmpty()) return;
+            try (Transaction tx = Transaction.openOuter()) {
+                if (from.extract(next, 1, tx) != 1) return;
+                tx.commit();
+            }
+            belt.handleInsertion(one, out, false);
+            pushed++;
+            return;
+        }
+        Storage<ItemVariant> to = ItemStorage.SIDED.find(level, front, out.getOpposite());
+        if (to == null) return;
+        try (Transaction tx = Transaction.openOuter()) {
+            if (from.extract(next, 1, tx) != 1) return;
+            if (to.insert(next, 1, tx) != 1) return;
+            tx.commit();
+            pushed++;
+        }
+    }
+
+    @Override
+    protected void write(ValueOutput view, boolean clientPacket) {
+        super.write(view, clientPacket);
         if (target != null) view.store("Feeds", BlockPos.CODEC, target);
         if (controller != null) view.store("Controller", BlockPos.CODEC, controller);
     }
 
     @Override
-    protected void loadAdditional(ValueInput view) {
-        super.loadAdditional(view);
+    protected void read(ValueInput view, boolean clientPacket) {
+        super.read(view, clientPacket);
         target = view.read("Feeds", BlockPos.CODEC).orElse(null);
         controller = view.read("Controller", BlockPos.CODEC).orElse(null);
     }

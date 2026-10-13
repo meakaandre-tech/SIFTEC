@@ -15,7 +15,6 @@ import com.meakaandre.siftec.power.PoleBlock;
 import com.meakaandre.siftec.power.StorageBlock;
 import com.meakaandre.siftec.workshop.WorkshopBlock;
 import com.meakaandre.siftec.block.NodeBlock;
-import com.meakaandre.siftec.block.PortableMinerBlock;
 import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.NodeType;
 import net.minecraft.core.Registry;
@@ -92,7 +91,6 @@ public class ModBlocks {
     public static final Supplier<Block> URANIUM_ORE = blockOnly("uranium_ore", Block::new,
         () -> BlockBehaviour.Properties.of().strength(3.0F, 3.0F).requiresCorrectToolForDrops().sound(SoundType.STONE));
 
-    public static final Supplier<PortableMinerBlock> PORTABLE_MINER = block("portable_miner", PortableMinerBlock::new, ModBlocks::machine);
     public static final Supplier<ExtractorBlock> RESOURCE_WELL_EXTRACTOR = block("resource_well_extractor", ExtractorBlock::new, ModBlocks::machine);
 
     /** The HUB Terminal and the Wormhole Gateway's terminal; their items place the whole structure (see prefab.Prefabs). */
@@ -135,8 +133,6 @@ public class ModBlocks {
 
     public static final Supplier<com.meakaandre.siftec.prefab.HubBedBlock> HUB_BED = blockOnly("hub_bed", com.meakaandre.siftec.prefab.HubBedBlock::new,
         () -> prefabProperties(net.minecraft.world.level.block.Blocks.BED.orange(), 0, true));
-    public static final Supplier<com.meakaandre.siftec.prefab.CraftBenchBlock> CRAFT_BENCH = blockOnly("craft_bench", com.meakaandre.siftec.prefab.CraftBenchBlock::new,
-        () -> prefabProperties(net.minecraft.world.level.block.Blocks.CRAFTING_TABLE, 0));
     public static final Supplier<com.meakaandre.siftec.prefab.StorageBoxBlock> PERSONAL_STORAGE = blockOnly("personal_storage", com.meakaandre.siftec.prefab.StorageBoxBlock::new,
         () -> prefabProperties(net.minecraft.world.level.block.Blocks.BARREL, 0));
     public static final Supplier<com.meakaandre.siftec.prefab.HubBurnerBlock> HUB_BURNER = blockOnly("hub_burner", com.meakaandre.siftec.prefab.HubBurnerBlock::new,
@@ -151,6 +147,9 @@ public class ModBlocks {
         com.meakaandre.siftec.building.ControllerBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0));
     public static final Supplier<com.meakaandre.siftec.building.PortBlock> BUILDING_PORT = hidden("building_port",
         com.meakaandre.siftec.building.PortBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0));
+    /** The motor inside a powered building, turning its machines (see building.MotorBlock). */
+    public static final Supplier<com.meakaandre.siftec.building.MotorBlock> BUILDING_MOTOR = hidden("building_motor",
+        com.meakaandre.siftec.building.MotorBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0).noOcclusion());
 
     public static final Supplier<WorkshopBlock> EQUIPMENT_WORKSHOP = block("equipment_workshop", WorkshopBlock::new, ModBlocks::machine);
 

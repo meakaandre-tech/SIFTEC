@@ -98,11 +98,11 @@ public class BuildingIndex extends SavedData {
         return controllerOf(level, pos) != null;
     }
 
-    void put(Level level, BlockPos member, BlockPos controller) {
+    public void put(Level level, BlockPos member, BlockPos controller) {
         if (map(dim(level)).put(member.asLong(), controller.asLong()) != controller.asLong()) setDirty();
     }
 
-    void remove(Level level, BlockPos member, BlockPos controller) {
+    public void remove(Level level, BlockPos member, BlockPos controller) {
         Long2LongOpenHashMap map = map(dim(level));
         if (map.get(member.asLong()) == controller.asLong()) {
             map.remove(member.asLong());

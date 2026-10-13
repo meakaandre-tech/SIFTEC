@@ -83,7 +83,8 @@ public final class BuildGun {
         BlockPos anchor = hit.getDirection() == Direction.UP ? hit.getBlockPos().above() : hit.getBlockPos().relative(hit.getDirection());
         Direction facing = player.getDirection();
         for (int i = turns & 3; i > 0; i--) facing = facing.getClockWise();
-        return new Placement(def, anchor.immutable(), facing, flip);
+        // a miner snaps onto the node it is aimed near, so its drill stands right over it
+        return Buildings.snapToNode(player.level(), new Placement(def, anchor.immutable(), facing, flip));
     }
 
     /** A client's hologram spot is believed only near the player (it may be nudged a little past the aim). */
