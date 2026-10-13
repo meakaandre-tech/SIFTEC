@@ -648,6 +648,7 @@
   "siftec.build_gun.dismantle_hint": "Right-click to take down the %s: its cost and contents come back",
   "siftec.build_gun.dismantled": "%s taken down",
   "siftec.build_gun.fits": "Right-click to build the %s. R rotate, F flip, Ctrl nudge",
+  "siftec.build_gun.fits_hub": "Right-click to build the HUB. R rotate, Ctrl nudge",
   "siftec.build_gun.locked": "Locked: needs %s",
   "siftec.build_gun.missing": "Missing %s %s",
   "siftec.build_gun.no_template": "The %s building has no template yet",

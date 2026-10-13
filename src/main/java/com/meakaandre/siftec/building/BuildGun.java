@@ -251,7 +251,7 @@ public final class BuildGun {
                 if (p == null || !reachable(player, p)) continue;
                 if (p.def().hub()) {
                     Prefabs.Check check = hubCheck(player, p);
-                    view = BuildGunPayloads.View.of(check.ok(), check.message(), p.anchor(), p.anchor());
+                    view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable("siftec.build_gun.fits_hub") : check.message(), p.anchor(), p.anchor());
                 } else {
                     Buildings.Check check = Buildings.check(player.level(), p, Companies.of(player), player.getInventory(), player.hasInfiniteMaterials());
                     view = BuildGunPayloads.View.of(check.ok(), check.message(), p.anchor(), p.anchor());

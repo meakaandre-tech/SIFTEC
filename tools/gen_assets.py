@@ -784,6 +784,7 @@ lang.update({
     "siftec.build_gun.overlay_none": "%s | Ctrl + Scroll to pick a building, Tab for the next tab",
     "siftec.build_gun.overlay_dismantle": "Dismantle | %s",
     "siftec.build_gun.fits": "Right-click to build the %s. R rotate, F flip, Ctrl nudge",
+    "siftec.build_gun.fits_hub": "Right-click to build the HUB. R rotate, Ctrl nudge",
     "siftec.build_gun.blocked": "%s blocks are in the way (marked red)",
     "siftec.build_gun.missing": "Missing %s %s",
     "siftec.build_gun.no_template": "The %s building has no template yet",

@@ -258,7 +258,7 @@ public final class BuildGunClient {
                 shape = hubCells(spot);
                 blocked = new ArrayList<>(check.blocked);
                 localOk = check.ok();
-                localMessage = check.message();
+                localMessage = check.ok() ? Component.translatable("siftec.build_gun.fits_hub") : check.message();
             } else {
                 Buildings.Check check = Buildings.check(mc.level, spot, null, player.getInventory(), player.hasInfiniteMaterials());
                 shape = cells(spot);
