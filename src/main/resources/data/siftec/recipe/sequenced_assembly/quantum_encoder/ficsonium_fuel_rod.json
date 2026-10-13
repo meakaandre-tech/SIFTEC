@@ -17,9 +17,7 @@
         "amount": 64800,
         "fluid": "siftec:excited_photonic_matter"
       },
-      "results": [
-        "$result"
-      ]
+      "result": "$result"
     },
     {
       "type": "create:deploying",
