@@ -49,6 +49,10 @@ public class ControllerBlockEntity extends BlockEntity {
     public float progress;
     /** Items a miner has got from its node (every block it broke, with its Fortune). */
     public long mined;
+    /** How the Customizer has painted the building ({@link Paint}; "" as built). */
+    public String paint = "";
+    /** The game time the Radar Tower last swept its range for crash sites. */
+    public long lastSweep;
     /** What a status line says is wrong right now ("" if nothing), as a lang key. */
     public String problem = "";
     public final SimpleContainer input = slots(), output = slots();
@@ -182,6 +186,8 @@ public class ControllerBlockEntity extends BlockEntity {
         view.putInt("Facing", facing.get2DDataValue());
         view.putBoolean("Flip", flip);
         view.putString("Company", companyId);
+        if (!paint.isEmpty()) view.putString("Paint", paint);
+        view.putLong("LastSweep", lastSweep);
         view.store("Refund", ItemStack.OPTIONAL_CODEC.listOf(), new ArrayList<>(refund));
         view.store("Filter", ItemStack.OPTIONAL_CODEC, filter);
         if (node != null) view.store("Node", BlockPos.CODEC, node);
@@ -211,6 +217,8 @@ public class ControllerBlockEntity extends BlockEntity {
         facing = Direction.from2DDataValue(view.getIntOr("Facing", 2));
         flip = view.getBooleanOr("Flip", false);
         companyId = view.getStringOr("Company", "");
+        paint = view.getStringOr("Paint", "");
+        lastSweep = view.getLongOr("LastSweep", 0L);
         refund.clear();
         for (ItemStack stack : view.read("Refund", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of())) if (!stack.isEmpty()) refund.add(stack);
         filter = view.read("Filter", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);

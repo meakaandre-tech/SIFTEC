@@ -35,6 +35,10 @@ ITEM_SHEETS = {
     # the sheet's last ten are buckets; the mod draws those from the game's own bucket instead (see bucket_overlay)
 }
 SCALE = 4
+# sprites still on the sheets for things the pack no longer has (the power slugs and Power Shards went with
+# overclocking): they keep their places on the sheet, so the rest line up, but nothing is cut from them
+GONE = {"blue_power_slug_block", "yellow_power_slug_block", "purple_power_slug_block", "blue_power_slug", "yellow_power_slug",
+        "purple_power_slug", "power_shard"}
 uneven = []
 
 
@@ -76,6 +80,8 @@ def main():
     for file, ids in BLOCK_SHEETS.items():
         sheet = Image.open(os.path.join(HERE, "art", file)).convert("RGBA")
         for i, bid in enumerate(ids.split()):
+            if bid in GONE:
+                continue
             # each card: inventory picture, then top, front and side at 4x
             x, y = (i % 2) * 336, (i // 2) * 104
             for face, dx in (("top", 116), ("front", 192), ("side", 268)):
@@ -84,6 +90,8 @@ def main():
     for file, ids in ITEM_SHEETS.items():
         sheet = Image.open(os.path.join(HERE, "art", file)).convert("RGBA")
         for i, iid in enumerate(ids.split()):
+            if iid in GONE:
+                continue
             save(shrink(sheet, (i % 10) * 64, (i // 10) * 64, iid), "item", iid)
             items.append(iid)
     bucket_overlay()

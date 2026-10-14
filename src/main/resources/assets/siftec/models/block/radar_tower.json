@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "top": "siftec:block/radar_tower_top",
-    "side": "siftec:block/radar_tower_side",
-    "bottom": "siftec:block/radar_tower_side"
-  }
-}

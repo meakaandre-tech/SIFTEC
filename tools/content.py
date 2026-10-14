@@ -19,6 +19,8 @@ ALIAS = {
     "Mechanical Drill": "create:mechanical_drill",
     # what the nodes give that the mod adds itself (blocks and items outside PARTS)
     "Raw Bauxite": "siftec:raw_bauxite", "Uranium": "siftec:uranium", "SAM": "siftec:sam",
+    # equipment the Equipment Workshop builds: the Xeno-Zapper is the pack's own, the Xeno-Basher Gunsmithing's hammer
+    "Xeno-Zapper": "siftec:xeno_zapper",
     # where Satisfactory takes Concrete or Limestone, the pack takes any stone (stone nodes, or what any pickaxe digs up)
     "Stone": "#siftec:stones",
 }
@@ -54,10 +56,9 @@ SAT_FLUIDS = {"Water": "water", "Crude Oil": "crude oil", "Fuel": "diesel", "Liq
 MB_PER_M3 = 40
 # Satisfactory items the pack leaves out, and with them every recipe that makes or takes them: the Nobelisks and rifle
 # rounds (Gunsmithing's guns, TNT and grenades take their place), Explosive Rebar, the power slugs (Power Shards are
-# gone), the Portable Miner (a Build Gun building, not an item) and the Xeno-Zapper (the Xeno-Basher is Gunsmithing's).
+# gone) and the Portable Miner (a Build Gun building, not an item).
 SAT_LEFT_OUT = {"Nobelisk", "Gas Nobelisk", "Pulse Nobelisk", "Cluster Nobelisk", "Nuke Nobelisk", "Rifle Ammo", "Homing Rifle Ammo",
-                "Turbo Rifle Ammo", "Explosive Rebar", "Blue Power Slug", "Yellow Power Slug", "Purple Power Slug", "Portable Miner",
-                "Xeno-Zapper"}
+                "Turbo Rifle Ammo", "Explosive Rebar", "Blue Power Slug", "Yellow Power Slug", "Purple Power Slug", "Portable Miner"}
 # made in a recipe, these are left out too: Concrete is gone, and the Power Shard recipes with it
 SAT_NOT_MADE = {"Concrete", "Power Shard"}
 
@@ -159,10 +160,8 @@ PARTS = [
     ("iron_rebar", "Iron Rebar", ROD, 0x909098), ("stun_rebar", "Stun Rebar", ROD, 0xF0C850), ("shatter_rebar", "Shatter Rebar", ROD, 0xF8F8FF),
     # vinegar in a bottle (Spout), what the Preserved Foods research takes
     ("vinegar_bottle", "Vinegar Bottle", "minecraft:item/potion", 0xE8D8A0),
-    # collectibles. The power slugs and Power Shards go with overclocking (not this package's work): they are found, but
-    # nothing makes or takes them any more
-    ("blue_power_slug", "Blue Power Slug", "minecraft:item/slime_ball", 0x50A0FF), ("yellow_power_slug", "Yellow Power Slug", "minecraft:item/slime_ball", 0xFFE050),
-    ("purple_power_slug", "Purple Power Slug", "minecraft:item/slime_ball", 0xC060FF), ("power_shard", "Power Shard", "minecraft:item/amethyst_shard", 0x60E0FF),
+    # collectibles (Exploration and Equipment tab): found in the world, never made. The power slugs and Power Shards are
+    # gone with overclocking
     ("mercer_sphere", "Mercer Sphere", "minecraft:item/ender_pearl", 0xFF80C0), ("somersloop", "Somersloop", "minecraft:item/nautilus_shell", 0xFF6060),
     ("hard_drive", "Hard Drive", "minecraft:item/music_disc_11", None),
 ]
@@ -193,7 +192,7 @@ FLUIDS = [
 # Satisfactory 1.0's and come from tools/satisfactory.py (below); the list says what each unlocks in the pack.
 # "items" are the things nobody in the company can craft or place until the milestone is done (the parts each
 # milestone's recipes make are added from PART_LOCKS, and the other mods' items from MORE_LOCKS).
-# "tokens" are switches other systems read: scanner:<node> (the node shows on the Resource Scanner), belt:<items a
+# "tokens" are switches other systems read: minimap (Xaero's Minimap works), scanner:<node> (the node shows on the Resource Scanner), belt:<items a
 # minute> (how fast a belt with no shaft runs by itself, Satisfactory's belt tiers), pumps:2 (Pipeline Mk.2).
 # Every inventory-slot reward is gone: inventories stay vanilla size and there is no backpack.
 C = "create:"
@@ -203,7 +202,7 @@ MILESTONES = [
     # Tier 0: HUB Upgrades, in order, with no lock time
     (0, "hub_upgrade_1", "HUB Upgrade 1",
      "Equipment Workshop, Portable Miner, Personal Storage Box, Wrench and Goggles, Mechanical Drill",
-     ["siftec:equipment_workshop", C + "wrench", C + "goggles", C + "mechanical_drill"], []),
+     [C + "wrench", C + "goggles", C + "mechanical_drill"], []),
     (0, "hub_upgrade_2", "HUB Upgrade 2",
      "Smelter, Power Line (wire and connectors), Electric Motor, Copper Ingot, Wire and Cable, copper nodes on the scanner, "
      "the first HUB Biomass Burner, Encased Fan and Nozzle",
@@ -228,7 +227,9 @@ MILESTONES = [
     (1, "logistics", "Logistics",
      "Splitter and Merger (Andesite Tunnel), Conveyor Lift (Chute and fan lift), Item Hatch, Speedometer and Stressometer",
      [C + "andesite_tunnel", C + "chute", C + "item_hatch", C + "speedometer", C + "stressometer"], []),
-    (1, "field_research", "Field Research", "MAM, Object Scanner, Toolbox", ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES, []),
+    # the Map: Xaero's Minimap is switched off for a company's players until Field Research is done (hub/MapLock.java)
+    (1, "field_research", "Field Research", "MAM, Object Scanner, Toolbox, the Map (Xaero's Minimap)", ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES,
+     ["minimap"]),
 
     # Tier 2
     (2, "part_assembly", "Part Assembly", "Assembler (Deployer); Copper Sheet, Rotor, Modular Frame and Smart Plating",
@@ -237,7 +238,7 @@ MILESTONES = [
      [C + "mechanical_harvester", C + "mechanical_plough", C + "tree_fertilizer"], []),
     (2, "jump_pads", "Jump Pads", "Jump Pad (Weighted Ejector), U-Jelly Landing Pad", [C + "weighted_ejector", "siftec:landing_pad"], []),
     (2, "resource_sink_bonus_program", "Resource Sink Bonus Program", "AWESOME Sink and AWESOME Shop (cosmetics only)",
-     ["siftec:awesome_sink", "siftec:awesome_shop"], []),
+     [], []),
     (2, "logistics_mk2", "Logistics Mk.2", "Belt Mk.2: belts with no shaft run at 120 items/min", [], ["belt:120"]),
 
     # Tier 3 (Wormhole Phase 1)
@@ -407,7 +408,8 @@ def parse_cost(text):
 # "needs" lists what must be researched first, by node name: "Name" in the same tree, "Tree name:Name" in another,
 # and "A|B" for either. A node that needs nothing starts its tree; a tree shows in the MAM once one of its starting
 # items is brought to it (or once anything in it is researched). A cost may name a tag ("#siftec:mycelia").
-# Tokens: object:<thing> (the Object Scanner finds it), scanner:<node>, zipline (ride Power Lines with a Wrench),
+# Tokens: object:<thing> (the Object Scanner finds it: mercer_sphere, somersloop, mobs, and the wild food sweet_berries,
+# apples and glow_berries), scanner:<node>, zipline (ride Power Lines with a Wrench),
 # depot:stacks:<n> and depot:upload:<items a minute> (the Dimensional Depot's cloud), depot:manual (upload from the
 # inventory), food:<what> (the Nutrients branches). The vanilla items' recipes are in recipes.py (VANILLA_RECIPES).
 M = "minecraft:"
@@ -481,9 +483,9 @@ MAM = [
          ["Wingsuit Research", "Alien Megafauna:Copper Backtank"], ["siftec:elytra_backpack"], []),
     ]),
     ("nutrients", "Nutrients", M + "sweet_berries", [
-        ("Sweet Berry Research", "2 minecraft:sweet_berries", "Opens the Nutrients tree", [], [], []),
-        ("Apple Research", "5 minecraft:apple", "Opens the Nutrients tree", [], [], []),
-        ("Glow Berry Research", "1 minecraft:glow_berries", "Opens the Nutrients tree", [], [], []),
+        ("Sweet Berry Research", "2 minecraft:sweet_berries", "Sweet berry bushes on the Object Scanner", [], [], ["object:sweet_berries"]),
+        ("Apple Research", "5 minecraft:apple", "Apple trees on the Object Scanner", [], [], ["object:apples"]),
+        ("Glow Berry Research", "1 minecraft:glow_berries", "Glow berries on the Object Scanner", [], [], ["object:glow_berries"]),
         ("Bulk Fermentation", "25 Modular Frame, 50 Steel Pipe, 500 Wire", "Bulk Fermenter; vinegar, bottled at the Spout",
          ["Sweet Berry Research|Apple Research|Glow Berry Research"],
          ["createdieselgenerators:bulk_fermenter", "siftec:vinegar_bucket", "siftec:vinegar_bottle"], ["food:vinegar"]),
@@ -510,7 +512,7 @@ MAM = [
         ("Display Systems", "10 Crystal Oscillator, 100 Modular Frame", "Display Link, Display Board and Nixie Tube; the Explorer",
          ["Crystal Oscillator"], [C + "display_link", C + "display_board", C + "nixie_tube"], []),
         ("Radar Technology", "50 Crystal Oscillator, 50 Heavy Modular Frame, 50 Computer", "Radar Tower (reveals Xaero's map and crash sites)",
-         ["Crystal Oscillator"], ["siftec:radar_tower"], []),
+         ["Crystal Oscillator"], [], []),
         ("Tidal Research", "4 minecraft:nautilus_shell, 32 minecraft:prismarine_shard, 20 Quartz Crystal",
          "Trident (Manufacturer: 10 Steel Pipe, 5 Crystal Oscillator, 50 Quickwire, 16 prismarine shard)", ["Crystal Oscillator"], [], []),
         ("Heart of the Sea", "8 minecraft:nautilus_shell, 32 minecraft:prismarine_crystals, 20 Crystal Oscillator",
@@ -693,9 +695,9 @@ for _key, _name, _building, _alt, _secs, _ins, _outs, _unlock in sat_recipes():
             _r["also"] = (n, a)
     PROCESSORS["converter" if _building == "Converter" else "particle_accelerator"][1].append(_r)
 
-# AWESOME Sink: points for one of each item, Satisfactory's own value for every Satisfactory part (where a part is the
-# same item as a vanilla one, Satisfactory's value wins). Anything not listed is worth 1. A spare Hard Drive is 1,000
-# (a SIFTEC rule: Satisfactory takes none).
+# AWESOME Sink (AWESOME Sink and Shop tab): points for one of each item. Every Satisfactory part has Satisfactory's own
+# value (where a part is the same item as a vanilla one, Satisfactory's value wins). A spare Hard Drive is 1,000 (a
+# SIFTEC rule: Satisfactory takes none).
 SINK_POINTS = {}
 for _sat, _info in sorted(SF.ITEMS.items()):
     _pack = sat_item(_sat, True)
@@ -703,6 +705,78 @@ for _sat, _info in sorted(SF.ITEMS.items()):
         SINK_POINTS.setdefault(_pack[1], _info["sink"])
 SINK_POINTS["Hard Drive"] = 1000
 SINK_POINTS["siftec:object_scanner"] = SINK_POINTS.pop("Object Scanner")
+SINK_POINTS["siftec:xeno_zapper"] = SINK_POINTS.pop("Xeno-Zapper")
+
+# Vanilla and modded items: the tab's SIFTEC choices, kept at or below similar Satisfactory parts so a factory always
+# beats farming for points. An id here never beats a Satisfactory value above; tags ("#...") are tried after ids.
+# Anything in neither goes by its Minecraft rarity (SINK_RARITY), and tools, armour and weapons not listed are the sum
+# of what they are made of; every one gets 25 more for each enchantment level on it (the Sink reads that).
+M_ = "minecraft:"
+SINK_VANILLA = {}
+for _ids, _p in (
+        # junk and basic blocks
+        ("dirt coarse_dirt rooted_dirt cobblestone cobbled_deepslate gravel sand red_sand netherrack stone granite diorite andesite deepslate "
+         "tuff calcite glass soul_sand soul_soil blackstone basalt end_stone clay mud", 1),
+        # logs and wood
+        ("stick", 1),
+        # plants and crops; pumpkins and melons
+        ("wheat carrot potato beetroot sugar_cane cactus kelp bamboo sweet_berries glow_berries apple wheat_seeds beetroot_seeds "
+         "pumpkin_seeds melon_seeds melon_slice brown_mushroom red_mushroom", 2),
+        ("pumpkin melon carved_pumpkin", 4),
+        # cooked food
+        ("bread cooked_beef cooked_porkchop cooked_chicken cooked_mutton cooked_rabbit cooked_cod cooked_salmon baked_potato", 6),
+        ("golden_carrot", 60),
+        # mob drops
+        ("rotten_flesh feather", 2), ("bone string spider_eye", 3), ("gunpowder leather", 4),
+        ("slime_ball", 10), ("phantom_membrane", 25), ("ender_pearl blaze_rod", 30), ("ghast_tear", 60), ("shulker_shell", 250),
+        # ores, ingots and gems
+        ("raw_iron raw_copper", 1), ("coal redstone", 3), ("lapis_lazuli quartz", 4), ("raw_gold", 8),
+        ("iron_ingot", 2), ("copper_ingot", 6), ("amethyst_shard", 8), ("gold_ingot", 20), ("emerald", 60),
+        ("diamond", 200), ("ancient_debris", 400), ("netherite_scrap", 500), ("netherite_ingot", 2500),
+        # rare loot and boss items
+        ("totem_of_undying", 1000), ("heart_of_the_sea", 1500), ("trident", 2000), ("enchanted_golden_apple", 2500), ("elytra", 5000),
+        ("dragon_head", 5000), ("nether_star", 10000), ("dragon_egg", 25000)):
+    for _id in _ids.split():
+        SINK_VANILLA[M_ + _id] = _p
+# storage blocks are 9 of what they hold
+for _block, _of in (("iron_block", "iron_ingot"), ("gold_block", "gold_ingot"), ("copper_block", "copper_ingot"), ("emerald_block", "emerald"),
+                    ("diamond_block", "diamond"), ("netherite_block", "netherite_ingot"), ("coal_block", "coal"), ("redstone_block", "redstone"),
+                    ("lapis_block", "lapis_lazuli"), ("raw_iron_block", "raw_iron"), ("raw_copper_block", "raw_copper"), ("raw_gold_block", "raw_gold")):
+    SINK_VANILLA[M_ + _block] = 9 * SINK_VANILLA[M_ + _of]
+SINK_VANILLA[M_ + "amethyst_block"] = 4 * SINK_VANILLA[M_ + "amethyst_shard"]
+# music discs, and Create's own parts
+for _disc in "13 cat blocks chirp far mall mellohi stal strad ward 11 wait otherside 5 pigstep relic creator creator_music_box precipice tears lava_chicken".split():
+    SINK_VANILLA[f"{M_}music_disc_{_disc}"] = 500
+SINK_VANILLA.update({C + "andesite_alloy": 4, C + "brass_ingot": 20, C + "precision_mechanism": 150})
+# tags, tried after the ids
+SINK_TAGS = {"#minecraft:logs": 3, "#minecraft:planks": 1, "#minecraft:saplings": 2, "#minecraft:flowers": 2, "#minecraft:leaves": 1,
+             "#minecraft:decorated_pot_sherds": 100, "#minecraft:trim_templates": 300, "#c:crops": 2, "#c:foods/cooked_meat": 6,
+             "#farmersdelight:meals": 25}
+# vanilla tools, armour and weapons: the sum of what they are made of (sticks 1 each)
+_MATERIALS = {"wooden": ("#minecraft:planks", 1), "stone": ("cobblestone", 1), "copper": ("copper_ingot", 6), "iron": ("iron_ingot", 2),
+              "golden": ("gold_ingot", 20), "diamond": ("diamond", 200)}
+_TOOLS = {"sword": (2, 1), "pickaxe": (3, 2), "axe": (3, 2), "shovel": (1, 2), "hoe": (2, 2)}
+_ARMOUR = {"helmet": 5, "chestplate": 8, "leggings": 7, "boots": 4}
+for _mat, (_part, _each) in _MATERIALS.items():
+    for _tool, (_n, _sticks) in _TOOLS.items():
+        SINK_VANILLA[f"{M_}{_mat}_{_tool}"] = _n * _each + _sticks
+    if _mat in ("copper", "iron", "diamond"):
+        for _piece, _n in _ARMOUR.items():
+            SINK_VANILLA[f"{M_}{_mat}_{_piece}"] = _n * _each
+for _piece, _n in _ARMOUR.items():
+    SINK_VANILLA[f"{M_}golden_{_piece}"] = _n * 20
+    SINK_VANILLA[f"{M_}leather_{_piece}"] = _n * 4
+    SINK_VANILLA[f"{M_}netherite_{_piece}"] = SINK_VANILLA[f"{M_}diamond_{_piece}"] + 2500
+for _tool in _TOOLS:
+    SINK_VANILLA[f"{M_}netherite_{_tool}"] = SINK_VANILLA[f"{M_}diamond_{_tool}"] + 2500
+SINK_VANILLA.update({M_ + "bow": 12, M_ + "crossbow": 3 * 1 + 2 * 3 + 2 + 3, M_ + "shield": 6 + 2, M_ + "fishing_rod": 3 + 6, M_ + "mace": 5000})
+SINK_RARITY = {"common": 2, "uncommon": 50, "rare": 500, "epic": 2500}
+SINK_ENCHANT = 25
+# what the Sink will not take: the radioactive and toxic waste has to be dealt with properly (as Satisfactory's Sink
+# refuses nuclear waste), and coupons are what it pays in
+SINK_REFUSED = ["siftec:toxic_residue", "siftec:uranium_waste", "siftec:plutonium_waste", "siftec:ficsit_coupon"]
+# FICSIT Coupons: Satisfactory 1.0's curve, unchanged (the Sink screen prints them; checked by the selftest)
+COUPON_FIRST, COUPON_FIRST_COST, COUPON_LAST, COUPON_CAP = 3, 500, 3000, 249501250
 
 
 # Build costs at Satisfactory 1.0's amounts, in the pack's names (Concrete is any stone). BUILD_COSTS is every
@@ -725,14 +799,120 @@ def sat_cost(cost):
 BUILD_COSTS = {name: sat_cost(cost) for name, cost in SF.BUILDINGS.items()}
 EQUIPMENT_COSTS = {name: sat_cost(cost) for name, cost in SF.EQUIPMENT.items() if sat_cost(cost)}
 
-# AWESOME Shop: (item id, how many, price in points)
-SHOP = [
-    (C + "potato_cannon", 1, 3000), (C + "extendo_grip", 1, 3000), (C + "wand_of_symmetry", 1, 5000), (C + "linked_controller", 1, 3000),
-    (C + "cuckoo_clock", 1, 500), (C + "steam_whistle", 1, 500), (C + "peculiar_bell", 1, 1000), (C + "clipboard", 1, 200), (C + "placard", 4, 200),
-    (C + "turntable", 1, 500), (C + "crafting_blueprint", 1, 500), (C + "copper_valve_handle", 4, 200), (C + "andesite_table_cloth", 4, 200),
-    ("minecraft:white_dye", 16, 100), ("minecraft:red_dye", 16, 100), ("minecraft:blue_dye", 16, 100), ("minecraft:yellow_dye", 16, 100),
-    ("minecraft:green_dye", 16, 100), ("minecraft:black_dye", 16, 100), ("minecraft:orange_dye", 16, 100), ("minecraft:light_blue_dye", 16, 100),
+# AWESOME Shop (AWESOME Sink and Shop tab): cosmetics only, bought with FICSIT Coupons, unlocked per company. Each entry:
+# (id, name, category, coupons, what it gives). What it gives:
+#   customizer       the Customizer (free once the Shop is built; any member takes one from the Shop)
+#   swatch           one more colour swatch slot for the Customizer (repeatable, up to SWATCH_MAX)
+#   finish:<id>      a paint finish for the Customizer (FINISHES)
+#   skin:<id>        a casing skin for Build Gun buildings (SKINS), or a Storage Container skin (STORAGE_SKINS)
+#   decor:<id>       a decoration (DECOR): once bought, members take them from the Shop for their part cost
+#   cup:<id>         a player cosmetic held in the hand (CUPS), taken the same way
+# The tab's other entries (signs and billboards, foundation, floor, wall and roof materials, holiday sets, helmet skins
+# and suit trims, emote packs, the company banner designer, the Golden Cart Assembler skin and the Boom Box) need the
+# systems they decorate first: foundations, signs, emotes, banners and vehicles are not in the pack yet.
+SWATCH_MAX = 18
+# finish id -> (name, the block the primary-colour panels become; "{colour}" is the swatch's primary colour)
+FINISHES = {"painted": ("Painted", "minecraft:{colour}_concrete"), "unpainted": ("Unpainted", "create:industrial_iron_block"),
+            "copper": ("Copper", "minecraft:waxed_copper_block"), "chrome": ("Chrome", "minecraft:iron_block"),
+            "carbon_steel": ("Carbon Steel", "minecraft:netherite_block"), "caterium": ("Caterium", "create:brass_block")}
+# casing skin id -> (name, the block a building's light grey panels become)
+SKINS = {"andesite": ("Andesite Casing", "create:andesite_casing"), "brass": ("Brass Casing", "create:brass_casing"),
+         "copper": ("Copper Casing", "create:copper_casing"), "steel": ("Steel Casing", "siftec:steel_casing")}
+STORAGE_SKINS = {"oak": ("Oak Crate", "minecraft:oak_planks"), "spruce": ("Spruce Crate", "minecraft:spruce_planks"),
+                 "brick": ("Brick Store", "minecraft:bricks"), "barrel": ("Barrel Store", "minecraft:barrel")}
+DYES = "white orange magenta light_blue yellow lime pink gray light_gray cyan purple blue brown green red black".split()
+
+# Decorations (blocks): (id, name, category, light, texture, [elements as (from, to) or (from, to, rotation)], part cost).
+# Statues stand on a small plinth; the creature statues are Minecraft mobs in metal or stone.
+_P = ([3, 0, 3], [13, 2, 13])   # a plinth
+STONE_T, IRON_T, GOLD_T, COPPER_T = "minecraft:block/smooth_stone", "minecraft:block/iron_block", "minecraft:block/gold_block", "minecraft:block/copper_block"
+DECOR = [
+    ("checkmark_statue", "SIFTEC Checkmark Statue", "statues", 0, "minecraft:block/orange_concrete",
+     [_P, ([4, 2, 7], [7, 10, 9], ("z", 45, [5.5, 2, 8])), ([7, 2, 7], [10, 16, 9], ("z", -22.5, [8.5, 2, 8]))], "10 Iron Sheet, 5 Iron Rod"),
+    ("adequate_award", "Adequate Pioneering Award", "statues", 0, COPPER_T,
+     [_P, ([7, 2, 7], [9, 7, 9]), ([5, 7, 5], [11, 12, 11]), ([4, 11, 4], [12, 13, 12])], "20 Copper Sheet"),
+    ("pretty_good_award", "Pretty Good Pioneering Award", "statues", 0, IRON_T,
+     [_P, ([7, 2, 7], [9, 7, 9]), ([5, 7, 5], [11, 12, 11]), ([4, 11, 4], [12, 13, 12])], "20 Iron Sheet"),
+    ("satisfactory_award", "Satisfactory Pioneering Award", "statues", 0, GOLD_T,
+     [_P, ([7, 2, 7], [9, 7, 9]), ([5, 7, 5], [11, 12, 11]), ([4, 11, 4], [12, 13, 12])], "10 minecraft:gold_ingot"),
+    ("silver_hog_statue", "Silver Hog Statue", "statues", 0, IRON_T,
+     [_P, ([4, 5, 3], [12, 11, 12]), ([5, 6, 12], [11, 12, 16]), ([6.5, 7, 15.5], [9.5, 9, 16]),
+      ([4.5, 2, 3.5], [6.5, 5, 5.5]), ([9.5, 2, 3.5], [11.5, 5, 5.5]), ([4.5, 2, 9.5], [6.5, 5, 11.5]), ([9.5, 2, 9.5], [11.5, 5, 11.5])],
+     "20 Iron Sheet, 10 Iron Rod"),
+    ("lizard_doggo_statue", "Lizard Doggo Statue", "statues", 0, "minecraft:block/pink_terracotta",
+     [_P, ([5, 4, 2], [11, 8, 11]), ([5, 5, 11], [11, 10, 15]), ([4, 9, 12], [5, 12, 13]), ([11, 9, 12], [12, 12, 13]),
+      ([7, 5, 0], [9, 7, 2]), ([5, 2, 3], [7, 4, 5]), ([9, 2, 3], [11, 4, 5]), ([5, 2, 8], [7, 4, 10]), ([9, 2, 8], [11, 4, 10])],
+     "20 Iron Sheet, 5 Rotor"),
+    ("confusing_creature_statue", "Confusing Creature Statue", "statues", 0, "minecraft:block/purpur_block",
+     [_P, ([5, 2, 5], [11, 8, 11], ("y", 45, [8, 5, 8])), ([6, 8, 6], [10, 13, 10]), ([4, 12, 7], [12, 14, 9], ("x", 22.5, [8, 13, 8])),
+      ([7, 13, 4], [9, 16, 12], ("z", -22.5, [8, 14, 8]))], "10 Reinforced Iron Plate"),
+    ("golden_nut_statue", "Golden Nut Statue", "statues", 6, GOLD_T,
+     [_P, ([5, 2, 5], [11, 12, 11]), ([4, 4, 6], [12, 10, 10]), ([6, 4, 4], [10, 10, 12]), ([7, 12, 7], [9, 14, 9])], "4 minecraft:gold_block"),
+    ("creeper_statue", "Creeper Statue", "mob statues", 0, STONE_T,
+     [_P, ([4, 9, 4], [12, 16, 12]), ([5, 4, 6], [11, 10, 10]), ([4, 2, 3], [7, 4, 6]), ([9, 2, 3], [12, 4, 6]),
+      ([4, 2, 10], [7, 4, 13]), ([9, 2, 10], [12, 4, 13])], "16 Stone"),
+    ("zombie_statue", "Zombie Statue", "mob statues", 0, STONE_T,
+     [_P, ([5, 12, 5], [11, 16, 11]), ([5, 7, 6], [11, 12, 10]), ([3, 10, 6], [5, 12, 13]), ([11, 10, 6], [13, 12, 13]),
+      ([5, 2, 6], [8, 7, 10]), ([8, 2, 6], [11, 7, 10])], "16 Stone"),
+    ("skeleton_statue", "Skeleton Statue", "mob statues", 0, "minecraft:block/bone_block_side",
+     [_P, ([5, 12, 5], [11, 16, 11]), ([6, 7, 7], [10, 12, 9]), ([4, 7, 7], [5, 12, 9]), ([11, 7, 7], [12, 12, 9]),
+      ([6, 2, 7], [7, 7, 9]), ([9, 2, 7], [10, 7, 9])], "16 minecraft:bone"),
+    ("cow_statue", "Cow Statue", "mob statues", 0, STONE_T,
+     [_P, ([4, 6, 2], [12, 12, 13]), ([5, 8, 13], [11, 14, 16]), ([4, 13, 14], [5, 15, 15]), ([11, 13, 14], [12, 15, 15]),
+      ([4.5, 2, 2.5], [6.5, 6, 4.5]), ([9.5, 2, 2.5], [11.5, 6, 4.5]), ([4.5, 2, 10.5], [6.5, 6, 12.5]), ([9.5, 2, 10.5], [11.5, 6, 12.5])],
+     "16 Stone"),
+    # decorative lights and the control panel
+    ("ceiling_light", "Ceiling Light", "lighting", 15, "minecraft:block/sea_lantern", [([3, 14, 3], [13, 16, 13])], "2 Iron Sheet, 5 Wire"),
+    ("flood_light", "Flood Light", "lighting", 15, "minecraft:block/redstone_lamp_on",
+     [([5, 0, 5], [11, 2, 11]), ([7, 2, 7], [9, 8, 9]), ([4, 8, 5], [12, 14, 11], ("x", -22.5, [8, 11, 8]))], "4 Iron Sheet, 10 Wire"),
+    ("street_light", "Street Light", "lighting", 15, "minecraft:block/iron_block",
+     [([6, 0, 6], [10, 1, 10]), ([7, 1, 7], [9, 14, 9]), ([5, 14, 5], [11, 16, 11])], "4 Iron Rod, 10 Wire"),
+    ("control_panel", "Control Panel", "lighting", 4, "create:block/brass_casing",
+     [([1, 0, 4], [15, 8, 12]), ([1, 8, 6], [15, 12, 12], ("x", 22.5, [8, 8, 8]))], "2 Reinforced Iron Plate, 5 Cable"),
+    # plants and office furniture
+    ("office_desk", "Office Desk", "furniture", 0, "minecraft:block/stripped_spruce_log",
+     [([0, 12, 2], [16, 14, 14]), ([1, 0, 3], [3, 12, 5]), ([13, 0, 3], [15, 12, 5]), ([1, 0, 11], [3, 12, 13]), ([13, 0, 11], [15, 12, 13])],
+     "6 #minecraft:planks"),
+    ("office_chair", "Office Chair", "furniture", 0, "minecraft:block/black_wool",
+     [([7, 0, 7], [9, 7, 9]), ([4, 7, 4], [12, 9, 12]), ([4, 9, 11], [12, 18, 13])], "4 minecraft:black_wool, 2 Iron Rod"),
+    ("filing_cabinet", "Filing Cabinet", "furniture", 0, IRON_T, [([3, 0, 3], [13, 16, 13])], "4 Iron Sheet"),
+    ("office_plant", "Office Plant", "furniture", 0, "minecraft:block/terracotta",
+     [([5, 0, 5], [11, 6, 11]), ([3, 6, 3], [13, 14, 13])], "1 #minecraft:saplings, 1 minecraft:flower_pot"),
 ]
+# the leaves of the Office Plant are drawn green, not in the pot's colour
+DECOR_TEXTURES = {"office_plant": {"top": "minecraft:block/azalea_leaves"}}
+# player cosmetics held in the hand: (id, name, part cost, what has to be done first ("" for nothing))
+CUPS = [("coffee_cup", "FICSIT Coffee Cup", "2 Iron Sheet", ""),
+        ("employee_of_the_planet_cup", "Employee of the Planet Cup", "4 minecraft:gold_ingot", "phase_5")]
+
+SHOP = [("customizer", "Customizer", "Customizer", 0, "customizer"),
+        ("swatch", "Colour swatch slot", "Swatches", 2, "swatch"),
+        ("finish_unpainted", "Unpainted finish", "Paint finishes", 3, "finish:unpainted"),
+        ("finish_copper", "Copper finish", "Paint finishes", 5, "finish:copper"),
+        ("finish_chrome", "Chrome finish", "Paint finishes", 5, "finish:chrome"),
+        ("finish_carbon_steel", "Carbon Steel finish", "Paint finishes", 8, "finish:carbon_steel"),
+        ("finish_caterium", "Caterium finish", "Paint finishes", 10, "finish:caterium")] \
+    + [(f"skin_{k}", f"{n} skin", "Building skins", 4, f"skin:{k}") for k, (n, _) in SKINS.items()] \
+    + [(f"storage_skin_{k}", f"{n} skin", "Storage skins", 1, f"skin:{k}") for k, (n, _) in STORAGE_SKINS.items()] \
+    + [("decor_checkmark_statue", "SIFTEC Checkmark Statue", "Statues", 8, "decor:checkmark_statue"),
+       ("decor_adequate_award", "Adequate Pioneering Award", "Statues", 25, "decor:adequate_award"),
+       ("decor_pretty_good_award", "Pretty Good Pioneering Award", "Statues", 50, "decor:pretty_good_award"),
+       ("decor_satisfactory_award", "Satisfactory Pioneering Award", "Statues", 150, "decor:satisfactory_award"),
+       ("decor_silver_hog_statue", "Silver Hog Statue", "Statues", 50, "decor:silver_hog_statue"),
+       ("decor_lizard_doggo_statue", "Lizard Doggo Statue", "Statues", 100, "decor:lizard_doggo_statue"),
+       ("decor_confusing_creature_statue", "Confusing Creature Statue", "Statues", 200, "decor:confusing_creature_statue"),
+       ("decor_golden_nut_statue", "Golden Nut Statue", "Statues", 1000, "decor:golden_nut_statue")] \
+    + [(f"decor_{d[0]}", d[1], "Mob statues", 15, f"decor:{d[0]}") for d in DECOR if d[2] == "mob statues"] \
+    + [("decor_ceiling_light", "Ceiling Light", "Lighting", 1, "decor:ceiling_light"),
+       ("decor_flood_light", "Flood Light", "Lighting", 3, "decor:flood_light"),
+       ("decor_street_light", "Street Light", "Lighting", 3, "decor:street_light"),
+       ("decor_control_panel", "Control Panel", "Lighting", 5, "decor:control_panel"),
+       ("decor_office_desk", "Office Desk", "Furniture", 4, "decor:office_desk"),
+       ("decor_office_chair", "Office Chair", "Furniture", 3, "decor:office_chair"),
+       ("decor_filing_cabinet", "Filing Cabinet", "Furniture", 3, "decor:filing_cabinet"),
+       ("decor_office_plant", "Office Plant", "Furniture", 3, "decor:office_plant"),
+       ("cup_coffee_cup", "FICSIT Coffee Cup", "Player cosmetics", 1, "cup:coffee_cup"),
+       ("cup_employee_of_the_planet_cup", "Employee of the Planet Cup", "Player cosmetics", 1, "cup:employee_of_the_planet_cup")]
 
 # Furnace burn times, in ticks (coal is 1600), after Satisfactory's energy values. A Blaze Burner burns anything a
 # furnace burns, so these heat boilers too.
@@ -741,7 +921,7 @@ FUELS = {"biomass": 960, "solid_biofuel": 2400, "compacted_coal": 3360, "petrole
 # ---------------------------------------------------------------------------------------------------
 # Everything else the other mods add. Locked by default: an item from Create, Diesel Generators, Gunsmithing or
 # Create: New Age is unlocked by a milestone above, by one here (MORE_LOCKS), left free on purpose
-# (FREE), switched off (DISABLED) or sold in the AWESOME Shop (SHOP, whose crafting recipes are removed).
+# (FREE) or switched off (DISABLED).
 # gen_assets.py stops with a list if any item is in none of these.
 COLOURS = "white orange magenta light_blue yellow lime pink gray light_gray cyan purple blue brown green red black".split()
 WOODS = "oak spruce birch jungle acacia dark_oak mangrove cherry bamboo crimson warped".split()
@@ -778,8 +958,12 @@ MORE_LOCKS = {
                       DG + "andesite_girder", DG + "chip_wood_block", DG + "chip_wood_slab", DG + "chip_wood_stairs", DG + "chip_wood_beam"]
                      + [f"{C}{w}_window{p}" for w in WOODS for p in ("", "_pane")] + [f"{C}{c}_seat" for c in COLOURS]
                      + _roofs() + [i for s in STONES for i in _palette(s)],
-    # with the AWESOME Shop: the dyed and haunted versions of what it sells, and the rest of the design's Shop list
-    "resource_sink_bonus_program": [C + "desk_bell", C + "haunted_bell", C + "mysterious_cuckoo_clock", C + "metal_bracket", C + "wooden_bracket",
+    # Create's gadgets and trinkets the AWESOME Shop used to sell for points: the Shop now sells cosmetics only, so they
+    # are made by Create's own recipes again, from the milestone that brings the Sink and Shop
+    "resource_sink_bonus_program": [C + "potato_cannon", C + "extendo_grip", C + "wand_of_symmetry", C + "linked_controller", C + "cuckoo_clock",
+                                    C + "steam_whistle", C + "peculiar_bell", C + "clipboard", C + "placard", C + "turntable", C + "crafting_blueprint",
+                                    C + "copper_valve_handle", C + "andesite_table_cloth",
+                                    C + "desk_bell", C + "haunted_bell", C + "mysterious_cuckoo_clock", C + "metal_bracket", C + "wooden_bracket",
                                     C + "copper_table_cloth"] + [f"{C}{c}_table_cloth" for c in COLOURS] + [f"{C}{c}_valve_handle" for c in COLOURS],
     "basic_steel_production": [G + "steel_nugget", G + "steel_block", G + "steel_sheet", G + "nail_steel"],
     # melee weapons go with the Xeno-Basher
@@ -948,6 +1132,14 @@ BUILDINGS = [
     ("particle_accelerator", "Particle Accelerator", "production", BUILD_COSTS["Particle Accelerator"], "particle_enrichment", False,
      {"logic": "processor", "su": round(500 * MW)}),
     ("converter", "Converter", "production", BUILD_COSTS["Converter"], "matter_conversion", False, {"logic": "processor", "su": round(250 * MW)}),
+    # work package 10 (Exploration and Equipment, AWESOME Sink and Shop): the Equipment Workshop (builds equipment by hand
+    # from the parts carried), the AWESOME Sink (destroys what its input port takes, for points; 30 MW as in 1.0), the
+    # AWESOME Shop (prints nothing itself: coupons buy cosmetics) and the Radar Tower (30 MW: reveals crash sites to the
+    # company on Xaero's map). Using any of them opens its window.
+    ("equipment_workshop", "Equipment Workshop", "special", BUILD_COSTS["Equipment Workshop"], "hub_upgrade_1", False, {"logic": "workshop"}),
+    ("awesome_sink", "AWESOME Sink", "special", BUILD_COSTS["AWESOME Sink"], "resource_sink_bonus_program", False, {"logic": "sink", "su": round(30 * MW)}),
+    ("awesome_shop", "AWESOME Shop", "special", BUILD_COSTS["AWESOME Shop"], "resource_sink_bonus_program", False, {"logic": "shop"}),
+    ("radar_tower", "Radar Tower", "special", BUILD_COSTS["Radar Tower"], mam("Quartz", "Radar Technology"), False, {"logic": "radar", "su": round(30 * MW)}),
 ]
 # The buildings whose Basin is a Brass Basin (four stacks of each item), for the recipe checkers
 BRASS_BASIN_BUILDINGS = ("manufacturer", "blender")
@@ -1020,7 +1212,7 @@ def _add_lock(uid, iid):
 # item id -> its 1.0 name. Each gets a Core and an Incomplete item, locked with the equipment.
 EQUIPMENT_BY_MACHINE = {"siftec:object_scanner": "Object Scanner", "siftec:jetpack": "Jetpack", "siftec:parachute": "Parachute",
                         "siftec:gas_mask": "Gas Mask", "siftec:hazmat_suit": "Hazmat Suit", "siftec:hover_pack": "Hoverpack",
-                        "siftec:blade_runners": "Blade Runners"}
+                        "siftec:blade_runners": "Blade Runners", "siftec:xeno_zapper": "Xeno-Zapper"}
 EQUIPMENT_CORES, EQUIPMENT_LOCKS = {}, {}
 _unlocks_of = {i: m[1] for m in MILESTONES for i in m[6]}
 _unlocks_of.update({i: mam_id(t[0], n[0]) for t in MAM for n in t[3] for i in n[4]})

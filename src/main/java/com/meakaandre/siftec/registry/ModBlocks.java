@@ -8,9 +8,7 @@ import com.meakaandre.siftec.collect.CollectibleBlock;
 import com.meakaandre.siftec.depot.DepotBlock;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.machine.ProcessorBlock;
-import com.meakaandre.siftec.sink.SinkBlock;
 import com.meakaandre.siftec.mam.MamBlock;
-import com.meakaandre.siftec.workshop.WorkshopBlock;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.NodeType;
@@ -153,12 +151,10 @@ public class ModBlocks {
     public static final Supplier<com.meakaandre.siftec.building.TurbineBlock> TURBINE = hidden("turbine",
         com.meakaandre.siftec.building.TurbineBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0).noOcclusion());
 
-    public static final Supplier<WorkshopBlock> EQUIPMENT_WORKSHOP = block("equipment_workshop", WorkshopBlock::new, ModBlocks::machine);
 
     public static final Supplier<DepotBlock> DIMENSIONAL_DEPOT = block("dimensional_depot", DepotBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.governor.GovernorBlock> SPEED_GOVERNOR = block("speed_governor", com.meakaandre.siftec.governor.GovernorBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.equip.LandingPadBlock> LANDING_PAD = block("landing_pad", com.meakaandre.siftec.equip.LandingPadBlock::new, ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.equip.RadarBlock> RADAR_TOWER = block("radar_tower", com.meakaandre.siftec.equip.RadarBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.drone.DronePortBlock> DRONE_PORT = block("drone_port", com.meakaandre.siftec.drone.DronePortBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> MAIN_PORTAL = block("main_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(true, properties), ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> SATELLITE_PORTAL = block("satellite_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(false, properties), ModBlocks::machine);
@@ -168,16 +164,15 @@ public class ModBlocks {
 
     public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);
 
-    /** Slugs and artefacts: small, glowing, and impossible to break. */
+    /** Mercer Spheres, Somersloops and crash site pods: glowing a little, and impossible to break. */
     public static final Map<Collectible, Supplier<CollectibleBlock>> COLLECTIBLES = new EnumMap<>(Collectible.class);
 
     static {
         for (Collectible type : Collectible.values()) {
             Identifier id = Siftec.id(type.id() + "_block");
             ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, id);
-            BlockBehaviour.Properties properties = node().noOcclusion().lightLevel(state -> type.light).sound(SoundType.SLIME_BLOCK).setId(key);
-            // the slugs glow: drawn at full brightness however dark it is round them
-            if (type.slug()) properties = properties.emissiveRendering(state -> true);
+            BlockBehaviour.Properties properties = node().noOcclusion().lightLevel(state -> type.light)
+                .sound(type == Collectible.CRASH_SITE ? SoundType.METAL : SoundType.AMETHYST).setId(key);
             CollectibleBlock block = Registry.register(BuiltInRegistries.BLOCK, key, new CollectibleBlock(type, properties));
             COLLECTIBLES.put(type, () -> block);
         }
@@ -189,9 +184,24 @@ public class ModBlocks {
 
     public static final Supplier<ProcessorBlock> CONVERTER = block("converter", properties -> new ProcessorBlock("converter", properties), ModBlocks::machine);
     public static final Supplier<ProcessorBlock> PARTICLE_ACCELERATOR = block("particle_accelerator", properties -> new ProcessorBlock("particle_accelerator", properties), ModBlocks::machine);
-    public static final Supplier<SinkBlock> AWESOME_SINK = block("awesome_sink", properties -> new SinkBlock(false, properties), ModBlocks::machine);
-    public static final Supplier<SinkBlock> AWESOME_SHOP = block("awesome_shop", properties -> new SinkBlock(true, properties), ModBlocks::machine);
     public static final Supplier<ClaimMarkerBlock> CLAIM_MARKER = block("claim_marker", ClaimMarkerBlock::new, ModBlocks::machine);
+
+    /** The AWESOME Shop's decorations (sink/DecorBlock.java), by id, from siftec_content.json (tools/content.py, DECOR). */
+    public static final Map<String, Block> DECOR = new java.util.LinkedHashMap<>();
+
+    static {
+        for (com.google.gson.JsonElement e : com.meakaandre.siftec.hub.Milestones.raw().getAsJsonArray("decor")) {
+            com.google.gson.JsonObject o = e.getAsJsonObject();
+            String id = o.get("id").getAsString();
+            int light = o.get("light").getAsInt();
+            com.google.gson.JsonArray b = o.getAsJsonArray("shape");
+            net.minecraft.world.phys.shapes.VoxelShape shape = Block.box(b.get(0).getAsDouble(), b.get(1).getAsDouble(), b.get(2).getAsDouble(),
+                b.get(3).getAsDouble(), b.get(4).getAsDouble(), b.get(5).getAsDouble());
+            Supplier<com.meakaandre.siftec.sink.DecorBlock> block = block(id, properties -> new com.meakaandre.siftec.sink.DecorBlock(shape, properties),
+                () -> BlockBehaviour.Properties.of().strength(1.5F, 6.0F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> light));
+            DECOR.put(id, block.get());
+        }
+    }
 
     private static <T extends Block> Supplier<T> hidden(
         String name, Function<BlockBehaviour.Properties, T> factory, Supplier<BlockBehaviour.Properties> properties

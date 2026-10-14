@@ -266,18 +266,6 @@
       "id": "vinegar_bottle"
     },
     {
-      "id": "blue_power_slug"
-    },
-    {
-      "id": "yellow_power_slug"
-    },
-    {
-      "id": "purple_power_slug"
-    },
-    {
-      "id": "power_shard"
-    },
-    {
       "id": "mercer_sphere"
     },
     {
@@ -611,6 +599,12 @@
       "id": "incomplete_blade_runners"
     },
     {
+      "id": "xeno_zapper_core"
+    },
+    {
+      "id": "incomplete_xeno_zapper"
+    },
+    {
       "id": "totem_of_undying_core"
     },
     {
@@ -659,7 +653,6 @@
       ],
       "seconds": 0,
       "items": [
-        "siftec:equipment_workshop",
         "create:wrench",
         "create:goggles",
         "create:mechanical_drill"
@@ -1268,7 +1261,9 @@
         "siftec:object_scanner_core",
         "siftec:incomplete_object_scanner"
       ],
-      "tokens": []
+      "tokens": [
+        "minimap"
+      ]
     },
     {
       "id": "part_assembly",
@@ -1374,8 +1369,19 @@
       ],
       "seconds": 300,
       "items": [
-        "siftec:awesome_sink",
-        "siftec:awesome_shop",
+        "create:potato_cannon",
+        "create:extendo_grip",
+        "create:wand_of_symmetry",
+        "create:linked_controller",
+        "create:cuckoo_clock",
+        "create:steam_whistle",
+        "create:peculiar_bell",
+        "create:clipboard",
+        "create:placard",
+        "create:turntable",
+        "create:crafting_blueprint",
+        "create:copper_valve_handle",
+        "create:andesite_table_cloth",
         "create:desk_bell",
         "create:haunted_bell",
         "create:mysterious_cuckoo_clock",
@@ -3789,7 +3795,9 @@
       ],
       "seconds": 3,
       "items": [],
-      "tokens": [],
+      "tokens": [
+        "object:sweet_berries"
+      ],
       "needs": []
     },
     {
@@ -3803,7 +3811,9 @@
       ],
       "seconds": 3,
       "items": [],
-      "tokens": [],
+      "tokens": [
+        "object:apples"
+      ],
       "needs": []
     },
     {
@@ -3817,7 +3827,9 @@
       ],
       "seconds": 3,
       "items": [],
-      "tokens": [],
+      "tokens": [
+        "object:glow_berries"
+      ],
       "needs": []
     },
     {
@@ -4141,9 +4153,7 @@
         }
       ],
       "seconds": 3,
-      "items": [
-        "siftec:radar_tower"
-      ],
+      "items": [],
       "tokens": [],
       "needs": [
         "mam_quartz_crystal_oscillator"
@@ -5758,113 +5768,935 @@
     "siftec:versatile_framework": 1176,
     "siftec:wire": 6,
     "siftec:hard_drive": 1000,
-    "siftec:object_scanner": 1400
+    "siftec:object_scanner": 1400,
+    "siftec:xeno_zapper": 1880,
+    "minecraft:dirt": 1,
+    "minecraft:coarse_dirt": 1,
+    "minecraft:rooted_dirt": 1,
+    "minecraft:cobblestone": 1,
+    "minecraft:cobbled_deepslate": 1,
+    "minecraft:gravel": 1,
+    "minecraft:sand": 1,
+    "minecraft:red_sand": 1,
+    "minecraft:netherrack": 1,
+    "minecraft:granite": 1,
+    "minecraft:diorite": 1,
+    "minecraft:andesite": 1,
+    "minecraft:deepslate": 1,
+    "minecraft:tuff": 1,
+    "minecraft:calcite": 1,
+    "minecraft:glass": 1,
+    "minecraft:soul_sand": 1,
+    "minecraft:soul_soil": 1,
+    "minecraft:blackstone": 1,
+    "minecraft:basalt": 1,
+    "minecraft:end_stone": 1,
+    "minecraft:clay": 1,
+    "minecraft:mud": 1,
+    "minecraft:stick": 1,
+    "minecraft:wheat": 2,
+    "minecraft:carrot": 2,
+    "minecraft:potato": 2,
+    "minecraft:beetroot": 2,
+    "minecraft:sugar_cane": 2,
+    "minecraft:cactus": 2,
+    "minecraft:kelp": 2,
+    "minecraft:bamboo": 2,
+    "minecraft:sweet_berries": 2,
+    "minecraft:glow_berries": 2,
+    "minecraft:apple": 2,
+    "minecraft:wheat_seeds": 2,
+    "minecraft:beetroot_seeds": 2,
+    "minecraft:pumpkin_seeds": 2,
+    "minecraft:melon_seeds": 2,
+    "minecraft:melon_slice": 2,
+    "minecraft:brown_mushroom": 2,
+    "minecraft:red_mushroom": 2,
+    "minecraft:pumpkin": 4,
+    "minecraft:melon": 4,
+    "minecraft:carved_pumpkin": 4,
+    "minecraft:bread": 6,
+    "minecraft:cooked_beef": 6,
+    "minecraft:cooked_porkchop": 6,
+    "minecraft:cooked_chicken": 6,
+    "minecraft:cooked_mutton": 6,
+    "minecraft:cooked_rabbit": 6,
+    "minecraft:cooked_cod": 6,
+    "minecraft:cooked_salmon": 6,
+    "minecraft:baked_potato": 6,
+    "minecraft:golden_carrot": 60,
+    "minecraft:rotten_flesh": 2,
+    "minecraft:feather": 2,
+    "minecraft:bone": 3,
+    "minecraft:string": 3,
+    "minecraft:spider_eye": 3,
+    "minecraft:leather": 4,
+    "minecraft:slime_ball": 10,
+    "minecraft:phantom_membrane": 25,
+    "minecraft:ender_pearl": 30,
+    "minecraft:blaze_rod": 30,
+    "minecraft:ghast_tear": 60,
+    "minecraft:shulker_shell": 250,
+    "minecraft:redstone": 3,
+    "minecraft:lapis_lazuli": 4,
+    "minecraft:raw_gold": 8,
+    "minecraft:amethyst_shard": 8,
+    "minecraft:gold_ingot": 20,
+    "minecraft:emerald": 60,
+    "minecraft:ancient_debris": 400,
+    "minecraft:netherite_scrap": 500,
+    "minecraft:netherite_ingot": 2500,
+    "minecraft:totem_of_undying": 1000,
+    "minecraft:heart_of_the_sea": 1500,
+    "minecraft:trident": 2000,
+    "minecraft:enchanted_golden_apple": 2500,
+    "minecraft:elytra": 5000,
+    "minecraft:dragon_head": 5000,
+    "minecraft:nether_star": 10000,
+    "minecraft:dragon_egg": 25000,
+    "minecraft:iron_block": 18,
+    "minecraft:gold_block": 180,
+    "minecraft:copper_block": 54,
+    "minecraft:emerald_block": 540,
+    "minecraft:diamond_block": 1800,
+    "minecraft:netherite_block": 22500,
+    "minecraft:coal_block": 27,
+    "minecraft:redstone_block": 27,
+    "minecraft:lapis_block": 36,
+    "minecraft:raw_iron_block": 9,
+    "minecraft:raw_copper_block": 9,
+    "minecraft:raw_gold_block": 72,
+    "minecraft:amethyst_block": 32,
+    "minecraft:music_disc_13": 500,
+    "minecraft:music_disc_cat": 500,
+    "minecraft:music_disc_blocks": 500,
+    "minecraft:music_disc_chirp": 500,
+    "minecraft:music_disc_far": 500,
+    "minecraft:music_disc_mall": 500,
+    "minecraft:music_disc_mellohi": 500,
+    "minecraft:music_disc_stal": 500,
+    "minecraft:music_disc_strad": 500,
+    "minecraft:music_disc_ward": 500,
+    "minecraft:music_disc_11": 500,
+    "minecraft:music_disc_wait": 500,
+    "minecraft:music_disc_otherside": 500,
+    "minecraft:music_disc_5": 500,
+    "minecraft:music_disc_pigstep": 500,
+    "minecraft:music_disc_relic": 500,
+    "minecraft:music_disc_creator": 500,
+    "minecraft:music_disc_creator_music_box": 500,
+    "minecraft:music_disc_precipice": 500,
+    "minecraft:music_disc_tears": 500,
+    "minecraft:music_disc_lava_chicken": 500,
+    "create:andesite_alloy": 4,
+    "create:precision_mechanism": 150,
+    "minecraft:wooden_sword": 3,
+    "minecraft:wooden_pickaxe": 5,
+    "minecraft:wooden_axe": 5,
+    "minecraft:wooden_shovel": 3,
+    "minecraft:wooden_hoe": 4,
+    "minecraft:stone_sword": 3,
+    "minecraft:stone_pickaxe": 5,
+    "minecraft:stone_axe": 5,
+    "minecraft:stone_shovel": 3,
+    "minecraft:stone_hoe": 4,
+    "minecraft:copper_sword": 13,
+    "minecraft:copper_pickaxe": 20,
+    "minecraft:copper_axe": 20,
+    "minecraft:copper_shovel": 8,
+    "minecraft:copper_hoe": 14,
+    "minecraft:copper_helmet": 30,
+    "minecraft:copper_chestplate": 48,
+    "minecraft:copper_leggings": 42,
+    "minecraft:copper_boots": 24,
+    "minecraft:iron_sword": 5,
+    "minecraft:iron_pickaxe": 8,
+    "minecraft:iron_axe": 8,
+    "minecraft:iron_shovel": 4,
+    "minecraft:iron_hoe": 6,
+    "minecraft:iron_helmet": 10,
+    "minecraft:iron_chestplate": 16,
+    "minecraft:iron_leggings": 14,
+    "minecraft:iron_boots": 8,
+    "minecraft:golden_sword": 41,
+    "minecraft:golden_pickaxe": 62,
+    "minecraft:golden_axe": 62,
+    "minecraft:golden_shovel": 22,
+    "minecraft:golden_hoe": 42,
+    "minecraft:diamond_sword": 401,
+    "minecraft:diamond_pickaxe": 602,
+    "minecraft:diamond_axe": 602,
+    "minecraft:diamond_shovel": 202,
+    "minecraft:diamond_hoe": 402,
+    "minecraft:diamond_helmet": 1000,
+    "minecraft:diamond_chestplate": 1600,
+    "minecraft:diamond_leggings": 1400,
+    "minecraft:diamond_boots": 800,
+    "minecraft:golden_helmet": 100,
+    "minecraft:leather_helmet": 20,
+    "minecraft:netherite_helmet": 3500,
+    "minecraft:golden_chestplate": 160,
+    "minecraft:leather_chestplate": 32,
+    "minecraft:netherite_chestplate": 4100,
+    "minecraft:golden_leggings": 140,
+    "minecraft:leather_leggings": 28,
+    "minecraft:netherite_leggings": 3900,
+    "minecraft:golden_boots": 80,
+    "minecraft:leather_boots": 16,
+    "minecraft:netherite_boots": 3300,
+    "minecraft:netherite_sword": 2901,
+    "minecraft:netherite_pickaxe": 3102,
+    "minecraft:netherite_axe": 3102,
+    "minecraft:netherite_shovel": 2702,
+    "minecraft:netherite_hoe": 2902,
+    "minecraft:bow": 12,
+    "minecraft:crossbow": 14,
+    "minecraft:shield": 8,
+    "minecraft:fishing_rod": 9,
+    "minecraft:mace": 5000
+  },
+  "sink_tags": [
+    {
+      "tag": "minecraft:logs",
+      "points": 3
+    },
+    {
+      "tag": "minecraft:planks",
+      "points": 1
+    },
+    {
+      "tag": "minecraft:saplings",
+      "points": 2
+    },
+    {
+      "tag": "minecraft:flowers",
+      "points": 2
+    },
+    {
+      "tag": "minecraft:leaves",
+      "points": 1
+    },
+    {
+      "tag": "minecraft:decorated_pot_sherds",
+      "points": 100
+    },
+    {
+      "tag": "minecraft:trim_templates",
+      "points": 300
+    },
+    {
+      "tag": "c:crops",
+      "points": 2
+    },
+    {
+      "tag": "c:foods/cooked_meat",
+      "points": 6
+    },
+    {
+      "tag": "farmersdelight:meals",
+      "points": 25
+    }
+  ],
+  "sink_rarity": {
+    "common": 2,
+    "uncommon": 50,
+    "rare": 500,
+    "epic": 2500
+  },
+  "sink_enchant": 25,
+  "sink_refused": [
+    "siftec:toxic_residue",
+    "siftec:uranium_waste",
+    "siftec:plutonium_waste",
+    "siftec:ficsit_coupon"
+  ],
+  "coupons": {
+    "first": 3,
+    "first_cost": 500,
+    "last": 3000,
+    "cap": 249501250
   },
   "shop": [
     {
-      "item": "create:potato_cannon",
-      "count": 1,
-      "price": 3000
+      "id": "customizer",
+      "category": "Customizer",
+      "coupons": 0,
+      "gives": "customizer"
     },
     {
-      "item": "create:extendo_grip",
-      "count": 1,
-      "price": 3000
+      "id": "swatch",
+      "category": "Swatches",
+      "coupons": 2,
+      "gives": "swatch"
     },
     {
-      "item": "create:wand_of_symmetry",
-      "count": 1,
-      "price": 5000
+      "id": "finish_unpainted",
+      "category": "Paint finishes",
+      "coupons": 3,
+      "gives": "finish:unpainted"
     },
     {
-      "item": "create:linked_controller",
-      "count": 1,
-      "price": 3000
+      "id": "finish_copper",
+      "category": "Paint finishes",
+      "coupons": 5,
+      "gives": "finish:copper"
     },
     {
-      "item": "create:cuckoo_clock",
-      "count": 1,
-      "price": 500
+      "id": "finish_chrome",
+      "category": "Paint finishes",
+      "coupons": 5,
+      "gives": "finish:chrome"
     },
     {
-      "item": "create:steam_whistle",
-      "count": 1,
-      "price": 500
+      "id": "finish_carbon_steel",
+      "category": "Paint finishes",
+      "coupons": 8,
+      "gives": "finish:carbon_steel"
     },
     {
-      "item": "create:peculiar_bell",
-      "count": 1,
-      "price": 1000
+      "id": "finish_caterium",
+      "category": "Paint finishes",
+      "coupons": 10,
+      "gives": "finish:caterium"
     },
     {
-      "item": "create:clipboard",
-      "count": 1,
-      "price": 200
+      "id": "skin_andesite",
+      "category": "Building skins",
+      "coupons": 4,
+      "gives": "skin:andesite"
     },
     {
-      "item": "create:placard",
-      "count": 4,
-      "price": 200
+      "id": "skin_brass",
+      "category": "Building skins",
+      "coupons": 4,
+      "gives": "skin:brass"
     },
     {
-      "item": "create:turntable",
-      "count": 1,
-      "price": 500
+      "id": "skin_copper",
+      "category": "Building skins",
+      "coupons": 4,
+      "gives": "skin:copper"
     },
     {
-      "item": "create:crafting_blueprint",
-      "count": 1,
-      "price": 500
+      "id": "skin_steel",
+      "category": "Building skins",
+      "coupons": 4,
+      "gives": "skin:steel"
     },
     {
-      "item": "create:copper_valve_handle",
-      "count": 4,
-      "price": 200
+      "id": "storage_skin_oak",
+      "category": "Storage skins",
+      "coupons": 1,
+      "gives": "skin:oak"
     },
     {
-      "item": "create:andesite_table_cloth",
-      "count": 4,
-      "price": 200
+      "id": "storage_skin_spruce",
+      "category": "Storage skins",
+      "coupons": 1,
+      "gives": "skin:spruce"
     },
     {
-      "item": "minecraft:white_dye",
-      "count": 16,
-      "price": 100
+      "id": "storage_skin_brick",
+      "category": "Storage skins",
+      "coupons": 1,
+      "gives": "skin:brick"
     },
     {
-      "item": "minecraft:red_dye",
-      "count": 16,
-      "price": 100
+      "id": "storage_skin_barrel",
+      "category": "Storage skins",
+      "coupons": 1,
+      "gives": "skin:barrel"
     },
     {
-      "item": "minecraft:blue_dye",
-      "count": 16,
-      "price": 100
+      "id": "decor_checkmark_statue",
+      "category": "Statues",
+      "coupons": 8,
+      "gives": "decor:checkmark_statue"
     },
     {
-      "item": "minecraft:yellow_dye",
-      "count": 16,
-      "price": 100
+      "id": "decor_adequate_award",
+      "category": "Statues",
+      "coupons": 25,
+      "gives": "decor:adequate_award"
     },
     {
-      "item": "minecraft:green_dye",
-      "count": 16,
-      "price": 100
+      "id": "decor_pretty_good_award",
+      "category": "Statues",
+      "coupons": 50,
+      "gives": "decor:pretty_good_award"
     },
     {
-      "item": "minecraft:black_dye",
-      "count": 16,
-      "price": 100
+      "id": "decor_satisfactory_award",
+      "category": "Statues",
+      "coupons": 150,
+      "gives": "decor:satisfactory_award"
     },
     {
-      "item": "minecraft:orange_dye",
-      "count": 16,
-      "price": 100
+      "id": "decor_silver_hog_statue",
+      "category": "Statues",
+      "coupons": 50,
+      "gives": "decor:silver_hog_statue"
     },
     {
-      "item": "minecraft:light_blue_dye",
-      "count": 16,
-      "price": 100
+      "id": "decor_lizard_doggo_statue",
+      "category": "Statues",
+      "coupons": 100,
+      "gives": "decor:lizard_doggo_statue"
+    },
+    {
+      "id": "decor_confusing_creature_statue",
+      "category": "Statues",
+      "coupons": 200,
+      "gives": "decor:confusing_creature_statue"
+    },
+    {
+      "id": "decor_golden_nut_statue",
+      "category": "Statues",
+      "coupons": 1000,
+      "gives": "decor:golden_nut_statue"
+    },
+    {
+      "id": "decor_creeper_statue",
+      "category": "Mob statues",
+      "coupons": 15,
+      "gives": "decor:creeper_statue"
+    },
+    {
+      "id": "decor_zombie_statue",
+      "category": "Mob statues",
+      "coupons": 15,
+      "gives": "decor:zombie_statue"
+    },
+    {
+      "id": "decor_skeleton_statue",
+      "category": "Mob statues",
+      "coupons": 15,
+      "gives": "decor:skeleton_statue"
+    },
+    {
+      "id": "decor_cow_statue",
+      "category": "Mob statues",
+      "coupons": 15,
+      "gives": "decor:cow_statue"
+    },
+    {
+      "id": "decor_ceiling_light",
+      "category": "Lighting",
+      "coupons": 1,
+      "gives": "decor:ceiling_light"
+    },
+    {
+      "id": "decor_flood_light",
+      "category": "Lighting",
+      "coupons": 3,
+      "gives": "decor:flood_light"
+    },
+    {
+      "id": "decor_street_light",
+      "category": "Lighting",
+      "coupons": 3,
+      "gives": "decor:street_light"
+    },
+    {
+      "id": "decor_control_panel",
+      "category": "Lighting",
+      "coupons": 5,
+      "gives": "decor:control_panel"
+    },
+    {
+      "id": "decor_office_desk",
+      "category": "Furniture",
+      "coupons": 4,
+      "gives": "decor:office_desk"
+    },
+    {
+      "id": "decor_office_chair",
+      "category": "Furniture",
+      "coupons": 3,
+      "gives": "decor:office_chair"
+    },
+    {
+      "id": "decor_filing_cabinet",
+      "category": "Furniture",
+      "coupons": 3,
+      "gives": "decor:filing_cabinet"
+    },
+    {
+      "id": "decor_office_plant",
+      "category": "Furniture",
+      "coupons": 3,
+      "gives": "decor:office_plant"
+    },
+    {
+      "id": "cup_coffee_cup",
+      "category": "Player cosmetics",
+      "coupons": 1,
+      "gives": "cup:coffee_cup"
+    },
+    {
+      "id": "cup_employee_of_the_planet_cup",
+      "category": "Player cosmetics",
+      "coupons": 1,
+      "gives": "cup:employee_of_the_planet_cup"
+    }
+  ],
+  "swatch_max": 18,
+  "dyes": [
+    "white",
+    "orange",
+    "magenta",
+    "light_blue",
+    "yellow",
+    "lime",
+    "pink",
+    "gray",
+    "light_gray",
+    "cyan",
+    "purple",
+    "blue",
+    "brown",
+    "green",
+    "red",
+    "black"
+  ],
+  "finishes": {
+    "painted": "minecraft:{colour}_concrete",
+    "unpainted": "create:industrial_iron_block",
+    "copper": "minecraft:waxed_copper_block",
+    "chrome": "minecraft:iron_block",
+    "carbon_steel": "minecraft:netherite_block",
+    "caterium": "create:brass_block"
+  },
+  "skins": {
+    "andesite": "create:andesite_casing",
+    "brass": "create:brass_casing",
+    "copper": "create:copper_casing",
+    "steel": "siftec:steel_casing"
+  },
+  "storage_skins": {
+    "oak": "minecraft:oak_planks",
+    "spruce": "minecraft:spruce_planks",
+    "brick": "minecraft:bricks",
+    "barrel": "minecraft:barrel"
+  },
+  "decor": [
+    {
+      "id": "checkmark_statue",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 10
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "adequate_award",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        13,
+        13
+      ],
+      "cost": [
+        {
+          "item": "create:copper_sheet",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "id": "pretty_good_award",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        13,
+        13
+      ],
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "id": "satisfactory_award",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        13,
+        13
+      ],
+      "cost": [
+        {
+          "item": "minecraft:gold_ingot",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "id": "silver_hog_statue",
+      "light": 0,
+      "shape": [
+        0,
+        0,
+        0,
+        16,
+        12,
+        16
+      ],
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 20
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "id": "lizard_doggo_statue",
+      "light": 0,
+      "shape": [
+        0,
+        0,
+        0,
+        16,
+        12,
+        16
+      ],
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 20
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "confusing_creature_statue",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "id": "golden_nut_statue",
+      "light": 6,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        14,
+        13
+      ],
+      "cost": [
+        {
+          "item": "minecraft:gold_block",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "id": "creeper_statue",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "zombie_statue",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "skeleton_statue",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "minecraft:bone",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "cow_statue",
+      "light": 0,
+      "shape": [
+        0,
+        0,
+        0,
+        16,
+        15,
+        16
+      ],
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "ceiling_light",
+      "light": 15,
+      "shape": [
+        3,
+        14,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        },
+        {
+          "item": "siftec:wire",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "flood_light",
+      "light": 15,
+      "shape": [
+        4,
+        0,
+        4,
+        12,
+        14,
+        12
+      ],
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 4
+        },
+        {
+          "item": "siftec:wire",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "id": "street_light",
+      "light": 15,
+      "shape": [
+        5,
+        0,
+        5,
+        11,
+        16,
+        11
+      ],
+      "cost": [
+        {
+          "item": "siftec:iron_rod",
+          "count": 4
+        },
+        {
+          "item": "siftec:wire",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "id": "control_panel",
+      "light": 4,
+      "shape": [
+        1,
+        0,
+        1,
+        15,
+        12,
+        15
+      ],
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 2
+        },
+        {
+          "item": "siftec:cable",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "office_desk",
+      "light": 0,
+      "shape": [
+        0,
+        0,
+        0,
+        16,
+        14,
+        16
+      ],
+      "cost": [
+        {
+          "item": "#minecraft:planks",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "id": "office_chair",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "minecraft:black_wool",
+          "count": 4
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "filing_cabinet",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "id": "office_plant",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        14,
+        13
+      ],
+      "cost": [
+        {
+          "item": "#minecraft:saplings",
+          "count": 1
+        },
+        {
+          "item": "minecraft:flower_pot",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "cups": [
+    {
+      "id": "coffee_cup",
+      "needs": "",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "employee_of_the_planet_cup",
+      "needs": "phase_5",
+      "cost": [
+        {
+          "item": "minecraft:gold_ingot",
+          "count": 4
+        }
+      ]
     }
   ],
   "fluids": [
@@ -6182,11 +7014,8 @@
     "siftec:cutting/biomass_from_sugar_cane": "hub_upgrade_6",
     "siftec:cutting/biomass_from_cactus": "hub_upgrade_6",
     "siftec:cutting/biomass_from_short_grass": "hub_upgrade_6",
-    "siftec:crafting/equipment_workshop": "hub_upgrade_1",
     "siftec:crafting/flywheel": "hub_upgrade_6",
     "siftec:crafting/deployer": "part_assembly",
-    "siftec:crafting/nailgun": "mam_megafauna_the_rebar_gun",
-    "siftec:crafting/hammer": "enhanced_asset_security",
     "siftec:crafting/crushing_wheel": "advanced_steel_production",
     "siftec:crafting/pumpjack_crank": "oil_processing",
     "siftec:crafting/mechanical_crafter": "industrial_manufacturing",
@@ -8301,6 +9130,29 @@
     },
     {
       "building": "manufacturer",
+      "result": "siftec:xeno_zapper",
+      "count": 1,
+      "first": "siftec:xeno_zapper_core",
+      "core": true,
+      "steps": [
+        {
+          "item": "siftec:iron_rod"
+        },
+        {
+          "item": "siftec:reinforced_iron_plate"
+        },
+        {
+          "item": "siftec:cable"
+        },
+        {
+          "item": "siftec:wire"
+        }
+      ],
+      "ticks": 0,
+      "lock": ""
+    },
+    {
+      "building": "manufacturer",
       "result": "minecraft:totem_of_undying",
       "count": 1,
       "first": "siftec:totem_of_undying_core",
@@ -8678,20 +9530,7 @@
     "farmersdelight:wheat_dough_from_egg",
     "farmersdelight:wheat_dough_from_water",
     "farmersdelight:bread_from_smelting",
-    "farmersdelight:bread_from_smoking",
-    "create:crafting/appliances/clipboard",
-    "create:crafting/appliances/crafting_blueprint",
-    "create:crafting/appliances/linked_controller",
-    "create:crafting/curiosities/peculiar_bell",
-    "create:crafting/kinetics/copper_valve_handle",
-    "create:crafting/kinetics/cuckoo_clock",
-    "create:crafting/kinetics/placard",
-    "create:crafting/kinetics/steam_whistle",
-    "create:crafting/kinetics/turntable",
-    "create:mechanical_crafting/extendo_grip",
-    "create:mechanical_crafting/potato_cannon",
-    "create:mechanical_crafting/wand_of_symmetry",
-    "create:andesite_table_cloth_from_andesite_alloy_stonecutting"
+    "farmersdelight:bread_from_smoking"
   ],
   "workshop": [
     {
@@ -8959,27 +9798,6 @@
       ]
     },
     {
-      "item": "siftec:radar_tower",
-      "cost": [
-        {
-          "item": "siftec:computer",
-          "count": 10
-        },
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 20
-        },
-        {
-          "item": "siftec:crystal_oscillator",
-          "count": 25
-        },
-        {
-          "item": "siftec:cable",
-          "count": 100
-        }
-      ]
-    },
-    {
       "item": "siftec:blueprint_designer",
       "cost": [
         {
@@ -9143,36 +9961,61 @@
       ]
     },
     {
-      "item": "siftec:awesome_sink",
+      "item": "siftec:xeno_zapper",
       "cost": [
         {
+          "item": "siftec:iron_rod",
+          "count": 10
+        },
+        {
           "item": "siftec:reinforced_iron_plate",
-          "count": 15
+          "count": 2
         },
         {
           "item": "siftec:cable",
-          "count": 30
+          "count": 15
         },
         {
-          "item": "#siftec:stones",
-          "count": 45
+          "item": "siftec:wire",
+          "count": 50
         }
       ]
     },
     {
-      "item": "siftec:awesome_shop",
+      "item": "cgs:nailgun",
       "cost": [
         {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 6
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 16
+        },
+        {
           "item": "siftec:screw",
-          "count": 200
+          "count": 100
+        }
+      ]
+    },
+    {
+      "item": "cgs:hammer",
+      "cost": [
+        {
+          "item": "siftec:xeno_zapper",
+          "count": 2
         },
         {
-          "item": "create:iron_sheet",
-          "count": 10
+          "item": "siftec:modular_frame",
+          "count": 5
         },
         {
-          "item": "siftec:cable",
-          "count": 10
+          "item": "siftec:iron_rod",
+          "count": 25
+        },
+        {
+          "item": "siftec:wire",
+          "count": 500
         }
       ]
     }
@@ -10940,6 +11783,88 @@
       "unlock": "matter_conversion",
       "logic": "processor",
       "su": 51200
+    },
+    {
+      "id": "equipment_workshop",
+      "category": "special",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 6
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 4
+        }
+      ],
+      "unlock": "hub_upgrade_1",
+      "logic": "workshop"
+    },
+    {
+      "id": "awesome_sink",
+      "category": "special",
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 15
+        },
+        {
+          "item": "siftec:cable",
+          "count": 30
+        },
+        {
+          "item": "#siftec:stones",
+          "count": 45
+        }
+      ],
+      "unlock": "resource_sink_bonus_program",
+      "logic": "sink",
+      "su": 6144
+    },
+    {
+      "id": "awesome_shop",
+      "category": "special",
+      "cost": [
+        {
+          "item": "siftec:screw",
+          "count": 200
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 10
+        },
+        {
+          "item": "siftec:cable",
+          "count": 10
+        }
+      ],
+      "unlock": "resource_sink_bonus_program",
+      "logic": "shop"
+    },
+    {
+      "id": "radar_tower",
+      "category": "special",
+      "cost": [
+        {
+          "item": "siftec:computer",
+          "count": 10
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 20
+        },
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 25
+        },
+        {
+          "item": "siftec:cable",
+          "count": 100
+        }
+      ],
+      "unlock": "mam_quartz_radar_technology",
+      "logic": "radar",
+      "su": 6144
     }
   ],
   "machine_ticks": {

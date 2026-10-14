@@ -75,6 +75,39 @@ several. Vanilla items come from research and machines, with no End trip or anci
 Shulker Shell from the Assembler, the Totem, Elytra, Trident, Heart of the Sea and Netherite Ingot from the Manufacturer,
 and the Elytra Backpack (an Elytra and a Copper Backtank in one, refilled from a placed backtank). The inhalers heal.
 
+The Map comes with Field Research: until a company has done it, Xaero's Minimap is switched off for its players
+(`hub/MapLock.java` sends Xaero's own server codes). There is no overclocking: no Power Shards, power slugs or
+Production Amplifier.
+
+## Exploration
+
+Mercer Spheres, Somersloops and crash sites are placed from the world seed (`collect/`), one possible spot per
+96-block cell, so the Object Scanner finds them in land nobody has visited, and each company can collect each one once;
+collecting one starts its MAM tree (Alien Technology, or the Hard Drive page). Mercer Spheres are common and float over
+a small patch of The Sift's siftslate. Somersloops are rare: in a pocket deep underground well away from spawn, in some
+far crash sites, and in every Ancient City's portal frame (found from the seed as /locate does, placed when the city's
+centre loads). Crash sites are cargo pods with wreckage, each holding a Hard Drive: near spawn they open freely, further
+out some want parts carried to them and, past 900 blocks, some want a Create: New Age wire from a grid with enough power
+to spare strung to the connector beside them. The Object Scanner is switched with sneak-use between crash sites, Mercer
+Spheres and Somersloops (after their analysis research), hostile mobs, and the wild food the Nutrients start nodes add:
+ripe sweet berry bushes, apple trees and glow berries in loaded land.
+
+The Equipment Workshop, the AWESOME Sink and Shop and the Radar Tower are Build Gun buildings in the Special tab; using
+one opens it. The Workshop builds equipment by hand from the parts carried (machines make the same, the Manufacturer's
+way): the Object Scanner, Jetpack, Hover Pack, Blade Runners, Parachute, Gas Mask, Hazmat Suit, the inhalers, the
+Xeno-Zapper (a stun jolt), and Gunsmithing's nail gun and hammer as the Rebar Gun and Xeno-Basher. The Radar Tower
+(30 MW) reveals the crash sites within about a kilometre to its company as Xaero waypoints, once a day while powered,
+and lists the nearest node and collectible of each kind when used.
+
+## AWESOME Sink and Shop
+
+The Sink (30 MW) destroys whatever its input port or a player's hand gives it, except the radioactive and toxic waste,
+and pays its company points (`sink/Sink.java`): Satisfactory's values for its parts, the AWESOME Sink and Shop tab's for
+vanilla and other mods' items, the item's rarity otherwise, and 25 more per enchantment level. Its screen prints the
+points as FICSIT Coupons on Satisfactory 1.0's curve. The Shop sells cosmetics only, unlocked for the whole company: the
+Customizer (free), colour swatch slots, paint finishes and casing skins it paints Build Gun buildings with, statues,
+lights, office furniture and cups (taken from the Shop for a few parts once owned).
+
 ## Building
 
     ./gradlew build
@@ -92,7 +125,7 @@ Most of `src/main/resources` is generated. Edit the generators, not the JSON:
 
 - `tools/content.py`: parts, fluids, milestones, wormhole phases, MAM research, which item each milestone
   unlocks (including every item of the other mods: `MORE_LOCKS` and `FREE`), switched-off items, furnace
-  fuels, the Converter and Particle Accelerator, the AWESOME Sink and Shop.
+  fuels, the Converter and Particle Accelerator, the AWESOME Sink's values and the Shop's cosmetics and decorations.
 - `tools/satisfactory.py`: Satisfactory 1.0's recipes, build costs, milestones, MAM costs and sink points, written by
   `tools/import_satisfactory.py` from the game export SatisfactoryTools publishes. Never edited by hand.
 - `tools/recipes.py`: every recipe the mod adds (1.0's at Satisfactory amounts, on the Create machines of each

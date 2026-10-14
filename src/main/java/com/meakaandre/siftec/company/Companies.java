@@ -249,8 +249,12 @@ public final class Companies {
             // nothing can be picked up a second time by changing company
             target.collected.addAll(old.collected);
             if (old.members.isEmpty()) {
-                // the last one out brings the base along: claims, machines, the cloud, the points and parts paid
+                // the last one out brings the base along: claims, machines, the cloud, the points, the Shop and parts paid
                 target.points += old.points;
+                target.pointsEver += old.pointsEver;
+                target.trees.addAll(old.trees);
+                target.shop.addAll(old.shop);
+                for (String swatch : old.swatches) if (target.swatches.size() < com.meakaandre.siftec.sink.Shop.MAX_SWATCHES && !target.swatches.contains(swatch)) target.swatches.add(swatch);
                 old.cloud.forEach((item, count) -> target.cloud.merge(item, count, Integer::sum));
                 mergePaid(old, target);
                 data.fold(old.id, target.id);

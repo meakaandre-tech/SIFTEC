@@ -27,13 +27,28 @@ public class Company {
     public long lockUntil;
     /** The company's Wormhole Gateway structure, as "dimension|packed position" of its terminal; empty when it has none. */
     public String gateway = "";
-    /** The MAM node being researched, and the game time it finishes. Empty when nothing is running. */
-    /** Slugs and artefacts already picked up, as "x,z". */
+    /** Mercer Spheres, Somersloops and crash sites already collected, as "x,z". */
     public Set<String> collected = new LinkedHashSet<>();
-    /** AWESOME Sink points. */
+    /** Crash sites a Radar Tower has already shown the company, as "x,z". */
+    public Set<String> revealed = new LinkedHashSet<>();
+    /** MAM trees the company has started (by collecting what starts them, or bringing it to the MAM): tree ids. */
+    public Set<String> trees = new LinkedHashSet<>();
+    /** AWESOME Sink points not yet printed as coupons. */
     public long points;
+    /** Every point the AWESOME Sink has paid out, for the Sink screen. */
+    public long pointsEver;
+    /** FICSIT Coupons printed so far (the next one costs more, on Satisfactory's curve). */
+    public int couponsPrinted;
+    /** What the company has bought in the AWESOME Shop: entry ids (a swatch slot counts in {@link #swatches}). */
+    public Set<String> shop = new LinkedHashSet<>();
+    /**
+     * The company's colour swatches, each "primary/secondary" dye names ("industrial" for the dark grey panels as
+     * built). The first is the default every company has; the AWESOME Shop sells more slots.
+     */
+    public java.util.List<String> swatches = new java.util.ArrayList<>(java.util.List.of("orange/industrial"));
     /** The alternates a finished Hard Drive is offering; empty when there is nothing to choose. */
     public java.util.List<String> offer = new java.util.ArrayList<>();
+    /** The MAM node being researched, and the game time it finishes. Empty when nothing is running. */
     public String research = "";
     public long researchEnd;
     /** The Dimensional Depot cloud: item id -> count. */

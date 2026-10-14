@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "siftec:block/office_desk"
+    },
+    "facing=west": {
+      "model": "siftec:block/office_desk",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "siftec:block/office_desk",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "siftec:block/office_desk",
+      "y": 270
+    }
+  }
+}

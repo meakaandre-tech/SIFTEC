@@ -2,31 +2,34 @@ package com.meakaandre.siftec.collect;
 
 import java.util.Locale;
 
-/** The things found lying around the world that feed the MAM. */
+/**
+ * The things found lying around the world that feed the MAM (Exploration and Equipment tab). Each is placed from the
+ * world seed, so the Object Scanner finds it in land nobody has visited, and each company can collect each one once.
+ */
 public enum Collectible {
-    BLUE_POWER_SLUG(50, false, "", 7), YELLOW_POWER_SLUG(25, false, "", 8), MERCER_SPHERE(15, false, "object:mercer_sphere", 10),
-    PURPLE_POWER_SLUG(7, true, "", 10), SOMERSLOOP(3, true, "object:somersloop", 10),
-    /** A cargo pod with wreckage round it. It holds a Hard Drive. */
-    CRASH_SITE(12, false, "", 10);
+    /** Common: floating over a small patch of siftslate. Builds Dimensional Depots and their research. */
+    MERCER_SPHERE(60, false, "object:mercer_sphere", 10, "alien"),
+    /** Rare: in a pocket deep underground (and in Ancient City portal frames and some crash sites). Builds the Alien Power Augmenter. */
+    SOMERSLOOP(6, true, "object:somersloop", 10, "alien"),
+    /** A cargo pod thrown out of a failed rift, with wreckage round it. It holds a Hard Drive. */
+    CRASH_SITE(24, false, "", 6, "hard_drives");
 
     public final int weight;
     /** Only found well away from world spawn. */
     public final boolean far;
     /** The research the Object Scanner needs before it can look for this one; empty for none. */
     public final String scannerToken;
-    /** How much light its block gives off: the rarer slugs glow brighter. */
+    /** How much light its block gives off. */
     public final int light;
+    /** The MAM tree collecting one starts for the company ("hard_drives": the Hard Drive page). */
+    public final String tree;
 
-    Collectible(int weight, boolean far, String scannerToken, int light) {
+    Collectible(int weight, boolean far, String scannerToken, int light, String tree) {
         this.weight = weight;
         this.far = far;
         this.scannerToken = scannerToken;
         this.light = light;
-    }
-
-    /** One of the three power slugs: a small blob on the ground, with nothing to bump into. */
-    public boolean slug() {
-        return this == BLUE_POWER_SLUG || this == YELLOW_POWER_SLUG || this == PURPLE_POWER_SLUG;
+        this.tree = tree;
     }
 
     /** The item a company gets for collecting one. */

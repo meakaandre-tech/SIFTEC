@@ -62,6 +62,8 @@ public class ControllerBlock extends Block implements EntityBlock {
                 server.sendOverlayMessage(Component.translatable("siftec.building.filter_cleared", def.name()));
                 return InteractionResult.SUCCESS;
             }
+            // the Equipment Workshop, the AWESOME Sink and Shop and the Radar Tower open their windows
+            if (def != null && !player.isShiftKeyDown() && SpecialBuildings.use(server, controller, def)) return InteractionResult.SUCCESS;
             server.sendOverlayMessage(BuildingLogic.status(level, controller));
         }
         return InteractionResult.SUCCESS;
@@ -72,6 +74,15 @@ public class ControllerBlock extends Block implements EntityBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof ControllerBlockEntity controller)) return InteractionResult.TRY_WITH_EMPTY_HAND;
         BuildingDef def = Buildings.def(controller.buildingId);
+        if (stack.getItem() instanceof com.meakaandre.siftec.sink.CustomizerItem) {
+            if (player instanceof ServerPlayer server) com.meakaandre.siftec.sink.CustomizerItem.open(server, controller);
+            return InteractionResult.SUCCESS;
+        }
+        // an AWESOME Sink used with something in hand sinks it
+        if (def != null && def.logic().equals("sink")) {
+            if (player instanceof ServerPlayer server) SpecialBuildings.sinkHeld(server, controller, stack);
+            return InteractionResult.SUCCESS;
+        }
         if (def == null || !BuildingLogic.hasFilter(def)) return InteractionResult.TRY_WITH_EMPTY_HAND;
         if (player instanceof ServerPlayer server) {
             if (!mayUse(server, controller)) {
