@@ -95,7 +95,7 @@ public class MamMenu extends ChestMenu {
         for (int t = 0; t < trees.size() && t < 9; t++) {
             Milestones.Tree each = trees.get(t);
             if (!found(each)) {
-                view.setItem(t, button(Items.GRAY_DYE, Component.translatable("siftec.mam.undiscovered"),
+                view.setItem(t, button(item("minecraft:gray_dye"), Component.translatable("siftec.mam.undiscovered"),
                     List.of(Component.translatable("siftec.mam.bring", triggers(each)).withStyle(ChatFormatting.GRAY)), false));
                 continue;
             }

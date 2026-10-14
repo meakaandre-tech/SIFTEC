@@ -315,10 +315,10 @@ public final class PrefabTests {
             + "; second gateway refused " + "siftec.prefab.one_gateway".equals(second.reason) + "; picked up: stacks back " + back2.size()
             + ", parts left " + leftG + "; placed again " + againG.ok() + " with ring gate " + ring(level, spotG));
         // the portal: inside the ring, in its middle layer, and nowhere else
-        boolean inside = Templates.inPortal(0, Templates.RING_Y + 0.5, Templates.RING_Z + 0.5) && Templates.inPortal(-8, Templates.RING_Y + 6, Templates.RING_Z + 0.5);
-        boolean outside = !Templates.inPortal(0, Templates.RING_Y + Templates.RING_OUTER, Templates.RING_Z + 0.5) && !Templates.inPortal(0, Templates.RING_Y + 0.5, Templates.RING_Z + 4)
+        boolean portalIn = Templates.inPortal(0, Templates.RING_Y + 0.5, Templates.RING_Z + 0.5) && Templates.inPortal(-8, Templates.RING_Y + 6, Templates.RING_Z + 0.5);
+        boolean portalOut = !Templates.inPortal(0, Templates.RING_Y + Templates.RING_OUTER, Templates.RING_Z + 0.5) && !Templates.inPortal(0, Templates.RING_Y + 0.5, Templates.RING_Z + 4)
             && !Templates.inPortal(Templates.RING_INNER + 1, Templates.RING_Y + 0.5, Templates.RING_Z + 0.5);
-        report(source, "gateway portal: walking in at the middle of the ring counts " + inside + "; beside it, in front of it or in the ring does not " + outside);
+        report(source, "gateway portal: walking in at the middle of the ring counts " + portalIn + "; beside it, in front of it or in the ring does not " + portalOut);
 
         // ---- an old single-block HUB still loads and works as a terminal
         BlockPos legacy = new BlockPos(AX + 30, Y + 1, AZ - 30);
