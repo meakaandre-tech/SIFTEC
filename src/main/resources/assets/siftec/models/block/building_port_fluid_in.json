@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:block/cube",
   "textures": {
-    "particle": "create:block/andesite_casing",
+    "particle": "create:block/industrial_iron_block",
     "north": "minecraft:block/light_blue_glazed_terracotta",
-    "south": "create:block/andesite_casing",
-    "east": "create:block/andesite_casing",
-    "west": "create:block/andesite_casing",
-    "up": "create:block/andesite_casing",
-    "down": "create:block/andesite_casing"
+    "south": "create:block/industrial_iron_block",
+    "east": "create:block/industrial_iron_block",
+    "west": "create:block/industrial_iron_block",
+    "up": "create:block/industrial_iron_block_top",
+    "down": "create:block/industrial_iron_block"
   }
 }

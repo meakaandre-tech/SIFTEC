@@ -25,12 +25,16 @@ import java.util.List;
  * <p>
  * {@code prefab} names a structure the Build Gun puts down through {@link com.meakaandre.siftec.prefab.Prefabs} instead
  * of a structure template ("hub": the HUB), or is "" for an ordinary building.
+ * <p>
+ * Work package 9's extractors: {@code fluid} is the fluid an extractor gives and {@code rate} its mB a minute on a normal
+ * node (purity scales it); {@code fluidNode} is the fluid node type ("oil", "nitrogen") a node building stands on instead
+ * of an ore node; {@code intake} is the cell a Water Extractor stands over, which has to be a water source.
  */
 public record BuildingDef(String id, Category category, List<Milestone.Cost> cost, String unlock, boolean dev, boolean node,
                           int @Nullable [] nodeCell, String logic, int su, int breakTicks, int fortune, String power, double mw, double water, int lines,
-                          int @Nullable [] vent, String prefab) {
+                          int @Nullable [] vent, String prefab, String fluid, int rate, String fluidNode, int @Nullable [] intake) {
     public BuildingDef(String id, Category category, List<Milestone.Cost> cost, String unlock, boolean dev, boolean node) {
-        this(id, category, cost, unlock, dev, node, node ? new int[]{0, 0, 1} : null, "", 0, 0, 0, "", 0, 0, 0, null, "");
+        this(id, category, cost, unlock, dev, node, node ? new int[]{0, 0, 1} : null, "", 0, 0, 0, "", 0, 0, 0, null, "", "", 0, "", null);
     }
 
     /** The HUB: put down by the Build Gun through {@link com.meakaandre.siftec.prefab.Prefabs}. */

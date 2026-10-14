@@ -24,7 +24,9 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * A building's control panel. Part of the building like its shell (only the Build Gun takes it away); using it
- * says what the building is doing. On a Constructor, using it with an item sets what it makes (its recipe filter),
+ * says what the building is doing. On a Constructor, Assembler, Foundry, Refinery, Blender, Manufacturer, Quantum
+ * Encoder, Particle Accelerator or Converter, using it with an item sets what it makes (its recipe filter; a fluid's
+ * bucket for a fluid),
  * and sneak-using it clears that. Sneak-using a generator or Power Storage whose grid's fuse has blown resets it.
  */
 public class ControllerBlock extends Block implements EntityBlock {
@@ -70,7 +72,7 @@ public class ControllerBlock extends Block implements EntityBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof ControllerBlockEntity controller)) return InteractionResult.TRY_WITH_EMPTY_HAND;
         BuildingDef def = Buildings.def(controller.buildingId);
-        if (def == null || !def.logic().equals("basin")) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (def == null || !BuildingLogic.hasFilter(def)) return InteractionResult.TRY_WITH_EMPTY_HAND;
         if (player instanceof ServerPlayer server) {
             if (!mayUse(server, controller)) {
                 server.sendOverlayMessage(Component.translatable("siftec.build_gun.not_yours"));

@@ -56,6 +56,7 @@ public class Siftec implements ModInitializer {
         com.meakaandre.siftec.prefab.Prefabs.register();
         com.meakaandre.siftec.building.Buildings.register();
         com.meakaandre.siftec.building.BuildGun.register();
+        com.meakaandre.siftec.building.ExtractorLogic.register();
         com.meakaandre.siftec.power.PowerGrids.register();
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> com.meakaandre.siftec.building.BuildingPower.forget());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.building.BuildingPower.forget());

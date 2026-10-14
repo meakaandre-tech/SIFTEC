@@ -82,6 +82,16 @@ public final class BuildGun {
         BlockHitResult hit = aimed(player);
         if (hit == null) return null;
         BlockPos anchor = hit.getDirection() == Direction.UP ? hit.getBlockPos().above() : hit.getBlockPos().relative(hit.getDirection());
+        // a Water Extractor stands in the water: aimed at the surface, its bottom row is the water's top layer
+        if (def.intake() != null) {
+            Level level = player.level();
+            Vec3 eye = player.getEyePosition();
+            BlockHitResult wet = level.clip(new ClipContext(eye, eye.add(player.getViewVector(1f).scale(Buildings.RANGE)), ClipContext.Block.OUTLINE,
+                ClipContext.Fluid.SOURCE_ONLY, player));
+            if (wet.getType() == HitResult.Type.BLOCK && level.getFluidState(wet.getBlockPos()).is(net.minecraft.tags.FluidTags.WATER)) {
+                anchor = wet.getBlockPos();
+            }
+        }
         Direction facing = player.getDirection();
         for (int i = turns & 3; i > 0; i--) facing = facing.getClockWise();
         // a miner snaps onto the node it is aimed near, so its drill stands right over it

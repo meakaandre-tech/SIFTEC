@@ -1,5 +1,5 @@
 {
-  "type": "create:compacting",
+  "type": "create:mixing",
   "heat_requirement": "heated",
   "ingredients": [
     "siftec:aluminum_scrap",

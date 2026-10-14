@@ -91,6 +91,8 @@ public final class BuildingLogic {
     static void placed(ServerLevel level, ControllerBlockEntity c) {
         BuildingDef def = c.def();
         if (def == null) return;
+        Placement p = c.placement();
+        BuildingTemplate t = p == null ? null : BuildingTemplate.of(def);
         for (BlockPos pos : BuildingPower.motors(c)) {
             if (!(level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.motor.MotorBlockEntity motor)) continue;
             int rpm = (int) MOTOR_RPM;
@@ -98,6 +100,10 @@ public final class BuildingLogic {
             Direction toward = motor.getBlockState().getValue(com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING);
             BlockState next = level.getBlockState(pos.relative(toward));
             if (next.getBlock() instanceof EncasedFanBlock) rpm *= next.getValue(EncasedFanBlock.FACING).getAxisDirection().getStep();
+            // two Crushing Wheels crush only turning against each other: the right one's motor runs the other way
+            if (next.getBlock() instanceof com.zurrtum.create.content.kinetics.crusher.CrushingWheelBlock && t != null) {
+                for (BuildingTemplate.Cell cell : t.members) if (p.at(cell).equals(pos) && cell.x() > 0) rpm = -rpm;
+            }
             if (motor.speedBehavior != null) motor.speedBehavior.setValue(rpm);
             motor.setChanged();
         }
@@ -106,7 +112,12 @@ public final class BuildingLogic {
 
     /** The Basin's filter follows the controller's. */
     static void syncFilter(Level level, ControllerBlockEntity c) {
-        for (BlockPos pos : cells(c, create("basin"))) {
+        BuildingDef def = c.def();
+        // the Manufacturer's and the Quantum Encoder's Basin makes the Core; the line sets its filter (ProductionLogic)
+        if (def == null || !def.logic().equals("basin")) return;
+        List<BlockPos> basins = cells(c, create("basin"));
+        basins.addAll(cells(c, com.meakaandre.siftec.registry.ModBlocks.BRASS_BASIN.get()));
+        for (BlockPos pos : basins) {
             if (level.getBlockEntity(pos) instanceof BasinBlockEntity basin && !ItemStack.matches(basin.getFilter().getFilter(), c.filter)) {
                 basin.getFilter().setFilter(c.filter.copy());
             }
@@ -116,11 +127,16 @@ public final class BuildingLogic {
     /** Sets what the building makes (empty: anything). False if it has no recipe filter. */
     public static boolean setFilter(Level level, ControllerBlockEntity c, ItemStack stack) {
         BuildingDef def = c.def();
-        if (def == null || !def.logic().equals("basin")) return false;
+        if (def == null || !hasFilter(def)) return false;
         c.filter = stack.isEmpty() ? ItemStack.EMPTY : stack.copyWithCount(1);
         c.setChanged();
         syncFilter(level, c);
         return true;
+    }
+
+    /** The buildings whose controller takes a recipe filter: what their Basin, line or recipe makes. */
+    public static boolean hasFilter(BuildingDef def) {
+        return def.logic().equals("basin") || def.logic().equals("assembly") || def.logic().equals("processor");
     }
 
     // ------------------------------------------------------------------------------------------------ running
@@ -132,6 +148,13 @@ public final class BuildingLogic {
             case "miner" -> mine(level, c, def, true);
             case "portable_miner" -> mine(level, c, def, false);
             case "smelter" -> smelt(level, c);
+            case "basin" -> ProductionLogic.heat(level, c);
+            case "assembly" -> ProductionLogic.assemble(level, c, def);
+            case "packager" -> ProductionLogic.pack(level, c);
+            case "processor" -> ProductionLogic.process(level, c, def);
+            case "extractor" -> ExtractorLogic.extract(level, c, def);
+            case "pressurizer" -> ExtractorLogic.pressurize(level, c, def);
+            case "well_extractor" -> ExtractorLogic.wellExtract(level, c, def);
             default -> {
             }
         }
@@ -142,6 +165,7 @@ public final class BuildingLogic {
         BuildingDef def = c.def();
         if (def == null) return false;
         if (def.logic().equals("smelter")) return MachineTimes.smelterTicks(stack) > 0;
+        if (def.logic().equals("packager")) return ProductionLogic.packagerTakes(stack);
         return BuildingPower.acceptsFuel(def, stack);
     }
 
@@ -400,7 +424,10 @@ public final class BuildingLogic {
             default -> {
             }
         }
-        if (!def.logic().equals("storage") && !def.logic().isEmpty() && !def.logic().equals("power")) parts.add(Component.translatable("siftec.building.made", c.made));
+        ProductionLogic.status(level, c, def, parts);
+        ExtractorLogic.status(level, c, def, parts);
+        if (!def.logic().equals("storage") && !def.logic().isEmpty() && !def.logic().equals("power") && !def.logic().contains("extractor")
+            && !def.logic().equals("pressurizer")) parts.add(Component.translatable("siftec.building.made", c.made));
         BuildingPower.status(level, c, def, parts);
         if (!c.problem.isEmpty()) parts.add(Component.translatable(c.problem));
         Component line = Component.empty();

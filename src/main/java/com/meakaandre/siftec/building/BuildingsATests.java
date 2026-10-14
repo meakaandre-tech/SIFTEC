@@ -323,7 +323,9 @@ public final class BuildingsATests {
         put(level, source, company, con);
         ControllerBlockEntity cc = controller(level, con);
         if (cc != null) BuildingLogic.setFilter(level, cc, new ItemStack(item("create:iron_sheet")));
-        BlockPos conIn = con.at(0, 0, 9), conInEnd = con.at(0, 0, 5), conOut = con.at(0, 0, -1), conOutEnd = con.at(0, 0, -6);
+        // the input port is in the back row of the pad: the belt comes in from five blocks behind it
+        int conBack = BuildingTemplate.of(con.def()).depth - 1;
+        BlockPos conIn = con.at(0, 0, conBack + 5), conInEnd = con.at(0, 0, conBack + 1), conOut = con.at(0, 0, -1), conOutEnd = con.at(0, 0, -6);
         belt(level, conIn, conInEnd);
         belt(level, conOut, conOutEnd);
         // a belt ends into a Basin as into a Depot, and a Basin holds nine stacks
@@ -336,7 +338,8 @@ public final class BuildingsATests {
         // ---- Smelter making Iron Ingot (1 Raw Iron -> 1 Iron Ingot, 2 s)
         Placement sm = at("smelter", X + 20, Z);
         put(level, source, company, sm);
-        BlockPos smIn = sm.at(0, 0, 9), smInEnd = sm.at(0, 0, 5), smOut = sm.at(0, 0, -1), smOutEnd = sm.at(0, 0, -6);
+        int smBack = BuildingTemplate.of(sm.def()).depth - 1;
+        BlockPos smIn = sm.at(0, 0, smBack + 5), smInEnd = sm.at(0, 0, smBack + 1), smOut = sm.at(0, 0, -1), smOutEnd = sm.at(0, 0, -6);
         belt(level, smIn, smInEnd);
         belt(level, smOut, smOutEnd);
         level.setBlock(sm.at(0, 0, -7), block("create:basin").defaultBlockState(), Block.UPDATE_ALL);

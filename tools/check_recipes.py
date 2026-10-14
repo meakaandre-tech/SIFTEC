@@ -36,7 +36,8 @@ GENERATED = [({"siftec:uranium_fuel_rod"}, {"siftec:uranium_waste"}, "nuclear_po
 SMELTING = [({"minecraft:raw_iron"}, {"minecraft:iron_ingot"}, None), ({"minecraft:raw_copper"}, {"minecraft:copper_ingot"}, None)]
 PHASE_OF_TIER = {3: "phase_1", 4: "phase_1", 5: "phase_2", 6: "phase_2", 7: "phase_3", 8: "phase_3", 9: "phase_4"}
 MAX_STACK = 64    # a Basin holds one stack of each kind of item
-BASIN_KINDS = 9
+BRASS_STACKS = 4  # a Brass Basin (the Manufacturer's and the Blender's) holds four stacks of each kind
+BASIN_KINDS = 9   # either has nine input slots
 TANK_MB = 1000    # a Basin tank, a Spout and an Item Drain
 
 
@@ -238,9 +239,18 @@ def check(data=None):
                 counts[i] = counts.get(i, 0) + 1
             if len(counts) > BASIN_KINDS:
                 errors.append(f"capacity: {path} takes {len(counts)} kinds of item; a Basin recipe takes at most {BASIN_KINDS}")
-            over = {i.split(':')[-1]: n for i, n in counts.items() if n > MAX_STACK}
+            # a recipe runs in the building its path names; the Brass Basin's buildings hold four stacks of each input
+            # (a stack a slot, nine slots), every other Basin one stack of each
+            brass = path.split("/")[1] in content.BRASS_BASIN_BUILDINGS if path.count("/") >= 2 else False
+            most = MAX_STACK * (BRASS_STACKS if brass else 1)
+            over = {i.split(':')[-1]: n for i, n in counts.items() if n > most}
             if over:
-                notes.append(f"basin stack: {path} needs more than a stack of {', '.join(f'{n} {i}' for i, n in sorted(over.items()))}")
+                errors.append(f"capacity: {path} needs more than {'a Brass' if brass else 'a'} Basin holds of {', '.join(f'{n} {i}' for i, n in sorted(over.items()))}")
+            slots = sum(-(-n // MAX_STACK) for n in counts.values())
+            if slots > BASIN_KINDS:
+                errors.append(f"capacity: {path} needs {slots} stacks at once; a Basin has {BASIN_KINDS} input slots")
+            if brass and any(n > MAX_STACK for n in counts.values()):
+                notes.append(f"brass basin: {path} holds {', '.join(f'{n} {i.split(chr(58))[-1]}' for i, n in sorted(counts.items()) if n > MAX_STACK)} in its Brass Basin")
             if len(body.get("results", [])) > 4 or len(body.get("fluid_results", [])) > 2 or len(body.get("fluid_ingredients", [])) > 2:
                 errors.append(f"capacity: {path} has more outputs or fluids than a Basin takes (4 items, 2 fluids in, 2 out)")
         for k in ("fluid_ingredients", "fluid_ingredient", "fluid_results", "fluid_result"):

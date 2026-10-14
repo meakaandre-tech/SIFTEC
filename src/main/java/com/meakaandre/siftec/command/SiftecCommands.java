@@ -43,6 +43,7 @@ public final class SiftecCommands {
         com.meakaandre.siftec.prefab.PrefabTests.register();
         com.meakaandre.siftec.building.BuildingTests.register();
         com.meakaandre.siftec.building.BuildingsATests.register();
+        com.meakaandre.siftec.building.BuildingsBTests.register();
         AutomateTests.register();
         com.meakaandre.siftec.power.PowerTests.register();
         NodeTests.register();

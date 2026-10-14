@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:block/cube",
   "textures": {
-    "particle": "create:block/brass_casing",
+    "particle": "create:block/industrial_iron_block",
     "north": "minecraft:block/crafter_north",
-    "south": "create:block/brass_casing",
-    "east": "create:block/brass_casing",
-    "west": "create:block/brass_casing",
-    "up": "create:block/brass_casing",
-    "down": "create:block/brass_casing"
+    "south": "create:block/industrial_iron_block",
+    "east": "create:block/industrial_iron_block",
+    "west": "create:block/industrial_iron_block",
+    "up": "create:block/industrial_iron_block_top",
+    "down": "create:block/industrial_iron_block"
   }
 }
