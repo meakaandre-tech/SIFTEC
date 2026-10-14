@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "top": "siftec:block/awesome_sink_top",
-    "side": "siftec:block/awesome_sink_side",
-    "bottom": "siftec:block/awesome_sink_side"
-  }
-}
