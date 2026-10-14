@@ -2,9 +2,9 @@ package com.meakaandre.siftec.client;
 
 import com.meakaandre.siftec.depot.OpenCloudPayload;
 import com.meakaandre.siftec.mixin.client.ContainerScreenAccessor;
+import com.meakaandre.siftec.mixin.client.ScreenInvoker;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -23,7 +23,7 @@ public final class CloudButton {
             Button button = Button.builder(Component.translatable("siftec.depot.button"), b -> ClientPlayNetworking.send(new OpenCloudPayload()))
                 .bounds(0, 0, WIDTH, HEIGHT).tooltip(Tooltip.create(Component.translatable("siftec.depot.button.tooltip"))).build();
             place(inventory, button);
-            Screens.getButtons(screen).add(button);
+            ((ScreenInvoker) screen).siftec$addRenderableWidget(button);
             // the recipe book moves the panel sideways; the button follows it
             ScreenEvents.afterTick(screen).register(s -> place(inventory, button));
         });

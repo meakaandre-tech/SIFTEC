@@ -72,7 +72,8 @@
   "client": [
     "client.BuildGunNudgeMixin",
     "client.BuildGunScrollMixin",
-    "client.ContainerScreenAccessor"
+    "client.ContainerScreenAccessor",
+    "client.ScreenInvoker"
   ],
   "injectors": {
     "defaultRequire": 1
