@@ -296,3 +296,29 @@ shot
 cmd siftec worldtest power view 2
 sleep 4
 shot
+cmd time set noon
+cmd siftec worldtest buildings_b view 0
+sleep 20
+shot
+cmd siftec worldtest buildings_b view 1
+sleep 5
+shot
+cmd siftec worldtest buildings_b view 2
+sleep 5
+shot
+cmd siftec worldtest buildings_b view 3
+sleep 5
+shot
+cmd siftec worldtest buildings_b view 4
+sleep 5
+shot
+cmd siftec worldtest buildings_b view 5
+sleep 5
+shot
+cmd siftec worldtest buildings_a view 0
+sleep 15
+shot
+cmd siftec worldtest sathub level 7
+cmd siftec worldtest sathub outside
+sleep 6
+shot

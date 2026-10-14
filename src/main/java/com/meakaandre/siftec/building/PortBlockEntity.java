@@ -80,7 +80,7 @@ public class PortBlockEntity extends SmartBlockEntity {
 
     public @Nullable Storage<FluidVariant> fluids(@Nullable Direction side) {
         if (!serves(side, true)) return null;
-        Storage<FluidVariant> inner = FluidStorage.SIDED.find(level, target, out());
+        Storage<FluidVariant> inner = ProductionLogic.fluids(level, target, out());
         if (inner == null) return null;
         return kind() == PortBlock.Kind.FLUID_IN ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
     }

@@ -110,6 +110,8 @@ public class ModBlocks {
             {"railway", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"coil", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
             {"coil_lit", net.minecraft.world.level.block.Blocks.AMETHYST_BLOCK, 15}, {"rift", net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN, 15},
             {"foundation", net.minecraft.world.level.block.Blocks.CONCRETE.gray(), 0},
+            // Polartt's yellow and black hazard stripes, on the HUB's platform edges
+            {"hazard_yellow", net.minecraft.world.level.block.Blocks.CONCRETE.yellow(), 0}, {"hazard_black", net.minecraft.world.level.block.Blocks.CONCRETE.black(), 0},
             // the Wormhole Gateway's energy conduits, and its portal: no collision, see-through, glowing (it swirls like a Nether portal)
             {"conduit", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 4}, {"portal", net.minecraft.world.level.block.Blocks.NETHER_PORTAL, 15}};
         for (Object[] style : styles) {
@@ -180,6 +182,10 @@ public class ModBlocks {
             COLLECTIBLES.put(type, () -> block);
         }
     }
+
+    /** The Manufacturer's and the Blender's Brass Basin: only ever part of a building, so it has no item. */
+    public static final Supplier<com.meakaandre.siftec.building.BrassBasinBlock> BRASS_BASIN = blockOnly("brass_basin",
+        com.meakaandre.siftec.building.BrassBasinBlock::new, () -> machine().sound(SoundType.NETHERITE_BLOCK));
 
     public static final Supplier<ProcessorBlock> CONVERTER = block("converter", properties -> new ProcessorBlock("converter", properties), ModBlocks::machine);
     public static final Supplier<ProcessorBlock> PARTICLE_ACCELERATOR = block("particle_accelerator", properties -> new ProcessorBlock("particle_accelerator", properties), ModBlocks::machine);

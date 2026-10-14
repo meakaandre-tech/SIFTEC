@@ -269,7 +269,9 @@ item_def("hub_planner", "siftec:item/hub_planner")
 
 # ---- the HUB and Wormhole Gateway structures (prefab/Templates.java): shell blocks by style, and the HUB's parts
 PREFAB = {  # style: (name, texture)
-    "white": ("HUB Panel", "minecraft:block/white_concrete"), "orange": ("HUB Trim", "minecraft:block/orange_concrete"),
+    # Polartt's palette, like the Build Gun's buildings: light and dark framed panels, flat orange, hazard stripes
+    "white": ("HUB Panel", "minecraft:block/iron_block"), "orange": ("HUB Trim", "minecraft:block/orange_concrete"),
+    "hazard_yellow": ("HUB Hazard Stripe", "minecraft:block/yellow_concrete"), "hazard_black": ("HUB Hazard Stripe (black)", "minecraft:block/black_concrete"),
     "metal": ("HUB Frame", "create:block/industrial_iron_block"), "floor": ("HUB Floor", "minecraft:block/light_gray_concrete"),
     "glass": ("HUB Window", "create:block/palettes/framed_glass"), "lamp": ("HUB Lamp", "minecraft:block/redstone_lamp_on"),
     "step": ("HUB Step", "minecraft:block/light_gray_concrete"), "locker": ("HUB Locker", "minecraft:block/iron_block"),
@@ -619,10 +621,10 @@ built = recipes.build()
 # Where the things no milestone locks come from, so an alternate is only offered once its company can get every
 # input: fluids and crushed ore from the machines that make them, tags from what is in them, and anything one of
 # the pack's own recipes makes from that recipe's inputs, machine and lock.
-SOURCES = {"createdieselgenerators:crude_oil": ["createdieselgenerators:pumpjack_crank", "createdieselgenerators:pumpjack_bearing"],
+SOURCES = {"createdieselgenerators:crude_oil": ["siftec:building/oil_extractor"],
            "createdieselgenerators:diesel": ["createdieselgenerators:distillation_controller", "createdieselgenerators:crude_oil"],
            "createdieselgenerators:biodiesel": ["siftec:solid_biofuel", "siftec:recipe/mixing/liquid_biofuel"],
-           "siftec:nitrogen": ["siftec:resource_well_extractor"], "siftec:sam": ["siftec:building/portable_miner"], "siftec:raw_bauxite": ["siftec:building/portable_miner"],
+           "siftec:nitrogen": ["siftec:building/resource_well_extractor"], "siftec:sam": ["siftec:building/portable_miner"], "siftec:raw_bauxite": ["siftec:building/portable_miner"],
            "#c:ingots/steel": ["cgs:steel_ingot"]}
 for ore in ("iron", "copper", "zinc", "gold"):
     SOURCES[f"create:crushed_raw_{ore}"] = [C + "crushing_wheel"]
@@ -689,7 +691,7 @@ for aid, info in recipes.ALTS.items():
 for machine, (pname, recipe_list) in content.PROCESSORS.items():
     for p in recipe_list:
         if not p["alt"]: continue
-        used = {_item_id(n) for n, c in p["in"]} | {"siftec:" + machine}
+        used = {_item_id(n) for n, c in p["in"]} | {"siftec:building/" + machine}
         if p["fluid_in"]: used.add(recipes.FLUID_IDS[p["fluid_in"][0]])
         data["alternates"].append({"id": "alt_" + p["alt"], "requires": needs_of(used)})
         lang[f"siftec.alt.alt_{p['alt']}"] = p["name"]
@@ -698,6 +700,28 @@ for machine, (pname, recipe_list) in content.PROCESSORS.items():
         took = ", ".join([f"{c} {n}" for n, c in p["in"]] + ([f"{p['fluid_in'][1]} mB {p['fluid_in'][0]}"] if p["fluid_in"] else []))
         lang[f"siftec.alt.alt_{p['alt']}.text"] = f"{took} makes {made_text} ({pname})"
 print("alternates:", len(data["alternates"]), "; with nothing required:", [a["id"] for a in data["alternates"] if not a["requires"]])
+# ---- what the Manufacturer, the Quantum Encoder and the Packager run (building/BuildingLogic.java): the steps of each
+# recipe and the milestone, MAM node or alternate it needs, so the building only takes on a recipe its company has
+recipes.build()
+
+
+def _recipe_lock(path, made):
+    lock = data["recipe_locks"].get("siftec:" + path)
+    if lock is None and path.startswith("sequenced_assembly/"):
+        lock = data["recipe_locks"].get("seq:" + made.split(":")[1])
+    return lock or ""
+
+
+data["assembly"] = []
+for e in recipes.ASSEMBLY:
+    entry = {k: v for k, v in e.items() if k != "seq"}
+    entry["lock"] = _recipe_lock(e["seq"], e.get("charged", e["result"]))
+    for st in e["steps"]:
+        if "item" in st and not st["item"].startswith("#"): check(st["item"], "assembly " + e["result"])
+    if not e["first"].startswith("#"): check(e["first"], "assembly " + e["result"])
+    data["assembly"].append(entry)
+data["packager"] = [{**{k: v for k, v in p.items() if k != "path"}, "lock": _recipe_lock(p["path"], p["out"])} for p in recipes.PACKAGER]
+print("assembly recipes:", len(data["assembly"]), "; packager recipes:", len(data["packager"]))
 print("recipes locked to a milestone:", len(data["recipe_locks"]), "of", len(recipes.build()))
 data["removed_recipes"] = recipes.REMOVED
 data["workshop"] = [{"item": i, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]} for i, cost in recipes.WORKSHOP]
@@ -720,7 +744,8 @@ write(f"{D}/loot_table/blocks/equipment_workshop.json", {"type": "minecraft:bloc
       "entries": [{"type": "minecraft:item", "name": "siftec:equipment_workshop"}]}]})
 # ---- Build Gun and its buildings (building/BuildGun.java, building/Buildings.java)
 data["buildings"] = []
-LOGICS = {"basin", "smelter", "miner", "portable_miner", "storage", "power"}
+LOGICS = {"basin", "smelter", "miner", "portable_miner", "storage", "power", "assembly", "packager", "extractor", "pressurizer",
+          "well_extractor", "processor"}
 POWERS = {"pole", "storage", "augmenter", "biomass", "coal", "fuel", "geothermal", "nuclear"}
 for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if tab not in content.BUILD_TABS:
@@ -741,8 +766,17 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
         if extra["logic"] not in LOGICS:
             raise SystemExit(f"building {bid}: unknown logic {extra['logic']!r}")
         b["logic"] = extra["logic"]
-    for k in ("su", "break", "fortune", "mw", "water", "lines"):
+    for k in ("su", "break", "fortune", "mw", "water", "lines", "rate"):
         if k in extra: b[k] = extra[k]
+    # an extractor's fluid, the fluid node it stands on (oil, nitrogen) and the water cell a Water Extractor stands over
+    if "fluid" in extra:
+        b["fluid"] = extra["fluid"]
+    if "fluid_node" in extra:
+        if extra["fluid_node"] not in ("oil", "nitrogen"):
+            raise SystemExit(f"building {bid}: unknown fluid node {extra['fluid_node']!r}")
+        b["fluid_node"] = extra["fluid_node"]
+    if "intake" in extra:
+        b["intake"] = list(extra["intake"])
     if "power" in extra:
         if extra["power"] not in POWERS:
             raise SystemExit(f"building {bid}: unknown power {extra['power']!r}")
@@ -839,6 +873,17 @@ lang.update({
     "siftec.building.full": "output full",
     "siftec.building.stopped": "not turning",
     "siftec.building.storage": "%s of %s slots used",
+    # work package 9
+    "siftec.building.no_filter_set": "no recipe set: use the panel with what it should make",
+    "siftec.building.no_recipe": "it cannot make that (or your company has not unlocked it)",
+    "siftec.building.no_water": "its intake is out of the water",
+    "siftec.build_gun.no_water": "A Water Extractor has to stand in water: its intake (the middle) over a water source",
+    "siftec.build_gun.no_node": "The %s has to stand over a node of its kind",
+    "siftec.build_gun.clump": "Mine the node's clump away first: %s blocks left",
+    "siftec.building.no_well": "no running Resource Well Pressurizer of your company within 32 blocks",
+    "siftec.building.extracting": "%s m3 of %s a minute",
+    "siftec.building.extracted": "%s mB out so far",
+    "siftec.building.pressurized": "pressurizing a %s well",
 })
 # a generator building's turbine: the steam engine's look, turning the generator coils while it runs
 write(f"{A}/models/block/turbine.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
@@ -848,22 +893,33 @@ write(f"{A}/blockstates/turbine.json", {"variants": {f"facing={d}": {"model": "s
 item_def("turbine", "siftec:block/turbine")
 # the controller: a control panel; the ports: a casing with a coloured face pointing out (Andre draws the real ones)
 write(f"{A}/blockstates/building_controller.json", {"variants": {f"facing={d}": ({"model": "siftec:block/building_controller", "y": y} if y else {"model": "siftec:block/building_controller"}) for d, y in ROT}})
-write(f"{A}/models/block/building_controller.json", {"parent": "minecraft:block/cube", "textures": {"particle": "create:block/brass_casing",
-      "north": "minecraft:block/crafter_north", "south": "create:block/brass_casing", "east": "create:block/brass_casing",
-      "west": "create:block/brass_casing", "up": "create:block/brass_casing", "down": "create:block/brass_casing"}})
+II = "create:block/industrial_iron_block"
+write(f"{A}/models/block/building_controller.json", {"parent": "minecraft:block/cube", "textures": {"particle": II,
+      "north": "minecraft:block/crafter_north", "south": II, "east": II, "west": II, "up": "create:block/industrial_iron_block_top", "down": II}})
 item_def("building_controller", "siftec:block/building_controller")
 PORT_FACES = {"item_in": "minecraft:block/lime_glazed_terracotta", "item_out": "minecraft:block/orange_glazed_terracotta",
               "fluid_in": "minecraft:block/light_blue_glazed_terracotta", "fluid_out": "minecraft:block/blue_glazed_terracotta"}
 PORT_TURN = {"north": {}, "east": {"y": 90}, "south": {"y": 180}, "west": {"y": 270}, "up": {"x": 270}, "down": {"x": 90}}
 port_variants = {}
 for kind, face in PORT_FACES.items():
-    write(f"{A}/models/block/building_port_{kind}.json", {"parent": "minecraft:block/cube", "textures": {"particle": "create:block/andesite_casing",
-          "north": face, "south": "create:block/andesite_casing", "east": "create:block/andesite_casing",
-          "west": "create:block/andesite_casing", "up": "create:block/andesite_casing", "down": "create:block/andesite_casing"}})
+    write(f"{A}/models/block/building_port_{kind}.json", {"parent": "minecraft:block/cube", "textures": {"particle": II,
+          "north": face, "south": II, "east": II, "west": II, "up": "create:block/industrial_iron_block_top", "down": II}})
     for d, turn in PORT_TURN.items():
         port_variants[f"facing={d},kind={kind}"] = {"model": f"siftec:block/building_port_{kind}", **turn}
 write(f"{A}/blockstates/building_port.json", {"variants": port_variants})
 item_def("building_port", "siftec:block/building_port_item_in")
+# the Brass Basin (the Manufacturer's and the Blender's Basin): Create's Basin in Create's brass casing, holding four
+# stacks of each item; Create's own Basin block entity runs it
+lang["block.siftec.brass_basin"] = "Brass Basin"
+BB = "create:block/brass_casing"
+write(f"{A}/models/block/brass_basin.json", {"parent": "minecraft:block/block", "textures": {"particle": BB, "case": BB}, "elements": [
+    {"from": [0, 2, 0], "to": [16, 16, 16], "faces": {**{d: {"uv": [0, 0, 16, 14], "texture": "#case"} for d in ("north", "east", "south", "west")},
+                                                       "up": {"uv": [0, 0, 16, 16], "texture": "#case"}, "down": {"uv": [0, 0, 16, 16], "texture": "#case"}}},
+    {"from": [1.95, 16, 1.95], "to": [14.05, 2, 14.05], "faces": {**{d: {"uv": [2, 2, 14, 14], "rotation": 180, "texture": "#case"} for d in ("north", "east", "south", "west")},
+                                                                    "up": {"uv": [2, 2, 14, 14], "rotation": 90, "texture": "#case"}}},
+    {"from": [2, 0, 2], "to": [14, 2, 14], "faces": {**{d: {"uv": [2, 14, 14, 16], "texture": "#case"} for d in ("north", "east", "south", "west")},
+                                                     "down": {"uv": [2, 2, 14, 14], "texture": "#case"}}}]})
+write(f"{A}/blockstates/brass_basin.json", {"variants": {f"facing={d}": {"model": "siftec:block/brass_basin"} for d in ("down", "north", "south", "east", "west")}})
 if UNKNOWN:
     raise SystemExit("unknown item ids (not items of the game or of the pack's mods):\n  " + "\n  ".join(UNKNOWN))
 write(os.path.join(ROOT, "siftec_content.json"), data)

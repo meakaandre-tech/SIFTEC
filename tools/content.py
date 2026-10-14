@@ -916,7 +916,41 @@ BUILDINGS = [
      {"logic": "power", "power": "nuclear", "mw": 2500, "water": 240}),
     ("alien_power_augmenter", "Alien Power Augmenter", "power", BUILD_COSTS["Alien Power Augmenter"], mam("Alien Technology", "Power Augmenter"), False,
      {"logic": "power", "power": "augmenter", "mw": 500}),
+    # work package 9: the rest of Satisfactory 1.0's production buildings, at 1.0's MW and unlocks. The Assembler, Foundry,
+    # Refinery and Blender are a Mixer over a Basin like the Constructor's Press (heated by a Blaze Burner the building keeps
+    # lit while it has power, for the last three); the Blender's and the Manufacturer's Basin is a Brass Basin, which holds
+    # four stacks of each item.
+    ("assembler", "Assembler", "production", BUILD_COSTS["Assembler"], "part_assembly", False, {"logic": "basin", "su": round(15 * MW)}),
+    ("foundry", "Foundry", "production", BUILD_COSTS["Foundry"], "basic_steel_production", False, {"logic": "basin", "su": round(16 * MW)}),
+    ("refinery", "Refinery", "production", BUILD_COSTS["Refinery"], "oil_processing", False, {"logic": "basin", "su": round(30 * MW)}),
+    ("blender", "Blender", "production", BUILD_COSTS["Blender"], "control_system_development", False, {"logic": "basin", "su": round(75 * MW)}),
+    # assembly: the Mixer over the Brass Basin makes the recipe's Core, then the Core goes along a row of Depots, a Deployer
+    # over each adding the last one of one input (the Quantum Encoder's Spout first fills it with Excited Photonic Matter,
+    # and its Item Drain takes the Dark Matter Residue off what comes out)
+    ("manufacturer", "Manufacturer", "production", BUILD_COSTS["Manufacturer"], "industrial_manufacturing", False, {"logic": "assembly", "su": round(55 * MW)}),
+    ("quantum_encoder", "Quantum Encoder", "production", BUILD_COSTS["Quantum Encoder"], "quantum_encoding", False,
+     {"logic": "assembly", "su": round(1000 * MW)}),
+    # packager: a Spout over a Depot fills empty canisters and tanks, an Item Drain empties packaged fluids
+    ("packager", "Packager", "production", BUILD_COSTS["Packager"], "fluid_packaging", False, {"logic": "packager", "su": round(10 * MW)}),
+    # extractors: fluid into a tank at 1.0's rate (rate: mB a minute on a normal node, purity scaling it); the Water
+    # Extractor stands in water over its intake cell, the Oil Extractor over an oil node, the Resource Well Pressurizer
+    # over a nitrogen well, and Resource Well Extractors near a running Pressurizer take the well's nitrogen
+    ("water_extractor", "Water Extractor", "production", BUILD_COSTS["Water Extractor"], "coal_power", False,
+     {"logic": "extractor", "su": round(20 * MW), "fluid": "minecraft:water", "rate": 120 * MB_PER_M3, "intake": (0, 0, 3)}),
+    ("oil_extractor", "Oil Extractor", "production", BUILD_COSTS["Oil Extractor"], "oil_processing", False,
+     {"logic": "extractor", "su": round(40 * MW), "fluid": "createdieselgenerators:crude_oil", "rate": 120 * MB_PER_M3, "node": (0, 0, 2), "fluid_node": "oil"}),
+    ("resource_well_pressurizer", "Resource Well Pressurizer", "production", BUILD_COSTS["Resource Well Pressurizer"], "advanced_aluminum_production", False,
+     {"logic": "pressurizer", "su": round(150 * MW), "node": (0, 0, 2), "fluid_node": "nitrogen"}),
+    ("resource_well_extractor", "Resource Well Extractor", "production", BUILD_COSTS["Resource Well Extractor"], "advanced_aluminum_production", False,
+     {"logic": "well_extractor", "fluid": "siftec:nitrogen", "rate": 60 * MB_PER_M3}),
+    # the pack's own late-game machines (PROCESSORS), run by the building from the recipe its filter picks; SU at the
+    # middle of 1.0's range (Particle Accelerator 250 to 750 MW for most recipes, Converter 100 to 400)
+    ("particle_accelerator", "Particle Accelerator", "production", BUILD_COSTS["Particle Accelerator"], "particle_enrichment", False,
+     {"logic": "processor", "su": round(500 * MW)}),
+    ("converter", "Converter", "production", BUILD_COSTS["Converter"], "matter_conversion", False, {"logic": "processor", "su": round(250 * MW)}),
 ]
+# The buildings whose Basin is a Brass Basin (four stacks of each item), for the recipe checkers
+BRASS_BASIN_BUILDINGS = ("manufacturer", "blender")
 # Buildings that stand over a resource node and can only go down once its clump is mined (the miners, extractors)
 NODE_BUILDINGS = {b[0] for b in BUILDINGS if "node" in b[6]}
 # What the generators burn, at Satisfactory 1.0's energy in MJ (a fluid's per m3): the Biomass Burners (the HUB's two and

@@ -91,6 +91,12 @@ _alt = None
 LOCKED = {}  # recipe path -> milestone, for recipes whose result alone does not say what unlocks them
 _under = None
 SATISFACTORY = {}  # recipe path -> the 1.0 recipe it comes from (key), for the checkers
+# What the Manufacturer and the Quantum Encoder run (building/BuildingLogic.java, "assembly"): one entry a recipe, with
+# what goes on the line first (the Core the Mixer makes, or the first input itself), each step's item or fluid, and what
+# the Item Drain takes off at the end. The Create recipes do the work; the building moves the item along its line.
+ASSEMBLY = []
+# What the Packager runs ("packager"): its Spout's filling and its Item Drain's emptying recipes, with Satisfactory's time
+PACKAGER = []
 
 
 def add(kind, name, body):
@@ -225,6 +231,10 @@ def satisfactory():
     for key, name, building, is_alt, secs, ins, outs, unlock in content.sat_recipes():
         if building in ("Converter", "Particle Accelerator") or name in VANILLA:
             continue
+        if name == "Alternate: Pure Aluminum Ingot":
+            # the Smelter's one recipe of two items into one cannot run on its fan, which smelts item by item: the
+            # Foundry, the other building that smelts, runs it in its heated Mixer
+            building = "Foundry"
         uid = content.unlock_id(unlock)
         rslug = content.slug(name)
         where = BUILDING_SLUG[building]
@@ -240,12 +250,10 @@ def satisfactory():
         item_out = [(n, a) for k, n, a in outs if k == "item"]
         fluid_out = [(n, mb(a)) for k, n, a in outs if k == "fluid"]
         ticks = round(secs * TICKS)
-        if building in ("Constructor", "Assembler", "Foundry", "Refinery", "Blender") or name == "Alternate: Pure Aluminum Ingot":
-            # the Smelter's one recipe of two items into one (Pure Aluminum Ingot) cannot run on a fan, which works item
-            # by item: it is pressed over a heated Basin instead
-            kind = "compacting" if building == "Constructor" or building == "Smelter" else "mixing"
+        if building in ("Constructor", "Assembler", "Foundry", "Refinery", "Blender"):
+            kind = "compacting" if building == "Constructor" else "mixing"
             body = {"type": f"create:{kind}"}
-            if building in HEATED or building == "Smelter":
+            if building in HEATED:
                 body["heat_requirement"] = "heated"
             if items:
                 body["ingredients"] = [item(i) for i in items]
@@ -266,11 +274,14 @@ def satisfactory():
                 (cname, cn), (pname, pn), (fname, fa) = container[0], packed[0], fluid[0]
                 per = fa / pn
                 if name.startswith("Packaged "):
-                    add("filling", f"{where}/{rslug}", {"type": "create:filling", "ingredient": item(cname), "fluid_ingredient": fl_in(fname, mb(per)),
+                    path = add("filling", f"{where}/{rslug}", {"type": "create:filling", "ingredient": item(cname), "fluid_ingredient": fl_in(fname, mb(per)),
                         "result": res(pname), "processing_time": round(ticks / pn)})
+                    PACKAGER.append({"kind": "fill", "in": made(cname), "fluid": FLUID_IDS[fname], "mb": mb(per), "out": made(pname), "ticks": round(ticks / pn), "path": path})
                 else:
-                    add("emptying", f"{where}/{rslug}", {"type": "create:emptying", "ingredient": item(pname), "result": res(cname),
+                    path = add("emptying", f"{where}/{rslug}", {"type": "create:emptying", "ingredient": item(pname), "result": res(cname),
                         "fluid_result": fl_out(fname, mb(per)), "processing_time": round(ticks / pn)})
+                    PACKAGER.append({"kind": "empty", "in": made(pname), "fluid": FLUID_IDS[fname], "mb": mb(per), "out": made(cname),
+                                     "ticks": round(ticks / pn), "path": path})
             else:
                 raise SystemExit(f"recipes: Packager recipe {name} is neither packing nor unpacking")
         elif building in content.TWO_STEP:
@@ -286,13 +297,18 @@ def satisfactory():
             if fluids:
                 steps = [("fill", f, m) for f, m in fluids] + steps
             (out_name, out_n), = item_out
+            entry = {"building": where, "result": made(out_name), "count": out_n, "first": item(base), "core": bool(core),
+                     "steps": [{"fluid": FLUID_IDS[st[1]], "mb": st[2]} if isinstance(st, tuple) else {"item": item(st)} for st in steps],
+                     "ticks": ticks}
             if charged:
-                sequence(base, "siftec:" + charged, steps, 1, name=f"{where}/{rslug}", transitional="siftec:" + incomplete)
+                entry["seq"] = sequence(base, "siftec:" + charged, steps, 1, name=f"{where}/{rslug}", transitional="siftec:" + incomplete)
                 (fname, fmb), = fluid_out
                 add("emptying", f"{where}/{rslug}_drain", {"type": "create:emptying", "ingredient": item("siftec:" + charged),
                     "result": res(out_name), "fluid_result": fl_out(fname, fmb)})
+                entry["charged"] = "siftec:" + charged
             else:
-                sequence(base, out_name, steps, 1, name=f"{where}/{rslug}", n=out_n, transitional="siftec:" + incomplete)
+                entry["seq"] = sequence(base, out_name, steps, 1, name=f"{where}/{rslug}", n=out_n, transitional="siftec:" + incomplete)
+            ASSEMBLY.append(entry)
         else:
             raise SystemExit(f"recipes: no machine for {building}")
         for path in set(OUT) - before:
@@ -314,7 +330,9 @@ def equipment_by_machine():
         core = content.EQUIPMENT_CORES[iid]
         under(content.EQUIPMENT_LOCKS.get(iid))
         mix(f"manufacturer/{rid}_core", items=[c for c, n in parts for _ in range(n - 1)], results=["siftec:" + core])
-        sequence("siftec:" + core, iid, [c for c, n in parts], 1, name=f"manufacturer/{rid}", transitional="siftec:incomplete_" + rid)
+        seq = sequence("siftec:" + core, iid, [c for c, n in parts], 1, name=f"manufacturer/{rid}", transitional="siftec:incomplete_" + rid)
+        ASSEMBLY.append({"building": "manufacturer", "result": iid, "count": 1, "first": "siftec:" + core, "core": True,
+                         "steps": [{"item": item(c)} for c, n in parts], "ticks": 0, "seq": seq})
         under(None)
 
 
@@ -330,7 +348,9 @@ def vanilla():
         else:
             core, incomplete = content.VANILLA_CORES[out]
             mix(f"manufacturer/{rid}_core", items=[p for p, c in parts for _ in range(c - 1)], results=["siftec:" + core])
-            sequence("siftec:" + core, out, [p for p, c in parts], 1, name=f"manufacturer/{rid}", n=n, transitional="siftec:" + incomplete)
+            seq = sequence("siftec:" + core, out, [p for p, c in parts], 1, name=f"manufacturer/{rid}", n=n, transitional="siftec:" + incomplete)
+            ASSEMBLY.append({"building": "manufacturer", "result": out, "count": n, "first": "siftec:" + core, "core": True,
+                             "steps": [{"item": item(p)} for p, c in parts], "ticks": 0, "seq": seq})
         under(None)
 
 
@@ -477,6 +497,8 @@ def carried_over():
 def build():
     OUT.clear()
     ALTS.clear()
+    ASSEMBLY.clear()
+    PACKAGER.clear()
     KITCHEN.clear()
     LOCKED.clear()
     SATISFACTORY.clear()
@@ -516,8 +538,8 @@ REMOVED = [
 ]
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked. Equipment and the
 # buildings 1.0 has cost what they cost in 1.0 (content.EQUIPMENT_COSTS and content.BUILD_COSTS, under the 1.0 name);
-# the buildings move to the Build Gun in work packages 5 and 9 (the Portable Miner has; the HUB is every player's to
-# start with and costs its 20 Raw Iron when it goes down). The rest are the pack's own.
+# the buildings have moved to the Build Gun in work packages 5 and 9 (the HUB is every player's to start with and costs its
+# 20 Raw Iron when it goes down). The rest are the pack's own.
 _B, _E = content.BUILD_COSTS, content.EQUIPMENT_COSTS
 WORKSHOP = [
     ("siftec:node_scanner", "2 Iron Sheet, 4 Wire"),
@@ -546,7 +568,5 @@ WORKSHOP = [
     ("siftec:dimensional_depot", _B["Dimensional Depot Uploader"]),
     ("siftec:awesome_sink", _B["AWESOME Sink"]),
     ("siftec:awesome_shop", _B["AWESOME Shop"]),
-    ("siftec:particle_accelerator", _B["Particle Accelerator"]),
-    ("siftec:converter", _B["Converter"]),
-    ("siftec:resource_well_extractor", _B["Resource Well Extractor"]),
+    # the Particle Accelerator, the Converter and the Resource Well Extractor are Build Gun buildings (work package 9)
 ]

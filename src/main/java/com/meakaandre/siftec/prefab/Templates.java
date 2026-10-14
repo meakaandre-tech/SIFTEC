@@ -80,11 +80,15 @@ public final class Templates {
         BlockState white = s("white"), orange = s("orange"), metal = s("metal"), floor = s("floor"), glass = s("glass"),
             lamp = s("lamp"), step = s("step"), locker = s("locker"), air = Template.AIR;
 
-        // ---- the platform: entrance steps at the front, the floor, an orange edge
+        // ---- the platform: entrance steps at the front, the floor, yellow and black hazard stripes down its sides (as
+        // Polartt's pads have them) and an orange back edge
         t.box(0, M, -7, 0, 0, 6, 0, 0, step);
         t.box(0, M, -7, 0, 1, 6, 0, 25, floor);
-        t.box(0, M, -7, 0, 1, -7, 0, 25, orange);
-        t.box(0, M, 6, 0, 1, 6, 0, 25, orange);
+        BlockState hazardY = s("hazard_yellow"), hazardB = s("hazard_black");
+        for (int z = 1; z <= 25; z++) {
+            t.set(0, M, -7, 0, z, z % 2 == 0 ? hazardY : hazardB);
+            t.set(0, M, 6, 0, z, z % 2 == 0 ? hazardY : hazardB);
+        }
         t.box(0, M, -7, 0, 25, 6, 0, 25, orange);
 
         // ---- terminal hall (z 1 to 9), open at the front, roof at y 7

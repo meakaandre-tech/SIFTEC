@@ -52,6 +52,24 @@ public class ControllerBlockEntity extends BlockEntity {
     /** What a status line says is wrong right now ("" if nothing), as a lang key. */
     public String problem = "";
     public final SimpleContainer input = slots(), output = slots();
+    /**
+     * Nine input slots, for the Particle Accelerator's and the Converter's ingredients: slot i takes the recipe's input i
+     * mod n, so a plentiful input never fills the slots a scarce one needs.
+     */
+    public final SimpleContainer buffer = new SimpleContainer(9) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            ControllerBlockEntity.this.setChanged();
+        }
+
+        @Override
+        public boolean canPlaceItem(int slot, ItemStack stack) {
+            return ProductionLogic.processorSlotTakes(ControllerBlockEntity.this, slot, stack);
+        }
+    };
+    /** What the assembly line last put on each of its stations (a Depot or the Item Drain), to see when its step is done. */
+    public final List<ItemStack> line = new ArrayList<>();
     // ---- power (BuildingPower)
     /** Banked energy in SU-ticks: a generator's fuel, a Power Storage's charge. */
     public double energy;
@@ -118,7 +136,8 @@ public class ControllerBlockEntity extends BlockEntity {
                     return false;
                 }
             };
-            storage = new CombinedStorage<>(List.of(in, FilteringStorage.extractOnlyOf(ContainerStorage.of(output, null))));
+            storage = new CombinedStorage<>(List.of(in, FilteringStorage.insertOnlyOf(ContainerStorage.of(buffer, null)),
+                FilteringStorage.extractOnlyOf(ContainerStorage.of(output, null))));
         }
         return storage;
     }
@@ -126,9 +145,11 @@ public class ControllerBlockEntity extends BlockEntity {
     /** Empties the input and output slots and returns what they held (dismantling gives it back). */
     public List<ItemStack> takeContents() {
         List<ItemStack> out = new ArrayList<>();
-        for (SimpleContainer c : new SimpleContainer[]{input, output}) {
-            ItemStack stack = c.removeItemNoUpdate(0);
-            if (!stack.isEmpty()) out.add(stack);
+        for (SimpleContainer c : new SimpleContainer[]{input, output, buffer}) {
+            for (int i = 0; i < c.getContainerSize(); i++) {
+                ItemStack stack = c.removeItemNoUpdate(i);
+                if (!stack.isEmpty()) out.add(stack);
+            }
         }
         setChanged();
         return out;
@@ -176,6 +197,10 @@ public class ControllerBlockEntity extends BlockEntity {
         view.putBoolean("Running", running);
         view.putBoolean("Erupting", erupting);
         view.putInt("Fed", fedTicks);
+        List<ItemStack> held = new ArrayList<>();
+        for (int i = 0; i < buffer.getContainerSize(); i++) held.add(buffer.getItem(i));
+        view.store("Buffer", ItemStack.OPTIONAL_CODEC.listOf(), held);
+        view.store("Line", ItemStack.OPTIONAL_CODEC.listOf(), new ArrayList<>(line));
     }
 
     @Override
@@ -202,5 +227,9 @@ public class ControllerBlockEntity extends BlockEntity {
         running = view.getBooleanOr("Running", false);
         erupting = view.getBooleanOr("Erupting", false);
         fedTicks = view.getIntOr("Fed", 0);
+        List<ItemStack> held = view.read("Buffer", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of());
+        for (int i = 0; i < buffer.getContainerSize(); i++) buffer.setItem(i, i < held.size() ? held.get(i) : ItemStack.EMPTY);
+        line.clear();
+        line.addAll(view.read("Line", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of()));
     }
 }

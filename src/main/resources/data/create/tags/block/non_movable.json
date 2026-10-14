@@ -5,6 +5,8 @@
     "siftec:wormhole_gateway",
     "siftec:prefab_white",
     "siftec:prefab_orange",
+    "siftec:prefab_hazard_yellow",
+    "siftec:prefab_hazard_black",
     "siftec:prefab_metal",
     "siftec:prefab_floor",
     "siftec:prefab_glass",

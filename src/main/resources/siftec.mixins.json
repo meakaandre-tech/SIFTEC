@@ -67,7 +67,10 @@
     "SiftEntryMixin",
     "SlotMixin",
     "SmartTankMixin",
-    "TunnelMixin"
+    "TunnelMixin",
+    "building.BasinTypeMixin",
+    "building.BrassBasinInventoryMixin",
+    "building.BlazeBurnerAccessor"
   ],
   "client": [
     "client.BuildGunNudgeMixin",

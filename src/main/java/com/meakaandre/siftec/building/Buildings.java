@@ -90,7 +90,9 @@ public final class Buildings {
                 o.has("unlock") ? o.get("unlock").getAsString() : "", o.has("dev") && o.get("dev").getAsBoolean(), node, nodeCell,
                 o.has("logic") ? o.get("logic").getAsString() : "", o.has("su") ? o.get("su").getAsInt() : 0, o.has("break") ? o.get("break").getAsInt() : 0, o.has("fortune") ? o.get("fortune").getAsInt() : 0,
                 o.has("power") ? o.get("power").getAsString() : "", o.has("mw") ? o.get("mw").getAsDouble() : 0, o.has("water") ? o.get("water").getAsDouble() : 0,
-                o.has("lines") ? o.get("lines").getAsInt() : 0, cell(o, "vent"), o.has("prefab") ? o.get("prefab").getAsString() : "");
+                o.has("lines") ? o.get("lines").getAsInt() : 0, cell(o, "vent"), o.has("prefab") ? o.get("prefab").getAsString() : "",
+                o.has("fluid") ? o.get("fluid").getAsString() : "", o.has("rate") ? o.get("rate").getAsInt() : 0,
+                o.has("fluid_node") ? o.get("fluid_node").getAsString() : "", cell(o, "intake"));
             DEFS.put(def.id(), def);
         }
     }
@@ -179,6 +181,12 @@ public final class Buildings {
             if (cell.solid()) solid.add(pos.asLong());
         }
         if (p.def().node()) nodeUnder(level, p, t, check);
+        int[] intake = p.def().intake();
+        if (intake != null) {
+            BlockPos water = p.at(intake[0], intake[1], intake[2]);
+            var fluid = level.getFluidState(water);
+            if (!fluid.isSource() || !fluid.is(net.minecraft.tags.FluidTags.WATER)) check.fail("siftec.build_gun.no_water");
+        }
         int[] vent = p.def().vent();
         if (vent != null && com.meakaandre.siftec.geyser.Vents.findVent(level, p.at(vent[0], vent[1], vent[2])) == null) {
             check.fail("siftec.power.no_geyser_place");
@@ -233,13 +241,19 @@ public final class Buildings {
             || block instanceof com.meakaandre.siftec.block.DepletedNodeBlock;
     }
 
+    /** The node a building stands on: an ore node for a miner, or a fluid node of its type for an extractor (oil, nitrogen). */
+    static boolean isNode(BuildingDef def, BlockState state) {
+        if (def.fluidNode().isEmpty()) return isNode(state);
+        return state.getBlock() instanceof com.meakaandre.siftec.block.NodeBlock node && node.look.fluid() && node.look.type().id().equals(def.fluidNode());
+    }
+
     /** The node a node building stands over: in its node cell, or else anywhere in its box (grown or mined). */
     public static @Nullable BlockPos nodeIn(Level level, Placement p, BuildingTemplate t) {
         int[] c = p.def().nodeCell();
-        if (c != null && isNode(level.getBlockState(p.at(c[0], c[1], c[2])))) return p.at(c[0], c[1], c[2]).immutable();
+        if (c != null && isNode(p.def(), level.getBlockState(p.at(c[0], c[1], c[2])))) return p.at(c[0], c[1], c[2]).immutable();
         AABB box = p.bounds(t);
         for (BlockPos pos : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
-            if (isNode(level.getBlockState(pos))) return pos.immutable();
+            if (isNode(p.def(), level.getBlockState(pos))) return pos.immutable();
         }
         return null;
     }
@@ -255,7 +269,7 @@ public final class Buildings {
         BlockPos best = null;
         double bestDist = Double.MAX_VALUE;
         for (BlockPos pos : BlockPos.betweenClosed(aim.offset(-3, -1, -3), aim.offset(3, 1, 3))) {
-            if (!level.isLoaded(pos) || !isNode(level.getBlockState(pos))) continue;
+            if (!level.isLoaded(pos) || !isNode(p.def(), level.getBlockState(pos))) continue;
             double d = pos.distSqr(aim);
             if (d < bestDist) {
                 bestDist = d;
