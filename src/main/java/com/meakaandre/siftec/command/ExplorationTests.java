@@ -144,6 +144,25 @@ public final class ExplorationTests {
         return c;
     }
 
+    /** The nearest spot of exactly this kind (not a crash pod carrying a Somersloop), from the cells round spawn. */
+    private static Optional<Collectibles.Spot> nearestOf(ServerLevel level, int[] origin, Collectible type, Set<String> collected) {
+        int oc = Math.floorDiv(origin[0], Collectibles.CELL), oz = Math.floorDiv(origin[1], Collectibles.CELL);
+        Collectibles.Spot best = null;
+        double bestD = Double.MAX_VALUE;
+        for (int dx = -40; dx <= 40; dx++) {
+            for (int dz = -40; dz <= 40; dz++) {
+                Optional<Collectibles.Spot> s = Collectibles.inCell(level, oc + dx, oz + dz);
+                if (s.isEmpty() || s.get().type() != type || collected.contains(s.get().key())) continue;
+                double d = Math.pow(s.get().x() - origin[0], 2) + Math.pow(s.get().z() - origin[1], 2);
+                if (d < bestD) {
+                    bestD = d;
+                    best = s.get();
+                }
+            }
+        }
+        return Optional.ofNullable(best);
+    }
+
     /** Where a collectible's block ended up in its column (its pocket, its float or its pod), or null. */
     private static @Nullable BlockPos find(ServerLevel level, Collectibles.Spot spot) {
         Block block = ModBlocks.COLLECTIBLES.get(spot.type()).get();
@@ -213,9 +232,15 @@ public final class ExplorationTests {
         FakePlayer fake = FakePlayer.get(level);
         fake.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         fake.getInventory().clearContent();
-        Company mine = Companies.of(fake);
+        // a fake player is nobody's member: for the test it joins a company of its own, and leaves it again at the end
+        CompanyData data = CompanyData.get(level.getServer());
+        Company mine = new Company();
+        mine.id = COMPANY + "_collect";
+        mine.name = "Selftest Exploration Collector";
+        mine.members.add(fake.getUUID().toString());
+        data.companies().put(mine.id, mine);
         for (Collectible type : Collectible.values()) {
-            Optional<Collectibles.Spot> nearest = Collectibles.nearest(level, origin[0], origin[1], type, Set.copyOf(mine.collected), 40);
+            Optional<Collectibles.Spot> nearest = nearestOf(level, origin, type, mine.collected);
             if (nearest.isEmpty()) {
                 expect(source, type.id() + ": one within 40 cells of spawn", false, "");
                 continue;
@@ -249,10 +274,13 @@ public final class ExplorationTests {
             expect(source, type.id() + ": collected once, the item given, and its MAM tree (" + type.tree + ") started",
                 got && item && mine.collected.contains(CollectibleBlock.key(at)) && mine.trees.contains(type.tree) && !CollectibleBlock.tryCollect(fake, at, type),
                 "collected " + got + ", item " + item + ", trees " + mine.trees);
-            Optional<Collectibles.Spot> next = Collectibles.nearest(level, origin[0], origin[1], type, Set.copyOf(mine.collected), 40);
+            Optional<Collectibles.Spot> next = nearestOf(level, origin, type, mine.collected);
             expect(source, type.id() + ": the scanner skips the one the company collected", next.isEmpty() || !next.get().key().equals(spot.key()), "");
         }
         expect(source, "the Hard Drive page and the Alien Technology tree are open to the company now", mine.trees.containsAll(List.of("alien", "hard_drives")), mine.trees.toString());
+        mine.members.clear();
+        data.companies().remove(mine.id);
+        fake.getInventory().clearContent();
 
         // ---- the Object Scanner: what each company can look for, and wild food in loaded land
         Company nutrients = fresh("mam_nutrients_sweet_berry_research", "mam_nutrients_apple_research", "mam_nutrients_glow_berry_research");
