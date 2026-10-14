@@ -635,6 +635,17 @@ public final class BuildingsBTests {
         expect(source, "restart: the Manufacturer and the Particle Accelerator kept their recipe filters", mc != null && mc.filter.is(item("siftec:computer"))
             && pac != null && pac.filter.is(item("siftec:dark_matter_crystal")), (mc == null ? "-" : mc.filter.toString()) + ", " + (pac == null ? "-" : pac.filter.toString()));
         long before = pac == null ? -1 : pac.made;
+        // its belt ran dry before the restart: more diamonds through its input port, and the residue piped in again
+        BlockPos diamondsIn = pa.at(-2, 0, 20);
+        var port = ItemStorage.SIDED.find(level, diamondsIn, level.getBlockState(diamondsIn).hasProperty(PortBlock.FACING)
+            ? level.getBlockState(diamondsIn).getValue(PortBlock.FACING) : null);
+        if (port != null) {
+            try (Transaction tx = Transaction.openOuter()) {
+                port.insert(ItemVariant.of(Items.DIAMOND), 16, tx);
+                tx.commit();
+            }
+        }
+        pipeInto(level, pa, new int[]{2, 0, 20}, fluid("siftec:dark_matter_residue"), 8);
         later(level, 200, () -> {
             ControllerBlockEntity p2 = controller(level, pa);
             expect(source, "restart: the Particle Accelerator is back on its grid and goes on making", p2 != null && p2.powered && p2.made > before,

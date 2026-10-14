@@ -363,12 +363,13 @@ public final class ProductionLogic {
         if (a.steps.isEmpty()) return;
         Station first = line.get(route[0]);
         if (!held(level, first).isEmpty()) return;
-        if (!a.core && level.getGameTime() < c.nextCraft) return;
+        // one goes on each recipe time, so the line runs at Satisfactory's rate however fast the Mixer makes Cores
+        if (level.getGameTime() < c.nextCraft) return;
         ItemStack next = takeFromBasin(basin, a.first, a.core);
         if (next.isEmpty()) return;
         if (put(level, first, next)) {
             c.line.set(route[0], next.copy());
-            if (!a.core) c.nextCraft = level.getGameTime() + a.ticks;
+            c.nextCraft = level.getGameTime() + a.ticks;
             c.setChanged();
         } else {
             giveBack(basin, next);
