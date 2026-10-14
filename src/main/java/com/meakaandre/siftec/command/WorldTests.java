@@ -464,21 +464,6 @@ public final class WorldTests {
         return 1;
     }
 
-    /** A company that has every speed limit milestone done, for machines that turn fast. */
-    static String fastCompany(CommandSourceStack source) {
-        var data = com.meakaandre.siftec.company.CompanyData.get(source.getServer());
-        com.meakaandre.siftec.company.Company company = data.byId("worldtest_fast");
-        if (company == null) {
-            company = new com.meakaandre.siftec.company.Company();
-            company.id = "worldtest_fast";
-            for (com.meakaandre.siftec.hub.Milestone m : com.meakaandre.siftec.hub.Milestones.all()) {
-                if (m.tokens().stream().anyMatch(t -> t.startsWith("cap:"))) company.done.add(m.id());
-            }
-            data.companies().put(company.id, company);
-        }
-        return company.id;
-    }
-
     // ---- processors
 
     /** A Converter or Particle Accelerator with a two-ingredient recipe, fed far too much of one ingredient: it must still take the other. */

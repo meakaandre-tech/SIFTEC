@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.tweak.SpeedCap;
+import com.meakaandre.siftec.net.CompanyState;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -86,7 +86,7 @@ public final class Alternates {
         company.done.add(id);
         company.offer = new ArrayList<>();
         Companies.save(server);
-        SpeedCap.recompute(server);
+        CompanyState.recompute(server);
         Companies.tell(server, company, Component.translatable("siftec.alt.chosen", name(id), text(id)).withStyle(ChatFormatting.GOLD));
         return true;
     }

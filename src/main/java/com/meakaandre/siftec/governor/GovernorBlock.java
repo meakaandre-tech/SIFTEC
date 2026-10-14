@@ -14,7 +14,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * Speed Governor: a shaft goes in one end and comes out the other at the speed you pick, whatever the
- * speed going in. Click it to choose; the most it will give is the speed limit of the company it belongs to.
+ * speed going in. Click it to choose, up to Create's top speed.
  */
 public class GovernorBlock extends AbstractEncasedShaftBlock implements IBE<GovernorBlockEntity> {
     public GovernorBlock(Properties properties) {

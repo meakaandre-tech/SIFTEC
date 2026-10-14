@@ -59,6 +59,7 @@ public class SiftecClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(com.meakaandre.siftec.prefab.PreviewPayload.TYPE, (payload, context) -> net.minecraft.client.Minecraft.getInstance().execute(() -> PrefabPreview.accept(payload)));
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(PrefabPreview::tick);
         BuildGunClient.register();
+        CloudButton.register();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
             ClientState.jetFuel = true;

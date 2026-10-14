@@ -6,6 +6,8 @@
   "mixins": [
     "BeltInventoryAccessor",
     "BeltProcessingMixin",
+    "BeltSelfMovingMixin",
+    "BeltSpeedMixin",
     "BlockDisplayInvoker",
     "BlueprintRecipeMixin",
     "BoundTickerMixin",
@@ -69,7 +71,9 @@
   ],
   "client": [
     "client.BuildGunNudgeMixin",
-    "client.BuildGunScrollMixin"
+    "client.BuildGunScrollMixin",
+    "client.ContainerScreenAccessor",
+    "client.ScreenInvoker"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1191,7 +1191,9 @@
         "create:speedometer",
         "create:stressometer"
       ],
-      "tokens": []
+      "tokens": [
+        "belt:60"
+      ]
     },
     {
       "id": "field_research",
@@ -1410,7 +1412,7 @@
       "seconds": 360,
       "items": [],
       "tokens": [
-        "cap:64"
+        "belt:120"
       ]
     },
     {
@@ -1610,7 +1612,7 @@
       "seconds": 300,
       "items": [],
       "tokens": [
-        "cap:96"
+        "belt:270"
       ]
     },
     {
@@ -1824,7 +1826,7 @@
       "seconds": 300,
       "items": [],
       "tokens": [
-        "cap:128"
+        "belt:480"
       ]
     },
     {
@@ -2121,7 +2123,7 @@
       "seconds": 300,
       "items": [],
       "tokens": [
-        "cap:192"
+        "belt:780"
       ]
     },
     {
@@ -2564,7 +2566,7 @@
         "siftec:incomplete_ficsonium_fuel_rod"
       ],
       "tokens": [
-        "cap:256"
+        "belt:1200"
       ]
     }
   ],

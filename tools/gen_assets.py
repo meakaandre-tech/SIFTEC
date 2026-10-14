@@ -154,7 +154,8 @@ lang["siftec.tag.spider_remains"] = "spider eye or string"
 
 # miners and the extractor: Create casings until real models are picked
 lang.update({"block.siftec.dimensional_depot": "Dimensional Depot", "siftec.depot.title": "Cloud: %s", "siftec.depot.count": "%s in the cloud",
-             "siftec.depot.click": "Click to take a stack", "siftec.depot.previous": "Previous page", "siftec.depot.next": "Next page"})
+             "siftec.depot.click": "Click to take a stack", "siftec.depot.previous": "Previous page", "siftec.depot.next": "Next page",
+             "siftec.depot.button": "Cloud", "siftec.depot.button.tooltip": "Your company's Dimensional Depot cloud: take items out"})
 
 lang.update({"siftec.claim.denied": "This land belongs to %s", "siftec.claim.budget": "Your company has used all %s of its Claim Markers",
              "siftec.claim.too_close": "Too close: markers must be more than %s chunks from another company's HUB",
@@ -321,8 +322,8 @@ write(f"{A}/models/block/steel_casing.json", {"parent": "minecraft:block/cube_al
 item_def("steel_casing", "siftec:block/steel_casing")
 lang.update({"siftec.lock.alt": "Locked: an alternate recipe from a Hard Drive (%s)", "siftec.lock.disabled": "Switched off in this pack", "siftec.blueprint.turned": "Blueprint turned to %s degrees"})
 # Speed Governor: borrows the Gearshift's model until it has its own
-lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (your company's limit is %s)",
-             "siftec.governor.set": "Set to %s RPM", "siftec.governor.over": "%s RPM: above your company's limit", "siftec.governor.step": "%s RPM"})
+lang.update({"block.siftec.speed_governor": "Speed Governor", "siftec.governor.status": "%s RPM out (at most %s)",
+             "siftec.governor.set": "Set to %s RPM", "siftec.governor.step": "%s RPM"})
 write(f"{A}/blockstates/speed_governor.json", {"variants": {
     "axis=x": {"model": "create:block/gearshift/block", "x": 90, "y": 90}, "axis=y": {"model": "create:block/gearshift/block"},
     "axis=z": {"model": "create:block/gearshift/block", "x": 90, "y": 180}}})
