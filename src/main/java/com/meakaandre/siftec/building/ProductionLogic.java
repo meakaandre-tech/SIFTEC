@@ -23,6 +23,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -473,7 +474,24 @@ public final class ProductionLogic {
     // ------------------------------------------------------------------------------------------------ fluids
 
     static @Nullable Storage<FluidVariant> fluids(Level level, @Nullable BlockPos pos) {
-        return pos == null ? null : FluidStorage.SIDED.find(level, pos, null);
+        return pos == null ? null : fluids(level, pos, null);
+    }
+
+    /**
+     * The fluid storage of a block from a side: Fabric's lookup, or for blocks Create only gives its own fluid inventory
+     * (the Item Drain), that inventory wrapped for Fabric.
+     */
+    @SuppressWarnings("unchecked")
+    static @Nullable Storage<FluidVariant> fluids(Level level, BlockPos pos, @Nullable Direction side) {
+        Storage<FluidVariant> s = FluidStorage.SIDED.find(level, pos, side);
+        if (s != null) return s;
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider<?> provider) {
+            var inv = provider.getFluidInventory(state, level, pos, level.getBlockEntity(pos), side);
+            if (inv != null) return side == null ? com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage.of(inv)
+                : com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage.of(inv, side);
+        }
+        return null;
     }
 
     /** The fluid in a tank or a Spout (the first it holds), or empty. */

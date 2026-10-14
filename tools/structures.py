@@ -146,6 +146,7 @@ EXTENSION = "create_new_age:basic_motor_extension[facing={}]"
 CONNECTOR = "create_new_age:electrical_connector[facing=up,mode=inert]"
 TANK = "create:fluid_tank[bottom=true,shape=window,top=true]"
 BASIN, BRASS_BASIN = "create:basin[facing=down]", "siftec:brass_basin[facing=down]"
+COG = "create:cogwheel[axis=y]"
 MIXER, DEPOT, SPOUT, DRAIN = "create:mechanical_mixer", "create:depot", "create:spout", "create:item_drain"
 BURNER = "create:blaze_burner[blaze=smouldering,facing=south]"
 # a deployer facing down whose shaft runs front to back (along z), so a row of them is turned through shafts between them
@@ -583,8 +584,7 @@ def assembler():
         f.box(side, 5, 2, side, 5, 8, DARK)
     f.set(0, 1, 5, BASIN)
     f.set(0, 2, 5, AIR)
-    f.set(0, 3, 5, MIXER)
-    f.set(0, 4, 5, MOTOR.format("down"))
+    mixer(f, 0, 3, 5)
     f.set(1, 1, 1, CONTROLLER)
     f.port(0, 0, 0, "south", "item_out", (0, 1, 5))
     f.port(-1, 0, 10, "north", "item_in", (0, 1, 5))
@@ -593,14 +593,21 @@ def assembler():
     return f.done()
 
 
+def mixer(f, x, y, z):
+    """A Mechanical Mixer has no shaft of its own: it turns as a cog, so a cogwheel beside it (to its right) is turned by
+    the motor on top of the cogwheel."""
+    f.set(x, y, z, MIXER)
+    f.set(x + 1, y, z, COG)
+    f.set(x + 1, y + 1, z, MOTOR.format("down"))
+
+
 def heated_mixer(f, x, z, basin=BASIN):
     """A heated Mixer: a Blaze Burner (kept lit by the building while it has power), the Basin on it, the Mixer two above
-    and the motor on the Mixer. Returns the Basin's cell."""
+    and its cogwheel and motor beside it. Returns the Basin's cell."""
     f.set(x, 1, z, BURNER)
     f.set(x, 2, z, basin)
     f.set(x, 3, z, AIR)
-    f.set(x, 4, z, MIXER)
-    f.set(x, 5, z, MOTOR.format("down"))
+    mixer(f, x, 4, z)
     return (x, 2, z)
 
 
@@ -684,8 +691,7 @@ def assembly_line(f, x, z_basin, stations, motor_z, basin=BRASS_BASIN):
     back through shafts between them, turned by one motor at the front end. Returns the Basin's cell."""
     f.set(x, 1, z_basin, basin)
     f.set(x, 2, z_basin, AIR)
-    f.set(x, 3, z_basin, MIXER)
-    f.set(x, 4, z_basin, MOTOR.format("down"))
+    mixer(f, x, 3, z_basin)
     z = z_basin - 2
     deployers = []
     for kind in stations:

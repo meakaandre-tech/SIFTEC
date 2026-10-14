@@ -628,7 +628,7 @@ public final class BuildingsBTests {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
         passed = failed = 0;
-        Placement ma = at("manufacturer", X + 4 * STEP, Z), pa = at("particle_accelerator", X + 11 * STEP, Z);
+        Placement ma = at("manufacturer", X + 4 * STEP, Z), pa = at("particle_accelerator", X + 10 * STEP, Z);
         level.getChunk(ma.anchor());
         level.getChunk(pa.anchor());
         ControllerBlockEntity mc = controller(level, ma), pac = controller(level, pa);
@@ -691,6 +691,10 @@ public final class BuildingsBTests {
             }
         }
         int mid = (VX + x) / 2;
+        // the camera hangs in the air (it would fall into the sea off the platform)
+        player.getAbilities().mayfly = true;
+        player.getAbilities().flying = true;
+        player.onUpdateAbilities();
         switch (n) {
             case 0 -> player.teleportTo(level, mid + 0.5, VY + 30, VZ + 60.5, java.util.Set.of(), 180f, 25f, true);
             case 1 -> player.teleportTo(level, where.getOrDefault("assembler", VX) + 4.5, VY + 8, VZ + 22.5, java.util.Set.of(), 160f, 15f, true);
