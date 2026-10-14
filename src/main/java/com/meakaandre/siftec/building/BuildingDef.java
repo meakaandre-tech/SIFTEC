@@ -38,6 +38,16 @@ public record BuildingDef(String id, Category category, List<Milestone.Cost> cos
         return prefab.equals("hub");
     }
 
+    /** A structure (the HUB or the Wormhole Gateway) the Build Gun puts down whole through {@link com.meakaandre.siftec.prefab.Prefabs}. */
+    public boolean structure() {
+        return !prefab.isEmpty();
+    }
+
+    /** Which structure it is, for {@link #structure()} ones. */
+    public com.meakaandre.siftec.prefab.Prefabs.Kind kind() {
+        return prefab.equals("gateway") ? com.meakaandre.siftec.prefab.Prefabs.Kind.GATEWAY : com.meakaandre.siftec.prefab.Prefabs.Kind.HUB;
+    }
+
     public String nameKey() {
         return "siftec.building." + id;
     }

@@ -16,6 +16,8 @@
     "siftec:prefab_coil_lit",
     "siftec:prefab_rift",
     "siftec:prefab_foundation",
+    "siftec:prefab_conduit",
+    "siftec:prefab_portal",
     "siftec:hub_bed",
     "siftec:personal_storage",
     "siftec:hub_burner",

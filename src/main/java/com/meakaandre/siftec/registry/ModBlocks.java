@@ -109,13 +109,15 @@ public class ModBlocks {
             {"step", net.minecraft.world.level.block.Blocks.CONCRETE.lightGray(), 0}, {"locker", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
             {"railway", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"coil", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
             {"coil_lit", net.minecraft.world.level.block.Blocks.AMETHYST_BLOCK, 15}, {"rift", net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN, 15},
-            {"foundation", net.minecraft.world.level.block.Blocks.CONCRETE.gray(), 0}};
+            {"foundation", net.minecraft.world.level.block.Blocks.CONCRETE.gray(), 0},
+            // the Wormhole Gateway's energy conduits, and its portal: no collision, see-through, glowing (it swirls like a Nether portal)
+            {"conduit", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 4}, {"portal", net.minecraft.world.level.block.Blocks.NETHER_PORTAL, 15}};
         for (Object[] style : styles) {
             String name = (String) style[0];
             Block like = (Block) style[1];
             int light = (Integer) style[2];
             PREFAB.put(name, blockOnly("prefab_" + name, properties -> new com.meakaandre.siftec.prefab.PrefabBlock(name.equals("step"), properties),
-                () -> prefabProperties(like, light, name.equals("step"))));
+                () -> prefabProperties(like, light, name.equals("step") || name.equals("portal"))));
         }
     }
 

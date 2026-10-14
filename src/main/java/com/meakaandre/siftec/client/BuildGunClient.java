@@ -221,7 +221,7 @@ public final class BuildGunClient {
         BuildingDef def = current(mc);
         Placement spot = null;
         if (!dismantle && def != null) {
-            spot = nudge && frozen != null && frozen.def() == def ? frozen : BuildGun.aim(player, def, turns, flip && !def.hub());
+            spot = nudge && frozen != null && frozen.def() == def ? frozen : BuildGun.aim(player, def, turns, flip && !def.structure());
         }
         send(def, spot);
         Outliner outliner = Outliner.getInstance();
@@ -250,15 +250,15 @@ public final class BuildGunClient {
             return;
         }
         // the HUB is a big structure: its ground and space are checked at most every third tick, and twice a second
-        boolean rebuild = def.hub() ? (!spot.equals(shown) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10 : !spot.equals(shown) || ticks % 10 == 0;
+        boolean rebuild = def.structure() ? (!spot.equals(shown) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10 : !spot.equals(shown) || ticks % 10 == 0;
         if (rebuild) {
             lastRebuild = ticks;
-            if (def.hub()) {
+            if (def.structure()) {
                 com.meakaandre.siftec.prefab.Prefabs.Check check = com.meakaandre.siftec.prefab.Prefabs.check(mc.level, BuildGun.hubSpot(spot), null, false);
                 shape = hubCells(spot);
                 blocked = new ArrayList<>(check.blocked);
                 localOk = check.ok();
-                localMessage = check.ok() ? Component.translatable("siftec.build_gun.fits_hub") : check.message();
+                localMessage = check.ok() ? Component.translatable(def.hub() ? "siftec.build_gun.fits_hub" : "siftec.build_gun.fits_gateway") : check.message();
             } else {
                 Buildings.Check check = Buildings.check(mc.level, spot, null, player.getInventory(), player.hasInfiniteMaterials());
                 shape = cells(spot);

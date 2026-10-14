@@ -29,11 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The MAM window, run by the server like the HUB's. The top row picks a tree, the middle row lists its
+ * The MAM window, run by the server like the HUB's. The top row picks a tree, the bottom three rows list its
  * nodes. Clicking a node delivers parts; once it is paid for, its research time starts. One node at a time.
+ * A tree shows once one of its starting items is brought to the MAM (or once anything in it is researched);
+ * until then its tab says what starts it.
  */
 public class MamMenu extends ChestMenu {
-    private static final int SIZE = 54, STATUS_SLOT = 17, FIRST_NODE = 27, DRIVE_SLOT = 28, OFFER_SLOT = 31;
+    private static final int SIZE = 54, STATUS_SLOT = 17, FIRST_NODE = 27, MAX_NODES = 27, DRIVE_SLOT = 28, OFFER_SLOT = 31;
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final Company company;
@@ -45,6 +47,14 @@ public class MamMenu extends ChestMenu {
         this.view = view;
         this.player = player;
         this.company = company;
+        // open on the first tree this player can see
+        List<Milestones.Tree> trees = Milestones.trees();
+        for (int t = 0; t < trees.size(); t++) {
+            if (found(trees.get(t))) {
+                tree = t;
+                break;
+            }
+        }
         refresh();
     }
 
@@ -83,8 +93,14 @@ public class MamMenu extends ChestMenu {
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         List<Milestones.Tree> trees = Milestones.trees();
         for (int t = 0; t < trees.size() && t < 9; t++) {
-            Item icon = BuiltInRegistries.ITEM.getOptional(trees.get(t).icon()).orElse(Items.BOOK);
-            view.setItem(t, button(icon, Component.translatable("siftec.tree." + trees.get(t).id()), List.of(), t == tree));
+            Milestones.Tree each = trees.get(t);
+            if (!found(each)) {
+                view.setItem(t, button(Items.GRAY_DYE, Component.translatable("siftec.mam.undiscovered"),
+                    List.of(Component.translatable("siftec.mam.bring", triggers(each)).withStyle(ChatFormatting.GRAY)), false));
+                continue;
+            }
+            Item icon = BuiltInRegistries.ITEM.getOptional(each.icon()).orElse(Items.BOOK);
+            view.setItem(t, button(icon, Component.translatable("siftec.tree." + each.id()), List.of(), t == tree));
         }
         view.setItem(trees.size(), button(item("siftec:hard_drive"), Component.translatable("siftec.tree.hard_drives"), List.of(), tree == trees.size()));
         view.setItem(STATUS_SLOT, button(Items.CLOCK, company.research.isEmpty()
@@ -94,9 +110,29 @@ public class MamMenu extends ChestMenu {
             hardDrives();
             return;
         }
-        if (tree >= trees.size()) return;
+        if (tree >= trees.size() || !found(trees.get(tree))) return;
         List<Milestone> nodes = trees.get(tree).nodes();
-        for (int i = 0; i < nodes.size() && i < 9; i++) view.setItem(FIRST_NODE + i, nodeButton(nodes.get(i)));
+        for (int i = 0; i < nodes.size() && i < MAX_NODES; i++) view.setItem(FIRST_NODE + i, nodeButton(nodes.get(i)));
+    }
+
+    /** True once the company has researched anything in the tree, or the player has one of its starting items with them. */
+    private boolean found(Milestones.Tree t) {
+        if (player.hasInfiniteMaterials()) return true;
+        for (Milestone m : t.nodes()) if (company.has(m.id()) || company.research.equals(m.id())) return true;
+        for (String trigger : t.triggers()) if (new Milestone.Cost(trigger, 1).carried(player.getInventory()) > 0) return true;
+        return false;
+    }
+
+    /** The items that start a tree, by name: "rotten flesh, bone, spider eye or gunpowder". */
+    private static Component triggers(Milestones.Tree t) {
+        net.minecraft.network.chat.MutableComponent out = Component.empty();
+        List<String> seen = new ArrayList<>();
+        for (String trigger : t.triggers()) if (!seen.contains(trigger)) seen.add(trigger);
+        for (int i = 0; i < seen.size(); i++) {
+            if (i > 0) out.append(Component.literal(i == seen.size() - 1 ? " or " : ", "));
+            out.append(new Milestone.Cost(seen.get(i), 1).label());
+        }
+        return out;
     }
 
     private Component runningName() {
@@ -174,7 +210,23 @@ public class MamMenu extends ChestMenu {
             lore.add(Component.translatable("siftec.mam.research", clock(m.seconds() * 20L)).withStyle(ChatFormatting.GRAY));
         }
         lore.add(Component.translatable("siftec.hub.unlocks", m.unlockText()).withStyle(ChatFormatting.AQUA));
-        if (blocker != null) lore.add(Component.translatable("siftec.hub.needs", blocker.name()).withStyle(ChatFormatting.RED));
+        if (blocker != null) {
+            for (String need : m.needs()) {
+                if (Milestones.needMet(company, need)) continue;
+                net.minecraft.network.chat.MutableComponent names = Component.empty();
+                String[] alts = need.split("\\|");
+                for (int i = 0; i < alts.length; i++) {
+                    Milestone other = Milestones.get(alts[i]);
+                    if (i > 0) names.append(Component.literal(i == alts.length - 1 ? " or " : ", "));
+                    names.append(other == null ? Component.literal(alts[i]) : other.name());
+                    // a node in another tree says which tree
+                    if (other != null && !other.tree().equals(m.tree())) {
+                        names.append(Component.literal(" (")).append(Component.translatable("siftec.tree." + other.tree())).append(Component.literal(")"));
+                    }
+                }
+                lore.add(Component.translatable("siftec.hub.needs", names).withStyle(ChatFormatting.RED));
+            }
+        }
         else if (!done && !researching) lore.add(Component.translatable("siftec.mam.click").withStyle(ChatFormatting.YELLOW));
         Item icon = done ? item("minecraft:lime_dye") : researching ? Items.CLOCK : blocker != null ? Items.BARRIER : Items.PAPER;
         return button(icon, m.name(), lore, researching);
@@ -183,6 +235,10 @@ public class MamMenu extends ChestMenu {
     private void press(int slot) {
         List<Milestones.Tree> trees = Milestones.trees();
         if (slot < trees.size() && slot < 9) {
+            if (!found(trees.get(slot))) {
+                player.sendOverlayMessage(Component.translatable("siftec.mam.bring", triggers(trees.get(slot))));
+                return;
+            }
             tree = slot;
             refresh();
             return;
@@ -197,7 +253,7 @@ public class MamMenu extends ChestMenu {
             return;
         }
         int index = slot - FIRST_NODE;
-        if (tree >= trees.size() || index < 0 || index >= trees.get(tree).nodes().size()) return;
+        if (tree >= trees.size() || index < 0 || index >= trees.get(tree).nodes().size() || index >= MAX_NODES || !found(trees.get(tree))) return;
         Milestone m = trees.get(tree).nodes().get(index);
         MinecraftServer server = player.level().getServer();
         if (company.has(m.id()) || company.research.equals(m.id())) return;

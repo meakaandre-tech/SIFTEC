@@ -1,7 +1,6 @@
 package com.meakaandre.siftec.claim;
 
 import com.meakaandre.siftec.Siftec;
-import com.meakaandre.siftec.backpack.Backpack;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -218,30 +217,6 @@ public final class StateSelfTest {
         boolean claimOk = cb2 != null && cb2.marker && cb2.source == claim.source;
         report(source, "SELFTEST state codec: tree round trip " + treeOk + " (" + json.length() + " chars as JSON); old string format loads " + legacyOk
             + "; unreadable file kept and not overwritten " + brokenOk + "; claim flags and positions " + claimOk);
-
-        // the backpack keeps slot positions and survives one unreadable item
-        RegistryOps<Tag> ops = level.registryAccess().createSerializationContext(NbtOps.INSTANCE);
-        Backpack.Contents contents = new Backpack.Contents();
-        contents.items.set(0, new ItemStack(Items.IRON_INGOT, 5));
-        contents.items.set(7, new ItemStack(Items.DIAMOND, 1));
-        contents.items.set(35, new ItemStack(Items.STONE, 64));
-        Backpack.Contents again = Backpack.Contents.CODEC.parse(ops, Backpack.Contents.CODEC.encodeStart(ops, contents).getOrThrow()).getOrThrow();
-        boolean slotsOk = again.items.get(0).is(Items.IRON_INGOT) && again.items.get(0).getCount() == 5 && again.items.get(7).is(Items.DIAMOND)
-            && again.items.get(35).getCount() == 64 && again.items.get(1).isEmpty();
-        ListTag list = new ListTag();
-        list.add(entry(1, "nosuchmod:thing", 1));
-        list.add(entry(4, "minecraft:apple", 2));
-        Backpack.Contents partial = Backpack.Contents.CODEC.parse(ops, list).getOrThrow();
-        boolean partialOk = partial.items.get(1).isEmpty() && partial.items.get(4).is(Items.APPLE) && partial.items.get(4).getCount() == 2;
-        ListTag old = new ListTag();
-        old.add(new CompoundTag());
-        CompoundTag oldItem = new CompoundTag();
-        oldItem.putString("id", "minecraft:bread");
-        oldItem.putInt("count", 3);
-        old.add(oldItem);
-        Backpack.Contents oldFormat = Backpack.Contents.CODEC.parse(ops, old).getOrThrow();
-        boolean oldOk = oldFormat.items.get(0).isEmpty() && oldFormat.items.get(1).is(Items.BREAD);
-        report(source, "SELFTEST state backpack codec: slots kept " + slotsOk + "; unreadable item skipped, others in place " + partialOk + "; old list format loads " + oldOk);
     }
 
     private static CompoundTag entry(int slot, String id, int count) {

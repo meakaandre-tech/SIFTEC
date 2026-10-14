@@ -116,7 +116,7 @@ public class Company {
         return true;
     }
 
-    /** How many finished milestones carry a token, such as "backpack". */
+    /** How many finished milestones carry a token, such as "scanner:copper". */
     public int count(String token) {
         // asked for by machines every tick, so the answers are kept until the company finishes something else
         if (countsFor != done.size()) {

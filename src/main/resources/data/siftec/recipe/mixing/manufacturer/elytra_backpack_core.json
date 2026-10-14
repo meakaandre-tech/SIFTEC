@@ -1,0 +1,43 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "create:precision_mechanism",
+    "siftec:high_speed_connector",
+    "siftec:high_speed_connector",
+    "siftec:high_speed_connector",
+    "siftec:high_speed_connector",
+    "siftec:high_speed_connector",
+    "siftec:high_speed_connector",
+    "siftec:high_speed_connector",
+    "siftec:high_speed_connector",
+    "siftec:high_speed_connector"
+  ],
+  "results": [
+    {
+      "id": "siftec:elytra_backpack_core"
+    }
+  ]
+}

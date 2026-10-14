@@ -1,0 +1,45 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:totem_of_undying_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_totem_of_undying"
+  },
+  "result": {
+    "id": "minecraft:totem_of_undying"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:alien_dna_capsule",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:gold_block",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:emerald",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:ai_limiter",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

@@ -47,6 +47,7 @@ public final class SiftecCommands {
         com.meakaandre.siftec.power.PowerTests.register();
         NodeTests.register();
         LogisticsTests.register();
+        ProgressionTests.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("node")
@@ -154,7 +155,7 @@ public final class SiftecCommands {
         Milestone coal = Milestones.get("coal_power");
         report(source, "SELFTEST hub: two members pay x" + company.costMultiplier() + "; tier 1 open " + Milestones.tierOpen(company, 1)
             + "; tier 3 open " + Milestones.tierOpen(company, 3) + "; coal power needs " + Milestones.blocker(company, coal).id()
-            + "; backpack given " + company.hasToken("backpack") + "; scanner copper " + company.hasToken("scanner:copper")
+            + "; scanner copper " + company.hasToken("scanner:copper")
             + "; self-moving belts " + com.meakaandre.siftec.tweak.SelfMovingBelts.itemsPerMinute(company) + " items/min");
         int ours = 0;
         boolean steelGone = true;

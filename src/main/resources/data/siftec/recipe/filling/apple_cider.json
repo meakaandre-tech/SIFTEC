@@ -1,0 +1,20 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "farmersdelight"
+      ]
+    }
+  ],
+  "type": "create:filling",
+  "ingredient": "minecraft:glass_bottle",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 20250,
+    "fluid": "siftec:cider"
+  },
+  "result": {
+    "id": "farmersdelight:apple_cider"
+  }
+}

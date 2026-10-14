@@ -184,6 +184,8 @@ public final class Companies {
         CompanyState.recompute(server);
         tell(server, company, Component.translatable("siftec.hub.complete", who, m.name()).withStyle(ChatFormatting.GOLD));
         tell(server, company, Component.translatable("siftec.hub.unlocks", m.unlockText()).withStyle(ChatFormatting.GRAY));
+        // the last phase: the gate opens, and the game goes on as free play (milestones, MAM and the Sink carry on)
+        if (m.isPhase() && Milestones.freePlay(company)) tell(server, company, Component.translatable("siftec.sift.open").withStyle(ChatFormatting.LIGHT_PURPLE));
     }
 
     private static int info(CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {

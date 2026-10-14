@@ -121,48 +121,6 @@ cmd siftec worldtest sathub gateway 5
 sleep 3
 shot
 cmd siftec selftest prefab check
-cmd gamemode survival @a
-cmd clear @a
-cmd siftec selftest tb setup
-sleep 2
-key e
-sleep 2
-shot
-key Escape
-sleep 1
-cmd siftec selftest tb give
-sleep 3
-key F5
-sleep 3
-shot
-key F5
-sleep 1
-key F5
-sleep 2
-key b
-sleep 3
-shot
-key Escape
-sleep 1
-cmd siftec selftest tb rules
-sleep 2
-cmd siftec selftest tb locked
-sleep 2
-cmd siftec selftest tb offline
-sleep 2
-cmd siftec selftest tb upgrade crafting
-sleep 2
-key b
-sleep 3
-shot
-key Escape
-sleep 1
-cmd siftec selftest tb tier 4
-sleep 3
-key b
-sleep 3
-shot
-key Escape
 sleep 1
 cmd gamemode spectator @a
 cmd effect give @a minecraft:night_vision infinite 0 true
@@ -274,17 +232,6 @@ cmd time set midnight
 sleep 3
 shot
 cmd execute in minecraft:overworld run tp @a 1002.5 181.0 997.6 0 25
-sleep 3
-shot
-cmd gamemode survival @a
-cmd siftec selftest tb death setup
-sleep 2
-cmd kill @a
-sleep 4
-shot
-click 640 344
-sleep 5
-cmd siftec selftest tb death check
 sleep 3
 shot
 cmd gamemode creative @a

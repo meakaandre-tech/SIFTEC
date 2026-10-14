@@ -43,9 +43,13 @@ public class HubBlockEntity extends BlockEntity {
         super(type, pos, state);
     }
 
-    /** Once a second: builds or takes away the structure's parts to match the company's progress. */
+    /**
+     * Once a second: builds or takes away the structure's parts to match the company's progress. A finished Wormhole
+     * Gateway also looks, twice a second, for players walking into its portal.
+     */
     public void serverTick() {
         ticked++;
+        if (ticked % 10 == 0) Prefabs.portal(this);
         if (++clock < 20) return;
         clock = 0;
         Prefabs.refresh(this);

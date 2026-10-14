@@ -1,0 +1,33 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:alien_dna_capsule",
+    "siftec:alien_dna_capsule",
+    "siftec:alien_dna_capsule",
+    "siftec:alien_dna_capsule",
+    "siftec:alien_dna_capsule",
+    "siftec:alien_dna_capsule",
+    "siftec:alien_dna_capsule",
+    "siftec:alien_dna_capsule",
+    "siftec:alien_dna_capsule",
+    "minecraft:gold_block",
+    "minecraft:gold_block",
+    "minecraft:gold_block",
+    "minecraft:emerald",
+    "minecraft:emerald",
+    "minecraft:emerald",
+    "minecraft:emerald",
+    "minecraft:emerald",
+    "minecraft:emerald",
+    "minecraft:emerald",
+    "siftec:ai_limiter",
+    "siftec:ai_limiter",
+    "siftec:ai_limiter",
+    "siftec:ai_limiter"
+  ],
+  "results": [
+    {
+      "id": "siftec:totem_of_undying_core"
+    }
+  ]
+}

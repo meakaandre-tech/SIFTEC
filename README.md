@@ -6,12 +6,12 @@ wormhole instead of a space elevator.
 
 Fabric, Minecraft 26.3, Java 25. Needs Fabric API, Create Fly (mod id `create`) and Create: New Age (mod id
 `create_new_age`, the fabric-26.3 build of meakaandre-tech/Create-New-Age); the pack also runs
-Create: Diesel Generators, Create: Gunsmithing, Create: Hypertubes and Farmer's Delight, which the mod's data
+Create: Diesel Generators, Create: Gunsmithing and Farmer's Delight, which the mod's data
 names (recipes that name another mod load only when that mod is installed).
 
 What it adds: the HUB with milestones and wormhole phases, companies and land claims, per-company recipe and
 item locks, resource nodes, the Build Gun and its buildings, the MAM research trees, the power grid, the Equipment
-Workshop, the AWESOME Sink and Shop, the backpack, blueprints, and the parts and fluids of Satisfactory's production
+Workshop, the AWESOME Sink and Shop, blueprints, and the parts and fluids of Satisfactory's production
 chain.
 
 The Build Gun's buildings are multiblocks with real Create machines inside (`building/`): the Constructor (a Press
@@ -51,9 +51,29 @@ the Logistics milestones through Satisfactory's belt tiers: Logistics 60 items/m
 the end the belt was started at. An Andesite Tunnel over a belt with belts leaving at its sides splits evenly between
 straight on and each side, and a belt running into its side merges in (`tweak/TunnelSplitter.java`). Drone Ports fly
 Create packages between ports, burning fire charges for each trip. A Dimensional Depot on an Item Vault uploads the
-vault's contents to the company's cloud (8 items a second, at most 320 of an item, both doubled by MAM research),
-which members take out from the Cloud button above their inventory, `/depot`, or any depot. The Blueprint Designer
+vault's contents to the company's cloud at Satisfactory 1.0's rates (15 items a minute and one stack of each item,
+raised by the MAM's Upload Upgrade and Depot Expansion research to 240 a minute and five stacks), which members take
+out from the Cloud button above their inventory, `/depot`, or any depot; with the Manual Depot Uploader research they
+shift-click their own items in. The Blueprint Designer
 saves what is built in its volume as a Blueprint that places it whole again.
+
+## Progression
+
+Satisfactory 1.0's progression, owned by the company: Tier 0's six HUB Upgrades in order, then Tiers 1 to 9 with 1.0's
+48 milestones, costs and lock times (Hypertubes is Contraption Transit: Create's elevators, rope pulleys and gantries).
+Every building and recipe stays locked until its milestone or MAM node. Inventories stay vanilla size: no milestone
+gives slots or a backpack. The Wormhole Gateway (HUB Upgrade 6, built with the Build Gun for the Space Elevator's
+parts) takes the phases that open Tiers 3, 5, 7 and 9 and grows like the Space Elevator: a bare platform with the
+terminal and two power hookups, then the ring's cradle and supports, the bottom third of a standing ring gate, the
+second third, the closed ring with energy conduits, and with Phase 5 a lit ring and a swirling portal: walking in
+takes the company's players to The Sift, and the game goes on as free play.
+
+The MAM (Field Research) is fed by hand and every node takes 3 seconds. Seven trees, each shown once one of its
+starting items is brought in: Alien Megafauna (mob drops), Caterium (crushed zinc: brass), Mycelia, Nutrients (wild
+food), Quartz, Sulfur and Alien Technology, plus the Hard Drives. A node may need nodes in other trees, or any one of
+several. Vanilla items come from research and machines, with no End trip or ancient debris: the Eye of Ender and the
+Shulker Shell from the Assembler, the Totem, Elytra, Trident, Heart of the Sea and Netherite Ingot from the Manufacturer,
+and the Elytra Backpack (an Elytra and a Copper Backtank in one, refilled from a placed backtank). The inhalers heal.
 
 ## Building
 

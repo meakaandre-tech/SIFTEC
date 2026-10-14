@@ -318,6 +318,22 @@ def equipment_by_machine():
         under(None)
 
 
+def vanilla():
+    """The vanilla items MAM research lets machines make (content.VANILLA_RECIPES), each locked to its node: an Assembler
+    recipe is a Mixer on a Basin; a Manufacturer recipe makes a Core in the Mixer from all but one of each part, then
+    one loop of sequenced assembly adds the last of each."""
+    for out, n, machine, parts, tree, node in content.VANILLA_RECIPES:
+        rid = out.split(":")[1]
+        under(content.mam(tree, node))
+        if machine == "Assembler":
+            mix(f"assembler/{rid}", items=[p for p, c in parts for _ in range(c)], results=[(out, n)])
+        else:
+            core, incomplete = content.VANILLA_CORES[out]
+            mix(f"manufacturer/{rid}_core", items=[p for p, c in parts for _ in range(c - 1)], results=["siftec:" + core])
+            sequence("siftec:" + core, out, [p for p, c in parts], 1, name=f"manufacturer/{rid}", n=n, transitional="siftec:" + incomplete)
+        under(None)
+
+
 KITCHEN = []   # recipe paths converted from Farmer's Delight; they need the Automated Kitchen research
 
 
@@ -361,6 +377,14 @@ def food():
         "ingredients": ["minecraft:honey_bottle", "minecraft:honey_bottle"], "fluid_ingredients": [fl_in("water", 250)], "fluid_results": [fl_out("mead", 500)],
         "results": [{"id": "minecraft:glass_bottle", "count": 2}]})
     spout("minecraft:glass_bottle", "mead", 250, "siftec:mead", name="mead")
+    # vinegar bottled at the Spout (Bulk Fermentation; Preserved Foods takes 50), and cider from apples, bottled as
+    # Farmer's Delight's Apple Cider (Cider and Mead)
+    spout("minecraft:glass_bottle", "vinegar", 250, "siftec:vinegar_bottle", name="vinegar_bottle")
+    add("bulk_fermenting", "cider", {"type": "createdieselgenerators:bulk_fermenting", "processing_time": 400,
+        "ingredients": ["minecraft:apple", "minecraft:apple"], "fluid_ingredients": [fl_in("water", 250)], "fluid_results": [fl_out("cider", 500)]})
+    under(content.mam("Nutrients", "Cider and Mead"))
+    spout("minecraft:glass_bottle", "cider", 250, FD + "apple_cider", name="apple_cider")
+    under(None)
     for what, source in (("tomato", FD + "tomato"), ("onion", FD + "onion"), ("cabbage", FD + "cabbage"), ("pumpkin", FD + "pumpkin_slice"),
                          ("carrot", "minecraft:carrot"), ("beetroot", "minecraft:beetroot"), ("kelp", "minecraft:kelp")):
         spout(source, "vinegar", 250, "siftec:pickled_" + what, name="pickled_" + what)
@@ -406,26 +430,26 @@ def carried_over():
     # a wire for the grid (New Age's copper wire): one Cable pressed flat, as 1.0 builds a Power Line from 1 Cable
     press("Cable", "create_new_age:copper_wire", name="copper_wire")
     # brass, the pack's Caterium: crushed copper and zinc with a flux, then smelted
-    under("mam_caterium_1")
+    under(content.mam("Caterium", "Brass"))
     for flux, n in (("minecraft:sand", 1), ("Coal", 2), ("Sulfur", 3)):
         mix("brass_blend_with_" + slug(flux), items=["create:crushed_raw_copper", "create:crushed_raw_zinc", flux], results=[("Brass Blend", n)])
     smelt("Brass Blend", "Brass Ingot", name="brass_ingot_from_blend")
     under(None)
     # the Assembler makes Create's brass-tier parts too (Create's own recipes stay as well)
-    under("mam_caterium_3")
+    under(content.mam("Caterium", "Caterium Electronics"))
     deploy("Iron Sheet", "Quickwire", "Electron Tube")
     deploy("Brass Sheet", "Rotor", "Precision Mechanism")
     under(None)
     # the old tweaks pack: gunpowder, Ignimbrite and what it makes
-    under("mam_sulfur_1")   # Black Powder
+    under(content.mam("Sulfur", "Black Powder"))
     for carbon in ("minecraft:coal", "minecraft:charcoal"):
         mix("gunpowder_with_" + slug(carbon), items=["Sulfur", carbon, "minecraft:bone_meal"], results=[("Gunpowder", 3)])
-    under("mam_sulfur_2")   # Ignimbrite: the only way to lava (Ignimbrite, then magma, then lava)
+    under(content.mam("Sulfur", "Ignimbrite"))   # the only way to lava (Ignimbrite, then magma, then lava)
     mix("ignimbrite", items=["minecraft:cobblestone", "Sulfur"], fluid_results=[("ignimbrite", 500)], heated=True)
     spout("minecraft:clay_ball", "ignimbrite", 250, "minecraft:fire_charge")
     compact("magma_block", fluids=[("ignimbrite", 250)], results=["minecraft:magma_block"])
     mix("lava_from_magma_block", items=["minecraft:magma_block"], fluid_results=[("lava", 250)], heated=True)
-    under("mam_sulfur_3")   # Explosives
+    under(content.mam("Sulfur", "Explosives"))
     spout("minecraft:barrel", "ignimbrite", 250, "minecraft:tnt")
     under(None)
     # the sulfuric acid loop (Power tab): neutralise it, or use it and deal with the residue
@@ -458,6 +482,7 @@ def build():
     SATISFACTORY.clear()
     satisfactory()
     equipment_by_machine()
+    vanilla()
     kitchen()
     food()
     carried_over()
@@ -489,29 +514,6 @@ REMOVED = [
     "create:mechanical_crafting/extendo_grip", "create:mechanical_crafting/potato_cannon", "create:mechanical_crafting/wand_of_symmetry",
     "create:andesite_table_cloth_from_andesite_alloy_stonecutting",
 ]
-# Traveler's Backpack: each player is given one backpack, never crafted, and its tier comes with milestones, so every
-# backpack recipe (designs, dyeing, smithing), the tier upgrades and the sleeping bags (only for those) go
-REMOVED += ["travelersbackpack:" + n for n in """
-    bat_smithing bee bee_smithing black_sleeping_bag blaze blaze_smithing blue_sleeping_bag bookshelf
-    bookshelf_smithing brown_sleeping_bag cactus cactus_smithing cake cake_smithing chicken chicken_smithing coal
-    coal_smithing cow cow_smithing creeper creeper_smithing cyan_sleeping_bag diamond diamond_smithing
-    diamond_tier_upgrade dragon dragon_smithing dye_black_sleeping_bag dye_blue_sleeping_bag dye_brown_sleeping_bag
-    dye_cyan_sleeping_bag dye_gray_sleeping_bag dye_green_sleeping_bag dye_light_blue_sleeping_bag
-    dye_light_gray_sleeping_bag dye_lime_sleeping_bag dye_magenta_sleeping_bag dye_orange_sleeping_bag
-    dye_pink_sleeping_bag dye_purple_sleeping_bag dye_red_sleeping_bag dye_white_sleeping_bag
-    dye_yellow_sleeping_bag emerald emerald_smithing end end_smithing enderman enderman_smithing fox fox_smithing
-    ghast ghast_smithing gold gold_smithing gold_tier_upgrade gray_sleeping_bag green_sleeping_bag hay hay_smithing
-    horse horse_smithing iron iron_golem_smithing iron_smithing iron_tier_upgrade lapis lapis_smithing
-    light_blue_sleeping_bag light_gray_sleeping_bag lime_sleeping_bag magenta_sleeping_bag magma_cube
-    magma_cube_smithing melon melon_smithing nether nether_smithing netherite netherite_smithing
-    netherite_tier_upgrade ocelot ocelot_smithing orange_sleeping_bag pig pig_smithing pink_sleeping_bag pumpkin
-    pumpkin_smithing purple_sleeping_bag quartz quartz_smithing red_sleeping_bag redstone redstone_smithing
-    sandstone sandstone_smithing sheep sheep_smithing skeleton skeleton_smithing snow snow_smithing spider
-    spider_smithing sponge sponge_smithing squid squid_smithing standard standard_dyed standard_no_sleeping_bag
-    standard_no_tanks standard_no_tanks_sleeping_bag standard_smithing villager_smithing warden warden_smithing
-    white_sleeping_bag wither wither_smithing wolf wolf_smithing yellow_sleeping_bag
-""".split()]
-
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked. Equipment and the
 # buildings 1.0 has cost what they cost in 1.0 (content.EQUIPMENT_COSTS and content.BUILD_COSTS, under the 1.0 name);
 # the buildings move to the Build Gun in work packages 5 and 9 (the Portable Miner has; the HUB is every player's to
@@ -519,7 +521,6 @@ REMOVED += ["travelersbackpack:" + n for n in """
 _B, _E = content.BUILD_COSTS, content.EQUIPMENT_COSTS
 WORKSHOP = [
     ("siftec:node_scanner", "2 Iron Sheet, 4 Wire"),
-    ("siftec:wormhole_gateway", _B["Space Elevator"]),
     ("siftec:claim_marker", "5 Iron Rod, 5 Stone"),
     ("siftec:mam", _B["MAM"]),
     ("siftec:object_scanner", _E["Object Scanner"]),
@@ -531,6 +532,10 @@ WORKSHOP = [
     ("siftec:blade_runners", _E["Blade Runners"]),
     ("siftec:parachute", _E["Parachute"]),
     ("siftec:gas_mask", _E["Gas Mask"]),
+    ("siftec:protein_inhaler", _E["Protein Inhaler"]),
+    ("siftec:vitamin_inhaler", _E["Vitamin Inhaler"]),
+    ("siftec:therapeutic_inhaler", _E["Therapeutic Inhaler"]),
+    ("siftec:nutritional_inhaler", _E["Nutritional Inhaler"]),
     ("siftec:radar_tower", _B["Radar Tower"]),
     ("siftec:blueprint_designer", _B["Blueprint Designer Mk.1"]),
     ("siftec:blueprint_designer_mk3", _B["Blueprint Designer Mk.3"]),

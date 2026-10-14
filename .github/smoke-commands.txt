@@ -5,6 +5,7 @@ siftec selftest buildings
 siftec selftest buildings_a
 siftec selftest power
 siftec selftest logistics
+siftec selftest progression
 siftec selftest content
 siftec selftest state setup
 siftec selftest state check

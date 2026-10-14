@@ -1,8 +1,0 @@
-{
-  "required": false,
-  "minVersion": "0.8",
-  "package": "com.meakaandre.siftec.mixin.tb",
-  "compatibilityLevel": "JAVA_25",
-  "mixins": ["TbServerActionsMixin", "TbDeathMixin", "TbPlaceMixin", "TbUpgradeSlotMixin"],
-  "injectors": {"defaultRequire": 1}
-}
