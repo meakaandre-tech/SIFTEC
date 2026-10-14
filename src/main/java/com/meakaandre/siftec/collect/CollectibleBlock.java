@@ -77,7 +77,7 @@ public class CollectibleBlock extends Block {
                     CrashSites.placeConnector(server.level(), pos);
                     if (!CrashSites.powered(server.level(), pos, need.mw())) {
                         server.sendOverlayMessage(Component.translatable("siftec.crash.needs_power", need.mw(),
-                            Power.fmt(Power.su(need.mw())), Power.fmt(CrashSites.spareSu(server.level(), pos))));
+                            Power.fmt(Power.su((double) need.mw())), Power.fmt(CrashSites.spareSu(server.level(), pos))));
                         return false;
                     }
                 }

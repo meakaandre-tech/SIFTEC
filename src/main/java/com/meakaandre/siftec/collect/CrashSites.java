@@ -121,7 +121,7 @@ public final class CrashSites {
 
     /** True if the pod's grid has the megawatts it asks for to spare. */
     public static boolean powered(ServerLevel level, BlockPos pod, int mw) {
-        return spareSu(level, pod) >= Power.su(mw) - 1e-6;
+        return spareSu(level, pod) >= Power.su((double) mw) - 1e-6;
     }
 
     /** A few broken pieces of casing and scorched ground next to the pod, and its wire connector if it wants power. */

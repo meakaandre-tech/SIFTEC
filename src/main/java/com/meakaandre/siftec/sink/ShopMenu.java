@@ -61,13 +61,13 @@ public class ShopMenu extends ChestMenu {
     static Item icon(Shop.Entry e) {
         return switch (e.kind()) {
             case "customizer" -> ModItems.CUSTOMIZER.get();
-            case "swatch" -> Items.ORANGE_DYE;
+            case "swatch" -> item("minecraft:orange_dye");
             case "finish" -> switch (e.arg()) {
-                case "copper" -> Items.COPPER_BLOCK;
+                case "copper" -> item("minecraft:copper_block");
                 case "chrome" -> Items.IRON_BLOCK;
                 case "carbon_steel" -> Items.NETHERITE_BLOCK;
                 case "caterium" -> Items.GOLD_BLOCK;
-                default -> Items.GRAY_CONCRETE;
+                default -> item("minecraft:gray_concrete");
             };
             case "skin" -> {
                 String block = Shop.skins().getOrDefault(e.arg(), Shop.storageSkins().getOrDefault(e.arg(), "minecraft:barrier"));
@@ -77,6 +77,10 @@ public class ShopMenu extends ChestMenu {
             case "cup" -> ModItems.CUPS.containsKey(e.arg()) ? ModItems.CUPS.get(e.arg()) : Items.BARRIER;
             default -> Items.BARRIER;
         };
+    }
+
+    private static Item item(String id) {
+        return BuiltInRegistries.ITEM.getOptional(Identifier.parse(id)).orElse(Items.BARRIER);
     }
 
     private List<Shop.Entry> shown() {

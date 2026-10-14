@@ -54,7 +54,7 @@ public record Paint(String primary, String secondary, String finish, String skin
     /** What a cell built as this block becomes under this paint (the block itself where paint does not touch it). */
     public BlockState look(BlockState built, boolean storage) {
         Block b = built.getBlock(), out = null;
-        if (b == Blocks.ORANGE_CONCRETE) {
+        if (b == block("minecraft:orange_concrete")) {
             String finishBlock = Shop.finishes().getOrDefault(finish, "minecraft:{colour}_concrete");
             out = block(finishBlock.replace("{colour}", primary));
         } else if (b == block("create:industrial_iron_block")) {

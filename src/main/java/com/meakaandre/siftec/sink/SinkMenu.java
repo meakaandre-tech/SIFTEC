@@ -5,6 +5,7 @@ import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Prediction;
@@ -76,7 +77,7 @@ public class SinkMenu extends ChestMenu {
             List.of(Component.translatable(company.points >= next ? "siftec.sink.status" : "siftec.sink.print_none", company.points,
                 company.couponsPrinted + 1, next).withStyle(company.points >= next ? ChatFormatting.GREEN : ChatFormatting.RED))));
         boolean on = powered.getAsBoolean();
-        view.setItem(STATUS, button(on ? Items.LIME_DYE : Items.RED_DYE,
+        view.setItem(STATUS, button(BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.withDefaultNamespace(on ? "lime_dye" : "red_dye")),
             on ? Component.translatable("siftec.sink.feed") : Component.translatable("siftec.sink.no_power").withStyle(ChatFormatting.RED), List.of()));
     }
 

@@ -300,11 +300,11 @@ public final class ExplorationTests {
         expect(source, "Shop: nothing but cosmetics (no parts, equipment or progression)", onlyCosmetic, "");
         Paint paint = new Paint("blue", "red", "painted", "brass");
         expect(source, "Customizer paint: orange panels take the primary colour, dark grey the secondary, light grey the casing skin; a finish changes the material",
-            paint.look(Blocks.ORANGE_CONCRETE.defaultBlockState(), false).is(Blocks.BLUE_CONCRETE)
-                && paint.look(block("create:industrial_iron_block").defaultBlockState(), false).is(Blocks.RED_CONCRETE)
+            paint.look(block("minecraft:orange_concrete").defaultBlockState(), false).is(block("minecraft:blue_concrete"))
+                && paint.look(block("create:industrial_iron_block").defaultBlockState(), false).is(block("minecraft:red_concrete"))
                 && paint.look(Blocks.IRON_BLOCK.defaultBlockState(), false).is(block("create:brass_casing"))
-                && paint.withFinish("copper").look(Blocks.ORANGE_CONCRETE.defaultBlockState(), false).is(Blocks.WAXED_COPPER_BLOCK)
-                && Paint.NONE.look(Blocks.ORANGE_CONCRETE.defaultBlockState(), false).is(Blocks.ORANGE_CONCRETE)
+                && paint.withFinish("copper").look(block("minecraft:orange_concrete").defaultBlockState(), false).is(block("minecraft:waxed_copper_block"))
+                && Paint.NONE.look(block("minecraft:orange_concrete").defaultBlockState(), false).is(block("minecraft:orange_concrete"))
                 && Paint.parse(paint.write()).equals(paint), "");
         expect(source, "decorations and cups exist for every Shop entry", ModBlocks.DECOR.size() >= 20 && ModItems.CUPS.size() == 2, ModBlocks.DECOR.size() + " decorations");
 
@@ -368,7 +368,7 @@ public final class ExplorationTests {
                 expect(source, "the Sink destroys what its input port takes and pays the company: 10 Iron Sheets for 60 points",
                     company.points - before == 60 && s2 != null && s2.made >= 10, (company.points - before) + " points");
                 expect(source, "the powered Radar Tower has swept its range", r2 != null && r2.lastSweep > 0, "");
-                boolean painted = sh != null && sh.placement() != null && level.getBlockState(sh.placement().at(0, 4, 0)).is(Blocks.LIME_CONCRETE);
+                boolean painted = sh != null && sh.placement() != null && level.getBlockState(sh.placement().at(0, 4, 0)).is(block("minecraft:lime_concrete"));
                 expect(source, "the Customizer's paint holds: the Shop's orange roof is lime and the building still stands", painted && sh.paint.equals("lime/black/painted/"),
                     sh == null ? "no Shop" : sh.paint + ", roof " + (sh.placement() == null ? "-" : level.getBlockState(sh.placement().at(0, 4, 0)).toString()));
                 report(source, "result: " + passed + " passed, " + failed + " failed");
