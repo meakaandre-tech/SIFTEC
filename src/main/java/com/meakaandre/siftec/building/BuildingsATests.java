@@ -208,7 +208,7 @@ public final class BuildingsATests {
         Direction side = along.getClockWise();
         BlockPos motorPos = from.relative(side);
         level.setBlock(motorPos, block("create:creative_motor").defaultBlockState().setValue(BlockStateProperties.FACING, side.getOpposite()), Block.UPDATE_ALL);
-        // 32 RPM: the company speed limit every company starts with, which the test belts answer to like any other
+        // 32 RPM: 80 items a minute, more than any building here puts out
         if (level.getBlockEntity(motorPos) instanceof CreativeMotorBlockEntity motor) motor.generatedSpeed.setValue(32);
         // which way a belt runs depends on the sign of its speed: turned round if it runs the wrong way
         later(level, 10, () -> {

@@ -43,12 +43,12 @@ public class GovernorMenu extends ChestMenu {
     }
 
     private void refresh() {
-        int limit = governor.limit(), target = governor.target();
+        int limit = GovernorBlockEntity.limit(), target = governor.target();
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         for (int i = 0; i < PRESETS.length; i++) {
             int rpm = PRESETS[i];
-            view.setItem(i, rpm > limit ? button("gray_dye", Component.translatable("siftec.governor.over", rpm))
-                : button(rpm == target ? "glowstone_dust" : "lime_dye", Component.translatable("siftec.governor.set", rpm)));
+            if (rpm > limit) continue;
+            view.setItem(i, button(rpm == target ? "glowstone_dust" : "lime_dye", Component.translatable("siftec.governor.set", rpm)));
         }
         for (int[] step : STEPS) {
             view.setItem(step[0], button(step[1] < 0 ? "redstone" : "emerald", Component.translatable("siftec.governor.step", (step[1] > 0 ? "+" : "") + step[1])));
@@ -59,7 +59,7 @@ public class GovernorMenu extends ChestMenu {
     private void press(int slot) {
         int target = governor.target();
         if (slot < PRESETS.length) {
-            if (PRESETS[slot] > governor.limit()) return;
+            if (PRESETS[slot] > GovernorBlockEntity.limit()) return;
             target = PRESETS[slot];
         }
         for (int[] step : STEPS) if (step[0] == slot) target += step[1];

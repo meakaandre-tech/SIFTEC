@@ -42,6 +42,19 @@ acid as waste), Nuclear Power Plant 2,500 MW (Uranium and Plutonium Fuel Rods, S
 Power Augmenter (500 MW, +10% to its grid, +30% fed Alien Power Matrices). A New Age reactor a player builds burns the
 same rods.
 
+## Logistics
+
+Items move on Create's own belts, chutes, funnels, tunnels and pipes, with no speed limit on anything a shaft turns.
+A belt no shaft drives moves by itself at its company's self-moving speed (`tweak/SelfMovingBelts.java`), raised by
+the Logistics milestones through Satisfactory's belt tiers: Logistics 60 items/min, Logistics Mk.2 120, Mk.3 270, Mk.4
+480, Mk.5 780 and Peak Efficiency 1,200 (single items, one per block of belt: 2.5 items/min per RPM). Items run from
+the end the belt was started at. An Andesite Tunnel over a belt with belts leaving at its sides splits evenly between
+straight on and each side, and a belt running into its side merges in (`tweak/TunnelSplitter.java`). Drone Ports fly
+Create packages between ports, burning fire charges for each trip. A Dimensional Depot on an Item Vault uploads the
+vault's contents to the company's cloud (8 items a second, at most 320 of an item, both doubled by MAM research),
+which members take out from the Cloud button above their inventory, `/depot`, or any depot. The Blueprint Designer
+saves what is built in its volume as a Blueprint that places it whole again.
+
 ## Building
 
     ./gradlew build

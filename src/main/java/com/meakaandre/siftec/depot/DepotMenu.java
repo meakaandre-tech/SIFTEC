@@ -81,14 +81,9 @@ public class DepotMenu extends ChestMenu {
         if (slot == PREVIOUS && page > 0) page--;
         else if (slot == NEXT) page++;
         else if (slot < shown.size()) {
-            String id = shown.get(slot);
-            Item item = BuiltInRegistries.ITEM.getOptional(Identifier.parse(id)).orElse(Items.AIR);
-            int have = company.cloud.getOrDefault(id, 0);
-            int take = Math.min(have, new ItemStack(item).getMaxStackSize());
-            if (item != Items.AIR && take > 0) {
-                if (have - take <= 0) company.cloud.remove(id);
-                else company.cloud.put(id, have - take);
-                player.getInventory().placeItemBackInInventory(new ItemStack(item, take), Prediction.SERVER_ONLY);
+            ItemStack taken = DepotBlockEntity.withdraw(company, shown.get(slot));
+            if (!taken.isEmpty()) {
+                player.getInventory().placeItemBackInInventory(taken, Prediction.SERVER_ONLY);
                 Companies.save(player.level().getServer());
             }
         }

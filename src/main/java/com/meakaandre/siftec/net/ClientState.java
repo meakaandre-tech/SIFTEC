@@ -8,14 +8,11 @@ public final class ClientState {
     public static volatile Set<String> done;
     /** False once the server has said the Jetpack is out of fuel. */
     public static volatile boolean jetFuel = true;
-    /** The company's speed limit in RPM. */
-    public static volatile int speedLimit = 32;
 
     private ClientState() {
     }
 
     public static void accept(StatePayload payload) {
         done = new HashSet<>(payload.done());
-        speedLimit = payload.speedCap();
     }
 }

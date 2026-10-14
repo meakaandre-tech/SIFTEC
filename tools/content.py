@@ -189,7 +189,8 @@ FLUIDS = [
 # ---------------------------------------------------------------------------------------------------
 # Milestones. (tier, id, name, cost, minutes:seconds, unlock text, locked item ids, tokens)
 # "items" are the things nobody in the company can craft or place until the milestone is done.
-# "tokens" are switches other systems read: scanner:<node>, cap:<rpm>, and the Traveler's Backpack: "backpack" gives each member
+# "tokens" are switches other systems read: scanner:<node>, belt:<items a minute> (how fast a belt with no shaft runs
+# by itself, Satisfactory's belt tiers), and the Traveler's Backpack: "backpack" gives each member
 # of the company one (Leather tier), "backpack:<tier>" raises it to that tier (iron, gold, diamond, netherite).
 C = "create:"
 SAILS = [C + "white_sail"]   # the dyed sails are blocks only; they have no item to lock
@@ -217,8 +218,8 @@ MILESTONES = [
      "Factory building blocks: girders, scaffolding, ladders, casings",
      [C + "metal_girder", C + "andesite_scaffolding", C + "andesite_ladder", C + "copper_ladder", C + "copper_scaffolding", C + "copycat_panel", C + "copycat_step"], []),
     (1, "logistics", "Logistics", "150 Iron Sheet, 150 Iron Rod, 300 Wire", "4:00",
-     "Splitter and merger (Andesite Tunnel), Chute, Speedometer and Stressometer",
-     [C + "andesite_tunnel", C + "chute", C + "item_hatch", C + "speedometer", C + "stressometer"], []),
+     "Splitter and merger (Andesite Tunnel), Chute, Speedometer and Stressometer; belts with no shaft run by themselves at 60 items/min (Belt Mk.1)",
+     [C + "andesite_tunnel", C + "chute", C + "item_hatch", C + "speedometer", C + "stressometer"], ["belt:60"]),
     (1, "field_research", "Field Research", "300 Wire, 300 Screw, 100 Iron Sheet", "3:00",
      "MAM, Toolbox, Object Scanner, backpack to Iron tier (45 slots)", ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES, ["backpack:iron"]),
 
@@ -233,7 +234,7 @@ MILESTONES = [
     (2, "resource_sink_bonus_program", "Resource Sink Bonus Program", "400 Stone, 500 Wire, 200 Iron Rod, 200 Iron Sheet", "5:00",
      "AWESOME Sink and AWESOME Shop", ["siftec:awesome_sink", "siftec:awesome_shop"], []),
     (2, "logistics_mk2", "Logistics Mk.2", "50 Reinforced Iron Plate, 200 Stone, 300 Iron Rod, 300 Iron Sheet", "6:00",
-     "Company speed limit raised from 32 to 64 RPM", [], ["cap:64"]),
+     "Belts with no shaft run at 120 items/min (Belt Mk.2)", [], ["belt:120"]),
 
     (3, "coal_power", "Coal Power", "150 Reinforced Iron Plate, 50 Rotor, 500 Cable", "8:00",
      "Steam Engine, Blaze Burner, pipes, pumps and tanks, Backpack Tanks Upgrade and hose, coal nodes on the scanner",
@@ -251,7 +252,7 @@ MILESTONES = [
     (4, "ficsit_blueprints", "FICSIT Blueprints", "100 Modular Frame, 200 Steel Beam, 500 Cable, 1000 Stone", "5:00",
      "Blueprint Designer Mk.1", ["siftec:blueprint_designer"], []),
     (4, "logistics_mk3", "Logistics Mk.3", "200 Steel Beam, 200 Steel Pipe, 400 Reinforced Iron Plate", "5:00",
-     "Company speed limit raised to 96 RPM", [], ["cap:96"]),
+     "Belts with no shaft run at 270 items/min (Belt Mk.3)", [], ["belt:270"]),
     (4, "advanced_steel_production", "Advanced Steel Production", "100 Steel Pipe, 200 Rotor, 100 Modular Frame, 500 Stone", "10:00",
      "Miner Mk.2, Crushing Wheels, Encased Industrial Beam, Stator, Motor, Automated Wiring",
      [C + "crushing_wheel", "siftec:encased_industrial_beam", "siftec:stator", "siftec:motor", "siftec:automated_wiring"], []),
@@ -271,7 +272,7 @@ MILESTONES = [
       "createdieselgenerators:pumpjack_hole", "createdieselgenerators:distillation_controller",
       C + "fluid_valve", "siftec:plastic", "siftec:rubber", "siftec:petroleum_coke", "siftec:circuit_board"], ["scanner:oil"]),
     (5, "logistics_mk4", "Logistics Mk.4", "50 Heavy Modular Frame, 100 Computer, 200 Encased Industrial Beam, 400 Rubber", "15:00",
-     "Company speed limit raised to 128 RPM", [], ["cap:128"]),
+     "Belts with no shaft run at 480 items/min (Belt Mk.4)", [], ["belt:480"]),
     (5, "fluid_packaging", "Fluid Packaging", "200 Plastic, 400 Steel Beam, 1000 Copper Sheet", "8:00",
      "Packager (Spout and Item Drain), canisters, Liquid Biofuel",
      [C + "spout", C + "item_drain", C + "portable_fluid_interface", "createdieselgenerators:canister"], []),
@@ -294,7 +295,7 @@ MILESTONES = [
      ["siftec:aluminum_scrap", "siftec:aluminum_ingot", "siftec:alclad_aluminum_sheet", "siftec:aluminum_casing",
       "siftec:radio_control_unit"], ["scanner:bauxite", "scanner:quartz"]),
     (7, "logistics_mk5", "Logistics Mk.5", "100 Alclad Aluminum Sheet, 200 Encased Industrial Beam, 300 Reinforced Iron Plate", "1:00",
-     "Company speed limit raised to 192 RPM", [], ["cap:192"]),
+     "Belts with no shaft run at 780 items/min (Belt Mk.5)", [], ["belt:780"]),
     (7, "hazmat_suit", "Hazmat Suit", "50 Aluminum Casing, 500 Quickwire, 50 Gas Filter", "5:00",
      "Hazmat Suit, Iodine Infused Filter, Backpack Lantern and Jukebox Upgrades", ["siftec:hazmat_suit", "siftec:iodine_infused_filter"], []),
     (7, "hover_pack", "Hover Pack", "200 Motor, 100 Heavy Modular Frame, 100 Computer, 200 Alclad Aluminum Sheet", "5:00",
@@ -328,7 +329,7 @@ MILESTONES = [
      "Main Portal and Satellite Portal, Singularity Cell, Ballistic Warp Drive",
      ["siftec:main_portal", "siftec:satellite_portal", "siftec:singularity_cell", "siftec:ballistic_warp_drive"], []),
     (9, "peak_efficiency", "Peak Efficiency", "250 Time Crystal, 250 Ficsite Trigon, 1000 Alclad Aluminum Sheet, 2000 Iron Sheet", "20:00",
-     "Company speed limit raised to 256 RPM", [], ["cap:256"]),
+     "Belts with no shaft run at 1,200 items/min (Belt Mk.6)", [], ["belt:1200"]),
 ]
 
 # Satisfactory 1.0's cost and lock time for every milestone come from tools/satisfactory.py (Concrete as any stone,
@@ -367,7 +368,7 @@ _TEXT = {  # unlock texts that named a recipe 1.0 gives with another milestone
     "particle_enrichment": "Particle Accelerator, Nitric Acid, Non-Fissile Uranium, plutonium, Copper Powder, Pressure Conversion Cube, Nuclear Pasta",
     "matter_conversion": "Converter, Ficsite, Diamonds, Time Crystal, Biochemical Sculptor, Reanimated SAM, SAM Fluctuator, SAM nodes on the scanner",
     "quantum_encoding": "Quantum Encoder, Excited Photonic Matter, Dark Matter, Superposition Oscillator, Neural-Quantum Processor, AI Expansion Server",
-    "peak_efficiency": "Belt Mk.6 speed, Ficsonium and the Ficsonium Fuel Rod",
+    "peak_efficiency": "Belts with no shaft run at 1,200 items/min (Belt Mk.6), Ficsonium and the Ficsonium Fuel Rod",
 }
 
 

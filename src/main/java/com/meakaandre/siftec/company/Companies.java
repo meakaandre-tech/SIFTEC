@@ -3,7 +3,7 @@ package com.meakaandre.siftec.company;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.registry.ModBlocks;
-import com.meakaandre.siftec.tweak.SpeedCap;
+import com.meakaandre.siftec.net.CompanyState;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -29,7 +29,7 @@ public final class Companies {
         ServerPlayerEvents.JOIN.register(player -> {
             CompanyData data = CompanyData.get(player.level().getServer());
             of(player);
-            SpeedCap.recompute(player.level().getServer());
+            CompanyState.recompute(player.level().getServer());
         });
         // valuable changes (payments, the cloud, points) are written within a few seconds instead of at the next autosave
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -181,7 +181,7 @@ public final class Companies {
             company.lockUntil = server.overworld().getGameTime() + m.seconds() * 20L;
         }
         save(server);
-        SpeedCap.recompute(server);
+        CompanyState.recompute(server);
         tell(server, company, Component.translatable("siftec.hub.complete", who, m.name()).withStyle(ChatFormatting.GOLD));
         tell(server, company, Component.translatable("siftec.hub.unlocks", m.unlockText()).withStyle(ChatFormatting.GRAY));
     }
@@ -261,7 +261,7 @@ public final class Companies {
         target.members.add(me);
         target.leftAt.remove(me);
         save(server);
-        SpeedCap.recompute(server);
+        CompanyState.recompute(server);
         com.meakaandre.siftec.claim.Claims.refreshLoading(server);
         tell(server, target, Component.translatable("siftec.company.joined", player.getGameProfile().name(), target.name));
         return 1;
@@ -300,7 +300,7 @@ public final class Companies {
         Company fresh = create(data, player, name);
         fresh.collected.addAll(old.collected);
         save(server);
-        SpeedCap.recompute(server);
+        CompanyState.recompute(server);
         com.meakaandre.siftec.claim.Claims.refreshLoading(server);
         return fresh;
     }

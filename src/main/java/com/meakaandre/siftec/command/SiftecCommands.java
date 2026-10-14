@@ -46,6 +46,7 @@ public final class SiftecCommands {
         AutomateTests.register();
         com.meakaandre.siftec.power.PowerTests.register();
         NodeTests.register();
+        LogisticsTests.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("node")
@@ -95,7 +96,6 @@ public final class SiftecCommands {
             }
             BlockPos miner = pos.above().immutable();
             if (type == NodeType.IRON) ownerTest(source, level, miner.above(16), setup);
-            if (type == NodeType.IRON) droneTest(source, level, miner.above(24), setup);
             // the Build Gun's miners are tested by /siftec selftest buildings_a
             if (setup) {
                 report(source, "SELFTEST setup " + node + " core at " + pos.toShortString());
@@ -155,7 +155,7 @@ public final class SiftecCommands {
         report(source, "SELFTEST hub: two members pay x" + company.costMultiplier() + "; tier 1 open " + Milestones.tierOpen(company, 1)
             + "; tier 3 open " + Milestones.tierOpen(company, 3) + "; coal power needs " + Milestones.blocker(company, coal).id()
             + "; backpack given " + company.hasToken("backpack") + "; scanner copper " + company.hasToken("scanner:copper")
-            + "; speed cap " + company.best("cap:", 32));
+            + "; self-moving belts " + com.meakaandre.siftec.tweak.SelfMovingBelts.itemsPerMinute(company) + " items/min");
         int ours = 0;
         boolean steelGone = true;
         for (var holder : source.getServer().getRecipeManager().getRecipes()) {
@@ -194,53 +194,26 @@ public final class SiftecCommands {
     }
 
     /**
-     * Used by the automated test. Two columns, each a creative motor over a Speed Governor over a shaft. In the
-     * first everything belongs to a company whose limit is 64 RPM; in the second the shaft belongs to a company
-     * still at 32, so the governor feeding it 64 should break.
+     * Used by the automated test: a shaft that belongs to a company, for the recipe lock check (refused for the
+     * company with nothing, allowed once the milestone is done).
      */
     private static void ownerTest(CommandSourceStack source, ServerLevel level, BlockPos at, boolean setup) {
         var data = com.meakaandre.siftec.company.CompanyData.get(source.getServer());
-        BlockPos[] governors = {at, at.east(3)};
         if (setup) {
-            Company fast = new Company(), slow = new Company();
-            fast.id = "selftest_fast";
-            slow.id = "selftest_slow";
-            for (Milestone m : Milestones.all()) if (m.tokens().contains("cap:64")) fast.done.add(m.id());
-            data.companies().put(fast.id, fast);
-            data.companies().put(slow.id, slow);
-            BlockState motor = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:creative_motor")).defaultBlockState();
-            if (motor.hasProperty(BlockStateProperties.FACING)) motor = motor.setValue(BlockStateProperties.FACING, Direction.DOWN);
+            Company owner = new Company();
+            owner.id = "selftest_owner";
+            data.companies().put(owner.id, owner);
             BlockState shaft = BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:shaft")).defaultBlockState();
             if (shaft.hasProperty(BlockStateProperties.AXIS)) shaft = shaft.setValue(BlockStateProperties.AXIS, Direction.Axis.Y);
-            StringBuilder said = new StringBuilder();
-            for (int i = 0; i < 2; i++) {
-                BlockPos pos = governors[i];
-                level.setBlockAndUpdate(pos.above(), motor);
-                level.setBlockAndUpdate(pos, ModBlocks.SPEED_GOVERNOR.get().defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.Y));
-                level.setBlockAndUpdate(pos.below(), shaft);
-                BlockEntity below = level.getBlockEntity(pos.below());
-                if (below != null) below.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, i == 0 ? fast.id : slow.id);
-                if (level.getBlockEntity(pos) instanceof com.meakaandre.siftec.governor.GovernorBlockEntity governor) {
-                    governor.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, fast.id);
-                    governor.setTarget(48);
-                    said.append(" set 48 -> ").append(governor.target());
-                    governor.setTarget(200);
-                    said.append(", set 200 -> ").append(governor.target()).append(" (limit ").append(governor.limit()).append(");");
-                }
-            }
-            report(source, "SELFTEST owner setup:" + said);
+            level.setBlockAndUpdate(at, shaft);
+            BlockEntity placed = level.getBlockEntity(at);
+            if (placed != null) placed.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, owner.id);
+            report(source, "SELFTEST owner setup: shaft of " + owner.id + " at " + at.toShortString());
             return;
         }
-        for (int i = 0; i < 2; i++) {
-            BlockPos pos = governors[i];
-            String shaft = level.getBlockEntity(pos.below()) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k
-                ? "shaft speed " + k.getSpeed() + " owner " + k.getAttached(com.meakaandre.siftec.owner.Ownership.OWNER) : "shaft missing";
-            report(source, "SELFTEST owner " + (i == 0 ? "same company" : "slower company below") + ": governor is "
-                + BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()) + "; " + shaft);
-        }
         // a locked recipe: refused for the company with nothing, allowed once the milestone is done
-        BlockEntity machine = level.getBlockEntity(governors[0].below());
-        Company fast = data.byId("selftest_fast");
+        BlockEntity machine = level.getBlockEntity(at);
+        Company fast = data.byId("selftest_owner");
         for (var holder : source.getServer().getRecipeManager().getRecipes()) {
             String lock = com.meakaandre.siftec.owner.RecipeLocks.lockOf(source.getServer(), holder.value());
             if (lock == null || machine == null || fast == null) continue;
@@ -252,29 +225,6 @@ public final class SiftecCommands {
                 + holder.id().identifier() + " needs " + lock + "; blocked before " + before + ", after unlocking " + after);
             break;
         }
-    }
-
-    /** Used by the automated test: two Drone Ports 20 blocks apart; the first sends five iron ingots to the second. */
-    private static void droneTest(CommandSourceStack source, ServerLevel level, BlockPos at, boolean setup) {
-        BlockPos far = at.east(20);
-        if (setup) {
-            level.setBlockAndUpdate(at, ModBlocks.DRONE_PORT.get().defaultBlockState());
-            level.setBlockAndUpdate(far, ModBlocks.DRONE_PORT.get().defaultBlockState());
-            if (level.getBlockEntity(at) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port) {
-                port.companyId = "selftest_fast";
-                port.hasDrone = true;
-                port.destination = far;
-                port.items.setItem(com.meakaandre.siftec.drone.PortContainer.FUEL, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.FIRE_CHARGE, 3));
-                port.items.setItem(com.meakaandre.siftec.drone.PortContainer.OUT, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_INGOT, 5));
-                report(source, "SELFTEST drone setup: a trip needs " + port.chargesNeeded() + " fire charge(s)");
-            }
-            return;
-        }
-        String home = level.getBlockEntity(at) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port
-            ? "state " + port.state + ", fire charges left " + port.fuel().getCount() + ", still waiting " + port.items.getItem(com.meakaandre.siftec.drone.PortContainer.OUT) : "missing";
-        String there = level.getBlockEntity(far) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port
-            ? "arrived " + port.items.getItem(com.meakaandre.siftec.drone.PortContainer.IN) : "missing";
-        report(source, "SELFTEST drone: home port " + home + "; far port " + there);
     }
 
     private static void report(CommandSourceStack source, String text) {

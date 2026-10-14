@@ -14,7 +14,7 @@ import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.registry.ModItems;
 import com.meakaandre.siftec.registry.ModTab;
 import com.meakaandre.siftec.net.StatePayload;
-import com.meakaandre.siftec.tweak.SpeedCap;
+import com.meakaandre.siftec.net.CompanyState;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -40,7 +40,7 @@ public class Siftec implements ModInitializer {
         com.meakaandre.siftec.node.NodeRegrowth.register();
         SiftecCommands.register();
         PayloadTypeRegistry.clientboundPlay().register(StatePayload.TYPE, StatePayload.STREAM_CODEC);
-        ServerLifecycleEvents.SERVER_STARTED.register(SpeedCap::recompute);
+        ServerLifecycleEvents.SERVER_STARTED.register(CompanyState::recompute);
         com.meakaandre.siftec.owner.Ownership.register();
         com.meakaandre.siftec.owner.Boosts.register();
         ServerLifecycleEvents.SERVER_STARTED.register(server -> com.meakaandre.siftec.owner.RecipeLocks.forget());
@@ -52,6 +52,7 @@ public class Siftec implements ModInitializer {
         // the pack's backpack is Traveler's Backpack; SIFTEC still loads without it (no backpack then)
         if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("travelersbackpack")) com.meakaandre.siftec.compat.TravelersBackpackCompat.register();
         com.meakaandre.siftec.equip.Equipment.register();
+        com.meakaandre.siftec.depot.OpenCloudPayload.register();
         Food.register();
         Locks.register();
         Companies.register();

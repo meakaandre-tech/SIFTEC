@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.governor;
 
-import com.meakaandre.siftec.tweak.SpeedCap;
 import com.zurrtum.create.content.kinetics.RotationPropagator;
 import com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -16,7 +15,7 @@ import net.minecraft.world.level.storage.ValueOutput;
  * a network up costs as much as gearing it up would.
  */
 public class GovernorBlockEntity extends SplitShaftBlockEntity {
-    private int target = SpeedCap.START;
+    private int target = START;
 
     public GovernorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -26,9 +25,12 @@ public class GovernorBlockEntity extends SplitShaftBlockEntity {
         return target;
     }
 
-    /** The speed limit of the company this governor belongs to. */
-    public int limit() {
-        return SpeedCap.of(this);
+    /** The speed a new governor gives. */
+    public static final int START = 32;
+
+    /** The most a governor gives: Create's own top speed. */
+    public static int limit() {
+        return com.zurrtum.create.infrastructure.config.AllConfigs.server().kinetics.maxRotationSpeed.get();
     }
 
     @Override
@@ -72,6 +74,6 @@ public class GovernorBlockEntity extends SplitShaftBlockEntity {
     @Override
     protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        target = view.getIntOr("Target", SpeedCap.START);
+        target = view.getIntOr("Target", START);
     }
 }

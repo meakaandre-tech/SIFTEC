@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
-/** Dimensional Depot: put it against an Item Vault (or any storage) and it uploads the contents to the company's cloud. */
+/** Dimensional Depot: put it against an Item Vault and it uploads the vault's contents to the company's cloud. */
 public class DepotBlock extends Block implements EntityBlock {
     public DepotBlock(Properties properties) {
         super(properties);
