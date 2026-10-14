@@ -115,11 +115,20 @@ public class MamMenu extends ChestMenu {
         for (int i = 0; i < nodes.size() && i < MAX_NODES; i++) view.setItem(FIRST_NODE + i, nodeButton(nodes.get(i)));
     }
 
-    /** True once the company has researched anything in the tree, or the player has one of its starting items with them. */
+    /**
+     * True once the company has started the tree: collected what starts it out in the world, researched anything in it,
+     * or had one of its starting items brought to the MAM (which starts it for good).
+     */
     private boolean found(Milestones.Tree t) {
-        if (player.hasInfiniteMaterials()) return true;
+        if (player.hasInfiniteMaterials() || company.trees.contains(t.id())) return true;
         for (Milestone m : t.nodes()) if (company.has(m.id()) || company.research.equals(m.id())) return true;
-        for (String trigger : t.triggers()) if (new Milestone.Cost(trigger, 1).carried(player.getInventory()) > 0) return true;
+        for (String trigger : t.triggers()) {
+            if (new Milestone.Cost(trigger, 1).carried(player.getInventory()) > 0) {
+                company.trees.add(t.id());
+                Companies.save(player.level().getServer());
+                return true;
+            }
+        }
         return false;
     }
 

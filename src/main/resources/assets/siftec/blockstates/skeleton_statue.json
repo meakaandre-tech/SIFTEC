@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "siftec:block/skeleton_statue"
+    },
+    "facing=west": {
+      "model": "siftec:block/skeleton_statue",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "siftec:block/skeleton_statue",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "siftec:block/skeleton_statue",
+      "y": 270
+    }
+  }
+}

@@ -58,6 +58,23 @@ public class ModItems {
             .component(net.minecraft.core.component.DataComponents.GLIDER, net.minecraft.util.Unit.INSTANCE)
             .component(com.zurrtum.create.AllDataComponents.BACKTANK_AIR, 0)));
 
+    /** What the AWESOME Sink pays in, and the AWESOME Shop takes. */
+    public static final Supplier<Item> FICSIT_COUPON = item("ficsit_coupon", properties -> new Item(properties.stacksTo(64)));
+    /** Repaints Build Gun buildings (sink/CustomizerMenu.java); free from the AWESOME Shop. */
+    public static final Supplier<com.meakaandre.siftec.sink.CustomizerItem> CUSTOMIZER = item("customizer",
+        properties -> new com.meakaandre.siftec.sink.CustomizerItem(properties.stacksTo(1)));
+    /** The Xeno-Zapper: a hand stun weapon (equip/Equipment.java), from the Equipment Workshop. */
+    public static final Supplier<Item> XENO_ZAPPER = item("xeno_zapper", properties -> new Item(properties.stacksTo(1)));
+    /** The AWESOME Shop's cups, held in the hand: nothing but a look. */
+    public static final Map<String, Item> CUPS = new LinkedHashMap<>();
+
+    static {
+        for (com.google.gson.JsonElement e : Milestones.raw().getAsJsonArray("cups")) {
+            String id = e.getAsJsonObject().get("id").getAsString();
+            CUPS.put(id, item(id, properties -> new Item(properties.stacksTo(1))).get());
+        }
+    }
+
     private static <T extends Item> Supplier<T> hiddenItem(String name, Function<Item.Properties, T> factory) {
         ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Siftec.id(name));
         T item = Registry.register(BuiltInRegistries.ITEM, key, factory.apply(new Item.Properties().setId(key)));

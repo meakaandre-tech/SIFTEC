@@ -34,6 +34,8 @@ import java.util.function.Predicate;
  * you fly near a turning Power Pole; the Jetpack burns fuel while the jump key is held in mid-air.
  */
 public final class Equipment {
+    /** What a charged Xeno-Zapper jolt does (Satisfactory's zapper does little but stun). */
+    private static final float ZAPPER_DAMAGE = 4f;
     /** How close a turning pole has to be for the Hover Pack. */
     public static final double HOVER_RANGE = 32;
     /** One filter lasts this long while the mask or suit is actually stopping something. */
@@ -94,6 +96,21 @@ public final class Equipment {
         ServerPlayNetworking.registerGlobalReceiver(JetThrustPayload.TYPE, (payload, context) ->
             context.server().execute(() -> thrust(context.server(), context.player(), payload.on())));
         ServerTickEvents.END_SERVER_TICK.register(Equipment::tick);
+        // the Xeno-Zapper: a jolt that hurts more than a fist and stuns (slowness and weakness for a moment); it needs the
+        // swing charged, as any weapon does
+        net.fabricmc.fabric.api.event.player.AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+            if (!(level instanceof net.minecraft.server.level.ServerLevel server) || player.isSpectator()) return net.minecraft.world.InteractionResult.PASS;
+            if (!player.getItemInHand(hand).is(ModItems.XENO_ZAPPER.get()) || !(entity instanceof net.minecraft.world.entity.LivingEntity living)) {
+                return net.minecraft.world.InteractionResult.PASS;
+            }
+            if (player.getAttackStrengthScale(0.5f) < 0.9f) return net.minecraft.world.InteractionResult.PASS;
+            if (living.hurtServer(server, server.damageSources().playerAttack(player), ZAPPER_DAMAGE)) {
+                living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 3));
+                living.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 1));
+                server.playSound(null, living.blockPosition(), net.minecraft.sounds.SoundEvents.BEE_STING, net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 1.6f);
+            }
+            return net.minecraft.world.InteractionResult.PASS;
+        });
         // carriers and drones are only ever drawn for something in flight; one read back from disk is left over from a restart
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
             if (entity.entityTags().contains(Ziplines.TAG)) level.getServer().execute(entity::discard);

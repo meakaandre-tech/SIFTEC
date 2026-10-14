@@ -963,6 +963,85 @@ def converter():
     return f.done()
 
 
+# ------------------------------------------------------------------------------------------------ work package 10
+
+def equipment_workshop():
+    # 5 wide, 3 deep, 4 high (Satisfactory's bench, at the pack's scale): on its pad a long dark workbench with an orange
+    # top, a light tool board behind it under a little orange roof, and lanterns on the board. The controller is the
+    # bench's terminal, in the middle of the front; using it opens the Workshop.
+    f = Frame(5, 3)
+    f.pad()
+    f.box(-2, 1, 0, 2, 1, 1, DARK)
+    f.box(-2, 2, 0, 2, 2, 1, ORANGE)
+    f.set(0, 1, 0, CONTROLLER)
+    f.box(-2, 1, 2, 2, 3, 2, LIGHT)
+    f.box(-2, 4, 1, 2, 4, 2, ORANGE)
+    f.hazard_x(-2, 2, 0, 0)
+    for x in (-1, 1):
+        f.set(x, 3, 1, "minecraft:lantern[hanging=false,waterlogged=false]")
+    return f.done()
+
+
+def awesome_sink():
+    # 5 wide, 5 deep, 9 high (the Sink's funnel of a tower): an orange body on dark legs, a glass band to see the magma
+    # it burns things in, and a dark funnel on top. Items go in at the input port at the back, on the ground; the
+    # controller in front opens the Sink's screen. 30 MW through the connector on the funnel's rim.
+    f = Frame(5, 5)
+    f.pad()
+    f.walls(1, 1, DARK, DARK, -2, 2, 0, 4)
+    f.hall(-2, 0, 2, 4, 1, 5, side=ORANGE, corner=DARK)
+    f.window_front(0, -1, 1, 3, 4)
+    f.window_side(-2, 1, 3, 3, 4)
+    f.window_side(2, 1, 3, 3, 4)
+    f.box(-1, 1, 1, 1, 1, 3, "minecraft:magma_block")
+    f.box(-2, 6, 0, 2, 6, 4, DARK)
+    f.walls(7, 8, DARK, ORANGE, -2, 2, 0, 4)
+    f.box(-1, 6, 1, 1, 6, 3, "minecraft:magma_block")
+    f.hazard_x(-2, 2, 6, 0)
+    f.set(1, 2, 0, CONTROLLER)
+    f.port(0, 0, 4, "north", "item_in", (1, 2, 0))
+    f.set(2, 9, 4, CONNECTOR)
+    return f.done()
+
+
+def awesome_shop():
+    # 3 wide, 3 deep, 5 high: a kiosk of light panels with an orange roof and a glass front; the controller is its counter
+    # terminal. No power (as in 1.0).
+    f = Frame(3, 3)
+    f.pad()
+    f.walls(1, 3, DARK, LIGHT)
+    f.window_front(0, -1, 1, 2, 3)
+    f.set(0, 1, 0, CONTROLLER)
+    f.box(-1, 4, 0, 1, 4, 2, ORANGE)
+    f.set(0, 3, 1, "minecraft:lantern[hanging=true,waterlogged=false]")
+    return f.done()
+
+
+def radar_tower():
+    # 3 by 3, 17 high: a dark lattice mast on a pad with hazard edges, orange bands, and a dish of light panels and iron
+    # bars at the top; the controller at its foot, the connector on the dish. 30 MW.
+    f = Frame(3, 3)
+    f.pad()
+    f.set(0, 1, 0, CONTROLLER)
+    for x in (-1, 1):
+        for z in (0, 2):
+            f.box(x, 1, z, x, 12, z, DARK)
+    for y in (4, 8, 12):
+        f.walls(y, y, ORANGE, ORANGE)
+    for y in range(1, 13):
+        if y not in (4, 8, 12):
+            f.set(0, y, 1, "minecraft:iron_bars[east=false,north=false,south=false,waterlogged=false,west=false]")
+    f.set(0, 4, 1, DARK)
+    f.set(0, 8, 1, DARK)
+    f.set(0, 12, 1, DARK)
+    f.box(-1, 13, 0, 1, 13, 2, LIGHT)
+    f.box(-1, 14, 0, 1, 14, 0, LIGHT)
+    f.box(-1, 15, 0, 1, 15, 0, "minecraft:iron_bars[east=true,north=false,south=false,waterlogged=false,west=true]")
+    f.set(0, 14, 1, DARK)
+    f.set(0, 15, 1, CONNECTOR)
+    return f.done()
+
+
 BUILT = {"test_building": test_building, "test_miner": test_miner,
          "constructor": constructor, "smelter": smelter,
          "miner_mk1": lambda: miner(8, ORANGE, ORANGE), "miner_mk2": lambda: miner(9, LIGHT, ORANGE),
@@ -976,7 +1055,8 @@ BUILT = {"test_building": test_building, "test_miner": test_miner,
          "assembler": assembler, "foundry": foundry, "refinery": refinery, "blender": blender, "manufacturer": manufacturer,
          "quantum_encoder": quantum_encoder, "packager": packager, "water_extractor": water_extractor, "oil_extractor": oil_extractor,
          "resource_well_pressurizer": resource_well_pressurizer, "resource_well_extractor": resource_well_extractor,
-         "particle_accelerator": particle_accelerator, "converter": converter}
+         "particle_accelerator": particle_accelerator, "converter": converter,
+         "equipment_workshop": equipment_workshop, "awesome_sink": awesome_sink, "awesome_shop": awesome_shop, "radar_tower": radar_tower}
 
 if __name__ == "__main__":
     for bid, make in BUILT.items():

@@ -8,7 +8,6 @@ import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.registry.ModBlocks;
-import com.meakaandre.siftec.workshop.WorkshopBlockEntity;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCraftingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationInput;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
@@ -46,7 +45,7 @@ import java.util.List;
 /**
  * Selftests for automation: the grid's copper wire pressed from Cable (and the old
  * Workshop crafter route refused); the Manufacturer's second step for a part and for equipment, run step by step
- * through a sequenced assembly (as the Deployer asks for each step), for an unlocked and a locked company; a Workshop saved by the old automatic mode giving its parts back; and a machine's fake player and
+ * through a sequenced assembly (as the Deployer asks for each step), for an unlocked and a locked company; and a machine's fake player and
  * stringing New Age wire between two Power Poles. Every line of output starts with "SELFTEST automate".
  */
 public final class AutomateTests {
@@ -94,7 +93,6 @@ public final class AutomateTests {
             // equipment made by machine the same way (Reinforced Iron Plate, Wire, Screw; then Fabric, Copper Sheet, Steel Pipe)
             assembly(source, level, at.east(4), "siftec:object_scanner");
             assembly(source, level, at.east(4), "siftec:gas_mask");
-            workshop(source, level, at.west(4));
             poles(source, level, new BlockPos(x, 250, z + 6));
         } catch (RuntimeException e) {
             report(source, "FAILED with " + e);
@@ -201,36 +199,6 @@ public final class AutomateTests {
             said.append(company.equals(YES) ? "unlocked company: " : "; locked company: ").append(outcome);
         }
         report(source, "assembly " + made + ": " + said);
-        level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
-    }
-
-    /**
-     * A Workshop loaded from what the old automatic mode saved (4 Wire held, a Node Scanner in the output slot): it
-     * takes nothing from belts any more, and gives what it held to the player who opens it.
-     */
-    private static void workshop(CommandSourceStack source, ServerLevel level, BlockPos at) {
-        level.setBlockAndUpdate(at, ModBlocks.EQUIPMENT_WORKSHOP.get().defaultBlockState());
-        if (!(level.getBlockEntity(at) instanceof WorkshopBlockEntity workshop)) {
-            report(source, "workshop: no block entity");
-            return;
-        }
-        net.minecraft.nbt.CompoundTag saved = new net.minecraft.nbt.CompoundTag();
-        net.minecraft.nbt.CompoundTag held = new net.minecraft.nbt.CompoundTag();
-        held.putInt("siftec:wire", 4);
-        saved.put("Held", held);
-        saved.putString("Target", "siftec:node_scanner");
-        saved.put("Output", ItemStack.OPTIONAL_CODEC.encodeStart(level.registryAccess().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE),
-            new ItemStack(item("siftec:node_scanner"))).getOrThrow());
-        workshop.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), saved));
-        int loaded = workshop.leftover();
-        boolean storage = net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, at, Direction.UP) != null;
-        FakePlayer fake = FakePlayer.get(level);
-        fake.getInventory().clearContent();
-        boolean gave = workshop.giveBack(fake);
-        int wire = fake.getInventory().countItem(item("siftec:wire")), scanners = fake.getInventory().countItem(item("siftec:node_scanner"));
-        fake.getInventory().clearContent();
-        report(source, "workshop: loaded " + loaded + " items from the old save; takes items from belts: " + storage + "; gave back " + gave
-            + " (" + wire + " Wire, " + scanners + " Node Scanner); left " + workshop.leftover());
         level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
     }
 

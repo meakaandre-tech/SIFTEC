@@ -1,14 +1,21 @@
 package com.meakaandre.siftec.collect;
 
+import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodeSavedData;
 import com.meakaandre.siftec.node.Terrain;
 import com.meakaandre.siftec.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -17,14 +24,16 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Where the slugs and alien artefacts are. Like nodes, they are worked out from the world seed, one
- * possible spot per 96-block cell of the Overworld, so the Object Scanner can find them in land nobody
- * has visited.
+ * Where the Mercer Spheres, Somersloops and crash sites are. Like nodes, they are worked out from the world seed, one
+ * possible spot per 96-block cell of the Overworld, so the Object Scanner can find them in land nobody has visited.
+ * Somersloops also sit in Ancient City portal frames ({@link AncientCities}) and in some crash pods.
  */
 public final class Collectibles {
     public static final int CELL = 96;
     private static final int MARGIN = 8, FAR = 1000;
     private static final float CHANCE = 0.4f;
+    /** A Somersloop's pocket lies between these heights (deepslate, above the bedrock). */
+    private static final int DEEP_LOW = -52, DEEP_HIGH = -16;
 
     public record Spot(int x, int z, Collectible type) {
         public String key() {
@@ -43,6 +52,7 @@ public final class Collectibles {
     public static void clear() {
         CACHE.clear();
         cacheSeed = Long.MIN_VALUE;
+        AncientCities.clear();
     }
 
     private static long key(int cellX, int cellZ) {
@@ -97,6 +107,22 @@ public final class Collectibles {
         h = mix(h);
         int z = baseZ + (int) Long.remainderUnsigned(h, span);
         h = mix(h);
+        boolean far = Math.sqrt(Math.pow(x - originX, 2) + Math.pow(z - originZ, 2)) >= FAR;
+        int total = 0;
+        for (Collectible c : Collectible.values()) if (far || !c.far) total += c.weight;
+        int roll = (int) Long.remainderUnsigned(h, total);
+        Collectible type = null;
+        for (Collectible c : Collectible.values()) {
+            if (!far && c.far) continue;
+            roll -= c.weight;
+            if (roll < 0) {
+                type = c;
+                break;
+            }
+        }
+        if (type == null) return Optional.empty();
+        // a Somersloop lies deep underground: the ground above it does not matter
+        if (type == Collectible.SOMERSLOOP) return Optional.of(new Spot(x, z, type));
         Terrain.Column column = Terrain.column(level, x, z);
         if (column == null) {
             // over void (floating islands): somewhere on the cell's land, or nowhere
@@ -107,16 +133,20 @@ public final class Collectibles {
         } else if (column.water()) {
             return Optional.empty();
         }
-        boolean far = Math.sqrt(Math.pow(x - originX, 2) + Math.pow(z - originZ, 2)) >= FAR;
-        int total = 0;
-        for (Collectible c : Collectible.values()) if (far || !c.far) total += c.weight;
-        int roll = (int) Long.remainderUnsigned(h, total);
-        for (Collectible c : Collectible.values()) {
-            if (!far && c.far) continue;
-            roll -= c.weight;
-            if (roll < 0) return Optional.of(new Spot(x, z, c));
-        }
-        return Optional.empty();
+        return Optional.of(new Spot(x, z, type));
+    }
+
+    /** The height a Somersloop's pocket is dug at, from the seed. */
+    public static int deepY(long seed, int x, int z) {
+        long h = mix(seed ^ mix(((long) x << 32) ^ (z & 0xffffffffL) ^ 0x5011L));
+        return DEEP_LOW + (int) Long.remainderUnsigned(h, DEEP_HIGH - DEEP_LOW + 1);
+    }
+
+    /** The height to point at for a spot: the pocket for a Somersloop, the ground otherwise (or the fallback). */
+    public static int y(ServerLevel level, Spot spot, int fallback) {
+        if (spot.type() == Collectible.SOMERSLOOP) return deepY(level.getSeed(), spot.x(), spot.z());
+        Terrain.Column column = Terrain.column(level, spot.x(), spot.z());
+        return column == null ? fallback : column.y() + (spot.type() == Collectible.MERCER_SPHERE ? 2 : 1);
     }
 
     /** The nearest one of a kind that this set of already-collected spots does not hold. */
@@ -124,7 +154,10 @@ public final class Collectibles {
         return nearest(level, x, z, type, collected, maxCells, Terrain.Border.NONE, Long.MAX_VALUE);
     }
 
-    /** As above, inside the world border and giving up (with the best so far) after {@code nanos}. Safe on the node map's worker thread. */
+    /**
+     * As above, inside the world border and giving up (with the best so far) after {@code nanos}. Safe on the node
+     * map's worker thread. Looking for Somersloops, the crash pods that carry one count too.
+     */
     public static Optional<Spot> nearest(ServerLevel level, double x, double z, Collectible type, java.util.Set<String> collected, int maxCells,
                                          Terrain.Border border, long nanos) {
         long deadline = nanos == Long.MAX_VALUE ? Long.MAX_VALUE : System.nanoTime() + nanos;
@@ -140,12 +173,15 @@ public final class Collectibles {
                     int fromX = (cx + dx) * CELL, fromZ = (cz + dz) * CELL;
                     if (fromX + CELL <= border.minX() || fromX >= border.maxX() || fromZ + CELL <= border.minZ() || fromZ >= border.maxZ()) continue;
                     Optional<Spot> spot = inCell(level, cx + dx, cz + dz);
-                    if (spot.isEmpty() || spot.get().type() != type || collected.contains(spot.get().key())) continue;
-                    if (!border.contains(spot.get().x(), spot.get().z())) continue;
-                    double d = Math.sqrt(Math.pow(spot.get().x() - x, 2) + Math.pow(spot.get().z() - z, 2));
+                    if (spot.isEmpty() || collected.contains(spot.get().key())) continue;
+                    Spot s = spot.get();
+                    boolean wanted = s.type() == type
+                        || type == Collectible.SOMERSLOOP && s.type() == Collectible.CRASH_SITE && CrashSites.hasSomersloop(level, new BlockPos(s.x(), 0, s.z()));
+                    if (!wanted || !border.contains(s.x(), s.z())) continue;
+                    double d = Math.sqrt(Math.pow(s.x() - x, 2) + Math.pow(s.z() - z, 2));
                     if (d < bestDistance) {
                         bestDistance = d;
-                        best = spot.get();
+                        best = s;
                     }
                 }
             }
@@ -153,8 +189,10 @@ public final class Collectibles {
         return Optional.ofNullable(best);
     }
 
-    /** Puts the block down the first time its chunk loads. */
+    /** Puts the blocks down the first time their chunk loads, and notes any Ancient City starting in it. */
     public static boolean placeChunk(ServerLevel level, int chunkX, int chunkZ) {
+        if (level.dimension() != Level.OVERWORLD) return false;
+        AncientCities.noteChunk(level, chunkX, chunkZ);
         Optional<Spot> found = inCell(level, Math.floorDiv(chunkX << 4, CELL), Math.floorDiv(chunkZ << 4, CELL));
         if (found.isEmpty()) return false;
         Spot spot = found.get();
@@ -163,6 +201,18 @@ public final class Collectibles {
         long piece = NodeSavedData.piece(mix(((long) spot.x() << 32) ^ spot.z() ^ 0x51065), chunkX, chunkZ);
         if (data.isPlaced(piece)) return false;
         data.markPlaced(piece);
+        return place(level, spot);
+    }
+
+    /** Puts one spot's blocks in the world. */
+    public static boolean place(ServerLevel level, Spot spot) {
+        BlockState block = ModBlocks.COLLECTIBLES.get(spot.type()).get().defaultBlockState();
+        if (spot.type() == Collectible.SOMERSLOOP) {
+            BlockPos at = new BlockPos(spot.x(), deepY(level.getSeed(), spot.x(), spot.z()), spot.z());
+            pocket(level, at);
+            level.setBlock(at, block, Block.UPDATE_CLIENTS);
+            return true;
+        }
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, spot.x(), spot.z());
         while (y > level.getMinY()) {
@@ -172,12 +222,73 @@ public final class Collectibles {
             y--;
         }
         if (y <= level.getMinY()) return false;
-        level.setBlock(pos.set(spot.x(), y, spot.z()), ModBlocks.COLLECTIBLES.get(spot.type()).get().defaultBlockState(), Block.UPDATE_CLIENTS);
-        if (spot.type() == Collectible.CRASH_SITE) CrashSites.wreckage(level, new BlockPos(spot.x(), y, spot.z()));
+        BlockPos ground = new BlockPos(spot.x(), y - 1, spot.z());
+        if (spot.type() == Collectible.MERCER_SPHERE) {
+            siftslatePatch(level, ground);
+            // it floats: one block of air between the patch and the sphere
+            level.setBlock(ground.above(), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(ground.above(2), block, Block.UPDATE_CLIENTS);
+            return true;
+        }
+        level.setBlock(ground.above(), block, Block.UPDATE_CLIENTS);
+        CrashSites.wreckage(level, ground.above());
         return true;
     }
 
-    private static long mix(long v) {
+    /** The block Mercer Spheres hover over: The Sift's siftslate, or deepslate without The Sift. */
+    private static BlockState siftslate() {
+        return BuiltInRegistries.BLOCK.getOptional(Identifier.fromNamespaceAndPath("the_sift", "siftslate")).orElse(Blocks.DEEPSLATE).defaultBlockState();
+    }
+
+    /** A small rough disc of siftslate set into the ground. */
+    private static void siftslatePatch(ServerLevel level, BlockPos centre) {
+        BlockState slate = siftslate();
+        long h = mix(((long) centre.getX() << 32) ^ centre.getZ() ^ 0x5D1F7L);
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                int d = dx * dx + dz * dz;
+                if (d > 5 || d >= 4 && ((h >>> ((dx + 2) * 5 + dz + 2)) & 1) == 0) continue;  // ragged edge
+                BlockPos at = centre.offset(dx, 0, dz);
+                // settle onto the ground there: down past air and plants, a block or two at most
+                for (int i = 0; i < 2 && level.getBlockState(at).canBeReplaced(); i++) at = at.below();
+                BlockState was = level.getBlockState(at);
+                if (was.canBeReplaced() || !was.getFluidState().isEmpty() || was.hasBlockEntity()) continue;
+                level.setBlock(at, slate, Block.UPDATE_CLIENTS);
+                if (level.getBlockState(at.above()).canBeReplaced() && level.getBlockState(at.above()).getFluidState().isEmpty()) {
+                    level.setBlock(at.above(), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                }
+            }
+        }
+    }
+
+    /** A small hollow round a Somersloop: three by three, two high, its floor and walls left as they were. */
+    private static void pocket(ServerLevel level, BlockPos at) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                for (int dy = 0; dy <= 1; dy++) {
+                    BlockPos p = at.offset(dx, dy, dz);
+                    BlockState was = level.getBlockState(p);
+                    if (was.is(Blocks.BEDROCK) || was.hasBlockEntity()) continue;
+                    level.setBlock(p, Blocks.CAVE_AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                }
+            }
+        }
+        BlockPos floor = at.below();
+        if (level.getBlockState(floor).canBeReplaced()) level.setBlock(floor, Blocks.DEEPSLATE.defaultBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    /**
+     * Opens the MAM tree a collectible starts (Alien Technology, the Hard Drive page) for the company, and says so the
+     * first time.
+     */
+    public static void startTree(ServerPlayer player, Company company, Collectible type) {
+        if (company.trees.add(type.tree)) {
+            player.sendSystemMessage(Component.translatable("siftec.mam.tree_started", Component.translatable("siftec.tree." + type.tree)));
+            Companies.save(player.level().getServer());
+        }
+    }
+
+    static long mix(long v) {
         v ^= v >>> 33;
         v *= 0xff51afd7ed558ccdL;
         v ^= v >>> 33;

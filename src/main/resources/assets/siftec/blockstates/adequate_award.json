@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "siftec:block/adequate_award"
+    },
+    "facing=west": {
+      "model": "siftec:block/adequate_award",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "siftec:block/adequate_award",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "siftec:block/adequate_award",
+      "y": 270
+    }
+  }
+}

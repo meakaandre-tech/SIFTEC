@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/employee_of_the_planet_cup",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 15777856
+      }
+    ]
+  }
+}

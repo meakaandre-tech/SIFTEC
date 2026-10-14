@@ -427,15 +427,11 @@ def carried_over():
     for crop in ("sugar_cane", "cactus", "short_grass"):
         saw("minecraft:" + crop, "Biomass", name="biomass_from_" + crop)
     under(None)
-    shaped("siftec:equipment_workshop", ["SSS", "RSR", "SRS"], {"S": "Iron Sheet", "R": "Iron Rod"}, name="equipment_workshop")
     # Create's own machines, rewritten with the pack's parts so each can be built at the tier that unlocks it
     # (Create's recipes need brass and Electron Tubes, which come later; theirs are in REMOVED)
     shaped("create:flywheel", ["RSR", "SAS", "RSR"], {"R": "Iron Rod", "S": "Iron Sheet", "A": "create:shaft"}, name="flywheel")  # HUB Upgrade 6
     shaped("create:deployer", ["R", "C", "P"], {"R": "Rotor", "C": "create:andesite_casing", "P": "Reinforced Iron Plate"}, name="deployer")
-    # the Rebar Gun: Megafauna research, long before the Mechanical Crafter
-    shaped("cgs:nailgun", ["PPT", "RS "], {"P": "Reinforced Iron Plate", "T": "create:copper_backtank", "R": "Iron Rod", "S": "Screw"}, name="nailgun")
-    # the Xeno-Basher (Enhanced Asset Security)
-    shaped("cgs:hammer", [" PR", " MP", "F  "], {"P": "Reinforced Iron Plate", "R": "Rotor", "M": "Modular Frame", "F": "Iron Rod"}, name="hammer")
+    # the Rebar Gun (Gunsmithing's nail gun) and the Xeno-Basher (its hammer) are built at the Equipment Workshop (WORKSHOP)
     # Crushing Wheels (Advanced Steel Production) on a crafting table: Create's is a 5x5 Mechanical Crafter recipe
     shaped("create:crushing_wheel", ["ASA", "SRS", "ASA"], {"A": "create:andesite_alloy", "S": "Steel Beam", "R": "Rotor"}, 2, name="crushing_wheel")
     # the Pumpjack crank on a crafting table: Diesel Generators' is a 3x5 Mechanical Crafter recipe (Tier 6)
@@ -529,12 +525,6 @@ REMOVED = [
     # Create's dough replaces Farmer's Delight's
     "farmersdelight:wheat_dough_from_egg", "farmersdelight:wheat_dough_from_water", "farmersdelight:bread_from_smelting",
     "farmersdelight:bread_from_smoking",
-    # what the AWESOME Shop sells is bought, not crafted
-    "create:crafting/appliances/clipboard", "create:crafting/appliances/crafting_blueprint", "create:crafting/appliances/linked_controller",
-    "create:crafting/curiosities/peculiar_bell", "create:crafting/kinetics/copper_valve_handle", "create:crafting/kinetics/cuckoo_clock",
-    "create:crafting/kinetics/placard", "create:crafting/kinetics/steam_whistle", "create:crafting/kinetics/turntable",
-    "create:mechanical_crafting/extendo_grip", "create:mechanical_crafting/potato_cannon", "create:mechanical_crafting/wand_of_symmetry",
-    "create:andesite_table_cloth_from_andesite_alloy_stonecutting",
 ]
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked. Equipment and the
 # buildings 1.0 has cost what they cost in 1.0 (content.EQUIPMENT_COSTS and content.BUILD_COSTS, under the 1.0 name);
@@ -558,7 +548,6 @@ WORKSHOP = [
     ("siftec:vitamin_inhaler", _E["Vitamin Inhaler"]),
     ("siftec:therapeutic_inhaler", _E["Therapeutic Inhaler"]),
     ("siftec:nutritional_inhaler", _E["Nutritional Inhaler"]),
-    ("siftec:radar_tower", _B["Radar Tower"]),
     ("siftec:blueprint_designer", _B["Blueprint Designer Mk.1"]),
     ("siftec:blueprint_designer_mk3", _B["Blueprint Designer Mk.3"]),
     ("siftec:drone_port", _B["Drone Port"]),
@@ -566,7 +555,11 @@ WORKSHOP = [
     ("siftec:main_portal", _B["Main Portal"]),
     ("siftec:satellite_portal", _B["Satellite Portal"]),
     ("siftec:dimensional_depot", _B["Dimensional Depot Uploader"]),
-    ("siftec:awesome_sink", _B["AWESOME Sink"]),
-    ("siftec:awesome_shop", _B["AWESOME Shop"]),
-    # the Particle Accelerator, the Converter and the Resource Well Extractor are Build Gun buildings (work package 9)
+    # equipment from 1.0's Workshop list: the Xeno-Zapper (the pack's own), and Gunsmithing's nail gun and hammer as the
+    # Rebar Gun and the Xeno-Basher
+    ("siftec:xeno_zapper", _E["Xeno-Zapper"]),
+    ("cgs:nailgun", _E["Rebar Gun"]),
+    ("cgs:hammer", _E["Xeno-Basher"]),
+    # the Particle Accelerator, the Converter, the Resource Well Extractor, the AWESOME Sink and Shop and the Radar Tower
+    # are Build Gun buildings (work packages 9 and 10)
 ]

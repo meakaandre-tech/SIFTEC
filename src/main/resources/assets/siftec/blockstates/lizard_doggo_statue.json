@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "siftec:block/lizard_doggo_statue"
+    },
+    "facing=west": {
+      "model": "siftec:block/lizard_doggo_statue",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "siftec:block/lizard_doggo_statue",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "siftec:block/lizard_doggo_statue",
+      "y": 270
+    }
+  }
+}

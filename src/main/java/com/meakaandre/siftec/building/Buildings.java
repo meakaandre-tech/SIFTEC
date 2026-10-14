@@ -401,12 +401,14 @@ public final class Buildings {
         if (t == null) return out;
         BuildingIndex index = BuildingIndex.get(level);
         List<BlockPos> remove = new ArrayList<>();
+        Paint paint = level.getBlockEntity(controllerPos) instanceof ControllerBlockEntity c ? Paint.parse(c.paint) : Paint.NONE;
+        boolean storage = p.def().logic().equals("storage");
         for (BuildingTemplate.Cell cell : t.members) {
             BlockPos pos = p.at(cell);
             index.remove(level, pos, controllerPos);
             if (pos.equals(controllerPos)) continue;
             BlockState now = level.getBlockState(pos);
-            if (now.getBlock() != cell.state().getBlock()) continue;
+            if (!paint.fits(cell.state(), now.getBlock(), storage)) continue;
             out.addAll(contents(level, pos));
             remove.add(pos);
         }
@@ -468,13 +470,35 @@ public final class Buildings {
         if (p == null) return null;
         BuildingTemplate t = BuildingTemplate.of(p.def());
         if (t == null) return null;
+        Paint paint = Paint.parse(controller.paint);
+        boolean storage = p.def().logic().equals("storage");
         BlockPos missing = null;
         for (BuildingTemplate.Cell cell : t.members) {
             BlockPos pos = p.at(cell);
             if (!level.isLoaded(pos)) return null;
-            if (missing == null && level.getBlockState(pos).getBlock() != cell.state().getBlock()) missing = pos;
+            if (missing == null && !paint.fits(cell.state(), level.getBlockState(pos).getBlock(), storage)) missing = pos;
         }
         return missing;
+    }
+
+    /**
+     * Paints the building (the Customizer): every panel the paint touches is set to its painted block, keeping the way
+     * it faced where both blocks have it. Nothing else of the building changes.
+     */
+    public static void repaint(ServerLevel level, ControllerBlockEntity controller, Paint paint) {
+        Placement p = controller.placement();
+        if (p == null) return;
+        BuildingTemplate t = BuildingTemplate.of(p.def());
+        if (t == null) return;
+        boolean storage = p.def().logic().equals("storage");
+        controller.paint = paint.write();
+        controller.setChanged();
+        for (BuildingTemplate.Cell cell : t.members) {
+            BlockPos pos = p.at(cell);
+            if (!level.isLoaded(pos)) continue;
+            BlockState want = paint.look(cell.state(), storage);
+            if (level.getBlockState(pos).getBlock() != want.getBlock()) level.setBlock(pos, p.orient(want), SET);
+        }
     }
 
     /** Lists the building's blocks again (a controller does it once after loading, in case the index lost them). */

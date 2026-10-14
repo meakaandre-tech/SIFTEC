@@ -172,7 +172,7 @@ lang.update({"item.siftec.gypsum": "Gypsum", "item.siftec.toxic_residue": "Toxic
 for name, tex, tint in (("gypsum", "minecraft:item/bone_meal", None), ("toxic_residue", "minecraft:item/slime_ball", 0x90C020)):
     write(f"{A}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
     item_def(name, f"siftec:item/{name}", tint)
-MACHINES = {"blueprint_designer": ("Blueprint Designer Mk.1", "minecraft:block/lapis_block"), "blueprint_designer_mk3": ("Blueprint Designer Mk.3", "minecraft:block/diamond_block"), "drone_port": ("Drone Port", "create:block/cardboard_block_side"), "main_portal": ("Main Portal", "minecraft:block/crying_obsidian"), "satellite_portal": ("Satellite Portal", "minecraft:block/obsidian"), "landing_pad": ("Landing Pad", "minecraft:block/hay_block_side"), "radar_tower": ("Radar Tower", "create:block/brass_casing"), "claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"),
+MACHINES = {"blueprint_designer": ("Blueprint Designer Mk.1", "minecraft:block/lapis_block"), "blueprint_designer_mk3": ("Blueprint Designer Mk.3", "minecraft:block/diamond_block"), "drone_port": ("Drone Port", "create:block/cardboard_block_side"), "main_portal": ("Main Portal", "minecraft:block/crying_obsidian"), "satellite_portal": ("Satellite Portal", "minecraft:block/obsidian"), "landing_pad": ("Landing Pad", "minecraft:block/hay_block_side"), "claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"),
             "resource_well_extractor": ("Resource Well Extractor", "create:block/railway_casing")}
 for b, (name, casing) in MACHINES.items():
     lang[f"block.siftec.{b}"] = name
@@ -236,9 +236,11 @@ lang.update({"siftec.inhaler.protein": "Heals 6 health", "siftec.inhaler.vitamin
 write(os.path.join(ROOT, "data", "create", "tags", "item", "pressurized_air_sources.json"), {"replace": False, "values": ["siftec:elytra_backpack"]})
 lang.update({"siftec.jetpack.empty": "Jetpack: out of fuel. It burns Solid Biofuel, Compacted Coal, diesel or Turbofuel",
              "siftec.zipline.no_line": "No Power Line leads that way from this pole", "siftec.zipline.locked": "Riding Power Lines needs the Power Line Riding research (MAM, Caterium)",
-             "siftec.crash.somersloop": "There was a Somersloop in the wreckage too", "siftec.boost.shards_only": "This machine takes Power Shards only",
+             "siftec.crash.somersloop": "There was a Somersloop in the wreckage too",
              "siftec.radar.title": "Radar Tower: nearest of each, from here", "siftec.radar.line": "%s: %s blocks %s (x %s, z %s)",
-             "siftec.radar.nothing": "Nothing in range"})
+             "siftec.radar.nothing": "Nothing in range", "siftec.radar.no_power": "The Radar Tower has no power",
+             "siftec.radar.revealed": "Radar Tower: %s crash sites found. Add them to Xaero's map:",
+             "siftec.map.unlocked": "Field Research: the Map is yours. Xaero's Minimap is switched on"})
 lang["item.siftec.cardboard_drone"] = "Cardboard Drone"
 write(f"{A}/models/item/cardboard_drone.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "create:item/cardboard"}})
 item_def("cardboard_drone", "siftec:item/cardboard_drone")
@@ -436,7 +438,7 @@ for m in data["milestones"] + data["milestones_mam"]:
             raise SystemExit(f"{i} is unlocked twice: {placed[i]} and {m['id']}")
         placed[i] = m["id"]
 for i in content.FREE: check(i, "FREE")
-accounted = set(placed) | set(content.FREE) | set(content.DISABLED) | {i for i, c, p in content.SHOP}
+accounted = set(placed) | set(content.FREE) | set(content.DISABLED)
 both = sorted((set(placed) | set(content.DISABLED)) & set(content.FREE))
 if both:
     raise SystemExit(f"both locked and free: {both}")
@@ -453,15 +455,19 @@ write(f"{A}/models/block/mam.json", {"parent": "minecraft:block/cube_bottom_top"
     "top": "minecraft:block/lodestone_top", "side": "create:block/copper_casing", "bottom": "create:block/copper_casing"}})
 item_def("mam", "siftec:block/mam")
 write(f"{D}/loot_table/blocks/mam.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": "siftec:mam"}]}]})
-# ---- slugs and artefacts in the world
-lang.update({"item.siftec.object_scanner": "Object Scanner", "siftec.boost.no_slot": "No free slot for that: research more at the MAM", "siftec.boost.status": "Power Shards: %s, Somersloop: %s",
-             "siftec.boost.yes": "yes", "siftec.boost.no": "no", "siftec.collect.already": "Your company already collected this one",
-             "siftec.collect.got": "Collected: %s", "siftec.scanner.none_object": "No %s left in range", "siftec.scanner.mobs": "hostile mobs"})
+# ---- Mercer Spheres, Somersloops and crash sites in the world (collect/), and the Object Scanner
+lang.update({"item.siftec.object_scanner": "Object Scanner", "siftec.collect.already": "Your company already collected this one",
+             "siftec.collect.got": "Collected: %s", "siftec.scanner.none_object": "No %s found in range", "siftec.scanner.mobs": "hostile mobs",
+             "siftec.scanner.target.hard_drive": "Crash Site (Hard Drive)", "siftec.scanner.target.mercer_sphere": "Mercer Sphere",
+             "siftec.scanner.target.somersloop": "Somersloop", "siftec.scanner.target.sweet_berries": "Sweet Berry Bush",
+             "siftec.scanner.target.apples": "Apple Tree", "siftec.scanner.target.glow_berries": "Glow Berries",
+             "siftec.scanner.target.mobs": "Hostile Mob",
+             "siftec.mam.tree_started": "MAM: the %s research tree is open to your company",
+             "siftec.crash.needs_power": "The pod is sealed. Wire its connector to a grid with %s MW (%s SU) to spare; it has %s SU"})
 write(f"{A}/models/item/object_scanner.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/compass_16"}})
 item_def("object_scanner", "siftec:item/object_scanner")
-COLLECT = {"blue_power_slug": ("minecraft:block/blue_concrete", "Blue Power Slug"), "yellow_power_slug": ("minecraft:block/yellow_concrete", "Yellow Power Slug"),
-           "purple_power_slug": ("minecraft:block/purple_concrete", "Purple Power Slug"), "mercer_sphere": ("minecraft:block/pink_concrete", "Mercer Sphere"),
-           "somersloop": ("minecraft:block/red_concrete", "Somersloop"), "crash_site": ("create:block/railway_casing", "Crash Site Pod")}
+COLLECT = {"mercer_sphere": ("minecraft:block/pink_concrete", "Mercer Sphere"), "somersloop": ("minecraft:block/red_concrete", "Somersloop"),
+           "crash_site": ("create:block/railway_casing", "Crash Site Pod")}
 lang.update({"item.siftec.crash_site": "Crash Site", "siftec.crash.needs": "The pod is sealed. It opens for %s %s",
              "siftec.tree.hard_drives": "Hard Drives", "siftec.mam.hard_drive": "Hard Drive", "siftec.alt.research": "Research a Hard Drive",
              "siftec.alt.cost": "Takes one Hard Drive from your inventory", "siftec.alt.owned": "Alternate recipes: %s of %s",
@@ -469,41 +475,28 @@ lang.update({"item.siftec.crash_site": "Crash Site", "siftec.crash.needs": "The 
              "siftec.alt.no_drive": "You are not carrying a Hard Drive", "siftec.alt.pick": "Click to take this one",
              "siftec.alt.ready": "The Hard Drive is decoded. Choose an alternate recipe at the MAM",
              "siftec.alt.chosen": "Alternate recipe unlocked: %s. %s"})
+# their shapes (collect/CollectibleBlock.java): the sphere a rounded ball floating in its block, the Somersloop a low
+# lumpy shell; the pod is a whole block, drawn by the art loop below. Each takes its own art's side and top.
+COLLECT_ELEMENTS = {
+    "mercer_sphere": [([4, 3, 4], [12, 13, 12]), ([3, 4, 4], [13, 12, 12]), ([4, 4, 3], [12, 12, 13])],
+    "somersloop": [([3, 0, 4], [13, 5, 12]), ([4, 0, 3], [12, 5, 13]), ([5, 5, 5], [11, 9, 11]), ([6, 9, 6], [10, 10, 10])],
+}
+SHAPED_COLLECT = set()
 for cid, (tex, name) in COLLECT.items():
-    lang[f"block.siftec.{cid}_block"] = name
-    write(f"{A}/blockstates/{cid}_block.json", {"variants": {"": {"model": f"siftec:block/{cid}_block"}}})
-    write(f"{A}/models/block/{cid}_block.json", {"parent": "minecraft:block/block", "textures": {"particle": tex, "all": tex},
-          "elements": [{"from": [4, 0, 4], "to": [12, 8, 12], "faces": {f: {"texture": "#all"} for f in ("north", "south", "east", "west", "up", "down")}}]})
-# the power slugs: a low, lumpy, glowing blob, cut from the owner's own slug drawing (the side texture tools/import_art.py
-# imports from tools/art). Every colour's drawing has the same layout, so one set of UVs serves all three. Each slug
-# sits turned one of four ways, picked by its position.
-SLUG_UV = {"side": [7, 8, 13, 12], "skirt": [3, 11, 13, 13], "under": [4, 12, 12, 14], "top": [7, 6, 13, 10], "core": [6, 6, 9, 9]}
-# (from, to, uv of the sides, uv of the top, light the faces give off)
-# (from, to, uv of the sides, uv of the top, light the faces give off): three layers, each two crossed boxes so the
-# corners come out round, the second a shade lower so no two tops lie in one plane; a glowing core and two lumps on top
-SLUG_PARTS = [([3, 0, 5], [13, 2, 11], "skirt", "side", 9), ([5, 0, 3], [11, 1.75, 13], "skirt", "side", 9),
-              ([4, 0, 4], [12, 1.5, 12], "skirt", "side", 9),
-              ([4, 2, 5], [12, 4, 11], "side", "top", 10), ([5, 2, 4], [11, 3.75, 12], "side", "top", 10),
-              ([5, 4, 6], [11, 5.5, 10], "side", "top", 11), ([6, 4, 5], [10, 5.25, 11], "side", "top", 11),
-              ([6.5, 5.5, 6.5], [9.5, 6.5, 9.5], "core", "core", 15),
-              ([8.75, 5.25, 5.75], [10, 6.25, 7], "top", "core", 13), ([5.75, 5.25, 8.75], [7, 6, 10], "top", "core", 13),
-              # bulges on the flanks, so it looks squashed rather than stacked
-              ([3.5, 1.5, 6.5], [5, 3.25, 9], "side", "top", 10), ([11, 1.25, 7], [12.5, 3, 9.5], "side", "top", 10),
-              ([7, 1.5, 3.25], [9.5, 3, 4.5], "side", "top", 10), ([6, 1.25, 11.5], [8, 2.75, 12.75], "side", "top", 10)]
-SLUG_MODELS = set()
-for cid in ("blue_power_slug", "yellow_power_slug", "purple_power_slug"):
     bid = f"{cid}_block"
-    SLUG_MODELS.add(bid)
-    write(f"{A}/blockstates/{bid}.json", {"variants": {"": [({"model": f"siftec:block/{bid}", "y": y} if y else {"model": f"siftec:block/{bid}"}) for y in (0, 90, 180, 270)]}})
-    elements = []
-    for frm, to, side, top, glow in SLUG_PARTS:
-        faces = {f: {"texture": "#slug", "uv": SLUG_UV[side]} for f in ("north", "south", "east", "west")}
-        faces["up"] = {"texture": "#slug", "uv": SLUG_UV[top]}
-        faces["down"] = {"texture": "#slug", "uv": SLUG_UV["under"]}
-        elements.append({"from": frm, "to": to, "light_emission": glow, "faces": faces})
-    tex = f"siftec:block/{bid}_side"
-    write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/block", "ambientocclusion": False,
-          "textures": {"particle": tex, "slug": tex}, "elements": elements})
+    lang[f"block.siftec.{bid}"] = name
+    write(f"{A}/blockstates/{bid}.json", {"variants": {"": {"model": f"siftec:block/{bid}"}}})
+    if cid not in COLLECT_ELEMENTS:
+        write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": tex}})
+        continue
+    SHAPED_COLLECT.add(bid)
+    art = os.path.exists(os.path.join(A, "textures", "block", bid + "_side.png"))
+    side = f"siftec:block/{bid}_side" if art else tex
+    top = f"siftec:block/{bid}_top" if art else tex
+    elements = [{"from": f, "to": t, "faces": {**{d: {"texture": "#side"} for d in ("north", "south", "east", "west")},
+                                                 "up": {"texture": "#top"}, "down": {"texture": "#side"}}} for f, t in COLLECT_ELEMENTS[cid]]
+    write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/block", "textures": {"particle": side, "side": side, "top": top},
+          "elements": elements})
 # ---- Converter and Particle Accelerator: 1.0's recipes (content.PROCESSORS), alternates with their lock
 data["processors"] = {}
 names_table = content.names()
@@ -534,19 +527,104 @@ for pid, (pname, recipe_list) in content.PROCESSORS.items():
     write(f"{D}/loot_table/blocks/{pid}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{pid}"}]}]})
 lang.update({"siftec.processor.selected": "Making: %s", "siftec.processor.fluid": "%s mB of %s"})
 
-# ---- AWESOME Sink and Shop
+# ---- AWESOME Sink and Shop (sink/, the AWESOME Sink and Shop tab)
 data["sink_points"] = {_item_id(n): p for n, p in content.SINK_POINTS.items()}
-data["shop"] = [{"item": i, "count": c, "price": p} for i, c, p in content.SHOP]
-for i, c, p in content.SHOP: check(i, "shop")
-lang.update({"block.siftec.awesome_sink": "AWESOME Sink", "block.siftec.awesome_shop": "AWESOME Shop", "siftec.sink.points": "AWESOME points: %s",
-             "siftec.shop.title": "AWESOME Shop: %s points", "siftec.shop.price": "%s points", "siftec.shop.poor": "Not enough points",
-             "siftec.sift.enter": "Enter The Sift", "siftec.sift.missing": "The Sift is not installed on this server"})
-for b, top in (("awesome_sink", "minecraft:block/hopper_top"), ("awesome_shop", "minecraft:block/barrel_top")):
-    write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
-    write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
-        "top": top, "side": "create:block/andesite_casing", "bottom": "create:block/andesite_casing"}})
-    item_def(b, f"siftec:block/{b}")
-    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}]}]})
+for i, p in content.SINK_VANILLA.items():
+    check(i, "sink")
+    data["sink_points"].setdefault(i, p)   # a Satisfactory value wins
+data["sink_tags"] = [{"tag": t[1:], "points": p} for t, p in content.SINK_TAGS.items()]
+data["sink_rarity"] = content.SINK_RARITY
+data["sink_enchant"] = content.SINK_ENCHANT
+data["sink_refused"] = content.SINK_REFUSED
+data["coupons"] = {"first": content.COUPON_FIRST, "first_cost": content.COUPON_FIRST_COST, "last": content.COUPON_LAST, "cap": content.COUPON_CAP}
+data["shop"] = [{"id": i, "category": cat, "coupons": n, "gives": g} for i, name, cat, n, g in content.SHOP]
+data["swatch_max"] = content.SWATCH_MAX
+data["dyes"] = content.DYES
+data["finishes"] = {k: b for k, (n, b) in content.FINISHES.items()}
+data["skins"] = {k: b for k, (n, b) in content.SKINS.items()}
+data["storage_skins"] = {k: b for k, (n, b) in content.STORAGE_SKINS.items()}
+for k, (n, b) in content.FINISHES.items():
+    lang[f"siftec.finish.{k}"] = n
+    if "{" not in b: check(b, "finish")
+for k, (n, b) in list(content.SKINS.items()) + list(content.STORAGE_SKINS.items()):
+    lang[f"siftec.skin.{k}"] = n
+    check(b, "skin")
+for i, name, cat, n, g in content.SHOP:
+    lang[f"siftec.shop.entry.{i}"] = name
+    lang[f"siftec.shop.category.{cat.lower().replace(' ', '_')}"] = cat
+_decor_ids = {d[0] for d in content.DECOR}
+_cup_ids = {c[0] for c in content.CUPS}
+for i, name, cat, n, g in content.SHOP:
+    kind, _, arg = g.partition(":")
+    ok = (kind in ("customizer", "swatch") and not arg) or (kind == "finish" and arg in content.FINISHES) or \
+         (kind == "skin" and (arg in content.SKINS or arg in content.STORAGE_SKINS)) or (kind == "decor" and arg in _decor_ids) or (kind == "cup" and arg in _cup_ids)
+    if not ok:
+        raise SystemExit(f"AWESOME Shop entry {i}: gives {g!r}, which is nothing the pack has")
+lang.update({
+    "item.siftec.ficsit_coupon": "FICSIT Coupon", "item.siftec.customizer": "Customizer", "item.siftec.xeno_zapper": "Xeno-Zapper",
+    "siftec.sink.title": "AWESOME Sink", "siftec.sink.points": "AWESOME points: %s",
+    "siftec.sink.status": "%s points toward coupon %s (%s needed)", "siftec.sink.ever": "Points from the Sink, ever: %s",
+    "siftec.sink.printed": "Coupons printed: %s", "siftec.sink.print": "Print Coupons", "siftec.sink.print_none": "Not enough points for a coupon yet",
+    "siftec.sink.print_done": "Printed %s FICSIT Coupons", "siftec.sink.feed": "Feed it by belt at the input port, or use it with what you hold",
+    "siftec.sink.no_power": "The AWESOME Sink has no power", "siftec.sink.refused": "The AWESOME Sink will not take that",
+    "siftec.sink.sunk": "Sunk %s for %s points",
+    "siftec.shop.title": "AWESOME Shop: %s coupons", "siftec.shop.price": "%s FICSIT Coupons", "siftec.shop.poor": "Not enough FICSIT Coupons",
+    "siftec.shop.owned": "Your company owns this", "siftec.shop.bought": "Bought: %s", "siftec.shop.take": "Click to take one (%s)",
+    "siftec.shop.take_free": "Click to take one", "siftec.shop.taken": "Took %s", "siftec.shop.missing": "You are missing parts for that",
+    "siftec.shop.swatches": "Swatch slots: %s of %s", "siftec.shop.full": "Your company has every swatch slot",
+    "siftec.shop.needs": "Needs %s first", "siftec.shop.page": "Page %s of %s", "siftec.shop.next": "Next page", "siftec.shop.previous": "Previous page",
+    "siftec.shop.category": "%s",
+    "siftec.customizer.title": "Customizer: %s", "siftec.customizer.swatch": "Swatch %s: %s / %s",
+    "siftec.customizer.swatch_pick": "Click: paint the building with it. Right-click: make it the swatch you are editing",
+    "siftec.customizer.editing": "Editing swatch %s", "siftec.customizer.primary": "Click: primary colour %s. Right-click: secondary",
+    "siftec.customizer.industrial": "Industrial grey (as built)", "siftec.customizer.finish": "Finish: %s",
+    "siftec.customizer.skin": "Casing: %s", "siftec.customizer.skin_none": "As built", "siftec.customizer.locked": "Buy it in the AWESOME Shop",
+    "siftec.customizer.reset": "Back to how it was built", "siftec.customizer.not_building": "Use the Customizer on a Build Gun building",
+    "siftec.customizer.applied": "Repainted %s",
+    "siftec.cup.employee": "Awarded to the company that finished the Wormhole",
+})
+data["decor"] = []
+for did, name, cat, light, tex, elements, cost in content.DECOR:
+    for c, n in content.parse_cost(cost): check(c, "decor " + did)
+    boxes = [e[:2] for e in elements]
+    lo = [min(b[0][i] for b in boxes) for i in range(3)]
+    hi = [max(b[1][i] for b in boxes) for i in range(3)]
+    # one box round the whole thing, made even round the middle so it fits whichever way the block faces
+    r = max(8 - lo[0], hi[0] - 8, 8 - lo[2], hi[2] - 8)
+    shape = [max(0, 8 - r), max(0, lo[1]), max(0, 8 - r), min(16, 8 + r), min(16, hi[1]), min(16, 8 + r)]
+    data["decor"].append({"id": did, "light": light, "shape": shape, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]})
+    lang[f"block.siftec.{did}"] = name
+    textures = {"particle": tex, "all": tex}
+    textures.update(content.DECOR_TEXTURES.get(did, {}))
+    els = []
+    for k, e in enumerate(elements):
+        faces = {f: {"texture": "#all"} for f in ("north", "south", "east", "west", "down")}
+        faces["up"] = {"texture": "#top" if "top" in textures else "#all"}
+        el = {"from": e[0], "to": e[1], "faces": faces}
+        if len(e) > 2:
+            axis, angle, origin = e[2]
+            el["rotation"] = {"axis": axis, "angle": angle, "origin": origin}
+        if light:
+            el["light_emission"] = light
+        els.append(el)
+    write(f"{A}/models/block/{did}.json", {"parent": "minecraft:block/block", "textures": textures, "elements": els})
+    # authored facing south (the statues look at whoever put them down)
+    write(f"{A}/blockstates/{did}.json", {"variants": {f"facing={d}": ({"model": f"siftec:block/{did}", "y": y} if y else {"model": f"siftec:block/{did}"})
+                                                       for d, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270))}})
+    item_def(did, f"siftec:block/{did}")
+    write(f"{D}/loot_table/blocks/{did}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{did}"}]}]})
+data["cups"] = []
+for cid, name, cost, needs in content.CUPS:
+    for c, n in content.parse_cost(cost): check(c, "cup " + cid)
+    data["cups"].append({"id": cid, "needs": needs, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]})
+    lang[f"item.siftec.{cid}"] = name
+for iid, tex, tint in (("ficsit_coupon", "minecraft:item/paper", 0xF0A040), ("customizer", "minecraft:item/brush", 0xF08030),
+                       ("xeno_zapper", "minecraft:item/blaze_rod", 0x80C0FF), ("coffee_cup", "minecraft:item/flower_pot", 0xF0F0F0),
+                       ("employee_of_the_planet_cup", "minecraft:item/flower_pot", 0xF0C040)):
+    write(f"{A}/models/item/{iid}.json", {"parent": "minecraft:item/handheld" if iid == "xeno_zapper" else "minecraft:item/generated",
+                                          "textures": {"layer0": tex}})
+    item_def(iid, f"siftec:item/{iid}", tint)
+lang.update({"siftec.sift.enter": "Enter The Sift", "siftec.sift.missing": "The Sift is not installed on this server"})
 for i in content.ALIAS.values(): check(i, "alias")
 for i, cost in recipes.WORKSHOP:
     check(i, "workshop")
@@ -732,20 +810,13 @@ for bname, cost in sorted(content.BUILD_COSTS.items()):
         raise SystemExit(f"build cost of {bname}: it takes something the pack leaves out")
     data["build_costs"][bname] = [{"item": c, "count": n} for c, n in content.parse_cost(cost)]
     for c, n in content.parse_cost(cost): check(c, "build cost " + bname)
-lang.update({"block.siftec.equipment_workshop": "Equipment Workshop", "siftec.workshop.title": "Equipment Workshop",
+lang.update({"siftec.workshop.title": "Equipment Workshop",
              "siftec.workshop.click": "Click to build from the parts in your inventory", "siftec.workshop.missing": "You are missing parts for that",
-             "siftec.workshop.built": "Built %s",
-             "siftec.workshop.leftover": "The Workshop gave you back the parts its old automatic mode was holding"})
-write(f"{A}/blockstates/equipment_workshop.json", {"variants": {"": {"model": "siftec:block/equipment_workshop"}}})
-write(f"{A}/models/block/equipment_workshop.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
-    "top": "minecraft:block/smithing_table_top", "side": "create:block/andesite_casing", "bottom": "create:block/andesite_casing"}})
-item_def("equipment_workshop", "siftec:block/equipment_workshop")
-write(f"{D}/loot_table/blocks/equipment_workshop.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
-      "entries": [{"type": "minecraft:item", "name": "siftec:equipment_workshop"}]}]})
+             "siftec.workshop.built": "Built %s"})
 # ---- Build Gun and its buildings (building/BuildGun.java, building/Buildings.java)
 data["buildings"] = []
 LOGICS = {"basin", "smelter", "miner", "portable_miner", "storage", "power", "assembly", "packager", "extractor", "pressurizer",
-          "well_extractor", "processor"}
+          "well_extractor", "processor", "workshop", "sink", "shop", "radar"}
 POWERS = {"pole", "storage", "augmenter", "biomass", "coal", "fuel", "geothermal", "nuclear"}
 for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if tab not in content.BUILD_TABS:
@@ -980,7 +1051,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # machines drop themselves
-for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "radar_tower", "claim_marker", "resource_well_extractor", "dimensional_depot", "speed_governor"):
+for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "claim_marker", "resource_well_extractor", "dimensional_depot", "speed_governor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -988,8 +1059,8 @@ for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:radar_tower", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:converter", "siftec:particle_accelerator", "siftec:awesome_sink", "siftec:awesome_shop", "siftec:hub", "siftec:wormhole_gateway", "siftec:equipment_workshop", "siftec:uranium_ore"]
-      + sorted(f"siftec:{b}" for b in NODE_IDS if b != "oil_well" and DEPOSIT[b[:-len("_node")]][3])})
+      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:converter", "siftec:particle_accelerator", "siftec:hub", "siftec:wormhole_gateway", "siftec:uranium_ore"]
+      + sorted(f"siftec:{b}" for b in NODE_IDS if b != "oil_well" and DEPOSIT[b[:-len("_node")]][3]) + [f"siftec:{d[0]}" for d in content.DECOR]})
 # Create's contraptions never move what has to stay put: the HUB and Gateway shells, claim markers, patches and nodes.
 # (Drills skip patches, depleted and fluid nodes, which are unbreakable; a node that can be mined is drilled and grows back.)
 write(os.path.join(ROOT, "data", "create", "tags", "block", "non_movable.json"), {"replace": False, "values":
@@ -1004,21 +1075,23 @@ TEX = os.path.join(A, "textures")
 def has(kind, name):
     return os.path.exists(os.path.join(TEX, kind, name + ".png"))
 
-FRONTED = {"hub", "mam", "awesome_shop", "resource_well_extractor", "converter",
+FRONTED = {"hub", "mam", "resource_well_extractor", "converter",
            "particle_accelerator", "hub_engine", "crash_site_block"}
 # drawn as a post or a tripod on a clear background: shown as two crossed planes, like a flower
 CROSSED = set()
 # art of blocks that are gone (work package 6 made the power blocks Build Gun buildings); the HUB Engine's is kept as
 # the look of the HUB's Biomass Burners (its model only)
-RETIRED = {"furnace_engine", "geyser_engine", "power_pole", "power_tower", "power_storage"}
+RETIRED = {"furnace_engine", "geyser_engine", "power_pole", "power_tower", "power_storage",
+           # work package 10 made these Build Gun buildings: their art stays for when the buildings use it
+           "awesome_sink", "awesome_shop", "equipment_workshop", "radar_tower"}
 # blocks that turn to face whoever placed them; the Crash Site Pod is set down by world generation, so it does not
 TURNS = FRONTED - {"crash_site_block", "hub_engine"}
 # these share a block class with one that turns, so they have the same facing, though nothing on them shows it
-for bid in ("wormhole_gateway", "awesome_sink"):
+for bid in ("wormhole_gateway",):
     write(f"{A}/blockstates/{bid}.json", {"variants": {f"facing={d}": {"model": f"siftec:block/{bid}"} for d in ("north", "east", "south", "west")}})
 for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "block")) if f.endswith("_side.png")} if os.path.isdir(os.path.join(TEX, "block")) else []):
-    if bid in SLUG_MODELS or bid in RETIRED:
-        continue  # the slugs have their own model (above); retired blocks have none
+    if bid in SHAPED_COLLECT or bid in RETIRED:
+        continue  # the Mercer Sphere and Somersloop have their own shapes (above); retired blocks have none
     if bid == "speed_governor" or bid.endswith("_node") or bid in NODE_IDS or bid == "node_rock" or bid.startswith("miner_mk") or bid == "portable_miner":
         continue  # the governor keeps Create's gearshift model; nodes look like ore blocks; old node and miner art is unused
     t = lambda face: f"siftec:block/{bid}_{face}"

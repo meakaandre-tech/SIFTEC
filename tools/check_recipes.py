@@ -27,8 +27,6 @@ RAW = {"minecraft:raw_iron", "minecraft:raw_copper", "create:raw_zinc", "minecra
 # pack tags the MAM takes, of things the pack itself makes
 TAGS = {"#siftec:preserves": ["siftec:pickled_" + w for w in ("tomato", "onion", "cabbage", "pumpkin", "carrot", "beetroot", "kelp")]
         + ["siftec:" + w + "_jam" for w in ("sweet_berry", "glow_berry", "apple", "melon")]}
-# found and never made: the power slugs and Power Shards stay as items until overclocking's removal takes them out
-FOUND_ONLY = {"siftec:blue_power_slug", "siftec:yellow_power_slug", "siftec:purple_power_slug", "siftec:power_shard"}
 # what a building gives that is not a recipe: the Nuclear Power Plant's waste (its fuel rods go in, work package 6)
 GENERATED = [({"siftec:uranium_fuel_rod"}, {"siftec:uranium_waste"}, "nuclear_power"),
              ({"siftec:plutonium_fuel_rod"}, {"siftec:plutonium_waste"}, "nuclear_power")]
@@ -91,7 +89,7 @@ def check(data=None):
     errors, notes = [], []
     parts = {"siftec:" + p[0] for p in content.PARTS}
     sat_items = {content.sat_item(n, True) for n in content.SF.ITEMS}
-    checked = (parts | {names[n[1]] for n in sat_items if n and n[0] == "item" and n[1] in names}) - RAW - FOUND_ONLY
+    checked = (parts | {names[n[1]] for n in sat_items if n and n[0] == "item" and n[1] in names}) - RAW
     checked = {c for c in checked if not c.startswith("#")}
     alt_paths = {p for info in recipes.ALTS.values() for p in info["paths"]}
     # half-built items come out of their own sequenced assembly; an alternate's own Core is only made once a company
