@@ -256,8 +256,9 @@ public final class LogisticsTests {
             later(level, 45 + MEASURE_TICKS, () -> {
                 float now = lead(level, from);
                 float measured = (now - start[0]) / MEASURE_TICKS * 1200;
-                boolean ok = start[0] >= 0 && Math.abs(measured - perMinute) <= Math.max(1, perMinute * 0.03f);
-                expect(source, "an item on the shaftless belt moves at " + perMinute + " items/min", ok,
+                // a belt that does not move takes nothing on, as in Create
+                boolean ok = perMinute == 0 ? now == start[0] : start[0] >= 0 && Math.abs(measured - perMinute) <= Math.max(1, perMinute * 0.03f);
+                expect(source, perMinute == 0 ? "a shaftless belt before Logistics stands still" : "an item on the shaftless belt moves at " + perMinute + " items/min", ok,
                     String.format(java.util.Locale.ROOT, "measured %.1f items/min, %.3f -> %.3f blocks", measured, start[0], now));
             });
         }
