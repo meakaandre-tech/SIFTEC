@@ -337,8 +337,10 @@ public final class Prefabs {
         boolean creative = player != null && player.hasInfiniteMaterials();
         Check check = check(level, spot, company, creative);
         if (!check.ok()) return check;
-        // the HUB costs Satisfactory's 20 Iron Ore (Raw Iron), from the player's inventory; it comes back when dismantled
-        List<Milestone.Cost> cost = spot.kind == Kind.HUB && player != null && !creative ? hubCost() : List.of();
+        // the HUB costs Satisfactory's 20 Iron Ore (Raw Iron) and the Gateway the Space Elevator's parts, from the player's
+        // inventory; they come back when it is dismantled. Placed by the old Gateway item (creative, tests), it is free.
+        boolean byItem = player != null && player.getMainHandItem().getItem() instanceof PrefabItem;
+        List<Milestone.Cost> cost = player != null && !creative && !byItem ? cost(spot.kind) : List.of();
         Milestone.Cost missing = player == null ? null : missing(player, cost);
         if (missing != null) {
             check.fail("siftec.prefab.cost", missing.count(), missing.icon().getHoverName());
@@ -452,12 +454,44 @@ public final class Prefabs {
         indexMachines(level, spot, target, hub.getBlockPos(), hub.companyId);
     }
 
+    /**
+     * The finished Wormhole Gateway's portal: a player of a company that has delivered Phase 5 who walks into it goes to
+     * The Sift; anyone else is told it is closed to them. The game goes on as free play after that.
+     */
+    public static void portal(HubBlockEntity hub) {
+        if (!hub.gateway() || !hub.prefab || hub.anchor == null || hub.facing == null || hub.builtLevel < Templates.GATEWAY_MAX) return;
+        if (!(hub.getLevel() instanceof ServerLevel level)) return;
+        AABB box = bounds(new Spot(Kind.GATEWAY, hub.anchor, hub.facing));
+        Direction right = hub.facing.getClockWise();
+        for (ServerPlayer player : level.getPlayers(p -> box.contains(p.position()))) {
+            // the player's place in the gateway's own frame (x right, y up, z away from the front edge)
+            double ox = player.getX() - (hub.anchor.getX() + 0.5), oz = player.getZ() - (hub.anchor.getZ() + 0.5);
+            double x = ox * right.getStepX() + oz * right.getStepZ() + 0.5, z = ox * hub.facing.getStepX() + oz * hub.facing.getStepZ() + 0.5;
+            double y = player.getY() + 0.9 - hub.anchor.getY();
+            if (!Templates.inPortal(x, y, z) || player.isSpectator()) continue;
+            if (!player.hasInfiniteMaterials() && !Companies.of(player).has("phase_5")) {
+                player.sendOverlayMessage(Component.translatable("siftec.sift.closed"));
+                continue;
+            }
+            com.meakaandre.siftec.compat.SiftGate.enter(player);
+        }
+    }
+
     /** What the HUB costs to put down: Satisfactory's, from siftec_content.json ("build_costs", The HUB). */
     public static List<Milestone.Cost> hubCost() {
+        return cost(Kind.HUB);
+    }
+
+    /**
+     * What a structure costs to put down with the Build Gun: Satisfactory's, from siftec_content.json ("build_costs"):
+     * The HUB, or the Space Elevator for the Wormhole Gateway. It comes back when the structure is dismantled.
+     */
+    public static List<Milestone.Cost> cost(Kind kind) {
+        String name = kind == Kind.GATEWAY ? "Space Elevator" : "The HUB";
         List<Milestone.Cost> out = new ArrayList<>();
         com.google.gson.JsonObject raw = com.meakaandre.siftec.hub.Milestones.raw();
-        if (raw == null || !raw.has("build_costs") || !raw.getAsJsonObject("build_costs").has("The HUB")) return out;
-        for (com.google.gson.JsonElement e : raw.getAsJsonObject("build_costs").getAsJsonArray("The HUB")) {
+        if (raw == null || !raw.has("build_costs") || !raw.getAsJsonObject("build_costs").has(name)) return out;
+        for (com.google.gson.JsonElement e : raw.getAsJsonObject("build_costs").getAsJsonArray(name)) {
             out.add(new Milestone.Cost(e.getAsJsonObject().get("item").getAsString(), e.getAsJsonObject().get("count").getAsInt()));
         }
         return out;
@@ -494,17 +528,33 @@ public final class Prefabs {
      * null. Looks through the HUB terminals in the loaded chunks near the block.
      */
     public static @Nullable HubBlockEntity hubAt(Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof HubBlockEntity own) return own.prefab && !own.gateway() ? own : null;
+        return structureAt(level, pos, Kind.HUB);
+    }
+
+    /** The HUB or Wormhole Gateway structure a block belongs to, whichever it is, or null. */
+    public static @Nullable HubBlockEntity structureAt(Level level, BlockPos pos) {
+        HubBlockEntity hub = structureAt(level, pos, Kind.HUB);
+        return hub != null ? hub : structureAt(level, pos, Kind.GATEWAY);
+    }
+
+    /**
+     * The structure of a kind a block belongs to (its terminal, a part of its shell or a machine of the HUB's Craft
+     * Station), or null. Looks through the terminals in the loaded chunks near the block.
+     */
+    public static @Nullable HubBlockEntity structureAt(Level level, BlockPos pos, Kind kind) {
+        boolean gateway = kind == Kind.GATEWAY;
+        if (level.getBlockEntity(pos) instanceof HubBlockEntity own) return own.prefab && own.gateway() == gateway ? own : null;
         BlockPos indexed = com.meakaandre.siftec.building.BuildingIndex.controllerOf(level, pos);
-        if (indexed != null && level.getBlockEntity(indexed) instanceof HubBlockEntity hub) return hub.prefab && !hub.gateway() ? hub : null;
+        if (indexed != null && level.getBlockEntity(indexed) instanceof HubBlockEntity hub) return hub.prefab && hub.gateway() == gateway ? hub : null;
         if (!isPart(level.getBlockState(pos))) return null;
-        int reach = Templates.hub().width() + Templates.hub().length();
+        Template t = kind.template();
+        int reach = t.width() + t.length();
         for (int cx = (pos.getX() - reach) >> 4; cx <= (pos.getX() + reach) >> 4; cx++) {
             for (int cz = (pos.getZ() - reach) >> 4; cz <= (pos.getZ() + reach) >> 4; cz++) {
                 if (!level.hasChunk(cx, cz)) continue;
                 for (net.minecraft.world.level.block.entity.BlockEntity be : level.getChunk(cx, cz).getBlockEntities().values()) {
-                    if (!(be instanceof HubBlockEntity hub) || !hub.prefab || hub.gateway() || hub.anchor == null || hub.facing == null) continue;
-                    if (bounds(new Spot(Kind.HUB, hub.anchor, hub.facing)).contains(Vec3.atCenterOf(pos))) return hub;
+                    if (!(be instanceof HubBlockEntity hub) || !hub.prefab || hub.gateway() != gateway || hub.anchor == null || hub.facing == null) continue;
+                    if (bounds(new Spot(kind, hub.anchor, hub.facing)).contains(Vec3.atCenterOf(pos))) return hub;
                 }
             }
         }
@@ -542,8 +592,7 @@ public final class Prefabs {
         BlockPos terminal = hub.getBlockPos().immutable();
         if (!(hub.getBlockState().getBlock() instanceof HubBlock block)) return out;
         Kind kind = Kind.of(block);
-        // the Gateway comes back as its item; the HUB has none (it is built with the Build Gun), only its cost comes back
-        if (kind == Kind.GATEWAY) out.add(new ItemStack(kind.block()));
+        // both are built with the Build Gun: what was paid for the structure comes back
         for (ItemStack paid : hub.refund) out.add(paid.copy());
         hub.refund.clear();
         Company company = CompanyData.get(level.getServer()).byId(hub.companyId);
@@ -662,7 +711,9 @@ public final class Prefabs {
 
     private static boolean isGatewayPart(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        return state.is(ModBlocks.PREFAB.get("railway").get()) || state.is(ModBlocks.PREFAB.get("coil").get())
-            || state.is(ModBlocks.PREFAB.get("coil_lit").get()) || state.is(ModBlocks.PREFAB.get("rift").get());
+        for (String style : new String[]{"railway", "coil", "coil_lit", "rift", "portal", "conduit"}) {
+            if (state.is(ModBlocks.PREFAB.get(style).get())) return true;
+        }
+        return false;
     }
 }

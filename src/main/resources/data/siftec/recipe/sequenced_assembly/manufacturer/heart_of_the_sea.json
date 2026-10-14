@@ -1,0 +1,45 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:heart_of_the_sea_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_heart_of_the_sea"
+  },
+  "result": {
+    "id": "minecraft:heart_of_the_sea"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:nautilus_shell",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:prismarine_crystals",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:crystal_oscillator",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:quickwire",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

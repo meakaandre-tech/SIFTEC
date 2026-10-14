@@ -1,0 +1,48 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:gold_ingot",
+    "minecraft:gold_ingot",
+    "minecraft:gold_ingot",
+    "minecraft:diamond",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack",
+    "minecraft:netherrack"
+  ],
+  "results": [
+    {
+      "id": "siftec:netherite_ingot_core"
+    }
+  ]
+}

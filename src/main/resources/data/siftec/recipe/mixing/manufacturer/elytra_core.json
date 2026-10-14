@@ -1,0 +1,53 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:fabric",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:alclad_aluminum_sheet",
+    "siftec:motor",
+    "siftec:motor",
+    "siftec:motor",
+    "minecraft:phantom_membrane",
+    "minecraft:phantom_membrane",
+    "minecraft:phantom_membrane",
+    "minecraft:phantom_membrane",
+    "minecraft:phantom_membrane",
+    "minecraft:phantom_membrane",
+    "minecraft:phantom_membrane"
+  ],
+  "results": [
+    {
+      "id": "siftec:elytra_core"
+    }
+  ]
+}

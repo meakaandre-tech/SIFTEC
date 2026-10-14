@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "siftec:pickled_tomato",
+    "siftec:pickled_onion",
+    "siftec:pickled_cabbage",
+    "siftec:pickled_pumpkin",
+    "siftec:pickled_carrot",
+    "siftec:pickled_beetroot",
+    "siftec:pickled_kelp",
+    "siftec:sweet_berry_jam",
+    "siftec:glow_berry_jam",
+    "siftec:apple_jam",
+    "siftec:melon_jam"
+  ]
+}

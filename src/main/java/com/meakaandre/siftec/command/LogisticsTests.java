@@ -419,13 +419,22 @@ public final class LogisticsTests {
     }
 
     /**
-     * Dimensional Depots on Item Vaults. One company uploads 8 items a second, one with the Upload Upgrade research 16;
-     * a depot on a chest uploads nothing; a cloud stops at its limit of 320 of an item; taking from the cloud gives a stack.
+     * Dimensional Depots on Item Vaults, at Satisfactory 1.0's rates. A company with no research uploads 15 items a minute
+     * (2 in eight seconds), one with Upload Upgrade 240/min 4 a second (32); a depot on a chest uploads nothing; the cloud
+     * holds one stack of an item, two with Depot Expansion (200%); taking from the cloud gives a stack; the Manual Depot
+     * Uploader research lets a member upload from their inventory.
      */
     private static void depot(CommandSourceStack source, ServerLevel level) {
         Company plain = company(level, source, "selftest_depot");
-        Company fast = company(level, source, "selftest_depot_upload", "depot:upload");
-        plain.cloud.put("minecraft:gold_ingot", DepotBlockEntity.CLOUD_LIMIT - 4);
+        Company fast = company(level, source, "selftest_depot_upload", "depot:upload:240");
+        Company stacked = company(level, source, "selftest_depot_stacks", "depot:upload:240", "depot:stacks:2");
+        Company manual = company(level, source, "selftest_depot_manual", "depot:manual");
+        stacked.cloud.put("minecraft:gold_ingot", 2 * 64 - 4);
+        expect(source, "depot rates before and after research: 15 and 240 items/min, 1 and 2 stacks",
+            DepotBlockEntity.uploadPerMinute(plain) == 15 && DepotBlockEntity.uploadPerMinute(fast) == 240 && DepotBlockEntity.cloudStacks(plain) == 1
+                && DepotBlockEntity.cloudStacks(stacked) == 2 && DepotBlockEntity.cloudLimit(plain, Items.ENDER_PEARL) == 16,
+            DepotBlockEntity.uploadPerMinute(plain) + "/" + DepotBlockEntity.uploadPerMinute(fast) + " a minute, " + DepotBlockEntity.cloudStacks(plain) + "/"
+                + DepotBlockEntity.cloudStacks(stacked) + " stacks, pearls " + DepotBlockEntity.cloudLimit(plain, Items.ENDER_PEARL));
         BlockPos vaultA = new BlockPos(X + 70, Y, Z + 40), vaultB = vaultA.east(4), chest = vaultA.east(8), vaultC = vaultA.east(12);
         for (BlockPos v : new BlockPos[]{vaultA, vaultB, vaultC}) level.setBlock(v, AllBlocks.ITEM_VAULT.defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(chest, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
@@ -434,7 +443,7 @@ public final class LogisticsTests {
             insert(level, vaultB, new ItemStack(Items.REDSTONE, 64), new ItemStack(Items.REDSTONE, 36));
             insert(level, chest, new ItemStack(Items.COPPER_INGOT, 64));
             insert(level, vaultC, new ItemStack(Items.GOLD_INGOT, 20));
-            Object[][] depots = {{vaultA, plain}, {vaultB, fast}, {chest, plain}, {vaultC, plain}};
+            Object[][] depots = {{vaultA, plain}, {vaultB, fast}, {chest, plain}, {vaultC, stacked}};
             for (Object[] d : depots) {
                 BlockPos at = ((BlockPos) d[0]).above();
                 level.setBlock(at, ModBlocks.DIMENSIONAL_DEPOT.get().defaultBlockState(), Block.UPDATE_ALL);
@@ -449,22 +458,29 @@ public final class LogisticsTests {
             first[0] = plain.cloud.getOrDefault("minecraft:iron_ingot", 0);
             first[1] = fast.cloud.getOrDefault("minecraft:redstone", 0);
         });
-        later(level, 75, () -> {
+        later(level, 195, () -> {
             int plainRate = plain.cloud.getOrDefault("minecraft:iron_ingot", 0) - first[0];
             int fastRate = fast.cloud.getOrDefault("minecraft:redstone", 0) - first[1];
-            expect(source, "a Dimensional Depot on an Item Vault uploads 8 items a second", plainRate == 2 * DepotBlockEntity.uploadPerSecond(plain) && plainRate == 16,
-                plainRate + " in two seconds");
-            expect(source, "with the Upload Upgrade research it uploads 16 a second", fastRate == 32, fastRate + " in two seconds");
+            expect(source, "a Dimensional Depot on an Item Vault uploads 15 items a minute", plainRate == 2, plainRate + " in eight seconds");
+            expect(source, "with Upload Upgrade 240/min it uploads 4 a second", fastRate == 32, fastRate + " in eight seconds");
             expect(source, "a depot on a chest uploads nothing", !plain.cloud.containsKey("minecraft:copper_ingot") && count(level, chest, Items.COPPER_INGOT) == 64,
                 plain.cloud.getOrDefault("minecraft:copper_ingot", 0) + " copper in the cloud");
-            int gold = plain.cloud.getOrDefault("minecraft:gold_ingot", 0);
-            expect(source, "the cloud holds at most 320 of an item", gold == DepotBlockEntity.CLOUD_LIMIT && count(level, vaultC, Items.GOLD_INGOT) == 16,
+            int gold = stacked.cloud.getOrDefault("minecraft:gold_ingot", 0);
+            expect(source, "with Depot Expansion (200%) the cloud holds two stacks of an item", gold == 128 && count(level, vaultC, Items.GOLD_INGOT) == 16,
                 gold + " in the cloud, " + count(level, vaultC, Items.GOLD_INGOT) + " left in the vault");
-            int before = plain.cloud.getOrDefault("minecraft:iron_ingot", 0);
-            ItemStack taken = DepotBlockEntity.withdraw(plain, "minecraft:iron_ingot");
-            int after = plain.cloud.getOrDefault("minecraft:iron_ingot", 0);
-            expect(source, "taking iron out of the cloud gives what it held, up to a stack", taken.is(Items.IRON_INGOT) && taken.getCount() == Math.min(64, before) && after == before - taken.getCount(),
+            int before = fast.cloud.getOrDefault("minecraft:redstone", 0);
+            ItemStack taken = DepotBlockEntity.withdraw(fast, "minecraft:redstone");
+            int after = fast.cloud.getOrDefault("minecraft:redstone", 0);
+            expect(source, "taking from the cloud gives what it held, up to a stack", taken.is(Items.REDSTONE) && taken.getCount() == Math.min(64, before) && after == before - taken.getCount(),
                 "had " + before + ", took " + taken + ", left " + after);
+            ItemStack hand = new ItemStack(Items.DIAMOND, 40);
+            int up = DepotBlockEntity.upload(manual, hand);
+            ItemStack more = new ItemStack(Items.DIAMOND, 40);
+            int upMore = DepotBlockEntity.upload(manual, more);
+            expect(source, "Manual Depot Uploader: a member uploads from their inventory, up to the cloud's limit",
+                DepotBlockEntity.manual(manual) && !DepotBlockEntity.manual(plain) && up == 40 && hand.isEmpty() && upMore == 24 && more.getCount() == 16
+                    && manual.cloud.getOrDefault("minecraft:diamond", 0) == 64,
+                "uploaded " + up + " then " + upMore + ", " + more.getCount() + " kept, " + manual.cloud.getOrDefault("minecraft:diamond", 0) + " in the cloud");
             Companies.save(level.getServer());
         });
     }

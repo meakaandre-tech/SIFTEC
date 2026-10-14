@@ -12,7 +12,7 @@
     "client": ["com.meakaandre.siftec.client.SiftecClient"],
     "jei_mod_plugin": ["com.meakaandre.siftec.client.jei.SiftecJeiPlugin"]
   },
-  "mixins": ["siftec.mixins.json", "siftec.cdg.mixins.json", "siftec.tb.mixins.json"],
+  "mixins": ["siftec.mixins.json", "siftec.cdg.mixins.json"],
   "depends": {
     "fabricloader": "*",
     "fabric-api": "*",
@@ -20,8 +20,5 @@
     "java": ">=25",
     "create": "*",
     "create_new_age": "*"
-  },
-  "recommends": {
-    "travelersbackpack": ">=11.4.1"
   }
 }

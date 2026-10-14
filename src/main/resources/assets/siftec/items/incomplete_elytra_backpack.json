@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/incomplete_elytra_backpack",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 6316136
+      }
+    ]
+  }
+}

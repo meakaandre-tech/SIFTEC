@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/therapeutic_inhaler",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 6344944
+      }
+    ]
+  }
+}

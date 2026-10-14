@@ -231,7 +231,9 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
             int phases = 0;
             for (Milestone p : Milestones.phases()) if (view.done.contains(p.id())) phases++;
             // under the phase list, as the old screen showed the Wormhole Generator
-            List<FormattedCharSequence> lines = font.split(Component.translatable("siftec.hubui.phases", phases, Milestones.phases().size()), 110);
+            Component status = phases >= Milestones.phases().size() ? Component.translatable("siftec.hubui.free_play")
+                : Component.translatable("siftec.hubui.phases", phases, Milestones.phases().size());
+            List<FormattedCharSequence> lines = font.split(status, 110);
             int ly = top + H - 30 - 10 * lines.size();
             for (FormattedCharSequence line : lines) {
                 g.text(font, line, left + 8, ly, view.gateway ? PURPLE : ORANGE, false);

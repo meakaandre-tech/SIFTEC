@@ -63,16 +63,12 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
             return Component.translatableWithFallback("siftec.tag." + path.replace('/', '.'), "any " + path.substring(path.lastIndexOf('/') + 1).replace('_', ' '));
         }
 
-        /** The inventory and, on the server, the Traveler's Backpack the player wears. */
+        /** Where a player's parts are: the inventory (vanilla size; there is no backpack). */
         private static java.util.List<net.minecraft.world.Container> containers(Inventory inventory) {
-            if (!(inventory.player instanceof net.minecraft.server.level.ServerPlayer server)) return java.util.List.of(inventory);
-            java.util.List<net.minecraft.world.Container> out = new java.util.ArrayList<>();
-            out.add(inventory);
-            out.addAll(com.meakaandre.siftec.backpack.Backpack.containers(server));
-            return out;
+            return java.util.List.of(inventory);
         }
 
-        /** How many matching items the player is carrying, backpack included. */
+        /** How many matching items the player is carrying. */
         public int carried(Inventory inventory) {
             int n = 0;
             for (net.minecraft.world.Container container : containers(inventory)) {
@@ -83,7 +79,7 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
             return n;
         }
 
-        /** Takes up to {@code amount} matching items out of the inventory, then the backpack, and says how many it got. */
+        /** Takes up to {@code amount} matching items out of the inventory, and says how many it got. */
         public int take(Inventory inventory, int amount) {
             int left = amount;
             for (net.minecraft.world.Container container : containers(inventory)) {

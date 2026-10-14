@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.geyser;
 
-import com.meakaandre.siftec.backpack.Backpack;
 import com.meakaandre.siftec.registry.ModItems;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.level.ServerLevel;
@@ -26,11 +25,6 @@ public final class Radiation {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 if (player.hasInfiniteMaterials() || player.isSpectator()) continue;
                 boolean exposed = player.getInventory().contains(stack -> stack.is(residue));
-                if (!exposed) {
-                    for (net.minecraft.world.Container worn : Backpack.containers(player)) {
-                        if (worn.hasAnyMatching(stack -> stack.is(residue))) exposed = true;
-                    }
-                }
                 ServerLevel level = player.level();
                 if (!exposed) {
                     exposed = !level.getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(RANGE), e -> e.getItem().is(residue)).isEmpty();

@@ -1,0 +1,45 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:elytra_backpack_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_elytra_backpack"
+  },
+  "result": {
+    "id": "siftec:elytra_backpack"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:elytra",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "create:copper_backtank",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "create:precision_mechanism",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "siftec:high_speed_connector",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

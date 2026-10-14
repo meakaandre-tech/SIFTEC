@@ -24,6 +24,9 @@ CRAFTING = {"minecraft:crafting_shaped", "minecraft:crafting_shapeless"}
 RAW = {"minecraft:raw_iron", "minecraft:raw_copper", "create:raw_zinc", "minecraft:coal", "minecraft:quartz", "siftec:raw_bauxite", "siftec:uranium",
        "siftec:sam", "cgs:sulfur", "#siftec:stones", "minecraft:stone", "minecraft:water", "createdieselgenerators:crude_oil", "siftec:nitrogen",
        "minecraft:lava", "siftec:hard_drive", "siftec:mercer_sphere", "siftec:somersloop"}
+# pack tags the MAM takes, of things the pack itself makes
+TAGS = {"#siftec:preserves": ["siftec:pickled_" + w for w in ("tomato", "onion", "cabbage", "pumpkin", "carrot", "beetroot", "kelp")]
+        + ["siftec:" + w + "_jam" for w in ("sweet_berry", "glow_berry", "apple", "melon")]}
 # found and never made: the power slugs and Power Shards stay as items until overclocking's removal takes them out
 FOUND_ONLY = {"siftec:blue_power_slug", "siftec:yellow_power_slug", "siftec:purple_power_slug", "siftec:power_shard"}
 # what a building gives that is not a recipe: the Nuclear Power Plant's waste (its fuel rods go in, work package 6)
@@ -127,8 +130,14 @@ def check(data=None):
         return i in RAW or (i not in checked and not i.startswith("siftec:") and i not in recipes.FLUID_IDS.values()) or i.startswith("#minecraft:") \
             or i.startswith("#c:") or i in ("#siftec:mycelia", "#siftec:spider_remains")
 
+    def have(i):
+        # a pack tag of things the pack makes counts once any of them is made
+        if i in TAGS:
+            return any(have(t) for t in TAGS[i])
+        return given(i) or i in known
+
     milestones = {m[1]: m for m in content.MILESTONES}
-    mam = {f"mam_{t[0]}_{k + 1}": (t, k, n) for t in content.MAM for k, n in enumerate(t[3])}
+    mam = {n[0]: n for n in content.mam_nodes()}
     phases = {p[0]: p for p in content.PHASES}
     done, known = set(), set()
 
@@ -139,12 +148,12 @@ def check(data=None):
             for ins, outs, lock, path in steps:
                 if lock == "alt" or (lock and lock not in done) or outs <= known:
                     continue
-                if all(given(i) or i in known for i in ins):
+                if all(have(i) for i in ins):
                     known.update(outs)
                     progress = True
 
     def payable(cost):
-        return all(given(i) or i in known for i, n in content.parse_cost(cost))
+        return all(have(i) for i, n in content.parse_cost(cost))
 
     order = [m[1] for m in content.MILESTONES]
     while True:
@@ -167,9 +176,9 @@ def check(data=None):
             if pid not in done and "hub_upgrade_6" in done and (k == 0 or content.PHASES[k - 1][0] in done) and payable(cost):
                 done.add(pid)
         if "field_research" in done:
-            for nid, (tree, k, node) in mam.items():
-                needs = node[4] if node[4] is not None else ([k] if k > 0 else [])
-                if nid not in done and all(f"mam_{tree[0]}_{n}" in done for n in needs) and payable(node[1]):
+            # a need is a node id, or "a|b" for any of them; research is hand-fed, one node at a time
+            for nid, (_, tree, name, cost, time, text, needs, items, tokens) in mam.items():
+                if nid not in done and all(any(a in done for a in need.split("|")) for need in needs) and payable(cost):
                     done.add(nid)
         if len(done) == before:
             break
@@ -180,9 +189,13 @@ def check(data=None):
     for pid, pname, cost, text in content.PHASES:
         if pid not in done:
             errors.append(f"reachability: {pname} can never be paid ({cost})")
-    for nid, (tree, k, node) in mam.items():
-        if nid not in done and tree[0] != "slugs":
-            errors.append(f"reachability: MAM {tree[1]} / {node[0]} can never be researched ({node[1]})")
+    for nid, (_, tree, name, cost, time, text, needs, items, tokens) in mam.items():
+        if nid not in done:
+            errors.append(f"reachability: MAM {tree} / {name} can never be researched ({cost})")
+        for need in needs:
+            for a in need.split("|"):
+                if a not in mam:
+                    errors.append(f"MAM {tree} / {name} needs {a}, which is no MAM node")
     for i in sorted(checked - known):
         errors.append(f"reachability: nothing reachable makes {i}")
     for name, cost in list(content.BUILD_COSTS.items()) + [(i, c) for i, c in recipes.WORKSHOP]:

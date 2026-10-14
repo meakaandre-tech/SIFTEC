@@ -311,9 +311,14 @@ public final class PrefabTests {
         List<ItemStack> back2 = gate == null ? List.of() : Prefabs.dismantle(level, gate);
         int leftG = partsIn(level, Prefabs.bounds(spotG));
         Prefabs.Check againG = Prefabs.place(level, spotG, a, null);
-        report(source, "gateway placed " + placedG.ok() + " (" + placedG.message().getString() + "), rings " + ring0 + " -> phase 1 paid " + phase1 + " -> " + ring1
-            + "; second gateway refused " + "siftec.prefab.one_gateway".equals(second.reason) + "; picked up: items " + count(back2, ModBlocks.WORMHOLE_GATEWAY.get().asItem())
-            + ", parts left " + leftG + "; placed again " + againG.ok() + " with rings " + ring(level, spotG));
+        report(source, "gateway placed " + placedG.ok() + " (" + placedG.message().getString() + "), ring gate " + ring0 + " -> phase 1 paid " + phase1 + " -> " + ring1
+            + "; second gateway refused " + "siftec.prefab.one_gateway".equals(second.reason) + "; picked up: stacks back " + back2.size()
+            + ", parts left " + leftG + "; placed again " + againG.ok() + " with ring gate " + ring(level, spotG));
+        // the portal: inside the ring, in its middle layer, and nowhere else
+        boolean portalIn = Templates.inPortal(0, Templates.RING_Y + 0.5, Templates.RING_Z + 0.5) && Templates.inPortal(-8, Templates.RING_Y + 6, Templates.RING_Z + 0.5);
+        boolean portalOut = !Templates.inPortal(0, Templates.RING_Y + Templates.RING_OUTER, Templates.RING_Z + 0.5) && !Templates.inPortal(0, Templates.RING_Y + 0.5, Templates.RING_Z + 4)
+            && !Templates.inPortal(Templates.RING_INNER + 1, Templates.RING_Y + 0.5, Templates.RING_Z + 0.5);
+        report(source, "gateway portal: walking in at the middle of the ring counts " + portalIn + "; beside it, in front of it or in the ring does not " + portalOut);
 
         // ---- an old single-block HUB still loads and works as a terminal
         BlockPos legacy = new BlockPos(AX + 30, Y + 1, AZ - 30);
@@ -324,14 +329,17 @@ public final class PrefabTests {
         Companies.save(source.getServer());
     }
 
-    /** The five gateway rings: o dark, * lit; then + if the crown is up. */
+    /**
+     * The ring gate's parts, one mark each: the cradle (Phase 1), the ring's bottom, side and top (Phases 2 to 4) as # when
+     * built and . when not; then the lining, o dark or * lit; then + if the portal is open.
+     */
     private static String ring(ServerLevel level, Prefabs.Spot spot) {
         StringBuilder b = new StringBuilder();
-        for (int[] r : Templates.RINGS) {
-            BlockState s = level.getBlockState(spot.at(r[0], r[1], r[2]));
-            b.append(s.is(ModBlocks.PREFAB.get("coil_lit").get()) ? "*" : s.is(ModBlocks.PREFAB.get("coil").get()) ? "o" : "?");
-        }
-        if (level.getBlockState(spot.at(Templates.CROWN[0], Templates.CROWN[1], Templates.CROWN[2])).is(ModBlocks.PREFAB.get("rift").get())) b.append("+");
+        int[][] marks = Templates.gatewayMarks();
+        for (int i = 0; i < 4; i++) b.append(Prefabs.isPart(level.getBlockState(spot.at(marks[i][0], marks[i][1], marks[i][2]))) ? "#" : ".");
+        BlockState lining = level.getBlockState(spot.at(marks[4][0], marks[4][1], marks[4][2]));
+        b.append(lining.is(ModBlocks.PREFAB.get("coil_lit").get()) ? "*" : lining.is(ModBlocks.PREFAB.get("coil").get()) ? "o" : ".");
+        if (level.getBlockState(spot.at(0, Templates.RING_Y, Templates.RING_Z)).is(ModBlocks.PREFAB.get("portal").get())) b.append("+");
         return b.toString();
     }
 

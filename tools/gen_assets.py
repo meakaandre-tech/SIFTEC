@@ -151,11 +151,18 @@ write(os.path.join(ROOT, "data", "siftec", "tags", "item", "mycelia.json"), {"re
 write(os.path.join(ROOT, "data", "siftec", "tags", "item", "spider_remains.json"), {"replace": False, "values": ["minecraft:spider_eye", "minecraft:string"]})
 lang["siftec.tag.mycelia"] = "any mushroom"
 lang["siftec.tag.spider_remains"] = "spider eye or string"
+# any pickle or jam (the Automated Cooking research takes 20)
+PRESERVE_TAG = ["siftec:pickled_" + w for w in ("tomato", "onion", "cabbage", "pumpkin", "carrot", "beetroot", "kelp")] \
+    + ["siftec:" + w + "_jam" for w in ("sweet_berry", "glow_berry", "apple", "melon")]
+write(os.path.join(ROOT, "data", "siftec", "tags", "item", "preserves.json"), {"replace": False, "values": PRESERVE_TAG})
+lang["siftec.tag.preserves"] = "any pickle or jam"
 
 # miners and the extractor: Create casings until real models are picked
 lang.update({"block.siftec.dimensional_depot": "Dimensional Depot", "siftec.depot.title": "Cloud: %s", "siftec.depot.count": "%s in the cloud",
              "siftec.depot.click": "Click to take a stack", "siftec.depot.previous": "Previous page", "siftec.depot.next": "Next page",
-             "siftec.depot.button": "Cloud", "siftec.depot.button.tooltip": "Your company's Dimensional Depot cloud: take items out"})
+             "siftec.depot.button": "Cloud", "siftec.depot.button.tooltip": "Your company's Dimensional Depot cloud: take items out",
+             "siftec.depot.manual_locked": "Uploading from your inventory needs the Manual Depot Uploader research (MAM, Alien Technology)",
+             "siftec.depot.uploaded": "Uploaded %s %s to the cloud", "siftec.depot.full": "The cloud has no room for that"})
 
 lang.update({"siftec.claim.denied": "This land belongs to %s", "siftec.claim.budget": "Your company has used all %s of its Claim Markers",
              "siftec.claim.too_close": "Too close: markers must be more than %s chunks from another company's HUB",
@@ -209,16 +216,26 @@ for eid, (ename, etex) in EQUIPMENT.items():
     lang[f"item.siftec.{eid}"] = ename
     write(f"{A}/models/item/{eid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": etex}})
     item_def(eid, f"siftec:item/{eid}")
-# the Traveler's Backpack each player is given (compat/TravelersBackpackCompat.java), and the old backpack rows' items
-lang.update({"siftec.backpack.given": "SIFTEC issued you a Traveler's Backpack (%s tier). Press B to open it",
-             "siftec.backpack.tier": "Your Traveler's Backpack grew to %s tier",
-             "siftec.backpack.bound": "Your Traveler's Backpack is bound to you: it stays on your back",
-             "siftec.backpack.returned": "Your Traveler's Backpack went back on your back",
-             "siftec.backpack.extra": "Only one Traveler's Backpack per player: the extra one was unpacked into your inventory",
-             "siftec.backpack.migrated": "The %s stacks from your old SIFTEC backpack rows were moved to your Traveler's Backpack or inventory",
-             "siftec.backpack.dropped": "Some of them did not fit and were dropped at your feet"})
+# the MAM's inhalers and the Elytra Backpack (item/MamItems.java)
+MAM_ITEMS = {"protein_inhaler": ("Protein Inhaler", "minecraft:item/potion", 0xE070C0),
+             "vitamin_inhaler": ("Vitamin Inhaler", "minecraft:item/potion", 0xF0A040),
+             "therapeutic_inhaler": ("Therapeutic Inhaler", "minecraft:item/potion", 0x60D0F0),
+             "nutritional_inhaler": ("Nutritional Inhaler", "minecraft:item/potion", 0x80E060),
+             "elytra_backpack": ("Elytra Backpack", "minecraft:item/elytra", 0xE8A060)}
+for eid, (ename, etex, tint) in MAM_ITEMS.items():
+    lang[f"item.siftec.{eid}"] = ename
+    write(f"{A}/models/item/{eid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": etex}})
+    item_def(eid, f"siftec:item/{eid}", tint)
+lang.update({"siftec.inhaler.protein": "Heals 6 health", "siftec.inhaler.vitamin": "Regeneration II for 20 seconds",
+             "siftec.inhaler.therapeutic": "Clears every bad effect and heals 4 health", "siftec.inhaler.nutritional": "Heals 14 health, and Regeneration for 10 seconds",
+             "siftec.elytra_backpack.tip": "An Elytra and a Copper Backtank in one: glides, and feeds diving gear its air",
+             "siftec.elytra_backpack.refill": "Use it on a placed backtank to take its air",
+             "siftec.elytra_backpack.filled": "Took %s air from the backtank", "siftec.elytra_backpack.empty_tank": "That backtank has no air to give",
+             "siftec.elytra_backpack.air": "Air: %s / %s"})
+# the Elytra Backpack counts as a backtank for Create's diving gear and air-hungry tools
+write(os.path.join(ROOT, "data", "create", "tags", "item", "pressurized_air_sources.json"), {"replace": False, "values": ["siftec:elytra_backpack"]})
 lang.update({"siftec.jetpack.empty": "Jetpack: out of fuel. It burns Solid Biofuel, Compacted Coal, diesel or Turbofuel",
-             "siftec.zipline.no_line": "No Power Line leads that way from this pole", "siftec.zipline.locked": "Riding Power Lines needs the Zipline research (MAM, Caterium)",
+             "siftec.zipline.no_line": "No Power Line leads that way from this pole", "siftec.zipline.locked": "Riding Power Lines needs the Power Line Riding research (MAM, Caterium)",
              "siftec.crash.somersloop": "There was a Somersloop in the wreckage too", "siftec.boost.shards_only": "This machine takes Power Shards only",
              "siftec.radar.title": "Radar Tower: nearest of each, from here", "siftec.radar.line": "%s: %s blocks %s (x %s, z %s)",
              "siftec.radar.nothing": "Nothing in range"})
@@ -259,6 +276,7 @@ PREFAB = {  # style: (name, texture)
     "railway": ("Gateway Frame", "create:block/railway_casing"), "coil": ("Gateway Ring", "create:block/dark_metal_block"),
     "coil_lit": ("Gateway Ring (charged)", "minecraft:block/amethyst_block"), "rift": ("Gateway Rift", "minecraft:block/crying_obsidian"),
     "foundation": ("Structure Leg", "minecraft:block/gray_concrete"),
+    "conduit": ("Gateway Conduit", "create:block/copper_casing"), "portal": ("Wormhole", "minecraft:block/nether_portal"),
 }
 for style, (name, tex) in PREFAB.items():
     b = f"prefab_{style}"
@@ -298,10 +316,13 @@ lang.update({
     "siftec.claim.hub_too_close": "Too close to another company's land: a claiming HUB must be more than %s chunks from another company's HUB",
     "siftec.claim.hub_extra": "HUB placed. Your company's first HUB already holds its land, so this one claims nothing",
     "siftec.prefab.cost": "Building the HUB takes %s %s from your inventory",
+    "siftec.prefab.cost_any": "Building it takes %s %s from your inventory",
     "siftec.prefab.build_gun": "You have a Build Gun: build the HUB with it first (Tab to the Special tab, 20 Raw Iron)",
     "siftec.burner.fuel": "The HUB's Biomass Burners burn leaves, logs, Biomass and Solid Biofuel",
 })
 lang["siftec.sift.closed"] = "The Sift is closed to you until your company finishes Wormhole Phase 5"
+lang.update({"siftec.sift.open": "The Wormhole is open: walk into the gate to reach The Sift. From here on it is free play",
+             "siftec.hubui.free_play": "Wormhole open: free play"})
 PRESERVE_ICONS = {"pickled_tomato": ("Pickled Tomato", 0xC84030), "pickled_onion": ("Pickled Onion", 0xD8C8A8), "pickled_cabbage": ("Pickled Cabbage", 0x90B850),
                   "pickled_pumpkin": ("Pickled Pumpkin", 0xE08828), "pickled_carrot": ("Pickled Carrot", 0xF09030), "pickled_beetroot": ("Pickled Beetroot", 0x902848),
                   "pickled_kelp": ("Pickled Kelp", 0x4C7A3A), "sweet_berry_jam": ("Sweet Berry Jam", 0xB01838), "glow_berry_jam": ("Glow Berry Jam", 0xF0B040),
@@ -310,7 +331,7 @@ for fid, (fname, tint) in PRESERVE_ICONS.items():
     lang[f"item.siftec.{fid}"] = fname
     write(f"{A}/models/item/{fid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/honey_bottle" if fid == "mead" else "minecraft:item/potion"}})
     item_def(fid, f"siftec:item/{fid}", tint)
-lang.update({"siftec.season.locked": "Your company has not researched Seasoning yet", "siftec.season.already": "That food is already seasoned",
+lang.update({"siftec.season.locked": "Your company has not researched Automated Cooking yet (MAM, Nutrients)", "siftec.season.already": "That food is already seasoned",
              "siftec.season.short": "You need %s of the ingredient: one for each item of food", "siftec.season.long": "Seasoned with glowstone: effects last twice as long",
              "siftec.season.strong": "Seasoned with blaze powder: effects one level stronger", "siftec.season.bonus": "Seasoned with nether wart: one more effect at random"})
 lang["item.siftec.toxic_shot"] = "Toxic Shot"
@@ -345,7 +366,7 @@ def secs(t):
 # every item id of the game and of the mods the pack's data names (items only: blocks without an item are not
 # in it), so a typo or a renamed item stops the generator instead of loading as nothing
 KNOWN = set(open(os.path.join(os.path.dirname(__file__), "known_ids.txt")).read().split())
-CHECKED = ("minecraft", "create", "cgs", "createdieselgenerators", "create_hypertube", "travelersbackpack", "create_new_age")
+CHECKED = ("minecraft", "create", "cgs", "createdieselgenerators", "create_new_age")
 UNKNOWN = []
 
 def check(item, where=""):
@@ -379,23 +400,24 @@ for mid, name, cost, text in content.PHASES:
                            "seconds": 0, "items": [], "tokens": []})
     lang[f"siftec.milestone.{mid}"] = name
     lang[f"siftec.milestone.{mid}.unlocks"] = text
-# ---- MAM research: every node is stored like a milestone, with its tree and what it needs first
+# ---- MAM research: every node is stored like a milestone, with its tree and what it needs first. A need is a node id,
+# or several joined by "|" for any of them. A tree shows in the MAM once one of its trigger items is brought in.
 data["trees"] = []
+data["milestones_mam"] = []
 for tree_id, tree_name, icon, nodes in content.MAM:
     check(icon, tree_id)
-    ids = [f"mam_{tree_id}_{n + 1}" for n in range(len(nodes))]
-    data["trees"].append({"id": tree_id, "icon": icon, "nodes": ids})
+    data["trees"].append({"id": tree_id, "icon": icon, "nodes": [content.mam_id(tree_id, n[0]) for n in nodes],
+                          "triggers": content.mam_triggers(tree_id)})
     lang[f"siftec.tree.{tree_id}"] = tree_name
-    for n, (name, cost, time, text, needs, items, tokens) in enumerate(nodes):
-        for i in items: check(i, ids[n])
-        for i, c in content.parse_cost(cost): check(i, ids[n] + " cost")
-        if needs is None:
-            needs = [n] if n > 0 else []
-        data["milestones_mam"] = data.get("milestones_mam", [])
-        data["milestones_mam"].append({"id": ids[n], "tree": tree_id, "cost": [{"item": i, "count": c} for i, c in content.parse_cost(cost)],
-                                       "seconds": secs(time), "items": items, "tokens": tokens, "needs": [ids[k - 1] for k in needs]})
-        lang[f"siftec.milestone.{ids[n]}"] = name
-        lang[f"siftec.milestone.{ids[n]}.unlocks"] = text
+for nid, tree_id, name, cost, time, text, needs, items, tokens in content.mam_nodes():
+    for i in items: check(i, nid)
+    for i, c in content.parse_cost(cost): check(i, nid + " cost")
+    data["milestones_mam"].append({"id": nid, "tree": tree_id, "cost": [{"item": i, "count": c} for i, c in content.parse_cost(cost)],
+                                   "seconds": secs(time), "items": items, "tokens": tokens, "needs": needs})
+    lang[f"siftec.milestone.{nid}"] = name
+    lang[f"siftec.milestone.{nid}.unlocks"] = text
+if len({m["id"] for m in data["milestones_mam"]}) != len(data["milestones_mam"]):
+    raise SystemExit("MAM: two nodes share an id")
 # the other mods' items that unlock with a milestone, beyond the ones listed with it
 by_id = {m["id"]: m for m in data["milestones"] + data["milestones_mam"]}
 for mid, more in content.MORE_LOCKS.items():
@@ -416,12 +438,13 @@ accounted = set(placed) | set(content.FREE) | set(content.DISABLED) | {i for i, 
 both = sorted((set(placed) | set(content.DISABLED)) & set(content.FREE))
 if both:
     raise SystemExit(f"both locked and free: {both}")
-loose = sorted(i for i in KNOWN if i.split(":")[0] in ("create", "cgs", "createdieselgenerators", "create_hypertube", "travelersbackpack", "create_new_age") and i not in accounted)
+loose = sorted(i for i in KNOWN if i.split(":")[0] in ("create", "cgs", "createdieselgenerators", "create_new_age") and i not in accounted)
 if loose:
     raise SystemExit(f"{len(loose)} items have no milestone and are not listed as free: {loose}")
 lang.update({"block.siftec.mam": "MAM", "siftec.mam.title": "MAM: %s", "siftec.mam.research": "Research time: %s",
              "siftec.mam.busy": "Already researching %s", "siftec.mam.running": "Researching %s: %s left", "siftec.mam.idle": "No research running",
              "siftec.mam.started": "Research started: %s", "siftec.mam.click": "Click to deliver parts from your inventory",
+             "siftec.mam.undiscovered": "Undiscovered research", "siftec.mam.bring": "Bring %s to the MAM to start this tree",
              "siftec.tag.mushrooms": "any mushroom", "siftec.tag.crops": "any crop"})
 write(f"{A}/blockstates/mam.json", {"variants": {"": {"model": "siftec:block/mam"}}})
 write(f"{A}/models/block/mam.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
@@ -550,7 +573,7 @@ for path, body in recipes.build().items():
         raise SystemExit(f"{path}: its half-built item {body['transitional_item']['id']} is not in content.PARTS")
     # a recipe that names another mod's item or fluid only loads when that mod is installed
     text = json.dumps(body)
-    mods = [m for m in ("cgs", "createdieselgenerators", "create_hypertube", "farmersdelight") if f'"{m}:' in text or f'"#{m}:' in text]
+    mods = [m for m in ("cgs", "createdieselgenerators", "farmersdelight") if f'"{m}:' in text or f'"#{m}:' in text]
     if "#c:tools/knife" in text or path.split("/")[-1].startswith("kitchen_"):
         mods = sorted(set(mods) | {"farmersdelight"})
     if mods:
@@ -727,7 +750,7 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if "vent" in extra:
         b["vent"] = list(extra["vent"])
     if extra.get("prefab"):
-        if extra["prefab"] != "hub":
+        if extra["prefab"] not in ("hub", "gateway"):
             raise SystemExit(f"building {bid}: unknown prefab {extra['prefab']!r}")
         b["prefab"] = extra["prefab"]
     data["buildings"].append(b)
@@ -786,6 +809,7 @@ lang.update({
     "siftec.build_gun.overlay_dismantle": "Dismantle | %s",
     "siftec.build_gun.fits": "Right-click to build the %s. R rotate, F flip, Ctrl nudge",
     "siftec.build_gun.fits_hub": "Right-click to build the HUB. R rotate, Ctrl nudge",
+    "siftec.build_gun.fits_gateway": "Right-click to build the Wormhole Gateway. R rotate, Ctrl nudge",
     "siftec.build_gun.blocked": "%s blocks are in the way (marked red)",
     "siftec.build_gun.missing": "Missing %s %s",
     "siftec.build_gun.no_template": "The %s building has no template yet",

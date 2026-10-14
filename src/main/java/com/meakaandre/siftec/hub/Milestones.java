@@ -34,8 +34,8 @@ public final class Milestones {
         return raw;
     }
 
-    /** A MAM research tree. */
-    public record Tree(String id, Identifier icon, List<Milestone> nodes) {
+    /** A MAM research tree, and the items that bring it up in the MAM (what its starting nodes take). */
+    public record Tree(String id, Identifier icon, List<Milestone> nodes, List<String> triggers) {
     }
 
     public record FluidDef(String id, int color) {
@@ -92,7 +92,9 @@ public final class Milestones {
             }
             for (JsonElement e : root.getAsJsonArray("trees")) {
                 JsonObject o = e.getAsJsonObject();
-                TREES.add(new Tree(o.get("id").getAsString(), Identifier.parse(o.get("icon").getAsString()), byTree.getOrDefault(o.get("id").getAsString(), List.of())));
+                List<String> triggers = new ArrayList<>();
+                if (o.has("triggers")) for (JsonElement t : o.getAsJsonArray("triggers")) triggers.add(t.getAsString());
+                TREES.add(new Tree(o.get("id").getAsString(), Identifier.parse(o.get("icon").getAsString()), byTree.getOrDefault(o.get("id").getAsString(), List.of()), triggers));
             }
         } catch (Exception e) {
             throw new IllegalStateException("SIFTEC could not read siftec_content.json", e);
@@ -153,6 +155,23 @@ public final class Milestones {
         return PHASES;
     }
 
+    /** True if the company has the node a need names, or for "a|b" any one of them. */
+    public static boolean needMet(Company company, String need) {
+        for (String one : need.split("\\|")) if (company.has(one)) return true;
+        return false;
+    }
+
+    /** The MAM tree a research node belongs to. */
+    public static Tree treeOf(Milestone m) {
+        for (Tree t : TREES) if (t.id().equals(m.tree())) return t;
+        return null;
+    }
+
+    /** True if every wormhole phase is delivered: the portal to The Sift is open and the game goes on as free play. */
+    public static boolean freePlay(Company company) {
+        return !PHASES.isEmpty() && company.has(PHASES.get(PHASES.size() - 1).id());
+    }
+
     /** The wormhole phase that opens a tier, or 0 when the tier needs none. */
     public static int phaseFor(int tier) {
         return tier <= 2 ? 0 : tier <= 4 ? 1 : tier <= 6 ? 2 : tier <= 8 ? 3 : 4;
@@ -168,7 +187,10 @@ public final class Milestones {
     /** What still has to be done before this one can be paid for, or null when it is open. */
     public static Milestone blocker(Company company, Milestone m) {
         if (m.isResearch()) {
-            for (String need : m.needs()) if (!company.has(need)) return get(need);
+            // a need is a node id, or several joined by "|" when any one of them will do
+            for (String need : m.needs()) {
+                if (!needMet(company, need)) return get(need.contains("|") ? need.substring(0, need.indexOf('|')) : need);
+            }
             return null;
         }
         if (m.isPhase()) {

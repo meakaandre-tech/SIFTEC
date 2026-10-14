@@ -25,7 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-/** The company's cloud inventory. Click an item to take a stack; the last row turns the page. */
+/**
+ * The company's cloud inventory. Click an item to take a stack; the last row turns the page. With the Manual Depot
+ * Uploader research, shift-clicking a stack in the player's own inventory uploads it.
+ */
 public class DepotMenu extends ChestMenu {
     private static final int SIZE = 54, PER_PAGE = 45, PREVIOUS = 45, NEXT = 53;
     private final SimpleContainer view;
@@ -96,7 +99,28 @@ public class DepotMenu extends ChestMenu {
             if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) press(slot);
             return;
         }
+        if (input == ContainerInput.QUICK_MOVE && slot >= SIZE && slot < slots.size()) {
+            uploadFrom(slot);
+            return;
+        }
         if (input == ContainerInput.PICKUP || input == ContainerInput.THROW) super.clicked(slot, button, input, who);
+    }
+
+    /** Manual Depot Uploader: puts the stack in one of the player's slots into the cloud, as much as there is room for. */
+    private void uploadFrom(int slot) {
+        if (!DepotBlockEntity.manual(company) && !player.hasInfiniteMaterials()) {
+            player.sendOverlayMessage(Component.translatable("siftec.depot.manual_locked"));
+            return;
+        }
+        ItemStack stack = slots.get(slot).getItem();
+        if (stack.isEmpty()) return;
+        Component name = stack.getHoverName();
+        int n = DepotBlockEntity.upload(company, stack);
+        slots.get(slot).setChanged();
+        player.sendOverlayMessage(n > 0 ? Component.translatable("siftec.depot.uploaded", n, name)
+            : Component.translatable("siftec.depot.full"));
+        if (n > 0) Companies.save(player.level().getServer());
+        refresh();
     }
 
     @Override

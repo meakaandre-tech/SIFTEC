@@ -18,10 +18,16 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 public class DepotBlockEntity extends BlockEntity {
-    /** Items uploaded per second, and the most of one item the cloud holds, before research. */
-    public static final int UPLOAD_PER_SECOND = 8, CLOUD_LIMIT = 320;
+    /**
+     * Satisfactory 1.0's Dimensional Depot before research: 15 items a minute, and one stack of each item in the cloud.
+     * The Upload Upgrade research raises the rate (30, 60, 120, 240 a minute) and the Depot Expansion research the stacks
+     * (2 to 5): tokens depot:upload:<items a minute> and depot:stacks:<n>.
+     */
+    public static final int UPLOAD_PER_MINUTE = 15, CLOUD_STACKS = 1;
     public String companyId = "";
     private int cooldown;
+    /** Uploads owed but not yet whole items, in sixtieths of an item: a depot at 15 a minute moves one every 4 seconds. */
+    private int owed;
     /** Whether the last upload moved anything, so the company is only saved when it changed. */
     private boolean moved;
 
@@ -52,14 +58,39 @@ public class DepotBlockEntity extends BlockEntity {
         return new net.minecraft.world.item.ItemStack(item, take);
     }
 
-    /** Items uploaded each second for a company: doubled by the Upload Upgrade research. */
-    public static int uploadPerSecond(Company company) {
-        return UPLOAD_PER_SECOND * (company.hasToken("depot:upload") ? 2 : 1);
+    /** Items a minute each of a company's depots uploads: raised by the Upload Upgrade research. */
+    public static int uploadPerMinute(Company company) {
+        return company.best("depot:upload:", UPLOAD_PER_MINUTE);
     }
 
-    /** The most of one item a company's cloud holds: doubled by the Depot Expansion research. */
-    public static int cloudLimit(Company company) {
-        return CLOUD_LIMIT * (company.hasToken("depot:expansion") ? 2 : 1);
+    /** How many stacks of one item a company's cloud holds: raised by the Depot Expansion research. */
+    public static int cloudStacks(Company company) {
+        return company.best("depot:stacks:", CLOUD_STACKS);
+    }
+
+    /** The most of one item a company's cloud holds: its stacks of that item. */
+    public static int cloudLimit(Company company, net.minecraft.world.item.Item item) {
+        return cloudStacks(company) * new net.minecraft.world.item.ItemStack(item).getMaxStackSize();
+    }
+
+    /** True once the company has the Manual Depot Uploader research: its members upload from their inventory. */
+    public static boolean manual(Company company) {
+        return company.hasToken("depot:manual");
+    }
+
+    /**
+     * Puts as much of a stack into the company's cloud as it has room for, and says how many went. Only plain items go
+     * to the cloud: nothing named, enchanted, damaged or filled.
+     */
+    public static int upload(Company company, net.minecraft.world.item.ItemStack stack) {
+        if (stack.isEmpty() || !stack.getComponentsPatch().isEmpty()) return 0;
+        String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
+        int room = cloudLimit(company, stack.getItem()) - company.cloud.getOrDefault(id, 0);
+        int n = Math.min(room, stack.getCount());
+        if (n <= 0) return 0;
+        company.cloud.merge(id, n, Integer::sum);
+        stack.shrink(n);
+        return n;
     }
 
     public void serverTick() {
@@ -68,8 +99,11 @@ public class DepotBlockEntity extends BlockEntity {
         Company company = CompanyData.get(level.getServer()).byId(companyId);
         if (company == null) return;
         moved = false;
-        int budget = uploadPerSecond(company);
-        int limit = cloudLimit(company);
+        // this second's share of the rate, kept in sixtieths so slow rates add up to whole items
+        owed = Math.min(owed + uploadPerMinute(company), 60 * 64);
+        int budget = owed / 60;
+        if (budget <= 0) return;
+        int spent = 0;
         for (Direction side : Direction.values()) {
             BlockPos next = worldPosition.relative(side);
             // a depot uploads from the Item Vault it sits on, nothing else
@@ -87,18 +121,21 @@ public class DepotBlockEntity extends BlockEntity {
                     // only plain items go to the cloud: nothing named, enchanted, damaged or filled
                     if (!what.getComponentsPatch().isEmpty()) continue;
                     String id = BuiltInRegistries.ITEM.getKey(what.getItem()).toString();
-                    int room = limit - company.cloud.getOrDefault(id, 0);
+                    int room = cloudLimit(company, what.getItem()) - company.cloud.getOrDefault(id, 0);
                     if (room <= 0) continue;
                     int moved = (int) view.extract(what, Math.min(budget, room), tx);
                     if (moved <= 0) continue;
                     company.cloud.merge(id, moved, Integer::sum);
                     budget -= moved;
+                    spent += moved;
                     this.moved = true;
                 }
                 tx.commit();
             }
             if (budget <= 0) break;
         }
+        // what was moved is paid off; a depot with nothing to move does not save up a burst for later
+        owed = spent > 0 ? owed - spent * 60 : owed % 60;
         if (moved) Companies.save(level.getServer());
     }
 }

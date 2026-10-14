@@ -1,0 +1,13 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:ender_pearl",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal"
+  ],
+  "results": [
+    {
+      "id": "minecraft:ender_eye"
+    }
+  ]
+}

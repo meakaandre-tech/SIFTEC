@@ -263,6 +263,9 @@
       "id": "shatter_rebar"
     },
     {
+      "id": "vinegar_bottle"
+    },
+    {
       "id": "blue_power_slug"
     },
     {
@@ -606,6 +609,42 @@
     },
     {
       "id": "incomplete_blade_runners"
+    },
+    {
+      "id": "totem_of_undying_core"
+    },
+    {
+      "id": "incomplete_totem_of_undying"
+    },
+    {
+      "id": "elytra_core"
+    },
+    {
+      "id": "incomplete_elytra"
+    },
+    {
+      "id": "elytra_backpack_core"
+    },
+    {
+      "id": "incomplete_elytra_backpack"
+    },
+    {
+      "id": "trident_core"
+    },
+    {
+      "id": "incomplete_trident"
+    },
+    {
+      "id": "heart_of_the_sea_core"
+    },
+    {
+      "id": "incomplete_heart_of_the_sea"
+    },
+    {
+      "id": "netherite_ingot_core"
+    },
+    {
+      "id": "incomplete_netherite_ingot"
     }
   ],
   "milestones": [
@@ -620,13 +659,12 @@
       ],
       "seconds": 0,
       "items": [
+        "siftec:equipment_workshop",
         "create:wrench",
         "create:goggles",
         "create:mechanical_drill"
       ],
-      "tokens": [
-        "backpack"
-      ]
+      "tokens": []
     },
     {
       "id": "hub_upgrade_2",
@@ -650,7 +688,9 @@
         "create_new_age:copper_wire",
         "create_new_age:incomplete_wire",
         "create_new_age:copper_wire_block",
-        "create_new_age:electrical_connector"
+        "create_new_age:electrical_connector",
+        "create_new_age:basic_motor",
+        "create_new_age:basic_motor_extension"
       ],
       "tokens": [
         "scanner:copper"
@@ -681,9 +721,7 @@
         "create:millstone",
         "create:basin",
         "siftec:reinforced_iron_plate",
-        "siftec:screw",
-        "create_new_age:basic_motor",
-        "create_new_age:basic_motor_extension"
+        "siftec:screw"
       ],
       "tokens": [
         "scanner:stone"
@@ -709,11 +747,11 @@
       "seconds": 0,
       "items": [
         "create:belt_connector",
-        "create:andesite_funnel",
-        "travelersbackpack:blank_upgrade",
-        "travelersbackpack:crafting_upgrade"
+        "create:andesite_funnel"
       ],
-      "tokens": []
+      "tokens": [
+        "belt:60"
+      ]
     },
     {
       "id": "hub_upgrade_5",
@@ -734,9 +772,7 @@
       ],
       "seconds": 0,
       "items": [
-        "create:item_vault",
-        "travelersbackpack:pickup_upgrade",
-        "travelersbackpack:furnace_upgrade"
+        "create:item_vault"
       ],
       "tokens": []
     },
@@ -763,7 +799,6 @@
       ],
       "seconds": 0,
       "items": [
-        "siftec:wormhole_gateway",
         "create:flywheel",
         "siftec:biomass"
       ],
@@ -1191,9 +1226,7 @@
         "create:speedometer",
         "create:stressometer"
       ],
-      "tokens": [
-        "belt:60"
-      ]
+      "tokens": []
     },
     {
       "id": "field_research",
@@ -1235,9 +1268,7 @@
         "siftec:object_scanner_core",
         "siftec:incomplete_object_scanner"
       ],
-      "tokens": [
-        "backpack:iron"
-      ]
+      "tokens": []
     },
     {
       "id": "part_assembly",
@@ -1292,9 +1323,7 @@
         "create:mechanical_harvester",
         "create:mechanical_plough",
         "create:tree_fertilizer",
-        "siftec:solid_biofuel",
-        "travelersbackpack:feeding_upgrade",
-        "travelersbackpack:smoker_upgrade"
+        "siftec:solid_biofuel"
       ],
       "tokens": []
     },
@@ -1441,10 +1470,6 @@
         "create:mechanical_pump",
         "create:fluid_tank",
         "create:hose_pulley",
-        "travelersbackpack:tanks_upgrade",
-        "travelersbackpack:backpack_tank",
-        "travelersbackpack:hose_nozzle",
-        "travelersbackpack:hose",
         "create_new_age:generator_coil",
         "create_new_age:carbon_brushes",
         "create_new_age:redstone_magnet",
@@ -1488,12 +1513,10 @@
       "seconds": 240,
       "items": [
         "create:cart_assembler",
-        "create:rope_pulley",
+        "create:portable_storage_interface",
         "create:minecart_coupling"
       ],
-      "tokens": [
-        "backpack:gold"
-      ]
+      "tokens": []
     },
     {
       "id": "basic_steel_production",
@@ -1527,8 +1550,7 @@
         "cgs:steel_nugget",
         "cgs:steel_block",
         "cgs:steel_sheet",
-        "cgs:nail_steel",
-        "travelersbackpack:blast_furnace_upgrade"
+        "cgs:nail_steel"
       ],
       "tokens": []
     },
@@ -1560,8 +1582,7 @@
         "cgs:axe_iron",
         "cgs:axe_diamond",
         "cgs:axe_netherite",
-        "cgs:spear",
-        "travelersbackpack:magnet_upgrade"
+        "cgs:spear"
       ],
       "tokens": []
     },
@@ -1669,24 +1690,17 @@
       ],
       "seconds": 300,
       "items": [
-        "create:windmill_bearing",
-        "create:sail_frame",
         "create:mechanical_piston",
         "create:sticky_mechanical_piston",
         "create:mechanical_bearing",
         "create:clockwork_bearing",
-        "create:gantry_carriage",
-        "create:gantry_shaft",
-        "create:elevator_pulley",
         "create:linear_chassis",
         "create:radial_chassis",
         "create:super_glue",
         "create:sticker",
         "create:contraption_controls",
-        "create:white_sail",
         "create:piston_extension_pole",
         "create:secondary_linear_chassis",
-        "create:elevator_contact",
         "create_new_age:advanced_motor",
         "create_new_age:advanced_motor_extension",
         "create_new_age:basic_energiser",
@@ -1705,7 +1719,7 @@
       "tokens": []
     },
     {
-      "id": "hypertubes",
+      "id": "contraption_transit",
       "tier": 4,
       "cost": [
         {
@@ -1723,12 +1737,11 @@
       ],
       "seconds": 600,
       "items": [
-        "create_hypertube:hypertube",
-        "create_hypertube:hypertube_entrance",
-        "create_hypertube:hypertube_accelerator",
-        "create_hypertube:hypertube_funnel",
-        "create_hypertube:redstone_detector_tube_attachment",
-        "create_hypertube:tube_scanner_attachment"
+        "create:elevator_pulley",
+        "create:rope_pulley",
+        "create:gantry_shaft",
+        "create:gantry_carriage",
+        "create:elevator_contact"
       ],
       "tokens": []
     },
@@ -1755,9 +1768,7 @@
         "siftec:jetpack_core",
         "siftec:incomplete_jetpack"
       ],
-      "tokens": [
-        "backpack:diamond"
-      ]
+      "tokens": []
     },
     {
       "id": "oil_processing",
@@ -1894,9 +1905,7 @@
         "createdieselgenerators:engine_turbocharger",
         "createdieselgenerators:lighter"
       ],
-      "tokens": [
-        "scanner:zinc"
-      ]
+      "tokens": []
     },
     {
       "id": "industrial_manufacturing",
@@ -1935,7 +1944,6 @@
         "siftec:modular_engine",
         "siftec:modular_engine_core",
         "create:crafter_slot_cover",
-        "create_hypertube:hypertube_junction",
         "cgs:nailgun_splitter",
         "create_new_age:reinforced_motor",
         "create_new_age:reinforced_energiser",
@@ -1972,7 +1980,6 @@
         "create:track_station",
         "create:controls",
         "create:schedule",
-        "create:portable_storage_interface",
         "create:mechanical_roller",
         "create:railway_casing",
         "create:train_door",
@@ -1994,6 +2001,30 @@
         "create:green_postbox",
         "create:red_postbox",
         "create:black_postbox"
+      ],
+      "tokens": []
+    },
+    {
+      "id": "railway_signalling",
+      "tier": 6,
+      "cost": [
+        {
+          "item": "siftec:computer",
+          "count": 50
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 400
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 1000
+        }
+      ],
+      "seconds": 300,
+      "items": [
+        "create:track_signal",
+        "create:track_observer"
       ],
       "tokens": []
     },
@@ -2043,30 +2074,6 @@
       ],
       "seconds": 600,
       "items": [],
-      "tokens": []
-    },
-    {
-      "id": "railway_signalling",
-      "tier": 6,
-      "cost": [
-        {
-          "item": "siftec:computer",
-          "count": 50
-        },
-        {
-          "item": "siftec:steel_pipe",
-          "count": 400
-        },
-        {
-          "item": "create:copper_sheet",
-          "count": 1000
-        }
-      ],
-      "seconds": 300,
-      "items": [
-        "create:track_signal",
-        "create:track_observer"
-      ],
       "tokens": []
     },
     {
@@ -2150,9 +2157,7 @@
         "siftec:iodine_infused_filter",
         "siftec:iodine_infused_filter_core",
         "siftec:hazmat_suit_core",
-        "siftec:incomplete_hazmat_suit",
-        "travelersbackpack:lantern_upgrade",
-        "travelersbackpack:jukebox_upgrade"
+        "siftec:incomplete_hazmat_suit"
       ],
       "tokens": []
     },
@@ -2183,9 +2188,7 @@
         "siftec:hover_pack_core",
         "siftec:incomplete_hover_pack"
       ],
-      "tokens": [
-        "backpack:netherite"
-      ]
+      "tokens": []
     },
     {
       "id": "control_system_development",
@@ -2267,6 +2270,46 @@
       ],
       "tokens": [
         "scanner:sulfur"
+      ]
+    },
+    {
+      "id": "nuclear_power",
+      "tier": 8,
+      "cost": [
+        {
+          "item": "siftec:supercomputer",
+          "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 200
+        },
+        {
+          "item": "siftec:cable",
+          "count": 1000
+        },
+        {
+          "item": "#siftec:stones",
+          "count": 2000
+        }
+      ],
+      "seconds": 900,
+      "items": [
+        "siftec:electromagnetic_control_rod",
+        "siftec:encased_uranium_cell",
+        "siftec:incomplete_uranium_fuel_rod",
+        "siftec:magnetic_field_generator",
+        "siftec:uranium_fuel_rod",
+        "siftec:uranium_fuel_rod_core",
+        "create_new_age:reactor_casing",
+        "create_new_age:incomplete_reactor_casing",
+        "create_new_age:reactor_glass",
+        "create_new_age:reactor_rod",
+        "create_new_age:reactor_fuel_acceptor",
+        "create_new_age:reactor_heat_vent"
+      ],
+      "tokens": [
+        "scanner:uranium"
       ]
     },
     {
@@ -2367,46 +2410,6 @@
         "siftec:pressure_conversion_cube"
       ],
       "tokens": []
-    },
-    {
-      "id": "nuclear_power",
-      "tier": 8,
-      "cost": [
-        {
-          "item": "siftec:supercomputer",
-          "count": 50
-        },
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 200
-        },
-        {
-          "item": "siftec:cable",
-          "count": 1000
-        },
-        {
-          "item": "#siftec:stones",
-          "count": 2000
-        }
-      ],
-      "seconds": 900,
-      "items": [
-        "siftec:electromagnetic_control_rod",
-        "siftec:encased_uranium_cell",
-        "siftec:incomplete_uranium_fuel_rod",
-        "siftec:magnetic_field_generator",
-        "siftec:uranium_fuel_rod",
-        "siftec:uranium_fuel_rod_core",
-        "create_new_age:reactor_casing",
-        "create_new_age:incomplete_reactor_casing",
-        "create_new_age:reactor_glass",
-        "create_new_age:reactor_rod",
-        "create_new_age:reactor_fuel_acceptor",
-        "create_new_age:reactor_heat_vent"
-      ],
-      "tokens": [
-        "scanner:uranium"
-      ]
     },
     {
       "id": "matter_conversion",
@@ -2699,194 +2702,225 @@
     "create_new_age:thorium_ore",
     "create_new_age:corium",
     "create_new_age:solid_corium",
-    "create_new_age:incomplete_enchanted_golden_apple",
-    "travelersbackpack:bat",
-    "travelersbackpack:bee",
-    "travelersbackpack:blaze",
-    "travelersbackpack:bookshelf",
-    "travelersbackpack:cactus",
-    "travelersbackpack:cake",
-    "travelersbackpack:chicken",
-    "travelersbackpack:coal",
-    "travelersbackpack:cow",
-    "travelersbackpack:creeper",
-    "travelersbackpack:diamond",
-    "travelersbackpack:dragon",
-    "travelersbackpack:emerald",
-    "travelersbackpack:end",
-    "travelersbackpack:enderman",
-    "travelersbackpack:fox",
-    "travelersbackpack:ghast",
-    "travelersbackpack:gold",
-    "travelersbackpack:hay",
-    "travelersbackpack:horse",
-    "travelersbackpack:iron",
-    "travelersbackpack:iron_golem",
-    "travelersbackpack:lapis",
-    "travelersbackpack:magma_cube",
-    "travelersbackpack:melon",
-    "travelersbackpack:nether",
-    "travelersbackpack:netherite",
-    "travelersbackpack:ocelot",
-    "travelersbackpack:pig",
-    "travelersbackpack:pumpkin",
-    "travelersbackpack:quartz",
-    "travelersbackpack:redstone",
-    "travelersbackpack:sandstone",
-    "travelersbackpack:sheep",
-    "travelersbackpack:skeleton",
-    "travelersbackpack:snow",
-    "travelersbackpack:spider",
-    "travelersbackpack:sponge",
-    "travelersbackpack:squid",
-    "travelersbackpack:standard",
-    "travelersbackpack:villager",
-    "travelersbackpack:warden",
-    "travelersbackpack:wither",
-    "travelersbackpack:wolf",
-    "travelersbackpack:iron_tier_upgrade",
-    "travelersbackpack:gold_tier_upgrade",
-    "travelersbackpack:diamond_tier_upgrade",
-    "travelersbackpack:netherite_tier_upgrade",
-    "travelersbackpack:white_sleeping_bag",
-    "travelersbackpack:orange_sleeping_bag",
-    "travelersbackpack:magenta_sleeping_bag",
-    "travelersbackpack:light_blue_sleeping_bag",
-    "travelersbackpack:yellow_sleeping_bag",
-    "travelersbackpack:lime_sleeping_bag",
-    "travelersbackpack:pink_sleeping_bag",
-    "travelersbackpack:gray_sleeping_bag",
-    "travelersbackpack:light_gray_sleeping_bag",
-    "travelersbackpack:cyan_sleeping_bag",
-    "travelersbackpack:purple_sleeping_bag",
-    "travelersbackpack:blue_sleeping_bag",
-    "travelersbackpack:brown_sleeping_bag",
-    "travelersbackpack:green_sleeping_bag",
-    "travelersbackpack:red_sleeping_bag",
-    "travelersbackpack:black_sleeping_bag"
+    "create_new_age:incomplete_enchanted_golden_apple"
   ],
   "trees": [
     {
       "id": "megafauna",
       "icon": "minecraft:rotten_flesh",
       "nodes": [
-        "mam_megafauna_1",
-        "mam_megafauna_2",
-        "mam_megafauna_3",
-        "mam_megafauna_4",
-        "mam_megafauna_5"
+        "mam_megafauna_zombie_research",
+        "mam_megafauna_skeleton_research",
+        "mam_megafauna_spider_research",
+        "mam_megafauna_creeper_research",
+        "mam_megafauna_bio_organic_properties",
+        "mam_megafauna_protein_inhaler",
+        "mam_megafauna_structural_analysis",
+        "mam_megafauna_copper_backtank",
+        "mam_megafauna_the_rebar_gun",
+        "mam_megafauna_hostile_organism_detection",
+        "mam_megafauna_undying_biology",
+        "mam_megafauna_ender_analysis"
+      ],
+      "triggers": [
+        "minecraft:rotten_flesh",
+        "minecraft:bone",
+        "minecraft:spider_eye",
+        "minecraft:gunpowder"
       ]
     },
     {
       "id": "caterium",
-      "icon": "create:raw_zinc",
+      "icon": "create:crushed_raw_zinc",
       "nodes": [
-        "mam_caterium_1",
-        "mam_caterium_2",
-        "mam_caterium_3",
-        "mam_caterium_4",
-        "mam_caterium_5",
-        "mam_caterium_6",
-        "mam_caterium_7",
-        "mam_caterium_8",
-        "mam_caterium_9",
-        "mam_caterium_10"
+        "mam_caterium_caterium",
+        "mam_caterium_brass",
+        "mam_caterium_quickwire",
+        "mam_caterium_power_line_riding",
+        "mam_caterium_caterium_electronics",
+        "mam_caterium_stun_rebar",
+        "mam_caterium_power_poles_mk_2",
+        "mam_caterium_ai_limiter",
+        "mam_caterium_mechanical_arm",
+        "mam_caterium_smart_splitter",
+        "mam_caterium_power_switch",
+        "mam_caterium_high_speed_connector",
+        "mam_caterium_power_poles_mk_3",
+        "mam_caterium_priority_power_switch",
+        "mam_caterium_programmable_splitter",
+        "mam_caterium_windmills"
+      ],
+      "triggers": [
+        "create:crushed_raw_zinc"
       ]
     },
     {
       "id": "mycelia",
       "icon": "minecraft:brown_mushroom",
       "nodes": [
-        "mam_mycelia_1",
-        "mam_mycelia_2",
-        "mam_mycelia_3",
-        "mam_mycelia_4",
-        "mam_mycelia_5",
-        "mam_mycelia_6"
+        "mam_mycelia_mycelia",
+        "mam_mycelia_fabric",
+        "mam_mycelia_medical_properties",
+        "mam_mycelia_parachute",
+        "mam_mycelia_diving_gear",
+        "mam_mycelia_synthetic_polyester_fabric",
+        "mam_mycelia_gas_mask",
+        "mam_mycelia_toxic_cellular_modification",
+        "mam_mycelia_vitamin_inhaler",
+        "mam_mycelia_therapeutic_inhaler",
+        "mam_mycelia_wingsuit_research",
+        "mam_mycelia_elytra_backpack"
+      ],
+      "triggers": [
+        "#siftec:mycelia"
       ]
     },
     {
       "id": "nutrients",
       "icon": "minecraft:sweet_berries",
       "nodes": [
-        "mam_nutrients_1",
-        "mam_nutrients_2",
-        "mam_nutrients_3",
-        "mam_nutrients_4",
-        "mam_nutrients_5"
-      ]
-    },
-    {
-      "id": "slugs",
-      "icon": "siftec:blue_power_slug",
-      "nodes": [
-        "mam_slugs_1",
-        "mam_slugs_2",
-        "mam_slugs_3",
-        "mam_slugs_4",
-        "mam_slugs_5"
+        "mam_nutrients_sweet_berry_research",
+        "mam_nutrients_apple_research",
+        "mam_nutrients_glow_berry_research",
+        "mam_nutrients_bulk_fermentation",
+        "mam_nutrients_preserved_foods",
+        "mam_nutrients_cider_and_mead",
+        "mam_nutrients_automated_cooking",
+        "mam_nutrients_nutritional_inhaler"
+      ],
+      "triggers": [
+        "minecraft:sweet_berries",
+        "minecraft:apple",
+        "minecraft:glow_berries"
       ]
     },
     {
       "id": "quartz",
       "icon": "minecraft:quartz",
       "nodes": [
-        "mam_quartz_1",
-        "mam_quartz_2",
-        "mam_quartz_3",
-        "mam_quartz_4",
-        "mam_quartz_5",
-        "mam_quartz_6",
-        "mam_quartz_7",
-        "mam_quartz_8"
+        "mam_quartz_quartz",
+        "mam_quartz_quartz_crystals",
+        "mam_quartz_silica",
+        "mam_quartz_blade_runners",
+        "mam_quartz_shatter_rebar",
+        "mam_quartz_crystal_oscillator",
+        "mam_quartz_display_systems",
+        "mam_quartz_radar_technology",
+        "mam_quartz_tidal_research",
+        "mam_quartz_heart_of_the_sea"
+      ],
+      "triggers": [
+        "minecraft:quartz"
       ]
     },
     {
       "id": "sulfur",
       "icon": "cgs:sulfur",
       "nodes": [
-        "mam_sulfur_1",
-        "mam_sulfur_2",
-        "mam_sulfur_3",
-        "mam_sulfur_4",
-        "mam_sulfur_5",
-        "mam_sulfur_6",
-        "mam_sulfur_7",
-        "mam_sulfur_8",
-        "mam_sulfur_9",
-        "mam_sulfur_10",
-        "mam_sulfur_11"
+        "mam_sulfur_sulfur",
+        "mam_sulfur_black_powder",
+        "mam_sulfur_smokeless_powder",
+        "mam_sulfur_flintlock",
+        "mam_sulfur_ignimbrite",
+        "mam_sulfur_explosives",
+        "mam_sulfur_the_rifle",
+        "mam_sulfur_heavy_weapons",
+        "mam_sulfur_compacted_coal",
+        "mam_sulfur_experimental_power_generation",
+        "mam_sulfur_turbofuel",
+        "mam_sulfur_rocket_fuel",
+        "mam_sulfur_ionized_fuel",
+        "mam_sulfur_geothermal_power"
+      ],
+      "triggers": [
+        "cgs:sulfur"
       ]
     },
     {
       "id": "alien",
       "icon": "siftec:mercer_sphere",
       "nodes": [
-        "mam_alien_1",
-        "mam_alien_2",
-        "mam_alien_3",
-        "mam_alien_4",
-        "mam_alien_5",
-        "mam_alien_6",
-        "mam_alien_7",
-        "mam_alien_8",
-        "mam_alien_9",
-        "mam_alien_10",
-        "mam_alien_11"
+        "mam_alien_mercer_sphere_analysis",
+        "mam_alien_somersloop_analysis",
+        "mam_alien_sam_analysis",
+        "mam_alien_sam_reanimation",
+        "mam_alien_sam_fluctuator",
+        "mam_alien_dimensional_depot",
+        "mam_alien_depot_expansion_200",
+        "mam_alien_upload_upgrade_30_min",
+        "mam_alien_manual_depot_uploader",
+        "mam_alien_depot_expansion_300",
+        "mam_alien_upload_upgrade_60_min",
+        "mam_alien_depot_expansion_400",
+        "mam_alien_upload_upgrade_120_min",
+        "mam_alien_depot_expansion_500",
+        "mam_alien_upload_upgrade_240_min",
+        "mam_alien_alien_energy_harvesting",
+        "mam_alien_power_augmenter",
+        "mam_alien_alien_power_matrix",
+        "mam_alien_pocket_storage",
+        "mam_alien_netherite_synthesis"
+      ],
+      "triggers": [
+        "siftec:mercer_sphere",
+        "siftec:somersloop",
+        "siftec:sam"
       ]
     }
   ],
   "milestones_mam": [
     {
-      "id": "mam_megafauna_1",
+      "id": "mam_megafauna_zombie_research",
       "tree": "megafauna",
       "cost": [
         {
           "item": "minecraft:rotten_flesh",
-          "count": 5
+          "count": 1
         }
       ],
-      "seconds": 30,
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_megafauna_skeleton_research",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "minecraft:bone",
+          "count": 1
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_megafauna_spider_research",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "minecraft:spider_eye",
+          "count": 1
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_megafauna_creeper_research",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "minecraft:gunpowder",
+          "count": 1
+        }
+      ],
+      "seconds": 3,
       "items": [
         "siftec:alien_protein"
       ],
@@ -2894,84 +2928,51 @@
       "needs": []
     },
     {
-      "id": "mam_megafauna_2",
+      "id": "mam_megafauna_bio_organic_properties",
       "tree": "megafauna",
       "cost": [
         {
-          "item": "minecraft:bone",
-          "count": 10
-        },
-        {
-          "item": "minecraft:string",
-          "count": 10
+          "item": "siftec:alien_protein",
+          "count": 5
         }
       ],
-      "seconds": 60,
+      "seconds": 3,
       "items": [
         "siftec:alien_dna_capsule"
       ],
       "tokens": [],
       "needs": [
-        "mam_megafauna_1"
+        "mam_megafauna_zombie_research|mam_megafauna_skeleton_research|mam_megafauna_spider_research|mam_megafauna_creeper_research"
       ]
     },
     {
-      "id": "mam_megafauna_3",
+      "id": "mam_megafauna_protein_inhaler",
       "tree": "megafauna",
       "cost": [
         {
-          "item": "siftec:reinforced_iron_plate",
-          "count": 10
+          "item": "siftec:alien_protein",
+          "count": 2
         },
         {
-          "item": "siftec:iron_rod",
-          "count": 25
+          "item": "minecraft:apple",
+          "count": 20
         },
         {
-          "item": "siftec:screw",
+          "item": "siftec:rotor",
           "count": 50
         }
       ],
-      "seconds": 120,
+      "seconds": 3,
       "items": [
-        "cgs:nailgun",
-        "create:copper_backtank",
-        "siftec:iron_rebar",
-        "cgs:nail"
+        "siftec:protein_inhaler"
       ],
       "tokens": [],
       "needs": [
-        "mam_megafauna_2"
+        "mam_megafauna_bio_organic_properties"
       ]
     },
     {
-      "id": "mam_megafauna_4",
-      "tree": "megafauna",
-      "cost": [
-        {
-          "item": "minecraft:spider_eye",
-          "count": 10
-        },
-        {
-          "item": "minecraft:gunpowder",
-          "count": 10
-        },
-        {
-          "item": "siftec:wire",
-          "count": 25
-        }
-      ],
-      "seconds": 120,
-      "items": [],
-      "tokens": [
-        "object:mobs"
-      ],
-      "needs": [
-        "mam_megafauna_3"
-      ]
-    },
-    {
-      "id": "mam_megafauna_5",
+      "id": "mam_megafauna_structural_analysis",
       "tree": "megafauna",
       "cost": [
         {
@@ -2979,26 +2980,147 @@
           "count": 5
         },
         {
-          "item": "minecraft:ender_pearl",
-          "count": 3
-        },
-        {
-          "item": "siftec:cable",
-          "count": 25
+          "item": "siftec:iron_rod",
+          "count": 100
         }
       ],
-      "seconds": 180,
-      "items": [
-        "travelersbackpack:void_upgrade",
-        "travelersbackpack:refill_upgrade"
-      ],
+      "seconds": 3,
+      "items": [],
       "tokens": [],
       "needs": [
-        "mam_megafauna_4"
+        "mam_megafauna_bio_organic_properties"
       ]
     },
     {
-      "id": "mam_caterium_1",
+      "id": "mam_megafauna_copper_backtank",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "create:copper_sheet",
+          "count": 50
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 25
+        },
+        {
+          "item": "siftec:alien_dna_capsule",
+          "count": 5
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:copper_backtank"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_megafauna_structural_analysis"
+      ]
+    },
+    {
+      "id": "mam_megafauna_the_rebar_gun",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "siftec:rotor",
+          "count": 25
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 50
+        },
+        {
+          "item": "siftec:screw",
+          "count": 500
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "cgs:nailgun",
+        "siftec:iron_rebar",
+        "cgs:nail"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_megafauna_copper_backtank"
+      ]
+    },
+    {
+      "id": "mam_megafauna_hostile_organism_detection",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "siftec:alien_dna_capsule",
+          "count": 10
+        },
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 5
+        },
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 5
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "object:mobs"
+      ],
+      "needs": [
+        "mam_megafauna_structural_analysis"
+      ]
+    },
+    {
+      "id": "mam_megafauna_undying_biology",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "siftec:alien_dna_capsule",
+          "count": 20
+        },
+        {
+          "item": "minecraft:emerald",
+          "count": 10
+        },
+        {
+          "item": "minecraft:gold_block",
+          "count": 4
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:totem_of_undying_core",
+        "siftec:incomplete_totem_of_undying"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_megafauna_bio_organic_properties"
+      ]
+    },
+    {
+      "id": "mam_megafauna_ender_analysis",
+      "tree": "megafauna",
+      "cost": [
+        {
+          "item": "minecraft:ender_pearl",
+          "count": 16
+        },
+        {
+          "item": "siftec:alien_protein",
+          "count": 20
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_megafauna_bio_organic_properties",
+        "mam_quartz_quartz_crystals"
+      ]
+    },
+    {
+      "id": "mam_caterium_caterium",
       "tree": "caterium",
       "cost": [
         {
@@ -3006,7 +3128,23 @@
           "count": 10
         }
       ],
-      "seconds": 30,
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "scanner:zinc"
+      ],
+      "needs": []
+    },
+    {
+      "id": "mam_caterium_brass",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "create:crushed_raw_zinc",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
       "items": [
         "siftec:brass_blend",
         "create:brass_ingot",
@@ -3024,106 +3162,30 @@
         "create:brass_encased_large_cogwheel"
       ],
       "tokens": [],
-      "needs": []
+      "needs": [
+        "mam_caterium_caterium"
+      ]
     },
     {
-      "id": "mam_caterium_2",
+      "id": "mam_caterium_quickwire",
       "tree": "caterium",
       "cost": [
         {
           "item": "create:brass_ingot",
-          "count": 10
+          "count": 50
         }
       ],
-      "seconds": 60,
+      "seconds": 3,
       "items": [
         "siftec:quickwire"
       ],
       "tokens": [],
       "needs": [
-        "mam_caterium_1"
+        "mam_caterium_brass"
       ]
     },
     {
-      "id": "mam_caterium_3",
-      "tree": "caterium",
-      "cost": [
-        {
-          "item": "siftec:quickwire",
-          "count": 50
-        }
-      ],
-      "seconds": 120,
-      "items": [
-        "create:electron_tube",
-        "create:precision_mechanism",
-        "create:brass_funnel",
-        "create:brass_tunnel",
-        "create:smart_chute",
-        "create:filter",
-        "create:attribute_filter",
-        "create:smart_fluid_pipe",
-        "create:controller_rail",
-        "create:content_observer",
-        "create:stockpile_switch",
-        "createdieselgenerators:entity_filter"
-      ],
-      "tokens": [],
-      "needs": [
-        "mam_caterium_2"
-      ]
-    },
-    {
-      "id": "mam_caterium_4",
-      "tree": "caterium",
-      "cost": [
-        {
-          "item": "siftec:quickwire",
-          "count": 100
-        },
-        {
-          "item": "create:copper_sheet",
-          "count": 50
-        }
-      ],
-      "seconds": 180,
-      "items": [
-        "create:mechanical_arm",
-        "siftec:ai_limiter"
-      ],
-      "tokens": [],
-      "needs": [
-        "mam_caterium_3"
-      ]
-    },
-    {
-      "id": "mam_caterium_5",
-      "tree": "caterium",
-      "cost": [
-        {
-          "item": "siftec:quickwire",
-          "count": 50
-        },
-        {
-          "item": "siftec:rotor",
-          "count": 25
-        }
-      ],
-      "seconds": 120,
-      "items": [
-        "create:clutch",
-        "create:gearshift",
-        "create:sequenced_gearshift",
-        "create:adjustable_chain_gearshift",
-        "siftec:speed_governor"
-      ],
-      "tokens": [],
-      "needs": [
-        "mam_caterium_2"
-      ]
-    },
-    {
-      "id": "mam_caterium_6",
+      "id": "mam_caterium_power_line_riding",
       "tree": "caterium",
       "cost": [
         {
@@ -3135,45 +3197,40 @@
           "count": 50
         }
       ],
-      "seconds": 120,
+      "seconds": 3,
       "items": [],
       "tokens": [
         "zipline"
       ],
       "needs": [
-        "mam_caterium_2"
+        "mam_caterium_quickwire"
       ]
     },
     {
-      "id": "mam_caterium_7",
+      "id": "mam_caterium_caterium_electronics",
       "tree": "caterium",
       "cost": [
         {
           "item": "siftec:quickwire",
-          "count": 500
-        },
-        {
-          "item": "siftec:plastic",
-          "count": 25
-        },
-        {
-          "item": "siftec:computer",
-          "count": 10
+          "count": 100
         }
       ],
-      "seconds": 300,
+      "seconds": 3,
       "items": [
-        "siftec:high_speed_connector",
-        "siftec:high_speed_connector_core",
-        "siftec:incomplete_high_speed_connector"
+        "create:electron_tube",
+        "create:precision_mechanism",
+        "create:smart_fluid_pipe",
+        "create:controller_rail",
+        "create:content_observer",
+        "create:stockpile_switch"
       ],
       "tokens": [],
       "needs": [
-        "mam_caterium_4"
+        "mam_caterium_quickwire"
       ]
     },
     {
-      "id": "mam_caterium_8",
+      "id": "mam_caterium_stun_rebar",
       "tree": "caterium",
       "cost": [
         {
@@ -3191,11 +3248,12 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_caterium_2"
+        "mam_caterium_quickwire",
+        "mam_megafauna_the_rebar_gun"
       ]
     },
     {
-      "id": "mam_caterium_9",
+      "id": "mam_caterium_power_poles_mk_2",
       "tree": "caterium",
       "cost": [
         {
@@ -3207,11 +3265,131 @@
       "items": [],
       "tokens": [],
       "needs": [
-        "mam_caterium_2"
+        "mam_caterium_quickwire"
       ]
     },
     {
-      "id": "mam_caterium_10",
+      "id": "mam_caterium_ai_limiter",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 200
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:ai_limiter"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_caterium_electronics"
+      ]
+    },
+    {
+      "id": "mam_caterium_mechanical_arm",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:ai_limiter",
+          "count": 25
+        },
+        {
+          "item": "create:precision_mechanism",
+          "count": 25
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:mechanical_arm"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_ai_limiter"
+      ]
+    },
+    {
+      "id": "mam_caterium_smart_splitter",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:ai_limiter",
+          "count": 10
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:brass_tunnel",
+        "create:brass_funnel",
+        "create:filter",
+        "createdieselgenerators:entity_filter"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_ai_limiter"
+      ]
+    },
+    {
+      "id": "mam_caterium_power_switch",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:steel_beam",
+          "count": 100
+        },
+        {
+          "item": "siftec:ai_limiter",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:clutch",
+        "create:gearshift"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_ai_limiter"
+      ]
+    },
+    {
+      "id": "mam_caterium_high_speed_connector",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 500
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:high_speed_connector",
+        "siftec:high_speed_connector_core",
+        "siftec:incomplete_high_speed_connector"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_ai_limiter"
+      ]
+    },
+    {
+      "id": "mam_caterium_power_poles_mk_3",
       "tree": "caterium",
       "cost": [
         {
@@ -3227,11 +3405,92 @@
       "items": [],
       "tokens": [],
       "needs": [
-        "mam_caterium_7"
+        "mam_caterium_high_speed_connector",
+        "mam_caterium_power_poles_mk_2"
       ]
     },
     {
-      "id": "mam_mycelia_1",
+      "id": "mam_caterium_priority_power_switch",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 25
+        },
+        {
+          "item": "siftec:quickwire",
+          "count": 500
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:sequenced_gearshift",
+        "create:adjustable_chain_gearshift",
+        "siftec:speed_governor"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_power_switch",
+        "mam_caterium_high_speed_connector"
+      ]
+    },
+    {
+      "id": "mam_caterium_programmable_splitter",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:ai_limiter",
+          "count": 100
+        },
+        {
+          "item": "siftec:computer",
+          "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:smart_chute",
+        "create:attribute_filter"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_smart_splitter"
+      ]
+    },
+    {
+      "id": "mam_caterium_windmills",
+      "tree": "caterium",
+      "cost": [
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 100
+        },
+        {
+          "item": "siftec:quickwire",
+          "count": 1000
+        },
+        {
+          "item": "siftec:motor",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:windmill_bearing",
+        "create:sail_frame",
+        "create:white_sail"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_caterium_high_speed_connector"
+      ]
+    },
+    {
+      "id": "mam_mycelia_mycelia",
       "tree": "mycelia",
       "cost": [
         {
@@ -3239,13 +3498,13 @@
           "count": 5
         }
       ],
-      "seconds": 30,
+      "seconds": 3,
       "items": [],
       "tokens": [],
       "needs": []
     },
     {
-      "id": "mam_mycelia_2",
+      "id": "mam_mycelia_fabric",
       "tree": "mycelia",
       "cost": [
         {
@@ -3255,23 +3514,39 @@
         {
           "item": "siftec:biomass",
           "count": 100
-        },
-        {
-          "item": "siftec:rotor",
-          "count": 10
         }
       ],
-      "seconds": 60,
+      "seconds": 3,
       "items": [
         "siftec:fabric"
       ],
       "tokens": [],
       "needs": [
-        "mam_mycelia_1"
+        "mam_mycelia_mycelia"
       ]
     },
     {
-      "id": "mam_mycelia_3",
+      "id": "mam_mycelia_medical_properties",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "#siftec:mycelia",
+          "count": 25
+        },
+        {
+          "item": "siftec:stator",
+          "count": 10
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_mycelia"
+      ]
+    },
+    {
+      "id": "mam_mycelia_parachute",
       "tree": "mycelia",
       "cost": [
         {
@@ -3280,10 +3555,10 @@
         },
         {
           "item": "siftec:cable",
-          "count": 10
+          "count": 50
         }
       ],
-      "seconds": 120,
+      "seconds": 3,
       "items": [
         "siftec:parachute",
         "siftec:parachute_core",
@@ -3291,23 +3566,23 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_mycelia_2"
+        "mam_mycelia_fabric"
       ]
     },
     {
-      "id": "mam_mycelia_4",
+      "id": "mam_mycelia_diving_gear",
       "tree": "mycelia",
       "cost": [
         {
           "item": "siftec:fabric",
-          "count": 10
+          "count": 50
         },
         {
-          "item": "create:copper_sheet",
-          "count": 10
+          "item": "siftec:rotor",
+          "count": 100
         }
       ],
-      "seconds": 120,
+      "seconds": 3,
       "items": [
         "create:copper_diving_helmet",
         "create:copper_diving_boots",
@@ -3317,42 +3592,12 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_mycelia_2"
+        "mam_mycelia_fabric",
+        "mam_megafauna_copper_backtank"
       ]
     },
     {
-      "id": "mam_mycelia_5",
-      "tree": "mycelia",
-      "cost": [
-        {
-          "item": "siftec:fabric",
-          "count": 50
-        },
-        {
-          "item": "siftec:rubber",
-          "count": 25
-        },
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 5
-        }
-      ],
-      "seconds": 180,
-      "items": [
-        "siftec:gas_mask",
-        "siftec:gas_filter",
-        "siftec:gas_filter_core",
-        "siftec:incomplete_gas_filter",
-        "siftec:gas_mask_core",
-        "siftec:incomplete_gas_mask"
-      ],
-      "tokens": [],
-      "needs": [
-        "mam_mycelia_2"
-      ]
-    },
-    {
-      "id": "mam_mycelia_6",
+      "id": "mam_mycelia_synthetic_polyester_fabric",
       "tree": "mycelia",
       "cost": [
         {
@@ -3368,323 +3613,384 @@
       "items": [],
       "tokens": [],
       "needs": [
-        "mam_mycelia_2"
+        "mam_mycelia_fabric"
       ]
     },
     {
-      "id": "mam_nutrients_1",
-      "tree": "nutrients",
+      "id": "mam_mycelia_gas_mask",
+      "tree": "mycelia",
       "cost": [
         {
-          "item": "#c:crops",
-          "count": 20
+          "item": "minecraft:coal",
+          "count": 10
         },
         {
-          "item": "minecraft:sugar",
+          "item": "siftec:fabric",
+          "count": 50
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:gas_mask",
+        "siftec:gas_filter",
+        "siftec:gas_filter_core",
+        "siftec:incomplete_gas_filter",
+        "siftec:gas_mask_core",
+        "siftec:incomplete_gas_mask"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_fabric"
+      ]
+    },
+    {
+      "id": "mam_mycelia_toxic_cellular_modification",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "cgs:frag_grenade",
+          "count": 10
+        },
+        {
+          "item": "#siftec:mycelia",
+          "count": 100
+        },
+        {
+          "item": "siftec:biomass",
+          "count": 200
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:toxic_shot"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_fabric",
+        "mam_sulfur_explosives"
+      ]
+    },
+    {
+      "id": "mam_mycelia_vitamin_inhaler",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "#siftec:mycelia",
+          "count": 10
+        },
+        {
+          "item": "minecraft:sweet_berries",
+          "count": 5
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:vitamin_inhaler"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_medical_properties"
+      ]
+    },
+    {
+      "id": "mam_mycelia_therapeutic_inhaler",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "#siftec:mycelia",
+          "count": 15
+        },
+        {
+          "item": "siftec:alien_protein",
+          "count": 1
+        },
+        {
+          "item": "minecraft:glow_berries",
+          "count": 1
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:therapeutic_inhaler"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_medical_properties"
+      ]
+    },
+    {
+      "id": "mam_mycelia_wingsuit_research",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "minecraft:phantom_membrane",
+          "count": 8
+        },
+        {
+          "item": "siftec:fabric",
+          "count": 100
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:elytra_core",
+        "siftec:incomplete_elytra"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_parachute"
+      ]
+    },
+    {
+      "id": "mam_mycelia_elytra_backpack",
+      "tree": "mycelia",
+      "cost": [
+        {
+          "item": "minecraft:elytra",
+          "count": 2
+        },
+        {
+          "item": "create:precision_mechanism",
+          "count": 25
+        },
+        {
+          "item": "siftec:high_speed_connector",
           "count": 10
         }
       ],
-      "seconds": 60,
+      "seconds": 3,
+      "items": [
+        "siftec:elytra_backpack",
+        "siftec:elytra_backpack_core",
+        "siftec:incomplete_elytra_backpack"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_mycelia_wingsuit_research",
+        "mam_megafauna_copper_backtank"
+      ]
+    },
+    {
+      "id": "mam_nutrients_sweet_berry_research",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "minecraft:sweet_berries",
+          "count": 2
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_nutrients_apple_research",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "minecraft:apple",
+          "count": 5
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_nutrients_glow_berry_research",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "minecraft:glow_berries",
+          "count": 1
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": []
+    },
+    {
+      "id": "mam_nutrients_bulk_fermentation",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "siftec:modular_frame",
+          "count": 25
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 50
+        },
+        {
+          "item": "siftec:wire",
+          "count": 500
+        }
+      ],
+      "seconds": 3,
       "items": [
         "createdieselgenerators:bulk_fermenter",
         "siftec:vinegar_bucket",
+        "siftec:vinegar_bottle",
         "createdieselgenerators:basin_lid"
       ],
       "tokens": [
         "food:vinegar"
       ],
-      "needs": []
-    },
-    {
-      "id": "mam_nutrients_2",
-      "tree": "nutrients",
-      "cost": [
-        {
-          "item": "minecraft:glass_bottle",
-          "count": 10
-        },
-        {
-          "item": "minecraft:sweet_berries",
-          "count": 20
-        },
-        {
-          "item": "siftec:empty_canister",
-          "count": 5
-        }
-      ],
-      "seconds": 120,
-      "items": [
-        "siftec:pickled_tomato",
-        "siftec:pickled_onion",
-        "siftec:pickled_cabbage",
-        "siftec:pickled_pumpkin",
-        "siftec:pickled_carrot",
-        "siftec:pickled_beetroot",
-        "siftec:pickled_kelp",
-        "siftec:sweet_berry_jam",
-        "siftec:glow_berry_jam",
-        "siftec:apple_jam",
-        "siftec:melon_jam"
-      ],
-      "tokens": [
-        "food:preserves"
-      ],
       "needs": [
-        "mam_nutrients_1"
+        "mam_nutrients_sweet_berry_research|mam_nutrients_apple_research|mam_nutrients_glow_berry_research"
       ]
     },
     {
-      "id": "mam_nutrients_3",
+      "id": "mam_nutrients_preserved_foods",
       "tree": "nutrients",
       "cost": [
         {
-          "item": "minecraft:apple",
-          "count": 20
-        },
-        {
-          "item": "minecraft:honey_bottle",
-          "count": 10
-        },
-        {
-          "item": "siftec:empty_canister",
-          "count": 5
-        }
-      ],
-      "seconds": 120,
-      "items": [
-        "siftec:mead_bucket",
-        "siftec:mead"
-      ],
-      "tokens": [
-        "food:brewing"
-      ],
-      "needs": [
-        "mam_nutrients_1"
-      ]
-    },
-    {
-      "id": "mam_nutrients_4",
-      "tree": "nutrients",
-      "cost": [
-        {
-          "item": "minecraft:glowstone_dust",
-          "count": 10
-        },
-        {
-          "item": "minecraft:blaze_powder",
-          "count": 10
-        },
-        {
-          "item": "minecraft:nether_wart",
-          "count": 10
-        }
-      ],
-      "seconds": 120,
-      "items": [],
-      "tokens": [
-        "food:seasoning"
-      ],
-      "needs": [
-        "mam_nutrients_1"
-      ]
-    },
-    {
-      "id": "mam_nutrients_5",
-      "tree": "nutrients",
-      "cost": [
-        {
-          "item": "minecraft:bread",
-          "count": 10
-        },
-        {
-          "item": "siftec:rotor",
-          "count": 10
-        }
-      ],
-      "seconds": 180,
-      "items": [],
-      "tokens": [
-        "food:kitchen"
-      ],
-      "needs": [
-        "mam_nutrients_1"
-      ]
-    },
-    {
-      "id": "mam_slugs_1",
-      "tree": "slugs",
-      "cost": [
-        {
-          "item": "siftec:blue_power_slug",
-          "count": 1
-        }
-      ],
-      "seconds": 30,
-      "items": [
-        "siftec:power_shard"
-      ],
-      "tokens": [],
-      "needs": []
-    },
-    {
-      "id": "mam_slugs_2",
-      "tree": "slugs",
-      "cost": [
-        {
-          "item": "siftec:power_shard",
-          "count": 1
+          "item": "siftec:vinegar_bottle",
+          "count": 50
         },
         {
           "item": "create:iron_sheet",
           "count": 50
         },
         {
-          "item": "siftec:wire",
-          "count": 50
+          "item": "minecraft:glass_bottle",
+          "count": 100
         }
       ],
-      "seconds": 60,
+      "seconds": 3,
       "items": [],
       "tokens": [
-        "shards:1"
+        "food:preserves"
       ],
       "needs": [
-        "mam_slugs_1"
+        "mam_nutrients_bulk_fermentation"
       ]
     },
     {
-      "id": "mam_slugs_3",
-      "tree": "slugs",
+      "id": "mam_nutrients_cider_and_mead",
+      "tree": "nutrients",
       "cost": [
         {
-          "item": "siftec:yellow_power_slug",
-          "count": 1
+          "item": "minecraft:apple",
+          "count": 50
         },
+        {
+          "item": "minecraft:honey_bottle",
+          "count": 20
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:mead_bucket",
+        "siftec:mead",
+        "siftec:cider_bucket"
+      ],
+      "tokens": [
+        "food:brewing"
+      ],
+      "needs": [
+        "mam_nutrients_bulk_fermentation"
+      ]
+    },
+    {
+      "id": "mam_nutrients_automated_cooking",
+      "tree": "nutrients",
+      "cost": [
         {
           "item": "siftec:rotor",
           "count": 25
         },
         {
-          "item": "siftec:cable",
-          "count": 100
-        }
-      ],
-      "seconds": 120,
-      "items": [],
-      "tokens": [
-        "shards:2"
-      ],
-      "needs": [
-        "mam_slugs_2"
-      ]
-    },
-    {
-      "id": "mam_slugs_4",
-      "tree": "slugs",
-      "cost": [
-        {
-          "item": "siftec:purple_power_slug",
-          "count": 1
-        },
-        {
-          "item": "siftec:modular_frame",
-          "count": 25
-        },
-        {
-          "item": "create:copper_sheet",
-          "count": 25
-        }
-      ],
-      "seconds": 180,
-      "items": [],
-      "tokens": [
-        "shards:3"
-      ],
-      "needs": [
-        "mam_slugs_3"
-      ]
-    },
-    {
-      "id": "mam_slugs_5",
-      "tree": "slugs",
-      "cost": [
-        {
-          "item": "siftec:time_crystal",
-          "count": 10
-        },
-        {
-          "item": "siftec:dark_matter_crystal",
-          "count": 10
-        }
-      ],
-      "seconds": 300,
-      "items": [],
-      "tokens": [],
-      "needs": [
-        "mam_slugs_4"
-      ]
-    },
-    {
-      "id": "mam_quartz_1",
-      "tree": "quartz",
-      "cost": [
-        {
-          "item": "minecraft:quartz",
-          "count": 10
-        }
-      ],
-      "seconds": 30,
-      "items": [
-        "create:sand_paper",
-        "create:red_sand_paper",
-        "siftec:quartz_crystal"
-      ],
-      "tokens": [],
-      "needs": []
-    },
-    {
-      "id": "mam_quartz_2",
-      "tree": "quartz",
-      "cost": [
-        {
-          "item": "minecraft:quartz",
-          "count": 10
-        }
-      ],
-      "seconds": 30,
-      "items": [
-        "siftec:silica"
-      ],
-      "tokens": [],
-      "needs": []
-    },
-    {
-      "id": "mam_quartz_3",
-      "tree": "quartz",
-      "cost": [
-        {
-          "item": "siftec:quartz_crystal",
-          "count": 25
-        },
-        {
-          "item": "minecraft:redstone",
+          "item": "siftec:reinforced_iron_plate",
           "count": 50
         },
         {
-          "item": "create:brass_sheet",
+          "item": "#siftec:preserves",
+          "count": 20
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "food:kitchen",
+        "food:seasoning"
+      ],
+      "needs": [
+        "mam_nutrients_preserved_foods"
+      ]
+    },
+    {
+      "id": "mam_nutrients_nutritional_inhaler",
+      "tree": "nutrients",
+      "cost": [
+        {
+          "item": "minecraft:sweet_berries",
+          "count": 4
+        },
+        {
+          "item": "minecraft:apple",
+          "count": 10
+        },
+        {
+          "item": "minecraft:glow_berries",
+          "count": 2
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:nutritional_inhaler"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_nutrients_bulk_fermentation"
+      ]
+    },
+    {
+      "id": "mam_quartz_quartz",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "minecraft:quartz",
           "count": 10
         }
       ],
-      "seconds": 120,
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "scanner:quartz"
+      ],
+      "needs": []
+    },
+    {
+      "id": "mam_quartz_quartz_crystals",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "minecraft:quartz",
+          "count": 20
+        }
+      ],
+      "seconds": 3,
       "items": [
+        "create:sand_paper",
+        "create:red_sand_paper",
         "create:rose_quartz",
-        "create:pulse_repeater",
-        "create:pulse_extender",
-        "create:pulse_timer",
-        "create:powered_latch",
-        "create:powered_toggle_latch",
-        "create:analog_lever",
-        "create:redstone_contact",
+        "siftec:quartz_crystal",
         "create:polished_rose_quartz",
         "create:rose_quartz_block",
         "create:rose_quartz_lamp",
@@ -3693,65 +3999,29 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_quartz_1"
+        "mam_quartz_quartz"
       ]
     },
     {
-      "id": "mam_quartz_4",
+      "id": "mam_quartz_silica",
       "tree": "quartz",
       "cost": [
         {
-          "item": "siftec:quartz_crystal",
-          "count": 100
-        },
-        {
-          "item": "siftec:reinforced_iron_plate",
-          "count": 50
-        },
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 5
+          "item": "minecraft:quartz",
+          "count": 20
         }
       ],
-      "seconds": 180,
+      "seconds": 3,
       "items": [
-        "siftec:crystal_oscillator",
-        "siftec:crystal_oscillator_core",
-        "siftec:incomplete_crystal_oscillator"
+        "siftec:silica"
       ],
       "tokens": [],
       "needs": [
-        "mam_quartz_1"
+        "mam_quartz_quartz"
       ]
     },
     {
-      "id": "mam_quartz_5",
-      "tree": "quartz",
-      "cost": [
-        {
-          "item": "siftec:crystal_oscillator",
-          "count": 5
-        },
-        {
-          "item": "minecraft:redstone",
-          "count": 50
-        }
-      ],
-      "seconds": 180,
-      "items": [
-        "create:redstone_link",
-        "create:display_link",
-        "create:display_board",
-        "create:nixie_tube"
-      ],
-      "tokens": [],
-      "needs": [
-        "mam_quartz_3",
-        "mam_quartz_4"
-      ]
-    },
-    {
-      "id": "mam_quartz_6",
+      "id": "mam_quartz_blade_runners",
       "tree": "quartz",
       "cost": [
         {
@@ -3763,7 +4033,7 @@
           "count": 10
         }
       ],
-      "seconds": 120,
+      "seconds": 3,
       "items": [
         "siftec:blade_runners",
         "siftec:blade_runners_core",
@@ -3771,33 +4041,11 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_quartz_2"
+        "mam_quartz_silica"
       ]
     },
     {
-      "id": "mam_quartz_7",
-      "tree": "quartz",
-      "cost": [
-        {
-          "item": "siftec:crystal_oscillator",
-          "count": 10
-        },
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 25
-        }
-      ],
-      "seconds": 300,
-      "items": [
-        "siftec:radar_tower"
-      ],
-      "tokens": [],
-      "needs": [
-        "mam_quartz_5"
-      ]
-    },
-    {
-      "id": "mam_quartz_8",
+      "id": "mam_quartz_shatter_rebar",
       "tree": "quartz",
       "cost": [
         {
@@ -3815,11 +4063,149 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_quartz_1"
+        "mam_quartz_quartz_crystals",
+        "mam_megafauna_the_rebar_gun"
       ]
     },
     {
-      "id": "mam_sulfur_1",
+      "id": "mam_quartz_crystal_oscillator",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:quartz_crystal",
+          "count": 100
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:redstone_link",
+        "create:pulse_repeater",
+        "create:pulse_extender",
+        "create:pulse_timer",
+        "create:powered_latch",
+        "create:powered_toggle_latch",
+        "create:analog_lever",
+        "create:redstone_contact",
+        "siftec:crystal_oscillator",
+        "siftec:crystal_oscillator_core",
+        "siftec:incomplete_crystal_oscillator"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_quartz_crystals"
+      ]
+    },
+    {
+      "id": "mam_quartz_display_systems",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 10
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 100
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "create:display_link",
+        "create:display_board",
+        "create:nixie_tube"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_crystal_oscillator"
+      ]
+    },
+    {
+      "id": "mam_quartz_radar_technology",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 50
+        },
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 50
+        },
+        {
+          "item": "siftec:computer",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:radar_tower"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_crystal_oscillator"
+      ]
+    },
+    {
+      "id": "mam_quartz_tidal_research",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "minecraft:nautilus_shell",
+          "count": 4
+        },
+        {
+          "item": "minecraft:prismarine_shard",
+          "count": 32
+        },
+        {
+          "item": "siftec:quartz_crystal",
+          "count": 20
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:trident_core",
+        "siftec:incomplete_trident"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_crystal_oscillator"
+      ]
+    },
+    {
+      "id": "mam_quartz_heart_of_the_sea",
+      "tree": "quartz",
+      "cost": [
+        {
+          "item": "minecraft:nautilus_shell",
+          "count": 8
+        },
+        {
+          "item": "minecraft:prismarine_crystals",
+          "count": 32
+        },
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 20
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "minecraft:conduit",
+        "siftec:heart_of_the_sea_core",
+        "siftec:incomplete_heart_of_the_sea"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_quartz_tidal_research"
+      ]
+    },
+    {
+      "id": "mam_sulfur_sulfur",
       "tree": "sulfur",
       "cost": [
         {
@@ -3827,7 +4213,73 @@
           "count": 10
         }
       ],
-      "seconds": 30,
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "scanner:sulfur"
+      ],
+      "needs": []
+    },
+    {
+      "id": "mam_sulfur_black_powder",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "cgs:sulfur",
+          "count": 50
+        },
+        {
+          "item": "minecraft:coal",
+          "count": 25
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_sulfur"
+      ]
+    },
+    {
+      "id": "mam_sulfur_smokeless_powder",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "minecraft:gunpowder",
+          "count": 100
+        },
+        {
+          "item": "siftec:plastic",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:smokeless_powder"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_black_powder"
+      ]
+    },
+    {
+      "id": "mam_sulfur_flintlock",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "minecraft:gunpowder",
+          "count": 25
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 50
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 10
+        }
+      ],
+      "seconds": 3,
       "items": [
         "cgs:flintlock",
         "cgs:flintlock_chambers",
@@ -3839,36 +4291,34 @@
         "cgs:lead_balls"
       ],
       "tokens": [],
-      "needs": []
+      "needs": [
+        "mam_sulfur_black_powder"
+      ]
     },
     {
-      "id": "mam_sulfur_2",
+      "id": "mam_sulfur_ignimbrite",
       "tree": "sulfur",
       "cost": [
         {
           "item": "cgs:sulfur",
-          "count": 20
+          "count": 50
         },
         {
           "item": "minecraft:cobblestone",
-          "count": 20
-        },
-        {
-          "item": "siftec:steel_pipe",
-          "count": 10
+          "count": 100
         }
       ],
-      "seconds": 60,
+      "seconds": 3,
       "items": [
         "siftec:ignimbrite_bucket"
       ],
       "tokens": [],
       "needs": [
-        "mam_sulfur_1"
+        "mam_sulfur_sulfur"
       ]
     },
     {
-      "id": "mam_sulfur_3",
+      "id": "mam_sulfur_explosives",
       "tree": "sulfur",
       "cost": [
         {
@@ -3877,44 +4327,41 @@
         },
         {
           "item": "siftec:steel_pipe",
-          "count": 10
+          "count": 100
         },
         {
-          "item": "siftec:encased_industrial_beam",
-          "count": 10
+          "item": "siftec:cable",
+          "count": 200
         }
       ],
-      "seconds": 120,
+      "seconds": 3,
       "items": [
         "cgs:frag_grenade"
       ],
       "tokens": [],
       "needs": [
-        "mam_sulfur_2"
+        "mam_sulfur_black_powder",
+        "mam_sulfur_ignimbrite"
       ]
     },
     {
-      "id": "mam_sulfur_4",
+      "id": "mam_sulfur_the_rifle",
       "tree": "sulfur",
       "cost": [
         {
-          "item": "minecraft:gunpowder",
+          "item": "siftec:smokeless_powder",
           "count": 50
         },
         {
-          "item": "siftec:steel_pipe",
-          "count": 25
-        },
-        {
           "item": "siftec:motor",
-          "count": 10
+          "count": 100
         },
         {
-          "item": "siftec:heavy_modular_frame",
-          "count": 5
+          "item": "siftec:rubber",
+          "count": 200
         }
       ],
-      "seconds": 180,
+      "seconds": 3,
       "items": [
         "cgs:revolver",
         "cgs:shotgun",
@@ -3943,27 +4390,28 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_sulfur_1"
+        "mam_sulfur_flintlock",
+        "mam_sulfur_smokeless_powder"
       ]
     },
     {
-      "id": "mam_sulfur_5",
+      "id": "mam_sulfur_heavy_weapons",
       "tree": "sulfur",
       "cost": [
         {
-          "item": "minecraft:gunpowder",
-          "count": 100
+          "item": "cgs:frag_grenade",
+          "count": 50
         },
         {
-          "item": "siftec:motor",
+          "item": "siftec:computer",
           "count": 25
         },
         {
-          "item": "siftec:encased_industrial_beam",
-          "count": 10
+          "item": "siftec:heavy_modular_frame",
+          "count": 50
         }
       ],
-      "seconds": 300,
+      "seconds": 3,
       "items": [
         "cgs:gatling",
         "cgs:launcher",
@@ -3987,102 +4435,89 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_sulfur_4"
+        "mam_sulfur_the_rifle",
+        "mam_sulfur_explosives"
       ]
     },
     {
-      "id": "mam_sulfur_6",
+      "id": "mam_sulfur_compacted_coal",
       "tree": "sulfur",
       "cost": [
         {
-          "item": "minecraft:coal",
-          "count": 25
+          "item": "siftec:hard_drive",
+          "count": 1
         },
         {
           "item": "cgs:sulfur",
           "count": 25
+        },
+        {
+          "item": "minecraft:coal",
+          "count": 25
         }
       ],
-      "seconds": 120,
+      "seconds": 3,
       "items": [
         "siftec:compacted_coal"
       ],
       "tokens": [],
       "needs": [
-        "mam_sulfur_1"
+        "mam_sulfur_sulfur"
       ]
     },
     {
-      "id": "mam_sulfur_7",
+      "id": "mam_sulfur_experimental_power_generation",
       "tree": "sulfur",
       "cost": [
+        {
+          "item": "cgs:sulfur",
+          "count": 25
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 50
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 100
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_compacted_coal"
+      ]
+    },
+    {
+      "id": "mam_sulfur_turbofuel",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "siftec:hard_drive",
+          "count": 1
+        },
         {
           "item": "siftec:compacted_coal",
           "count": 15
         },
         {
-          "item": "createdieselgenerators:diesel_bucket",
-          "count": 20
+          "item": "siftec:packaged_fuel",
+          "count": 50
         }
       ],
-      "seconds": 300,
+      "seconds": 3,
       "items": [
         "siftec:turbofuel_bucket",
         "siftec:packaged_turbofuel"
       ],
       "tokens": [],
       "needs": [
-        "mam_sulfur_6"
+        "mam_sulfur_experimental_power_generation"
       ]
     },
     {
-      "id": "mam_sulfur_8",
-      "tree": "sulfur",
-      "cost": [
-        {
-          "item": "cgs:sulfur",
-          "count": 50
-        },
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 10
-        },
-        {
-          "item": "siftec:supercomputer",
-          "count": 5
-        }
-      ],
-      "seconds": 300,
-      "items": [],
-      "tokens": [],
-      "needs": [
-        "mam_sulfur_2"
-      ]
-    },
-    {
-      "id": "mam_sulfur_9",
-      "tree": "sulfur",
-      "cost": [
-        {
-          "item": "minecraft:gunpowder",
-          "count": 100
-        },
-        {
-          "item": "siftec:plastic",
-          "count": 50
-        }
-      ],
-      "seconds": 3,
-      "items": [
-        "siftec:smokeless_powder"
-      ],
-      "tokens": [],
-      "needs": [
-        "mam_sulfur_1"
-      ]
-    },
-    {
-      "id": "mam_sulfur_10",
+      "id": "mam_sulfur_rocket_fuel",
       "tree": "sulfur",
       "cost": [
         {
@@ -4104,11 +4539,11 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_sulfur_7"
+        "mam_sulfur_turbofuel"
       ]
     },
     {
-      "id": "mam_sulfur_11",
+      "id": "mam_sulfur_ionized_fuel",
       "tree": "sulfur",
       "cost": [
         {
@@ -4130,11 +4565,35 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_sulfur_10"
+        "mam_sulfur_rocket_fuel"
       ]
     },
     {
-      "id": "mam_alien_1",
+      "id": "mam_sulfur_geothermal_power",
+      "tree": "sulfur",
+      "cost": [
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 100
+        },
+        {
+          "item": "siftec:quickwire",
+          "count": 1000
+        },
+        {
+          "item": "siftec:motor",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_sulfur_experimental_power_generation"
+      ]
+    },
+    {
+      "id": "mam_alien_mercer_sphere_analysis",
       "tree": "alien",
       "cost": [
         {
@@ -4142,7 +4601,7 @@
           "count": 1
         }
       ],
-      "seconds": 60,
+      "seconds": 3,
       "items": [],
       "tokens": [
         "object:mercer_sphere"
@@ -4150,77 +4609,7 @@
       "needs": []
     },
     {
-      "id": "mam_alien_2",
-      "tree": "alien",
-      "cost": [
-        {
-          "item": "siftec:mercer_sphere",
-          "count": 2
-        },
-        {
-          "item": "siftec:modular_frame",
-          "count": 10
-        },
-        {
-          "item": "siftec:cable",
-          "count": 50
-        }
-      ],
-      "seconds": 180,
-      "items": [
-        "siftec:dimensional_depot"
-      ],
-      "tokens": [],
-      "needs": [
-        "mam_alien_1"
-      ]
-    },
-    {
-      "id": "mam_alien_3",
-      "tree": "alien",
-      "cost": [
-        {
-          "item": "siftec:mercer_sphere",
-          "count": 3
-        },
-        {
-          "item": "siftec:computer",
-          "count": 25
-        }
-      ],
-      "seconds": 300,
-      "items": [],
-      "tokens": [
-        "depot:expansion"
-      ],
-      "needs": [
-        "mam_alien_2"
-      ]
-    },
-    {
-      "id": "mam_alien_4",
-      "tree": "alien",
-      "cost": [
-        {
-          "item": "siftec:mercer_sphere",
-          "count": 3
-        },
-        {
-          "item": "siftec:motor",
-          "count": 25
-        }
-      ],
-      "seconds": 300,
-      "items": [],
-      "tokens": [
-        "depot:upload"
-      ],
-      "needs": [
-        "mam_alien_2"
-      ]
-    },
-    {
-      "id": "mam_alien_5",
+      "id": "mam_alien_somersloop_analysis",
       "tree": "alien",
       "cost": [
         {
@@ -4228,7 +4617,7 @@
           "count": 1
         }
       ],
-      "seconds": 60,
+      "seconds": 3,
       "items": [],
       "tokens": [
         "object:somersloop"
@@ -4236,55 +4625,23 @@
       "needs": []
     },
     {
-      "id": "mam_alien_6",
+      "id": "mam_alien_sam_analysis",
       "tree": "alien",
       "cost": [
         {
-          "item": "siftec:somersloop",
-          "count": 1
-        },
-        {
-          "item": "siftec:circuit_board",
-          "count": 25
-        },
-        {
-          "item": "siftec:motor",
+          "item": "siftec:sam",
           "count": 10
         }
       ],
-      "seconds": 300,
+      "seconds": 3,
       "items": [],
       "tokens": [
-        "amplifier"
+        "scanner:sam"
       ],
-      "needs": [
-        "mam_alien_5"
-      ]
+      "needs": []
     },
     {
-      "id": "mam_alien_7",
-      "tree": "alien",
-      "cost": [
-        {
-          "item": "siftec:somersloop",
-          "count": 2
-        },
-        {
-          "item": "siftec:supercomputer",
-          "count": 10
-        }
-      ],
-      "seconds": 300,
-      "items": [],
-      "tokens": [
-        "amplifier:shards"
-      ],
-      "needs": [
-        "mam_alien_6"
-      ]
-    },
-    {
-      "id": "mam_alien_8",
+      "id": "mam_alien_sam_reanimation",
       "tree": "alien",
       "cost": [
         {
@@ -4297,10 +4654,12 @@
         "siftec:reanimated_sam"
       ],
       "tokens": [],
-      "needs": []
+      "needs": [
+        "mam_alien_sam_analysis"
+      ]
     },
     {
-      "id": "mam_alien_9",
+      "id": "mam_alien_sam_fluctuator",
       "tree": "alien",
       "cost": [
         {
@@ -4324,11 +4683,277 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_alien_8"
+        "mam_alien_sam_reanimation"
       ]
     },
     {
-      "id": "mam_alien_10",
+      "id": "mam_alien_dimensional_depot",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 1
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 11
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:dimensional_depot"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_alien_mercer_sphere_analysis",
+        "mam_alien_sam_fluctuator"
+      ]
+    },
+    {
+      "id": "mam_alien_depot_expansion_200",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 3
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 47
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:stacks:2"
+      ],
+      "needs": [
+        "mam_alien_dimensional_depot"
+      ]
+    },
+    {
+      "id": "mam_alien_upload_upgrade_30_min",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 3
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 47
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:upload:30"
+      ],
+      "needs": [
+        "mam_alien_dimensional_depot"
+      ]
+    },
+    {
+      "id": "mam_alien_manual_depot_uploader",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 3
+        },
+        {
+          "item": "siftec:computer",
+          "count": 17
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 29
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:manual"
+      ],
+      "needs": [
+        "mam_alien_dimensional_depot"
+      ]
+    },
+    {
+      "id": "mam_alien_depot_expansion_300",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 7
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 103
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:stacks:3"
+      ],
+      "needs": [
+        "mam_alien_depot_expansion_200"
+      ]
+    },
+    {
+      "id": "mam_alien_upload_upgrade_60_min",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 7
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 103
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:upload:60"
+      ],
+      "needs": [
+        "mam_alien_upload_upgrade_30_min"
+      ]
+    },
+    {
+      "id": "mam_alien_depot_expansion_400",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 13
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 151
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:stacks:4"
+      ],
+      "needs": [
+        "mam_alien_depot_expansion_300"
+      ]
+    },
+    {
+      "id": "mam_alien_upload_upgrade_120_min",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 13
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 151
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:upload:120"
+      ],
+      "needs": [
+        "mam_alien_upload_upgrade_60_min"
+      ]
+    },
+    {
+      "id": "mam_alien_depot_expansion_500",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 23
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 199
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:stacks:5"
+      ],
+      "needs": [
+        "mam_alien_depot_expansion_400"
+      ]
+    },
+    {
+      "id": "mam_alien_upload_upgrade_240_min",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:mercer_sphere",
+          "count": 23
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 199
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [
+        "depot:upload:240"
+      ],
+      "needs": [
+        "mam_alien_upload_upgrade_120_min"
+      ]
+    },
+    {
+      "id": "mam_alien_alien_energy_harvesting",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 10
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_alien_sam_fluctuator"
+      ]
+    },
+    {
+      "id": "mam_alien_power_augmenter",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "siftec:somersloop",
+          "count": 1
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 100
+        },
+        {
+          "item": "siftec:computer",
+          "count": 50
+        }
+      ],
+      "seconds": 3,
+      "items": [],
+      "tokens": [],
+      "needs": [
+        "mam_alien_somersloop_analysis",
+        "mam_alien_alien_energy_harvesting"
+      ]
+    },
+    {
+      "id": "mam_alien_alien_power_matrix",
       "tree": "alien",
       "cost": [
         {
@@ -4353,23 +4978,19 @@
       ],
       "tokens": [],
       "needs": [
-        "mam_alien_9"
+        "mam_alien_power_augmenter"
       ]
     },
     {
-      "id": "mam_alien_11",
+      "id": "mam_alien_pocket_storage",
       "tree": "alien",
       "cost": [
         {
-          "item": "siftec:somersloop",
-          "count": 1
-        },
-        {
           "item": "siftec:sam_fluctuator",
-          "count": 100
+          "count": 5
         },
         {
-          "item": "siftec:computer",
+          "item": "create:iron_sheet",
           "count": 50
         }
       ],
@@ -4377,7 +4998,38 @@
       "items": [],
       "tokens": [],
       "needs": [
-        "mam_alien_9"
+        "mam_alien_sam_fluctuator"
+      ]
+    },
+    {
+      "id": "mam_alien_netherite_synthesis",
+      "tree": "alien",
+      "cost": [
+        {
+          "item": "minecraft:netherrack",
+          "count": 64
+        },
+        {
+          "item": "minecraft:diamond",
+          "count": 10
+        },
+        {
+          "item": "cgs:steel_ingot",
+          "count": 100
+        },
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 20
+        }
+      ],
+      "seconds": 3,
+      "items": [
+        "siftec:netherite_ingot_core",
+        "siftec:incomplete_netherite_ingot"
+      ],
+      "tokens": [],
+      "needs": [
+        "mam_alien_sam_fluctuator"
       ]
     }
   ],
@@ -5257,6 +5909,10 @@
       "color": 14721072
     },
     {
+      "id": "cider",
+      "color": 15249504
+    },
+    {
       "id": "rocket_fuel",
       "color": 14704672
     },
@@ -5282,11 +5938,11 @@
     }
   ],
   "recipe_locks": {
-    "siftec:compacting/constructor/alien_dna_capsule": "mam_megafauna_2",
+    "siftec:compacting/constructor/alien_dna_capsule": "mam_megafauna_bio_organic_properties",
     "siftec:compacting/constructor/aluminum_casing": "bauxite_refinement",
-    "siftec:compacting/constructor/biomass_alien_protein": "mam_megafauna_2",
+    "siftec:compacting/constructor/biomass_alien_protein": "mam_megafauna_bio_organic_properties",
     "siftec:compacting/constructor/biomass_leaves": "hub_upgrade_6",
-    "siftec:compacting/constructor/biomass_mycelia": "mam_mycelia_1",
+    "siftec:compacting/constructor/biomass_mycelia": "mam_mycelia_mycelia",
     "siftec:compacting/constructor/biomass_wood": "hub_upgrade_6",
     "siftec:compacting/constructor/cable": "hub_upgrade_2",
     "siftec:compacting/constructor/copper_powder": "particle_enrichment",
@@ -5294,19 +5950,19 @@
     "siftec:compacting/constructor/empty_canister": "fluid_packaging",
     "siftec:compacting/constructor/empty_fluid_tank": "advanced_aluminum_production",
     "siftec:compacting/constructor/ficsite_trigon": "matter_conversion",
-    "siftec:compacting/constructor/hatcher_protein": "mam_megafauna_1",
-    "siftec:compacting/constructor/hog_protein": "mam_megafauna_1",
-    "siftec:compacting/constructor/iron_rebar": "mam_megafauna_3",
-    "siftec:compacting/constructor/quartz_crystal": "mam_quartz_1",
-    "siftec:compacting/constructor/quickwire": "mam_caterium_2",
-    "siftec:compacting/constructor/reanimated_sam": "mam_alien_8",
+    "siftec:compacting/constructor/hatcher_protein": "mam_megafauna_creeper_research",
+    "siftec:compacting/constructor/hog_protein": "mam_megafauna_zombie_research",
+    "siftec:compacting/constructor/iron_rebar": "mam_megafauna_the_rebar_gun",
+    "siftec:compacting/constructor/quartz_crystal": "mam_quartz_quartz_crystals",
+    "siftec:compacting/constructor/quickwire": "mam_caterium_quickwire",
+    "siftec:compacting/constructor/reanimated_sam": "mam_alien_sam_reanimation",
     "siftec:compacting/constructor/screw": "hub_upgrade_3",
-    "siftec:compacting/constructor/silica": "mam_quartz_2",
+    "siftec:compacting/constructor/silica": "mam_quartz_silica",
     "siftec:compacting/constructor/solid_biofuel": "obstacle_clearing",
-    "siftec:compacting/constructor/spitter_protein": "mam_megafauna_1",
+    "siftec:compacting/constructor/spitter_protein": "mam_megafauna_skeleton_research",
     "siftec:compacting/constructor/steel_beam": "basic_steel_production",
     "siftec:compacting/constructor/steel_pipe": "basic_steel_production",
-    "siftec:compacting/constructor/stinger_protein": "mam_megafauna_1",
+    "siftec:compacting/constructor/stinger_protein": "mam_megafauna_spider_research",
     "siftec:compacting/constructor/wire": "hub_upgrade_2",
     "siftec:compacting/constructor/aluminum_beam": "alt_aluminum_beam",
     "siftec:compacting/constructor/cast_screw": "alt_cast_screw",
@@ -5316,7 +5972,7 @@
     "siftec:compacting/constructor/steel_canister": "alt_steel_canister",
     "siftec:compacting/constructor/steel_screw": "alt_steel_screw",
     "siftec:compacting/smelter/pure_aluminum_ingot": "alt_pure_aluminum_ingot",
-    "siftec:mixing/assembler/ai_limiter": "mam_caterium_4",
+    "siftec:mixing/assembler/ai_limiter": "mam_caterium_ai_limiter",
     "siftec:mixing/assembler/alclad_aluminum_sheet": "bauxite_refinement",
     "siftec:mixing/assembler/assembly_director_system": "control_system_development",
     "siftec:mixing/assembler/automated_wiring": "advanced_steel_production",
@@ -5324,7 +5980,7 @@
     "siftec:mixing/assembler/electromagnetic_control_rod": "nuclear_power",
     "siftec:mixing/assembler/encased_industrial_beam": "advanced_steel_production",
     "siftec:mixing/assembler/encased_plutonium_cell": "particle_enrichment",
-    "siftec:mixing/assembler/fabric": "mam_mycelia_2",
+    "siftec:mixing/assembler/fabric": "mam_mycelia_fabric",
     "siftec:mixing/assembler/heat_sink": "advanced_aluminum_production",
     "siftec:mixing/assembler/magnetic_field_generator": "nuclear_power",
     "siftec:mixing/assembler/modular_frame": "part_assembly",
@@ -5332,10 +5988,10 @@
     "siftec:mixing/assembler/pressure_conversion_cube": "particle_enrichment",
     "siftec:mixing/assembler/reinforced_iron_plate": "hub_upgrade_3",
     "siftec:mixing/assembler/rotor": "part_assembly",
-    "siftec:mixing/assembler/shatter_rebar": "mam_quartz_8",
+    "siftec:mixing/assembler/shatter_rebar": "mam_quartz_shatter_rebar",
     "siftec:mixing/assembler/smart_plating": "part_assembly",
     "siftec:mixing/assembler/stator": "advanced_steel_production",
-    "siftec:mixing/assembler/stun_rebar": "mam_caterium_8",
+    "siftec:mixing/assembler/stun_rebar": "mam_caterium_stun_rebar",
     "siftec:mixing/assembler/versatile_framework": "basic_steel_production",
     "siftec:mixing/assembler/adhered_iron_plate": "alt_adhered_iron_plate",
     "siftec:mixing/assembler/alclad_casing": "alt_alclad_casing",
@@ -5344,7 +6000,7 @@
     "siftec:mixing/assembler/caterium_circuit_board": "alt_caterium_circuit_board",
     "siftec:mixing/assembler/cheap_silica": "alt_cheap_silica",
     "siftec:mixing/assembler/coated_iron_canister": "alt_coated_iron_canister",
-    "siftec:mixing/assembler/compacted_coal": "mam_sulfur_6",
+    "siftec:mixing/assembler/compacted_coal": "mam_sulfur_compacted_coal",
     "siftec:mixing/assembler/copper_rotor": "alt_copper_rotor",
     "siftec:mixing/assembler/crystal_computer": "alt_crystal_computer",
     "siftec:mixing/assembler/electric_motor": "alt_electric_motor",
@@ -5379,14 +6035,14 @@
     "seq:ballistic_warp_drive": "spatial_energy_regulation",
     "siftec:mixing/manufacturer/computer_core": "industrial_manufacturing",
     "seq:computer": "industrial_manufacturing",
-    "siftec:mixing/manufacturer/crystal_oscillator_core": "mam_quartz_4",
-    "seq:crystal_oscillator": "mam_quartz_4",
-    "siftec:mixing/manufacturer/gas_filter_core": "mam_mycelia_5",
-    "seq:gas_filter": "mam_mycelia_5",
+    "siftec:mixing/manufacturer/crystal_oscillator_core": "mam_quartz_crystal_oscillator",
+    "seq:crystal_oscillator": "mam_quartz_crystal_oscillator",
+    "siftec:mixing/manufacturer/gas_filter_core": "mam_mycelia_gas_mask",
+    "seq:gas_filter": "mam_mycelia_gas_mask",
     "siftec:mixing/manufacturer/heavy_modular_frame_core": "industrial_manufacturing",
     "seq:heavy_modular_frame": "industrial_manufacturing",
-    "siftec:mixing/manufacturer/high_speed_connector_core": "mam_caterium_7",
-    "seq:high_speed_connector": "mam_caterium_7",
+    "siftec:mixing/manufacturer/high_speed_connector_core": "mam_caterium_high_speed_connector",
+    "seq:high_speed_connector": "mam_caterium_high_speed_connector",
     "siftec:mixing/manufacturer/iodine_infused_filter_core": "hazmat_suit",
     "seq:iodine_infused_filter": "hazmat_suit",
     "siftec:mixing/manufacturer/modular_engine_core": "industrial_manufacturing",
@@ -5395,8 +6051,8 @@
     "seq:plutonium_fuel_rod": "particle_enrichment",
     "siftec:mixing/manufacturer/radio_control_unit_core": "control_system_development",
     "seq:radio_control_unit": "control_system_development",
-    "siftec:mixing/manufacturer/sam_fluctuator_core": "mam_alien_9",
-    "seq:sam_fluctuator": "mam_alien_9",
+    "siftec:mixing/manufacturer/sam_fluctuator_core": "mam_alien_sam_fluctuator",
+    "seq:sam_fluctuator": "mam_alien_sam_fluctuator",
     "siftec:mixing/manufacturer/singularity_cell_core": "spatial_energy_regulation",
     "seq:singularity_cell": "spatial_energy_regulation",
     "siftec:mixing/manufacturer/supercomputer_core": "control_system_development",
@@ -5416,19 +6072,19 @@
     "siftec:mixing/refinery/alumina_solution": "bauxite_refinement",
     "siftec:mixing/refinery/aluminum_scrap": "bauxite_refinement",
     "siftec:mixing/refinery/fuel": "oil_processing",
-    "siftec:mixing/refinery/ionized_fuel": "mam_sulfur_11",
+    "siftec:mixing/refinery/ionized_fuel": "mam_sulfur_ionized_fuel",
     "siftec:mixing/refinery/petroleum_coke": "oil_processing",
     "siftec:mixing/refinery/plastic": "oil_processing",
     "siftec:mixing/refinery/residual_plastic": "oil_processing",
     "siftec:mixing/refinery/residual_rubber": "oil_processing",
     "siftec:mixing/refinery/rubber": "oil_processing",
-    "siftec:mixing/refinery/smokeless_powder": "mam_sulfur_9",
+    "siftec:mixing/refinery/smokeless_powder": "mam_sulfur_smokeless_powder",
     "siftec:mixing/refinery/coated_cable": "alt_coated_cable",
     "siftec:mixing/refinery/diluted_packaged_fuel": "alt_diluted_packaged_fuel",
     "siftec:mixing/refinery/electrode_aluminum_scrap": "alt_electrode_aluminum_scrap",
     "siftec:mixing/refinery/heavy_oil_residue": "alt_heavy_oil_residue",
     "siftec:mixing/refinery/leached_caterium_ingot": "alt_leached_caterium_ingot",
-    "siftec:mixing/refinery/polyester_fabric": "mam_mycelia_6",
+    "siftec:mixing/refinery/polyester_fabric": "mam_mycelia_synthetic_polyester_fabric",
     "siftec:mixing/refinery/polymer_resin": "alt_polymer_resin",
     "siftec:mixing/refinery/pure_caterium_ingot": "alt_pure_caterium_ingot",
     "siftec:mixing/refinery/pure_quartz_crystal": "alt_pure_quartz_crystal",
@@ -5437,14 +6093,14 @@
     "siftec:mixing/refinery/recycled_rubber": "alt_recycled_rubber",
     "siftec:mixing/refinery/steamed_copper_sheet": "alt_steamed_copper_sheet",
     "siftec:mixing/refinery/turbo_heavy_fuel": "alt_turbo_heavy_fuel",
-    "siftec:mixing/refinery/turbofuel": "mam_sulfur_7",
+    "siftec:mixing/refinery/turbofuel": "mam_sulfur_turbofuel",
     "siftec:mixing/blender/battery": "control_system_development",
     "siftec:mixing/blender/biochemical_sculptor": "matter_conversion",
     "siftec:mixing/blender/cooling_system": "advanced_aluminum_production",
     "siftec:mixing/blender/encased_uranium_cell": "nuclear_power",
     "siftec:mixing/blender/fused_modular_frame": "advanced_aluminum_production",
     "siftec:mixing/blender/non_fissile_uranium": "particle_enrichment",
-    "siftec:mixing/blender/rocket_fuel": "mam_sulfur_10",
+    "siftec:mixing/blender/rocket_fuel": "mam_sulfur_rocket_fuel",
     "siftec:mixing/blender/cooling_device": "alt_cooling_device",
     "siftec:mixing/blender/distilled_silica": "alt_distilled_silica",
     "siftec:mixing/blender/fertile_uranium": "alt_fertile_uranium",
@@ -5455,32 +6111,32 @@
     "siftec:filling/packager/packaged_alumina_solution": "bauxite_refinement",
     "siftec:filling/packager/packaged_fuel": "fluid_packaging",
     "siftec:filling/packager/packaged_heavy_oil_residue": "fluid_packaging",
-    "siftec:filling/packager/packaged_ionized_fuel": "mam_sulfur_11",
+    "siftec:filling/packager/packaged_ionized_fuel": "mam_sulfur_ionized_fuel",
     "siftec:filling/packager/packaged_liquid_biofuel": "fluid_packaging",
     "siftec:filling/packager/packaged_nitric_acid": "particle_enrichment",
     "siftec:filling/packager/packaged_nitrogen_gas": "advanced_aluminum_production",
     "siftec:filling/packager/packaged_oil": "fluid_packaging",
-    "siftec:filling/packager/packaged_rocket_fuel": "mam_sulfur_10",
+    "siftec:filling/packager/packaged_rocket_fuel": "mam_sulfur_rocket_fuel",
     "siftec:filling/packager/packaged_sulfuric_acid": "control_system_development",
-    "siftec:filling/packager/packaged_turbofuel": "mam_sulfur_7",
+    "siftec:filling/packager/packaged_turbofuel": "mam_sulfur_turbofuel",
     "siftec:filling/packager/packaged_water": "fluid_packaging",
     "siftec:emptying/packager/unpackage_alumina_solution": "bauxite_refinement",
     "siftec:emptying/packager/unpackage_fuel": "fluid_packaging",
     "siftec:emptying/packager/unpackage_heavy_oil_residue": "fluid_packaging",
-    "siftec:emptying/packager/unpackage_ionized_fuel": "mam_sulfur_11",
+    "siftec:emptying/packager/unpackage_ionized_fuel": "mam_sulfur_ionized_fuel",
     "siftec:emptying/packager/unpackage_liquid_biofuel": "fluid_packaging",
     "siftec:emptying/packager/unpackage_nitric_acid": "particle_enrichment",
     "siftec:emptying/packager/unpackage_nitrogen_gas": "advanced_aluminum_production",
     "siftec:emptying/packager/unpackage_oil": "fluid_packaging",
-    "siftec:emptying/packager/unpackage_rocket_fuel": "mam_sulfur_10",
+    "siftec:emptying/packager/unpackage_rocket_fuel": "mam_sulfur_rocket_fuel",
     "siftec:emptying/packager/unpackage_sulfuric_acid": "control_system_development",
     "siftec:emptying/packager/unpackage_turbofuel": "alt_unpackage_turbofuel",
     "siftec:emptying/packager/unpackage_water": "fluid_packaging",
     "seq:charged_ai_expansion_server": "quantum_encoding",
     "siftec:emptying/quantum_encoder/ai_expansion_server_drain": "quantum_encoding",
-    "siftec:mixing/quantum_encoder/alien_power_matrix_core": "mam_alien_10",
-    "seq:charged_alien_power_matrix": "mam_alien_10",
-    "siftec:emptying/quantum_encoder/alien_power_matrix_drain": "mam_alien_10",
+    "siftec:mixing/quantum_encoder/alien_power_matrix_core": "mam_alien_alien_power_matrix",
+    "seq:charged_alien_power_matrix": "mam_alien_alien_power_matrix",
+    "siftec:emptying/quantum_encoder/alien_power_matrix_drain": "mam_alien_alien_power_matrix",
     "siftec:mixing/quantum_encoder/ficsonium_fuel_rod_core": "peak_efficiency",
     "seq:charged_ficsonium_fuel_rod": "peak_efficiency",
     "siftec:emptying/quantum_encoder/ficsonium_fuel_rod_drain": "peak_efficiency",
@@ -5494,30 +6150,28 @@
     "seq:object_scanner": "field_research",
     "siftec:mixing/manufacturer/jetpack_core": "jetpack",
     "seq:jetpack": "jetpack",
-    "siftec:mixing/manufacturer/parachute_core": "mam_mycelia_3",
-    "seq:parachute": "mam_mycelia_3",
-    "siftec:mixing/manufacturer/gas_mask_core": "mam_mycelia_5",
-    "seq:gas_mask": "mam_mycelia_5",
+    "siftec:mixing/manufacturer/parachute_core": "mam_mycelia_parachute",
+    "seq:parachute": "mam_mycelia_parachute",
+    "siftec:mixing/manufacturer/gas_mask_core": "mam_mycelia_gas_mask",
+    "seq:gas_mask": "mam_mycelia_gas_mask",
     "siftec:mixing/manufacturer/hazmat_suit_core": "hazmat_suit",
     "seq:hazmat_suit": "hazmat_suit",
     "siftec:mixing/manufacturer/hover_pack_core": "hover_pack",
     "seq:hover_pack": "hover_pack",
-    "siftec:mixing/manufacturer/blade_runners_core": "mam_quartz_6",
-    "seq:blade_runners": "mam_quartz_6",
-    "siftec:bulk_fermenting/vinegar": "mam_nutrients_1",
-    "siftec:bulk_fermenting/mead": "mam_nutrients_3",
-    "siftec:filling/mead": "mam_nutrients_3",
-    "siftec:filling/pickled_tomato": "mam_nutrients_2",
-    "siftec:filling/pickled_onion": "mam_nutrients_2",
-    "siftec:filling/pickled_cabbage": "mam_nutrients_2",
-    "siftec:filling/pickled_pumpkin": "mam_nutrients_2",
-    "siftec:filling/pickled_carrot": "mam_nutrients_2",
-    "siftec:filling/pickled_beetroot": "mam_nutrients_2",
-    "siftec:filling/pickled_kelp": "mam_nutrients_2",
-    "siftec:mixing/sweet_berry_jam": "mam_nutrients_2",
-    "siftec:mixing/glow_berry_jam": "mam_nutrients_2",
-    "siftec:mixing/apple_jam": "mam_nutrients_2",
-    "siftec:mixing/melon_jam": "mam_nutrients_2",
+    "siftec:mixing/manufacturer/blade_runners_core": "mam_quartz_blade_runners",
+    "seq:blade_runners": "mam_quartz_blade_runners",
+    "siftec:mixing/manufacturer/totem_of_undying_core": "mam_megafauna_undying_biology",
+    "siftec:mixing/manufacturer/elytra_core": "mam_mycelia_wingsuit_research",
+    "siftec:mixing/manufacturer/elytra_backpack_core": "mam_mycelia_elytra_backpack",
+    "seq:elytra_backpack": "mam_mycelia_elytra_backpack",
+    "siftec:mixing/manufacturer/trident_core": "mam_quartz_tidal_research",
+    "siftec:mixing/manufacturer/heart_of_the_sea_core": "mam_quartz_heart_of_the_sea",
+    "siftec:mixing/manufacturer/netherite_ingot_core": "mam_alien_netherite_synthesis",
+    "siftec:bulk_fermenting/vinegar": "mam_nutrients_bulk_fermentation",
+    "siftec:bulk_fermenting/mead": "mam_nutrients_cider_and_mead",
+    "siftec:filling/mead": "mam_nutrients_cider_and_mead",
+    "siftec:filling/vinegar_bottle": "mam_nutrients_bulk_fermentation",
+    "siftec:bulk_fermenting/cider": "mam_nutrients_cider_and_mead",
     "siftec:milling/biomass_from_straw": "hub_upgrade_6",
     "siftec:milling/biomass_from_bark": "hub_upgrade_6",
     "siftec:milling/biomass_from_wheat_seeds": "hub_upgrade_6",
@@ -5528,39 +6182,42 @@
     "siftec:cutting/biomass_from_sugar_cane": "hub_upgrade_6",
     "siftec:cutting/biomass_from_cactus": "hub_upgrade_6",
     "siftec:cutting/biomass_from_short_grass": "hub_upgrade_6",
+    "siftec:crafting/equipment_workshop": "hub_upgrade_1",
     "siftec:crafting/flywheel": "hub_upgrade_6",
     "siftec:crafting/deployer": "part_assembly",
-    "siftec:crafting/nailgun": "mam_megafauna_3",
+    "siftec:crafting/nailgun": "mam_megafauna_the_rebar_gun",
     "siftec:crafting/hammer": "enhanced_asset_security",
     "siftec:crafting/crushing_wheel": "advanced_steel_production",
     "siftec:crafting/pumpjack_crank": "oil_processing",
     "siftec:crafting/mechanical_crafter": "industrial_manufacturing",
     "siftec:pressing/copper_wire": "hub_upgrade_2",
-    "siftec:mixing/brass_blend_with_sand": "mam_caterium_1",
-    "siftec:mixing/brass_blend_with_coal": "mam_caterium_1",
-    "siftec:mixing/brass_blend_with_sulfur": "mam_caterium_1",
-    "siftec:smelting/brass_ingot_from_blend": "mam_caterium_1",
-    "siftec:blasting/brass_ingot_from_blend": "mam_caterium_1",
-    "siftec:deploying/electron_tube": "mam_caterium_3",
-    "siftec:deploying/precision_mechanism": "mam_caterium_3",
-    "siftec:mixing/ignimbrite": "mam_sulfur_2",
+    "siftec:mixing/brass_blend_with_sand": "mam_caterium_brass",
+    "siftec:mixing/brass_blend_with_coal": "mam_caterium_brass",
+    "siftec:mixing/brass_blend_with_sulfur": "mam_caterium_brass",
+    "siftec:smelting/brass_ingot_from_blend": "mam_caterium_brass",
+    "siftec:blasting/brass_ingot_from_blend": "mam_caterium_brass",
+    "siftec:deploying/electron_tube": "mam_caterium_caterium_electronics",
+    "siftec:deploying/precision_mechanism": "mam_caterium_caterium_electronics",
+    "siftec:mixing/ignimbrite": "mam_sulfur_ignimbrite",
+    "siftec:crafting/toxic_shot": "control_system_development",
+    "siftec:deploying/toxic_shot": "control_system_development",
     "siftec:item_application/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:deploying/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:item_application/steel_casing_from_stripped_woods": "basic_steel_production",
     "siftec:deploying/steel_casing_from_stripped_woods": "basic_steel_production",
-    "siftec:mixing/assembler/black_powder": "mam_sulfur_1",
+    "siftec:mixing/assembler/black_powder": "mam_sulfur_black_powder",
     "siftec:sequenced_assembly/manufacturer/adaptive_control_unit": "industrial_manufacturing",
     "siftec:sequenced_assembly/manufacturer/ballistic_warp_drive": "spatial_energy_regulation",
     "siftec:sequenced_assembly/manufacturer/computer": "industrial_manufacturing",
-    "siftec:sequenced_assembly/manufacturer/crystal_oscillator": "mam_quartz_4",
-    "siftec:sequenced_assembly/manufacturer/gas_filter": "mam_mycelia_5",
+    "siftec:sequenced_assembly/manufacturer/crystal_oscillator": "mam_quartz_crystal_oscillator",
+    "siftec:sequenced_assembly/manufacturer/gas_filter": "mam_mycelia_gas_mask",
     "siftec:sequenced_assembly/manufacturer/heavy_modular_frame": "industrial_manufacturing",
-    "siftec:sequenced_assembly/manufacturer/high_speed_connector": "mam_caterium_7",
+    "siftec:sequenced_assembly/manufacturer/high_speed_connector": "mam_caterium_high_speed_connector",
     "siftec:sequenced_assembly/manufacturer/iodine_infused_filter": "hazmat_suit",
     "siftec:sequenced_assembly/manufacturer/modular_engine": "industrial_manufacturing",
     "siftec:sequenced_assembly/manufacturer/plutonium_fuel_rod": "particle_enrichment",
     "siftec:sequenced_assembly/manufacturer/radio_control_unit": "control_system_development",
-    "siftec:sequenced_assembly/manufacturer/sam_fluctuator": "mam_alien_9",
+    "siftec:sequenced_assembly/manufacturer/sam_fluctuator": "mam_alien_sam_fluctuator",
     "siftec:sequenced_assembly/manufacturer/singularity_cell": "spatial_energy_regulation",
     "siftec:sequenced_assembly/manufacturer/supercomputer": "control_system_development",
     "siftec:sequenced_assembly/manufacturer/thermal_propulsion_rocket": "leading_edge_production",
@@ -5571,108 +6228,115 @@
     "siftec:mixing/refinery/sulfuric_acid": "control_system_development",
     "siftec:mixing/blender/nitric_acid": "particle_enrichment",
     "siftec:sequenced_assembly/quantum_encoder/ai_expansion_server": "quantum_encoding",
-    "siftec:sequenced_assembly/quantum_encoder/alien_power_matrix": "mam_alien_10",
+    "siftec:sequenced_assembly/quantum_encoder/alien_power_matrix": "mam_alien_alien_power_matrix",
     "siftec:sequenced_assembly/quantum_encoder/ficsonium_fuel_rod": "peak_efficiency",
     "siftec:sequenced_assembly/quantum_encoder/neural_quantum_processor": "quantum_encoding",
     "siftec:sequenced_assembly/quantum_encoder/superposition_oscillator": "quantum_encoding",
     "siftec:sequenced_assembly/manufacturer/object_scanner": "field_research",
     "siftec:sequenced_assembly/manufacturer/jetpack": "jetpack",
-    "siftec:sequenced_assembly/manufacturer/parachute": "mam_mycelia_3",
-    "siftec:sequenced_assembly/manufacturer/gas_mask": "mam_mycelia_5",
+    "siftec:sequenced_assembly/manufacturer/parachute": "mam_mycelia_parachute",
+    "siftec:sequenced_assembly/manufacturer/gas_mask": "mam_mycelia_gas_mask",
     "siftec:sequenced_assembly/manufacturer/hazmat_suit": "hazmat_suit",
     "siftec:sequenced_assembly/manufacturer/hover_pack": "hover_pack",
-    "siftec:sequenced_assembly/manufacturer/blade_runners": "mam_quartz_6",
-    "siftec:mixing/gunpowder_with_coal": "mam_sulfur_1",
-    "siftec:mixing/gunpowder_with_charcoal": "mam_sulfur_1",
-    "siftec:filling/fire_charge": "mam_sulfur_2",
-    "siftec:compacting/magma_block": "mam_sulfur_2",
-    "siftec:mixing/lava_from_magma_block": "mam_sulfur_2",
-    "siftec:filling/tnt": "mam_sulfur_3",
+    "siftec:sequenced_assembly/manufacturer/blade_runners": "mam_quartz_blade_runners",
+    "siftec:sequenced_assembly/manufacturer/totem_of_undying": "mam_megafauna_undying_biology",
+    "siftec:mixing/assembler/ender_eye": "mam_megafauna_ender_analysis",
+    "siftec:sequenced_assembly/manufacturer/elytra": "mam_mycelia_wingsuit_research",
+    "siftec:sequenced_assembly/manufacturer/elytra_backpack": "mam_mycelia_elytra_backpack",
+    "siftec:sequenced_assembly/manufacturer/trident": "mam_quartz_tidal_research",
+    "siftec:sequenced_assembly/manufacturer/heart_of_the_sea": "mam_quartz_heart_of_the_sea",
+    "siftec:mixing/assembler/shulker_shell": "mam_alien_pocket_storage",
+    "siftec:sequenced_assembly/manufacturer/netherite_ingot": "mam_alien_netherite_synthesis",
+    "siftec:filling/apple_cider": "mam_nutrients_cider_and_mead",
+    "siftec:mixing/gunpowder_with_coal": "mam_sulfur_black_powder",
+    "siftec:mixing/gunpowder_with_charcoal": "mam_sulfur_black_powder",
+    "siftec:filling/fire_charge": "mam_sulfur_ignimbrite",
+    "siftec:compacting/magma_block": "mam_sulfur_ignimbrite",
+    "siftec:mixing/lava_from_magma_block": "mam_sulfur_ignimbrite",
+    "siftec:filling/tnt": "mam_sulfur_explosives",
     "siftec:mixing/gypsum_from_calcite": "control_system_development",
     "siftec:mixing/acid_leached_iron": "control_system_development",
     "siftec:mixing/acid_leached_copper": "control_system_development",
     "siftec:mixing/acid_leached_zinc": "control_system_development",
     "siftec:mixing/sulfur_from_acid": "control_system_development",
-    "siftec:crafting/toxic_shot": "control_system_development",
-    "siftec:deploying/toxic_shot": "control_system_development",
-    "siftec:mixing/kitchen_apple_cider": "mam_nutrients_5",
-    "siftec:mixing/kitchen_baked_cod_stew": "mam_nutrients_5",
-    "siftec:mixing/kitchen_beef_stew": "mam_nutrients_5",
-    "siftec:mixing/kitchen_beetroot_soup": "mam_nutrients_5",
-    "siftec:mixing/kitchen_bone_broth": "mam_nutrients_5",
-    "siftec:mixing/kitchen_cabbage_rolls": "mam_nutrients_5",
-    "siftec:mixing/kitchen_chicken_soup": "mam_nutrients_5",
-    "siftec:mixing/kitchen_cooked_rice": "mam_nutrients_5",
-    "siftec:mixing/kitchen_dog_food": "mam_nutrients_5",
-    "siftec:mixing/kitchen_dumplings": "mam_nutrients_5",
-    "siftec:mixing/kitchen_fish_stew": "mam_nutrients_5",
-    "siftec:mixing/kitchen_fried_rice": "mam_nutrients_5",
-    "siftec:mixing/kitchen_glow_berry_custard": "mam_nutrients_5",
-    "siftec:mixing/kitchen_hot_cocoa": "mam_nutrients_5",
-    "siftec:mixing/kitchen_mushroom_rice": "mam_nutrients_5",
-    "siftec:mixing/kitchen_mushroom_stew": "mam_nutrients_5",
-    "siftec:mixing/kitchen_noodle_soup": "mam_nutrients_5",
-    "siftec:mixing/kitchen_onion_soup": "mam_nutrients_5",
-    "siftec:mixing/kitchen_pasta_with_meatballs": "mam_nutrients_5",
-    "siftec:mixing/kitchen_pasta_with_mutton_chop": "mam_nutrients_5",
-    "siftec:mixing/kitchen_pumpkin_soup": "mam_nutrients_5",
-    "siftec:mixing/kitchen_rabbit_stew": "mam_nutrients_5",
-    "siftec:mixing/kitchen_ratatouille": "mam_nutrients_5",
-    "siftec:mixing/kitchen_squid_ink_pasta": "mam_nutrients_5",
-    "siftec:mixing/kitchen_stuffed_pumpkin_block": "mam_nutrients_5",
-    "siftec:mixing/kitchen_vegetable_noodles": "mam_nutrients_5",
-    "siftec:mixing/kitchen_vegetable_soup": "mam_nutrients_5",
-    "siftec:deploying/kitchen_allium": "mam_nutrients_5",
-    "siftec:deploying/kitchen_apple_pie": "mam_nutrients_5",
-    "siftec:deploying/kitchen_azure_bluet": "mam_nutrients_5",
-    "siftec:deploying/kitchen_beef": "mam_nutrients_5",
-    "siftec:deploying/kitchen_blue_orchid": "mam_nutrients_5",
-    "siftec:deploying/kitchen_brown_mushroom_colony": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cabbage": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cactus_flower": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cake": "mam_nutrients_5",
-    "siftec:deploying/kitchen_chicken": "mam_nutrients_5",
-    "siftec:deploying/kitchen_chocolate_pie": "mam_nutrients_5",
-    "siftec:deploying/kitchen_closed_eyeblossom": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cod": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cooked_chicken": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cooked_cod": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cooked_mutton": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cooked_salmon": "mam_nutrients_5",
-    "siftec:deploying/kitchen_cornflower": "mam_nutrients_5",
-    "siftec:deploying/kitchen_dandelion": "mam_nutrients_5",
-    "siftec:deploying/kitchen_golden_dandelion": "mam_nutrients_5",
-    "siftec:deploying/kitchen_ham": "mam_nutrients_5",
-    "siftec:deploying/kitchen_ink_sac": "mam_nutrients_5",
-    "siftec:deploying/kitchen_kelp_roll": "mam_nutrients_5",
-    "siftec:deploying/kitchen_lily_of_the_valley": "mam_nutrients_5",
-    "siftec:deploying/kitchen_melon": "mam_nutrients_5",
-    "siftec:deploying/kitchen_mutton": "mam_nutrients_5",
-    "siftec:deploying/kitchen_open_eyeblossom": "mam_nutrients_5",
-    "siftec:deploying/kitchen_orange_tulip": "mam_nutrients_5",
-    "siftec:deploying/kitchen_oxeye_daisy": "mam_nutrients_5",
-    "siftec:deploying/kitchen_pink_tulip": "mam_nutrients_5",
-    "siftec:deploying/kitchen_poppy": "mam_nutrients_5",
-    "siftec:deploying/kitchen_porkchop": "mam_nutrients_5",
-    "siftec:deploying/kitchen_pumpkin": "mam_nutrients_5",
-    "siftec:deploying/kitchen_pumpkin_pie": "mam_nutrients_5",
-    "siftec:deploying/kitchen_red_mushroom_colony": "mam_nutrients_5",
-    "siftec:deploying/kitchen_red_tulip": "mam_nutrients_5",
-    "siftec:deploying/kitchen_rice_panicle": "mam_nutrients_5",
-    "siftec:deploying/kitchen_salmon": "mam_nutrients_5",
-    "siftec:deploying/kitchen_smoked_ham": "mam_nutrients_5",
-    "siftec:deploying/kitchen_sweet_berry_cheesecake": "mam_nutrients_5",
-    "siftec:deploying/kitchen_torchflower": "mam_nutrients_5",
-    "siftec:deploying/kitchen_white_tulip": "mam_nutrients_5",
-    "siftec:deploying/kitchen_wild_beetroots": "mam_nutrients_5",
-    "siftec:deploying/kitchen_wild_cabbages": "mam_nutrients_5",
-    "siftec:deploying/kitchen_wild_carrots": "mam_nutrients_5",
-    "siftec:deploying/kitchen_wild_onions": "mam_nutrients_5",
-    "siftec:deploying/kitchen_wild_potatoes": "mam_nutrients_5",
-    "siftec:deploying/kitchen_wild_rice": "mam_nutrients_5",
-    "siftec:deploying/kitchen_wild_tomatoes": "mam_nutrients_5",
-    "siftec:deploying/kitchen_wither_rose": "mam_nutrients_5",
-    "siftec:deploying/kitchen_tag_dough": "mam_nutrients_5",
+    "siftec:mixing/kitchen_apple_cider": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_baked_cod_stew": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_beef_stew": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_beetroot_soup": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_bone_broth": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_cabbage_rolls": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_chicken_soup": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_cooked_rice": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_dog_food": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_dumplings": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_fish_stew": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_fried_rice": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_glow_berry_custard": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_hot_cocoa": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_mushroom_rice": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_mushroom_stew": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_noodle_soup": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_onion_soup": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_pasta_with_meatballs": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_pasta_with_mutton_chop": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_pumpkin_soup": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_rabbit_stew": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_ratatouille": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_squid_ink_pasta": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_stuffed_pumpkin_block": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_vegetable_noodles": "mam_nutrients_automated_cooking",
+    "siftec:mixing/kitchen_vegetable_soup": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_allium": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_apple_pie": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_azure_bluet": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_beef": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_blue_orchid": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_brown_mushroom_colony": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cabbage": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cactus_flower": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cake": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_chicken": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_chocolate_pie": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_closed_eyeblossom": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cod": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cooked_chicken": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cooked_cod": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cooked_mutton": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cooked_salmon": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_cornflower": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_dandelion": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_golden_dandelion": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_ham": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_ink_sac": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_kelp_roll": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_lily_of_the_valley": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_melon": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_mutton": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_open_eyeblossom": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_orange_tulip": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_oxeye_daisy": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_pink_tulip": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_poppy": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_porkchop": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_pumpkin": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_pumpkin_pie": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_red_mushroom_colony": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_red_tulip": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_rice_panicle": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_salmon": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_smoked_ham": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_sweet_berry_cheesecake": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_torchflower": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_white_tulip": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_wild_beetroots": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_wild_cabbages": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_wild_carrots": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_wild_onions": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_wild_potatoes": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_wild_rice": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_wild_tomatoes": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_wither_rose": "mam_nutrients_automated_cooking",
+    "siftec:deploying/kitchen_tag_dough": "mam_nutrients_automated_cooking",
     "siftec:compacting/constructor/aluminum_rod": "alt_aluminum_rod",
     "siftec:compacting/constructor/biocoal": "alt_biocoal",
     "siftec:compacting/constructor/charcoal": "alt_charcoal",
@@ -5757,7 +6421,7 @@
       "id": "alt_caterium_wire",
       "requires": [
         "hub_upgrade_3",
-        "mam_caterium_1"
+        "mam_caterium_brass"
       ]
     },
     {
@@ -5843,7 +6507,7 @@
         "hub_upgrade_3",
         "basic_steel_production",
         "oil_processing",
-        "mam_caterium_2"
+        "mam_caterium_quickwire"
       ]
     },
     {
@@ -5883,7 +6547,7 @@
         "hub_upgrade_3",
         "basic_steel_production",
         "oil_processing",
-        "mam_quartz_4"
+        "mam_quartz_crystal_oscillator"
       ]
     },
     {
@@ -5908,7 +6572,7 @@
       "requires": [
         "hub_upgrade_3",
         "basic_steel_production",
-        "mam_caterium_7",
+        "mam_caterium_high_speed_connector",
         "advanced_steel_production"
       ]
     },
@@ -5926,14 +6590,14 @@
         "coal_power",
         "basic_steel_production",
         "control_system_development",
-        "mam_sulfur_6"
+        "mam_sulfur_compacted_coal"
       ]
     },
     {
       "id": "alt_fused_quickwire",
       "requires": [
         "hub_upgrade_3",
-        "mam_caterium_1",
+        "mam_caterium_brass",
         "basic_steel_production"
       ]
     },
@@ -5941,7 +6605,7 @@
       "id": "alt_fused_wire",
       "requires": [
         "hub_upgrade_3",
-        "mam_caterium_1",
+        "mam_caterium_brass",
         "basic_steel_production"
       ]
     },
@@ -5978,7 +6642,7 @@
         "hub_upgrade_3",
         "basic_steel_production",
         "oil_processing",
-        "mam_caterium_2"
+        "mam_caterium_quickwire"
       ]
     },
     {
@@ -5994,7 +6658,7 @@
       "requires": [
         "hub_upgrade_3",
         "basic_steel_production",
-        "mam_caterium_2",
+        "mam_caterium_quickwire",
         "oil_processing"
       ]
     },
@@ -6003,7 +6667,7 @@
       "requires": [
         "hub_upgrade_3",
         "basic_steel_production",
-        "mam_caterium_2"
+        "mam_caterium_quickwire"
       ]
     },
     {
@@ -6012,7 +6676,7 @@
         "hub_upgrade_3",
         "part_assembly",
         "basic_steel_production",
-        "mam_quartz_2"
+        "mam_quartz_silica"
       ]
     },
     {
@@ -6061,7 +6725,7 @@
         "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
-        "mam_sulfur_6"
+        "mam_sulfur_compacted_coal"
       ]
     },
     {
@@ -6144,7 +6808,7 @@
         "hub_upgrade_3",
         "part_assembly",
         "basic_steel_production",
-        "mam_caterium_7",
+        "mam_caterium_high_speed_connector",
         "advanced_steel_production",
         "hub_upgrade_2"
       ]
@@ -6156,7 +6820,7 @@
         "part_assembly",
         "basic_steel_production",
         "oil_processing",
-        "mam_caterium_2"
+        "mam_caterium_quickwire"
       ]
     },
     {
@@ -6208,8 +6872,8 @@
         "basic_steel_production",
         "control_system_development",
         "part_assembly",
-        "mam_caterium_2",
-        "mam_quartz_2"
+        "mam_caterium_quickwire",
+        "mam_quartz_silica"
       ]
     },
     {
@@ -6218,8 +6882,8 @@
         "hub_upgrade_3",
         "part_assembly",
         "basic_steel_production",
-        "mam_caterium_4",
-        "mam_quartz_1",
+        "mam_caterium_ai_limiter",
+        "mam_quartz_quartz_crystals",
         "oil_processing"
       ]
     },
@@ -6239,8 +6903,8 @@
         "part_assembly",
         "basic_steel_production",
         "advanced_aluminum_production",
-        "mam_caterium_7",
-        "mam_quartz_1"
+        "mam_caterium_high_speed_connector",
+        "mam_quartz_quartz_crystals"
       ]
     },
     {
@@ -6251,7 +6915,7 @@
         "basic_steel_production",
         "bauxite_refinement",
         "oil_processing",
-        "mam_quartz_4"
+        "mam_quartz_crystal_oscillator"
       ]
     },
     {
@@ -6260,7 +6924,7 @@
         "hub_upgrade_3",
         "part_assembly",
         "basic_steel_production",
-        "mam_quartz_4",
+        "mam_quartz_crystal_oscillator",
         "advanced_steel_production"
       ]
     },
@@ -6271,8 +6935,8 @@
         "part_assembly",
         "basic_steel_production",
         "oil_processing",
-        "mam_caterium_2",
-        "mam_quartz_2"
+        "mam_caterium_quickwire",
+        "mam_quartz_silica"
       ]
     },
     {
@@ -6315,7 +6979,7 @@
         "hub_upgrade_3",
         "part_assembly",
         "basic_steel_production",
-        "mam_quartz_4",
+        "mam_quartz_crystal_oscillator",
         "nuclear_power"
       ]
     },
@@ -6478,7 +7142,7 @@
         "hub_upgrade_3",
         "coal_power",
         "basic_steel_production",
-        "mam_sulfur_6",
+        "mam_sulfur_compacted_coal",
         "oil_processing"
       ]
     },
@@ -6568,7 +7232,7 @@
       "id": "alt_unpackage_turbofuel",
       "requires": [
         "fluid_packaging",
-        "mam_sulfur_7"
+        "mam_sulfur_turbofuel"
       ]
     },
     {
@@ -6576,14 +7240,14 @@
       "requires": [
         "matter_conversion",
         "quantum_encoding",
-        "mam_sulfur_10"
+        "mam_sulfur_rocket_fuel"
       ]
     },
     {
       "id": "alt_pink_diamonds",
       "requires": [
         "matter_conversion",
-        "mam_quartz_1"
+        "mam_quartz_quartz_crystals"
       ]
     },
     {
@@ -6629,7 +7293,7 @@
     {
       "id": "alt_turbo_diamonds",
       "requires": [
-        "mam_sulfur_7",
+        "mam_sulfur_turbofuel",
         "particle_enrichment"
       ]
     }
@@ -6669,132 +7333,7 @@
     "create:mechanical_crafting/extendo_grip",
     "create:mechanical_crafting/potato_cannon",
     "create:mechanical_crafting/wand_of_symmetry",
-    "create:andesite_table_cloth_from_andesite_alloy_stonecutting",
-    "travelersbackpack:bat_smithing",
-    "travelersbackpack:bee",
-    "travelersbackpack:bee_smithing",
-    "travelersbackpack:black_sleeping_bag",
-    "travelersbackpack:blaze",
-    "travelersbackpack:blaze_smithing",
-    "travelersbackpack:blue_sleeping_bag",
-    "travelersbackpack:bookshelf",
-    "travelersbackpack:bookshelf_smithing",
-    "travelersbackpack:brown_sleeping_bag",
-    "travelersbackpack:cactus",
-    "travelersbackpack:cactus_smithing",
-    "travelersbackpack:cake",
-    "travelersbackpack:cake_smithing",
-    "travelersbackpack:chicken",
-    "travelersbackpack:chicken_smithing",
-    "travelersbackpack:coal",
-    "travelersbackpack:coal_smithing",
-    "travelersbackpack:cow",
-    "travelersbackpack:cow_smithing",
-    "travelersbackpack:creeper",
-    "travelersbackpack:creeper_smithing",
-    "travelersbackpack:cyan_sleeping_bag",
-    "travelersbackpack:diamond",
-    "travelersbackpack:diamond_smithing",
-    "travelersbackpack:diamond_tier_upgrade",
-    "travelersbackpack:dragon",
-    "travelersbackpack:dragon_smithing",
-    "travelersbackpack:dye_black_sleeping_bag",
-    "travelersbackpack:dye_blue_sleeping_bag",
-    "travelersbackpack:dye_brown_sleeping_bag",
-    "travelersbackpack:dye_cyan_sleeping_bag",
-    "travelersbackpack:dye_gray_sleeping_bag",
-    "travelersbackpack:dye_green_sleeping_bag",
-    "travelersbackpack:dye_light_blue_sleeping_bag",
-    "travelersbackpack:dye_light_gray_sleeping_bag",
-    "travelersbackpack:dye_lime_sleeping_bag",
-    "travelersbackpack:dye_magenta_sleeping_bag",
-    "travelersbackpack:dye_orange_sleeping_bag",
-    "travelersbackpack:dye_pink_sleeping_bag",
-    "travelersbackpack:dye_purple_sleeping_bag",
-    "travelersbackpack:dye_red_sleeping_bag",
-    "travelersbackpack:dye_white_sleeping_bag",
-    "travelersbackpack:dye_yellow_sleeping_bag",
-    "travelersbackpack:emerald",
-    "travelersbackpack:emerald_smithing",
-    "travelersbackpack:end",
-    "travelersbackpack:end_smithing",
-    "travelersbackpack:enderman",
-    "travelersbackpack:enderman_smithing",
-    "travelersbackpack:fox",
-    "travelersbackpack:fox_smithing",
-    "travelersbackpack:ghast",
-    "travelersbackpack:ghast_smithing",
-    "travelersbackpack:gold",
-    "travelersbackpack:gold_smithing",
-    "travelersbackpack:gold_tier_upgrade",
-    "travelersbackpack:gray_sleeping_bag",
-    "travelersbackpack:green_sleeping_bag",
-    "travelersbackpack:hay",
-    "travelersbackpack:hay_smithing",
-    "travelersbackpack:horse",
-    "travelersbackpack:horse_smithing",
-    "travelersbackpack:iron",
-    "travelersbackpack:iron_golem_smithing",
-    "travelersbackpack:iron_smithing",
-    "travelersbackpack:iron_tier_upgrade",
-    "travelersbackpack:lapis",
-    "travelersbackpack:lapis_smithing",
-    "travelersbackpack:light_blue_sleeping_bag",
-    "travelersbackpack:light_gray_sleeping_bag",
-    "travelersbackpack:lime_sleeping_bag",
-    "travelersbackpack:magenta_sleeping_bag",
-    "travelersbackpack:magma_cube",
-    "travelersbackpack:magma_cube_smithing",
-    "travelersbackpack:melon",
-    "travelersbackpack:melon_smithing",
-    "travelersbackpack:nether",
-    "travelersbackpack:nether_smithing",
-    "travelersbackpack:netherite",
-    "travelersbackpack:netherite_smithing",
-    "travelersbackpack:netherite_tier_upgrade",
-    "travelersbackpack:ocelot",
-    "travelersbackpack:ocelot_smithing",
-    "travelersbackpack:orange_sleeping_bag",
-    "travelersbackpack:pig",
-    "travelersbackpack:pig_smithing",
-    "travelersbackpack:pink_sleeping_bag",
-    "travelersbackpack:pumpkin",
-    "travelersbackpack:pumpkin_smithing",
-    "travelersbackpack:purple_sleeping_bag",
-    "travelersbackpack:quartz",
-    "travelersbackpack:quartz_smithing",
-    "travelersbackpack:red_sleeping_bag",
-    "travelersbackpack:redstone",
-    "travelersbackpack:redstone_smithing",
-    "travelersbackpack:sandstone",
-    "travelersbackpack:sandstone_smithing",
-    "travelersbackpack:sheep",
-    "travelersbackpack:sheep_smithing",
-    "travelersbackpack:skeleton",
-    "travelersbackpack:skeleton_smithing",
-    "travelersbackpack:snow",
-    "travelersbackpack:snow_smithing",
-    "travelersbackpack:spider",
-    "travelersbackpack:spider_smithing",
-    "travelersbackpack:sponge",
-    "travelersbackpack:sponge_smithing",
-    "travelersbackpack:squid",
-    "travelersbackpack:squid_smithing",
-    "travelersbackpack:standard",
-    "travelersbackpack:standard_dyed",
-    "travelersbackpack:standard_no_sleeping_bag",
-    "travelersbackpack:standard_no_tanks",
-    "travelersbackpack:standard_no_tanks_sleeping_bag",
-    "travelersbackpack:standard_smithing",
-    "travelersbackpack:villager_smithing",
-    "travelersbackpack:warden",
-    "travelersbackpack:warden_smithing",
-    "travelersbackpack:white_sleeping_bag",
-    "travelersbackpack:wither",
-    "travelersbackpack:wither_smithing",
-    "travelersbackpack:wolf",
-    "travelersbackpack:wolf_smithing",
-    "travelersbackpack:yellow_sleeping_bag"
+    "create:andesite_table_cloth_from_andesite_alloy_stonecutting"
   ],
   "workshop": [
     {
@@ -6807,27 +7346,6 @@
         {
           "item": "siftec:wire",
           "count": 4
-        }
-      ]
-    },
-    {
-      "item": "siftec:wormhole_gateway",
-      "cost": [
-        {
-          "item": "#siftec:stones",
-          "count": 500
-        },
-        {
-          "item": "create:iron_sheet",
-          "count": 250
-        },
-        {
-          "item": "siftec:iron_rod",
-          "count": 400
-        },
-        {
-          "item": "siftec:wire",
-          "count": 1500
         }
       ]
     },
@@ -7019,6 +7537,66 @@
         {
           "item": "siftec:steel_pipe",
           "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:protein_inhaler",
+      "cost": [
+        {
+          "item": "siftec:alien_protein",
+          "count": 1
+        },
+        {
+          "item": "minecraft:apple",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "siftec:vitamin_inhaler",
+      "cost": [
+        {
+          "item": "#siftec:mycelia",
+          "count": 10
+        },
+        {
+          "item": "minecraft:sweet_berries",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "item": "siftec:therapeutic_inhaler",
+      "cost": [
+        {
+          "item": "#siftec:mycelia",
+          "count": 15
+        },
+        {
+          "item": "siftec:alien_protein",
+          "count": 1
+        },
+        {
+          "item": "minecraft:glow_berries",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "item": "siftec:nutritional_inhaler",
+      "cost": [
+        {
+          "item": "minecraft:glow_berries",
+          "count": 1
+        },
+        {
+          "item": "minecraft:sweet_berries",
+          "count": 2
+        },
+        {
+          "item": "minecraft:apple",
+          "count": 5
         }
       ]
     },
@@ -8197,6 +8775,30 @@
       "prefab": "hub"
     },
     {
+      "id": "wormhole_gateway",
+      "category": "special",
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 500
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 250
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 400
+        },
+        {
+          "item": "siftec:wire",
+          "count": 1500
+        }
+      ],
+      "unlock": "hub_upgrade_6",
+      "prefab": "gateway"
+    },
+    {
       "id": "test_building",
       "category": "production",
       "cost": [
@@ -8462,7 +9064,7 @@
           "count": 2
         }
       ],
-      "unlock": "mam_caterium_9",
+      "unlock": "mam_caterium_power_poles_mk_2",
       "logic": "power",
       "lines": 7,
       "power": "pole"
@@ -8484,7 +9086,7 @@
           "count": 3
         }
       ],
-      "unlock": "mam_caterium_10",
+      "unlock": "mam_caterium_power_poles_mk_3",
       "logic": "power",
       "lines": 10,
       "power": "pole"
@@ -8632,7 +9234,7 @@
           "count": 250
         }
       ],
-      "unlock": "mam_sulfur_8",
+      "unlock": "mam_sulfur_geothermal_power",
       "logic": "power",
       "mw": 200,
       "power": "geothermal",
@@ -8702,7 +9304,7 @@
           "count": 10
         }
       ],
-      "unlock": "mam_alien_11",
+      "unlock": "mam_alien_power_augmenter",
       "logic": "power",
       "mw": 500,
       "power": "augmenter"

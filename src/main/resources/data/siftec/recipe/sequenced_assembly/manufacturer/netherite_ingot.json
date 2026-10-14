@@ -1,0 +1,45 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "siftec:netherite_ingot_core",
+  "transitional_item": {
+    "id": "siftec:incomplete_netherite_ingot"
+  },
+  "result": {
+    "id": "minecraft:netherite_ingot"
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:gold_ingot",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:diamond",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "#c:ingots/steel",
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "minecraft:netherrack",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

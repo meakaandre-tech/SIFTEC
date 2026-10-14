@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/heart_of_the_sea_core",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 9474200
+      }
+    ]
+  }
+}

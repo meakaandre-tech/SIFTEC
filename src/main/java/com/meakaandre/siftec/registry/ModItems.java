@@ -43,6 +43,20 @@ public class ModItems {
     public static final Supplier<Item> SAM = item("sam", Item::new);
     /** From uranium nodes; work package 4 wires it into the nuclear chain. */
     public static final Supplier<Item> URANIUM = item("uranium", Item::new);
+    /** The MAM's inhalers (item/MamItems.java): Protein (Alien Megafauna), Vitamin and Therapeutic (Mycelia), Nutritional (Nutrients). */
+    public static final Supplier<Item> PROTEIN_INHALER = item("protein_inhaler",
+        properties -> new com.meakaandre.siftec.item.MamItems.InhalerItem(com.meakaandre.siftec.item.MamItems.Inhaler.PROTEIN, properties.stacksTo(16)));
+    public static final Supplier<Item> VITAMIN_INHALER = item("vitamin_inhaler",
+        properties -> new com.meakaandre.siftec.item.MamItems.InhalerItem(com.meakaandre.siftec.item.MamItems.Inhaler.VITAMIN, properties.stacksTo(16)));
+    public static final Supplier<Item> THERAPEUTIC_INHALER = item("therapeutic_inhaler",
+        properties -> new com.meakaandre.siftec.item.MamItems.InhalerItem(com.meakaandre.siftec.item.MamItems.Inhaler.THERAPEUTIC, properties.stacksTo(16)));
+    public static final Supplier<Item> NUTRITIONAL_INHALER = item("nutritional_inhaler",
+        properties -> new com.meakaandre.siftec.item.MamItems.InhalerItem(com.meakaandre.siftec.item.MamItems.Inhaler.NUTRITIONAL, properties.stacksTo(16)));
+    /** An Elytra and a Copper Backtank in one chest item (MAM, Mycelia): glides, and holds Create's backtank air. */
+    public static final Supplier<Item> ELYTRA_BACKPACK = item("elytra_backpack", properties -> new com.meakaandre.siftec.item.MamItems.ElytraBackpackItem(
+        properties.stacksTo(1).durability(432).equippable(net.minecraft.world.entity.EquipmentSlot.CHEST)
+            .component(net.minecraft.core.component.DataComponents.GLIDER, net.minecraft.util.Unit.INSTANCE)
+            .component(com.zurrtum.create.AllDataComponents.BACKTANK_AIR, 0)));
 
     private static <T extends Item> Supplier<T> hiddenItem(String name, Function<Item.Properties, T> factory) {
         ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Siftec.id(name));
