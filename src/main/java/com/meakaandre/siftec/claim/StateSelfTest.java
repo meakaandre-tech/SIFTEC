@@ -34,8 +34,8 @@ import java.util.UUID;
 
 /**
  * Used by the automated test ({@code /siftec selftest state setup|check|verify}): saves far bigger than the old
- * 64 KB limit, claims given up when their block goes, explosions, the HUB budget, the spawn area, chunk loading
- * and kicking. {@code verify} runs after the restart and removes everything the test made.
+ * 64 KB limit, claims given up when their block goes, explosions, the HUB budget, the spawn area, chunk loading,
+ * kicking, and Build Gun buildings on claimed land with the per-company unlocks ({@link com.meakaandre.siftec.building.ClaimGunTests}). {@code verify} runs after the restart and removes everything the test made.
  */
 public final class StateSelfTest {
     private static final String BIG = "selftest_big", OTHER = "selftest_other", BUDGET = "selftest_budget", LOAD = "selftest_load", KICK = "selftest_kick";
@@ -178,6 +178,9 @@ public final class StateSelfTest {
         report(source, "SELFTEST state kick: by a member " + byMember + ", by the founder " + byFounder + "; members " + kick.members.size()
             + "; multiplier right after " + multiplier + "; may rejoin " + !cooling + "; 15 parts paid at x2.0 become " + kick.paid.get("selftest").get("minecraft:iron_ingot")
             + " at x" + kick.costMultiplier());
+
+        // 7. Build Gun buildings and claims, and the per-company unlocks of buildings and belt speed
+        com.meakaandre.siftec.building.ClaimGunTests.run(source, level, StateSelfTest::fake);
         return 1;
     }
 

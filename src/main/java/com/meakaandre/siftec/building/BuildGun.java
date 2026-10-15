@@ -131,7 +131,7 @@ public final class BuildGun {
                 player.sendOverlayMessage(Component.translatable("siftec.build_gun.dismantle_aim"));
                 return;
             }
-            Component refused = mayDismantle(player, controller);
+            Component refused = mayDismantle(player, company, controller);
             if (refused != null) {
                 player.sendOverlayMessage(refused);
                 return;
@@ -175,8 +175,7 @@ public final class BuildGun {
 
     /** Dismantles a HUB or Wormhole Gateway for a player of its company: its cost and everything in it come back. False if refused. */
     static boolean takeDownHub(ServerPlayer player, HubBlockEntity hub, Company company) {
-        Component refused = player.hasInfiniteMaterials() || hub.companyId.isEmpty() || company.id.equals(hub.companyId) ? null
-            : Component.translatable("siftec.build_gun.not_yours");
+        Component refused = mayDismantle(player, company, hub.companyId, hubBounds(hub));
         if (refused != null) {
             player.sendOverlayMessage(refused);
             return false;
@@ -202,10 +201,7 @@ public final class BuildGun {
     static Prefabs.Check hubCheck(ServerPlayer player, Placement p, Company company) {
         boolean creative = player.hasInfiniteMaterials();
         Prefabs.Check check = Prefabs.check(player.level(), hubSpot(p), company, creative);
-        if (check.ok() && !creative && !p.def().unlock().isEmpty() && !company.has(p.def().unlock())) {
-            com.meakaandre.siftec.hub.Milestone m = com.meakaandre.siftec.hub.Milestones.get(p.def().unlock());
-            check.fail("siftec.build_gun.locked", m == null ? Component.literal(p.def().unlock()) : m.name());
-        }
+        if (check.ok() && !creative && Buildings.locked(p.def(), company)) check.fail("siftec.build_gun.locked", Buildings.unlockName(p.def()));
         if (check.ok() && !creative) {
             var missing = Prefabs.missing(player, Prefabs.cost(hubSpot(p).kind()));
             if (missing != null) check.fail(p.def().hub() ? "siftec.prefab.cost" : "siftec.prefab.cost_any", missing.count(), missing.icon().getHoverName());
@@ -219,16 +215,35 @@ public final class BuildGun {
         return c != null && level.getBlockEntity(c) instanceof ControllerBlockEntity controller ? controller : null;
     }
 
-    /** Null if the player may take the building down: their company's, nobody's, or they are in creative. */
-    static @Nullable Component mayDismantle(ServerPlayer player, ControllerBlockEntity controller) {
-        return mayDismantle(player, controller.companyId);
+    /** The space a HUB or Wormhole Gateway takes up, as it stands. */
+    static AABB hubBounds(HubBlockEntity hub) {
+        return Prefabs.bounds(new Prefabs.Spot(hub.gateway() ? Prefabs.Kind.GATEWAY : Prefabs.Kind.HUB, hub.anchor, hub.facing));
     }
 
-    static @Nullable Component mayDismantle(ServerPlayer player, String companyId) {
-        if (player.hasInfiniteMaterials() || companyId == null || companyId.isEmpty()) return null;
-        Company mine = Companies.of(player);
-        if (mine.id.equals(companyId)) return null;
-        return Component.translatable("siftec.build_gun.not_yours");
+    /** The space a placed building takes up, or just its controller's block if its placement is lost. */
+    static AABB bounds(ControllerBlockEntity controller) {
+        Placement p = controller.placement();
+        BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
+        return p != null && t != null ? p.bounds(t) : new AABB(controller.getBlockPos());
+    }
+
+    static @Nullable Component mayDismantle(ServerPlayer player, Company company, ControllerBlockEntity controller) {
+        return mayDismantle(player, company, controller.companyId, bounds(controller));
+    }
+
+    /**
+     * Null if a player of this company may take down a building (or HUB) owned by {@code ownerId} that takes up
+     * {@code box}; otherwise why not. A company's building comes down only for its own members, wherever it stands
+     * (its refund is theirs). One nobody owns comes down for anyone the land lets build there: unclaimed land, or
+     * their own company's claim. Creative players may take down anything.
+     */
+    static @Nullable Component mayDismantle(ServerPlayer player, Company company, @Nullable String ownerId, AABB box) {
+        if (player.hasInfiniteMaterials()) return null;
+        if (ownerId != null && !ownerId.isEmpty()) {
+            return !company.id.isEmpty() && company.id.equals(ownerId) ? null : Component.translatable("siftec.build_gun.not_yours");
+        }
+        com.meakaandre.siftec.claim.Claims.Claim claim = com.meakaandre.siftec.claim.Claims.foreign(player.level(), box, company.id);
+        return claim == null ? null : Component.translatable("siftec.claim.denied", com.meakaandre.siftec.claim.Claims.holder(player.level(), claim));
     }
 
     // ------------------------------------------------------------------------------------------------ the hologram's verdict
@@ -249,8 +264,8 @@ public final class BuildGun {
                 Placement p = controller == null ? null : controller.placement();
                 BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
                 if (hub != null) {
-                    AABB box = Prefabs.bounds(new Prefabs.Spot(hub.gateway() ? Prefabs.Kind.GATEWAY : Prefabs.Kind.HUB, hub.anchor, hub.facing));
-                    Component refused = mayDismantle(player, hub.companyId);
+                    AABB box = hubBounds(hub);
+                    Component refused = mayDismantle(player, Companies.of(player), hub.companyId, box);
                     view = BuildGunPayloads.View.of(refused == null, refused != null ? refused
                             : Component.translatable("siftec.build_gun.dismantle_hint", Component.translatable(hub.gateway() ? "block.siftec.wormhole_gateway" : "block.siftec.hub")),
                         BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1, box.maxY - 1, box.maxZ - 1));
@@ -258,7 +273,7 @@ public final class BuildGun {
                     view = BuildGunPayloads.View.of(false, Component.translatable("siftec.build_gun.dismantle_aim"), null, null);
                 } else {
                     AABB box = p.bounds(t);
-                    Component refused = mayDismantle(player, controller);
+                    Component refused = mayDismantle(player, Companies.of(player), controller.companyId, box);
                     view = BuildGunPayloads.View.of(refused == null, refused != null ? refused : Component.translatable("siftec.build_gun.dismantle_hint", p.def().name()),
                         BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1, box.maxY - 1, box.maxZ - 1));
                 }
