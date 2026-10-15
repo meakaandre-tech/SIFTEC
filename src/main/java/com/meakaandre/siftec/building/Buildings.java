@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -120,6 +119,20 @@ public final class Buildings {
 
     // ------------------------------------------------------------------------------------------------ checking
 
+    /**
+     * True if the company has not unlocked the building yet: its milestone, Wormhole phase or MAM research is not among
+     * what the company has done. Unlocks belong to the company, so every member builds what one of them unlocked.
+     */
+    public static boolean locked(BuildingDef def, Company company) {
+        return !def.unlock().isEmpty() && !company.has(def.unlock());
+    }
+
+    /** The name of what unlocks the building (a milestone or MAM node), or its id if no such milestone is known. */
+    public static Component unlockName(BuildingDef def) {
+        Milestone m = Milestones.get(def.unlock());
+        return m == null ? Component.literal(def.unlock()) : m.name();
+    }
+
     /** What a placement check found. */
     public static final class Check {
         public final Placement placement;
@@ -202,10 +215,7 @@ public final class Buildings {
         }
         if (creative) return check;
         if (p.def().dev()) check.fail("siftec.build_gun.dev");
-        if (company != null && !p.def().unlock().isEmpty() && !company.has(p.def().unlock())) {
-            Milestone m = Milestones.get(p.def().unlock());
-            check.fail("siftec.build_gun.locked", m == null ? Component.literal(p.def().unlock()) : m.name());
-        }
+        if (company != null && locked(p.def(), company)) check.fail("siftec.build_gun.locked", unlockName(p.def()));
         if (company != null && level instanceof ServerLevel server) land(server, p, t, company, check);
         if (payer != null) {
             for (Milestone.Cost cost : p.def().cost()) {
@@ -280,16 +290,8 @@ public final class Buildings {
     }
 
     private static void land(ServerLevel level, Placement p, BuildingTemplate t, Company company, Check check) {
-        AABB box = p.bounds(t);
-        for (int cx = ((int) box.minX) >> 4; cx <= ((int) box.maxX - 1) >> 4; cx++)
-            for (int cz = ((int) box.minZ) >> 4; cz <= ((int) box.maxZ - 1) >> 4; cz++) {
-                Claims.Claim claim = Claims.at(level, cx, cz);
-                if (claim != null && !claim.company.equals(company.id)) {
-                    Company owner = CompanyData.get(level.getServer()).byId(claim.company);
-                    check.fail("siftec.prefab.claimed", owner == null ? "?" : owner.name);
-                    return;
-                }
-            }
+        Claims.Claim claim = Claims.foreign(level, p.bounds(t), company.id);
+        if (claim != null) check.fail("siftec.prefab.claimed", Claims.holder(level, claim));
     }
 
     // ------------------------------------------------------------------------------------------------ placing

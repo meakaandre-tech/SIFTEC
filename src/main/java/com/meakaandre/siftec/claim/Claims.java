@@ -189,6 +189,27 @@ public final class Claims {
         return server.hasInfiniteMaterials();
     }
 
+    /**
+     * The first chunk under the box (block coordinates, max exclusive, as an {@link net.minecraft.world.phys.AABB}
+     * gives them) that another company holds, or null if all of it is the company's own or unclaimed. A Build Gun
+     * building is placed, or taken down when it has no owner, only where this finds nothing.
+     */
+    public static @Nullable Claim foreign(Level level, net.minecraft.world.phys.AABB box, String company) {
+        for (int cx = ((int) Math.floor(box.minX)) >> 4; cx <= ((int) Math.ceil(box.maxX) - 1) >> 4; cx++)
+            for (int cz = ((int) Math.floor(box.minZ)) >> 4; cz <= ((int) Math.ceil(box.maxZ) - 1) >> 4; cz++) {
+                Claim claim = at(level, cx, cz);
+                if (claim != null && !claim.company.equals(company)) return claim;
+            }
+        return null;
+    }
+
+    /** The name of the company holding a claim, for messages. */
+    public static String holder(Level level, Claim claim) {
+        if (!(level instanceof ServerLevel server)) return "?";
+        Company owner = CompanyData.get(server.getServer()).byId(claim.company);
+        return owner == null ? "?" : owner.name;
+    }
+
     /** True if a machine (a drill or saw) may break the block at the target. */
     public static boolean machineMayBreak(BlockEntity machine, BlockPos target) {
         Level level = machine.getLevel();
@@ -207,6 +228,8 @@ public final class Claims {
             return false;
         });
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+            // the Build Gun never uses the block it points at; it checks the land under what it builds or takes down itself
+            if (player.getItemInHand(hand).getItem() instanceof com.meakaandre.siftec.building.BuildGunItem) return InteractionResult.PASS;
             if (allowed(player, level, hit.getBlockPos())) return InteractionResult.PASS;
             deny(player, level, hit.getBlockPos());
             resync(player, level, hit.getBlockPos(), hit.getDirection());

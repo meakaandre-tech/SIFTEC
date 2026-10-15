@@ -26,6 +26,15 @@ fast it regrows, which caps every miner. Every player spawns with the Build Gun,
 is the HUB (Special tab, 20 Raw Iron, given back when it is dismantled), which has a hand-cranked Craft Station (a Press
 and a Mixer over Basins) and two Biomass Burners.
 
+## Companies and claims
+
+Everything a player unlocks belongs to their company: milestones, Wormhole phases, MAM research, which Build Gun
+buildings can be placed (`Buildings.locked`) and how fast self-moving belts run. The company's first HUB claims the 5×5
+chunks around it and each Claim Marker the 3×3 around it; inside a claim only members can build, break or use
+anything. The Build Gun checks the land under a building's whole box before placing it, so nothing is built on or
+across another company's claim. A company's building is dismantled only by its own members, wherever it stands; one
+nobody owns comes down only for players the land lets build there. Creative players skip claims, unlocks and costs.
+
 ## Power
 
 Power is Create: New Age electricity underneath and SU on top: Satisfactory's MW at **1 MW = 204.8 SU**, with FE
