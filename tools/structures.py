@@ -1042,6 +1042,27 @@ def radar_tower():
     return f.done()
 
 
+def truck_station():
+    # work package 14. 5 wide, 5 deep, 4 high: an orange garage on a pad, its dock in front of it (the 5 by 5 just past
+    # its front edge, where a vehicle on a route stops). Inside: two Item Vaults the vehicles load from or unload into
+    # (item_in on its right side, item_out on its left) and a fuel tank they fill up from (fluid_in at the back). The
+    # controller is the terminal in its front wall: using it switches between loading and unloading.
+    f = Frame(5, 5)
+    f.pad()
+    f.hall(-2, 1, 2, 4, 1, 3, side=ORANGE, corner=DARK)
+    f.box(-2, 4, 1, 2, 4, 4, DARK)
+    f.hazard_x(-2, 2, 0, 0)
+    f.window_front(1, -1, 1, 2, 3)
+    f.set(0, 1, 1, CONTROLLER)
+    f.set(-1, 1, 2, "create:item_vault[axis=z,large=false]")
+    f.set(-1, 1, 3, "create:item_vault[axis=z,large=false]")
+    f.set(1, 1, 3, TANK)
+    f.port(2, 1, 2, "east", "item_in", (-1, 1, 2))
+    f.port(-2, 1, 3, "west", "item_out", (-1, 1, 3))
+    f.port(1, 1, 4, "north", "fluid_in", (1, 1, 3))
+    return f.done()
+
+
 BUILT = {"test_building": test_building, "test_miner": test_miner,
          "constructor": constructor, "smelter": smelter,
          "miner_mk1": lambda: miner(8, ORANGE, ORANGE), "miner_mk2": lambda: miner(9, LIGHT, ORANGE),
@@ -1056,7 +1077,8 @@ BUILT = {"test_building": test_building, "test_miner": test_miner,
          "quantum_encoder": quantum_encoder, "packager": packager, "water_extractor": water_extractor, "oil_extractor": oil_extractor,
          "resource_well_pressurizer": resource_well_pressurizer, "resource_well_extractor": resource_well_extractor,
          "particle_accelerator": particle_accelerator, "converter": converter,
-         "equipment_workshop": equipment_workshop, "awesome_sink": awesome_sink, "awesome_shop": awesome_shop, "radar_tower": radar_tower}
+         "equipment_workshop": equipment_workshop, "awesome_sink": awesome_sink, "awesome_shop": awesome_shop, "radar_tower": radar_tower,
+         "truck_station": truck_station}
 
 if __name__ == "__main__":
     for bid, make in BUILT.items():

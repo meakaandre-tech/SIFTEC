@@ -142,7 +142,7 @@ public final class Buildings {
         public @Nullable String reason;
         public Object[] args = new Object[0];
 
-        Check(Placement placement) {
+        public Check(Placement placement) {
             this.placement = placement;
         }
 
@@ -160,7 +160,7 @@ public final class Buildings {
             return Component.translatable("siftec.build_gun.fits", placement.def().name());
         }
 
-        void fail(String reason, Object... args) {
+        public void fail(String reason, Object... args) {
             if (this.reason != null) return;
             this.reason = reason;
             this.args = args;
@@ -355,7 +355,7 @@ public final class Buildings {
     }
 
     /** Takes the costs out of a container (the check has made sure they are there) and returns what was taken. */
-    private static List<ItemStack> take(Container payer, List<Milestone.Cost> costs) {
+    public static List<ItemStack> take(Container payer, List<Milestone.Cost> costs) {
         List<ItemStack> taken = new ArrayList<>();
         for (Milestone.Cost cost : costs) {
             if (!cost.present()) continue;

@@ -1140,6 +1140,14 @@ BUILDINGS = [
     ("awesome_sink", "AWESOME Sink", "special", BUILD_COSTS["AWESOME Sink"], "resource_sink_bonus_program", False, {"logic": "sink", "su": round(30 * MW)}),
     ("awesome_shop", "AWESOME Shop", "special", BUILD_COSTS["AWESOME Shop"], "resource_sink_bonus_program", False, {"logic": "shop"}),
     ("radar_tower", "Radar Tower", "special", BUILD_COSTS["Radar Tower"], mam("Quartz", "Radar Technology"), False, {"logic": "radar", "su": round(30 * MW)}),
+    # work package 14: vehicles (vehicle/Vehicles.java). The Tractor, Truck and Explorer are single entities the Build Gun
+    # puts down (prefab "vehicle", no template), drawn from Create's own models; they burn the Fuel Generator's fuels. The
+    # Truck Station is a building: an Item Vault vehicles load from or unload into (using its terminal switches which),
+    # and a fuel tank they fill up from, while they stand at its dock in front of it on a recorded route.
+    ("truck_station", "Truck Station", "logistics", BUILD_COSTS["Truck Station"], "vehicular_transport", False, {"logic": "truck_station"}),
+    ("tractor", "Tractor", "logistics", BUILD_COSTS["Tractor"], "vehicular_transport", False, {"prefab": "vehicle"}),
+    ("truck", "Truck", "logistics", BUILD_COSTS["Truck"], "logistics_mk4", False, {"prefab": "vehicle"}),
+    ("explorer", "Explorer", "logistics", BUILD_COSTS["Explorer"], mam("Quartz", "Display Systems"), False, {"prefab": "vehicle"}),
 ]
 # The buildings whose Basin is a Brass Basin (four stacks of each item), for the recipe checkers
 BRASS_BASIN_BUILDINGS = ("manufacturer", "blender")

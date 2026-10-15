@@ -66,6 +66,22 @@ out from the Cloud button above their inventory, `/depot`, or any depot; with th
 shift-click their own items in. The Blueprint Designer
 saves what is built in its volume as a Blueprint that places it whole again.
 
+## Vehicles
+
+The Tractor (Vehicular Transport), the Truck (Logistics Mk.4) and the Explorer (the Quartz tree's Display Systems) are
+single entities, not contraptions (`vehicle/`): the Build Gun puts one down for Satisfactory's cost from its Logistics
+tab and its dismantle mode takes it back with the cost and its cargo. They are drawn only from Create's own models and
+textures (`client/VehicleRenderer.java`): casings, a seat, fluid tanks, Item Vaults, cogwheels for wheels that turn as
+they roll and, on the Truck, belts for treads that run. Use one to get in (W and S throttle, A and D steer, Space
+brakes), sneak-use it for its storage (Tractor 27 slots, Truck 54, Explorer 9), and use it with a bucket of any fuel the Fuel
+Generator burns (Fuel, Liquid Biofuel, Turbofuel and up) to fill its tank; it burns its Satisfactory MW while the throttle is open.
+The Explorer is the fastest.
+
+The Truck Station is a building with two Item Vaults and a fuel tank; using its terminal switches it between loading
+vehicles and unloading them. Press V while driving to record a route, drive it once through the docks (the ground in
+front of each station) you want it to stop at, and press V again. With nobody in the seat it then drives the route by
+itself in a loop, stopping five seconds at each dock while the station loads or unloads it and fills its tank.
+
 ## Progression
 
 Satisfactory 1.0's progression, owned by the company: Tier 0's six HUB Upgrades in order, then Tiers 1 to 9 with 1.0's

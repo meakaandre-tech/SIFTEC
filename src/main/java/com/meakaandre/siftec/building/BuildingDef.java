@@ -24,7 +24,8 @@ import java.util.List;
  * wires its connector takes, and {@code vent} the open cell a Geothermal Generator must stand over a geyser with.
  * <p>
  * {@code prefab} names a structure the Build Gun puts down through {@link com.meakaandre.siftec.prefab.Prefabs} instead
- * of a structure template ("hub": the HUB), or is "" for an ordinary building.
+ * of a structure template ("hub": the HUB), "vehicle" for a vehicle (an entity, {@link com.meakaandre.siftec.vehicle.Vehicles}),
+ * or is "" for an ordinary building.
  * <p>
  * Work package 9's extractors: {@code fluid} is the fluid an extractor gives and {@code rate} its mB a minute on a normal
  * node (purity scales it); {@code fluidNode} is the fluid node type ("oil", "nitrogen") a node building stands on instead
@@ -44,7 +45,12 @@ public record BuildingDef(String id, Category category, List<Milestone.Cost> cos
 
     /** A structure (the HUB or the Wormhole Gateway) the Build Gun puts down whole through {@link com.meakaandre.siftec.prefab.Prefabs}. */
     public boolean structure() {
-        return !prefab.isEmpty();
+        return prefab.equals("hub") || prefab.equals("gateway");
+    }
+
+    /** A vehicle (work package 14): the Build Gun puts down a {@link com.meakaandre.siftec.vehicle.VehicleEntity}, not blocks. */
+    public boolean vehicle() {
+        return prefab.equals("vehicle");
     }
 
     /** Which structure it is, for {@link #structure()} ones. */

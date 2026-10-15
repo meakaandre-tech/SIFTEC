@@ -11878,6 +11878,94 @@
       "unlock": "mam_quartz_radar_technology",
       "logic": "radar",
       "su": 6144
+    },
+    {
+      "id": "truck_station",
+      "category": "logistics",
+      "cost": [
+        {
+          "item": "siftec:modular_frame",
+          "count": 15
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 20
+        },
+        {
+          "item": "siftec:cable",
+          "count": 50
+        }
+      ],
+      "unlock": "vehicular_transport",
+      "logic": "truck_station"
+    },
+    {
+      "id": "tractor",
+      "category": "logistics",
+      "cost": [
+        {
+          "item": "siftec:modular_frame",
+          "count": 5
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 5
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 10
+        }
+      ],
+      "unlock": "vehicular_transport",
+      "prefab": "vehicle"
+    },
+    {
+      "id": "truck",
+      "category": "logistics",
+      "cost": [
+        {
+          "item": "siftec:motor",
+          "count": 15
+        },
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 20
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 20
+        },
+        {
+          "item": "siftec:rubber",
+          "count": 50
+        }
+      ],
+      "unlock": "logistics_mk4",
+      "prefab": "vehicle"
+    },
+    {
+      "id": "explorer",
+      "category": "logistics",
+      "cost": [
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 5
+        },
+        {
+          "item": "siftec:motor",
+          "count": 5
+        },
+        {
+          "item": "siftec:modular_frame",
+          "count": 10
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 15
+        }
+      ],
+      "unlock": "mam_quartz_display_systems",
+      "prefab": "vehicle"
     }
   ],
   "machine_ticks": {

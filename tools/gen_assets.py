@@ -816,7 +816,7 @@ lang.update({"siftec.workshop.title": "Equipment Workshop",
 # ---- Build Gun and its buildings (building/BuildGun.java, building/Buildings.java)
 data["buildings"] = []
 LOGICS = {"basin", "smelter", "miner", "portable_miner", "storage", "power", "assembly", "packager", "extractor", "pressurizer",
-          "well_extractor", "processor", "workshop", "sink", "shop", "radar"}
+          "well_extractor", "processor", "workshop", "sink", "shop", "radar", "truck_station"}
 POWERS = {"pole", "storage", "augmenter", "biomass", "coal", "fuel", "geothermal", "nuclear"}
 for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if tab not in content.BUILD_TABS:
@@ -855,7 +855,7 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if "vent" in extra:
         b["vent"] = list(extra["vent"])
     if extra.get("prefab"):
-        if extra["prefab"] not in ("hub", "gateway"):
+        if extra["prefab"] not in ("hub", "gateway", "vehicle"):
             raise SystemExit(f"building {bid}: unknown prefab {extra['prefab']!r}")
         b["prefab"] = extra["prefab"]
     data["buildings"].append(b)
@@ -955,6 +955,28 @@ lang.update({
     "siftec.building.extracting": "%s m3 of %s a minute",
     "siftec.building.extracted": "%s mB out so far",
     "siftec.building.pressurized": "pressurizing a %s well",
+    # work package 14: vehicles (vehicle/Vehicles.java) and the Truck Station (building/TruckStations.java)
+    "entity.siftec.tractor": "Tractor", "entity.siftec.truck": "Truck", "entity.siftec.explorer": "Explorer",
+    "key.category.siftec.vehicles": "SIFTEC Vehicles", "key.siftec.vehicle.record": "Record a self-driving route",
+    "siftec.build_gun.fits_vehicle": "Right-click to put the %s down here. R rotate",
+    "siftec.build_gun.dismantle_vehicle": "Right-click to take the %s back: its cost and cargo come back",
+    "siftec.vehicle.blocked": "Not enough room for it here",
+    "siftec.vehicle.hud": "%s | fuel %s%% | %s",
+    "siftec.vehicle.no_fuel": "Out of fuel: use a bucket of Fuel, Liquid Biofuel or Turbofuel on it, or dock it at a Truck Station with fuel",
+    "siftec.vehicle.fuelled": "%s filled up: fuel %s%%",
+    "siftec.vehicle.full": "The %s's tank is full",
+    "siftec.vehicle.driving": "driving (V: record a route)",
+    "siftec.vehicle.recording": "recording: %s points, %s stops (V: finish)",
+    "siftec.vehicle.route": "route: %s points, %s stops; get out and it drives itself (V: record a new one)",
+    "siftec.vehicle.record_start": "Recording the route: drive it once, through the Truck Stations to stop at, and press V again",
+    "siftec.vehicle.record_done": "Route saved: %s points, %s stops. Get out and the %s drives it by itself",
+    "siftec.vehicle.record_short": "Too short to drive by itself: drive further before you finish",
+    "siftec.vehicle.not_yours": "That vehicle belongs to another company",
+    "siftec.vehicle.autopilot": "%s: self-driving, %s stops on its route, fuel %s%%",
+    "siftec.building.station_load": "loads vehicles from its storage",
+    "siftec.building.station_unload": "unloads vehicles into its storage",
+    "siftec.building.station_fuel": "%s m3 of fuel",
+    "siftec.building.station_mode": "The %s now %s",
 })
 # a generator building's turbine: the steam engine's look, turning the generator coils while it runs
 write(f"{A}/models/block/turbine.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {

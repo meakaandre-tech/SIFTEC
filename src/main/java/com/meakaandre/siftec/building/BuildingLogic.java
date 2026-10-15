@@ -157,6 +157,7 @@ public final class BuildingLogic {
             case "well_extractor" -> ExtractorLogic.wellExtract(level, c, def);
             case "sink" -> SpecialBuildings.sink(level, c);
             case "radar" -> com.meakaandre.siftec.equip.Radar.tick(level, c);
+            case "truck_station" -> TruckStations.tick(level, c);
             default -> {
             }
         }
@@ -424,13 +425,14 @@ public final class BuildingLogic {
                 }
                 parts.add(Component.translatable("siftec.building.storage", used, total));
             }
+            case "truck_station" -> TruckStations.status(level, c, parts);
             default -> {
             }
         }
         ProductionLogic.status(level, c, def, parts);
         ExtractorLogic.status(level, c, def, parts);
         if (!def.logic().equals("storage") && !def.logic().isEmpty() && !def.logic().equals("power") && !def.logic().contains("extractor")
-            && !def.logic().equals("pressurizer") && !java.util.Set.of("workshop", "shop", "radar").contains(def.logic())) {
+            && !def.logic().equals("pressurizer") && !java.util.Set.of("workshop", "shop", "radar", "truck_station").contains(def.logic())) {
             parts.add(Component.translatable("siftec.building.made", c.made));
         }
         BuildingPower.status(level, c, def, parts);

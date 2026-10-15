@@ -53,6 +53,8 @@ public class ControllerBlockEntity extends BlockEntity {
     public String paint = "";
     /** The game time the Radar Tower last swept its range for crash sites. */
     public long lastSweep;
+    /** A Truck Station's mode: unloading vehicles into its storage (true) or loading them from it (false). */
+    public boolean unload;
     /** What a status line says is wrong right now ("" if nothing), as a lang key. */
     public String problem = "";
     public final SimpleContainer input = slots(), output = slots();
@@ -203,6 +205,7 @@ public class ControllerBlockEntity extends BlockEntity {
         view.putBoolean("Running", running);
         view.putBoolean("Erupting", erupting);
         view.putInt("Fed", fedTicks);
+        view.putBoolean("Unload", unload);
         List<ItemStack> held = new ArrayList<>();
         for (int i = 0; i < buffer.getContainerSize(); i++) held.add(buffer.getItem(i));
         view.store("Buffer", ItemStack.OPTIONAL_CODEC.listOf(), held);
@@ -235,6 +238,7 @@ public class ControllerBlockEntity extends BlockEntity {
         running = view.getBooleanOr("Running", false);
         erupting = view.getBooleanOr("Erupting", false);
         fedTicks = view.getIntOr("Fed", 0);
+        unload = view.getBooleanOr("Unload", false);
         List<ItemStack> held = view.read("Buffer", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of());
         for (int i = 0; i < buffer.getContainerSize(); i++) buffer.setItem(i, i < held.size() ? held.get(i) : ItemStack.EMPTY);
         line.clear();

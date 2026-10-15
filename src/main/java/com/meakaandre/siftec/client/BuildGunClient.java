@@ -253,7 +253,15 @@ public final class BuildGunClient {
         boolean rebuild = def.structure() ? (!spot.equals(shown) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10 : !spot.equals(shown) || ticks % 10 == 0;
         if (rebuild) {
             lastRebuild = ticks;
-            if (def.structure()) {
+            com.meakaandre.siftec.vehicle.VehicleKind vehicle = com.meakaandre.siftec.vehicle.Vehicles.kind(def);
+            if (vehicle != null) {
+                // a vehicle: its footprint, and whether there is room for it (unlock, land and cost are the server's)
+                Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.check(mc.level, spot, null, player.getInventory(), player.hasInfiniteMaterials());
+                shape = com.meakaandre.siftec.vehicle.Vehicles.cells(spot, vehicle);
+                blocked = new ArrayList<>();
+                localOk = check.ok();
+                localMessage = check.ok() ? Component.translatable("siftec.build_gun.fits_vehicle", def.name()) : check.message();
+            } else if (def.structure()) {
                 com.meakaandre.siftec.prefab.Prefabs.Check check = com.meakaandre.siftec.prefab.Prefabs.check(mc.level, BuildGun.hubSpot(spot), null, false);
                 shape = hubCells(spot);
                 blocked = new ArrayList<>(check.blocked);

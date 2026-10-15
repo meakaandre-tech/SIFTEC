@@ -320,3 +320,7 @@ cmd siftec worldtest sathub level 7
 cmd siftec worldtest sathub outside
 sleep 6
 shot
+cmd time set noon
+cmd siftec worldtest vehicles view
+sleep 8
+shot
