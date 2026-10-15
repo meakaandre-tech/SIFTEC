@@ -39,6 +39,7 @@
     "ItemCombinerResultMixin",
     "KineticCapacityMixin",
     "LevelChunkMixin",
+    "NodeBucketMixin",
     "ManualApplicationMixin",
     "NetworkNoLoadMixin",
     "PotentSulfurMixin",

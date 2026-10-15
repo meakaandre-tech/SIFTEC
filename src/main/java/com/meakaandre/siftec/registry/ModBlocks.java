@@ -35,16 +35,15 @@ public class ModBlocks {
     /** Items shown in the creative tab, in registration order. */
     public static final List<Item> TAB_ITEMS = new ArrayList<>();
 
-    /** Patches, depleted nodes and fluid nodes cannot be broken, pushed or blown up. */
+    /** Patches and fluid nodes cannot be broken, pushed or blown up. */
     private static BlockBehaviour.Properties node() {
         return BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable()
             .sound(SoundType.DEEPSLATE).pushReaction(PushReaction.IMMOVEABLE);
     }
 
-    /** A node that can be mined: like an ore block to dig, but never pushed or blown up (it regrows instead of going). */
-    private static BlockBehaviour.Properties minable() {
-        return BlockBehaviour.Properties.of().strength(3.0F, 3600000.0F).requiresCorrectToolForDrops()
-            .sound(SoundType.STONE).pushReaction(PushReaction.IMMOVEABLE);
+    /** An ore block of SIFTEC's own: dug, dropped and blown up exactly like a vanilla ore (iron ore's hardness). */
+    private static BlockBehaviour.Properties ore() {
+        return BlockBehaviour.Properties.of().strength(3.0F, 3.0F).requiresCorrectToolForDrops().sound(SoundType.STONE);
     }
 
     private static BlockBehaviour.Properties machine() {
@@ -56,22 +55,19 @@ public class ModBlocks {
      * item and no loot; Create's drills skip it (in create:non_movable, hardness -1).
      */
     public static final Map<String, Supplier<com.meakaandre.siftec.block.NodePadBlock>> PATCHES = new java.util.LinkedHashMap<>();
-    /** The node of each look ({@code <look>_node}); oil's is the Oil Well. */
+    /**
+     * The fluid nodes' blocks ({@code nitrogen_node}, and oil's Oil Well). Ore nodes have no block of their own: they
+     * are the real ore block (node.NodeLook, node.NodeSites).
+     */
     public static final Map<String, Supplier<NodeBlock>> NODES = new java.util.LinkedHashMap<>();
-    /** The mined node of each look that can be mined ({@code <look>_node_depleted}), growing back. */
-    public static final Map<String, Supplier<com.meakaandre.siftec.block.DepletedNodeBlock>> DEPLETED = new java.util.LinkedHashMap<>();
 
     static {
         for (String patch : NodeLook.patches()) {
             PATCHES.put(patch, blockOnly(patch + "_patch", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node));
         }
         for (NodeLook look : NodeLook.all()) {
-            if (look.type() == NodeType.OIL) continue;
-            Supplier<BlockBehaviour.Properties> nodeProperties = look.fluid() ? ModBlocks::node : ModBlocks::minable;
-            NODES.put(look.id(), hidden(look.id() + "_node", p -> new NodeBlock(look, p), nodeProperties));
-            if (!look.fluid()) {
-                DEPLETED.put(look.id(), blockOnly(look.id() + "_node_depleted", properties -> new com.meakaandre.siftec.block.DepletedNodeBlock(look, properties), () -> node().noOcclusion()));
-            }
+            if (!look.fluid() || look.type() == NodeType.OIL) continue;
+            NODES.put(look.id(), hidden(look.id() + "_node", p -> new NodeBlock(look, p), ModBlocks::node));
         }
     }
 
@@ -82,9 +78,15 @@ public class ModBlocks {
         NODES.put("oil", OIL_WELL);
     }
 
-    /** Uranium in a uranium node's clump: mined like an ore, it gives Uranium. */
-    public static final Supplier<Block> URANIUM_ORE = blockOnly("uranium_ore", Block::new,
-        () -> BlockBehaviour.Properties.of().strength(3.0F, 3.0F).requiresCorrectToolForDrops().sound(SoundType.STONE));
+    /**
+     * SIFTEC's ore blocks, for the resources neither the game nor Create has an ore of: the node block of those nodes
+     * (uranium's is also in its clump). Plain ore blocks: a pickaxe digs them, Fortune adds to the drop, Silk Touch keeps
+     * the block.
+     */
+    public static final Supplier<Block> URANIUM_ORE = hidden("uranium_ore", Block::new, ModBlocks::ore);
+    public static final Supplier<Block> BAUXITE_ORE = hidden("bauxite_ore", Block::new, ModBlocks::ore);
+    public static final Supplier<Block> SAM_ORE = hidden("sam_ore", Block::new, ModBlocks::ore);
+    public static final Supplier<Block> SULFUR_ORE = hidden("sulfur_ore", Block::new, ModBlocks::ore);
 
     public static final Supplier<ExtractorBlock> RESOURCE_WELL_EXTRACTOR = block("resource_well_extractor", ExtractorBlock::new, ModBlocks::machine);
 

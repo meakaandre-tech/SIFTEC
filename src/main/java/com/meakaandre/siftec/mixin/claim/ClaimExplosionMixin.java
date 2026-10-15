@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Claimed land and Build Gun buildings are not damaged by explosions, whoever set them off. */
+/** Claimed land, Build Gun buildings and resource nodes' ore are not damaged by explosions, whoever set them off. */
 @Mixin(ServerExplosion.class)
 public abstract class ClaimExplosionMixin {
     @Shadow
@@ -26,7 +26,8 @@ public abstract class ClaimExplosionMixin {
         List<BlockPos> positions = cir.getReturnValue();
         if (positions == null || positions.isEmpty()) return;
         List<BlockPos> kept = new ArrayList<>(positions.size());
-        for (BlockPos pos : positions) if (Claims.at(level, pos) == null && !com.meakaandre.siftec.building.Buildings.protectedAt(level, pos)) kept.add(pos);
+        for (BlockPos pos : positions) if (Claims.at(level, pos) == null && !com.meakaandre.siftec.building.Buildings.protectedAt(level, pos)
+            && !com.meakaandre.siftec.node.NodeSites.isSite(level, pos)) kept.add(pos);
         if (kept.size() != positions.size()) cir.setReturnValue(kept);
     }
 }

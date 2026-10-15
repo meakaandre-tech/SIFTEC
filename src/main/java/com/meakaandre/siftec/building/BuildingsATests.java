@@ -283,7 +283,7 @@ public final class BuildingsATests {
         return check;
     }
 
-    /** A hand-made node at a spot: the ore block of the look's type at a purity, on its patch stone. */
+    /** A hand-made node at a spot: the real ore block of the look's type, kept as a node of that purity by its position, on its patch stone. */
     private static BlockPos node(ServerLevel level, NodeType type, Purity purity, int x, int z) {
         return node(level, type, purity, x, Y, z);
     }
@@ -292,7 +292,8 @@ public final class BuildingsATests {
         NodeLook look = NodeLook.of(type);
         BlockPos at = new BlockPos(x, y, z);
         level.setBlock(at.below(), look.patchStone(), Block.UPDATE_ALL);
-        level.setBlock(at, ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(NodeBlock.PURITY, purity), Block.UPDATE_ALL);
+        if (look.fluid()) level.setBlock(at, ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(NodeBlock.PURITY, purity), Block.UPDATE_ALL);
+        else com.meakaandre.siftec.node.NodeSites.put(level, at, look, purity);
         return at;
     }
 
@@ -371,7 +372,7 @@ public final class BuildingsATests {
         Placement pm = Buildings.snapToNode(level, at("portable_miner", X + 90, Z + 2));
         put(level, source, company, pm);
 
-        // ---- every miner really mines: count each time its node block goes from grown to depleted, seen from outside
+        // ---- every miner really mines: count each time its node's ore block goes from grown to plain air, seen from outside
         List<BlockPos> watched = new ArrayList<>();
         for (Placement p : minerSpots) {
             int[] cell = p.def().nodeCell();
@@ -383,8 +384,10 @@ public final class BuildingsATests {
         boolean[] counting = {false};
         EVERY_TICK.add(() -> {
             for (int i = 0; i < watched.size(); i++) {
-                boolean grown = level.getBlockState(watched.get(i)).getBlock() instanceof NodeBlock;
-                if (counting[0] && wasGrown[i] && !grown && level.getBlockState(watched.get(i)).getBlock() instanceof com.meakaandre.siftec.block.DepletedNodeBlock) depletions[i]++;
+                var site = com.meakaandre.siftec.node.NodeSites.at(level, watched.get(i));
+                BlockState now = level.getBlockState(watched.get(i));
+                boolean grown = site != null && site.look.isNodeBlock(now);
+                if (counting[0] && wasGrown[i] && !grown && now.isAir()) depletions[i]++;
                 wasGrown[i] = grown;
             }
         });
@@ -475,8 +478,9 @@ public final class BuildingsATests {
                     breaks > 0 && per >= lo && per <= hi, items + " items from " + breaks + " breaks (" + String.format(java.util.Locale.ROOT, "%.2f", per) + " a break)");
                 ControllerBlockEntity mc = controller(level, p);
                 BlockState nodeNow = mc == null || mc.node == null ? null : level.getBlockState(mc.node);
-                expect(source, miners[i][0] + ": the node is still there (grown or growing back) and its ore reaches the chest",
-                    nodeNow != null && (nodeNow.getBlock() instanceof NodeBlock || nodeNow.getBlock() instanceof com.meakaandre.siftec.block.DepletedNodeBlock)
+                Block oreBlock = ((NodeType) miners[i][1]) == NodeType.IRON ? Blocks.IRON_ORE : Blocks.COPPER_ORE;
+                expect(source, miners[i][0] + ": the node is still there (its ore block " + BuiltInRegistries.BLOCK.getKey(oreBlock) + ", or air growing back) and its ore reaches the chest",
+                    nodeNow != null && (nodeNow.is(oreBlock) || nodeNow.isAir()) && com.meakaandre.siftec.node.NodeSites.isSite(level, mc.node)
                         && count(level, p.at(0, 0, -1), ((NodeType) miners[i][1]) == NodeType.IRON ? Items.RAW_IRON : Items.RAW_COPPER) > 0,
                     mc == null ? "no controller" : String.valueOf(nodeNow));
             }

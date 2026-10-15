@@ -33,7 +33,8 @@ import java.util.function.Predicate;
  * Object Scanner: finds the nearest thing of the kind it is set to. Crash sites (their Hard Drives) from the start;
  * Mercer Spheres and Somersloops once their Alien Technology analysis is done; hostile mobs after Hostile Organism
  * Detection; and the wild food the Nutrients tree starts with (sweet berry bushes, apple trees, glow berries) once its
- * first research for each is done. Sneak to switch what it looks for.
+ * first research for each is done. Sneak to switch what it looks for. Aimed at a resource node, it says what node it is
+ * (type and purity) and, while it is empty, how long until it grows back.
  */
 public class ObjectScannerItem extends Item {
     /** What the scanner can be set to, in the order sneaking steps through them. */
@@ -91,6 +92,12 @@ public class ObjectScannerItem extends Item {
         List<Target> open = open(company, player.hasInfiniteMaterials());
         Target target = SELECTED.getOrDefault(player.getUUID(), Target.HARD_DRIVE);
         if (!open.contains(target)) target = open.getFirst();
+        // aimed at a resource node (its ore, or the empty spot growing back): what node it is, and its regrowth
+        BlockPos node = player.isShiftKeyDown() ? null : com.meakaandre.siftec.node.NodeSites.lookedAt(player, player.blockInteractionRange());
+        if (node != null) {
+            player.sendOverlayMessage(com.meakaandre.siftec.node.NodeSites.describe(server, node));
+            return InteractionResult.SUCCESS;
+        }
         if (player.isShiftKeyDown()) {
             target = open.get((open.indexOf(target) + 1) % open.size());
             SELECTED.put(player.getUUID(), target);

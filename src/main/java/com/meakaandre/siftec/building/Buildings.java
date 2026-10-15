@@ -245,25 +245,24 @@ public final class Buildings {
         if (left > 0) check.fail("siftec.build_gun.clump", left);
     }
 
-    static boolean isNode(BlockState state) {
-        var block = state.getBlock();
-        return block instanceof com.meakaandre.siftec.block.NodeBlock node && !node.look.fluid()
-            || block instanceof com.meakaandre.siftec.block.DepletedNodeBlock;
+    /** An ore node's position, its ore grown or the spot empty and growing back (nodes are kept by position: node.NodeSites). */
+    static boolean isNode(Level level, BlockPos pos) {
+        return com.meakaandre.siftec.node.NodeSites.isSite(level, pos);
     }
 
     /** The node a building stands on: an ore node for a miner, or a fluid node of its type for an extractor (oil, nitrogen). */
-    static boolean isNode(BuildingDef def, BlockState state) {
-        if (def.fluidNode().isEmpty()) return isNode(state);
-        return state.getBlock() instanceof com.meakaandre.siftec.block.NodeBlock node && node.look.fluid() && node.look.type().id().equals(def.fluidNode());
+    static boolean isNode(BuildingDef def, Level level, BlockPos pos) {
+        if (def.fluidNode().isEmpty()) return isNode(level, pos);
+        return level.getBlockState(pos).getBlock() instanceof com.meakaandre.siftec.block.NodeBlock node && node.look.fluid() && node.look.type().id().equals(def.fluidNode());
     }
 
     /** The node a node building stands over: in its node cell, or else anywhere in its box (grown or mined). */
     public static @Nullable BlockPos nodeIn(Level level, Placement p, BuildingTemplate t) {
         int[] c = p.def().nodeCell();
-        if (c != null && isNode(p.def(), level.getBlockState(p.at(c[0], c[1], c[2])))) return p.at(c[0], c[1], c[2]).immutable();
+        if (c != null && isNode(p.def(), level, p.at(c[0], c[1], c[2]))) return p.at(c[0], c[1], c[2]).immutable();
         AABB box = p.bounds(t);
         for (BlockPos pos : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
-            if (isNode(p.def(), level.getBlockState(pos))) return pos.immutable();
+            if (isNode(p.def(), level, pos)) return pos.immutable();
         }
         return null;
     }
@@ -279,7 +278,7 @@ public final class Buildings {
         BlockPos best = null;
         double bestDist = Double.MAX_VALUE;
         for (BlockPos pos : BlockPos.betweenClosed(aim.offset(-3, -1, -3), aim.offset(3, 1, 3))) {
-            if (!level.isLoaded(pos) || !isNode(p.def(), level.getBlockState(pos))) continue;
+            if (!level.isLoaded(pos) || !isNode(p.def(), level, pos)) continue;
             double d = pos.distSqr(aim);
             if (d < bestDist) {
                 bestDist = d;

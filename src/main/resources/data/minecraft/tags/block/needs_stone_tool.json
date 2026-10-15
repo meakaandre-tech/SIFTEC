@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "siftec:bauxite_ore",
+    "siftec:sam_ore",
+    "siftec:sulfur_ore",
+    "siftec:uranium_ore"
+  ]
+}

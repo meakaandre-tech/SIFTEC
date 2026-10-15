@@ -15,6 +15,11 @@ public enum Purity implements net.minecraft.util.StringRepresentable {
         return name().toLowerCase(java.util.Locale.ROOT);
     }
 
+    public static Purity byName(String name) {
+        for (Purity p : values()) if (p.getSerializedName().equals(name)) return p;
+        return null;
+    }
+
     public String key() {
         return "siftec.purity." + name().toLowerCase(java.util.Locale.ROOT);
     }

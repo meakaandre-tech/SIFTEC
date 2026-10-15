@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.node;
 
-import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.registry.ModBlocks;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -23,7 +22,8 @@ import java.util.Set;
  * Puts node sites into the world, like resource nodes in Satisfactory. A site is a level, round <b>patch</b> of
  * unbreakable stone 7 blocks across (the node's own natural stone, see {@link NodeLook}); under it, unbreakable fill
  * runs down to solid ground, flaring out so the patch sits in the terrain instead of on a pillar; above it the ground
- * is cut back so the patch is open. The <b>node</b>, an ore block that regrows when mined, stands on its middle, and
+ * is cut back so the patch is open. The <b>node</b>, the real ore block, regrowing when mined and kept as a node by
+ * its position ({@link NodeSites}), stands on its middle, and
  * a <b>clump</b> of ordinary breakable blocks (the stone, the ore and the raw ore block, more ore the purer the node)
  * is piled over and round it; it is placed once and never comes back, and a miner can only go on once it is mined.
  * Each chunk places only its own columns of a site, the first time it loads, so no neighbouring chunk is ever forced
@@ -182,6 +182,11 @@ public final class NodePlacer {
                 }
             }
             any |= placePiece(level, data, node, chunkX, chunkZ, height);
+            // the chunk holding the node keeps it as a node by its position; a site placed before nodes were kept that
+            // way is taken in here too, the first time its chunk loads, and its ore grows back whatever is there now
+            if (!node.type().isFluid() && node.x() >> 4 == chunkX && node.z() >> 4 == chunkZ) {
+                NodeSites.ensure(level, new BlockPos(node.x(), height + 1, node.z()), NodeLook.of(node), node.purity());
+            }
         }
         return any;
     }
@@ -245,9 +250,11 @@ public final class NodePlacer {
         return level.getBlockState(pos.set(x, y + 1, z)).isAir() && level.getBlockState(pos.set(x, y + 2, z)).isAir();
     }
 
-    /** The node block of a node, showing its purity. */
+    /** The node block of a node: its plain ore block, or a fluid node's well block, which carries the purity. */
     public static BlockState coreState(Node node) {
-        return ModBlocks.NODES.get(NodeLook.of(node).id()).get().defaultBlockState().setValue(NodeBlock.PURITY, node.purity());
+        NodeLook look = NodeLook.of(node);
+        if (!look.fluid()) return look.nodeState();
+        return ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(com.meakaandre.siftec.block.NodeBlock.PURITY, node.purity());
     }
 
     /** True for blocks a site must never remove: other unbreakable blocks (bedrock, nodes, collectibles) and anything with a block entity. */

@@ -323,7 +323,8 @@ public final class BuildingsBTests {
     private static BlockPos node(ServerLevel level, NodeType type, Purity purity, BlockPos at) {
         NodeLook look = NodeLook.of(type);
         level.setBlock(at.below(), look.patchStone(), Block.UPDATE_ALL);
-        level.setBlock(at, ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(NodeBlock.PURITY, purity), Block.UPDATE_ALL);
+        if (look.fluid()) level.setBlock(at, ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(NodeBlock.PURITY, purity), Block.UPDATE_ALL);
+        else com.meakaandre.siftec.node.NodeSites.put(level, at, look, purity);
         return at;
     }
 

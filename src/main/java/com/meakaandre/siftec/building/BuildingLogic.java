@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.building;
 
-import com.meakaandre.siftec.block.DepletedNodeBlock;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.Purity;
@@ -183,10 +182,8 @@ public final class BuildingLogic {
 
     private static @Nullable NodeAt nodeAt(Level level, @Nullable BlockPos pos) {
         if (pos == null || !level.isLoaded(pos)) return null;
-        BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof NodeBlock node && !node.look.fluid()) return new NodeAt(node.look, state.getValue(NodeBlock.PURITY));
-        if (state.getBlock() instanceof DepletedNodeBlock depleted) return new NodeAt(depleted.look, state.getValue(NodeBlock.PURITY));
-        return null;
+        var site = com.meakaandre.siftec.node.NodeSites.at(level, pos);
+        return site == null ? null : new NodeAt(site.look, site.purity);
     }
 
     // ------------------------------------------------------------------------------------------------ miners
@@ -194,9 +191,9 @@ public final class BuildingLogic {
     /**
      * A miner really mines its node. Its Drill breaks the node block once it has regrown (Create's own breaking, with the
      * cracks showing; the Mk sets how fast, {@link BuildingDef#breakTicks}), and what the block drops is the output: the
-     * node's loot, with the miner's built-in Fortune ({@link BuildingDef#fortune}) by vanilla's ore formula. The node
-     * then goes depleted and regrows at its purity's rate ({@link com.meakaandre.siftec.node.NodeRegrowth}), so purity caps
-     * every miner. Nothing is ever made without a block being broken. The Portable Miner has no power: its controller
+     * node's ore block's own loot, with the miner's built-in Fortune ({@link BuildingDef#fortune}) by vanilla's ore
+     * formula. The spot is then air until it regrows at its purity's rate ({@link com.meakaandre.siftec.node.NodeRegrowth}),
+     * and the miner waits, so purity caps every miner. Nothing is ever made without a block being broken. The Portable Miner has no power: its controller
      * breaks the node the same way at its own speed, the ore dropping on the ground in front.
      */
     private static void mine(ServerLevel level, ControllerBlockEntity c, BuildingDef def, boolean powered) {
@@ -216,7 +213,7 @@ public final class BuildingLogic {
         }
         c.problem = "";
         BlockState state = level.getBlockState(c.node);
-        boolean regrown = state.getBlock() instanceof NodeBlock;
+        boolean regrown = node.look().isNodeBlock(state);
         if (powered) {
             // the Drill only looks for a block to break every half second after its last one: a regrown node is started at once
             if (regrown && drillPos != null && level.getBlockEntity(drillPos) instanceof com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity drill
@@ -266,7 +263,8 @@ public final class BuildingLogic {
 
     /** Whether a miner's Drill may break its node now: the node has regrown and the output has room. */
     public static boolean mayBreak(Level level, ControllerBlockEntity c, BlockState state) {
-        return state.getBlock() instanceof NodeBlock node && !node.look.fluid() && room(level, c);
+        NodeAt node = nodeAt(level, c.node);
+        return node != null && node.look().isNodeBlock(state) && room(level, c);
     }
 
     /**
@@ -287,7 +285,7 @@ public final class BuildingLogic {
 
     /**
      * The node block was broken by the miner: what it drops (its loot, mined with the miner's Fortune) goes to the output
-     * (on the ground in front of a Portable Miner), and the node is taken out, so it goes depleted and regrows.
+     * (on the ground in front of a Portable Miner), and the ore is taken out, leaving air that regrows.
      */
     public static void mined(ServerLevel level, ControllerBlockEntity c, BlockState state) {
         BlockPos pos = c.node;

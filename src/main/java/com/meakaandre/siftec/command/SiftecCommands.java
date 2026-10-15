@@ -92,7 +92,7 @@ public final class SiftecCommands {
             BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(node.x(), level.getMaxY(), node.z());
             while (pos.getY() > level.getMinY()) {
                 BlockState state = level.getBlockState(pos);
-                if (state.getBlock() instanceof NodeBlock) break;
+                if (state.getBlock() instanceof NodeBlock || com.meakaandre.siftec.node.NodeSites.isSite(level, pos)) break;
                 pos.move(0, -1, 0);
             }
             if (pos.getY() <= level.getMinY()) {
@@ -105,7 +105,9 @@ public final class SiftecCommands {
             if (setup) {
                 report(source, "SELFTEST setup " + node + " core at " + pos.toShortString());
             } else {
-                report(source, "SELFTEST check " + node + ": core still " + level.getBlockState(pos).getBlock().getClass().getSimpleName());
+                var site = com.meakaandre.siftec.node.NodeSites.at(level, pos);
+                report(source, "SELFTEST check " + node + ": core still " + BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock())
+                    + (site == null ? ", NOT a node any more" : ", a node (" + site.look.id() + " " + site.purity.getSerializedName() + ")"));
                 // the setup kept this chunk loaded until now; let it go
                 level.setChunkForced(node.x() >> 4, node.z() >> 4, false);
             }

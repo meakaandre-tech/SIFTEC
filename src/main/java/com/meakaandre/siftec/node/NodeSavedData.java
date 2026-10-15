@@ -4,19 +4,26 @@ import com.meakaandre.siftec.Siftec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * What the node system has to remember about a world: the point the node map is measured from, which
  * pieces of which nodes are already placed, the height chosen for each node's pad (for an old surface mound,
- * none), and which nodes are flat pads.
+ * none), which nodes are flat pads, and every placed ore node by position ({@link Site}: its type, look and purity,
+ * and when an empty one grows back). The node block itself is a plain vanilla, Create or SIFTEC ore block: what
+ * makes a position a node is only this list ({@link NodeSites}).
  */
 public class NodeSavedData extends SavedData {
     public static final Codec<NodeSavedData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -25,7 +32,8 @@ public class NodeSavedData extends SavedData {
         Codec.INT.optionalFieldOf("origin_z", 0).forGetter(data -> data.originZ),
         Codec.LONG.listOf().optionalFieldOf("placed", List.of()).forGetter(data -> new ArrayList<>(data.placed)),
         Codec.LONG.listOf().optionalFieldOf("heights", List.of()).forGetter(NodeSavedData::packHeights),
-        Codec.LONG.listOf().optionalFieldOf("flat", List.of()).forGetter(data -> new ArrayList<>(data.flat))
+        Codec.LONG.listOf().optionalFieldOf("flat", List.of()).forGetter(data -> new ArrayList<>(data.flat)),
+        SiteEntry.CODEC.listOf().optionalFieldOf("sites", List.of()).forGetter(NodeSavedData::packSites)
     ).apply(instance, NodeSavedData::new));
     private static final SavedDataType<NodeSavedData> TYPE = new SavedDataType<>(
         Siftec.id("nodes"), NodeSavedData::new, CODEC, null
@@ -43,8 +51,14 @@ public class NodeSavedData extends SavedData {
         heights.defaultReturnValue(NO_HEIGHT);
     }
 
-    private NodeSavedData(boolean hasOrigin, int originX, int originZ, List<Long> placed, List<Long> heights, List<Long> flat) {
+    private NodeSavedData(boolean hasOrigin, int originX, int originZ, List<Long> placed, List<Long> heights, List<Long> flat, List<SiteEntry> sites) {
         this();
+        for (SiteEntry e : sites) {
+            NodeLook look = NodeLook.byId(e.look());
+            Purity purity = Purity.byName(e.purity());
+            if (look == null || look.fluid() || purity == null) continue;
+            this.sites.computeIfAbsent(e.dimension(), k -> new Long2ObjectOpenHashMap<>()).put(e.pos(), new Site(look, purity, e.regrowAt()));
+        }
         this.flat.addAll(flat);
         this.hasOrigin = hasOrigin;
         this.originX = originX;
@@ -60,6 +74,97 @@ public class NodeSavedData extends SavedData {
             out.add((long) e.getIntValue());
         });
         return out;
+    }
+
+    // ---- ore node sites
+
+    /**
+     * One ore node: its look (which gives its type and its block) and purity, and the game time an empty node grows
+     * back at ({@link #GROWN} while its ore block stands there).
+     */
+    public static final class Site {
+        public final NodeLook look;
+        public final Purity purity;
+        long regrowAt;
+
+        Site(NodeLook look, Purity purity, long regrowAt) {
+            this.look = look;
+            this.purity = purity;
+            this.regrowAt = regrowAt;
+        }
+
+        public NodeType type() {
+            return look.type();
+        }
+
+        /** True while the ore stands there; false while the spot is empty and waiting to grow back. */
+        public boolean grown() {
+            return regrowAt == GROWN;
+        }
+
+        /** The game time it grows back at; {@link #GROWN} while grown. */
+        public long regrowAt() {
+            return regrowAt;
+        }
+
+        @Override
+        public String toString() {
+            return look.id() + " " + purity.getSerializedName() + (grown() ? ", grown" : ", empty until " + regrowAt);
+        }
+    }
+
+    public static final long GROWN = -1;
+
+    private record SiteEntry(String dimension, long pos, String type, String look, String purity, long regrowAt) {
+        static final Codec<SiteEntry> CODEC = RecordCodecBuilder.create(i -> i.group(
+            Codec.STRING.fieldOf("dimension").forGetter(SiteEntry::dimension),
+            Codec.LONG.fieldOf("pos").forGetter(SiteEntry::pos),
+            Codec.STRING.optionalFieldOf("type", "").forGetter(SiteEntry::type),
+            Codec.STRING.fieldOf("look").forGetter(SiteEntry::look),
+            Codec.STRING.fieldOf("purity").forGetter(SiteEntry::purity),
+            Codec.LONG.optionalFieldOf("regrow_at", GROWN).forGetter(SiteEntry::regrowAt)
+        ).apply(i, SiteEntry::new));
+    }
+
+    /** Every ore node by dimension, then by {@link net.minecraft.core.BlockPos#asLong} position. */
+    private final Map<String, Long2ObjectOpenHashMap<Site>> sites = new HashMap<>();
+
+    private List<SiteEntry> packSites() {
+        List<SiteEntry> out = new ArrayList<>();
+        sites.forEach((dim, map) -> map.long2ObjectEntrySet().forEach(e -> {
+            Site s = e.getValue();
+            out.add(new SiteEntry(dim, e.getLongKey(), s.type().id(), s.look.id(), s.purity.getSerializedName(), s.regrowAt));
+        }));
+        return out;
+    }
+
+    /** The ore nodes of one dimension, by position; never null. */
+    public Long2ObjectOpenHashMap<Site> sites(String dimension) {
+        return sites.computeIfAbsent(dimension, k -> new Long2ObjectOpenHashMap<>());
+    }
+
+    public @Nullable Site site(String dimension, long pos) {
+        Long2ObjectOpenHashMap<Site> map = sites.get(dimension);
+        return map == null ? null : map.get(pos);
+    }
+
+    /** Makes a position an ore node (grown), or changes the one there. */
+    public Site putSite(String dimension, long pos, NodeLook look, Purity purity, long regrowAt) {
+        Site site = new Site(look, purity, regrowAt);
+        sites(dimension).put(pos, site);
+        setDirty();
+        return site;
+    }
+
+    public void removeSite(String dimension, long pos) {
+        Long2ObjectOpenHashMap<Site> map = sites.get(dimension);
+        if (map != null && map.remove(pos) != null) setDirty();
+    }
+
+    public void setRegrowAt(Site site, long regrowAt) {
+        if (site.regrowAt == regrowAt) return;
+        site.regrowAt = regrowAt;
+        setDirty();
     }
 
     public static NodeSavedData get(MinecraftServer server) {

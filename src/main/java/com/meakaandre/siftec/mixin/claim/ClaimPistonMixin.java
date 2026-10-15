@@ -11,7 +11,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** A piston cannot push or pull blocks into, out of or within someone else's claim, nor move or break a building's blocks. */
+/**
+ * A piston cannot push or pull blocks into, out of or within someone else's claim, nor move or break a building's
+ * blocks, nor move or break a node's ore or push anything into an empty node.
+ */
 @Mixin(PistonBaseBlock.class)
 public abstract class ClaimPistonMixin {
     @Inject(method = "moveBlocks", at = @At("HEAD"), cancellable = true)
@@ -25,13 +28,14 @@ public abstract class ClaimPistonMixin {
         if (!resolver.resolve()) return;
         Direction push = resolver.getPushDirection();
         for (BlockPos moved : resolver.getToPush()) {
-            if (com.meakaandre.siftec.building.Buildings.protectedAt(level, moved) || Claims.crosses(level, pos, moved) || Claims.crosses(level, pos, moved.relative(push))) {
+            if (com.meakaandre.siftec.building.Buildings.protectedAt(level, moved) || Claims.crosses(level, pos, moved) || Claims.crosses(level, pos, moved.relative(push))
+                || com.meakaandre.siftec.node.NodeSites.isSite(level, moved) || com.meakaandre.siftec.node.NodeSites.isSite(level, moved.relative(push))) {
                 cir.setReturnValue(false);
                 return;
             }
         }
         for (BlockPos broken : resolver.getToDestroy()) {
-            if (com.meakaandre.siftec.building.Buildings.protectedAt(level, broken) || Claims.crosses(level, pos, broken)) {
+            if (com.meakaandre.siftec.building.Buildings.protectedAt(level, broken) || Claims.crosses(level, pos, broken) || com.meakaandre.siftec.node.NodeSites.isSite(level, broken)) {
                 cir.setReturnValue(false);
                 return;
             }

@@ -23,6 +23,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class ClaimBlockItemMixin {
     @Inject(method = "place(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/InteractionResult;", at = @At("HEAD"), cancellable = true)
     private void siftec$placeCheck(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
+        // nothing goes into an empty resource node, from a player, a Deployer or a dispenser: it is growing back
+        if (com.meakaandre.siftec.node.NodeSites.isSite(context.getLevel(), context.getClickedPos())) {
+            if (context.getPlayer() instanceof ServerPlayer p) Claims.resync(p, context.getLevel(), context.getClickedPos(), context.getClickedFace());
+            cir.setReturnValue(InteractionResult.FAIL);
+            return;
+        }
         if (!(context.getPlayer() instanceof ServerPlayer player)) return;
         Level level = context.getLevel();
         BlockPos target = context.getClickedPos();

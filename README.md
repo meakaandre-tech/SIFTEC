@@ -19,8 +19,12 @@ over a Basin, its recipe picked by the controller's filter), the Smelter (an Enc
 Depot), Miner Mk.1 to Mk.3 and the Portable Miner (a Drill over a node), and the Storage Containers (Item Vaults).
 The machines keep to Satisfactory's time per recipe (`BasinPace`, `BuildingLogic`), take belts at their input ports
 and put what they make onto the belt at the output port, and are turned by Create: New Age motors inside that run on
-the power grid. A miner really mines its node: its Drill breaks the regrown node block and what the block drops is the
-output. The Mk sets how fast it breaks it (Mk.1 half a second, Mk.2 a quarter, Mk.3 a tenth, the unpowered Portable
+the power grid. A node is the real ore block itself (minecraft:iron_ore, create:zinc_ore, a stone node's own stone; a
+SIFTEC ore only for bauxite, uranium, SAM and sulfur), made a node by its position (`node/NodeSites`): mined by hand or by
+a miner it drops exactly what that block drops (Fortune and Silk Touch as usual) and leaves air, which grows back into
+the same block after its purity's time, kept through unloads and restarts. Nothing can be placed or poured into an empty
+node, and pistons, contraptions and explosions leave its ore alone. A miner really mines its node: its Drill breaks the
+regrown ore block and what the block drops is the output, and it waits while the spot is air. The Mk sets how fast it breaks it (Mk.1 half a second, Mk.2 a quarter, Mk.3 a tenth, the unpowered Portable
 Miner two seconds) and its built-in Fortune (Mk.2 III, Mk.3 V, by vanilla's ore formula); the node's purity sets how
 fast it regrows, which caps every miner. Every player spawns with the Build Gun, and the first thing they build with it
 is the HUB (Special tab, 20 Raw Iron, given back when it is dismantled), which has a hand-cranked Craft Station (a Press
@@ -115,7 +119,8 @@ centre loads). Crash sites are cargo pods with wreckage, each holding a Hard Dri
 out some want parts carried to them and, past 900 blocks, some want a Create: New Age wire from a grid with enough power
 to spare strung to the connector beside them. The Object Scanner is switched with sneak-use between crash sites, Mercer
 Spheres and Somersloops (after their analysis research), hostile mobs, and the wild food the Nutrients start nodes add:
-ripe sweet berry bushes, apple trees and glow berries in loaded land.
+ripe sweet berry bushes, apple trees and glow berries in loaded land. Aimed at a resource node (or wearing Create's Engineer's Goggles
+and looking at one), it shows the node's type, purity and, while it is empty, how long until it grows back.
 
 The Equipment Workshop, the AWESOME Sink and Shop and the Radar Tower are Build Gun buildings in the Special tab; using
 one opens it. The Workshop builds equipment by hand from the parts carried (machines make the same, the Manufacturer's

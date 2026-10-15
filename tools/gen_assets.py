@@ -49,8 +49,10 @@ for d, n in {"north": "north", "north_east": "north-east", "east": "east", "sout
     lang[f"siftec.direction.{d}"] = n
 
 # ---- resource nodes (the Nodes and World tab). node/NodeLook.java holds the same table for the game; keep them in
-# step. A site is a patch of the node's own natural stone (unbreakable), the node (an ore block that regrows when
-# mined, standing on the patch) and a clump of ordinary blocks over it. Vanilla and Create textures only.
+# step. A site is a patch of the node's own natural stone (unbreakable), the node and a clump of ordinary blocks over
+# it. An ore node is the real ore block itself (minecraft:iron_ore, create:zinc_ore, a stone node's stone), kept as a
+# node by its position (node/NodeSites.java): it drops what that block always drops, and leaves air that grows back.
+# Only resources neither the game nor Create has an ore of get a SIFTEC ore block, an ordinary ore in every way.
 NODE_TYPES = {"iron": "Iron Ore", "copper": "Copper Ore", "stone": "Stone", "coal": "Coal", "zinc": "Zinc Ore", "oil": "Crude Oil",
               "bauxite": "Bauxite", "nitrogen": "Nitrogen Gas", "uranium": "Uranium", "sam": "SAM", "quartz": "Nether Quartz", "sulfur": "Sulfur"}
 CS = "create:block/palettes/stone_types/"
@@ -79,68 +81,73 @@ STONE = {
     "sulfur": ("Sulfur", "minecraft:sulfur", "minecraft:block/sulfur", "minecraft:block/sulfur"),
 }
 STONE_KINDS = ["granite", "diorite", "andesite", "tuff", "calcite", "dripstone", "asurine", "crimsite", "ochrum", "veridium", "scoria", "scorchia"]
-# every node look: (type, patch stone, what the node block looks like, what mining it drops ("" for a fluid node)).
-# The node looks like an ordinary ore block (never deepslate ore); where there is none, the resource's block. Uranium
-# borrows the emerald ore texture until it has its own.
+# every node look: (type, patch stone, the node block, what mining it drops without Fortune ("" for a fluid node))
 DEPOSIT = {
-    "iron": ("iron", "tuff", "minecraft:block/iron_ore", "minecraft:raw_iron"),
-    "copper": ("copper", "granite", "minecraft:block/copper_ore", "minecraft:raw_copper"),
-    **{k: ("stone", k, STONE[k][2], STONE[k][1]) for k in STONE_KINDS},
-    "coal": ("coal", "stone", "minecraft:block/coal_ore", "minecraft:coal"),
-    "zinc": ("zinc", "andesite", "create:block/zinc_ore", "create:raw_zinc"),
-    "oil": ("oil", "basalt", "siftec:block/oil_well_top", ""),
-    "bauxite": ("bauxite", "cinnabar", "minecraft:block/terracotta", "siftec:raw_bauxite"),
-    "nitrogen": ("nitrogen", "diorite", "minecraft:block/packed_ice", ""),
-    "uranium": ("uranium", "blackstone", "minecraft:block/emerald_ore", "siftec:uranium"),
-    "sam": ("sam", "deepslate", "minecraft:block/amethyst_block", "siftec:sam"),
-    "quartz": ("quartz", "netherrack", "minecraft:block/nether_quartz_ore", "minecraft:quartz"),
-    "sulfur": ("sulfur", "sulfur", "minecraft:block/potent_sulfur", "cgs:sulfur"),
+    "iron": ("iron", "tuff", "minecraft:iron_ore", "minecraft:raw_iron"),
+    "copper": ("copper", "granite", "minecraft:copper_ore", "minecraft:raw_copper"),
+    **{k: ("stone", k, STONE[k][1], STONE[k][1]) for k in STONE_KINDS},
+    "coal": ("coal", "stone", "minecraft:coal_ore", "minecraft:coal"),
+    "zinc": ("zinc", "andesite", "create:zinc_ore", "create:raw_zinc"),
+    "oil": ("oil", "basalt", "siftec:oil_well", ""),
+    "bauxite": ("bauxite", "cinnabar", "siftec:bauxite_ore", "siftec:raw_bauxite"),
+    "nitrogen": ("nitrogen", "diorite", "siftec:nitrogen_node", ""),
+    "uranium": ("uranium", "blackstone", "siftec:uranium_ore", "siftec:uranium"),
+    "sam": ("sam", "deepslate", "siftec:sam_ore", "siftec:sam"),
+    "quartz": ("quartz", "netherrack", "minecraft:nether_quartz_ore", "minecraft:quartz"),
+    "sulfur": ("sulfur", "sulfur", "siftec:sulfur_ore", "cgs:sulfur"),
+}
+# SIFTEC's own ore blocks: (name, texture). Bauxite, SAM and sulfur take the ore art drawn for their nodes (stone with
+# the resource in it); uranium borrows the emerald ore texture until it has its own.
+SIFTEC_ORES = {
+    "bauxite_ore": ("Bauxite Ore", "siftec:block/bauxite_node_front"),
+    "uranium_ore": ("Uranium Ore", "minecraft:block/emerald_ore"),
+    "sam_ore": ("SAM Ore", "siftec:block/sam_node_front"),
+    "sulfur_ore": ("Sulfur Ore", "siftec:block/sulfur_node_front"),
 }
 for t, name in NODE_TYPES.items():
     lang[f"siftec.node.{t}"] = name
-lang["siftec.node.depleted"] = "%s: mined, growing back"
+lang["siftec.node.regrowing"] = "%s: mined, grows back in %s s"
 for key, (name, block, side, top) in STONE.items():
     b = f"{key}_patch"
     lang[f"block.siftec.{b}"] = f"{name} Patch"
     write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_column", "textures": {"side": side, "end": top}})
-NODE_IDS = set()
-for look, (t, patch, tex, drop) in DEPOSIT.items():
-    b = "oil_well" if look == "oil" else f"{look}_node"
-    NODE_IDS.add(b)
-    name = STONE[look][0] if t == "stone" else NODE_TYPES[t]
-    lang[f"block.siftec.{b}"] = "Oil Well" if look == "oil" else f"{name} Node"
+for look, (t, patch, block, drop) in DEPOSIT.items():
+    ns, path = block.split(":")
+    if ns != "siftec":
+        continue
+    if path in SIFTEC_ORES:
+        assert drop, look
+        continue
+    # the fluid nodes' own blocks: the Oil Well and the nitrogen node (unbreakable, never mined)
+    assert not drop, look
+    lang[f"block.siftec.{path}"] = "Oil Well" if look == "oil" else f"{NODE_TYPES[t]} Node"
     _, _, side, top = STONE[patch]
     if look == "oil":
         # the well: crude oil welling up in a basalt collar
-        model = {"parent": "minecraft:block/cube_bottom_top", "textures": {"top": tex, "side": side, "bottom": top}}
+        model = {"parent": "minecraft:block/cube_bottom_top", "textures": {"top": "siftec:block/oil_well_top", "side": side, "bottom": top}}
     else:
-        model = {"parent": "minecraft:block/cube_all", "textures": {"all": tex}}
-    write(f"{A}/models/block/{b}.json", model)
-    write(f"{A}/blockstates/{b}.json", {"variants": {f"purity={p}": {"model": f"siftec:block/{b}"} for p in ("impure", "normal", "pure")}})
+        model = {"parent": "minecraft:block/cube_all", "textures": {"all": "minecraft:block/packed_ice"}}
+    write(f"{A}/models/block/{path}.json", model)
+    write(f"{A}/blockstates/{path}.json", {"variants": {f"purity={p}": {"model": f"siftec:block/{path}"} for p in ("impure", "normal", "pure")}})
+    item_def(path, f"siftec:block/{path}")
+FLUID_NODE_IDS = sorted(DEPOSIT[k][2].split(":")[1] for k in DEPOSIT if not DEPOSIT[k][3])
+ORE_DROPS = {DEPOSIT[k][2].split(":")[1]: DEPOSIT[k][3] for k in DEPOSIT if DEPOSIT[k][2].startswith("siftec:") and DEPOSIT[k][3]}
+for b, (name, tex) in SIFTEC_ORES.items():
+    lang[f"block.siftec.{b}"] = name
+    write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
+    write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": tex}})
     item_def(b, f"siftec:block/{b}")
-    if not drop:
-        continue
-    # mining the node gives its resource, more with Fortune by vanilla's ore formula (a pickaxe's, or a miner's built-in
-    # Fortune III or V); the node itself grows back (node/NodeRegrowth.java)
-    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": drop,
-          "modifier": [{"type": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"}]}]}]})
-    # the depleted node: a low stub of bare patch stone where the ore was
-    lang[f"block.siftec.{b}_depleted"] = f"{name} Node (mined)"
-    write(f"{A}/models/block/{b}_depleted.json", {"parent": "minecraft:block/block", "textures": {"particle": side, "side": side, "top": top},
-          "elements": [{"from": [0, 0, 0], "to": [16, 6, 16], "faces": {
-              **{f: {"texture": "#side", "uv": [0, 10, 16, 16], "cullface": f} for f in ("north", "south", "east", "west")},
-              "up": {"texture": "#top"}, "down": {"texture": "#top", "cullface": "down"}}},
-              {"from": [3, 6, 3], "to": [13, 9, 13], "faces": {
-              **{f: {"texture": "#side", "uv": [3, 7, 13, 10]} for f in ("north", "south", "east", "west")}, "up": {"texture": "#top"}}}]})
-    write(f"{A}/blockstates/{b}_depleted.json", {"variants": {f"purity={p}": {"model": f"siftec:block/{b}_depleted"} for p in ("impure", "normal", "pure")}})
-# the uranium in a uranium node's clump: mined like an ore, it gives Uranium
-lang["block.siftec.uranium_ore"] = "Uranium Ore"
+    # vanilla's ore loot: Silk Touch keeps the block; otherwise the resource, more with Fortune by the ore formula (a
+    # pickaxe's, or a miner's built-in Fortune III or V), less from an explosion
+    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0, "entries": [{"type": "minecraft:alternatives", "children": [
+        {"type": "minecraft:item", "name": f"siftec:{b}", "conditions": [{"condition": "minecraft:match_tool", "predicate": {"predicates": {
+            "minecraft:enchantments": [{"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}]},
+        {"type": "minecraft:item", "name": ORE_DROPS[b], "functions": [
+            {"function": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"},
+            {"function": "minecraft:explosion_decay"}]}]}]}]})
 lang["item.siftec.uranium"] = "Uranium"
-write(f"{A}/blockstates/uranium_ore.json", {"variants": {"": {"model": "siftec:block/uranium_ore"}}})
-write(f"{A}/models/block/uranium_ore.json", {"parent": "minecraft:block/cube_all", "textures": {"all": "minecraft:block/emerald_ore"}})
-write(f"{D}/loot_table/blocks/uranium_ore.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": "siftec:uranium"}],
-      "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+NODE_IDS = set(FLUID_NODE_IDS) | set(SIFTEC_ORES)
 # Recipes that take "Stone" (where Satisfactory takes Concrete) take any of these
 write(os.path.join(ROOT, "data", "siftec", "tags", "item", "stones.json"), {"replace": False, "values":
       ["minecraft:stone", "minecraft:cobblestone", "minecraft:cobbled_deepslate", "minecraft:deepslate", "minecraft:blackstone", "minecraft:basalt"]
@@ -1077,18 +1084,20 @@ for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
-# pickaxe is the right tool for the machines, the nodes that can be mined and uranium ore
+# pickaxe is the right tool for the machines and SIFTEC's ores
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:converter", "siftec:particle_accelerator", "siftec:hub", "siftec:wormhole_gateway", "siftec:uranium_ore"]
-      + sorted(f"siftec:{b}" for b in NODE_IDS if b != "oil_well" and DEPOSIT[b[:-len("_node")]][3]) + [f"siftec:{d[0]}" for d in content.DECOR]})
-# Create's contraptions never move what has to stay put: the HUB and Gateway shells, claim markers, patches and nodes.
-# (Drills skip patches, depleted and fluid nodes, which are unbreakable; a node that can be mined is drilled and grows back.)
+      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:converter", "siftec:particle_accelerator", "siftec:hub", "siftec:wormhole_gateway"]
+      + sorted(f"siftec:{b}" for b in SIFTEC_ORES) + [f"siftec:{d[0]}" for d in content.DECOR]})
+# SIFTEC's ores take a stone pickaxe or better, like iron ore
+write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "needs_stone_tool.json"), {"replace": False, "values": sorted(f"siftec:{b}" for b in SIFTEC_ORES)})
+# Create's contraptions never move what has to stay put: the HUB and Gateway shells, claim markers, patches and fluid
+# nodes. (Drills skip patches and fluid nodes, which are unbreakable.) An ore node's block is an ordinary ore block: it
+# is kept still by its position instead (node/NodeSites.java and the claim mixins), and a drill mines it.
 write(os.path.join(ROOT, "data", "create", "tags", "block", "non_movable.json"), {"replace": False, "values":
       ["siftec:hub", "siftec:wormhole_gateway"] + [f"siftec:prefab_{k}" for k in PREFAB] + ["siftec:hub_bed", "siftec:personal_storage",
-       "siftec:hub_burner", "siftec:claim_marker"] + [f"siftec:{k}_patch" for k in STONE] + sorted(f"siftec:{b}" for b in NODE_IDS)
-      + sorted(f"siftec:{b}_depleted" for b in NODE_IDS if b != "oil_well" and DEPOSIT[b[:-len("_node")]][3])})
+       "siftec:hub_burner", "siftec:claim_marker"] + [f"siftec:{k}_patch" for k in STONE] + [f"siftec:{b}" for b in FLUID_NODE_IDS]})
 
 # ---------------------------------------------------------------------------------------------------
 # The mod's own art, cut from the sprite sheets by tools/import_art.py. Anything with a texture file

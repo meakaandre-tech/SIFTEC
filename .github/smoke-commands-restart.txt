@@ -1,5 +1,6 @@
 #sleep 3
 siftec selftest check
+siftec worldtest restart check
 siftec selftest prefab restart
 siftec selftest buildings restart
 siftec selftest buildings_a restart
