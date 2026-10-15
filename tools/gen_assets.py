@@ -140,12 +140,12 @@ for b, (name, tex) in SIFTEC_ORES.items():
     item_def(b, f"siftec:block/{b}")
     # vanilla's ore loot: Silk Touch keeps the block; otherwise the resource, more with Fortune by the ore formula (a
     # pickaxe's, or a miner's built-in Fortune III or V), less from an explosion
-    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0, "entries": [{"type": "minecraft:alternatives", "children": [
-        {"type": "minecraft:item", "name": f"siftec:{b}", "conditions": [{"condition": "minecraft:match_tool", "predicate": {"predicates": {
-            "minecraft:enchantments": [{"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}]},
-        {"type": "minecraft:item", "name": ORE_DROPS[b], "functions": [
-            {"function": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"},
-            {"function": "minecraft:explosion_decay"}]}]}]}]})
+    # (the same shape as the game's own iron_ore.json)
+    write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:alternatives", "children": [
+        {"type": "minecraft:item", "condition": "minecraft:tool/can_silk_touch", "name": f"siftec:{b}"},
+        {"type": "minecraft:item", "modifier": [
+            {"type": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"},
+            {"type": "minecraft:explosion_decay"}], "name": ORE_DROPS[b]}]}]}], "random_sequence": f"siftec:blocks/{b}"})
 lang["item.siftec.uranium"] = "Uranium"
 NODE_IDS = set(FLUID_NODE_IDS) | set(SIFTEC_ORES)
 # Recipes that take "Stone" (where Satisfactory takes Concrete) take any of these

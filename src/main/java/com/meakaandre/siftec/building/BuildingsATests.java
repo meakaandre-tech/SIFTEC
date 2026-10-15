@@ -348,9 +348,9 @@ public final class BuildingsATests {
 
         // ---- miners on hand-made nodes, each aimed a little off and snapped onto its node; their ore goes into a chest
         // id, node, purity, and the items a break gives on average: Mk.1 none extra, Mk.2 Fortune III (2.2 on average by
-        // vanilla's ore formula), Mk.3 Fortune V (3.14)
+        // vanilla's ore formula), Mk.3 Fortune V (3.14) on copper ore, which drops 2 to 5 raw copper as in vanilla (11 on average)
         Object[][] miners = {{"miner_mk1", NodeType.IRON, Purity.NORMAL, 1f, 1f}, {"miner_mk2", NodeType.IRON, Purity.IMPURE, 1.5f, 3f},
-            {"miner_mk3", NodeType.COPPER, Purity.PURE, 2.2f, 4.2f}};
+            {"miner_mk3", NodeType.COPPER, Purity.PURE, 8f, 14f}};
         List<Placement> minerSpots = new ArrayList<>();
         for (int i = 0; i < miners.length; i++) {
             int x = X + 40 + 15 * i;
@@ -368,7 +368,7 @@ public final class BuildingsATests {
         expect(source, "a miner off any node is refused", "siftec.build_gun.no_node".equals(offNode.reason), String.valueOf(offNode.reason));
 
         // ---- Portable Miner on a normal copper node: it breaks the node about 20 times a minute, the ore dropped in front
-        BlockPos pmNode = node(level, NodeType.COPPER, Purity.NORMAL, X + 90, Z);
+        BlockPos pmNode = node(level, NodeType.IRON, Purity.NORMAL, X + 90, Z);
         Placement pm = Buildings.snapToNode(level, at("portable_miner", X + 90, Z + 2));
         put(level, source, company, pm);
 
@@ -488,7 +488,7 @@ public final class BuildingsATests {
             expect(source, "Portable Miner on a normal node: breaks it 16 to 21 times a minute (40 ticks each, after 20 to regrow), one ore each",
                 dug >= 16 && dug <= 21 && dugItems == dug && Math.abs(dug - depletions[3]) <= 1, dug + " breaks, " + dugItems + " items, " + depletions[3] + " depletions seen");
             int lying = 0;
-            for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(pm.at(0, 0, -1)).inflate(1.5))) if (e.getItem().is(Items.RAW_COPPER)) lying += e.getItem().getCount();
+            for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(pm.at(0, 0, -1)).inflate(1.5))) if (e.getItem().is(Items.RAW_IRON)) lying += e.getItem().getCount();
             expect(source, "Portable Miner: the ore lies on the ground in front", lying >= 16, lying + " lying there");
             long stored = count(level, stChest, Items.COBBLESTONE) + count(level, BuildingLogic.cell(controller(level, st), block("create:item_vault")), Items.COBBLESTONE);
             expect(source, "Storage Container: the belt fills it and its front port empties it into a chest", stored == 30 && count(level, stChest, Items.COBBLESTONE) > 0,

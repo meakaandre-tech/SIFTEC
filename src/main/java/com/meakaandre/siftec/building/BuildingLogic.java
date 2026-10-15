@@ -244,8 +244,9 @@ public final class BuildingLogic {
         Item item = node.look().output();
         if (def.logic().equals("portable_miner")) return item == Items.AIR || !groundFull(level, c, item);
         ItemStack out = c.output.getItem(0);
-        // a break gives at most Fortune + 1 of the node's drop
-        return out.isEmpty() || out.is(item) && out.getCount() + def.fortune() + 1 <= out.getMaxStackSize();
+        // a break gives at most Fortune + 1 times the block's own most (copper ore drops up to 5 raw copper, the rest one)
+        int most = (def.fortune() + 1) * (item == Items.RAW_COPPER ? 5 : 1);
+        return out.isEmpty() || out.is(item) && out.getCount() + most <= out.getMaxStackSize();
     }
 
     private static int breakerId(ControllerBlockEntity c) {
