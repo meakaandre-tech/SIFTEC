@@ -265,6 +265,9 @@ public final class ClaimGunTests {
         level.setBlockAndUpdate(unowned, Blocks.AIR.defaultBlockState());
         level.setBlockAndUpdate(stamped, Blocks.AIR.defaultBlockState());
 
+        // the platform force-loaded its chunks; let them go so the restart check only sees what claims hold
+        for (int cx = (x0 - 16) >> 4; cx <= (x0 + 63) >> 4; cx++)
+            for (int cz = (z0 - 16) >> 4; cz <= (z0 + 31) >> 4; cz++) level.setChunkForced(cx, cz, false);
         report(source, (failed == 0 ? "OK" : "FAILED") + ": " + passed + " passed, " + failed + " failed");
     }
 }
