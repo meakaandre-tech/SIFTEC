@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "wp11-food-brass"]
   workflow_dispatch:
 
 permissions:
