@@ -100,6 +100,12 @@ public final class FoodTests {
         Recipe<?> r = recipe(server, id);
         if (r == null) return 0;
         int n = 0;
+        // Create's machine recipes keep their results to themselves (their display shows none)
+        List<ItemStack> made = new ArrayList<>();
+        if (r instanceof com.zurrtum.create.content.kinetics.mixer.MixingRecipe m) m.results().forEach(o -> made.add(o.create()));
+        if (r instanceof com.zurrtum.create.content.kinetics.mixer.CompactingRecipe c) c.results().forEach(o -> made.add(o.create()));
+        if (r instanceof com.zurrtum.create.content.fluids.transfer.FillingRecipe f) made.add(f.result().create());
+        for (ItemStack stack : made) if (stack.is(what)) n = Math.max(n, stack.getCount());
         for (RecipeDisplay display : r.display()) {
             for (ItemStack stack : display.result().resolveForStacks(SlotDisplayContext.fromLevel(level))) {
                 if (stack.is(what)) n = Math.max(n, stack.getCount());
