@@ -322,5 +322,7 @@ sleep 6
 shot
 cmd time set noon
 cmd siftec worldtest vehicles view
-sleep 8
+sleep 25
+shot
+sleep 5
 shot
