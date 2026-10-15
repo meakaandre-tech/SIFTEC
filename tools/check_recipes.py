@@ -32,6 +32,14 @@ GENERATED = [({"siftec:uranium_fuel_rod"}, {"siftec:uranium_waste"}, "nuclear_po
              ({"siftec:plutonium_fuel_rod"}, {"siftec:plutonium_waste"}, "nuclear_power")]
 # vanilla smelting the Smelter runs (the fan's blasting)
 SMELTING = [({"minecraft:raw_iron"}, {"minecraft:iron_ingot"}, None), ({"minecraft:raw_copper"}, {"minecraft:copper_ingot"}, None)]
+# Create's own Crushing Wheel recipes that the pack relies on (Create Fly's data/create/recipe/crushing): crushed copper
+# and zinc only come from Crushing Wheels, so brass waits for the milestone that unlocks them
+CRUSHING = {"minecraft:raw_copper": "create:crushed_raw_copper", "create:raw_zinc": "create:crushed_raw_zinc",
+            "minecraft:raw_iron": "create:crushed_raw_iron"}
+CRUSHED = set(CRUSHING.values())
+# when things must first become reachable (Food and Brass tab): brass, the pack's Caterium, at Tier 4 (Crushing Wheels
+# come with Advanced Steel Production); the recipes that asked for superheating take diesel instead, so not before Tier 5
+FIRST_TIER = {"create:brass_ingot": (4, 4), "siftec:brass_blend": (4, 4), "create_new_age:blank_circuit": (5, 9)}
 PHASE_OF_TIER = {3: "phase_1", 4: "phase_1", 5: "phase_2", 6: "phase_2", 7: "phase_3", 8: "phase_3", 9: "phase_4"}
 MAX_STACK = 64    # a Basin holds one stack of each kind of item
 BRASS_STACKS = 4  # a Brass Basin (the Manufacturer's and the Blender's) holds four stacks of each kind
@@ -117,6 +125,9 @@ def check(data=None):
         steps.append((ins, set(outs), lock_of(path, body), path))
     for ins, outs, lock in GENERATED + SMELTING:
         steps.append((ins, outs, lock, "(" + ",".join(sorted(outs)) + ")"))
+    crushing_wheel = next(m[1] for m in content.MILESTONES if C + "crushing_wheel" in m[6])
+    for raw, crushed in CRUSHING.items():
+        steps.append(({raw}, {crushed}, crushing_wheel, "create:crushing/" + raw.split(":")[1]))
     for machine, (pname, recipe_list) in content.PROCESSORS.items():
         for p in recipe_list:
             ins = {names.get(n, n) for n, c in p["in"]} | ({recipes.FLUID_IDS[p["fluid_in"][0]]} if p["fluid_in"] else set())
@@ -126,7 +137,7 @@ def check(data=None):
 
     def given(i):
         # anything the pack does not make itself comes from vanilla or the other mods
-        return i in RAW or (i not in checked and not i.startswith("siftec:") and i not in recipes.FLUID_IDS.values()) or i.startswith("#minecraft:") \
+        return i in RAW or (i not in checked and i not in CRUSHED and not i.startswith("siftec:") and i not in recipes.FLUID_IDS.values()) or i.startswith("#minecraft:") \
             or i.startswith("#c:") or i in ("#siftec:mycelia", "#siftec:spider_remains")
 
     def have(i):
@@ -155,13 +166,19 @@ def check(data=None):
         return all(have(i) for i, n in content.parse_cost(cost))
 
     order = [m[1] for m in content.MILESTONES]
-    while True:
+    first_tier = {}  # item or node -> the HUB tier at which it is first reached (MAM research counts at the tier it is done in)
+
+    def play(cap):
+        while not play_round(cap):
+            pass
+
+    def play_round(cap):
         closure()
         before = len(done)
         tier0 = [m for m in order if milestones[m][0] == 0]
         for mid in order:
             t = milestones[mid][0]
-            if mid in done:
+            if mid in done or t > cap:
                 continue
             if t == 0 and any(x not in done for x in tier0[:tier0.index(mid)]):
                 continue
@@ -179,9 +196,13 @@ def check(data=None):
             for nid, (_, tree, name, cost, time, text, needs, items, tokens) in mam.items():
                 if nid not in done and all(any(a in done for a in need.split("|")) for need in needs) and payable(cost):
                     done.add(nid)
-        if len(done) == before:
-            break
-    closure()
+        return len(done) == before
+
+    for cap in range(max(m[0] for m in content.MILESTONES) + 1):
+        play(cap)
+        closure()
+        for x in known | done:
+            first_tier.setdefault(x, cap)
     for mid in order:
         if mid not in done:
             errors.append(f"reachability: milestone {mid} can never be paid ({milestones[mid][3]})")
@@ -201,6 +222,12 @@ def check(data=None):
         if cost and not payable(cost):
             errors.append(f"reachability: {name} costs something nothing makes ({cost})")
     reach = len(checked & known)
+    for i, (low, high) in FIRST_TIER.items():
+        t = first_tier.get(i)
+        if t is None or not low <= t <= high:
+            errors.append(f"tier: {i} is first reachable at {'no tier' if t is None else f'Tier {t}'}, not "
+                          + (f"Tier {low}" if low == high else f"Tier {low} to {high}"))
+    tiers = ", ".join(f"{i.split(':')[1]} Tier {first_tier[i]}" for i in FIRST_TIER if i in first_tier)
 
     # ---- automatability
     machine_made = set()
@@ -271,7 +298,7 @@ def check(data=None):
             notes.append(f"alternate overlap: {', '.join(paths)} (only for a company that picked the alternate)")
     summary = (f"checkers: reachability {reach}/{len(checked)} parts, {len(done & set(order))}/{len(order)} milestones, "
                f"{len(done & set(phases))}/{len(phases)} phases, {len(done & set(mam))}/{len(mam)} MAM nodes; "
-               f"automatability {auto}/{len(must)}; conflicts {clashes}")
+               f"automatability {auto}/{len(must)}; conflicts {clashes}; first reached: {tiers}")
     return errors, notes, summary
 
 

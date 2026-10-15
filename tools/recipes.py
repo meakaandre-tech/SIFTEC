@@ -389,28 +389,31 @@ def kitchen():
 
 
 def food():
-    """Vinegar, pickles, jams and mead (the Nutrients research)."""
+    """Vinegar, pickles, jams, cider and mead (the Nutrients research), each locked to its node."""
     FD = "farmersdelight:"
+    # vinegar, bottled at the Spout (Bulk Fermentation; Preserved Foods takes 50)
+    under(content.mam("Nutrients", "Bulk Fermentation"))
     add("bulk_fermenting", "vinegar", {"type": "createdieselgenerators:bulk_fermenting", "processing_time": 400,
         "ingredients": ["minecraft:sugar", "minecraft:sugar"], "fluid_ingredients": [fl_in("water", 250)], "fluid_results": [fl_out("vinegar", 250)]})
+    spout("minecraft:glass_bottle", "vinegar", 250, "siftec:vinegar_bottle", name="vinegar_bottle")
+    # mead, and cider from apples bottled as Farmer's Delight's Apple Cider (Cider and Mead)
+    under(content.mam("Nutrients", "Cider and Mead"))
     add("bulk_fermenting", "mead", {"type": "createdieselgenerators:bulk_fermenting", "processing_time": 400,
         "ingredients": ["minecraft:honey_bottle", "minecraft:honey_bottle"], "fluid_ingredients": [fl_in("water", 250)], "fluid_results": [fl_out("mead", 500)],
         "results": [{"id": "minecraft:glass_bottle", "count": 2}]})
     spout("minecraft:glass_bottle", "mead", 250, "siftec:mead", name="mead")
-    # vinegar bottled at the Spout (Bulk Fermentation; Preserved Foods takes 50), and cider from apples, bottled as
-    # Farmer's Delight's Apple Cider (Cider and Mead)
-    spout("minecraft:glass_bottle", "vinegar", 250, "siftec:vinegar_bottle", name="vinegar_bottle")
     add("bulk_fermenting", "cider", {"type": "createdieselgenerators:bulk_fermenting", "processing_time": 400,
         "ingredients": ["minecraft:apple", "minecraft:apple"], "fluid_ingredients": [fl_in("water", 250)], "fluid_results": [fl_out("cider", 500)]})
-    under(content.mam("Nutrients", "Cider and Mead"))
     spout("minecraft:glass_bottle", "cider", 250, FD + "apple_cider", name="apple_cider")
-    under(None)
+    # pickles and jams are the Preserved Foods research (their items carry no lock of their own, so the recipes do)
+    under(content.mam("Nutrients", "Preserved Foods"))
     for what, source in (("tomato", FD + "tomato"), ("onion", FD + "onion"), ("cabbage", FD + "cabbage"), ("pumpkin", FD + "pumpkin_slice"),
                          ("carrot", "minecraft:carrot"), ("beetroot", "minecraft:beetroot"), ("kelp", "minecraft:kelp")):
         spout(source, "vinegar", 250, "siftec:pickled_" + what, name="pickled_" + what)
     for jam, fruit in (("sweet_berry_jam", "minecraft:sweet_berries"), ("glow_berry_jam", "minecraft:glow_berries"), ("apple_jam", "minecraft:apple"),
                        ("melon_jam", "minecraft:melon_slice")):
         mix(jam, items=[fruit, fruit, fruit, "minecraft:sugar"], results=["siftec:" + jam], heated=True)
+    under(None)
     # crop waste into Biomass
     mill(FD + "straw", "Biomass", name="biomass_from_straw")
     mill(FD + "tree_bark", "Biomass", name="biomass_from_bark")
@@ -479,6 +482,12 @@ def carried_over():
     hand("siftec:toxic_shot", [(1, "cgs:paper_shot"), (1, "siftec:toxic_residue")], name="toxic_shot")
     deploy("cgs:paper_shot", "siftec:toxic_residue", "siftec:toxic_shot", name="toxic_shot")
     under(None)
+    # Heat (Food and Brass tab): superheating is gone, so a recipe that asked for it becomes a heated one that also takes
+    # diesel, which puts it at Tier 5. Create: New Age's Blank Circuit was the one left (its own recipe is in REMOVED).
+    under("expanded_power_infrastructure")
+    compact("blank_circuit", items=["#c:stones", "#c:dusts/redstone", "#c:ingots/iron", "minecraft:quartz"], fluids=[("diesel", 100)],
+            results=[("create_new_age:blank_circuit", 4)], heated=True)
+    under(None)
     # Steel Casing: steel on a stripped log, by hand or by Deployer, like Create's own casings
     for wood in ("stripped_logs", "stripped_woods"):
         add("item_application", "steel_casing_from_" + wood, {"type": "create:item_application", "target": "#c:" + wood, "ingredient": item("Steel Ingot"),
@@ -513,6 +522,7 @@ REMOVED = [
     "create:mixing/brass_ingot",                                # brass comes from brass blend
     "create:mixing/lava_from_cobble",                           # superheated; lava comes from Ignimbrite
     "createdieselgenerators:distillation/superheated_crude_oil",
+    "create_new_age:compacting/blank_circuit",                  # superheated; the heated diesel recipe in carried_over() replaces it
     "create:crafting/kinetics/water_wheel", "create:crafting/kinetics/large_water_wheel",
     # washing crushed ore would make ingots outside 1.0's recipes (the Pure Iron and Pure Copper Ingot alternates)
     "create:splashing/crushed_raw_iron", "create:splashing/crushed_raw_copper",

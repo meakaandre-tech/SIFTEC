@@ -150,11 +150,14 @@ public final class Food {
     }
 
     private static void holdFoodLevel(MinecraftServer server) {
-        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            var food = player.getFoodData();
-            if (food.getFoodLevel() != HELD_FOOD_LEVEL) food.setFoodLevel(HELD_FOOD_LEVEL);
-            if (food.getSaturationLevel() != 0) food.setSaturation(0);
-        }
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) hold(player);
+    }
+
+    /** Holds one player's food bar just under natural regeneration, with no saturation. */
+    public static void hold(Player player) {
+        var food = player.getFoodData();
+        if (food.getFoodLevel() != HELD_FOOD_LEVEL) food.setFoodLevel(HELD_FOOD_LEVEL);
+        if (food.getSaturationLevel() != 0) food.setSaturation(0);
     }
 
     /** Called when anything finishes eating a food item. */
