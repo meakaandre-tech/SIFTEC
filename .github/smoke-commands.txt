@@ -10,6 +10,7 @@ siftec selftest progression
 siftec selftest exploration
 siftec selftest content
 siftec selftest food
+siftec selftest vehicles
 siftec selftest state setup
 siftec selftest state check
 siftec worldtest nodes 2000

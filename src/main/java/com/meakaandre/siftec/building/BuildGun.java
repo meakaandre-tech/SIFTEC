@@ -120,6 +120,20 @@ public final class BuildGun {
         Selection sel = selection(player);
         ServerLevel level = player.level();
         if (sel.dismantle) {
+            // a vehicle in the way is what the gun points at first
+            com.meakaandre.siftec.vehicle.VehicleEntity vehicle = com.meakaandre.siftec.vehicle.Vehicles.aimed(player);
+            if (vehicle != null) {
+                Component refused = mayDismantle(player, company, vehicle.companyId, vehicle.getBoundingBox());
+                if (refused != null) {
+                    player.sendOverlayMessage(refused);
+                    return;
+                }
+                Component name = vehicle.getName();
+                Prefabs.give(level, player, vehicle.blockPosition(), com.meakaandre.siftec.vehicle.Vehicles.dismantle(vehicle));
+                used("dismantled " + vehicle.kind.id);
+                player.sendOverlayMessage(Component.translatable("siftec.build_gun.dismantled", name));
+                return;
+            }
             BlockHitResult hit = aimed(player);
             ControllerBlockEntity controller = hit == null ? null : controllerAt(level, hit.getBlockPos());
             HubBlockEntity hub = controller != null || hit == null ? null : Prefabs.structureAt(level, hit.getBlockPos());
@@ -155,7 +169,12 @@ public final class BuildGun {
         }
         boolean ok;
         Component message;
-        if (def.structure()) {
+        if (def.vehicle()) {
+            // a vehicle goes down as one entity (vehicle/Vehicles.java); its cost comes back when it is taken back
+            Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.place(level, p, company, player.getInventory(), player.hasInfiniteMaterials());
+            ok = check.ok();
+            message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
+        } else if (def.structure()) {
             // the HUB and the Wormhole Gateway go down as their structures (prefab/Prefabs.java), built in parts as their
             // upgrades or phases are done; their cost is taken from the player and comes back when they are dismantled
             Prefabs.Check check = hubCheck(player, p, company);
@@ -237,7 +256,7 @@ public final class BuildGun {
      * (its refund is theirs). One nobody owns comes down for anyone the land lets build there: unclaimed land, or
      * their own company's claim. Creative players may take down anything.
      */
-    static @Nullable Component mayDismantle(ServerPlayer player, Company company, @Nullable String ownerId, AABB box) {
+    public static @Nullable Component mayDismantle(ServerPlayer player, Company company, @Nullable String ownerId, AABB box) {
         if (player.hasInfiniteMaterials()) return null;
         if (ownerId != null && !ownerId.isEmpty()) {
             return !company.id.isEmpty() && company.id.equals(ownerId) ? null : Component.translatable("siftec.build_gun.not_yours");
@@ -257,7 +276,13 @@ public final class BuildGun {
             }
             Selection sel = selection(player);
             BuildGunPayloads.View view;
-            if (sel.dismantle) {
+            com.meakaandre.siftec.vehicle.VehicleEntity vehicle = sel.dismantle ? com.meakaandre.siftec.vehicle.Vehicles.aimed(player) : null;
+            if (vehicle != null) {
+                AABB box = vehicle.getBoundingBox();
+                Component refused = mayDismantle(player, Companies.of(player), vehicle.companyId, box);
+                view = BuildGunPayloads.View.of(refused == null, refused != null ? refused : Component.translatable("siftec.build_gun.dismantle_vehicle", vehicle.getName()),
+                    BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1e-4, box.maxY - 1e-4, box.maxZ - 1e-4));
+            } else if (sel.dismantle) {
                 BlockHitResult hit = aimed(player);
                 ControllerBlockEntity controller = hit == null ? null : controllerAt(player.level(), hit.getBlockPos());
                 HubBlockEntity hub = controller != null || hit == null ? null : Prefabs.structureAt(player.level(), hit.getBlockPos());
@@ -280,7 +305,11 @@ public final class BuildGun {
             } else {
                 Placement p = sel.spot;
                 if (p == null || !reachable(player, p)) continue;
-                if (p.def().structure()) {
+                if (p.def().vehicle()) {
+                    Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.check(player.level(), p, Companies.of(player), player.getInventory(), player.hasInfiniteMaterials());
+                    view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable("siftec.build_gun.fits_vehicle", p.def().name()) : check.message(),
+                        p.anchor(), p.anchor());
+                } else if (p.def().structure()) {
                     Prefabs.Check check = hubCheck(player, p);
                     view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable(p.def().hub() ? "siftec.build_gun.fits_hub" : "siftec.build_gun.fits_gateway")
                         : check.message(), p.anchor(), p.anchor());

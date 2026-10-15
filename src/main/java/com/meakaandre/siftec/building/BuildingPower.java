@@ -216,6 +216,12 @@ public final class BuildingPower {
         }
     }
 
+    /** The fluids a generator of this kind burns ("fuel": the Fuel Generator's), by id. */
+    public static java.util.Set<String> fluidFuels(String kind) {
+        readFuel();
+        return java.util.Set.copyOf(FUEL.getOrDefault(kind, Map.of()).keySet());
+    }
+
     /** Megajoules of one item of this fuel in a generator of this kind, or 0 if it does not burn it. */
     public static double itemMj(String kind, ItemStack stack) {
         readFuel();
@@ -233,7 +239,7 @@ public final class BuildingPower {
     }
 
     /** Megajoules of one mB of this fluid in a generator of this kind, or 0. */
-    static double fluidMj(String kind, Fluid fluid) {
+    public static double fluidMj(String kind, Fluid fluid) {
         readFuel();
         Map<String, Double> table = FUEL.getOrDefault(kind, Map.of());
         Fluid still = fluid instanceof net.minecraft.world.level.material.FlowingFluid flowing ? flowing.getSource() : fluid;

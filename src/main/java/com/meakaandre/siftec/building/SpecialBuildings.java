@@ -32,6 +32,7 @@ public final class SpecialBuildings {
                 SinkMenu.open(player, owner == null ? company : owner, () -> c.powered);
             }
             case "radar" -> Radar.use(player, c);
+            case "truck_station" -> TruckStations.use(player, c, def);
             default -> {
                 return false;
             }
