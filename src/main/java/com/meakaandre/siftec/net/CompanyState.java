@@ -23,5 +23,6 @@ public final class CompanyState {
         Company company = CompanyData.get(player.level().getServer()).ofMember(player.getUUID().toString());
         ServerPlayNetworking.send(player, new StatePayload(company == null ? new ArrayList<>() : new ArrayList<>(company.done)));
         com.meakaandre.siftec.hub.MapLock.update(player, company);
+        com.meakaandre.siftec.map.MapServer.companyChanged(player, company);
     }
 }

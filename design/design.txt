@@ -238,7 +238,7 @@ Both tiers open once Tier 0 is done. They add logistics, research and the first 
  | Field Research
  | 300 Wire, 300 Screw, 100 Iron Sheet
  | 3:00
- | MAM; Toolbox; Object Scanner; backpack to Iron tier (no Beacon: the pack uses Xaero's Minimap)
+ | MAM; Toolbox; Object Scanner; backpack to Iron tier (no Beacon: the pack has its own map)
  | 
 ### Tier 2
 #

@@ -192,7 +192,7 @@ FLUIDS = [
 # Satisfactory 1.0's and come from tools/satisfactory.py (below); the list says what each unlocks in the pack.
 # "items" are the things nobody in the company can craft or place until the milestone is done (the parts each
 # milestone's recipes make are added from PART_LOCKS, and the other mods' items from MORE_LOCKS).
-# "tokens" are switches other systems read: minimap (Xaero's Minimap works), scanner:<node> (the node shows on the Resource Scanner), belt:<items a
+# "tokens" are switches other systems read: map (the minimap and fullscreen map open, map/MapServer.java), scanner:<node> (the node shows on the Resource Scanner), belt:<items a
 # minute> (how fast a belt with no shaft runs by itself, Satisfactory's belt tiers), pumps:2 (Pipeline Mk.2).
 # Every inventory-slot reward is gone: inventories stay vanilla size and there is no backpack.
 C = "create:"
@@ -227,9 +227,10 @@ MILESTONES = [
     (1, "logistics", "Logistics",
      "Splitter and Merger (Andesite Tunnel), Conveyor Lift (Chute and fan lift), Item Hatch, Speedometer and Stressometer",
      [C + "andesite_tunnel", C + "chute", C + "item_hatch", C + "speedometer", C + "stressometer"], []),
-    # the Map: Xaero's Minimap is switched off for a company's players until Field Research is done (hub/MapLock.java)
-    (1, "field_research", "Field Research", "MAM, Object Scanner, Toolbox, the Map (Xaero's Minimap)", ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES,
-     ["minimap"]),
+    # the Map: SIFTEC's minimap and fullscreen map stay closed for a company's players until Field Research is done
+    # (map/MapServer.java; the compass strip is there from the start)
+    (1, "field_research", "Field Research", "MAM, Object Scanner, Toolbox, the Map (minimap and fullscreen map, M)", ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES,
+     ["map"]),
 
     # Tier 2
     (2, "part_assembly", "Part Assembly", "Assembler (Deployer); Copper Sheet, Rotor, Modular Frame and Smart Plating",
@@ -511,7 +512,7 @@ MAM = [
                                C + "powered_toggle_latch", C + "analog_lever", C + "redstone_contact"], []),
         ("Display Systems", "10 Crystal Oscillator, 100 Modular Frame", "Display Link, Display Board and Nixie Tube; the Explorer",
          ["Crystal Oscillator"], [C + "display_link", C + "display_board", C + "nixie_tube"], []),
-        ("Radar Technology", "50 Crystal Oscillator, 50 Heavy Modular Frame, 50 Computer", "Radar Tower (reveals Xaero's map and crash sites)",
+        ("Radar Technology", "50 Crystal Oscillator, 50 Heavy Modular Frame, 50 Computer", "Radar Tower (clears the map's fog over about a kilometre round it, showing its crash sites)",
          ["Crystal Oscillator"], [], []),
         ("Tidal Research", "4 minecraft:nautilus_shell, 32 minecraft:prismarine_shard, 20 Quartz Crystal",
          "Trident (Manufacturer: 10 Steel Pipe, 5 Crystal Oscillator, 50 Quickwire, 16 prismarine shard)", ["Crystal Oscillator"], [], []),
@@ -1134,8 +1135,8 @@ BUILDINGS = [
     ("converter", "Converter", "production", BUILD_COSTS["Converter"], "matter_conversion", False, {"logic": "processor", "su": round(250 * MW)}),
     # work package 10 (Exploration and Equipment, AWESOME Sink and Shop): the Equipment Workshop (builds equipment by hand
     # from the parts carried), the AWESOME Sink (destroys what its input port takes, for points; 30 MW as in 1.0), the
-    # AWESOME Shop (prints nothing itself: coupons buy cosmetics) and the Radar Tower (30 MW: reveals crash sites to the
-    # company on Xaero's map). Using any of them opens its window.
+    # AWESOME Shop (prints nothing itself: coupons buy cosmetics) and the Radar Tower (30 MW: clears the company's
+    # map over its range). Using any of them opens its window.
     ("equipment_workshop", "Equipment Workshop", "special", BUILD_COSTS["Equipment Workshop"], "hub_upgrade_1", False, {"logic": "workshop"}),
     ("awesome_sink", "AWESOME Sink", "special", BUILD_COSTS["AWESOME Sink"], "resource_sink_bonus_program", False, {"logic": "sink", "su": round(30 * MW)}),
     ("awesome_shop", "AWESOME Shop", "special", BUILD_COSTS["AWESOME Shop"], "resource_sink_bonus_program", False, {"logic": "shop"}),

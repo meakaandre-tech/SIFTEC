@@ -53,6 +53,7 @@ public class Siftec implements ModInitializer {
         Food.register();
         Locks.register();
         Companies.register();
+        com.meakaandre.siftec.map.MapServer.register();
         Claims.register();
         com.meakaandre.siftec.prefab.Prefabs.register();
         com.meakaandre.siftec.building.Buildings.register();

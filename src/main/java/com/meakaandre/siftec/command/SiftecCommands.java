@@ -52,6 +52,7 @@ public final class SiftecCommands {
         ExplorationTests.register();
         FoodTests.register();
         com.meakaandre.siftec.vehicle.VehicleTests.register();
+        com.meakaandre.siftec.map.MapTests.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("node")

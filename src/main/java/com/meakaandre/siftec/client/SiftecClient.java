@@ -61,6 +61,7 @@ public class SiftecClient implements ClientModInitializer {
         BuildGunClient.register();
         VehicleClient.register();
         CloudButton.register();
+        com.meakaandre.siftec.client.map.MapClient.register();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
             ClientState.jetFuel = true;

@@ -295,7 +295,7 @@ public final class ExplorationTests {
         expect(source, "Object Scanner: finds a ripe sweet berry bush", bush.equals(seen), seen == null ? "nothing" : seen.toShortString());
 
         // ---- Field Research's Map
-        expect(source, "Field Research gives the Map: Xaero's Minimap is off until it is done", !MapLock.open(fresh()) && MapLock.open(fresh("field_research")), "");
+        expect(source, "Field Research gives the Map: SIFTEC's minimap and fullscreen map are closed until it is done", !MapLock.open(fresh()) && MapLock.open(fresh("field_research")), "");
 
         // ---- the Sink's values and the coupon curve
         long sheet = Sink.worthOne(new ItemStack(Items.IRON_INGOT)), dirt = Sink.worthOne(new ItemStack(Items.DIRT));
