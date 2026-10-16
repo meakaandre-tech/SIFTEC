@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.kinetics.deployer.DeployerHandler;
@@ -15,12 +16,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * A Deployer acts as its owner (Create gives its fake player the owner's id), so inside a claim it may only
  * punch, use, place or attack when the owner's company holds the claim, or when it works inside that claim itself.
+ * It never acts on a Build Gun building's block ({@link Buildings#deployerMayAct}): buildings come down only with the
+ * Build Gun. A Deployer that is itself part of that building (the Manufacturer's line) still works on it.
  */
 @Mixin(DeployerHandler.class)
 public abstract class ClaimDeployerMixin {
     @Inject(method = "activate", at = @At("HEAD"), cancellable = true)
     private static void siftec$claim(DeployerPlayer player, Vec3 vec, BlockPos clickedPos, Vec3 extensionVector, DeployerBlockEntity.Mode mode, CallbackInfo ci) {
         ServerPlayer fake = player.cast();
-        if (!Claims.allowed(fake, fake.level(), clickedPos)) ci.cancel();
+        // vec is the middle of the Deployer's own block (or where it is on a moving contraption)
+        if (!Claims.allowed(fake, fake.level(), clickedPos) || !Buildings.deployerMayAct(fake.level(), BlockPos.containing(vec), clickedPos)) ci.cancel();
     }
 }

@@ -49,9 +49,11 @@ import java.util.Set;
  * <p>
  * A building goes down whole: its template's blocks are set in one go, every block is listed in the
  * {@link BuildingIndex} under the controller, and the build cost is taken from the inventory and kept in the
- * controller as the refund. No block of it can be mined, wrenched, blown up, pushed or drilled; the Build Gun's
- * dismantle mode takes it all away again and gives back the refund and anything inside. If a block goes anyway, the
- * controller notices and the whole building comes down, dropping the refund and contents.
+ * controller as the refund. No block of it can be mined, wrenched, blown up, pushed, drilled, deployed on (but by
+ * its own Deployers), broken by a Wither or cleared by a Blueprint Designer; the Build Gun's dismantle mode takes it all
+ * away again and gives back the refund and anything inside, its tanks' fluid packaged. If a block goes anyway, it drops
+ * nothing for itself (mixin/claim/BuildingDropsMixin), the controller notices and the whole building comes down,
+ * dropping the refund and contents.
  */
 public final class Buildings {
     /** How far the Build Gun reaches, as Satisfactory's reaches further than a hand. */
@@ -193,6 +195,13 @@ public final class Buildings {
             if (!level.getBlockState(pos).canBeReplaced()) check.blocked.add(pos);
             if (cell.solid()) solid.add(pos.asLong());
         }
+        // an ore node's position is never building space, grown or empty; a node building's own node cell is its node
+        BlockPos ownNode = ownNodeCell(p);
+        AABB nodeBox = p.bounds(t);
+        for (BlockPos pos : BlockPos.betweenClosed((int) nodeBox.minX, (int) nodeBox.minY, (int) nodeBox.minZ, (int) nodeBox.maxX - 1, (int) nodeBox.maxY - 1, (int) nodeBox.maxZ - 1)) {
+            if (pos.equals(ownNode) || !isNode(level, pos)) continue;
+            if (!check.blocked.contains(pos)) check.blocked.add(pos.immutable());
+        }
         if (p.def().node()) nodeUnder(level, p, t, check);
         int[] intake = p.def().intake();
         if (intake != null) {
@@ -256,15 +265,19 @@ public final class Buildings {
         return level.getBlockState(pos).getBlock() instanceof com.meakaandre.siftec.block.NodeBlock node && node.look.fluid() && node.look.type().id().equals(def.fluidNode());
     }
 
-    /** The node a node building stands over: in its node cell, or else anywhere in its box (grown or mined). */
+    /**
+     * The node a node building stands over: the node in its own node cell (grown or mined), or null. A node anywhere
+     * else in its box is not its node (and blocks it: {@link #check}).
+     */
     public static @Nullable BlockPos nodeIn(Level level, Placement p, BuildingTemplate t) {
+        BlockPos cell = ownNodeCell(p);
+        return cell != null && isNode(p.def(), level, cell) ? cell : null;
+    }
+
+    /** Where a node building's node goes (its template's node cell), or null for any other building. */
+    public static @Nullable BlockPos ownNodeCell(Placement p) {
         int[] c = p.def().nodeCell();
-        if (c != null && isNode(p.def(), level, p.at(c[0], c[1], c[2]))) return p.at(c[0], c[1], c[2]).immutable();
-        AABB box = p.bounds(t);
-        for (BlockPos pos : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
-            if (isNode(p.def(), level, pos)) return pos.immutable();
-        }
-        return null;
+        return p.def().node() && c != null ? p.at(c[0], c[1], c[2]).immutable() : null;
     }
 
     /**
@@ -426,11 +439,15 @@ public final class Buildings {
         return out;
     }
 
-    /** Everything a block holds: a vanilla container's slots, or what its item storage lets out. Ports and the controller hold nothing. */
+    /**
+     * Everything a block holds: a vanilla container's slots, or what its item storage lets out, and what its tanks hold
+     * ({@link #fluids}). Ports and the controller hold nothing.
+     */
     public static List<ItemStack> contents(ServerLevel level, BlockPos pos) {
         List<ItemStack> out = new ArrayList<>();
         BlockEntity be = level.getBlockEntity(pos);
         if (be == null || be instanceof PortBlockEntity || be instanceof ControllerBlockEntity) return out;
+        out.addAll(fluids(level, pos));
         // a Basin keeps its input and output in one inventory that its item storage only lets the output out of
         Container container = be instanceof Container c ? c
             : be instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity basin ? basin.itemCapability : null;
@@ -452,6 +469,45 @@ public final class Buildings {
                     int part = (int) Math.min(n, variant.toStack().getMaxStackSize());
                     out.add(variant.toStack(part));
                     n -= part;
+                }
+            }
+            tx.commit();
+        }
+        return out;
+    }
+
+    /**
+     * Empties the tanks of a block being dismantled into items: each fluid the Packager packages comes back as its
+     * packaged fluid (one per 1 m3, as Satisfactory gives it back), any other fluid with a bucket as full buckets. Less
+     * than one package or bucket is too little to give back and goes with the tank; a fluid with neither is left in it.
+     */
+    public static List<ItemStack> fluids(ServerLevel level, BlockPos pos) {
+        List<ItemStack> out = new ArrayList<>();
+        Storage<net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant> tanks = net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.find(level, pos, null);
+        if (tanks == null) return out;
+        try (Transaction tx = Transaction.openOuter()) {
+            for (StorageView<net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant> view : tanks.nonEmptyViews()) {
+                var variant = view.getResource();
+                if (variant.isBlank()) continue;
+                ItemStack unit = ProductionLogic.packaged(variant.getFluid());
+                long size;
+                if (!unit.isEmpty()) {
+                    size = (long) ProductionLogic.packagedMb(variant.getFluid()) * (net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants.BUCKET / 1000);
+                } else if (variant.getFluid().getBucket() != net.minecraft.world.item.Items.AIR) {
+                    unit = new ItemStack(variant.getFluid().getBucket());
+                    size = net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants.BUCKET;
+                } else {
+                    continue;
+                }
+                if (size <= 0) continue;
+                long units = view.getAmount() / size;
+                if (units <= 0) continue;
+                long took = view.extract(variant, view.getAmount(), tx);
+                units = took / size;
+                while (units > 0) {
+                    int part = (int) Math.min(units, unit.getMaxStackSize());
+                    out.add(unit.copyWithCount(part));
+                    units -= part;
                 }
             }
             tx.commit();
@@ -610,5 +666,15 @@ public final class Buildings {
     /** For the protections in mixins: true if the block belongs to a building (always false on the client). */
     public static boolean protectedAt(Level level, BlockPos pos) {
         return BuildingIndex.isMember(level, pos);
+    }
+
+    /**
+     * Whether a Deployer standing at {@code deployer} may act on the block at {@code target}: never on a building's
+     * block, unless the Deployer is part of that same building (the Manufacturer's line works on its own Depots).
+     */
+    public static boolean deployerMayAct(Level level, BlockPos deployer, BlockPos target) {
+        BlockPos building = BuildingIndex.controllerOf(level, target);
+        if (building == null) return true;
+        return building.equals(BuildingIndex.controllerOf(level, deployer));
     }
 }

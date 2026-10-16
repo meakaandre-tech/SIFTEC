@@ -362,7 +362,8 @@ public final class VehicleTests {
                 && truck.stopStation.size() == 2, truck.companyId + ", " + truck.route.size() + " points, " + truck.stopStation.size() + " stops");
             expect(source, "restart: the unloading station still unloads", b != null && b.unload, "");
             Vec3 was = truck.position();
-            later(level, 120, () -> {
+            // longer than a stop at a dock (DOCK_TICKS), so a Truck that came back standing at one has driven on by then
+            later(level, VehicleEntity.DOCK_TICKS + 140, () -> {
                 expect(source, "restart: it is still driving itself", !truck.isRemoved() && truck.position().distanceTo(was) > 2,
                     "moved " + String.format("%.1f", truck.position().distanceTo(was)));
                 report(source, "restart done: " + passed + " passed, " + failed + " failed");

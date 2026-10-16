@@ -421,6 +421,24 @@ public final class ProductionLogic {
         return out;
     }
 
+    /** The fill recipe that packages this fluid, or null when the Packager has none. */
+    private static @org.jspecify.annotations.Nullable Pack fillFor(Fluid fluid) {
+        for (Pack p : packs()) if (p.fill && p.fluid == fluid && p.mb > 0 && p.out != net.minecraft.world.item.Items.AIR) return p;
+        return null;
+    }
+
+    /** One packaged fluid of this fluid (what the Packager fills), or empty when it has no package. */
+    public static ItemStack packaged(Fluid fluid) {
+        Pack p = fillFor(fluid);
+        return p == null ? ItemStack.EMPTY : new ItemStack(p.out);
+    }
+
+    /** mB of the fluid one package holds (0 when it has no package). */
+    public static int packagedMb(Fluid fluid) {
+        Pack p = fillFor(fluid);
+        return p == null ? 0 : p.mb;
+    }
+
     /** What the Packager's input port takes: empty containers and packaged fluids it has a recipe for. */
     static boolean packagerTakes(ItemStack stack) {
         for (Pack p : packs()) if (stack.is(p.in)) return true;

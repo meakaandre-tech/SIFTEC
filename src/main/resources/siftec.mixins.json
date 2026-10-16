@@ -18,6 +18,8 @@
     "building.MinerDrillMixin",
     "building.MixerPaceMixin",
     "building.PressPaceMixin",
+    "claim.BuildingDestroyMixin",
+    "claim.BuildingDropsMixin",
     "claim.ClaimAssemblyMixin",
     "claim.ClaimBlockItemMixin",
     "claim.ClaimBreakerMixin",

@@ -3,6 +3,7 @@ package com.meakaandre.siftec.depot;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -21,6 +22,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -34,22 +37,46 @@ public class DepotMenu extends ChestMenu {
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final Company company;
+    /** The depot it was opened at, or null when opened from anywhere (the Cloud button, /depot). */
+    private final @Nullable BlockPos at;
     private final List<String> shown = new ArrayList<>();
     private int page;
     private int ticks;
 
-    private DepotMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company) {
+    private DepotMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, @Nullable BlockPos at) {
         super(MenuType.GENERIC_9x6, id, inventory, view, 6);
         this.view = view;
         this.player = player;
         this.company = company;
+        this.at = at == null ? null : at.immutable();
         refresh();
     }
 
     public static void open(ServerPlayer player, Company company) {
+        open(player, company, null);
+    }
+
+    /** Opens the cloud; {@code at} is the depot it was opened at (it must stay there and in reach), or null. */
+    public static void open(ServerPlayer player, Company company, @Nullable BlockPos at) {
         player.openMenu(new SimpleMenuProvider(
-            (id, inventory, p) -> new DepotMenu(id, inventory, new SimpleContainer(SIZE), player, company),
+            (id, inventory, p) -> new DepotMenu(id, inventory, new SimpleContainer(SIZE), player, company, at),
             Component.translatable("siftec.depot.title", company.name)));
+    }
+
+    /** Blocks a player can be from the depot they opened the cloud at and keep it open. */
+    public static final double REACH = 8.0;
+
+    /**
+     * Whether the window stays open: the player is still there and alive, still a member of the company whose cloud it
+     * shows, and, when it was opened at a depot, that depot still stands and is within reach.
+     */
+    public static boolean valid(ServerPlayer player, Company company, @Nullable BlockPos at) {
+        if (player.isRemoved() || !player.isAlive()) return false;
+        Company now = Companies.find(player);
+        if (now == null || !now.id.equals(company.id)) return false;
+        if (at == null) return true;
+        if (!(player.level().getBlockEntity(at) instanceof DepotBlockEntity)) return false;
+        return player.distanceToSqr(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5) <= REACH * REACH;
     }
 
     private void refresh() {
@@ -136,6 +163,6 @@ public class DepotMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player who) {
-        return true;
+        return who == player && valid(player, company, at);
     }
 }
