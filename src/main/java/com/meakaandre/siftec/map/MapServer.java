@@ -119,7 +119,8 @@ public final class MapServer {
         ServerPlayerEvents.JOIN.register(MapServer::sync);
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> SYNCED.remove(handler.getPlayer().getUUID()));
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
-            if (entity instanceof ServerPlayer player && !Companies.isFake(player)) deathMarker(player);
+            // a death that left a Death Crate already has its marker, on the crate
+            if (entity instanceof ServerPlayer player && !Companies.isFake(player) && !com.meakaandre.siftec.death.DeathCrates.placedJustNow(player)) deathMarker(player);
         });
         ServerTickEvents.END_SERVER_TICK.register(MapServer::tick);
     }
@@ -572,22 +573,46 @@ public final class MapServer {
 
     /** A death marker where the player died (or stands, for the tests); only the last few are kept. */
     public static void deathMarker(ServerPlayer player) {
-        MinecraftServer server = player.level().getServer();
+        deathMarker(player, player.level(), player.blockPosition(), false);
+    }
+
+    /**
+     * A death marker at a player's Death Crate: kept, whatever the number of deaths since, until the crate is emptied
+     * or taken away ({@link #removeMarker}). Returns its id.
+     */
+    public static String crateMarker(ServerPlayer player, net.minecraft.server.level.ServerLevel level, BlockPos at) {
+        return deathMarker(player, level, at, true);
+    }
+
+    /** Takes a marker away (a Death Crate's, once it is emptied), for everyone who saw it. */
+    public static void removeMarker(MinecraftServer server, String id) {
+        if (id == null || id.isEmpty()) return;
+        MapMarkers markers = MapMarkers.get(server);
+        MapMarker m = markers.byId(id);
+        if (m == null) return;
+        markers.all().remove(m);
+        markers.setDirty();
+        markersChanged(server, m);
+    }
+
+    private static String deathMarker(ServerPlayer player, net.minecraft.server.level.ServerLevel level, BlockPos at, boolean crate) {
+        MinecraftServer server = level.getServer();
         MapMarkers markers = MapMarkers.get(server);
         String id = player.getUUID().toString();
+        // only the last few plain death markers are kept; one on a crate stays as long as the crate
         List<MapMarker> deaths = new ArrayList<>();
-        for (MapMarker m : markers.all()) if (m.death && m.owner.equals(id)) deaths.add(m);
+        for (MapMarker m : markers.all()) if (m.death && !m.crate && m.owner.equals(id)) deaths.add(m);
         deaths.sort((a, b) -> Long.compare(a.at, b.at));
-        while (deaths.size() >= MapMarkers.DEATHS_KEPT) markers.all().remove(deaths.remove(0));
+        while (!crate && deaths.size() >= MapMarkers.DEATHS_KEPT) markers.all().remove(deaths.remove(0));
         MapMarker m = new MapMarker();
         m.id = UUID.randomUUID().toString();
-        m.dimension = player.level().dimension().identifier().toString();
-        BlockPos at = player.blockPosition();
+        m.dimension = level.dimension().identifier().toString();
         m.x = at.getX();
         m.y = at.getY();
         m.z = at.getZ();
         m.name = "";
         m.death = true;
+        m.crate = crate;
         m.owner = id;
         Company company = Companies.find(player);
         m.companyId = company == null ? "" : company.id;
@@ -595,6 +620,7 @@ public final class MapServer {
         markers.all().add(m);
         markers.setDirty();
         sendMarkers(player);
+        return m.id;
     }
 
     // ------------------------------------------------------------------------------------------------ companies

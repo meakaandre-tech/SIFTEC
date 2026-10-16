@@ -12,3 +12,4 @@ siftec selftest state verify
 siftec worldtest powerchain restart
 siftec selftest vehicles restart
 #sleep 40
+siftec selftest tb crate persisted

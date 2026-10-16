@@ -48,6 +48,10 @@ public class Siftec implements ModInitializer {
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.owner.RecipeLocks.forget());
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> com.meakaandre.siftec.building.MachineTimes.forget());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.building.MachineTimes.forget());
+        // the inventory is the Traveler's Backpack each player wears (SIFTEC still loads without it: vanilla inventory
+        // then); a dead player's things go into a Death Crate either way
+        com.meakaandre.siftec.death.DeathCrates.register();
+        if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("travelersbackpack")) com.meakaandre.siftec.compat.TravelersBackpackCompat.register();
         com.meakaandre.siftec.equip.Equipment.register();
         com.meakaandre.siftec.depot.OpenCloudPayload.register();
         Food.register();

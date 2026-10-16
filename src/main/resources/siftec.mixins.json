@@ -42,6 +42,7 @@
     "NodeBucketMixin",
     "ManualApplicationMixin",
     "NetworkNoLoadMixin",
+    "PlayerDeathCrateMixin",
     "PotentSulfurMixin",
     "power.ConnectorAccessor",
     "power.ConnectorMixin",

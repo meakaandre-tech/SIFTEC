@@ -187,6 +187,13 @@ public class ModBlocks {
     public static final Supplier<ProcessorBlock> CONVERTER = block("converter", properties -> new ProcessorBlock("converter", properties), ModBlocks::machine);
     public static final Supplier<ProcessorBlock> PARTICLE_ACCELERATOR = block("particle_accelerator", properties -> new ProcessorBlock("particle_accelerator", properties), ModBlocks::machine);
     public static final Supplier<ClaimMarkerBlock> CLAIM_MARKER = block("claim_marker", ClaimMarkerBlock::new, ModBlocks::machine);
+    /**
+     * A dead player's things, where they died (death/DeathCrates.java): placed only by the game, so it has no item.
+     * Nothing breaks, blows up or pushes it, and it drops nothing; its owner empties it by clicking it.
+     */
+    public static final Supplier<com.meakaandre.siftec.death.DeathCrateBlock> DEATH_CRATE = blockOnly("death_crate", com.meakaandre.siftec.death.DeathCrateBlock::new,
+        () -> BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.WOOD)
+            .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK));
 
     /** The AWESOME Shop's decorations (sink/DecorBlock.java), by id, from siftec_content.json (tools/content.py, DECOR). */
     public static final Map<String, Block> DECOR = new java.util.LinkedHashMap<>();

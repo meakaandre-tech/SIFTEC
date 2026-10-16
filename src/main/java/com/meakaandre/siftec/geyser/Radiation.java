@@ -25,6 +25,11 @@ public final class Radiation {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 if (player.hasInfiniteMaterials() || player.isSpectator()) continue;
                 boolean exposed = player.getInventory().contains(stack -> stack.is(residue));
+                if (!exposed) {
+                    for (net.minecraft.world.Container worn : com.meakaandre.siftec.backpack.Backpack.containers(player)) {
+                        if (worn.hasAnyMatching(stack -> stack.is(residue))) exposed = true;
+                    }
+                }
                 ServerLevel level = player.level();
                 if (!exposed) {
                     exposed = !level.getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(RANGE), e -> e.getItem().is(residue)).isEmpty();

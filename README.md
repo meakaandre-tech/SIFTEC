@@ -139,13 +139,34 @@ with a filter panel down the side as Satisfactory's (players, map markers, resou
 wells, geysers, crash sites, artifacts, key buildings). Fog of war is shared by the company: what any member has been
 near is mapped, and a Radar Tower's sweep clears its whole range, filling land nobody has loaded from the world
 generator. Markers are placed from the map (right click) with an icon, a colour and a name, private or shared with the
-company; left click pins anything to the compass. Dying leaves a private death marker, pinned at once (the last three
-are kept).
+company; left click pins anything to the compass. Dying leaves a private death marker, pinned at once: on the Death
+Crate while there is one, otherwise where it happened (the last three of those are kept).
 
 It stays light: the terrain is kept at one pixel for 4 by 4 blocks in tiles of 512 by 512 blocks, recorded only when a
 chunk loads or a few seconds after a block in it changes (`map/MapTerrain.java`), saved under `data/siftec/map`, and
 sent to a client only when it holds an older copy; clients keep their tiles on disk (`siftec/map/<map id>` in the game
 folder), so a world's map is there at once on the next visit.
+
+## Backpack and death crate
+
+The inventory is a Traveler's Backpack (`compat/`, only when that mod is installed; the pack always has it). Every player
+wears one from spawn and it is bound to them: it cannot be taken off, swapped, dropped or placed, and nobody can craft
+one (every backpack, design, tier upgrade and sleeping bag is switched off). E opens the backpack window in place of the
+vanilla inventory; the vanilla hotbar stays as it is, and the window has the armour and offhand slots in a column on its
+left. Its tier grows with the company at four of the milestones where Satisfactory gives inventory slots: Leather (27
+slots) from the start, Iron (45) at Field Research, Gold (63) at Vehicular Transport, Diamond (81) at Jetpack and
+Netherite (99) at Hover Pack. One upgrade slot holds a built-in 2x2 crafting grid that stays in; using a Crafting
+Upgrade turns it into 3x3. The upgrades are unlocked by MAM research (Crafting at Structural Analysis, Tanks and the
+hose at Copper Backtank, Pickup at Quickwire, Lantern at Silica, Magnet at Crystal Oscillator, Jukebox at Display
+Systems, Feeding at Preserved Foods, Smoker at Automated Cooking, Furnace and Blast Furnace at Ignimbrite, Void and Refill
+at Pocket Storage), built at the Equipment Workshop from the pack's parts (the Assembler makes them too), and a locked
+one does not fit an upgrade slot. Milestone payments, the Workshop and radiation see what the backpack holds.
+
+Dying leaves a Death Crate where it happened (`death/`), as in Satisfactory: everything carried goes into it, the hotbar,
+inventory, armour, offhand and everything in the backpack, while the backpack and its upgrades stay on. Clicking it puts
+every stack straight back into the slot it came from (whatever no longer fits stays in the crate). Only its owner opens
+it; it cannot be broken, blown up or pushed and never despawns, and the map shows it as the death marker until it is
+emptied. With keepInventory on nothing changes, and Curse of Vanishing items vanish as in vanilla.
 
 ## AWESOME Sink and Shop
 

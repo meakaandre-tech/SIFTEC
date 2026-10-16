@@ -27,6 +27,11 @@ public final class MapMarker {
     /** The owner's company when placed (for company markers). */
     public String companyId = "";
     public boolean death;
+    /**
+     * A death marker that shows a Death Crate (death/DeathCrates.java): kept until the crate is emptied or taken away,
+     * whatever the number of deaths since. Only the server needs it, so it is not sent.
+     */
+    public boolean crate;
     /** Real time (ms) it was placed. */
     public long at;
 

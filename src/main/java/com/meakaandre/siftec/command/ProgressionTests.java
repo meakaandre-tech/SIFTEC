@@ -81,9 +81,12 @@ public final class ProgressionTests {
         five.done.add(phase5.id());
         expect(source, "free play once Phase 5 is delivered", Milestones.phases().size() == 5 && !before && Milestones.freePlay(five), phase5.id());
         expect(source, "belt Mk.1 comes with HUB Upgrade 4", Milestones.get("hub_upgrade_4").tokens().contains("belt:60"), "");
-        boolean noBackpack = true;
-        for (Milestone m : Milestones.all()) for (String t : m.tokens()) noBackpack &= !t.startsWith("backpack");
-        expect(source, "no milestone gives a backpack", noBackpack, "");
+        // the backpack is worn from the start; four of Satisfactory's inventory-slot milestones raise its tier
+        java.util.Map<String, String> tiers = new java.util.TreeMap<>();
+        for (Milestone m : Milestones.all()) for (String t : m.tokens()) if (t.startsWith("backpack")) tiers.put(t, m.id());
+        expect(source, "the backpack's tiers come with Field Research, Vehicular Transport, Jetpack and Hover Pack",
+            tiers.equals(java.util.Map.of("backpack:iron", "field_research", "backpack:gold", "vehicular_transport", "backpack:diamond", "jetpack",
+                "backpack:netherite", "hover_pack")), tiers.toString());
 
         // ---- the MAM: seven trees, every node 3 seconds, the starting items, and needs across trees and either-or
         List<Milestones.Tree> trees = Milestones.trees();

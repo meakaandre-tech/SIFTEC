@@ -1262,7 +1262,8 @@
         "siftec:incomplete_object_scanner"
       ],
       "tokens": [
-        "map"
+        "map",
+        "backpack:iron"
       ]
     },
     {
@@ -1522,7 +1523,9 @@
         "create:portable_storage_interface",
         "create:minecart_coupling"
       ],
-      "tokens": []
+      "tokens": [
+        "backpack:gold"
+      ]
     },
     {
       "id": "basic_steel_production",
@@ -1774,7 +1777,9 @@
         "siftec:jetpack_core",
         "siftec:incomplete_jetpack"
       ],
-      "tokens": []
+      "tokens": [
+        "backpack:diamond"
+      ]
     },
     {
       "id": "oil_processing",
@@ -2194,7 +2199,9 @@
         "siftec:hover_pack_core",
         "siftec:incomplete_hover_pack"
       ],
-      "tokens": []
+      "tokens": [
+        "backpack:netherite"
+      ]
     },
     {
       "id": "control_system_development",
@@ -2701,6 +2708,71 @@
     "create:schematic_and_quill",
     "create:schematic",
     "farmersdelight:wheat_dough",
+    "travelersbackpack:bat",
+    "travelersbackpack:bee",
+    "travelersbackpack:blaze",
+    "travelersbackpack:bookshelf",
+    "travelersbackpack:cactus",
+    "travelersbackpack:cake",
+    "travelersbackpack:chicken",
+    "travelersbackpack:coal",
+    "travelersbackpack:cow",
+    "travelersbackpack:creeper",
+    "travelersbackpack:diamond",
+    "travelersbackpack:dragon",
+    "travelersbackpack:emerald",
+    "travelersbackpack:end",
+    "travelersbackpack:enderman",
+    "travelersbackpack:fox",
+    "travelersbackpack:ghast",
+    "travelersbackpack:gold",
+    "travelersbackpack:hay",
+    "travelersbackpack:horse",
+    "travelersbackpack:iron",
+    "travelersbackpack:iron_golem",
+    "travelersbackpack:lapis",
+    "travelersbackpack:magma_cube",
+    "travelersbackpack:melon",
+    "travelersbackpack:nether",
+    "travelersbackpack:netherite",
+    "travelersbackpack:ocelot",
+    "travelersbackpack:pig",
+    "travelersbackpack:pumpkin",
+    "travelersbackpack:quartz",
+    "travelersbackpack:redstone",
+    "travelersbackpack:sandstone",
+    "travelersbackpack:sheep",
+    "travelersbackpack:skeleton",
+    "travelersbackpack:snow",
+    "travelersbackpack:spider",
+    "travelersbackpack:sponge",
+    "travelersbackpack:squid",
+    "travelersbackpack:standard",
+    "travelersbackpack:villager",
+    "travelersbackpack:warden",
+    "travelersbackpack:wither",
+    "travelersbackpack:wolf",
+    "travelersbackpack:iron_tier_upgrade",
+    "travelersbackpack:gold_tier_upgrade",
+    "travelersbackpack:diamond_tier_upgrade",
+    "travelersbackpack:netherite_tier_upgrade",
+    "travelersbackpack:white_sleeping_bag",
+    "travelersbackpack:orange_sleeping_bag",
+    "travelersbackpack:magenta_sleeping_bag",
+    "travelersbackpack:light_blue_sleeping_bag",
+    "travelersbackpack:yellow_sleeping_bag",
+    "travelersbackpack:lime_sleeping_bag",
+    "travelersbackpack:pink_sleeping_bag",
+    "travelersbackpack:gray_sleeping_bag",
+    "travelersbackpack:light_gray_sleeping_bag",
+    "travelersbackpack:cyan_sleeping_bag",
+    "travelersbackpack:purple_sleeping_bag",
+    "travelersbackpack:blue_sleeping_bag",
+    "travelersbackpack:brown_sleeping_bag",
+    "travelersbackpack:green_sleeping_bag",
+    "travelersbackpack:red_sleeping_bag",
+    "travelersbackpack:black_sleeping_bag",
+    "travelersbackpack:blank_upgrade",
     "create_new_age:nuclear_fuel",
     "create_new_age:incomplete_fuel",
     "create_new_age:thorium",
@@ -2991,7 +3063,9 @@
         }
       ],
       "seconds": 3,
-      "items": [],
+      "items": [
+        "travelersbackpack:crafting_upgrade"
+      ],
       "tokens": [],
       "needs": [
         "mam_megafauna_bio_organic_properties"
@@ -3016,7 +3090,11 @@
       ],
       "seconds": 3,
       "items": [
-        "create:copper_backtank"
+        "create:copper_backtank",
+        "travelersbackpack:tanks_upgrade",
+        "travelersbackpack:backpack_tank",
+        "travelersbackpack:hose_nozzle",
+        "travelersbackpack:hose"
       ],
       "tokens": [],
       "needs": [
@@ -3183,7 +3261,8 @@
       ],
       "seconds": 3,
       "items": [
-        "siftec:quickwire"
+        "siftec:quickwire",
+        "travelersbackpack:pickup_upgrade"
       ],
       "tokens": [],
       "needs": [
@@ -3881,7 +3960,9 @@
         }
       ],
       "seconds": 3,
-      "items": [],
+      "items": [
+        "travelersbackpack:feeding_upgrade"
+      ],
       "tokens": [
         "food:preserves"
       ],
@@ -3937,7 +4018,9 @@
         }
       ],
       "seconds": 3,
-      "items": [],
+      "items": [
+        "travelersbackpack:smoker_upgrade"
+      ],
       "tokens": [
         "food:kitchen",
         "food:seasoning"
@@ -4025,7 +4108,8 @@
       ],
       "seconds": 3,
       "items": [
-        "siftec:silica"
+        "siftec:silica",
+        "travelersbackpack:lantern_upgrade"
       ],
       "tokens": [],
       "needs": [
@@ -4104,7 +4188,8 @@
         "create:redstone_contact",
         "siftec:crystal_oscillator",
         "siftec:crystal_oscillator_core",
-        "siftec:incomplete_crystal_oscillator"
+        "siftec:incomplete_crystal_oscillator",
+        "travelersbackpack:magnet_upgrade"
       ],
       "tokens": [],
       "needs": [
@@ -4128,7 +4213,8 @@
       "items": [
         "create:display_link",
         "create:display_board",
-        "create:nixie_tube"
+        "create:nixie_tube",
+        "travelersbackpack:jukebox_upgrade"
       ],
       "tokens": [],
       "needs": [
@@ -4320,7 +4406,9 @@
       ],
       "seconds": 3,
       "items": [
-        "siftec:ignimbrite_bucket"
+        "siftec:ignimbrite_bucket",
+        "travelersbackpack:furnace_upgrade",
+        "travelersbackpack:blast_furnace_upgrade"
       ],
       "tokens": [],
       "needs": [
@@ -5005,7 +5093,10 @@
         }
       ],
       "seconds": 3,
-      "items": [],
+      "items": [
+        "travelersbackpack:void_upgrade",
+        "travelersbackpack:refill_upgrade"
+      ],
       "tokens": [],
       "needs": [
         "mam_alien_sam_fluctuator"
@@ -6992,6 +7083,21 @@
     "seq:hover_pack": "hover_pack",
     "siftec:mixing/manufacturer/blade_runners_core": "mam_quartz_blade_runners",
     "seq:blade_runners": "mam_quartz_blade_runners",
+    "siftec:mixing/assembler/backpack/crafting_upgrade": "mam_megafauna_structural_analysis",
+    "siftec:mixing/assembler/backpack/tanks_upgrade": "mam_megafauna_copper_backtank",
+    "siftec:mixing/assembler/backpack/backpack_tank": "mam_megafauna_copper_backtank",
+    "siftec:mixing/assembler/backpack/hose_nozzle": "mam_megafauna_copper_backtank",
+    "siftec:mixing/assembler/backpack/hose": "mam_megafauna_copper_backtank",
+    "siftec:mixing/assembler/backpack/pickup_upgrade": "mam_caterium_quickwire",
+    "siftec:mixing/assembler/backpack/lantern_upgrade": "mam_quartz_silica",
+    "siftec:mixing/assembler/backpack/magnet_upgrade": "mam_quartz_crystal_oscillator",
+    "siftec:mixing/assembler/backpack/jukebox_upgrade": "mam_quartz_display_systems",
+    "siftec:mixing/assembler/backpack/feeding_upgrade": "mam_nutrients_preserved_foods",
+    "siftec:mixing/assembler/backpack/smoker_upgrade": "mam_nutrients_automated_cooking",
+    "siftec:mixing/assembler/backpack/furnace_upgrade": "mam_sulfur_ignimbrite",
+    "siftec:mixing/assembler/backpack/blast_furnace_upgrade": "mam_sulfur_ignimbrite",
+    "siftec:mixing/assembler/backpack/void_upgrade": "mam_alien_pocket_storage",
+    "siftec:mixing/assembler/backpack/refill_upgrade": "mam_alien_pocket_storage",
     "siftec:mixing/manufacturer/totem_of_undying_core": "mam_megafauna_undying_biology",
     "siftec:mixing/manufacturer/elytra_core": "mam_mycelia_wingsuit_research",
     "siftec:mixing/manufacturer/elytra_backpack_core": "mam_mycelia_elytra_backpack",
@@ -9543,7 +9649,22 @@
     "farmersdelight:wheat_dough_from_egg",
     "farmersdelight:wheat_dough_from_water",
     "farmersdelight:bread_from_smelting",
-    "farmersdelight:bread_from_smoking"
+    "farmersdelight:bread_from_smoking",
+    "travelersbackpack:crafting_upgrade",
+    "travelersbackpack:tanks_upgrade",
+    "travelersbackpack:backpack_tank",
+    "travelersbackpack:hose_nozzle",
+    "travelersbackpack:hose",
+    "travelersbackpack:pickup_upgrade",
+    "travelersbackpack:lantern_upgrade",
+    "travelersbackpack:magnet_upgrade",
+    "travelersbackpack:jukebox_upgrade",
+    "travelersbackpack:feeding_upgrade",
+    "travelersbackpack:smoker_upgrade",
+    "travelersbackpack:furnace_upgrade",
+    "travelersbackpack:blast_furnace_upgrade",
+    "travelersbackpack:void_upgrade",
+    "travelersbackpack:refill_upgrade"
   ],
   "workshop": [
     {
@@ -10029,6 +10150,205 @@
         {
           "item": "siftec:wire",
           "count": 500
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:crafting_upgrade",
+      "cost": [
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 4
+        },
+        {
+          "item": "siftec:screw",
+          "count": 25
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:tanks_upgrade",
+      "cost": [
+        {
+          "item": "create:copper_sheet",
+          "count": 10
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:backpack_tank",
+      "cost": [
+        {
+          "item": "create:copper_sheet",
+          "count": 5
+        },
+        {
+          "item": "minecraft:glass",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:hose_nozzle",
+      "cost": [
+        {
+          "item": "create:copper_sheet",
+          "count": 2
+        },
+        {
+          "item": "siftec:screw",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:hose",
+      "cost": [
+        {
+          "item": "travelersbackpack:hose_nozzle",
+          "count": 1
+        },
+        {
+          "item": "siftec:cable",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:pickup_upgrade",
+      "cost": [
+        {
+          "item": "siftec:quickwire",
+          "count": 20
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:lantern_upgrade",
+      "cost": [
+        {
+          "item": "siftec:silica",
+          "count": 10
+        },
+        {
+          "item": "siftec:wire",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:magnet_upgrade",
+      "cost": [
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 2
+        },
+        {
+          "item": "siftec:quickwire",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:jukebox_upgrade",
+      "cost": [
+        {
+          "item": "minecraft:jukebox",
+          "count": 1
+        },
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:feeding_upgrade",
+      "cost": [
+        {
+          "item": "minecraft:golden_carrot",
+          "count": 1
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 2
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:smoker_upgrade",
+      "cost": [
+        {
+          "item": "minecraft:smoker",
+          "count": 1
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:furnace_upgrade",
+      "cost": [
+        {
+          "item": "minecraft:furnace",
+          "count": 1
+        },
+        {
+          "item": "siftec:reinforced_iron_plate",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:blast_furnace_upgrade",
+      "cost": [
+        {
+          "item": "minecraft:blast_furnace",
+          "count": 1
+        },
+        {
+          "item": "siftec:steel_pipe",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:void_upgrade",
+      "cost": [
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 1
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "item": "travelersbackpack:refill_upgrade",
+      "cost": [
+        {
+          "item": "siftec:sam_fluctuator",
+          "count": 1
+        },
+        {
+          "item": "siftec:rotor",
+          "count": 2
         }
       ]
     }

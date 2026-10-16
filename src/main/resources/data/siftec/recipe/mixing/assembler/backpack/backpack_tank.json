@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "travelersbackpack"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "create:copper_sheet",
+    "minecraft:glass",
+    "minecraft:glass",
+    "minecraft:glass",
+    "minecraft:glass"
+  ],
+  "results": [
+    {
+      "id": "travelersbackpack:backpack_tank"
+    }
+  ]
+}

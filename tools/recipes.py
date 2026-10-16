@@ -509,6 +509,7 @@ def build():
     SATISFACTORY.clear()
     satisfactory()
     equipment_by_machine()
+    backpack_upgrades()
     vanilla()
     kitchen()
     food()
@@ -573,3 +574,38 @@ WORKSHOP = [
     # the Particle Accelerator, the Converter, the Resource Well Extractor, the AWESOME Sink and Shop and the Radar Tower
     # are Build Gun buildings (work packages 9 and 10)
 ]
+# Traveler's Backpack upgrades (Exploration and Equipment tab, Backpack): built at the Equipment Workshop, each once its
+# MAM node is researched (content.TB_UPGRADES), from the pack's parts. The mod's own crafting recipes are removed
+# (REMOVED); the Assembler (a Mixer on a Basin) makes each one too, under the same lock (backpack_upgrades()).
+TB = content.TB
+BACKPACK_UPGRADES = [
+    (TB + "crafting_upgrade", "4 Reinforced Iron Plate, 25 Screw"),
+    (TB + "tanks_upgrade", "10 Copper Sheet, 2 Rotor"),
+    (TB + "backpack_tank", "5 Copper Sheet, 4 minecraft:glass"),
+    (TB + "hose_nozzle", "2 Copper Sheet, 4 Screw"),
+    (TB + "hose", "1 travelersbackpack:hose_nozzle, 5 Cable"),
+    (TB + "pickup_upgrade", "20 Quickwire, 2 Rotor"),
+    (TB + "lantern_upgrade", "10 Silica, 4 Wire"),
+    (TB + "magnet_upgrade", "2 Crystal Oscillator, 10 Quickwire"),
+    (TB + "jukebox_upgrade", "1 minecraft:jukebox, 2 Crystal Oscillator"),
+    (TB + "feeding_upgrade", "1 minecraft:golden_carrot, 2 Rotor, 10 Iron Rod"),
+    (TB + "smoker_upgrade", "1 minecraft:smoker, 5 Reinforced Iron Plate"),
+    (TB + "furnace_upgrade", "1 minecraft:furnace, 5 Reinforced Iron Plate"),
+    (TB + "blast_furnace_upgrade", "1 minecraft:blast_furnace, 10 Steel Pipe"),
+    (TB + "void_upgrade", "1 SAM Fluctuator, 5 Iron Sheet"),
+    (TB + "refill_upgrade", "1 SAM Fluctuator, 2 Rotor"),
+]
+WORKSHOP += BACKPACK_UPGRADES
+# the mod's own recipe for each upgrade has the upgrade's id; the backpack itself, its designs, tier upgrades and sleeping
+# bags are switched off (content.DISABLED)
+REMOVED += [out for out, cost in BACKPACK_UPGRADES]
+
+
+def backpack_upgrades():
+    """Each Traveler's Backpack upgrade from the Assembler (a Mixer on a Basin), locked to its MAM node like the
+    Workshop build."""
+    lock_of = {TB + i: content.mam(tree, node) for (tree, node), items in content.TB_UPGRADES.items() for i in items}
+    for out, cost in BACKPACK_UPGRADES:
+        under(lock_of[out])
+        mix(f"assembler/backpack/{out.split(':')[1]}", items=[c for c, n in content.parse_cost(cost) for _ in range(n)], results=[out])
+        under(None)

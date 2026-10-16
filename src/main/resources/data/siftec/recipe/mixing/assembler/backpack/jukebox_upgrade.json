@@ -1,0 +1,21 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "travelersbackpack"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:jukebox",
+    "siftec:crystal_oscillator",
+    "siftec:crystal_oscillator"
+  ],
+  "results": [
+    {
+      "id": "travelersbackpack:jukebox_upgrade"
+    }
+  ]
+}

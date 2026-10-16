@@ -193,8 +193,10 @@ FLUIDS = [
 # "items" are the things nobody in the company can craft or place until the milestone is done (the parts each
 # milestone's recipes make are added from PART_LOCKS, and the other mods' items from MORE_LOCKS).
 # "tokens" are switches other systems read: map (the minimap and fullscreen map open, map/MapServer.java), scanner:<node> (the node shows on the Resource Scanner), belt:<items a
-# minute> (how fast a belt with no shaft runs by itself, Satisfactory's belt tiers), pumps:2 (Pipeline Mk.2).
-# Every inventory-slot reward is gone: inventories stay vanilla size and there is no backpack.
+# minute> (how fast a belt with no shaft runs by itself, Satisfactory's belt tiers), pumps:2 (Pipeline Mk.2),
+# backpack:<tier> (compat/TravelersBackpackCompat.java: every member's Traveler's Backpack, worn from spawn at Leather,
+# grows to that tier). The tiers come at four of the milestones where Satisfactory gives inventory slots, spread over
+# the game: Iron at Field Research, Gold at Vehicular Transport, Diamond at Jetpack and Netherite at Hover Pack.
 C = "create:"
 SAILS = [C + "white_sail"]   # the dyed sails are blocks only; they have no item to lock
 TOOLBOXES = [C + c + "_toolbox" for c in "white orange magenta light_blue yellow lime pink gray light_gray cyan purple blue brown green red black".split()]
@@ -229,8 +231,8 @@ MILESTONES = [
      [C + "andesite_tunnel", C + "chute", C + "item_hatch", C + "speedometer", C + "stressometer"], []),
     # the Map: SIFTEC's minimap and fullscreen map stay closed for a company's players until Field Research is done
     # (map/MapServer.java; the compass strip is there from the start)
-    (1, "field_research", "Field Research", "MAM, Object Scanner, Toolbox, the Map (minimap and fullscreen map, M)", ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES,
-     ["map"]),
+    (1, "field_research", "Field Research", "MAM, Object Scanner, Toolbox, the Map (minimap and fullscreen map, M); backpack to Iron (45 slots)",
+     ["siftec:mam", "siftec:object_scanner"] + TOOLBOXES, ["map", "backpack:iron"]),
 
     # Tier 2
     (2, "part_assembly", "Part Assembly", "Assembler (Deployer); Copper Sheet, Rotor, Modular Frame and Smart Plating",
@@ -248,8 +250,8 @@ MILESTONES = [
      [C + "steam_engine", C + "blaze_burner", C + "empty_blaze_burner", C + "fluid_pipe", C + "mechanical_pump", C + "fluid_tank", C + "hose_pulley"],
      ["scanner:coal"]),
     (3, "vehicular_transport", "Vehicular Transport",
-     "Tractor, Truck Station, Cart Assembler minecart contraptions, Portable Storage Interface, Minecart Coupling",
-     [C + "cart_assembler", C + "portable_storage_interface", C + "minecart_coupling"], []),
+     "Tractor, Truck Station, Cart Assembler minecart contraptions, Portable Storage Interface, Minecart Coupling; backpack to Gold (63 slots)",
+     [C + "cart_assembler", C + "portable_storage_interface", C + "minecart_coupling"], ["backpack:gold"]),
     (3, "basic_steel_production", "Basic Steel Production",
      "Foundry (Mechanical Mixer); Steel Ingot, Steel Beam, Steel Pipe and Versatile Framework",
      [C + "mechanical_mixer", "cgs:steel_ingot", "siftec:steel_casing"], []),
@@ -270,7 +272,7 @@ MILESTONES = [
      [C + "elevator_pulley", C + "rope_pulley", C + "gantry_shaft", C + "gantry_carriage"], []),
 
     # Tier 5 (Wormhole Phase 2)
-    (5, "jetpack", "Jetpack", "Jetpack", ["siftec:jetpack"], []),
+    (5, "jetpack", "Jetpack", "Jetpack; backpack to Diamond (81 slots)", ["siftec:jetpack"], ["backpack:diamond"]),
     (5, "oil_processing", "Oil Processing",
      "Oil Extractor (pumpjack, oil nodes only), Refinery, Fluid Valve; Plastic, Rubber, Fuel, Heavy Oil Residue, Petroleum Coke and Circuit Board; "
      "oil nodes on the scanner",
@@ -300,7 +302,7 @@ MILESTONES = [
      [], ["scanner:bauxite", "scanner:quartz"]),
     (7, "logistics_mk5", "Logistics Mk.5", "Belt Mk.5: belts with no shaft run at 780 items/min", [], ["belt:780"]),
     (7, "hazmat_suit", "Hazmat Suit", "Hazmat Suit, Iodine Infused Filter", ["siftec:hazmat_suit"], []),
-    (7, "hover_pack", "Hover Pack", "Hover Pack", ["siftec:hover_pack"], []),
+    (7, "hover_pack", "Hover Pack", "Hover Pack; backpack to Netherite (99 slots)", ["siftec:hover_pack"], ["backpack:netherite"]),
     (7, "control_system_development", "Control System Development",
      "Blender; Sulfuric Acid, Battery, Radio Control Unit, Supercomputer and Assembly Director System", [], []),
 
@@ -948,6 +950,7 @@ def _roofs():
 
 DG, G = "createdieselgenerators:", "cgs:"
 NA = "create_new_age:"
+TB = "travelersbackpack:"
 MORE_LOCKS = {
     # factory building blocks
     "base_building": [C + "copper_casing", C + "andesite_bars", C + "copper_bars", C + "andesite_door", C + "copper_door",
@@ -1000,6 +1003,32 @@ MORE_LOCKS = {
                      G + "rocket", G + "rocket_small", G + "launcher_auto", G + "ballistazooka", G + "blazegun", G + "steam_engine", G + "tank_empty",
                      G + "tank_lava", G + "tank_water", DG + "chemical_sprayer", DG + "chemical_sprayer_lighter", DG + "chemical_turret"],
 }
+# Traveler's Backpack (Exploration and Equipment tab, Backpack): the backpack is every player's inventory, worn from
+# spawn and never crafted, so every backpack design, the tier upgrades (tiers come with milestones), the sleeping bags
+# and the Blank Upgrade (the upgrades are built at the Equipment Workshop, recipes.py WORKSHOP) are switched off.
+# The upgrades unlock with MAM research: (tree, node) -> what it unlocks. The Crafting Upgrade turns the backpack's
+# built-in 2x2 grid into 3x3.
+TB_UPGRADES = {
+    ("Alien Megafauna", "Structural Analysis"): ["crafting_upgrade"],
+    ("Alien Megafauna", "Copper Backtank"): ["tanks_upgrade", "backpack_tank", "hose_nozzle", "hose"],
+    ("Caterium", "Quickwire"): ["pickup_upgrade"],
+    ("Quartz", "Silica"): ["lantern_upgrade"],
+    ("Quartz", "Crystal Oscillator"): ["magnet_upgrade"],
+    ("Quartz", "Display Systems"): ["jukebox_upgrade"],
+    ("Nutrients", "Preserved Foods"): ["feeding_upgrade"],
+    ("Nutrients", "Automated Cooking"): ["smoker_upgrade"],
+    ("Sulfur", "Ignimbrite"): ["furnace_upgrade", "blast_furnace_upgrade"],
+    ("Alien Technology", "Pocket Storage"): ["void_upgrade", "refill_upgrade"],
+}
+for (_tree, _node), _items in TB_UPGRADES.items():
+    MORE_LOCKS.setdefault(mam(_tree, _node), []).extend(TB + i for i in _items)
+TB_BACKPACKS = [TB + i for i in (
+    "bat bee blaze bookshelf cactus cake chicken coal cow creeper diamond dragon emerald end enderman fox ghast gold hay "
+    "horse iron iron_golem lapis magma_cube melon nether netherite ocelot pig pumpkin quartz redstone sandstone sheep "
+    "skeleton snow spider sponge squid standard villager warden wither wolf").split()]
+DISABLED += TB_BACKPACKS + [TB + t + "_tier_upgrade" for t in ("iron", "gold", "diamond", "netherite")] \
+    + [f"{TB}{c}_sleeping_bag" for c in COLOURS] + [TB + "blank_upgrade"]
+
 # Create: New Age (the grid's wires and connectors, the motors players can put on it, its generators, the reactor).
 # Its own nuclear fuel and the thorium it is made from are switched off: reactors burn Satisfactory's fuel rods.
 for _mid, _items in {

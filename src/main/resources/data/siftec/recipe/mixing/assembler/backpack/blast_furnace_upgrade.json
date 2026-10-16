@@ -1,0 +1,29 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "travelersbackpack"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:blast_furnace",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe",
+    "siftec:steel_pipe"
+  ],
+  "results": [
+    {
+      "id": "travelersbackpack:blast_furnace_upgrade"
+    }
+  ]
+}

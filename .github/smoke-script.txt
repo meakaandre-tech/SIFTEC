@@ -25,6 +25,39 @@ sleep 2
 shot
 key Escape
 sleep 1
+cmd siftec selftest tb setup
+sleep 2
+key e
+sleep 2
+shot
+cmd siftec selftest tb screen
+sleep 1
+key Escape
+sleep 1
+cmd siftec selftest tb rules
+sleep 2
+cmd siftec selftest tb craft grid
+sleep 3
+shot
+cmd siftec selftest tb craft full
+sleep 3
+shot
+key Escape
+sleep 1
+cmd siftec selftest tb tier 1
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest tb tier 4
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
 cmd siftec worldtest hubui
 cmd give @a siftec:iron_rod 10
 cmd give @a create:iron_sheet 5
@@ -356,3 +389,33 @@ sleep 2
 shot
 cmd siftec worldtest map close
 sleep 2
+cmd time set noon
+cmd gamemode survival @a
+cmd siftec selftest tb crate setup
+sleep 1
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd kill @a
+sleep 3
+shot
+click 640 344
+sleep 6
+cmd siftec selftest tb crate check
+sleep 2
+key e
+sleep 2
+shot
+key Escape
+sleep 1
+cmd siftec selftest tb crate keep
+sleep 1
+cmd kill @a
+sleep 3
+click 640 344
+sleep 6
+cmd siftec selftest tb crate kept
+sleep 2
+shot
