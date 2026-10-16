@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Every block entity that appears during a player's click gets that player's company as its owner. */
+/** Every block entity that appears during a player's click gets that player's company as its owner; block changes reach the map. */
 @Mixin(LevelChunk.class)
 public abstract class LevelChunkMixin {
     /** The Sift's portal never forms in the Overworld, the Nether or the End: the Ancient City frame stays dead. */
@@ -18,6 +18,15 @@ public abstract class LevelChunkMixin {
         LevelChunk self = (LevelChunk) (Object) this;
         if (com.meakaandre.siftec.compat.SiftGate.isPortal(state) && !self.getLevel().isClientSide() && self.getLevel().dimension() != com.meakaandre.siftec.compat.SiftGate.SIFT) {
             cir.setReturnValue(null);
+        }
+    }
+
+    /** The map records a chunk again a little after a block in it changes. */
+    @Inject(method = "setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("RETURN"))
+    private void siftec$mapChanged(net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state, int flags,
+                                   org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<net.minecraft.world.level.block.state.BlockState> cir) {
+        if (cir.getReturnValue() != null && ((LevelChunk) (Object) this).getLevel() instanceof net.minecraft.server.level.ServerLevel level) {
+            com.meakaandre.siftec.map.MapTerrain.blockChanged(level, pos);
         }
     }
 

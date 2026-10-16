@@ -258,6 +258,7 @@ public final class Companies {
                 old.cloud.forEach((item, count) -> target.cloud.merge(item, count, Integer::sum));
                 mergePaid(old, target);
                 data.fold(old.id, target.id);
+                com.meakaandre.siftec.map.MapServer.fold(server, old.id, target.id);
                 com.meakaandre.siftec.claim.Claims.reassign(server, old.id, target.id);
                 com.meakaandre.siftec.place.Places.reassign(server, old.id, target.id);
             } else {

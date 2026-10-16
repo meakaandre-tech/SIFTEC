@@ -104,8 +104,7 @@ several. Vanilla items come from research and machines, with no End trip or anci
 Shulker Shell from the Assembler, the Totem, Elytra, Trident, Heart of the Sea and Netherite Ingot from the Manufacturer,
 and the Elytra Backpack (an Elytra and a Copper Backtank in one, refilled from a placed backtank). The inhalers heal.
 
-The Map comes with Field Research: until a company has done it, Xaero's Minimap is switched off for its players
-(`hub/MapLock.java` sends Xaero's own server codes). There is no overclocking: no Power Shards, power slugs or
+The Map comes with Field Research (see Map below). There is no overclocking: no Power Shards, power slugs or
 Production Amplifier.
 
 ## Exploration
@@ -126,8 +125,27 @@ The Equipment Workshop, the AWESOME Sink and Shop and the Radar Tower are Build 
 one opens it. The Workshop builds equipment by hand from the parts carried (machines make the same, the Manufacturer's
 way): the Object Scanner, Jetpack, Hover Pack, Blade Runners, Parachute, Gas Mask, Hazmat Suit, the inhalers, the
 Xeno-Zapper (a stun jolt), and Gunsmithing's nail gun and hammer as the Rebar Gun and Xeno-Basher. The Radar Tower
-(30 MW) reveals the crash sites within about a kilometre to its company as Xaero waypoints, once a day while powered,
-and lists the nearest node and collectible of each kind when used.
+(30 MW) clears its company's map over about a kilometre round it once a day while powered, so the crash sites, nodes
+and geysers there show, and lists the nearest node and collectible of each kind when used.
+
+## Map
+
+SIFTEC has its own map (`map/`, `client/map/`) in place of Xaero's Minimap, laid out like Satisfactory's. A compass
+strip runs across the top of the screen from the start: the bearing, the HUB, placed markers, pinned things with their
+distance, company players, and scanned nodes and crash sites nearby. Vanilla's player locator bar is switched off
+(company players are on the compass instead). Field Research opens a small square minimap at the top right (N hides
+it) and the fullscreen map (M): soft biome colours, height shading and contour lines, of the Overworld's surface only,
+with a filter panel down the side as Satisfactory's (players, map markers, resource nodes by type with purity, resource
+wells, geysers, crash sites, artifacts, key buildings). Fog of war is shared by the company: what any member has been
+near is mapped, and a Radar Tower's sweep clears its whole range, filling land nobody has loaded from the world
+generator. Markers are placed from the map (right click) with an icon, a colour and a name, private or shared with the
+company; left click pins anything to the compass. Dying leaves a private death marker, pinned at once (the last three
+are kept).
+
+It stays light: the terrain is kept at one pixel for 4 by 4 blocks in tiles of 512 by 512 blocks, recorded only when a
+chunk loads or a few seconds after a block in it changes (`map/MapTerrain.java`), saved under `data/siftec/map`, and
+sent to a client only when it holds an older copy; clients keep their tiles on disk (`siftec/map/<map id>` in the game
+folder), so a world's map is there at once on the next visit.
 
 ## AWESOME Sink and Shop
 

@@ -246,8 +246,26 @@ lang.update({"siftec.jetpack.empty": "Jetpack: out of fuel. It burns Solid Biofu
              "siftec.crash.somersloop": "There was a Somersloop in the wreckage too",
              "siftec.radar.title": "Radar Tower: nearest of each, from here", "siftec.radar.line": "%s: %s blocks %s (x %s, z %s)",
              "siftec.radar.nothing": "Nothing in range", "siftec.radar.no_power": "The Radar Tower has no power",
-             "siftec.radar.revealed": "Radar Tower: %s crash sites found. Add them to Xaero's map:",
-             "siftec.map.unlocked": "Field Research: the Map is yours. Xaero's Minimap is switched on"})
+             "siftec.radar.revealed": "Radar Tower: %s new crash sites found. They are on the map",
+             "siftec.map.unlocked": "Field Research: the Map is yours. M opens it, and the minimap is at the top right (N hides it)"})
+# the map (work package 15): compass strip, minimap, fullscreen map with its filter panel and markers
+lang.update({"key.category.siftec.map": "SIFTEC Map", "key.siftec.map.open": "Open the map", "key.siftec.map.minimap": "Show or hide the minimap",
+             "siftec.map.title": "Map", "siftec.map.filters": "Filters",
+             "siftec.map.help": "Drag to move, scroll to zoom, C: centre on you. Left click: pin to the compass. Right click: place or change a marker",
+             "siftec.map.locked": "The Map comes with Field Research (HUB, Tier 1)", "siftec.map.surface_only": "The map shows the Overworld's surface only",
+             "siftec.map.filter.players": "Players", "siftec.map.filter.markers": "Map markers", "siftec.map.filter.nodes": "Resource nodes",
+             "siftec.map.filter.wells": "Resource wells", "siftec.map.filter.geysers": "Geysers", "siftec.map.filter.crash_sites": "Crash sites",
+             "siftec.map.filter.artifacts": "Artifacts", "siftec.map.filter.buildings": "Key buildings",
+             "siftec.map.filter.placed": "Placed markers", "siftec.map.filter.deaths": "Death markers",
+             "siftec.map.poi.node": "Resource node", "siftec.map.poi.well": "Resource well", "siftec.map.poi.geyser": "Sulfur geyser",
+             "siftec.map.poi.crash_site": "Crash site", "siftec.map.poi.mercer_sphere": "Mercer Sphere", "siftec.map.poi.somersloop": "Somersloop",
+             "siftec.map.poi.hub": "HUB", "siftec.map.poi.gateway": "Wormhole Gateway", "siftec.map.poi.radar_tower": "Radar Tower",
+             "siftec.map.poi.train_station": "Train Station", "siftec.map.poi.truck_station": "Truck Station", "siftec.map.poi.drone_port": "Drone Port",
+             "siftec.map.marker": "Marker", "siftec.map.death_marker": "Where you died", "siftec.map.private": "Private", "siftec.map.company": "Shared with the company",
+             "siftec.map.click_pin": "Left click: pin to the compass", "siftec.map.click_unpin": "Left click: unpin", "siftec.map.click_edit": "Right click: change or remove",
+             "siftec.map.name": "Name", "siftec.map.save": "Save", "siftec.map.delete": "Remove", "siftec.map.new_marker": "New marker",
+             "siftec.map.edit_marker": "Change marker", "siftec.map.too_many": "You have placed as many markers as you can",
+             "siftec.map.no_marker": "That marker is gone", "siftec.map.not_yours": "That marker is not yours to change"})
 lang["item.siftec.cardboard_drone"] = "Cardboard Drone"
 write(f"{A}/models/item/cardboard_drone.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "create:item/cardboard"}})
 item_def("cardboard_drone", "siftec:item/cardboard_drone")

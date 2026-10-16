@@ -326,3 +326,33 @@ sleep 25
 shot
 sleep 5
 shot
+cmd time set noon
+cmd siftec worldtest map death
+sleep 1
+cmd spreadplayers 300 -200 0 1 false @a
+sleep 8
+cmd siftec worldtest map setup
+sleep 25
+shot
+cmd siftec worldtest map open 0.12
+sleep 8
+shot
+cmd siftec worldtest map open 0.3
+sleep 4
+shot
+cmd siftec worldtest map hide cat:crash_sites
+cmd siftec worldtest map hide cat:artifacts
+cmd siftec worldtest map hide node:iron
+sleep 2
+shot
+cmd siftec worldtest map show cat:crash_sites
+cmd siftec worldtest map show cat:artifacts
+cmd siftec worldtest map show node:iron
+cmd siftec worldtest map open 1.5
+sleep 4
+shot
+cmd siftec worldtest map edit
+sleep 2
+shot
+cmd siftec worldtest map close
+sleep 2
