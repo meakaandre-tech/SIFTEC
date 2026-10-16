@@ -87,7 +87,7 @@ public final class TravelersBackpackSelfTest {
                         .then(Commands.literal("check").executes(context -> crateCheck(context.getSource())))
                         .then(Commands.literal("keep").executes(context -> crateKeep(context.getSource())))
                         .then(Commands.literal("kept").executes(context -> crateKept(context.getSource(), false)))
-                        .then(Commands.literal("persisted").executes(context -> crateKept(context.getSource(), true)))))))));
+                        .then(Commands.literal("persisted").executes(context -> crateKept(context.getSource(), true))))))));
     }
 
     private static List<ServerPlayer> players(CommandSourceStack source) {
