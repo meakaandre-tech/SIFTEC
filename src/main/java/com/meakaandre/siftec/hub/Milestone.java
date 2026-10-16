@@ -110,4 +110,9 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
     public Component unlockText() {
         return Component.translatable("siftec.milestone." + id + ".unlocks");
     }
+
+    /** Its Satisfactory-style text (work package 13), shown in the HUB under its name; HUB milestones and phases have one. */
+    public Component desc() {
+        return Component.translatable("siftec.milestone." + id + ".desc");
+    }
 }

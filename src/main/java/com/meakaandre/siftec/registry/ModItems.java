@@ -91,6 +91,22 @@ public class ModItems {
     /** The plain parts (Iron Rod, Rotor, Computer and so on), by id. Listed in siftec_content.json. */
     public static final Map<String, Item> PARTS = new LinkedHashMap<>();
 
+    /**
+     * The guide's stand-ins for the Build Gun's buildings and vehicles (work package 13), by building id: an item
+     * {@code siftec:building_<id>} for each, that its Ponder scene, JEI and the Ponder index show. It has no recipe, does
+     * nothing and is not in the creative tab; the Build Gun is still the only way to put a building down.
+     */
+    public static final Map<String, Item> BUILDINGS = new LinkedHashMap<>();
+
+    static {
+        for (com.google.gson.JsonElement e : Milestones.raw().getAsJsonArray("buildings")) {
+            com.google.gson.JsonObject b = e.getAsJsonObject();
+            if (b.has("dev") && b.get("dev").getAsBoolean()) continue;
+            String id = b.get("id").getAsString();
+            BUILDINGS.put(id, hiddenItem("building_" + id, properties -> new Item(properties.stacksTo(1))).get());
+        }
+    }
+
     public static void register() {
         for (Map.Entry<String, com.meakaandre.siftec.food.Food.Intrinsic> preserve : com.meakaandre.siftec.food.Food.PRESERVES.entrySet()) {
             item(preserve.getKey(), properties -> new com.meakaandre.siftec.food.PreserveItem(preserve.getValue(), properties.stacksTo(16)

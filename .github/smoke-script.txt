@@ -419,3 +419,41 @@ sleep 6
 cmd siftec selftest tb crate kept
 sleep 2
 shot
+cmd siftec worldtest guide check
+sleep 25
+cmd siftec worldtest guide open smelter
+sleep 6
+shot
+sleep 5
+shot
+cmd siftec worldtest guide close
+sleep 2
+cmd siftec worldtest guide open miner_mk1
+sleep 6
+shot
+cmd siftec worldtest guide close
+sleep 2
+cmd siftec worldtest guide open manufacturer
+sleep 6
+shot
+cmd siftec worldtest guide close
+sleep 2
+cmd siftec worldtest guide open hub
+sleep 6
+shot
+sleep 12
+shot
+cmd siftec worldtest guide close
+sleep 2
+cmd siftec worldtest guide open wormhole_gateway
+sleep 8
+shot
+sleep 14
+shot
+cmd siftec worldtest guide close
+sleep 2
+cmd siftec worldtest guide open tractor
+sleep 6
+shot
+cmd siftec worldtest guide close
+sleep 2

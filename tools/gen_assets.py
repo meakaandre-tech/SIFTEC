@@ -4,7 +4,9 @@ Textures come from tools/import_art.py; anything without one borrows a vanilla o
 import json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import content
+import guide
 import recipes
+import structures
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "src", "main", "resources")
 A = os.path.join(ROOT, "assets", "siftec")
@@ -429,6 +431,14 @@ for mid, name, cost, text in content.PHASES:
                            "seconds": 0, "items": [], "tokens": []})
     lang[f"siftec.milestone.{mid}"] = name
     lang[f"siftec.milestone.{mid}.unlocks"] = text
+# every milestone and phase has its Satisfactory-style text (tools/guide.py), shown in the HUB under its name
+for m in data["milestones"] + data["phases"]:
+    if m["id"] not in guide.MILESTONE_TEXT:
+        raise SystemExit(f"milestone {m['id']}: no text in tools/guide.py (MILESTONE_TEXT)")
+    m["desc"] = True
+    lang[f"siftec.milestone.{m['id']}.desc"] = guide.MILESTONE_TEXT[m["id"]]
+if set(guide.MILESTONE_TEXT) - {m["id"] for m in data["milestones"] + data["phases"]}:
+    raise SystemExit(f"text for milestones that do not exist: {sorted(set(guide.MILESTONE_TEXT) - {m['id'] for m in data['milestones'] + data['phases']})}")
 # ---- MAM research: every node is stored like a milestone, with its tree and what it needs first. A need is a node id,
 # or several joined by "|" for any of them. A tree shows in the MAM once one of its trigger items is brought in.
 data["trees"] = []
@@ -885,6 +895,36 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
         b["prefab"] = extra["prefab"]
     data["buildings"].append(b)
     lang[f"siftec.building.{bid}"] = bname
+    if dev:
+        continue
+    # the guide (work package 13): an item that stands for the building in Ponder, JEI and the Ponder index (it has no
+    # recipe and does nothing), and its Ponder scene's own lines (client/ponder/BuildingScenes.java)
+    lines = guide.BUILDING_GUIDE.get(bid)
+    if not lines:
+        raise SystemExit(f"building {bid}: no guide text in tools/guide.py (BUILDING_GUIDE)")
+    b["guide"] = lines
+    lang[f"item.siftec.building_{bid}"] = bname
+    item_def(f"building_{bid}", "siftec:item/blueprint")
+    lang[f"siftec.ponder.{bid}.header"] = bname
+    for n, line in enumerate(lines, 1):
+        lang[f"siftec.ponder.{bid}.text_{n}"] = line
+_guided = {b[0] for b in content.BUILDINGS if not b[5]}
+if set(guide.BUILDING_GUIDE) - _guided:
+    raise SystemExit(f"guide text for buildings that do not exist: {sorted(set(guide.BUILDING_GUIDE) - _guided)}")
+for key, text in guide.PONDER_SHARED.items():
+    lang[f"siftec.ponder.shared.{key}"] = text
+for tab, (title, text) in guide.PONDER_TAGS.items():
+    if tab not in content.BUILD_TABS:
+        raise SystemExit(f"Ponder tag {tab}: no Build Gun tab of that name")
+    lang[f"siftec.ponder.tag.{tab}"] = title
+    lang[f"siftec.ponder.tag.{tab}.description"] = text
+lang.update({"key.siftec.build_gun.ponder": "Ponder the picked building",
+             "siftec.guide.tooltip": "A Build Gun building (%s tab)",
+             "siftec.guide.ponder_hint": "%s: ponder the picked building"})
+# Ponder scenes need a schematic to start from; a building's scene puts its own blocks in (BuildingScenes.java)
+_plate = os.path.join(A, "ponder", "building.nbt")
+structures.write_nbt(_plate, structures.structure({(0, 0, 0): "minecraft:smooth_stone"}))
+WRITTEN.add(os.path.normpath(_plate))
 # Satisfactory's time for each machine recipe a building paces (building/MachineTimes.java), in ticks, and the Smelter's
 # time per item for the vanilla smelting its fan runs
 data["machine_ticks"] = {}
