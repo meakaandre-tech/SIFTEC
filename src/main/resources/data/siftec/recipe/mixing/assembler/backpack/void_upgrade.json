@@ -1,0 +1,24 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "travelersbackpack"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:sam_fluctuator",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet",
+    "create:iron_sheet"
+  ],
+  "results": [
+    {
+      "id": "travelersbackpack:void_upgrade"
+    }
+  ]
+}

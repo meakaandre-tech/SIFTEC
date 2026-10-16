@@ -1,0 +1,22 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.meakaandre.siftec.mixin.tb",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "TbCraftingGridMixin",
+    "TbDeathMixin",
+    "TbMenuMixin",
+    "TbPlaceMixin",
+    "TbServerActionsMixin",
+    "TbUpgradeSlotMixin"
+  ],
+  "client": [
+    "client.TbGridWidgetMixin",
+    "client.TbOpenMixin",
+    "client.TbScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

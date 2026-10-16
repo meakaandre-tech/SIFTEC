@@ -1,0 +1,24 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "travelersbackpack"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "travelersbackpack:hose_nozzle",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable",
+    "siftec:cable"
+  ],
+  "results": [
+    {
+      "id": "travelersbackpack:hose"
+    }
+  ]
+}

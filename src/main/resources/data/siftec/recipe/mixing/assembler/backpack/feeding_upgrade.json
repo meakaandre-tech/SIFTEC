@@ -1,0 +1,31 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "travelersbackpack"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:golden_carrot",
+    "siftec:rotor",
+    "siftec:rotor",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod",
+    "siftec:iron_rod"
+  ],
+  "results": [
+    {
+      "id": "travelersbackpack:feeding_upgrade"
+    }
+  ]
+}

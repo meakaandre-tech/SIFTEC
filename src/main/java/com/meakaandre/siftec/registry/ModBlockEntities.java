@@ -53,6 +53,7 @@ public class ModBlockEntities {
 
     public static final Entry<com.meakaandre.siftec.building.ControllerBlockEntity> BUILDING_CONTROLLER = register("building_controller", com.meakaandre.siftec.building.ControllerBlockEntity::new, ModBlocks.BUILDING_CONTROLLER.get());
     public static final Entry<com.meakaandre.siftec.building.PortBlockEntity> BUILDING_PORT = register("building_port", com.meakaandre.siftec.building.PortBlockEntity::new, ModBlocks.BUILDING_PORT.get());
+    public static final Entry<com.meakaandre.siftec.death.DeathCrateBlockEntity> DEATH_CRATE = register("death_crate", com.meakaandre.siftec.death.DeathCrateBlockEntity::new, ModBlocks.DEATH_CRATE.get());
     public static final Entry<com.meakaandre.siftec.building.TurbineBlockEntity> TURBINE = register("turbine", com.meakaandre.siftec.building.TurbineBlockEntity::new, ModBlocks.TURBINE.get());
 
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {

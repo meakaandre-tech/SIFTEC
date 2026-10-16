@@ -395,7 +395,7 @@ def secs(t):
 # every item id of the game and of the mods the pack's data names (items only: blocks without an item are not
 # in it), so a typo or a renamed item stops the generator instead of loading as nothing
 KNOWN = set(open(os.path.join(os.path.dirname(__file__), "known_ids.txt")).read().split())
-CHECKED = ("minecraft", "create", "cgs", "createdieselgenerators", "create_new_age")
+CHECKED = ("minecraft", "create", "cgs", "createdieselgenerators", "create_new_age", "travelersbackpack")
 UNKNOWN = []
 
 def check(item, where=""):
@@ -467,7 +467,7 @@ accounted = set(placed) | set(content.FREE) | set(content.DISABLED)
 both = sorted((set(placed) | set(content.DISABLED)) & set(content.FREE))
 if both:
     raise SystemExit(f"both locked and free: {both}")
-loose = sorted(i for i in KNOWN if i.split(":")[0] in ("create", "cgs", "createdieselgenerators", "create_new_age") and i not in accounted)
+loose = sorted(i for i in KNOWN if i.split(":")[0] in ("create", "cgs", "createdieselgenerators", "create_new_age", "travelersbackpack") and i not in accounted)
 if loose:
     raise SystemExit(f"{len(loose)} items have no milestone and are not listed as free: {loose}")
 lang.update({"block.siftec.mam": "MAM", "siftec.mam.title": "MAM: %s", "siftec.mam.research": "Research time: %s",
@@ -678,7 +678,7 @@ for path, body in recipes.build().items():
         raise SystemExit(f"{path}: its half-built item {body['transitional_item']['id']} is not in content.PARTS")
     # a recipe that names another mod's item or fluid only loads when that mod is installed
     text = json.dumps(body)
-    mods = [m for m in ("cgs", "createdieselgenerators", "farmersdelight") if f'"{m}:' in text or f'"#{m}:' in text]
+    mods = [m for m in ("cgs", "createdieselgenerators", "farmersdelight", "travelersbackpack") if f'"{m}:' in text or f'"#{m}:' in text]
     if "#c:tools/knife" in text or path.split("/")[-1].startswith("kitchen_"):
         mods = sorted(set(mods) | {"farmersdelight"})
     if mods:
@@ -1028,6 +1028,29 @@ write(f"{A}/blockstates/building_port.json", {"variants": port_variants})
 item_def("building_port", "siftec:block/building_port_item_in")
 # the Brass Basin (the Manufacturer's and the Blender's Basin): Create's Basin in Create's brass casing, holding four
 # stacks of each item; Create's own Basin block entity runs it
+# ---- the backpack and the death crate (Exploration and Equipment tab, Backpack; work package 16)
+# compat/TravelersBackpackCompat.java, compat/TbClient.java and death/DeathCrates.java
+lang.update({
+    "siftec.backpack.bound": "Your backpack is your inventory: it stays on your back",
+    "siftec.backpack.tier": "Your backpack grew to %s: %s slots",
+    "siftec.backpack.extra": "Only one backpack per player: the extra one was unpacked into your inventory",
+    "siftec.backpack.grid": "2x2 Crafting Grid",
+    "siftec.backpack.grid.locked": "The backpack's crafting grid stays in it. A Crafting Upgrade makes it 3x3",
+    "siftec.backpack.grid.install": "Use a Crafting Upgrade to turn your backpack's 2x2 grid into 3x3",
+    "siftec.backpack.grid.installed": "Your backpack's crafting grid is 3x3 now",
+    "siftec.backpack.grid.already": "Your backpack's crafting grid is already 3x3",
+    "siftec.backpack.equipment": "Equipment",
+    "block.siftec.death_crate": "Death Crate",
+    "siftec.crate.placed": "Your things are in a Death Crate where you died (%s, %s, %s). It is on your map",
+    "siftec.crate.restored": "Everything is back where it was",
+    "siftec.crate.partly": "%s stacks did not fit and stay in the crate",
+    "siftec.crate.not_yours": "This Death Crate belongs to %s",
+    "siftec.crate.empty": "The Death Crate was empty",
+})
+write(f"{A}/models/block/death_crate.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
+    "top": "minecraft:block/barrel_top", "bottom": "create:block/andesite_casing", "side": "create:block/andesite_casing"}})
+write(f"{A}/blockstates/death_crate.json", {"variants": {"": {"model": "siftec:block/death_crate"}}})
+
 lang["block.siftec.brass_basin"] = "Brass Basin"
 BB = "create:block/brass_casing"
 write(f"{A}/models/block/brass_basin.json", {"parent": "minecraft:block/block", "textures": {"particle": BB, "case": BB}, "elements": [

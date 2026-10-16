@@ -4,3 +4,4 @@ https://cdn.modrinth.com/data/7vxePowz/versions/hTNvMewX/FarmersDelight-26.3-3.6
 https://cdn.modrinth.com/data/8BmcQJ2H/versions/kSxHvs99/geckolib-fabric-26.3-5.5.7.jar
 https://github.com/meakaandre-tech/NukaTeamGunLib/releases/download/fabric-26.3-latest/ntgl-fabric-26.3.jar
 modrinth:mielons-the-sift
+# Traveler's Backpack and Forge Config API Port come from .github/fetch-tb.py (SIFTEC compiles against them)
