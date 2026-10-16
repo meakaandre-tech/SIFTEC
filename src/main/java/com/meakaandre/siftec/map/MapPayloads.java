@@ -14,13 +14,13 @@ public final class MapPayloads {
     private MapPayloads() {
     }
 
-    private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> type(String id) {
+    private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> typeOf(String id) {
         return new CustomPacketPayload.Type<>(Siftec.id(id));
     }
 
     /** Server to client on joining: which map this is, so the client's disk cache keeps each world's tiles apart. */
     public record Hello(String mapId) implements CustomPacketPayload {
-        public static final Type<Hello> TYPE = type("map_hello");
+        public static final Type<Hello> TYPE = typeOf("map_hello");
         public static final StreamCodec<RegistryFriendlyByteBuf, Hello> CODEC = StreamCodec.of((buf, p) -> buf.writeUtf(p.mapId), buf -> new Hello(buf.readUtf(64)));
 
         @Override
@@ -35,7 +35,7 @@ public final class MapPayloads {
 
     /** Server to client: the company's fog for whole regions; {@code replace} drops all fog the client held first. */
     public record Fog(boolean replace, List<FogRegion> regions) implements CustomPacketPayload {
-        public static final Type<Fog> TYPE = type("map_fog");
+        public static final Type<Fog> TYPE = typeOf("map_fog");
         public static final StreamCodec<RegistryFriendlyByteBuf, Fog> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeBoolean(p.replace);
             buf.writeVarInt(p.regions.size());
@@ -64,7 +64,7 @@ public final class MapPayloads {
 
     /** Server to client: chunks a company member has just explored. */
     public record FogDelta(long[] chunks) implements CustomPacketPayload {
-        public static final Type<FogDelta> TYPE = type("map_fog_delta");
+        public static final Type<FogDelta> TYPE = typeOf("map_fog_delta");
         public static final StreamCodec<RegistryFriendlyByteBuf, FogDelta> CODEC = StreamCodec.of((buf, p) -> buf.writeLongArray(p.chunks),
             buf -> new FogDelta(buf.readLongArray()));
 
@@ -80,7 +80,7 @@ public final class MapPayloads {
 
     /** Server to client: the points of interest of some regions, each replacing what the client held for it. */
     public record Pois(List<RegionPois> regions) implements CustomPacketPayload {
-        public static final Type<Pois> TYPE = type("map_pois");
+        public static final Type<Pois> TYPE = typeOf("map_pois");
         public static final StreamCodec<RegistryFriendlyByteBuf, Pois> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeVarInt(p.regions.size());
             for (RegionPois r : p.regions) {
@@ -109,7 +109,7 @@ public final class MapPayloads {
 
     /** Server to client: a region's terrain, packed as {@link MapTile#pack()} (its version is inside). */
     public record Tile(long region, byte[] data) implements CustomPacketPayload {
-        public static final Type<Tile> TYPE = type("map_tile");
+        public static final Type<Tile> TYPE = typeOf("map_tile");
         public static final StreamCodec<RegistryFriendlyByteBuf, Tile> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeLong(p.region);
             buf.writeByteArray(p.data);
@@ -123,7 +123,7 @@ public final class MapPayloads {
 
     /** Client to server: regions the client wants, each with the version it already holds (0 for none). */
     public record TileRequest(long[] regions, long[] versions) implements CustomPacketPayload {
-        public static final Type<TileRequest> TYPE = type("map_tile_request");
+        public static final Type<TileRequest> TYPE = typeOf("map_tile_request");
         public static final StreamCodec<RegistryFriendlyByteBuf, TileRequest> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeLongArray(p.regions);
             buf.writeLongArray(p.versions);
@@ -137,7 +137,7 @@ public final class MapPayloads {
 
     /** Server to client: every marker the player sees. */
     public record Markers(List<MapMarker> markers) implements CustomPacketPayload {
-        public static final Type<Markers> TYPE = type("map_markers");
+        public static final Type<Markers> TYPE = typeOf("map_markers");
         public static final StreamCodec<RegistryFriendlyByteBuf, Markers> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeVarInt(p.markers.size());
             for (MapMarker m : p.markers) m.write(buf);
@@ -158,7 +158,7 @@ public final class MapPayloads {
 
     /** Client to server: place, change or remove a marker. The server checks who may. */
     public record MarkerEdit(int op, MapMarker marker) implements CustomPacketPayload {
-        public static final Type<MarkerEdit> TYPE = type("map_marker_edit");
+        public static final Type<MarkerEdit> TYPE = typeOf("map_marker_edit");
         public static final StreamCodec<RegistryFriendlyByteBuf, MarkerEdit> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeVarInt(p.op);
             p.marker.write(buf);
@@ -187,7 +187,7 @@ public final class MapPayloads {
 
     /** Server to client, twice a second: the company's other members in the player's dimension. */
     public record Mates(List<Mate> mates) implements CustomPacketPayload {
-        public static final Type<Mates> TYPE = type("map_mates");
+        public static final Type<Mates> TYPE = typeOf("map_mates");
         public static final StreamCodec<RegistryFriendlyByteBuf, Mates> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeVarInt(p.mates.size());
             for (Mate m : p.mates) m.write(buf);
@@ -209,7 +209,7 @@ public final class MapPayloads {
      * or switches a filter (key presses under the CI's virtual display are not reliable enough).
      */
     public record Control(String action, String arg, int x, int z, float zoom) implements CustomPacketPayload {
-        public static final Type<Control> TYPE = type("map_control");
+        public static final Type<Control> TYPE = typeOf("map_control");
         public static final StreamCodec<RegistryFriendlyByteBuf, Control> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeUtf(p.action);
             buf.writeUtf(p.arg);

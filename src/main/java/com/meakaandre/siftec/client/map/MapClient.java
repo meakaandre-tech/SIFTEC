@@ -313,7 +313,7 @@ public final class MapClient {
     }
 
     /** Opens the fullscreen map, if the company has it and the player is in the Overworld. */
-    public static void open(@Nullable MapPayloads.Control at) {
+    public static void open(MapPayloads.@Nullable Control at) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         if (!unlocked()) {
