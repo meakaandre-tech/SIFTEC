@@ -20,7 +20,8 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * Nodes are infinite. An ore node's position ({@link NodeSites}) whose ore block is gone (mined by hand, drilled by a
  * miner, or taken any other way: blown up, pushed, replaced, a command) is empty, and after {@link #ticks} its ore
- * block grows back, whatever has got into the spot meanwhile. The purity sets the regrowth; a miner's Mk never does.
+ * block grows back. If something has got into the spot meanwhile (anything its ore may not simply replace), it waits
+ * until the spot is clear: it never deletes what is there. The purity sets the regrowth; a miner's Mk never does.
  * The time it grows back at is kept with the node in {@link NodeSavedData}, as a game time, so it holds through
  * chunks unloading and server restarts: a node whose chunk is not loaded grows back as soon as it is.
  */
@@ -71,8 +72,7 @@ public final class NodeRegrowth {
                 if (site.grown()) {
                     // its ore has gone, however: the spot is empty from now and grows back after its purity's time
                     if (!site.look.isNodeBlock(state)) data.setRegrowAt(site, now + ticks(site.purity));
-                } else if (now >= site.regrowAt()) {
-                    regrow(level, pos, site);
+                } else if (now >= site.regrowAt() && regrow(level, pos, site)) {
                     data.setRegrowAt(site, NodeSavedData.GROWN);
                 }
             }
@@ -80,11 +80,22 @@ public final class NodeRegrowth {
         if (server.getTickCount() % 5 == 0) goggles(server);
     }
 
-    /** Puts the ore back, over whatever is in the spot (a fallen block, a fluid, anything). */
-    private static void regrow(ServerLevel level, BlockPos pos, NodeSavedData.Site site) {
-        BlockState ore = site.look.nodeState();
-        if (level.getBlockState(pos).hasBlockEntity()) level.removeBlockEntity(pos);
-        level.setBlock(pos, ore, Block.UPDATE_ALL);
+    /**
+     * Puts the ore back when the spot is free: air, or something the ore may simply replace (a fluid, grass, snow). If
+     * anything else occupies it (a fallen block, a block a contraption left there, anything with a block entity) the node
+     * waits, and grows back as soon as the spot is cleared; nothing in it is ever deleted. True if it grew back.
+     */
+    static boolean regrow(ServerLevel level, BlockPos pos, NodeSavedData.Site site) {
+        if (occupied(level, pos)) return false;
+        level.setBlock(pos, site.look.nodeState(), Block.UPDATE_ALL);
+        return true;
+    }
+
+    /** True if something stands in an empty node's spot that its ore must not replace. */
+    public static boolean occupied(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (state.isAir()) return false;
+        return state.hasBlockEntity() || level.getBlockEntity(pos) != null || !state.canBeReplaced();
     }
 
     private static Item gogglesItem;

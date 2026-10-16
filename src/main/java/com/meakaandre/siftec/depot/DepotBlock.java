@@ -47,7 +47,7 @@ public class DepotBlock extends Block implements EntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (player instanceof ServerPlayer server) DepotMenu.open(server, Companies.of(server));
+        if (player instanceof ServerPlayer server) DepotMenu.open(server, Companies.of(server), pos);
         return InteractionResult.SUCCESS;
     }
 }

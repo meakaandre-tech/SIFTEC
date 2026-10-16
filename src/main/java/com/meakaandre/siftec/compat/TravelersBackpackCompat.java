@@ -81,6 +81,12 @@ public final class TravelersBackpackCompat {
             }
 
             @Override
+            public boolean spillInto(int index) {
+                // storage and tools take anything that fits; the crafting grid only its own stacks back
+                return index < 2;
+            }
+
+            @Override
             public void afterRestore(ServerPlayer player) {
                 sync(player);
             }
@@ -168,14 +174,28 @@ public final class TravelersBackpackCompat {
         return storage == null ? List.of() : List.of(storage);
     }
 
-    /** What the death crate takes out of the backpack and puts back: its storage, then its tool slots. Not the upgrades. */
+    /**
+     * What the death crate takes out of the backpack and puts back: its storage, its tool slots, then what lies on its
+     * crafting grid. Not the upgrades. The order is fixed (a crate's entries name the container by its place in it), so
+     * a missing part is an empty stand-in.
+     */
     private static List<Container> crateContainers(ServerPlayer player) {
         BackpackWrapper wrapper = wrapper(player);
         if (wrapper == null) return List.of();
         List<Container> out = new ArrayList<>();
-        if (wrapper.getStorage() != null) out.add(wrapper.getStorage());
-        if (wrapper.getTools() != null) out.add(wrapper.getTools());
+        out.add(wrapper.getStorage() != null ? wrapper.getStorage() : new net.minecraft.world.SimpleContainer(0));
+        out.add(wrapper.getTools() != null ? wrapper.getTools() : new net.minecraft.world.SimpleContainer(0));
+        Container grid = grid(player);
+        out.add(grid != null ? grid : new net.minecraft.world.SimpleContainer(0));
         return out;
+    }
+
+    /** What lies on the worn backpack's crafting grid (the built-in 2x2 or a Crafting Upgrade's 3x3), or null. */
+    public static @org.jspecify.annotations.Nullable Container grid(Player player) {
+        BackpackWrapper wrapper = wrapper(player);
+        if (wrapper == null || wrapper.getUpgradeManager() == null) return null;
+        return wrapper.getUpgradeManager().getUpgrade(com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade.class)
+            .map(upgrade -> (Container) upgrade.crafting).orElse(null);
     }
 
     /** Puts what fits of the stack into the worn backpack's storage; returns what is left. */

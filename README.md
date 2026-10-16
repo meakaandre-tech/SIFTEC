@@ -23,7 +23,10 @@ the power grid. A node is the real ore block itself (minecraft:iron_ore, create:
 SIFTEC ore only for bauxite, uranium, SAM and sulfur), made a node by its position (`node/NodeSites`): mined by hand or by
 a miner it drops exactly what that block drops (Fortune and Silk Touch as usual) and leaves air, which grows back into
 the same block after its purity's time, kept through unloads and restarts. Nothing can be placed or poured into an empty
-node, and pistons, contraptions and explosions leave its ore alone. A miner really mines its node: its Drill breaks the
+node, and pistons, contraptions and explosions leave its ore alone; if something gets into the spot anyway (a falling
+block, anything with a block entity), the node waits for it to be cleared and never deletes it. A node's position is
+never building space: no building covers one, grown or empty, a miner takes only the node in its own node cell, and a
+Death Crate never goes on one. A miner really mines its node: its Drill breaks the
 regrown ore block and what the block drops is the output, and it waits while the spot is air. The Mk sets how fast it breaks it (Mk.1 half a second, Mk.2 a quarter, Mk.3 a tenth, the unpowered Portable
 Miner two seconds) and its built-in Fortune (Mk.2 III, Mk.3 V, by vanilla's ore formula); the node's purity sets how
 fast it regrows, which caps every miner. Every player spawns with the Build Gun, and the first thing they build with it
@@ -38,6 +41,10 @@ chunks around it and each Claim Marker the 3×3 around it; inside a claim only m
 anything. The Build Gun checks the land under a building's whole box before placing it, so nothing is built on or
 across another company's claim. A company's building is dismantled only by its own members, wherever it stands; one
 nobody owns comes down only for players the land lets build there. Creative players skip claims, unlocks and costs.
+Only the Build Gun takes a building down: no hand, wrench, Deployer (but the building's own), drill, piston, contraption,
+explosion, Wither or Blueprint Designer's sneak-clear takes one of its blocks. A block lost anyway (a command, another mod)
+brings the building down with its refund and contents, but gives nothing back for itself. Dismantled, a building's tanks
+come back as packaged fluid (1 m3 a package; other fluids as full buckets).
 
 ## Power
 
@@ -84,7 +91,9 @@ The Explorer is the fastest.
 The Truck Station is a building with two Item Vaults and a fuel tank; using its terminal switches it between loading
 vehicles and unloading them. Press V while driving to record a route, drive it once through the docks (the ground in
 front of each station) you want it to stop at, and press V again. With nobody in the seat it then drives the route by
-itself in a loop, stopping five seconds at each dock while the station loads or unloads it and fills its tank.
+itself in a loop, stopping five seconds at each dock while the station loads or unloads it and fills its tank. A vehicle
+that falls out of the bottom of the world comes back to the dock of the Truck Station it last stopped at (else beside
+its company's HUB), cargo and all. Its storage window stays open only near it and only for its company's members.
 
 ## Progression
 
@@ -164,9 +173,11 @@ one does not fit an upgrade slot. Milestone payments, the Workshop and radiation
 
 Dying leaves a Death Crate where it happened (`death/`), as in Satisfactory: everything carried goes into it, the hotbar,
 inventory, armour, offhand and everything in the backpack, while the backpack and its upgrades stay on. Clicking it puts
-every stack straight back into the slot it came from (whatever no longer fits stays in the crate). Only its owner opens
-it; it cannot be broken, blown up or pushed and never despawns, and the map shows it as the death marker until it is
-emptied. With keepInventory on nothing changes, and Curse of Vanishing items vanish as in vanilla.
+every stack straight back into the slot it came from (whatever no longer fits stays in the crate); what lay on the
+backpack's crafting grid goes back on it. Only its owner opens it, inside another company's claim too; it cannot be
+broken, blown up or pushed and never despawns, and the map shows it as the death marker until it is emptied. It goes on
+the first free spot of the column and never over a block or an ore node (with no free spot at all the things drop). The
+Build Gun stays out of it wherever it was carried. With keepInventory on nothing changes, and Curse of Vanishing items vanish as in vanilla.
 
 ## AWESOME Sink and Shop
 

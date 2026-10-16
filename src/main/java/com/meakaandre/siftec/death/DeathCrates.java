@@ -26,7 +26,9 @@ import java.util.UUID;
 /**
  * Satisfactory's death crate (Exploration and Equipment tab, Backpack). When a player dies, everything they carry goes
  * into a Death Crate where they died: the hotbar, the rest of the inventory, armour, offhand and everything in their
- * backpack (its storage and tool slots). They keep the backpack and its upgrades. The crate is a block: it never
+ * backpack (its storage, tool slots and crafting grid). The crate goes on the first free spot of the column that is not
+ * an ore node, and never over a block; with no such spot the things drop as vanilla drops them. Its owner opens it
+ * inside any claim. They keep the backpack and its upgrades. The crate is a block: it never
  * despawns, cannot be broken, blown up or pushed, and the map shows it as the player's death marker. Clicking it
  * puts every stack straight back in the slot it came from; what cannot go back (the slot has something in it now)
  * goes anywhere in the inventory or backpack, and what does not fit at all stays in the crate.
@@ -39,8 +41,16 @@ import java.util.UUID;
 public final class DeathCrates {
     /** The parts of the worn backpack a crate takes and gives back (set by the Traveler's Backpack compat layer). */
     public interface BackpackAccess {
-        /** The backpack's containers, in a fixed order (storage, then tool slots). */
+        /** The backpack's containers, in a fixed order (storage, then tool slots, then its crafting grid). */
         List<Container> containers(ServerPlayer player);
+
+        /**
+         * Whether what does not fit back in its own slot may be put anywhere in this container (its index in
+         * {@link #containers}). The crafting grid takes back only what came from it.
+         */
+        default boolean spillInto(int index) {
+            return true;
+        }
 
         /** After a crate gave things back (the backpack is checked again). */
         default void afterRestore(ServerPlayer player) {
@@ -88,8 +98,9 @@ public final class DeathCrates {
             for (int j = 0; j < part.getContainerSize(); j++) {
                 ItemStack stack = part.getItem(j);
                 if (stack.isEmpty()) continue;
-                out.add(new DeathCrateBlockEntity.Entry(1 + k, j, stack.copy()));
                 if (take) part.setItem(j, ItemStack.EMPTY);
+                if (isBuildGun(stack)) continue;
+                out.add(new DeathCrateBlockEntity.Entry(1 + k, j, stack.copy()));
             }
         }
         return out;
@@ -105,8 +116,8 @@ public final class DeathCrates {
         if (entries.isEmpty()) return null;
         ServerLevel level = player.level();
         BlockPos pos = spot(level, player.blockPosition());
-        level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
-        if (!(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) {
+        if (pos != null) level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
+        if (pos == null || !(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) {
             // the crate could not be put down (nothing should stop it): drop everything as vanilla would
             for (DeathCrateBlockEntity.Entry e : entries) Containers.dropItemStack(level, player.getX(), player.getY(), player.getZ(), e.stack());
             Siftec.LOGGER.warn("SIFTEC: could not put {}'s Death Crate down at {}; dropped their things", player.getGameProfile().name(), pos);
@@ -123,8 +134,11 @@ public final class DeathCrates {
         return pos;
     }
 
-    /** Where the crate goes: where the player died, or the nearest free spot above it (below, when there is none). */
-    static BlockPos spot(ServerLevel level, BlockPos at) {
+    /**
+     * Where the crate goes: where the player died, or the nearest free spot above it (below, when there is none). Null
+     * when the whole column is taken: the crate never goes over a block, so the things are dropped instead.
+     */
+    public static @org.jspecify.annotations.Nullable BlockPos spot(ServerLevel level, BlockPos at) {
         int minY = level.getMinY(), maxY = level.getMaxY();
         if (at.getY() <= minY) {
             // fell out of the world: the ground of that column, if it has any
@@ -138,10 +152,12 @@ public final class DeathCrates {
         for (int y = at.getY() - 1; y > minY; y--) {
             if (free(level, at.atY(y))) return at.atY(y);
         }
-        return at;
+        return null;
     }
 
-    private static boolean free(ServerLevel level, BlockPos pos) {
+    /** Room for the crate: air or something it may replace, and not an ore node's position (grown or empty). */
+    public static boolean free(ServerLevel level, BlockPos pos) {
+        if (com.meakaandre.siftec.node.NodeSites.isSite(level, pos)) return false;
         BlockState state = level.getBlockState(pos);
         return state.isAir() || (state.canBeReplaced() && !state.hasBlockEntity());
     }
@@ -193,7 +209,8 @@ public final class DeathCrates {
         for (DeathCrateBlockEntity.Entry e : later) {
             ItemStack stack = e.stack().copy();
             inventory.add(stack);
-            for (Container part : parts) if (!stack.isEmpty()) insert(part, stack);
+            BackpackAccess spill = backpack;
+            for (int k = 0; k < parts.size(); k++) if (!stack.isEmpty() && (spill == null || spill.spillInto(k))) insert(parts.get(k), stack);
             if (!stack.isEmpty()) left.add(new DeathCrateBlockEntity.Entry(e.where(), e.slot(), stack));
         }
         inventory.setChanged();

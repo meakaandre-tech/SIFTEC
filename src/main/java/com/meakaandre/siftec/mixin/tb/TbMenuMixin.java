@@ -66,8 +66,9 @@ public abstract class TbMenuMixin {
         } else {
             return;
         }
+        // the leftover is set back, not just marked changed: a backpack slot saves only what is set into it
         if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY, before);
-        else slot.setChanged();
+        else slot.set(stack);
         cir.setReturnValue(stack.getCount() == before.getCount() ? ItemStack.EMPTY : before);
     }
 }

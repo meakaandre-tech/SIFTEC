@@ -190,6 +190,16 @@ public final class Claims {
     }
 
     /**
+     * True if the player may use the block here: wherever {@link #allowed} lets them, and their own Death Crate anywhere,
+     * in another company's claim too (the crate holds only their things, and only they can open it).
+     */
+    public static boolean mayUse(Player player, Level level, BlockPos pos) {
+        if (allowed(player, level, pos)) return true;
+        return level.getBlockEntity(pos) instanceof com.meakaandre.siftec.death.DeathCrateBlockEntity crate && crate.owner != null
+            && crate.owner.equals(player.getUUID());
+    }
+
+    /**
      * The first chunk under the box (block coordinates, max exclusive, as an {@link net.minecraft.world.phys.AABB}
      * gives them) that another company holds, or null if all of it is the company's own or unclaimed. A Build Gun
      * building is placed, or taken down when it has no owner, only where this finds nothing.
@@ -230,7 +240,7 @@ public final class Claims {
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             // the Build Gun never uses the block it points at; it checks the land under what it builds or takes down itself
             if (player.getItemInHand(hand).getItem() instanceof com.meakaandre.siftec.building.BuildGunItem) return InteractionResult.PASS;
-            if (allowed(player, level, hit.getBlockPos())) return InteractionResult.PASS;
+            if (mayUse(player, level, hit.getBlockPos())) return InteractionResult.PASS;
             deny(player, level, hit.getBlockPos());
             resync(player, level, hit.getBlockPos(), hit.getDirection());
             return InteractionResult.FAIL;
@@ -306,6 +316,24 @@ public final class Claims {
             if (e.getValue().marker && e.getValue().company.equals(company.id)) sources.add(e.getKey().split("\\|")[0] + e.getValue().source);
         }
         return sources.size();
+    }
+
+    /** Where a company's HUB stands: the dimension and the terminal its land was claimed from. */
+    public record HubSpot(ResourceKey<Level> dimension, BlockPos pos) {
+    }
+
+    /** The company's (first) HUB, from the land it claimed with it; null when it holds none. */
+    public static @Nullable HubSpot hubOf(MinecraftServer server, String companyId) {
+        if (companyId.isEmpty()) return null;
+        for (Map.Entry<String, Claim> e : Data.get(server).chunks().entrySet()) {
+            Claim claim = e.getValue();
+            if (claim.marker || !claim.company.equals(companyId)) continue;
+            String key = e.getKey();
+            int bar = key.lastIndexOf('|');
+            if (bar <= 0) continue;
+            return new HubSpot(ResourceKey.create(Registries.DIMENSION, Identifier.parse(key.substring(0, bar))), BlockPos.of(claim.source));
+        }
+        return null;
     }
 
     /** True if the company already holds land through a HUB. */

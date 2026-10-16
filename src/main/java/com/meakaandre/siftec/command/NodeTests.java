@@ -360,6 +360,7 @@ public final class NodeTests {
             Map<String, Integer> drops;
             List<ItemStack> expected;
             boolean placeRefused, pourRefused, stillAir, sandIn;
+            long sandOut = -1;
 
             @Override
             public boolean tick() {
@@ -405,16 +406,22 @@ public final class NodeTests {
                     return false;
                 }
                 if (phase == 2) {
-                    // something in the way (as a falling block lands there) does not stop it
+                    // something in the way (as a falling block lands there) is never deleted: the node waits for it to go
+                    int want = NodeRegrowth.ticks(node.purity());
                     if (!sandIn && since >= 3) {
                         level.setBlock(core, Blocks.SAND.defaultBlockState(), Block.UPDATE_ALL);
                         sandIn = true;
                     }
-                    if (look.isNodeBlock(now) || since > NodeRegrowth.ticks(node.purity()) + 100) {
-                        int want = NodeRegrowth.ticks(node.purity());
-                        check(source, tally, exactNode(level, core, look, node.purity()) && Math.abs(since - want) <= 2,
-                            "the empty node, with sand dropped into it, grew back after " + since + " ticks (its purity's regrowth is " + want + "): now "
-                                + key(now.getBlock()) + ", " + look.node() + " wanted");
+                    if (sandIn && sandOut < 0 && since >= want + 10) {
+                        check(source, tally, now.is(Blocks.SAND) && NodeSites.emptyAt(level, core),
+                            "the empty node, with sand dropped into it, waits past its regrowth (" + want + " ticks) and leaves the sand alone: now " + key(now.getBlock()));
+                        level.setBlock(core, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+                        sandOut = since;
+                        return false;
+                    }
+                    if (sandOut >= 0 && (look.isNodeBlock(now) || since > sandOut + 60)) {
+                        check(source, tally, exactNode(level, core, look, node.purity()) && since - sandOut <= 3,
+                            "the sand taken out, it grew back " + (since - sandOut) + " ticks later: now " + key(now.getBlock()) + ", " + look.node() + " wanted");
                         release(level, node);
                         report(source, "break result: " + tally[0] + " passed, " + tally[1] + " failed");
                         return true;

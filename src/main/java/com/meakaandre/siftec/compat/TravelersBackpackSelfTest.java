@@ -23,6 +23,7 @@ import com.tiviacz.travelersbackpack.inventory.menu.BackpackBaseMenu;
 import com.tiviacz.travelersbackpack.inventory.menu.BackpackItemMenu;
 import com.tiviacz.travelersbackpack.inventory.menu.slot.UpgradeLockableSlotItemHandler;
 import com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade;
+import com.tiviacz.travelersbackpack.util.ContainerContentsHelper;
 import com.tiviacz.travelersbackpack.util.Reference;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
@@ -58,7 +59,10 @@ import java.util.Map;
  * Crafting Upgrade makes it 3x3, which makes the chest (each leaves its window open for a screenshot);</li>
  * <li>{@code crate setup} / {@code crate check}: things in known slots before dying; after respawning, a Death Crate
  * marked on the map holds them and one click puts every one back in its slot;</li>
- * <li>{@code crate keep} / {@code crate kept} / {@code crate persisted}: a crate left alone stays, through a restart.</li>
+ * <li>{@code crate keep} / {@code crate kept} / {@code crate persisted}: a crate left alone stays, through a restart;</li>
+ * <li>{@code fixes}: the review's fixes that need a real player: a shift-click leaving part of a stack in a backpack slot
+ * saves what is left (fix 3); a Build Gun in the backpack stays out of the crate and the crafting grid's stacks go into
+ * it and back (fix 4).</li>
  * </ul>
  */
 public final class TravelersBackpackSelfTest {
@@ -87,7 +91,8 @@ public final class TravelersBackpackSelfTest {
                         .then(Commands.literal("check").executes(context -> crateCheck(context.getSource())))
                         .then(Commands.literal("keep").executes(context -> crateKeep(context.getSource())))
                         .then(Commands.literal("kept").executes(context -> crateKept(context.getSource(), false)))
-                        .then(Commands.literal("persisted").executes(context -> crateKept(context.getSource(), true))))))));
+                        .then(Commands.literal("persisted").executes(context -> crateKept(context.getSource(), true))))
+                    .then(Commands.literal("fixes").executes(context -> fixes(context.getSource())))))));
     }
 
     private static List<ServerPlayer> players(CommandSourceStack source) {
@@ -454,6 +459,102 @@ public final class TravelersBackpackSelfTest {
             expect(source, "the emptied crate and its marker are gone", gone, "");
         }
         return 1;
+    }
+
+    // ------------------------------------------------------------------------------------------------ the review's fixes
+
+    private static int fixes(CommandSourceStack source) {
+        for (ServerPlayer player : players(source)) {
+            leftoverSaved(source, player);
+            crateBuildGunAndGrid(source, player);
+        }
+        return 1;
+    }
+
+    /** Fix 3: armour shift-clicked out of a backpack slot that keeps part of its stack: the part left is saved in the backpack. */
+    private static void leftoverSaved(CommandSourceStack source, ServerPlayer player) {
+        player.closeContainer();
+        clearAll(player);
+        BackpackWrapper wrapper = TravelersBackpackCompat.wrapper(player);
+        if (wrapper == null) {
+            expect(source, "fix 3: a backpack is worn", false, state(player));
+            return;
+        }
+        ItemStack two = new ItemStack(Items.IRON_HELMET);
+        two.setCount(2);
+        wrapper.getStorage().setStackInSlot(0, two);
+        BackpackContainer.openBackpack(player, TravelersBackpackCompat.worn(player), Reference.WEARABLE_SCREEN_ID);
+        if (!(player.containerMenu instanceof BackpackBaseMenu menu)) {
+            expect(source, "fix 3: the backpack window opens", false, player.containerMenu.getClass().getSimpleName());
+            return;
+        }
+        int index = -1;
+        for (int i = menu.BACKPACK_INV_START; i < menu.BACKPACK_INV_END && i < menu.slots.size(); i++) {
+            if (menu.slots.get(i).getItem().is(Items.IRON_HELMET)) index = i;
+        }
+        if (index >= 0) menu.quickMoveStack(player, index);
+        player.closeContainer();
+        ItemStack worn = TravelersBackpackCompat.worn(player);
+        int saved = 0;
+        for (ItemStack stack : ContainerContentsHelper.getItems(worn.getOrDefault(ModDataComponents.BACKPACK_CONTAINER, ItemContainerContents.EMPTY),
+            wrapper.getStorage().getSlots())) {
+            if (stack.is(Items.IRON_HELMET)) saved += stack.getCount();
+        }
+        boolean on = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(Items.IRON_HELMET);
+        expect(source, "fix 3: shift-clicking armour out of a backpack slot that keeps part of the stack saves the part left in the backpack",
+            index >= 0 && on && saved == 1, "slot " + index + ", helmet on " + on + ", the backpack's saved contents hold " + saved + " (1 wanted)");
+        clearAll(player);
+        player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, ItemStack.EMPTY);
+    }
+
+    /** Fix 4: a Build Gun in the backpack is left out of the crate; the crafting grid's stacks go in and come back to the grid. */
+    private static void crateBuildGunAndGrid(CommandSourceStack source, ServerPlayer player) {
+        player.closeContainer();
+        clearAll(player);
+        BackpackWrapper wrapper = TravelersBackpackCompat.wrapper(player);
+        net.minecraft.world.Container grid = TravelersBackpackCompat.grid(player);
+        if (wrapper == null || grid == null) {
+            expect(source, "fix 4: the backpack and its crafting grid are there", false, state(player));
+            return;
+        }
+        wrapper.getStorage().setStackInSlot(2, new ItemStack(com.meakaandre.siftec.registry.ModItems.BUILD_GUN.get()));
+        wrapper.getStorage().setStackInSlot(3, new ItemStack(Items.COAL, 7));
+        grid.setItem(0, new ItemStack(Items.OAK_PLANKS, 3));
+        List<DeathCrateBlockEntity.Entry> looked = DeathCrates.carried(player, false);
+        boolean gun = false, planks = false;
+        for (DeathCrateBlockEntity.Entry e : looked) {
+            gun |= e.stack().getItem() instanceof com.meakaandre.siftec.building.BuildGunItem;
+            planks |= e.where() == 3 && e.slot() == 0 && e.stack().is(Items.OAK_PLANKS) && e.stack().getCount() == 3;
+        }
+        expect(source, "fix 4: the crate leaves out a Build Gun kept in the backpack", !gun, looked.size() + " stacks");
+        expect(source, "fix 4: the crate takes what lies on the backpack's crafting grid", planks, looked.toString());
+        // as at death: everything is taken (the Build Gun too, it comes back on respawn), into a crate the owner opens
+        List<DeathCrateBlockEntity.Entry> taken = DeathCrates.carried(player, true);
+        boolean emptied = grid.getItem(0).isEmpty() && wrapper.getStorage().getStackInSlot(2).isEmpty();
+        ServerLevel level = player.level();
+        BlockPos at = DeathCrates.spot(level, player.blockPosition().above(3));
+        if (at == null) {
+            expect(source, "fix 4: room for a crate", false, "");
+            return;
+        }
+        level.setBlockAndUpdate(at, com.meakaandre.siftec.registry.ModBlocks.DEATH_CRATE.get().defaultBlockState());
+        if (!(level.getBlockEntity(at) instanceof DeathCrateBlockEntity crate)) {
+            expect(source, "fix 4: a crate goes down", false, at.toShortString());
+            return;
+        }
+        crate.owner = player.getUUID();
+        crate.ownerName = player.getGameProfile().name();
+        crate.entries.addAll(taken);
+        int left = DeathCrates.restore(player, crate);
+        boolean back = grid.getItem(0).is(Items.OAK_PLANKS) && grid.getItem(0).getCount() == 3 && wrapper.getStorage().getStackInSlot(3).is(Items.COAL);
+        expect(source, "fix 4: opened, the crate puts the grid's planks back on the grid", emptied && back && left == 0,
+            "taken " + taken.size() + ", emptied " + emptied + ", grid now " + grid.getItem(0) + ", " + left + " left in the crate");
+        if (level.getBlockEntity(at) instanceof DeathCrateBlockEntity still) {
+            still.entries.clear();
+            level.removeBlock(at, false);
+        }
+        grid.setItem(0, ItemStack.EMPTY);
+        clearAll(player);
     }
 
     private static int crateKeep(CommandSourceStack source) {

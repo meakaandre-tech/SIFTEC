@@ -74,6 +74,8 @@ public class VehicleEntity extends Entity {
     public boolean recording;
     /** The route point it is driving to. */
     public int target;
+    /** The Truck Station it last stopped at (where it goes back to if it falls out of the world); null if none yet. */
+    public @Nullable BlockPos lastStation;
     private int docked, stuck;
     private double lastDist = Double.MAX_VALUE;
     /** A selftest's pretend driver: the keys it holds while nobody sits in the seat (null: none). */
@@ -253,6 +255,7 @@ public class VehicleEntity extends Entity {
         if (here.distanceTo(route.getLast()) > 0.01) route.add(here);
         stopAt.add(route.size() - 1);
         stopStation.add(station);
+        lastStation = station;
     }
 
     private int stopIndex(int point) {
@@ -279,6 +282,7 @@ public class VehicleEntity extends Entity {
                 if (docked == 0) {
                     itemsMoved += TruckStations.dock(level, stopStation.get(stop), this);
                     stopsMade++;
+                    lastStation = stopStation.get(stop);
                 }
                 docked++;
                 return new double[]{0, 0, 1};
@@ -356,7 +360,92 @@ public class VehicleEntity extends Entity {
             case 5 -> MenuType.GENERIC_9x5;
             default -> MenuType.GENERIC_9x6;
         };
-        player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new ChestMenu(type, id, inventory, cargo, kind.rows), getName()));
+        player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new ChestMenu(type, id, inventory, cargo, kind.rows) {
+            @Override
+            public boolean stillValid(Player who) {
+                return mayKeepCargoOpen(who);
+            }
+        }, getName()));
+    }
+
+    /** Blocks a player can be from the vehicle and keep its storage open. */
+    public static final double CARGO_REACH = 8.0;
+
+    /**
+     * Whether a player's open window on the storage stays open: the vehicle is still in the world, the player is alive,
+     * close by, and (unless in creative) still in the company the vehicle belongs to.
+     */
+    public boolean mayKeepCargoOpen(Player who) {
+        if (isRemoved() || who.isRemoved() || !who.isAlive() || who.level() != level()) return false;
+        if (who.distanceToSqr(this) > CARGO_REACH * CARGO_REACH) return false;
+        return !(who instanceof ServerPlayer server) || !Vehicles.foreign(this, companyId, server);
+    }
+
+    // ------------------------------------------------------------------------------------------------ out of the world
+
+    /**
+     * Fallen out of the bottom of the world: not deleted as vanilla deletes things there, but put back at the dock of
+     * the Truck Station it last stopped at, or else beside its company's HUB, or else at world spawn.
+     */
+    @Override
+    public void onBelowWorld() {
+        if (level() instanceof ServerLevel level && returnHome(level)) return;
+        super.onBelowWorld();
+    }
+
+    /** Puts the vehicle back where {@link #onBelowWorld} says. True if it was put somewhere. */
+    public boolean returnHome(ServerLevel level) {
+        ejectPassengers();
+        ServerLevel to = level;
+        Vec3 spot = null;
+        if (lastStation != null) {
+            level.getChunk(lastStation);
+            var station = TruckStations.at(level, lastStation);
+            if (station != null) spot = TruckStations.dock(station);
+        }
+        if (spot == null) {
+            var hub = com.meakaandre.siftec.claim.Claims.hubOf(level.getServer(), companyId);
+            ServerLevel hubLevel = hub == null ? null : level.getServer().getLevel(hub.dimension());
+            if (hubLevel != null) {
+                to = hubLevel;
+                spot = besideHub(hubLevel, hub.pos());
+            }
+        }
+        if (spot == null) {
+            to = level.getServer().overworld();
+            var origin = com.meakaandre.siftec.node.NodeSavedData.get(level.getServer());
+            int x = origin.hasOrigin() ? origin.originX() : 0, z = origin.hasOrigin() ? origin.originZ() : 0;
+            to.getChunk(new BlockPos(x, 0, z));
+            spot = new Vec3(x + 0.5, to.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z + 0.5);
+        }
+        speed = 0;
+        docked = 0;
+        lastDist = Double.MAX_VALUE;
+        stuck = 0;
+        setDeltaMovement(Vec3.ZERO);
+        resetFallDistance();
+        if (to == level) {
+            setPos(spot.x, spot.y + 0.1, spot.z);
+        } else if (teleport(new net.minecraft.world.entity.TeleportTransition(to, new Vec3(spot.x, spot.y + 0.1, spot.z), Vec3.ZERO, getYRot(), getXRot(),
+            net.minecraft.world.entity.TeleportTransition.DO_NOTHING)) == null) {
+            return false;
+        }
+        com.meakaandre.siftec.Siftec.LOGGER.info("SIFTEC: {} fell out of the world; put back at {} {}", kind.id, to.dimension().identifier(), BlockPos.containing(spot).toShortString());
+        return true;
+    }
+
+    /** A spot on the ground just outside the HUB that stands at this terminal (on the ground by the terminal if none is found). */
+    private static Vec3 besideHub(ServerLevel level, BlockPos terminal) {
+        level.getChunk(terminal);
+        int x = terminal.getX(), z = terminal.getZ();
+        var hub = com.meakaandre.siftec.prefab.Prefabs.hubAt(level, terminal);
+        if (hub != null && hub.anchor != null && hub.facing != null) {
+            var box = com.meakaandre.siftec.prefab.Prefabs.bounds(new com.meakaandre.siftec.prefab.Prefabs.Spot(com.meakaandre.siftec.prefab.Prefabs.Kind.HUB, hub.anchor, hub.facing));
+            x = (int) Math.floor(box.maxX) + 2;
+            z = (int) Math.floor((box.minZ + box.maxZ) / 2);
+            level.getChunk(new BlockPos(x, 0, z));
+        }
+        return new Vec3(x + 0.5, level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z + 0.5);
     }
 
     /** A bucket of a fuel the Fuel Generator burns goes into the tank, and the empty bucket comes back. */
@@ -410,6 +499,7 @@ public class VehicleEntity extends Entity {
         view.store("StopAt", Codec.INT.listOf(), new ArrayList<>(stopAt));
         view.store("StopStation", BlockPos.CODEC.listOf(), new ArrayList<>(stopStation));
         view.putInt("Target", target);
+        if (lastStation != null) view.store("LastStation", BlockPos.CODEC, lastStation);
         view.putBoolean("Recording", recording);
         view.putInt("StopsMade", stopsMade);
     }
@@ -433,6 +523,7 @@ public class VehicleEntity extends Entity {
             stopStation.clear();
         }
         target = view.getIntOr("Target", 0);
+        lastStation = view.read("LastStation", BlockPos.CODEC).orElse(null);
         recording = view.getBooleanOr("Recording", false);
         stopsMade = view.getIntOr("StopsMade", 0);
         syncFuel();

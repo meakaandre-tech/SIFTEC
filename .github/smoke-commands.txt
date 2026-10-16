@@ -13,6 +13,7 @@ siftec selftest food
 siftec selftest vehicles
 siftec selftest map
 siftec selftest guide
+siftec selftest fixes
 siftec selftest state setup
 siftec selftest state check
 siftec worldtest nodes 2000

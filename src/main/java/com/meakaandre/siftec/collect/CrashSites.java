@@ -99,14 +99,58 @@ public final class CrashSites {
         return state.hasProperty(BlockStateProperties.FACING) ? state.setValue(BlockStateProperties.FACING, Direction.UP) : state;
     }
 
-    /** Puts the pod's wire connector beside it (again, if someone took it away). True if one is there now. */
+    /** Which pods have had their wire connector put down, kept with the world ("dimension|x,y,z" of the pod). */
+    public static class Data extends com.meakaandre.siftec.save.JsonSavedData<Data.Stored> {
+        public static class Stored {
+            java.util.Set<String> connectors = new java.util.HashSet<>();
+        }
+
+        static final com.mojang.serialization.Codec<Data> CODEC = com.meakaandre.siftec.save.JsonSavedData.codec(Data::new);
+        static final net.minecraft.world.level.saveddata.SavedDataType<Data> TYPE =
+            new net.minecraft.world.level.saveddata.SavedDataType<>(com.meakaandre.siftec.Siftec.id("crash_sites"), Data::new, CODEC, null);
+
+        public Data() {
+            super("crash_sites", Stored.class, Stored::new);
+        }
+
+        static Data get(net.minecraft.server.MinecraftServer server) {
+            return server.getDataStorage().computeIfAbsent(TYPE);
+        }
+    }
+
+    private static String podKey(ServerLevel level, BlockPos pod) {
+        return level.dimension().identifier() + "|" + pod.getX() + "," + pod.getY() + "," + pod.getZ();
+    }
+
+    /** True if this pod's wire connector has been put down (it may have been taken away since). */
+    public static boolean connectorPlaced(ServerLevel level, BlockPos pod) {
+        return Data.get(level.getServer()).stored.connectors.contains(podKey(level, pod));
+    }
+
+    /** Forgets that the pod's connector was put down (the selftests' own pods). */
+    public static void forgetConnector(ServerLevel level, BlockPos pod) {
+        Data data = Data.get(level.getServer());
+        if (data.stored.connectors.remove(podKey(level, pod))) data.setDirty();
+    }
+
+    /**
+     * Puts the pod's wire connector beside it, once per pod: one taken away is not put back (it would be a free
+     * connector each time). True if one is there now.
+     */
     public static boolean placeConnector(ServerLevel level, BlockPos pod) {
         BlockPos at = connectorSpot(level, pod);
-        if (at == null) return false;
-        if (isConnector(level.getBlockState(at))) return true;
+        Data data = Data.get(level.getServer());
+        String key = podKey(level, pod);
+        if (at != null && isConnector(level.getBlockState(at))) {
+            if (data.stored.connectors.add(key)) data.setDirty();
+            return true;
+        }
+        if (at == null || data.stored.connectors.contains(key)) return false;
         BlockState state = connector();
         if (state == null) return false;
         level.setBlock(at, state, Block.UPDATE_ALL);
+        data.stored.connectors.add(key);
+        data.setDirty();
         return true;
     }
 
