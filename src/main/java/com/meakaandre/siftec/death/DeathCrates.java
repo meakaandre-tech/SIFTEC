@@ -31,8 +31,9 @@ import java.util.UUID;
  * puts every stack straight back in the slot it came from; what cannot go back (the slot has something in it now)
  * goes anywhere in the inventory or backpack, and what does not fit at all stays in the crate.
  * <p>
- * Nothing changes with the keepInventory game rule on (nothing is dropped, so there is no crate), and Curse of
- * Vanishing items vanish as in vanilla. Packing happens where vanilla would drop the inventory
+ * Nothing changes with the keepInventory game rule on (nothing is dropped, so there is no crate), Curse of
+ * Vanishing items vanish as in vanilla, and the Build Gun stays out of it (every player is given one again when they
+ * respawn). Packing happens where vanilla would drop the inventory
  * (mixin/PlayerDeathCrateMixin).
  */
 public final class DeathCrates {
@@ -76,8 +77,10 @@ public final class DeathCrates {
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             ItemStack stack = inventory.getItem(i);
             if (stack.isEmpty()) continue;
-            out.add(new DeathCrateBlockEntity.Entry(DeathCrateBlockEntity.INVENTORY, i, stack.copy()));
             if (take) inventory.setItem(i, ItemStack.EMPTY);
+            // the Build Gun is every player's from the start and comes back with them when they respawn (prefab/Prefabs)
+            if (isBuildGun(stack)) continue;
+            out.add(new DeathCrateBlockEntity.Entry(DeathCrateBlockEntity.INVENTORY, i, stack.copy()));
         }
         List<Container> parts = backpackContainers(player);
         for (int k = 0; k < parts.size(); k++) {
@@ -164,6 +167,18 @@ public final class DeathCrates {
         Inventory inventory = player.getInventory();
         List<Container> parts = backpackContainers(player);
         boolean wasEmpty = crate.isEmpty();
+        // the Build Gun the player got back when they respawned moves out of a slot the crate has something for
+        Set<Integer> wanted = new HashSet<>();
+        for (DeathCrateBlockEntity.Entry e : crate.entries) if (e.where() == DeathCrateBlockEntity.INVENTORY) wanted.add(e.slot());
+        for (int i : wanted) {
+            if (i < 0 || i >= Inventory.INVENTORY_SIZE || !isBuildGun(inventory.getItem(i))) continue;
+            for (int j = 0; j < Inventory.INVENTORY_SIZE; j++) {
+                if (wanted.contains(j) || !inventory.getItem(j).isEmpty()) continue;
+                inventory.setItem(j, inventory.getItem(i));
+                inventory.setItem(i, ItemStack.EMPTY);
+                break;
+            }
+        }
         List<DeathCrateBlockEntity.Entry> later = new ArrayList<>();
         for (DeathCrateBlockEntity.Entry e : crate.entries) {
             Container target = e.where() == DeathCrateBlockEntity.INVENTORY ? inventory : (e.where() - 1 < parts.size() ? parts.get(e.where() - 1) : null);
@@ -198,6 +213,10 @@ public final class DeathCrates {
         if (access != null) access.afterRestore(player);
         Siftec.LOGGER.info("SIFTEC: {} opened their Death Crate at {}; {} stacks stay in it", player.getGameProfile().name(), crate.getBlockPos(), left.size());
         return left.size();
+    }
+
+    private static boolean isBuildGun(ItemStack stack) {
+        return stack.getItem() instanceof com.meakaandre.siftec.building.BuildGunItem;
     }
 
     /** Merges the stack into the container's matching stacks, then its empty slots, as far as it goes. */
