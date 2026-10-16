@@ -62,6 +62,8 @@ public class SiftecClient implements ClientModInitializer {
         VehicleClient.register();
         CloudButton.register();
         com.meakaandre.siftec.client.map.MapClient.register();
+        // the guide: Ponder scenes for every building and vehicle (work package 13)
+        com.meakaandre.siftec.client.ponder.Guide.register();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
             ClientState.jetFuel = true;

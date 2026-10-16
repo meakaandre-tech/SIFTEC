@@ -38,6 +38,7 @@ import java.util.List;
  * <li>X: dismantle mode</li>
  * <li>Left click: cancel (leave nudge mode, then dismantle mode, then put the building away)</li>
  * <li>Right click: build (or dismantle) - sent to the server as an ordinary use of the item</li>
+ * <li>H: open the picked building's Ponder scene (the guide)</li>
  * </ul>
  * All keys can be changed in the controls screen, under SIFTEC Build Gun.
  */
@@ -48,6 +49,7 @@ public final class BuildGunClient {
     public static final KeyMapping FLIP = new KeyMapping("key.siftec.build_gun.flip", InputConstants.KEY_F, CATEGORY);
     public static final KeyMapping NUDGE = new KeyMapping("key.siftec.build_gun.nudge", InputConstants.KEY_LCONTROL, CATEGORY);
     public static final KeyMapping DISMANTLE = new KeyMapping("key.siftec.build_gun.dismantle", InputConstants.KEY_X, CATEGORY);
+    public static final KeyMapping PONDER = new KeyMapping("key.siftec.build_gun.ponder", InputConstants.KEY_H, CATEGORY);
 
     private static final Object SHAPE = "siftec:build_gun_shape", BLOCKED = "siftec:build_gun_blocked", TARGET = "siftec:build_gun_target";
     private static final int GREEN = 0x5CD65C, RED = 0xE03C3C, BLUE = 0x4AA8FF;
@@ -73,6 +75,7 @@ public final class BuildGunClient {
         KeyMappingHelper.registerKeyMapping(FLIP);
         KeyMappingHelper.registerKeyMapping(NUDGE);
         KeyMappingHelper.registerKeyMapping(DISMANTLE);
+        KeyMappingHelper.registerKeyMapping(PONDER);
         ClientTickEvents.START_CLIENT_TICK.register(BuildGunClient::keys);
         ClientTickEvents.END_CLIENT_TICK.register(BuildGunClient::hologram);
         ClientPlayNetworking.registerGlobalReceiver(BuildGunPayloads.View.TYPE, (payload, context) -> Minecraft.getInstance().execute(() -> verdict = payload));
@@ -127,7 +130,7 @@ public final class BuildGunClient {
         }
         if (!wasHolding) {
             // movement presses from before the gun was in hand must not nudge anything
-            drain(o.keyUp, o.keyDown, o.keyLeft, o.keyRight, NEXT_TAB, ROTATE, FLIP, DISMANTLE, NUDGE);
+            drain(o.keyUp, o.keyDown, o.keyLeft, o.keyRight, NEXT_TAB, ROTATE, FLIP, DISMANTLE, NUDGE, PONDER);
             wasHolding = true;
         }
         while (NEXT_TAB.consumeClick()) {
@@ -176,6 +179,11 @@ public final class BuildGunClient {
         }
         // left click cancels, and never mines with the gun
         while (o.keyAttack.consumeClick()) cancel();
+        // the guide: the picked building's Ponder scene
+        while (PONDER.consumeClick()) {
+            BuildingDef def = current(mc);
+            if (def != null && !dismantle) com.meakaandre.siftec.client.ponder.Guide.open(def);
+        }
     }
 
     /** The smoke run's tab: see {@link BuildGunPayloads.Tab}. */

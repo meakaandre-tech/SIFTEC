@@ -146,6 +146,9 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
                 rebuildWidgets();
             }).bounds(left + 6, y, 112, 18).build();
             b.active = !m.id().equals(selected);
+            // its Satisfactory-style text, in full
+            b.setTooltip(net.minecraft.client.gui.components.Tooltip.create(m.name().copy().withStyle(ChatFormatting.GOLD)
+                .append("\n").append(m.desc().copy().withStyle(ChatFormatting.GRAY))));
             addRenderableWidget(b);
             y += 20;
         }
@@ -288,11 +291,23 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
         boolean lockLine = sel.seconds() > 0 && !done;
 
         g.text(font, sel.name(), x, y, GOLD, false);
+        if (over(mouseX, mouseY, x, y, width, 10)) hoverLines = List.of(sel.name().copy().withStyle(ChatFormatting.GOLD), sel.desc());
         y += 12;
         Component unlocks = Component.translatable("siftec.hub.unlocks", sel.unlockText());
         List<FormattedCharSequence> lines = font.split(unlocks, width);
         int room = (bottom - y - 4 - costs.size() * row - (lockLine ? 10 : 0)) / 10;
         int shown = Math.max(1, Math.min(lines.size(), Math.min(3, room)));
+        // the milestone's text (work package 13) under its name, in what room the unlocks and costs leave; all of it on hover
+        List<FormattedCharSequence> about = font.split(sel.desc().copy().withStyle(ChatFormatting.ITALIC), width);
+        int aboutShown = Math.max(0, Math.min(about.size(), Math.min(4, room - shown - 1)));
+        for (int i = 0; i < aboutShown; i++) {
+            g.text(font, about.get(i), x, y, DIM, false);
+            y += 10;
+        }
+        if (aboutShown > 0) {
+            if (over(mouseX, mouseY, x, y - 10 * aboutShown, width, 10 * aboutShown)) hoverLines = List.of(sel.desc());
+            y += 3;
+        }
         for (int i = 0; i < shown; i++) {
             g.text(font, lines.get(i), x, y, GREY, false);
             y += 10;

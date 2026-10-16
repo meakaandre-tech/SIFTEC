@@ -657,7 +657,8 @@
         "create:goggles",
         "create:mechanical_drill"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "hub_upgrade_2",
@@ -687,7 +688,8 @@
       ],
       "tokens": [
         "scanner:copper"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "hub_upgrade_3",
@@ -718,7 +720,8 @@
       ],
       "tokens": [
         "scanner:stone"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "hub_upgrade_4",
@@ -744,7 +747,8 @@
       ],
       "tokens": [
         "belt:60"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "hub_upgrade_5",
@@ -767,7 +771,8 @@
       "items": [
         "create:item_vault"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "hub_upgrade_6",
@@ -795,7 +800,8 @@
         "create:flywheel",
         "siftec:biomass"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "base_building",
@@ -1192,7 +1198,8 @@
         "create_new_age:lamp_post",
         "create_new_age:street_light"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "logistics",
@@ -1219,7 +1226,8 @@
         "create:speedometer",
         "create:stressometer"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "field_research",
@@ -1264,7 +1272,8 @@
       "tokens": [
         "map",
         "backpack:iron"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "part_assembly",
@@ -1295,7 +1304,8 @@
         "siftec:rotor",
         "siftec:smart_plating"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "obstacle_clearing",
@@ -1321,7 +1331,8 @@
         "create:tree_fertilizer",
         "siftec:solid_biofuel"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "jump_pads",
@@ -1345,7 +1356,8 @@
         "create:weighted_ejector",
         "siftec:landing_pad"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "resource_sink_bonus_program",
@@ -1422,7 +1434,8 @@
         "create:red_valve_handle",
         "create:black_valve_handle"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "logistics_mk2",
@@ -1449,7 +1462,8 @@
       "items": [],
       "tokens": [
         "belt:120"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "coal_power",
@@ -1494,7 +1508,8 @@
       ],
       "tokens": [
         "scanner:coal"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "vehicular_transport",
@@ -1525,7 +1540,8 @@
       ],
       "tokens": [
         "backpack:gold"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "basic_steel_production",
@@ -1561,7 +1577,8 @@
         "cgs:steel_sheet",
         "cgs:nail_steel"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "enhanced_asset_security",
@@ -1593,7 +1610,8 @@
         "cgs:axe_netherite",
         "cgs:spear"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "ficsit_blueprints",
@@ -1620,7 +1638,8 @@
       "items": [
         "siftec:blueprint_designer"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "logistics_mk3",
@@ -1643,7 +1662,8 @@
       "items": [],
       "tokens": [
         "belt:270"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "advanced_steel_production",
@@ -1674,7 +1694,8 @@
         "siftec:motor",
         "siftec:stator"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "expanded_power_infrastructure",
@@ -1725,7 +1746,8 @@
         "create_new_age:copper_circuit",
         "create_new_age:blank_circuit"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "contraption_transit",
@@ -1752,7 +1774,8 @@
         "create:gantry_carriage",
         "create:elevator_contact"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "jetpack",
@@ -1779,7 +1802,8 @@
       ],
       "tokens": [
         "backpack:diamond"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "oil_processing",
@@ -1826,7 +1850,8 @@
       ],
       "tokens": [
         "scanner:oil"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "logistics_mk4",
@@ -1849,7 +1874,8 @@
       "items": [],
       "tokens": [
         "belt:480"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "fluid_packaging",
@@ -1882,7 +1908,8 @@
         "siftec:packaged_water",
         "createdieselgenerators:oil_barrel"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "petroleum_power",
@@ -1916,7 +1943,8 @@
         "createdieselgenerators:engine_turbocharger",
         "createdieselgenerators:lighter"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "industrial_manufacturing",
@@ -1962,7 +1990,8 @@
         "create_new_age:overcharged_diamond_wire",
         "create_new_age:overcharged_diamond_wire_block"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "monorail_train_technology",
@@ -2013,7 +2042,8 @@
         "create:red_postbox",
         "create:black_postbox"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "railway_signalling",
@@ -2037,7 +2067,8 @@
         "create:track_signal",
         "create:track_observer"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "pipeline_engineering_mk2",
@@ -2060,7 +2091,8 @@
       "items": [],
       "tokens": [
         "pumps:2"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "ficsit_blueprints_mk2",
@@ -2085,7 +2117,8 @@
       ],
       "seconds": 600,
       "items": [],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "bauxite_refinement",
@@ -2119,7 +2152,8 @@
       "tokens": [
         "scanner:bauxite",
         "scanner:quartz"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "logistics_mk5",
@@ -2142,7 +2176,8 @@
       "items": [],
       "tokens": [
         "belt:780"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "hazmat_suit",
@@ -2170,7 +2205,8 @@
         "siftec:hazmat_suit_core",
         "siftec:incomplete_hazmat_suit"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "hover_pack",
@@ -2201,7 +2237,8 @@
       ],
       "tokens": [
         "backpack:netherite"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "control_system_development",
@@ -2236,7 +2273,8 @@
         "siftec:supercomputer",
         "siftec:supercomputer_core"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "aeronautical_engineering",
@@ -2283,7 +2321,8 @@
       ],
       "tokens": [
         "scanner:sulfur"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "nuclear_power",
@@ -2323,7 +2362,8 @@
       ],
       "tokens": [
         "scanner:uranium"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "advanced_aluminum_production",
@@ -2357,7 +2397,8 @@
       ],
       "tokens": [
         "scanner:nitrogen"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "leading_edge_production",
@@ -2385,7 +2426,8 @@
         "siftec:turbo_motor",
         "siftec:turbo_motor_core"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "particle_enrichment",
@@ -2422,7 +2464,8 @@
         "siftec:plutonium_pellet",
         "siftec:pressure_conversion_cube"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "matter_conversion",
@@ -2451,7 +2494,8 @@
       ],
       "tokens": [
         "scanner:sam"
-      ]
+      ],
+      "desc": true
     },
     {
       "id": "quantum_encoding",
@@ -2489,7 +2533,8 @@
         "siftec:superposition_oscillator",
         "siftec:superposition_oscillator_core"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "ficsit_blueprints_mk3",
@@ -2516,7 +2561,8 @@
       "items": [
         "siftec:blueprint_designer_mk3"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "spatial_energy_regulation",
@@ -2550,7 +2596,8 @@
         "siftec:singularity_cell",
         "siftec:singularity_cell_core"
       ],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "peak_efficiency",
@@ -2583,7 +2630,8 @@
       ],
       "tokens": [
         "belt:1200"
-      ]
+      ],
+      "desc": true
     }
   ],
   "phases": [
@@ -2598,7 +2646,8 @@
       ],
       "seconds": 0,
       "items": [],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "phase_2",
@@ -2619,7 +2668,8 @@
       ],
       "seconds": 0,
       "items": [],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "phase_3",
@@ -2640,7 +2690,8 @@
       ],
       "seconds": 0,
       "items": [],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "phase_4",
@@ -2665,7 +2716,8 @@
       ],
       "seconds": 0,
       "items": [],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     },
     {
       "id": "phase_5",
@@ -2690,7 +2742,8 @@
       ],
       "seconds": 0,
       "items": [],
-      "tokens": []
+      "tokens": [],
+      "desc": true
     }
   ],
   "disabled": [
@@ -11247,7 +11300,13 @@
           "count": 20
         }
       ],
-      "prefab": "hub"
+      "prefab": "hub",
+      "guide": [
+        "The HUB is where it all starts: the first thing every Pioneer builds with the Build Gun.",
+        "Its terminal shows the milestones, and pays for them from what you carry. Beside it, the Craft Station's hand-cranked Press and Mixer make your first parts.",
+        "Every HUB Upgrade adds to it: beds and lockers, Biomass Burners for power at the back, and at the last upgrade the freighter's dock tower.",
+        "It is the company's base for the whole game. Its upgrades belong to the company, not to the building."
+      ]
     },
     {
       "id": "wormhole_gateway",
@@ -11271,7 +11330,12 @@
         }
       ],
       "unlock": "hub_upgrade_6",
-      "prefab": "gateway"
+      "prefab": "gateway",
+      "guide": [
+        "The Wormhole Gateway is the colony's goal. It arrives as a bare platform with a delivery terminal and two power hookups.",
+        "Each Wormhole Phase delivered at its terminal opens new HUB tiers and builds more of the ring gate.",
+        "The fifth phase closes the circuit: the ring lights up and a portal to The Sift opens inside it."
+      ]
     },
     {
       "id": "test_building",
@@ -11326,7 +11390,11 @@
         1
       ],
       "logic": "portable_miner",
-      "break": 40
+      "break": 40,
+      "guide": [
+        "The Portable Miner is a small drill rig for the very first ores. It needs no power at all.",
+        "Set it over a resource node: it mines the node each time the ore grows back, and drops what it digs on the ground in front."
+      ]
     },
     {
       "id": "miner_mk1",
@@ -11354,7 +11422,11 @@
       ],
       "logic": "miner",
       "su": 1024,
-      "break": 10
+      "break": 10,
+      "guide": [
+        "The Miner Mk.1 drills a resource node for as long as it has power, each time the ore grows back.",
+        "Ore drops down a chute to the output port at the front, ready for a belt."
+      ]
     },
     {
       "id": "miner_mk2",
@@ -11391,7 +11463,10 @@
       "logic": "miner",
       "su": 3072,
       "break": 5,
-      "fortune": 3
+      "fortune": 3,
+      "guide": [
+        "The Miner Mk.2 breaks the regrown ore twice as quickly as the Mk.1 and mines with Fortune III, so every node gives more."
+      ]
     },
     {
       "id": "miner_mk3",
@@ -11432,7 +11507,10 @@
       "logic": "miner",
       "su": 9216,
       "break": 2,
-      "fortune": 5
+      "fortune": 5,
+      "guide": [
+        "The Miner Mk.3 is FICSIT's fastest miner: it breaks the ore five times as quickly as the Mk.1, with Fortune V. Its 45 MW takes a second motor, in the extension at the back."
+      ]
     },
     {
       "id": "smelter",
@@ -11449,7 +11527,10 @@
       ],
       "unlock": "hub_upgrade_2",
       "logic": "smelter",
-      "su": 819
+      "su": 819,
+      "guide": [
+        "The Smelter melts ore into ingots. Inside, a motor drives an Encased Fan that blows through lava onto a Depot: Create's bulk blasting."
+      ]
     },
     {
       "id": "constructor",
@@ -11466,7 +11547,10 @@
       ],
       "unlock": "hub_upgrade_3",
       "logic": "basin",
-      "su": 819
+      "su": 819,
+      "guide": [
+        "The Constructor makes one part from one input: a Mechanical Press over a Basin, turned by its own motor."
+      ]
     },
     {
       "id": "storage_container",
@@ -11482,7 +11566,10 @@
         }
       ],
       "unlock": "hub_upgrade_5",
-      "logic": "storage"
+      "logic": "storage",
+      "guide": [
+        "The Storage Container holds items in an Item Vault. Belt things in at the back and take them out at the front."
+      ]
     },
     {
       "id": "industrial_storage_container",
@@ -11498,7 +11585,10 @@
         }
       ],
       "unlock": "logistics_mk3",
-      "logic": "storage"
+      "logic": "storage",
+      "guide": [
+        "The Industrial Storage Container is the bigger Storage Container: two Item Vaults side by side."
+      ]
     },
     {
       "id": "power_pole_mk1",
@@ -11520,7 +11610,10 @@
       "unlock": "hub_upgrade_3",
       "logic": "power",
       "lines": 4,
-      "power": "pole"
+      "power": "pole",
+      "guide": [
+        "Power Poles carry power across the factory: each wire from its connector joins two parts of the grid. A Mk.1 takes up to 4 wires."
+      ]
     },
     {
       "id": "power_pole_mk2",
@@ -11542,7 +11635,10 @@
       "unlock": "mam_caterium_power_poles_mk_2",
       "logic": "power",
       "lines": 7,
-      "power": "pole"
+      "power": "pole",
+      "guide": [
+        "The Power Pole Mk.2 takes up to 7 wires."
+      ]
     },
     {
       "id": "power_pole_mk3",
@@ -11564,7 +11660,10 @@
       "unlock": "mam_caterium_power_poles_mk_3",
       "logic": "power",
       "lines": 10,
-      "power": "pole"
+      "power": "pole",
+      "guide": [
+        "The Power Pole Mk.3 takes up to 10 wires."
+      ]
     },
     {
       "id": "power_tower",
@@ -11586,7 +11685,10 @@
       "unlock": "expanded_power_infrastructure",
       "logic": "power",
       "lines": 10,
-      "power": "pole"
+      "power": "pole",
+      "guide": [
+        "The Power Tower lifts the grid high above the ground and takes up to 10 wires, for long runs between distant parts of the factory."
+      ]
     },
     {
       "id": "power_storage",
@@ -11607,7 +11709,10 @@
       ],
       "unlock": "expanded_power_infrastructure",
       "logic": "power",
-      "power": "storage"
+      "power": "storage",
+      "guide": [
+        "Power Storage keeps the power the grid does not use, and gives it back when the generators cannot keep up."
+      ]
     },
     {
       "id": "biomass_burner",
@@ -11629,7 +11734,10 @@
       "unlock": "hub_upgrade_6",
       "logic": "power",
       "mw": 30,
-      "power": "biomass"
+      "power": "biomass",
+      "guide": [
+        "The Biomass Burner burns leaves, wood, mycelia, Biomass and Solid Biofuel for 30 MW. Fuel goes in at the back."
+      ]
     },
     {
       "id": "coal_generator",
@@ -11652,7 +11760,10 @@
       "logic": "power",
       "mw": 75,
       "water": 45,
-      "power": "coal"
+      "power": "coal",
+      "guide": [
+        "The Coal Generator burns coal, Compacted Coal or Petroleum Coke for 75 MW, and takes 45 m3 of water a minute to do it."
+      ]
     },
     {
       "id": "fuel_generator",
@@ -11682,7 +11793,10 @@
       "unlock": "petroleum_power",
       "logic": "power",
       "mw": 250,
-      "power": "fuel"
+      "power": "fuel",
+      "guide": [
+        "The Fuel Generator burns Fuel, Liquid Biofuel, Turbofuel, Rocket Fuel or Ionized Fuel for 250 MW."
+      ]
     },
     {
       "id": "geothermal_generator",
@@ -11717,6 +11831,9 @@
         0,
         0,
         2
+      ],
+      "guide": [
+        "The Geothermal Generator stands over a geyser and gives 200 MW for free, forever. It only goes down where a geyser vents."
       ]
     },
     {
@@ -11748,7 +11865,11 @@
       "logic": "power",
       "mw": 2500,
       "water": 240,
-      "power": "nuclear"
+      "power": "nuclear",
+      "guide": [
+        "The Nuclear Power Plant gives 2,500 MW from Uranium or Plutonium Fuel Rods, and takes 240 m3 of water a minute.",
+        "Every spent rod leaves nuclear waste behind, which has to go somewhere."
+      ]
     },
     {
       "id": "alien_power_augmenter",
@@ -11782,7 +11903,10 @@
       "unlock": "mam_alien_power_augmenter",
       "logic": "power",
       "mw": 500,
-      "power": "augmenter"
+      "power": "augmenter",
+      "guide": [
+        "The Alien Power Augmenter adds 500 MW to its grid and boosts the grid's generators by 10%, or 30% while it is fed Alien Power Matrices."
+      ]
     },
     {
       "id": "assembler",
@@ -11803,7 +11927,10 @@
       ],
       "unlock": "part_assembly",
       "logic": "basin",
-      "su": 3072
+      "su": 3072,
+      "guide": [
+        "The Assembler combines two inputs into one part: a Mechanical Mixer over a Basin."
+      ]
     },
     {
       "id": "foundry",
@@ -11824,7 +11951,10 @@
       ],
       "unlock": "basic_steel_production",
       "logic": "basin",
-      "su": 3277
+      "su": 3277,
+      "guide": [
+        "The Foundry makes steel and alloys: a Mechanical Mixer over a Basin, heated by a Blaze Burner the building keeps lit while it has power."
+      ]
     },
     {
       "id": "refinery",
@@ -11849,7 +11979,10 @@
       ],
       "unlock": "oil_processing",
       "logic": "basin",
-      "su": 6144
+      "su": 6144,
+      "guide": [
+        "The Refinery turns crude oil into plastic, rubber, fuel and more: a heated Mixer over a Basin, with fluid ports for pipes."
+      ]
     },
     {
       "id": "blender",
@@ -11874,7 +12007,10 @@
       ],
       "unlock": "control_system_development",
       "logic": "basin",
-      "su": 15360
+      "su": 15360,
+      "guide": [
+        "The Blender mixes fluids and solids for the late-game chemistry: a heated Mixer over a Brass Basin, which holds four stacks of each item."
+      ]
     },
     {
       "id": "manufacturer",
@@ -11899,7 +12035,11 @@
       ],
       "unlock": "industrial_manufacturing",
       "logic": "assembly",
-      "su": 11264
+      "su": 11264,
+      "guide": [
+        "The Manufacturer builds the most complex parts. The Mixer over the Brass Basin makes the recipe's Core first.",
+        "Then the Core travels along a row of Depots, and a Deployer over each adds the last of one input."
+      ]
     },
     {
       "id": "quantum_encoder",
@@ -11928,7 +12068,10 @@
       ],
       "unlock": "quantum_encoding",
       "logic": "assembly",
-      "su": 204800
+      "su": 204800,
+      "guide": [
+        "The Quantum Encoder works like the Manufacturer, with two extra steps: a Spout fills the Core with Excited Photonic Matter first, and an Item Drain takes the Dark Matter Residue off what comes out."
+      ]
     },
     {
       "id": "packager",
@@ -11949,7 +12092,10 @@
       ],
       "unlock": "fluid_packaging",
       "logic": "packager",
-      "su": 2048
+      "su": 2048,
+      "guide": [
+        "The Packager puts fluids into canisters and tanks, and takes them out again: a Spout over a Depot fills, and an Item Drain empties."
+      ]
     },
     {
       "id": "water_extractor",
@@ -11977,6 +12123,9 @@
         0,
         0,
         3
+      ],
+      "guide": [
+        "The Water Extractor stands in water and pumps 120 m3 a minute into its tank. The cell under its intake has to be a water source."
       ]
     },
     {
@@ -12007,7 +12156,10 @@
       "su": 8192,
       "rate": 4800,
       "fluid": "createdieselgenerators:crude_oil",
-      "fluid_node": "oil"
+      "fluid_node": "oil",
+      "guide": [
+        "The Oil Extractor stands over an oil node and pumps crude oil into its tank. Pure nodes give more, impure ones less."
+      ]
     },
     {
       "id": "resource_well_pressurizer",
@@ -12043,7 +12195,10 @@
       ],
       "logic": "pressurizer",
       "su": 30720,
-      "fluid_node": "nitrogen"
+      "fluid_node": "nitrogen",
+      "guide": [
+        "The Resource Well Pressurizer stands over a nitrogen well and puts it under pressure, so the Resource Well Extractors around it can work."
+      ]
     },
     {
       "id": "resource_well_extractor",
@@ -12061,7 +12216,10 @@
       "unlock": "advanced_aluminum_production",
       "logic": "well_extractor",
       "rate": 2400,
-      "fluid": "siftec:nitrogen"
+      "fluid": "siftec:nitrogen",
+      "guide": [
+        "The Resource Well Extractor takes nitrogen gas from a well while a Resource Well Pressurizer near it is running."
+      ]
     },
     {
       "id": "particle_accelerator",
@@ -12090,7 +12248,10 @@
       ],
       "unlock": "particle_enrichment",
       "logic": "processor",
-      "su": 102400
+      "su": 102400,
+      "guide": [
+        "The Particle Accelerator smashes particles together for the rarest materials, such as Plutonium and Nuclear Pasta. It draws a lot of power."
+      ]
     },
     {
       "id": "converter",
@@ -12115,7 +12276,10 @@
       ],
       "unlock": "matter_conversion",
       "logic": "processor",
-      "su": 51200
+      "su": 51200,
+      "guide": [
+        "The Converter turns one resource into another with the help of SAM, and makes Ficsite, Diamonds and Time Crystals."
+      ]
     },
     {
       "id": "equipment_workshop",
@@ -12131,7 +12295,10 @@
         }
       ],
       "unlock": "hub_upgrade_1",
-      "logic": "workshop"
+      "logic": "workshop",
+      "guide": [
+        "The Equipment Workshop builds equipment by hand from the parts you carry. Use its control panel to open it."
+      ]
     },
     {
       "id": "awesome_sink",
@@ -12152,7 +12319,10 @@
       ],
       "unlock": "resource_sink_bonus_program",
       "logic": "sink",
-      "su": 6144
+      "su": 6144,
+      "guide": [
+        "The AWESOME Sink destroys whatever its input port takes, and pays FICSIT Coupons for it. Use it with something in hand to sink that."
+      ]
     },
     {
       "id": "awesome_shop",
@@ -12172,7 +12342,10 @@
         }
       ],
       "unlock": "resource_sink_bonus_program",
-      "logic": "shop"
+      "logic": "shop",
+      "guide": [
+        "The AWESOME Shop sells cosmetics for FICSIT Coupons, such as the Customizer for painting your buildings. Use its control panel to open it."
+      ]
     },
     {
       "id": "radar_tower",
@@ -12197,7 +12370,10 @@
       ],
       "unlock": "mam_quartz_radar_technology",
       "logic": "radar",
-      "su": 6144
+      "su": 6144,
+      "guide": [
+        "The Radar Tower clears the company's map over a wide area around it while it has power."
+      ]
     },
     {
       "id": "truck_station",
@@ -12217,7 +12393,11 @@
         }
       ],
       "unlock": "vehicular_transport",
-      "logic": "truck_station"
+      "logic": "truck_station",
+      "guide": [
+        "The Truck Station loads vehicles from its two Item Vaults, or unloads them into the vaults, while they stand at the dock in front of it.",
+        "Its fuel tank fills up every vehicle that docks. Its terminal switches between loading and unloading."
+      ]
     },
     {
       "id": "tractor",
@@ -12237,7 +12417,12 @@
         }
       ],
       "unlock": "vehicular_transport",
-      "prefab": "vehicle"
+      "prefab": "vehicle",
+      "guide": [
+        "The Tractor is a small, quick hauler with three rows of storage. Right-click it to drive: W and S for throttle, A and D to steer, Space to brake.",
+        "It burns Fuel, Liquid Biofuel or Turbofuel: use a bucket on it, or dock it at a Truck Station. Sneak and right-click for its storage.",
+        "Press V while driving to record a route through Truck Stations. Get out, and it drives the route by itself."
+      ]
     },
     {
       "id": "truck",
@@ -12261,7 +12446,12 @@
         }
       ],
       "unlock": "logistics_mk4",
-      "prefab": "vehicle"
+      "prefab": "vehicle",
+      "guide": [
+        "The Truck is slower than the Tractor, but carries six rows of storage. Right-click it to drive.",
+        "It burns Fuel, Liquid Biofuel or Turbofuel: use a bucket on it, or dock it at a Truck Station. Sneak and right-click for its storage.",
+        "Press V while driving to record a route through Truck Stations. Get out, and it drives the route by itself."
+      ]
     },
     {
       "id": "explorer",
@@ -12285,7 +12475,12 @@
         }
       ],
       "unlock": "mam_quartz_display_systems",
-      "prefab": "vehicle"
+      "prefab": "vehicle",
+      "guide": [
+        "The Explorer is the fastest vehicle on the planet, built for scouting rather than cargo: one row of storage. Right-click it to drive.",
+        "It burns Fuel, Liquid Biofuel or Turbofuel: use a bucket on it, or dock it at a Truck Station. Sneak and right-click for its storage.",
+        "Press V while driving to record a route through Truck Stations. Get out, and it drives the route by itself."
+      ]
     }
   ],
   "machine_ticks": {
