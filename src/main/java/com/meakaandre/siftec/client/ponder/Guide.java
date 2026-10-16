@@ -16,7 +16,6 @@ import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -71,7 +70,7 @@ public final class Guide {
                 if (def == null) report("FAIL open: no building " + control.arg());
                 else open(def);
             }
-            case "close" -> Minecraft.getInstance().setScreen(null);
+            case "close" -> Minecraft.getInstance().gui.setScreen(null);
             default -> {
             }
         }
@@ -92,9 +91,9 @@ public final class Guide {
             if (def.dev() || item == null) continue;
             Identifier key = BuiltInRegistries.ITEM.getKey(item);
             List<String> missing = new ArrayList<>();
-            if (!I18n.exists("siftec.ponder." + def.id() + ".header")) missing.add("header");
+            if (!net.minecraft.locale.Language.getInstance().has("siftec.ponder." + def.id() + ".header")) missing.add("header");
             int lines = BuildingScenes.lines(def).size();
-            for (int n = 1; n <= lines; n++) if (!I18n.exists("siftec.ponder." + def.id() + ".text_" + n)) missing.add("text_" + n);
+            for (int n = 1; n <= lines; n++) if (!net.minecraft.locale.Language.getInstance().has("siftec.ponder." + def.id() + ".text_" + n)) missing.add("text_" + n);
             String result;
             boolean ok;
             try {
@@ -117,14 +116,14 @@ public final class Guide {
             report((ok ? "PASS " : "FAIL ") + def.id() + " (" + result + ")");
         }
         List<String> shared = new ArrayList<>();
-        for (String k : SiftecPonderPlugin.SHARED) if (!I18n.exists("siftec.ponder.shared." + k)) shared.add(k);
+        for (String k : SiftecPonderPlugin.SHARED) if (!net.minecraft.locale.Language.getInstance().has("siftec.ponder.shared." + k)) shared.add(k);
         if (shared.isEmpty()) passed++;
         else failed++;
         report((shared.isEmpty() ? "PASS " : "FAIL ") + "shared lines" + (shared.isEmpty() ? "" : " missing " + shared));
         List<String> text = new ArrayList<>();
         List<Milestone> all = new ArrayList<>(Milestones.phases());
         for (int tier = 0; tier < Milestones.TIERS; tier++) all.addAll(Milestones.tier(tier));
-        for (Milestone m : all) if (!I18n.exists("siftec.milestone." + m.id() + ".desc")) text.add(m.id());
+        for (Milestone m : all) if (!net.minecraft.locale.Language.getInstance().has("siftec.milestone." + m.id() + ".desc")) text.add(m.id());
         if (text.isEmpty()) passed++;
         else failed++;
         report((text.isEmpty() ? "PASS " : "FAIL ") + "milestone text for " + all.size() + " milestones and phases" + (text.isEmpty() ? "" : ", missing " + text));
