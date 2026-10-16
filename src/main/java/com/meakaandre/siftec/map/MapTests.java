@@ -84,9 +84,9 @@ public final class MapTests {
                         .executes(context -> control(context, "open", "", FloatArgumentType.getFloat(context, "zoom")))))
                     .then(Commands.literal("close").executes(context -> control(context, "close", "", 0)))
                     .then(Commands.literal("edit").executes(context -> control(context, "edit", "", 0)))
-                    .then(Commands.literal("hide").then(Commands.argument("filter", StringArgumentType.string())
+                    .then(Commands.literal("hide").then(Commands.argument("filter", StringArgumentType.greedyString())
                         .executes(context -> control(context, "hide", StringArgumentType.getString(context, "filter"), 0))))
-                    .then(Commands.literal("show").then(Commands.argument("filter", StringArgumentType.string())
+                    .then(Commands.literal("show").then(Commands.argument("filter", StringArgumentType.greedyString())
                         .executes(context -> control(context, "show", StringArgumentType.getString(context, "filter"), 0))))))));
     }
 

@@ -42,7 +42,7 @@ public final class MapPalette {
 
     /** Ground: the biome's colour with a little of the top block's map colour, softened. */
     public static int ground(int biomeColour, int blockColour) {
-        int c = blockColour == 0 ? biomeColour : mix(biomeColour, blockColour, 0.35f);
+        int c = blockColour == 0 ? biomeColour : mix(biomeColour, blockColour, 0.25f);
         return soften(c);
     }
 
