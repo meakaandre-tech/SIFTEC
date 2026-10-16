@@ -426,8 +426,8 @@ public class VehicleEntity extends Entity {
         resetFallDistance();
         if (to == level) {
             setPos(spot.x, spot.y + 0.1, spot.z);
-        } else if (teleport(new net.minecraft.world.entity.TeleportTransition(to, new Vec3(spot.x, spot.y + 0.1, spot.z), Vec3.ZERO, getYRot(), getXRot(),
-            net.minecraft.world.entity.TeleportTransition.DO_NOTHING)) == null) {
+        } else if (teleport(new net.minecraft.world.level.portal.TeleportTransition(to, new Vec3(spot.x, spot.y + 0.1, spot.z), Vec3.ZERO, getYRot(), getXRot(),
+            net.minecraft.world.level.portal.TeleportTransition.DO_NOTHING)) == null) {
             return false;
         }
         com.meakaandre.siftec.Siftec.LOGGER.info("SIFTEC: {} fell out of the world; put back at {} {}", kind.id, to.dimension().identifier(), BlockPos.containing(spot).toShortString());
