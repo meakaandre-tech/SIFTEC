@@ -136,6 +136,9 @@ public final class TravelersBackpackSelfTest {
         for (ItemStackHandler part : List.of(wrapper.getStorage(), wrapper.getTools())) {
             if (part != null) for (int i = 0; i < part.getSlots(); i++) part.setStackInSlot(i, ItemStack.EMPTY);
         }
+        // what an earlier crafting check left on the grid (the death crate takes that too)
+        net.minecraft.world.Container grid = TravelersBackpackCompat.grid(player);
+        if (grid != null) for (int i = 0; i < grid.getContainerSize(); i++) grid.setItem(i, ItemStack.EMPTY);
     }
 
     // ------------------------------------------------------------------------------------------------ worn and tiers
