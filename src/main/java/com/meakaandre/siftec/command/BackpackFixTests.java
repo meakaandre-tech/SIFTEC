@@ -139,7 +139,8 @@ public final class BackpackFixTests {
         passed = failed = 0;
         BuildingTests.platform(level, X - 8, Z - 8, X + 48, Z + 48, Y, 16);
         for (VehicleEntity v : level.getEntitiesOfClass(VehicleEntity.class, new AABB(X - 8, Y - 40, Z - 8, X + 48, Y + 40, Z + 48))) v.discard();
-        LATER.add(new Later(level.getGameTime() + 10, () -> checks(source, level)));
+        // long enough for the forced chunks' entities to load, so the Tractor can be found once it is put down
+        LATER.add(new Later(level.getGameTime() + 100, () -> checks(source, level)));
         report(source, "test site ready; the checks report in a moment");
         return 1;
     }
@@ -214,7 +215,7 @@ public final class BackpackFixTests {
         BuildGun.act(fake, company);
         List<VehicleEntity> made = level.getEntitiesOfClass(VehicleEntity.class, new AABB(p.anchor()).inflate(6));
         expect(source, "the Build Gun puts a vehicle down with the cost in the backpack, and takes it from there", !made.isEmpty() && items(bag) == 0,
-            made.size() + " vehicles, " + items(bag) + " items left in the backpack");
+            made.size() + " vehicles, " + items(bag) + " items left in the backpack, entity ticking " + level.isPositionEntityTicking(p.anchor()));
         for (VehicleEntity v : made) v.discard();
         BuildGun.select(fake, "", false, null);
     }
