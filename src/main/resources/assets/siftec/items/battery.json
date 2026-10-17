@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:item/battery"
+    "model": "siftec:item/battery",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 15253568
+      }
+    ]
   }
 }

@@ -20,5 +20,6 @@
       "id": "minecraft:water",
       "amount": 20250
     }
-  ]
+  ],
+  "processing_time": 24
 }

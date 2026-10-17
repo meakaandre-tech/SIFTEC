@@ -92,7 +92,11 @@ public class Company {
         }
         if (Math.abs(paidAt - now) < 1e-4) return;
         float ratio = now / paidAt;
-        for (Map<String, Integer> parts : paid.values()) parts.replaceAll((item, count) -> Math.round(count * ratio));
+        paid.forEach((id, parts) -> {
+            // a MAM node costs the same whatever the company's size: its parts are never scaled
+            Milestone m = com.meakaandre.siftec.hub.Milestones.get(id);
+            if (m == null || !m.isResearch()) parts.replaceAll((item, count) -> Math.round(count * ratio));
+        });
         paidAt = now;
     }
 
@@ -100,23 +104,32 @@ public class Company {
         return done.contains(id);
     }
 
-    /** Costs rise 50% for each member after the first; someone who left recently still counts. */
+    /**
+     * Milestone and Wormhole phase costs rise 50% for each member after the first; someone who left recently still
+     * counts. MAM nodes are not affected ({@link #cost(Milestone, Milestone.Cost)}).
+     */
     public float costMultiplier() {
         return 1f + 0.5f * Math.max(0, members.size() + recentLeavers() - 1);
     }
 
+    /** What a milestone or Wormhole phase cost line asks of the company at its size. */
     public int cost(Milestone.Cost cost) {
         syncPaid();
         return (int) Math.ceil(cost.count() * paidAt);
     }
 
+    /** What a cost line of this milestone, phase or MAM node asks of the company: a MAM node's never grows with the members. */
+    public int cost(Milestone m, Milestone.Cost cost) {
+        return m.isResearch() ? cost.count() : cost(cost);
+    }
+
     public int paid(Milestone m, Milestone.Cost cost) {
         Map<String, Integer> map = paid.get(m.id());
-        return map == null ? 0 : Math.min(cost(cost), map.getOrDefault(cost.key(), 0));
+        return map == null ? 0 : Math.min(cost(m, cost), map.getOrDefault(cost.key(), 0));
     }
 
     public int needed(Milestone m, Milestone.Cost cost) {
-        return cost(cost) - paid(m, cost);
+        return cost(m, cost) - paid(m, cost);
     }
 
     public void pay(Milestone m, Milestone.Cost cost, int amount) {

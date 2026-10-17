@@ -232,6 +232,12 @@ public final class BuildGunClient {
             spot = nudge && frozen != null && frozen.def() == def ? frozen : BuildGun.aim(player, def, turns, flip && !def.structure());
         }
         send(def, spot);
+        // a miner: the server snapped the spot sent onto the node near it (the client does not know the nodes), so the
+        // hologram shows where it will really go
+        BuildGunPayloads.View snap = verdict;
+        if (spot != null && snap != null && snap.snapped() && snap.from().equals(spot.anchor()) && spot.def().node()) {
+            spot = spot.moved(snap.min().getX() - spot.anchor().getX(), snap.min().getY() - spot.anchor().getY(), snap.min().getZ() - spot.anchor().getZ());
+        }
         Outliner outliner = Outliner.getInstance();
         if (dismantle) {
             outliner.remove(SHAPE);
@@ -264,7 +270,7 @@ public final class BuildGunClient {
             com.meakaandre.siftec.vehicle.VehicleKind vehicle = com.meakaandre.siftec.vehicle.Vehicles.kind(def);
             if (vehicle != null) {
                 // a vehicle: its footprint, and whether there is room for it (unlock, land and cost are the server's)
-                Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.check(mc.level, spot, null, player.getInventory(), player.hasInfiniteMaterials());
+                Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.check(mc.level, spot, null, null, player.hasInfiniteMaterials());
                 shape = com.meakaandre.siftec.vehicle.Vehicles.cells(spot, vehicle);
                 blocked = new ArrayList<>();
                 localOk = check.ok();
@@ -276,7 +282,8 @@ public final class BuildGunClient {
                 localOk = check.ok();
                 localMessage = check.ok() ? Component.translatable(def.hub() ? "siftec.build_gun.fits_hub" : "siftec.build_gun.fits_gateway") : check.message();
             } else {
-                Buildings.Check check = Buildings.check(mc.level, spot, null, player.getInventory(), player.hasInfiniteMaterials());
+                // the cost is the server's to check: it is paid from the backpack too, which the client does not see
+                Buildings.Check check = Buildings.check(mc.level, spot, null, null, player.hasInfiniteMaterials());
                 shape = cells(spot);
                 blocked = new ArrayList<>(check.blocked);
                 localOk = check.ok();
@@ -285,7 +292,9 @@ public final class BuildGunClient {
         }
         BuildGunPayloads.View v = verdict;
         boolean same = v != null && v.min().equals(spot.anchor());
-        boolean ok = localOk && (!same || v.ok());
+        // whether a miner stands over an ore node only the server knows: its verdict is the one that counts
+        boolean oreNode = def.node() && def.fluidNode().isEmpty();
+        boolean ok = oreNode ? same && v.ok() : localOk && (!same || v.ok());
         int color = ok ? GREEN : RED;
         if (rebuild || color != lastColor) {
             outliner.showCluster(SHAPE, shape).colored(color).disableLineNormals().lineWidth(1 / 16f).withFaceTexture(AllSpecialTextures.CHECKERED);
@@ -301,7 +310,7 @@ public final class BuildGunClient {
         }
         shown = spot;
         if (ticks % 10 == 0) {
-            Component status = localOk && same && !v.ok() ? v.message() : localMessage;
+            Component status = same && (oreNode || localOk && !v.ok()) ? v.message() : localMessage;
             player.sendOverlayMessage(Component.translatable(nudge ? "siftec.build_gun.overlay_nudge" : "siftec.build_gun.overlay", tab(), def.name(), status));
         }
     }

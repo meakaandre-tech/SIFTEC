@@ -296,6 +296,34 @@ def check(data=None):
             clashes += 1
         else:
             notes.append(f"alternate overlap: {', '.join(paths)} (only for a company that picked the alternate)")
+    # ---- the review's data fixes (the Java side is /siftec selftest datafix)
+    if data:
+        buildings = {b[0]: b[4] for b in content.BUILDINGS}
+        for a in data.get("alternates", []):
+            b = a.get("building")
+            if b not in buildings:
+                errors.append(f"alternate {a['id']}: runs in no SIFTEC building ({b})")
+            elif buildings[b] and buildings[b] not in a["requires"]:
+                errors.append(f"alternate {a['id']}: offered before its {b} is unlocked ({buildings[b]} is not in {a['requires']})")
+        for path, body in built.items():
+            if body["type"] in BASIN and "siftec:" + path not in data.get("machine_ticks", {}):
+                errors.append(f"time: Basin recipe {path} has no time")
+        for rid in ("create:pressing/iron_ingot", "create:pressing/copper_ingot"):
+            if rid not in data.get("removed_recipes", []):
+                errors.append(f"removed: {rid} is still in the pack")
+        if data.get("recipe_locks", {}).get("createdieselgenerators:mixing/biodiesel") != "fluid_packaging":
+            errors.append("locks: Diesel Generators' biodiesel is not locked behind Fluid Packaging")
+        waste = {k: v["count"] for k, v in data.get("generator_fuel", {}).get("nuclear", {}).items()}
+        if waste != {"siftec:uranium_fuel_rod": 50, "siftec:plutonium_fuel_rod": 10}:
+            errors.append(f"nuclear waste per rod: {waste}, not Satisfactory's 50 and 10")
+        tags = {t["tag"]: t["points"] for t in data.get("sink_tags", [])}
+        for sat, tag in (("Leaves", "minecraft:leaves"), ("Wood", "minecraft:logs"), ("Mycelia", "siftec:mycelia")):
+            if tags.get(tag) != content.SF.ITEMS[sat]["sink"]:
+                errors.append(f"sink: {tag} is worth {tags.get(tag)}, not Satisfactory's {sat} ({content.SF.ITEMS[sat]['sink']})")
+        protein = [k for k, v in locks.items() if k.startswith("siftec:compacting/constructor/") and k.endswith("_protein") and "biomass" not in k]
+        if len({locks[k] for k in protein}) != 4 or any("siftec:alien_protein" in m[6] for m in content.MILESTONES) \
+                or any("siftec:alien_protein" in n[7] for n in content.mam_nodes()):
+            errors.append("Alien Protein: not unlocked by each of the four creature nodes alone")
     summary = (f"checkers: reachability {reach}/{len(checked)} parts, {len(done & set(order))}/{len(order)} milestones, "
                f"{len(done & set(phases))}/{len(phases)} phases, {len(done & set(mam))}/{len(mam)} MAM nodes; "
                f"automatability {auto}/{len(must)}; conflicts {clashes}; first reached: {tiers}")

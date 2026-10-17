@@ -213,7 +213,7 @@ public class MamMenu extends ChestMenu {
         } else {
             for (Milestone.Cost cost : m.cost()) {
                 if (!cost.present()) continue;
-                int need = company.cost(cost), have = company.paid(m, cost);
+                int need = company.cost(m, cost), have = company.paid(m, cost);
                 lore.add(Component.translatable("siftec.hub.cost", cost.label(), have, need).withStyle(have >= need ? ChatFormatting.GREEN : ChatFormatting.WHITE));
             }
             lore.add(Component.translatable("siftec.mam.research", clock(m.seconds() * 20L)).withStyle(ChatFormatting.GRAY));
@@ -266,6 +266,8 @@ public class MamMenu extends ChestMenu {
         Milestone m = trees.get(tree).nodes().get(index);
         MinecraftServer server = player.level().getServer();
         if (company.has(m.id()) || company.research.equals(m.id())) return;
+        // the MAM opens only after Field Research (MamBlock); checked again here for a window opened some other way
+        if (!player.hasInfiniteMaterials() && !company.has(MamBlock.FIELD_RESEARCH)) return;
         Milestone blocker = Milestones.blocker(company, m);
         if (blocker != null) {
             player.sendOverlayMessage(Component.translatable("siftec.hub.needs", blocker.name()));

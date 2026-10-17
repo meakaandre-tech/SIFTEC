@@ -1,7 +1,9 @@
 package com.meakaandre.siftec.mixin.tb;
 
 import com.meakaandre.siftec.compat.TbEquipSlots;
+import com.meakaandre.siftec.compat.TravelersBackpackCompat;
 import com.tiviacz.travelersbackpack.inventory.menu.BackpackBaseMenu;
+import com.tiviacz.travelersbackpack.inventory.menu.slot.ResultSlotExt;
 import com.tiviacz.travelersbackpack.util.Reference;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * The window of the player's own worn backpack is their inventory, so it carries the armour and offhand slots too
  * ({@link TbEquipSlots}). They are added after the player's inventory slots and counted with the slots the mod keeps
- * when it rebuilds the upgrade slots. Shift-clicking moves armour between them and the rest of the window.
+ * when it rebuilds the upgrade slots. Shift-clicking moves armour between them and the rest of the window. A locked
+ * crafting result cannot be taken out of the crafting grid, by any click or by shift-craft.
  */
 @Pseudo
 @Mixin(targets = "com.tiviacz.travelersbackpack.inventory.menu.BackpackBaseMenu", remap = false)
@@ -39,6 +42,18 @@ public abstract class TbMenuMixin {
         if (self.getWrapper() == null || self.getWrapper().getScreenID() != Reference.WEARABLE_SCREEN_ID) return;
         for (Slot slot : TbEquipSlots.create(self.getPlayerInventory())) addSlot(slot);
         unmodifiableSlotCount = self.slots.size();
+    }
+
+    /**
+     * Shift-crafting out of the result slot (the mod's handleShiftCraft, which crafts again and again without asking the
+     * slot) makes nothing while its result is locked ({@link TravelersBackpackCompat#mayTakeResult}). The other clicks
+     * ask the slot's mayPickup (mixin/tb/TbResultSlotMixin).
+     */
+    @Inject(method = "quickMoveStack(Lnet/minecraft/world/entity/player/Player;I)Lnet/minecraft/world/item/ItemStack;", at = @At("HEAD"), cancellable = true)
+    private void siftec$lockedShiftCraft(Player player, int index, CallbackInfoReturnable<ItemStack> cir) {
+        BackpackBaseMenu self = (BackpackBaseMenu) (Object) this;
+        if (index < 0 || index >= self.slots.size() || !(self.slots.get(index) instanceof ResultSlotExt result)) return;
+        if (!TravelersBackpackCompat.mayTakeResult(player, self, result.getItem())) cir.setReturnValue(ItemStack.EMPTY);
     }
 
     @Inject(method = "quickMoveStack(Lnet/minecraft/world/entity/player/Player;I)Lnet/minecraft/world/item/ItemStack;", at = @At("HEAD"), cancellable = true)

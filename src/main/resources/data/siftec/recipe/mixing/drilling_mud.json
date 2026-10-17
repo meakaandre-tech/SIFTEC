@@ -16,5 +16,6 @@
       "id": "siftec:drilling_mud",
       "amount": 40500
     }
-  ]
+  ],
+  "processing_time": 120
 }

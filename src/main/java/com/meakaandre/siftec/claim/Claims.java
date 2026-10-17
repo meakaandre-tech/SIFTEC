@@ -171,7 +171,7 @@ public final class Claims {
         Claim target = at(level, to);
         if (target == null) return false;
         Claim here = at(level, from);
-        return here == null || !here.company.equals(target.company);
+        return here == null || !Companies.same(here.company, target.company);
     }
 
     /** True if the player may build and use things here: unclaimed land, their own claim, or creative mode. */
@@ -180,11 +180,11 @@ public final class Claims {
         Claim claim = at(level, pos);
         if (claim == null) return true;
         Company company = Companies.find(server);
-        if (company != null && claim.company.equals(company.id)) return true;
+        if (Companies.owns(company, claim.company)) return true;
         if (Companies.isFake(server)) {
             // a Deployer without a known owner may still work inside the claim it stands in
             Claim here = at(level, server.blockPosition());
-            return here != null && here.company.equals(claim.company);
+            return here != null && Companies.same(here.company, claim.company);
         }
         return server.hasInfiniteMaterials();
     }
@@ -208,7 +208,7 @@ public final class Claims {
         for (int cx = ((int) Math.floor(box.minX)) >> 4; cx <= ((int) Math.ceil(box.maxX) - 1) >> 4; cx++)
             for (int cz = ((int) Math.floor(box.minZ)) >> 4; cz <= ((int) Math.ceil(box.maxZ) - 1) >> 4; cz++) {
                 Claim claim = at(level, cx, cz);
-                if (claim != null && !claim.company.equals(company)) return claim;
+                if (claim != null && !Companies.same(claim.company, company)) return claim;
             }
         return null;
     }
@@ -227,7 +227,7 @@ public final class Claims {
         Claim claim = at(level, target);
         if (claim == null) return true;
         Company owner = Ownership.of(machine);
-        if (owner != null && owner.id.equals(claim.company)) return true;
+        if (Companies.owns(owner, claim.company)) return true;
         return !crosses(level, machine.getBlockPos(), target);
     }
 
@@ -306,14 +306,14 @@ public final class Claims {
 
     public static int chunksUsed(MinecraftServer server, Company company) {
         int n = 0;
-        for (Claim claim : Data.get(server).chunks().values()) if (claim.company.equals(company.id)) n++;
+        for (Claim claim : Data.get(server).chunks().values()) if (Companies.owns(company, claim.company)) n++;
         return n;
     }
 
     public static int markersUsed(MinecraftServer server, Company company) {
         Set<String> sources = new HashSet<>();
         for (Map.Entry<String, Claim> e : Data.get(server).chunks().entrySet()) {
-            if (e.getValue().marker && e.getValue().company.equals(company.id)) sources.add(e.getKey().split("\\|")[0] + e.getValue().source);
+            if (e.getValue().marker && Companies.owns(company, e.getValue().company)) sources.add(e.getKey().split("\\|")[0] + e.getValue().source);
         }
         return sources.size();
     }
@@ -327,7 +327,7 @@ public final class Claims {
         if (companyId.isEmpty()) return null;
         for (Map.Entry<String, Claim> e : Data.get(server).chunks().entrySet()) {
             Claim claim = e.getValue();
-            if (claim.marker || !claim.company.equals(companyId)) continue;
+            if (claim.marker || !Companies.same(claim.company, companyId)) continue;
             String key = e.getKey();
             int bar = key.lastIndexOf('|');
             if (bar <= 0) continue;
@@ -338,7 +338,7 @@ public final class Claims {
 
     /** True if the company already holds land through a HUB. */
     public static boolean hasClaimingHub(MinecraftServer server, Company company) {
-        for (Claim claim : Data.get(server).chunks().values()) if (!claim.marker && claim.company.equals(company.id)) return true;
+        for (Claim claim : Data.get(server).chunks().values()) if (!claim.marker && Companies.owns(company, claim.company)) return true;
         return false;
     }
 
@@ -353,7 +353,7 @@ public final class Claims {
         for (int dx = -chunks; dx <= chunks; dx++) {
             for (int dz = -chunks; dz <= chunks; dz++) {
                 Claim claim = at(level, cx + dx, cz + dz);
-                if (claim != null && (!hubsOnly || !claim.marker) && !claim.company.equals(company.id)) return true;
+                if (claim != null && (!hubsOnly || !claim.marker) && !Companies.same(claim.company, company.id)) return true;
             }
         }
         return false;

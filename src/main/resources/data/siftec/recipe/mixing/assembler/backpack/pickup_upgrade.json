@@ -36,5 +36,6 @@
     {
       "id": "travelersbackpack:pickup_upgrade"
     }
-  ]
+  ],
+  "processing_time": 240
 }

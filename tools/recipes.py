@@ -514,7 +514,70 @@ def build():
     kitchen()
     food()
     carried_over()
+    basin_times()
     return dict(OUT)
+
+
+def _sat_seconds(name):
+    """Satisfactory 1.0's time for one of its recipes, by name."""
+    return next(secs for key, n, building, alt, secs, ins, outs, unlock in content.sat_recipes() if n == name)
+
+
+def _sat_median(building):
+    """The middle time of a building's standard 1.0 recipes."""
+    times = sorted(secs for key, n, b, alt, secs, ins, outs, unlock in content.sat_recipes() if b == building and not alt)
+    return times[len(times) // 2]
+
+
+def basin_times():
+    """Every Basin recipe has a time a building keeps to (building/MachineTimes.java). The 1.0 recipes carry their own;
+    the rest take the time of the 1.0 recipe they stand in for, or their building's usual time:
+      Assembler recipes (backpack upgrades, Eye of Ender, Shulker Shell)  the Assembler's middle time (12 s)
+      Manufacturer Cores (equipment and vanilla items)                    the Manufacturer's middle time, on its line too
+      brass blend (Caterium)                                              Caterium Ingot (4 s)
+      gunpowder                                                           Black Powder (4 s)
+      acid leaching                                                       Leached Iron Ingot, per ingot made
+      sulfur from acid, gypsum                                            Sulfuric Acid, per Sulfur
+      Blank Circuit                                                       Circuit Board (8 s)
+      Ignimbrite, lava, magma, drilling mud, coolant                      the Refinery's middle time (6 s)
+      kitchen recipes and jams                                            the Cooking Pot's own time (10 s unless it says)"""
+    import json, os
+    assembler, manufacturer, refinery = _sat_median("Assembler"), _sat_median("Manufacturer"), _sat_median("Refinery")
+    leached = _sat_seconds("Alternate: Leached Iron ingot") / 10   # 5 Raw Iron and 1 m3 acid make 10 Iron Ingots
+    acid = _sat_seconds("Sulfuric Acid") / 5                       # 5 Sulfur a run
+    pot = {}
+    fd = os.path.join(os.path.dirname(__file__), "pack", "farmersdelight.json")
+    if os.path.exists(fd):
+        for key, body in json.load(open(fd)).items():
+            if body.get("type") == "farmersdelight:cooking":
+                pot["mixing/kitchen_" + key.split("/")[-1][:-5]] = body.get("cookingtime", 200) / TICKS
+    for path, body in OUT.items():
+        if body["type"] not in ("create:mixing", "create:compacting") or body.get("processing_time"):
+            continue
+        name = path.split("/")[-1]
+        if path.startswith("mixing/assembler/"):
+            secs = assembler
+        elif path.startswith("mixing/manufacturer/"):
+            secs = manufacturer
+        elif name.startswith("brass_blend_with_"):
+            secs = _sat_seconds("Caterium Ingot")
+        elif name.startswith("gunpowder_with_"):
+            secs = _sat_seconds("Black Powder")
+        elif name.startswith("acid_leached_"):
+            secs = leached * sum(r.get("count", 1) for r in body["results"] if not r["id"].startswith("siftec:"))
+        elif name in ("sulfur_from_acid", "gypsum_from_calcite"):
+            secs = acid
+        elif name == "blank_circuit":
+            secs = _sat_seconds("Circuit Board")
+        elif name.startswith("kitchen_") or name.endswith("_jam"):
+            secs = pot.get(path, 200 / TICKS)
+        else:
+            secs = refinery
+        body["processing_time"] = round(secs * TICKS)
+    # the Manufacturer's line for the same items goes at the same pace as their Cores
+    for entry in ASSEMBLY:
+        if not entry["ticks"]:
+            entry["ticks"] = round(manufacturer * TICKS)
 
 
 # Recipes from other mods that the pack takes out.
@@ -536,7 +599,30 @@ REMOVED = [
     # Create's dough replaces Farmer's Delight's
     "farmersdelight:wheat_dough_from_egg", "farmersdelight:wheat_dough_from_water", "farmersdelight:bread_from_smelting",
     "farmersdelight:bread_from_smoking",
+    # an ingot pressed flat would be Iron or Copper Sheet without the Constructor: only the Constructor makes them
+    "create:pressing/iron_ingot", "create:pressing/copper_ingot",
 ]
+
+
+def _foreign_locks():
+    """Other mods' recipes the pack locks by their own id (their result alone does not say what unlocks them): every
+    Create: Diesel Generators recipe that makes biodiesel (Satisfactory's Liquid Biofuel) needs Fluid Packaging.
+    Read from the recipes shipped in Diesel Generators (tools/pack/diesel.json)."""
+    import json, os
+    out = {}
+    path = os.path.join(os.path.dirname(__file__), "pack", "diesel.json")
+    if not os.path.exists(path):
+        return out
+    for key, body in sorted(json.load(open(path)).items()):
+        if not key.startswith("data/createdieselgenerators/recipe/"):
+            continue
+        made = [r.get("id") for r in body.get("fluid_results", []) + body.get("results", []) if isinstance(r, dict)]
+        if "createdieselgenerators:biodiesel" in made:
+            out["createdieselgenerators:" + key[len("data/createdieselgenerators/recipe/"):-len(".json")]] = "fluid_packaging"
+    return out
+
+
+FOREIGN_LOCKS = _foreign_locks()
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked. Equipment and the
 # buildings 1.0 has cost what they cost in 1.0 (content.EQUIPMENT_COSTS and content.BUILD_COSTS, under the 1.0 name);
 # the buildings have moved to the Build Gun in work packages 5 and 9 (the HUB is every player's to start with and costs its
@@ -560,6 +646,7 @@ WORKSHOP = [
     ("siftec:therapeutic_inhaler", _E["Therapeutic Inhaler"]),
     ("siftec:nutritional_inhaler", _E["Nutritional Inhaler"]),
     ("siftec:blueprint_designer", _B["Blueprint Designer Mk.1"]),
+    ("siftec:blueprint_designer_mk2", _B["Blueprint Designer Mk.2"]),
     ("siftec:blueprint_designer_mk3", _B["Blueprint Designer Mk.3"]),
     ("siftec:drone_port", _B["Drone Port"]),
     ("siftec:cardboard_drone", _B["Drone"]),

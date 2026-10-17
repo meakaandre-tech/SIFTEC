@@ -226,7 +226,7 @@ public class HubMenu extends AbstractContainerMenu {
         HubBlockEntity hub = hub();
         if (hub == null || !(hub.getBlockState().getBlock() instanceof HubBlock block) || block.gateway != gateway) return false;
         // the block must still be this company's, and the player still in it
-        if (!company.id.equals(hub.companyId) || !company.members.contains(player.getUUID().toString())) return false;
+        if (!com.meakaandre.siftec.company.Companies.owns(company, hub.companyId) || !company.members.contains(player.getUUID().toString())) return false;
         return CompanyData.get(player.level().getServer()).byId(company.id) == company;
     }
 }

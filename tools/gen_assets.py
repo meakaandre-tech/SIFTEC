@@ -181,7 +181,7 @@ lang.update({"item.siftec.gypsum": "Gypsum", "item.siftec.toxic_residue": "Toxic
 for name, tex, tint in (("gypsum", "minecraft:item/bone_meal", None), ("toxic_residue", "minecraft:item/slime_ball", 0x90C020)):
     write(f"{A}/models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
     item_def(name, f"siftec:item/{name}", tint)
-MACHINES = {"blueprint_designer": ("Blueprint Designer Mk.1", "minecraft:block/lapis_block"), "blueprint_designer_mk3": ("Blueprint Designer Mk.3", "minecraft:block/diamond_block"), "drone_port": ("Drone Port", "create:block/cardboard_block_side"), "main_portal": ("Main Portal", "minecraft:block/crying_obsidian"), "satellite_portal": ("Satellite Portal", "minecraft:block/obsidian"), "landing_pad": ("Landing Pad", "minecraft:block/hay_block_side"), "claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"),
+MACHINES = {"blueprint_designer": ("Blueprint Designer Mk.1", "minecraft:block/lapis_block"), "blueprint_designer_mk2": ("Blueprint Designer Mk.2", "minecraft:block/emerald_block"), "blueprint_designer_mk3": ("Blueprint Designer Mk.3", "minecraft:block/diamond_block"), "drone_port": ("Drone Port", "create:block/cardboard_block_side"), "main_portal": ("Main Portal", "minecraft:block/crying_obsidian"), "satellite_portal": ("Satellite Portal", "minecraft:block/obsidian"), "landing_pad": ("Landing Pad", "minecraft:block/hay_block_side"), "claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"),
             "resource_well_extractor": ("Resource Well Extractor", "create:block/railway_casing")}
 for b, (name, casing) in MACHINES.items():
     lang[f"block.siftec.{b}"] = name
@@ -327,7 +327,7 @@ write(f"{A}/blockstates/personal_storage.json", {"variants": {"": {"model": "min
 write(f"{A}/blockstates/hub_burner.json", {"variants": {f"facing={d}": ({"model": "siftec:block/hub_engine", "y": y} if y else {"model": "siftec:block/hub_engine"}) for d, y in ROT}})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "beds.json"), {"replace": False, "values": ["siftec:hub_bed"]})
 lang.update({
-    "siftec.prefab.hint": "Right-click to build the %s here. Sneak and right-click to turn it",
+    "siftec.prefab.hint": "Right-click to build the %s here. R rotates it",
     "siftec.prefab.blocked": "%s blocks are in the way (marked red)",
     "siftec.prefab.no_ground": "No ground under part of it: it can stand at most %s blocks above the ground",
     "siftec.prefab.unloaded": "Part of that area is not loaded: come closer",
@@ -335,15 +335,16 @@ lang.update({
     "siftec.prefab.entity": "Something is standing where it would go",
     "siftec.prefab.spawn": "Nothing can be built within %s blocks of spawn",
     "siftec.prefab.claimed": "That land belongs to %s",
-    "siftec.prefab.one_gateway": "Your company already has a Wormhole Gateway (at %s). Pick it up from its terminal to move it",
+    "siftec.prefab.one_gateway": "Your company already has a Wormhole Gateway (at %s). Take it down with the Build Gun to move it",
     "siftec.prefab.aim": "Aim at the ground, at most %s blocks away",
     "siftec.prefab.turned": "Turned %s degrees",
     "siftec.prefab.no_sleep": "The HUB's bunks cannot be slept in here",
     "siftec.prefab.placed": "%s built",
     "siftec.prefab.dismantle_confirm": "Sneak and use it again to pick up the whole %s. Its contents come with it and progress is kept",
     "siftec.prefab.hub_gun": "Take the HUB down with the Build Gun's dismantle mode (X): its 20 Raw Iron and contents come back",
+    "siftec.prefab.gateway_gun": "Take the Wormhole Gateway down with the Build Gun's dismantle mode (X): its parts and progress are kept",
     "siftec.prefab.dismantled": "%s picked up",
-    "siftec.prefab.part": "Part of the %s: sneak and use its terminal twice to pick up the whole structure",
+    "siftec.prefab.part": "Part of the %s: take it down with the Build Gun's dismantle mode (X)",
     "siftec.claim.hub_too_close": "Too close to another company's land: a claiming HUB must be more than %s chunks from another company's HUB",
     "siftec.claim.hub_extra": "HUB placed. Your company's first HUB already holds its land, so this one claims nothing",
     "siftec.prefab.cost": "Building the HUB takes %s %s from your inventory",
@@ -716,6 +717,11 @@ for path, mid in recipes.LOCKED.items():
     if mid not in by_id:
         raise SystemExit(f"recipes.LOCKED: no milestone {mid} for {path}")
     data["recipe_locks"]["siftec:" + path] = mid
+# other mods' recipes locked by their own id (Diesel Generators' biodiesel)
+for rid, mid in recipes.FOREIGN_LOCKS.items():
+    if mid not in by_id:
+        raise SystemExit(f"recipes.FOREIGN_LOCKS: no milestone {mid} for {rid}")
+    data["recipe_locks"][rid] = mid
 # Farmer's Delight recipes moved onto Create machines need the Automated Kitchen research
 kitchen_node = next(m["id"] for m in data["milestones_mam"] if "food:kitchen" in m["tokens"])
 for path in recipes.KITCHEN:
@@ -736,7 +742,7 @@ built = recipes.build()
 # the pack's own recipes makes from that recipe's inputs, machine and lock.
 SOURCES = {"createdieselgenerators:crude_oil": ["siftec:building/oil_extractor"],
            "createdieselgenerators:diesel": ["createdieselgenerators:distillation_controller", "createdieselgenerators:crude_oil"],
-           "createdieselgenerators:biodiesel": ["siftec:solid_biofuel", "siftec:recipe/mixing/liquid_biofuel"],
+           "createdieselgenerators:biodiesel": ["siftec:solid_biofuel", "siftec:recipe/mixing/refinery/liquid_biofuel"],
            "siftec:nitrogen": ["siftec:building/resource_well_extractor"], "siftec:sam": ["siftec:building/portable_miner"], "siftec:raw_bauxite": ["siftec:building/portable_miner"],
            "#c:ingots/steel": ["cgs:steel_ingot"]}
 for ore in ("iron", "copper", "zinc", "gold"):
@@ -753,11 +759,25 @@ def ids_in(node, found):
         for v in node: ids_in(v, found)
 
 
-def inputs_of(body):
-    """Everything a recipe needs: its ingredients and fluids, its machines, heat, and its own lock."""
+BUILDING_IDS = {b[0] for b in content.BUILDINGS}
+
+
+def building_of(path):
+    """The SIFTEC building that runs a recipe, from its path (mixing/refinery/fuel: the Refinery), or None."""
+    parts = path.split("/")
+    return parts[1] if len(parts) > 2 and parts[1] in BUILDING_IDS else None
+
+
+def inputs_of(body, path=""):
+    """Everything a recipe needs: its ingredients and fluids, its machines, heat, and its own lock. A recipe a SIFTEC
+    building runs needs that building (which holds its machines, heat and all) in place of the loose Create machines."""
     used = set()
     for k, v in body.items():
         if k not in ("type", "results", "result", "fluid_results", "fabric:load_conditions", "transitional_item"): ids_in(v, used)
+    building = building_of(path)
+    if building:
+        used.add("siftec:building/" + building)
+        return used
     used.update(MACHINE_OF[body["type"]])
     if body.get("heat_requirement"): used.add(C + "blaze_burner")
     return used
@@ -769,7 +789,7 @@ for path, body in built.items():
     made = [r if isinstance(r, str) else r.get("id", "") for r in list(body.get("results", [])) + list(body.get("fluid_results", [])) + ([body["result"]] if "result" in body else [])]
     for o in made:
         if o and o not in lock_of and o not in SOURCES and not o.startswith("minecraft:"):
-            SOURCES[o] = sorted(inputs_of(body)) + ["siftec:recipe/" + path]
+            SOURCES[o] = sorted(inputs_of(body, path)) + ["siftec:recipe/" + path]
 for path, mid in data["recipe_locks"].items():
     lock_of["siftec:recipe/" + path.split(":", 1)[1]] = mid
 # the Build Gun's buildings count as what unlocks them (a node's resource needs a miner on the node)
@@ -794,11 +814,16 @@ def needs_of(things, seen=None):
 
 data["alternates"] = []
 for aid, info in recipes.ALTS.items():
-    used = set()
+    used, where = set(), set()
     for path in info["paths"]:
-        used |= inputs_of(built[path])
+        if not building_of(path):
+            raise SystemExit(f"alternate {aid}: {path} names no SIFTEC building to run it")
+        where.add(building_of(path))
+        used |= inputs_of(built[path], path)
         data["recipe_locks"]["siftec:" + path] = "alt_" + aid
-    data["alternates"].append({"id": "alt_" + aid, "requires": needs_of(used)})
+    # a Hard Drive only offers an alternate once its company has the building that runs it (and everything it uses)
+    (building,) = where
+    data["alternates"].append({"id": "alt_" + aid, "building": building, "requires": needs_of(used)})
     lang[f"siftec.alt.alt_{aid}"] = info["name"]
     lang[f"siftec.alt.alt_{aid}.text"] = info["text"]
 for machine, (pname, recipe_list) in content.PROCESSORS.items():
@@ -806,7 +831,7 @@ for machine, (pname, recipe_list) in content.PROCESSORS.items():
         if not p["alt"]: continue
         used = {_item_id(n) for n, c in p["in"]} | {"siftec:building/" + machine}
         if p["fluid_in"]: used.add(recipes.FLUID_IDS[p["fluid_in"][0]])
-        data["alternates"].append({"id": "alt_" + p["alt"], "requires": needs_of(used)})
+        data["alternates"].append({"id": "alt_" + p["alt"], "building": machine, "requires": needs_of(used)})
         lang[f"siftec.alt.alt_{p['alt']}"] = p["name"]
         made_text = ", ".join(x for x in (f"{p['out'][1]} {p['out'][0]}" if p["out"] else "", f"{p['also'][1]} {p['also'][0]}" if p.get("also") else "",
                                            f"{p['fluid_out'][1]} mB {p['fluid_out'][0]}" if p["fluid_out"] else "") if x)
@@ -929,7 +954,9 @@ WRITTEN.add(os.path.normpath(_plate))
 # time per item for the vanilla smelting its fan runs
 data["machine_ticks"] = {}
 for path, body in sorted(built.items()):
-    if path in recipes.SATISFACTORY and body["type"] in ("create:compacting", "create:mixing") and "processing_time" in body:
+    if body["type"] in ("create:compacting", "create:mixing"):
+        if not body.get("processing_time"):
+            raise SystemExit(f"{path}: a Basin recipe with no time (recipes.basin_times)")
         data["machine_ticks"]["siftec:" + path] = body["processing_time"]
 data["smelter_ticks"] = {}
 for key, name, building, alt, secs, ins, outs, unlock in content.sat_recipes():
@@ -997,6 +1024,7 @@ lang.update({
     "siftec.building.status": "%s: %s",
     "siftec.building.made": "%s made",
     "siftec.building.su": "draws %s SU",
+    "siftec.building.idle": "idle, drawing next to nothing (%s SU while it works)",
     "siftec.building.filter": "makes %s",
     "siftec.building.no_filter": "right-click it with an item to pick what it makes",
     "siftec.building.filter_set": "The %s makes %s now",
@@ -1017,6 +1045,7 @@ lang.update({
     "siftec.build_gun.no_node": "The %s has to stand over a node of its kind",
     "siftec.build_gun.clump": "Mine the node's clump away first: %s blocks left",
     "siftec.building.no_well": "no running Resource Well Pressurizer of your company within 32 blocks",
+    "siftec.building.well_full": "every Resource Well Pressurizer of your company within 32 blocks already has its 8 Extractors",
     "siftec.building.extracting": "%s m3 of %s a minute",
     "siftec.building.extracted": "%s mB out so far",
     "siftec.building.pressurized": "pressurizing a %s well",
@@ -1161,7 +1190,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # machines drop themselves
-for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "claim_marker", "resource_well_extractor", "dimensional_depot", "speed_governor"):
+for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk2", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "claim_marker", "resource_well_extractor", "dimensional_depot", "speed_governor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -1169,7 +1198,7 @@ for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk3", "drone
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:converter", "siftec:particle_accelerator", "siftec:hub", "siftec:wormhole_gateway"]
+      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk2", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:converter", "siftec:particle_accelerator", "siftec:hub", "siftec:wormhole_gateway"]
       + sorted(f"siftec:{b}" for b in SIFTEC_ORES) + [f"siftec:{d[0]}" for d in content.DECOR]})
 # SIFTEC's ores take a stone pickaxe or better, like iron ore
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "needs_stone_tool.json"), {"replace": False, "values": sorted(f"siftec:{b}" for b in SIFTEC_ORES)})

@@ -77,5 +77,6 @@
     {
       "id": "siftec:object_scanner_core"
     }
-  ]
+  ],
+  "processing_time": 960
 }

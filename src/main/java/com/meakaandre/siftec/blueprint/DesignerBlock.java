@@ -29,7 +29,7 @@ import org.jspecify.annotations.Nullable;
  * empty-handed to clear the volume.
  */
 public class DesignerBlock extends Block implements EntityBlock {
-    /** Blocks from the centre column to each side: 4 makes a 9-block cube, 8 a 17-block cube. */
+    /** Blocks from the centre column to each side: 4 makes a 9-block cube (Mk.1), 6 a 13-block cube (Mk.2), 8 a 17-block cube (Mk.3). */
     public final int reach;
 
     public DesignerBlock(int reach, Properties properties) {

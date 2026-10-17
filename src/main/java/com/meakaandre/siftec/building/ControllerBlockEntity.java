@@ -43,6 +43,12 @@ public class ControllerBlockEntity extends BlockEntity {
     public @Nullable BlockPos node;
     /** The game time before which the machines may not start their next recipe (Satisfactory's time per recipe). */
     public long nextCraft;
+    /**
+     * The Manufacturer's and the Quantum Encoder's assembly line: the game time before which the next item may not go onto
+     * it. The Mixer making the Core keeps its own time ({@link #nextCraft}), so the two run side by side, each at
+     * Satisfactory's rate.
+     */
+    public long lineNext;
     /** How many recipes the building has started (or how many times a miner has broken its node), for the status line and the selftests. */
     public long made;
     /** The Portable Miner's ticks into breaking its node. */
@@ -87,8 +93,12 @@ public class ControllerBlockEntity extends BlockEntity {
     public boolean running, erupting;
     /** Ticks an Alien Power Augmenter is still fed by its last Alien Power Matrix. */
     public int fedTicks;
-    /** A consumer had power on its last tick. */
+    /** A consumer had power on its last tick (while idle, its standby draw). */
     public boolean powered;
+    /** A consumer has nothing to work on, so it draws only its standby power ({@link BuildingLogic#working}). Worked out each tick. */
+    public boolean idle;
+    /** The game time {@link #idle} was last worked out at, and until when the building counts as working after its last work. */
+    long idleAt = Long.MIN_VALUE, awakeUntil;
     /** SU a generator gave on its last tick (a Power Storage: SU-ticks it took, negative when it gave). */
     public double lastGenerated;
     /** Its grid as last balanced, and its part in it. */
@@ -127,7 +137,8 @@ public class ControllerBlockEntity extends BlockEntity {
 
     /**
      * What the ports see when they point at the controller: its input slot takes what the building accepts, its
-     * output slot gives what it has made.
+     * output slot gives what it has made. Only the building's ports reach it ({@link PortBlockEntity#items}); the
+     * controller has no item storage on any of its sides, as a Satisfactory machine is fed only at its ports.
      */
     public Storage<ItemVariant> storage() {
         if (storage == null) {
@@ -194,6 +205,7 @@ public class ControllerBlockEntity extends BlockEntity {
         view.store("Filter", ItemStack.OPTIONAL_CODEC, filter);
         if (node != null) view.store("Node", BlockPos.CODEC, node);
         view.putLong("NextCraft", nextCraft);
+        view.putLong("LineNext", lineNext);
         view.putLong("Made", made);
         view.putFloat("Progress", progress);
         view.putLong("Mined", mined);
@@ -227,6 +239,7 @@ public class ControllerBlockEntity extends BlockEntity {
         filter = view.read("Filter", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         node = view.read("Node", BlockPos.CODEC).orElse(null);
         nextCraft = view.getLongOr("NextCraft", 0L);
+        lineNext = view.getLongOr("LineNext", 0L);
         made = view.getLongOr("Made", 0L);
         progress = view.getFloatOr("Progress", 0f);
         mined = view.getLongOr("Mined", 0L);

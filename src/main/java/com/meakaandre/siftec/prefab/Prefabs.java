@@ -275,7 +275,7 @@ public final class Prefabs {
                 return;
             }
             Claims.Claim claim = Claims.at(level, cx, cz);
-            if (claim != null && !claim.company.equals(company.id) && !creative) {
+            if (claim != null && !Companies.same(claim.company, company.id) && !creative) {
                 Company owner = CompanyData.get(level.getServer()).byId(claim.company);
                 check.fail("siftec.prefab.claimed", owner == null ? "?" : owner.name);
                 return;
@@ -346,19 +346,9 @@ public final class Prefabs {
             check.fail("siftec.prefab.cost", missing.count(), missing.icon().getHoverName());
             return check;
         }
-        List<ItemStack> paid = new ArrayList<>();
-        for (Milestone.Cost c : cost) {
-            if (!c.present()) continue;
-            int left = c.count();
-            for (int i = 0; i < player.getInventory().getContainerSize() && left > 0; i++) {
-                ItemStack stack = player.getInventory().getItem(i);
-                if (!c.matches(stack)) continue;
-                int n = Math.min(left, stack.getCount());
-                paid.add(stack.split(n));
-                left -= n;
-            }
-        }
-        if (!paid.isEmpty()) player.getInventory().setChanged();
+        // paid from the inventory and the backpack alike
+        List<ItemStack> paid = player == null ? new ArrayList<>()
+            : new ArrayList<>(com.meakaandre.siftec.building.Buildings.take(com.meakaandre.siftec.backpack.Carried.of(player), cost));
         Template t = spot.kind.template();
         int target = levelOf(spot.kind, company, level.getServer());
         // inside space is cleared once, at the start; legs go down to the ground
@@ -497,15 +487,14 @@ public final class Prefabs {
         return out;
     }
 
-    /** A cost the player does not carry enough of (null if they carry it all), as the HUB's 20 Raw Iron is checked. */
+    /**
+     * A cost the player does not carry enough of (null if they carry it all), as the HUB's 20 Raw Iron is checked. The
+     * backpack counts as carried.
+     */
     public static Milestone.@Nullable Cost missing(ServerPlayer player, List<Milestone.Cost> cost) {
         for (Milestone.Cost c : cost) {
             if (!c.present()) continue;
-            int have = 0;
-            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                if (c.matches(player.getInventory().getItem(i))) have += player.getInventory().getItem(i).getCount();
-            }
-            if (have < c.count()) return c;
+            if (c.carried(player.getInventory()) < c.count()) return c;
         }
         return null;
     }

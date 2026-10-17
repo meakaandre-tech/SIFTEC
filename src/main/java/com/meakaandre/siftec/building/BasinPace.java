@@ -11,7 +11,8 @@ import org.jspecify.annotations.Nullable;
  * Keeps a building's Press or Mixer to Satisfactory's time per recipe. Create runs a Basin recipe as fast as the
  * machine turns; inside a building each start waits until the last recipe's Satisfactory time is up, so a
  * Constructor making Iron Plate starts one every 6 seconds whatever its speed. Machines outside a building, the
- * HUB's hand-cranked Craft Station included, run as Create has them.
+ * HUB's hand-cranked Craft Station included, run as Create has them. In the Manufacturer and the Quantum Encoder this
+ * paces only the Mixer making the Core; their line keeps its own time ({@link ControllerBlockEntity#lineNext}).
  */
 public final class BasinPace {
     private BasinPace() {
@@ -36,7 +37,9 @@ public final class BasinPace {
         Recipe<?> recipe = ((BasinOperatorAccessor) machine).siftec$recipe();
         int ticks = recipe == null ? 0 : MachineTimes.ticks(level.getServer(), recipe);
         c.nextCraft = level.getGameTime() + ticks;
-        c.made++;
+        // the Manufacturer's and the Quantum Encoder's Mixer only makes the Core: the building counts what leaves its line
+        BuildingDef def = c.def();
+        if (def == null || !def.logic().equals("assembly")) c.made++;
         c.setChanged();
     }
 }

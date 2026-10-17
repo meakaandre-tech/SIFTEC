@@ -16,7 +16,6 @@ import net.minecraft.util.Prediction;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -134,12 +133,12 @@ public final class Equipment {
         return player.getItemBySlot(slot).is(item);
     }
 
-    /** Takes one of the item out of the player's inventory. */
+    /** Takes one of the item out of what the player carries: the inventory, then the backpack. */
     private static boolean take(ServerPlayer player, Item item) {
-        Inventory inventory = player.getInventory();
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            if (inventory.getItem(i).is(item)) {
-                inventory.removeItem(i, 1);
+        com.meakaandre.siftec.backpack.Carried carried = com.meakaandre.siftec.backpack.Carried.of(player);
+        for (int i = 0; i < carried.getContainerSize(); i++) {
+            if (carried.getItem(i).is(item)) {
+                carried.removeItem(i, 1);
                 return true;
             }
         }
@@ -165,7 +164,8 @@ public final class Equipment {
 
     // ---- jetpack
 
-    private static boolean refuel(ServerPlayer player) {
+    /** Starts a new fill of the jetpack from the first fuel carried (inventory or backpack). False when there is none. */
+    public static boolean refuel(ServerPlayer player) {
         if (player.hasInfiniteMaterials()) {
             player.setAttached(JET_TICKS, 1200);
             return true;

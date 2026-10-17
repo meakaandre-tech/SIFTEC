@@ -44,8 +44,10 @@ public class ModBlockEntities {
     public static final Entry<com.meakaandre.siftec.prefab.HubBurnerBlockEntity> HUB_BURNER = register("hub_burner", com.meakaandre.siftec.prefab.HubBurnerBlockEntity::new, ModBlocks.HUB_BURNER.get());
     /** The HUB's Personal Storage Box. */
     public static final Entry<com.meakaandre.siftec.prefab.StorageBoxBlockEntity> STORAGE_BOX = register("personal_storage", com.meakaandre.siftec.prefab.StorageBoxBlockEntity::new, ModBlocks.PERSONAL_STORAGE.get());
+    /** The MAM: which company it belongs to. */
+    public static final Entry<com.meakaandre.siftec.mam.MamBlockEntity> MAM = register("mam", com.meakaandre.siftec.mam.MamBlockEntity::new, ModBlocks.MAM.get());
     public static final Entry<com.meakaandre.siftec.drone.DronePortBlockEntity> DRONE_PORT = register("drone_port", com.meakaandre.siftec.drone.DronePortBlockEntity::new, ModBlocks.DRONE_PORT.get());
-    public static final Entry<com.meakaandre.siftec.blueprint.DesignerBlockEntity> DESIGNER = register("blueprint_designer", com.meakaandre.siftec.blueprint.DesignerBlockEntity::new, ModBlocks.BLUEPRINT_DESIGNER.get(), ModBlocks.BLUEPRINT_DESIGNER_MK3.get());
+    public static final Entry<com.meakaandre.siftec.blueprint.DesignerBlockEntity> DESIGNER = register("blueprint_designer", com.meakaandre.siftec.blueprint.DesignerBlockEntity::new, ModBlocks.BLUEPRINT_DESIGNER.get(), ModBlocks.BLUEPRINT_DESIGNER_MK2.get(), ModBlocks.BLUEPRINT_DESIGNER_MK3.get());
 
 
     public static final Entry<ProcessorBlockEntity> PROCESSOR = register("processor", ProcessorBlockEntity::new, ModBlocks.CONVERTER.get(), ModBlocks.PARTICLE_ACCELERATOR.get());
@@ -73,8 +75,7 @@ public class ModBlockEntities {
         ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());
         // a building's ports pass items and fluids to and from the machines inside
         ItemStorage.SIDED.registerForBlockEntity((port, side) -> port.items(side), BUILDING_PORT.get());
-        // what a building's ports reach when they point at its controller (a miner's ore, the Smelter's ore and ingots)
-        ItemStorage.SIDED.registerForBlockEntity((controller, side) -> controller.storage(), BUILDING_CONTROLLER.get());
+        // a building's controller has no storage of its own on any side: only its ports reach it (PortBlockEntity.items)
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((port, side) -> port.fluids(side), BUILDING_PORT.get());
     }
 }

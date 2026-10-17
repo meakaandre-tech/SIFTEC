@@ -22,6 +22,9 @@
     "create_new_age": "*"
   },
   "recommends": {
-    "travelersbackpack": ">=11.4.1"
+    "travelersbackpack": ">=11.4.1 <11.5-"
+  },
+  "breaks": {
+    "travelersbackpack": ["<11.4.1", ">=11.5-"]
   }
 }

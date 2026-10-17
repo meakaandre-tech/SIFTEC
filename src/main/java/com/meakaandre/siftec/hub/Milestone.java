@@ -63,8 +63,12 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
             return Component.translatableWithFallback("siftec.tag." + path.replace('/', '.'), "any " + path.substring(path.lastIndexOf('/') + 1).replace('_', ' '));
         }
 
-        /** Where a player's parts are: the inventory and, on the server, the backpack they wear. */
-        private static java.util.List<net.minecraft.world.Container> containers(Inventory inventory) {
+        /**
+         * Where a player's parts are: the inventory and, on the server, the backpack they wear. Everything that is paid
+         * for from what the player carries pays from these (milestones, the Workshop, the Build Gun, vehicles,
+         * blueprints, jetpack fuel and filters; see {@link com.meakaandre.siftec.backpack.Carried}).
+         */
+        public static java.util.List<net.minecraft.world.Container> containers(Inventory inventory) {
             if (!(inventory.player instanceof net.minecraft.server.level.ServerPlayer server)) return java.util.List.of(inventory);
             java.util.List<net.minecraft.world.Container> out = new java.util.ArrayList<>();
             out.add(inventory);

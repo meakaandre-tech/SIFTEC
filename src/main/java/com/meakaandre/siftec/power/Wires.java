@@ -137,6 +137,7 @@ public final class Wires {
         }
         if (!drops.isEmpty()) Containers.dropContents(level, connector.getBlockPos(), NonNullList.of(ItemStack.EMPTY, drops.toArray(new ItemStack[0])));
         WireMap.get(server).remove(server, connector.getBlockPos());
+        PowerMemory.get(server).forget(server, connector.getBlockPos());
         PowerGrids.dirty();
     }
 }

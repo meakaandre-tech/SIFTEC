@@ -19,13 +19,16 @@ import java.util.Random;
 /**
  * Alternate recipes, the reward for Hard Drives. A researched drive offers two the company does not have
  * yet; picking one unlocks that recipe in the company's machines. An alternate is only offered once the
- * company has unlocked its machine and everything it uses.
+ * company has unlocked the SIFTEC building that runs it (the Constructor, the Refinery...) and everything it uses, so a
+ * drive only offers alternates of the tiers whose buildings the company has.
  */
 public final class Alternates {
     /** The research id a Hard Drive runs under, and how long it takes. */
     public static final String RESEARCH = "hard_drive";
     public static final int SECONDS = 600;
     private static final Map<String, List<String>> REQUIRES = new LinkedHashMap<>();
+    /** The building that runs each alternate (siftec_content.json "alternates", "building"). */
+    private static final Map<String, String> BUILDING = new LinkedHashMap<>();
 
     private Alternates() {
     }
@@ -37,6 +40,7 @@ public final class Alternates {
                 List<String> needs = new ArrayList<>();
                 for (JsonElement n : o.getAsJsonArray("requires")) needs.add(n.getAsString());
                 REQUIRES.put(o.get("id").getAsString(), needs);
+                if (o.has("building")) BUILDING.put(o.get("id").getAsString(), o.get("building").getAsString());
             }
         }
         return REQUIRES;
@@ -60,12 +64,24 @@ public final class Alternates {
         return Component.translatable("siftec.alt." + id + ".text");
     }
 
+    /** The id of the building that runs this alternate, or "" if none is listed. */
+    public static String building(String id) {
+        all();
+        return BUILDING.getOrDefault(id, "");
+    }
+
+    /** True once the company may build the building this alternate runs in. */
+    public static boolean buildingUnlocked(Company company, String id) {
+        com.meakaandre.siftec.building.BuildingDef def = com.meakaandre.siftec.building.Buildings.def(building(id));
+        return def == null || !com.meakaandre.siftec.building.Buildings.locked(def, company);
+    }
+
     /** The alternates this company could be offered right now. */
     public static List<String> eligible(Company company) {
         List<String> out = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : all().entrySet()) {
             if (company.has(entry.getKey())) continue;
-            boolean ready = true;
+            boolean ready = buildingUnlocked(company, entry.getKey());
             for (String need : entry.getValue()) ready &= company.has(need);
             if (ready) out.add(entry.getKey());
         }

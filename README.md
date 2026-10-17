@@ -38,11 +38,11 @@ and a Mixer over Basins) and two Biomass Burners.
 Everything a player unlocks belongs to their company: milestones, Wormhole phases, MAM research, which Build Gun
 buildings can be placed (`Buildings.locked`) and how fast self-moving belts run. The company's first HUB claims the 5×5
 chunks around it and each Claim Marker the 3×3 around it; inside a claim only members can build, break or use
-anything. The Build Gun checks the land under a building's whole box before placing it, so nothing is built on or
+anything, and dispensers, open-ended pipes and contraptions putting their blocks back do nothing across its border. When a company folds into another (its last member joins it), everything stamped with the old company's id answers to the new one, and its Gateway, points and coupons printed come along. The Build Gun checks the land under a building's whole box before placing it, so nothing is built on or
 across another company's claim. A company's building is dismantled only by its own members, wherever it stands; one
 nobody owns comes down only for players the land lets build there. Creative players skip claims, unlocks and costs.
 Only the Build Gun takes a building down: no hand, wrench, Deployer (but the building's own), drill, piston, contraption,
-explosion, Wither or Blueprint Designer's sneak-clear takes one of its blocks. A block lost anyway (a command, another mod)
+explosion, Wither or Blueprint Designer's sneak-clear takes one of its blocks. The same holds for the HUB and the Wormhole Gateway. A block lost anyway (a command, another mod)
 brings the building down with its refund and contents, but gives nothing back for itself. Dismantled, a building's tanks
 come back as packaged fluid (1 m3 a package; other fluids as full buckets).
 
@@ -91,7 +91,7 @@ The Explorer is the fastest.
 The Truck Station is a building with two Item Vaults and a fuel tank; using its terminal switches it between loading
 vehicles and unloading them. Press V while driving to record a route, drive it once through the docks (the ground in
 front of each station) you want it to stop at, and press V again. With nobody in the seat it then drives the route by
-itself in a loop, stopping five seconds at each dock while the station loads or unloads it and fills its tank. A vehicle
+itself in a loop, stopping five seconds at each dock while the station loads or unloads it and fills its tank. A station serves only its own company's vehicles, and only its company switches it. A vehicle
 that falls out of the bottom of the world comes back to the dock of the Truck Station it last stopped at (else beside
 its company's HUB), cargo and all. Its storage window stays open only near it and only for its company's members.
 
@@ -106,7 +106,7 @@ terminal and two power hookups, then the ring's cradle and supports, the bottom 
 second third, the closed ring with energy conduits, and with Phase 5 a lit ring and a swirling portal: walking in
 takes the company's players to The Sift, and the game goes on as free play.
 
-The MAM (Field Research) is fed by hand and every node takes 3 seconds. Seven trees, each shown once one of its
+The MAM (Field Research) belongs to the company that placed it and only its members use it, once their company has done Field Research. It is fed by hand and every node takes 3 seconds; a node costs the same whatever the company's size (the 50% per member applies to milestones and Wormhole phases only). Seven trees, each shown once one of its
 starting items is brought in: Alien Megafauna (mob drops), Caterium (crushed zinc: brass), Mycelia, Nutrients (wild
 food), Quartz, Sulfur and Alien Technology, plus the Hard Drives. A node may need nodes in other trees, or any one of
 several. Vanilla items come from research and machines, with no End trip or ancient debris: the Eye of Ender and the
@@ -169,7 +169,9 @@ Upgrade turns it into 3x3. The upgrades are unlocked by MAM research (Crafting a
 hose at Copper Backtank, Pickup at Quickwire, Lantern at Silica, Magnet at Crystal Oscillator, Jukebox at Display
 Systems, Feeding at Preserved Foods, Smoker at Automated Cooking, Furnace and Blast Furnace at Ignimbrite, Void and Refill
 at Pocket Storage), built at the Equipment Workshop from the pack's parts (the Assembler makes them too), and a locked
-one does not fit an upgrade slot. Milestone payments, the Workshop and radiation see what the backpack holds.
+one does not fit an upgrade slot. Milestone payments, the Workshop, the Build Gun (buildings, vehicles, the HUB), blueprints,
+jetpack fuel, filters and radiation see what the backpack holds. Its crafting grid keeps to the recipe locks, shift-craft
+included, and its window has the inventory's Cloud button.
 
 Dying leaves a Death Crate where it happened (`death/`), as in Satisfactory: everything carried goes into it, the hotbar,
 inventory, armour, offhand and everything in the backpack, while the backpack and its upgrades stay on. Clicking it puts

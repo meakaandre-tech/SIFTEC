@@ -219,6 +219,6 @@ public final class Vehicles {
     static boolean foreign(Entity vehicle, String ownerId, ServerPlayer player) {
         if (player.hasInfiniteMaterials() || ownerId.isEmpty()) return false;
         Company company = com.meakaandre.siftec.company.Companies.of(player);
-        return !ownerId.equals(company.id);
+        return !com.meakaandre.siftec.company.Companies.owns(company, ownerId);
     }
 }

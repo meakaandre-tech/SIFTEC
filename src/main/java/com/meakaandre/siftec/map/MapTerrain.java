@@ -348,7 +348,7 @@ public final class MapTerrain {
         List<MapPoi> out = new ArrayList<>();
         for (List<Found> list : found(region).values()) {
             for (Found f : list) {
-                boolean mine = f.owner().equals(companyId) || (f.poi().kind() == MapPoi.Kind.GEYSER)
+                boolean mine = com.meakaandre.siftec.company.Companies.same(f.owner(), companyId) || (f.poi().kind() == MapPoi.Kind.GEYSER)
                     || (f.poi().kind() == MapPoi.Kind.TRAIN_STATION && f.owner().isEmpty());
                 if (mine) out.add(f.poi());
             }

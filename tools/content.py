@@ -122,7 +122,8 @@ PARTS = [
     ("aluminum_scrap", "Aluminum Scrap", NUG, 0xD0D8E8),
     ("aluminum_ingot", "Aluminum Ingot", I, 0xE0E8F8), ("alclad_aluminum_sheet", "Alclad Aluminum Sheet", S, 0xE8D0B8),
     ("aluminum_casing", "Aluminum Casing", "create:item/sturdy_sheet", 0xE0E8F8), ("radio_control_unit", "Radio Control Unit", "create:item/transmitter", None),
-    ("battery", "Battery", "minecraft:item/redstone_torch", None),
+    # (the game has no item texture for the redstone torch: it is a block's)
+    ("battery", "Battery", "minecraft:item/redstone", 0xE8C040),
     ("iodine_infused_filter", "Iodine Infused Filter", "create:item/filter", 0xB080E0),
     ("supercomputer", "Supercomputer", "minecraft:item/comparator", 0x60C0FF), ("assembly_director_system", "Assembly Director System", "create:item/linked_controller", None),
     ("electromagnetic_control_rod", "Electromagnetic Control Rod", "minecraft:item/blaze_rod", 0x80C0FF),
@@ -294,7 +295,7 @@ MILESTONES = [
      [C + "track", C + "track_station", C + "controls", C + "schedule", C + "mechanical_roller", C + "railway_casing"], []),
     (6, "railway_signalling", "Railway Signalling", "Train Signal and Train Observer", [C + "track_signal", C + "track_observer"], []),
     (6, "pipeline_engineering_mk2", "Pipeline Engineering Mk.2", "Pipeline and Pump Mk.2: Mechanical Pump flow and range doubled", [], ["pumps:2"]),
-    (6, "ficsit_blueprints_mk2", "FICSIT Blueprints Mk.2", "Blueprint Designer Mk.2", [], []),
+    (6, "ficsit_blueprints_mk2", "FICSIT Blueprints Mk.2", "Blueprint Designer Mk.2", ["siftec:blueprint_designer_mk2"], []),
 
     # Tier 7 (Wormhole Phase 3)
     (7, "bauxite_refinement", "Bauxite Refinement",
@@ -724,7 +725,7 @@ for _ids, _p in (
         ("stick", 1),
         # plants and crops; pumpkins and melons
         ("wheat carrot potato beetroot sugar_cane cactus kelp bamboo sweet_berries glow_berries apple wheat_seeds beetroot_seeds "
-         "pumpkin_seeds melon_seeds melon_slice brown_mushroom red_mushroom", 2),
+         "pumpkin_seeds melon_seeds melon_slice", 2),
         ("pumpkin melon carved_pumpkin", 4),
         # cooked food
         ("bread cooked_beef cooked_porkchop cooked_chicken cooked_mutton cooked_rabbit cooked_cod cooked_salmon baked_potato", 6),
@@ -752,9 +753,12 @@ for _disc in "13 cat blocks chirp far mall mellohi stal strad ward 11 wait other
     SINK_VANILLA[f"{M_}music_disc_{_disc}"] = 500
 SINK_VANILLA.update({C + "andesite_alloy": 4, C + "brass_ingot": 20, C + "precision_mechanism": 150})
 # tags, tried after the ids
-SINK_TAGS = {"#minecraft:logs": 3, "#minecraft:planks": 1, "#minecraft:saplings": 2, "#minecraft:flowers": 2, "#minecraft:leaves": 1,
+SINK_TAGS = {"#minecraft:planks": 1, "#minecraft:saplings": 2, "#minecraft:flowers": 2,
              "#minecraft:decorated_pot_sherds": 100, "#minecraft:trim_templates": 300, "#c:crops": 2, "#c:foods/cooked_meat": 6,
              "#farmersdelight:meals": 25}
+# Satisfactory's Leaves, Wood and Mycelia are tags in the pack (any leaves, any log, any mushroom): Satisfactory's value
+# (3, 30 and 10), tried before the tab's own tags
+SINK_TAGS = {**{SAT_NAMES[_sat]: SF.ITEMS[_sat]["sink"] for _sat in ("Leaves", "Wood", "Mycelia")}, **SINK_TAGS}
 # vanilla tools, armour and weapons: the sum of what they are made of (sticks 1 each)
 _MATERIALS = {"wooden": ("#minecraft:planks", 1), "stone": ("cobblestone", 1), "copper": ("copper_ingot", 6), "iron": ("iron_ingot", 2),
               "golden": ("gold_ingot", 20), "diamond": ("diamond", 200)}
@@ -1190,7 +1194,7 @@ GENERATOR_FUEL = {
     "biomass": {"#minecraft:leaves": 15, "#minecraft:logs": 100, "#siftec:mycelia": 20, "siftec:biomass": 180, "siftec:solid_biofuel": 450},
     "coal": {"minecraft:coal": 300, "siftec:compacted_coal": 630, "siftec:petroleum_coke": 180},
     "fuel": {"Fuel": 750, "Liquid Biofuel": 750, "Turbofuel": 2000, "Rocket Fuel": 3600, "Ionized Fuel": 5000},
-    "nuclear": {"siftec:uranium_fuel_rod": (750000, "siftec:uranium_waste", 10), "siftec:plutonium_fuel_rod": (1500000, "siftec:plutonium_waste", 1)},
+    "nuclear": {"siftec:uranium_fuel_rod": (750000, "siftec:uranium_waste", 50), "siftec:plutonium_fuel_rod": (1500000, "siftec:plutonium_waste", 10)},
     "augmenter": {"siftec:alien_power_matrix": 1},
 }
 
@@ -1220,6 +1224,12 @@ def _part_locks():
 
 
 PART_LOCKS = _part_locks()
+# Alien Protein comes from any of the four creature nodes (Hog, Spitter, Stinger and Hatcher Research: here Zombie,
+# Skeleton, Spider and Creeper Research), whichever is researched first. A part has one lock, so it has none of its own:
+# each of its recipes is locked to its own node, and the part is there once any of them runs.
+ANY_OF = {"siftec:alien_protein"}
+for _p in ANY_OF:
+    PART_LOCKS.pop(_p, None)
 _GONE = {"siftec:dna_capsule"}
 MILESTONES = [(t, mid, name, cost, time, text, [i for i in items if i not in PART_LOCKS and i not in _GONE]
                + sorted(p for p, m in PART_LOCKS.items() if m == mid), tokens) for t, mid, name, cost, time, text, items, tokens in MILESTONES]

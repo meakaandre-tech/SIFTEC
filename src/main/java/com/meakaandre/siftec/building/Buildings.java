@@ -366,7 +366,11 @@ public final class Buildings {
         return check;
     }
 
-    /** Takes the costs out of a container (the check has made sure they are there) and returns what was taken. */
+    /**
+     * Takes the costs out of a container (the check has made sure they are there) and returns what was taken. Taken
+     * with removeItem, not by shrinking the stack, so a backpack slot (see {@link com.meakaandre.siftec.backpack.Carried})
+     * saves what is left in it.
+     */
     public static List<ItemStack> take(Container payer, List<Milestone.Cost> costs) {
         List<ItemStack> taken = new ArrayList<>();
         for (Milestone.Cost cost : costs) {
@@ -375,9 +379,9 @@ public final class Buildings {
             for (int i = 0; i < payer.getContainerSize() && left > 0; i++) {
                 ItemStack stack = payer.getItem(i);
                 if (!cost.matches(stack)) continue;
-                int n = Math.min(left, stack.getCount());
-                taken.add(stack.split(n));
-                left -= n;
+                ItemStack got = payer.removeItem(i, Math.min(left, stack.getCount()));
+                left -= got.getCount();
+                taken.add(got);
             }
         }
         payer.setChanged();
@@ -666,6 +670,18 @@ public final class Buildings {
     /** For the protections in mixins: true if the block belongs to a building (always false on the client). */
     public static boolean protectedAt(Level level, BlockPos pos) {
         return BuildingIndex.isMember(level, pos);
+    }
+
+    /**
+     * True if something at {@code from} (a funnel, a hopper) may not reach the inventory at {@code target}: the target is
+     * a block of a building other than one of its ports, and {@code from} is not part of that same building. A building
+     * is fed and emptied only at its ports, as in Satisfactory.
+     */
+    public static boolean sealed(Level level, BlockPos from, BlockPos target) {
+        BlockPos building = BuildingIndex.controllerOf(level, target);
+        // Build Gun buildings only: the HUB's hand-cranked Craft Station is listed under its terminal and stays open
+        if (building == null || level.getBlockState(target).getBlock() instanceof PortBlock || !(level.getBlockEntity(building) instanceof ControllerBlockEntity)) return false;
+        return !building.equals(BuildingIndex.controllerOf(level, from));
     }
 
     /**

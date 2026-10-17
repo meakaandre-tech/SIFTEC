@@ -68,6 +68,22 @@ public final class RecipeLocks {
                 // a recipe that cannot say what it makes this way is left unlocked
             }
         }
+        // every step of another mod's sequenced assembly is locked exactly as the whole assembly (its final result)
+        // is: a step makes only the half-built item, so it cannot say for itself what it leads to. (The pack's own
+        // assemblies' steps are listed by their result's name, "seq:...", above.)
+        for (RecipeHolder<?> holder : server.getRecipeManager().getRecipes()) {
+            if (holder.id().identifier().getNamespace().equals("siftec")
+                || !(holder.value() instanceof com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe line)) continue;
+            String lock = map.get(line);
+            if (lock == null) {
+                com.meakaandre.siftec.hub.Milestone m = com.meakaandre.siftec.hub.Locks.lockOf(line.result().item().value());
+                if (m != null) lock = m.id();
+            }
+            for (Recipe<?> step : line.sequence()) {
+                if (lock == null) map.remove(step);
+                else map.put(step, lock);
+            }
+        }
         table = map;
         return map;
     }

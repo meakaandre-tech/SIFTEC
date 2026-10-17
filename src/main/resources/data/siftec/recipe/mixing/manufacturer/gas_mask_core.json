@@ -73,5 +73,6 @@
     {
       "id": "siftec:gas_mask_core"
     }
-  ]
+  ],
+  "processing_time": 960
 }

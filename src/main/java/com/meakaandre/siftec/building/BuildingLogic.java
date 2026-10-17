@@ -162,6 +162,54 @@ public final class BuildingLogic {
         }
     }
 
+    // ------------------------------------------------------------------------------------------------ idle
+
+    /** Ticks a building still counts as working after it last had work, so a short gap between items does not stop it. */
+    static final int AWAKE_TICKS = 40;
+
+    /**
+     * True while a powered building has nothing to work on, so it draws no power, as Satisfactory's machines draw only
+     * while they run ({@link BuildingPower}). It counts as working for {@link #AWAKE_TICKS} after it last had work.
+     * Worked out once a tick.
+     */
+    static boolean idle(ServerLevel level, ControllerBlockEntity c, BuildingDef def) {
+        long now = level.getGameTime();
+        if (c.idleAt == now) return c.idle;
+        c.idleAt = now;
+        if (working(level, c, def)) c.awakeUntil = now + AWAKE_TICKS;
+        c.idle = now >= c.awakeUntil;
+        return c.idle;
+    }
+
+    /**
+     * Whether a powered building has work right now: a miner a node and room for what it mines; the Smelter ore in or on
+     * its Depot; a Constructor, Assembler, Foundry, Refinery or Blender ingredients in its Basin; the Manufacturer and the
+     * Quantum Encoder ingredients in the Basin or an item on the line; the Packager something in or on its Depot or Item
+     * Drain; the Particle Accelerator and the Converter a recipe they can run (or one under way); an extractor room in its
+     * tank; the AWESOME Sink something to sink. The Pressurizer and the Radar Tower always run.
+     */
+    static boolean working(ServerLevel level, ControllerBlockEntity c, BuildingDef def) {
+        return switch (def.logic()) {
+            case "miner" -> nodeAt(level, c.node) != null && room(level, c);
+            case "smelter" -> {
+                BlockPos depot = cell(c, create("depot"));
+                yield !c.input.getItem(0).isEmpty() || depot != null && level.getBlockEntity(depot) instanceof DepotBlockEntity d
+                    && d.getHeldItem() != null && !d.getHeldItem().stack.isEmpty();
+            }
+            case "basin" -> ProductionLogic.basinHasInput(level, c, false);
+            case "assembly" -> {
+                boolean onLine = false;
+                for (ItemStack s : c.line) onLine |= !s.isEmpty();
+                yield onLine || ProductionLogic.basinHasInput(level, c, true);
+            }
+            case "packager" -> !c.input.getItem(0).isEmpty() || ProductionLogic.packagerHolds(level, c);
+            case "processor" -> c.progress > 0 || ProductionLogic.processorReady(level, c, def);
+            case "extractor" -> !c.problem.equals("siftec.building.full");
+            case "sink" -> !c.input.getItem(0).isEmpty();
+            default -> true;
+        };
+    }
+
     /** What the input port may put into the controller: the Smelter takes the ores it smelts; nothing else takes anything. */
     static boolean accepts(ControllerBlockEntity c, ItemStack stack) {
         BuildingDef def = c.def();

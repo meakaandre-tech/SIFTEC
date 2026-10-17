@@ -40,10 +40,12 @@ public final class Companies {
             }
         });
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+            running = server;
             com.meakaandre.siftec.config.SiftecConfig.load();
             com.meakaandre.siftec.save.JsonSavedData.serverStarting(server);
         });
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            running = null;
             urgent = false;
             lastUrgentSave = 0;
             com.meakaandre.siftec.save.JsonSavedData.serverStopped();
@@ -96,6 +98,29 @@ public final class Companies {
                 return 1;
             })
         ));
+    }
+
+    /** The server running now, so ownership can be checked where no server is at hand (mixins, the map). */
+    private static @org.jspecify.annotations.Nullable MinecraftServer running;
+
+    /**
+     * True if two company ids name the same company today. A company folded into another keeps answering under its old
+     * id ({@link CompanyData#byId}), so whatever still carries the old id (a building, a vehicle, a station, a MAM, a
+     * map find) belongs to the company that took it over. Every ownership comparison goes through here. An empty id is
+     * nobody's and matches nothing.
+     */
+    public static boolean same(@org.jspecify.annotations.Nullable String a, @org.jspecify.annotations.Nullable String b) {
+        if (a == null || b == null || a.isEmpty() || b.isEmpty()) return false;
+        if (a.equals(b)) return true;
+        if (running == null) return false;
+        CompanyData data = CompanyData.get(running);
+        Company first = data.byId(a);
+        return first != null && first == data.byId(b);
+    }
+
+    /** True if something stamped with {@code ownerId} belongs to this company (directly, or through a company folded into it). */
+    public static boolean owns(@org.jspecify.annotations.Nullable Company company, @org.jspecify.annotations.Nullable String ownerId) {
+        return company != null && same(company.id, ownerId);
     }
 
     /** Ticks between two quick saves of valuable changes. */
@@ -249,18 +274,7 @@ public final class Companies {
             // nothing can be picked up a second time by changing company
             target.collected.addAll(old.collected);
             if (old.members.isEmpty()) {
-                // the last one out brings the base along: claims, machines, the cloud, the points, the Shop and parts paid
-                target.points += old.points;
-                target.pointsEver += old.pointsEver;
-                target.trees.addAll(old.trees);
-                target.shop.addAll(old.shop);
-                for (String swatch : old.swatches) if (target.swatches.size() < com.meakaandre.siftec.sink.Shop.MAX_SWATCHES && !target.swatches.contains(swatch)) target.swatches.add(swatch);
-                old.cloud.forEach((item, count) -> target.cloud.merge(item, count, Integer::sum));
-                mergePaid(old, target);
-                data.fold(old.id, target.id);
-                com.meakaandre.siftec.map.MapServer.fold(server, old.id, target.id);
-                com.meakaandre.siftec.claim.Claims.reassign(server, old.id, target.id);
-                com.meakaandre.siftec.place.Places.reassign(server, old.id, target.id);
+                fold(server, old, target);
             } else {
                 old.leftAt.put(me, System.currentTimeMillis());
             }
@@ -274,13 +288,49 @@ public final class Companies {
         return 1;
     }
 
-    /** Parts a folding company had delivered move to the company that takes it over, scaled to its costs. */
-    private static void mergePaid(Company from, Company to) {
-        float ratio = to.costMultiplier() / Math.max(1f, from.costMultiplier());
+    /**
+     * The last member of {@code old} has gone over to {@code target}: the base comes along. Claims, machines, the cloud,
+     * the points and the coupons already printed (so the next coupon costs what it would have), the Shop, the Wormhole
+     * Gateway and the parts paid all move, and the old id answers to the target from then on. Both companies' parts must
+     * have been synced to their multipliers ({@link Company#syncPaid}) before the member moved.
+     */
+    public static void fold(MinecraftServer server, Company old, Company target) {
+        CompanyData data = CompanyData.get(server);
+        target.points += old.points;
+        target.pointsEver += old.pointsEver;
+        target.couponsPrinted += old.couponsPrinted;
+        target.trees.addAll(old.trees);
+        target.shop.addAll(old.shop);
+        target.revealed.addAll(old.revealed);
+        target.collected.addAll(old.collected);
+        for (String swatch : old.swatches) if (target.swatches.size() < com.meakaandre.siftec.sink.Shop.MAX_SWATCHES && !target.swatches.contains(swatch)) target.swatches.add(swatch);
+        old.cloud.forEach((item, count) -> target.cloud.merge(item, count, Integer::sum));
+        // a company has one Gateway: the target keeps its own, else takes the old one's (its terminal answers to the target through the old id)
+        if ((target.gateway == null || target.gateway.isEmpty()) && old.gateway != null) target.gateway = old.gateway;
+        mergePaid(old, target);
+        data.fold(old.id, target.id);
+        com.meakaandre.siftec.map.MapServer.fold(server, old.id, target.id);
+        com.meakaandre.siftec.claim.Claims.reassign(server, old.id, target.id);
+        com.meakaandre.siftec.place.Places.reassign(server, old.id, target.id);
+        save(server);
+    }
+
+    /**
+     * Parts a folding company had delivered move to the company that takes it over. Milestone and phase parts were paid at
+     * the old company's multiplier ({@link Company#paidAt}, synced before its last member left) and are booked at the
+     * target's, so each keeps its share of the cost: count x target's / old's. MAM nodes cost the same for every company
+     * and move as they are.
+     */
+    public static void mergePaid(Company from, Company to) {
+        to.syncPaid();
+        float fromAt = from.paidAt > 0 ? from.paidAt : 1f;
+        float ratio = to.paidAt / fromAt;
         from.paid.forEach((milestone, parts) -> {
             if (to.has(milestone)) return;
+            Milestone m = Milestones.get(milestone);
+            float scale = m != null && m.isResearch() ? 1f : ratio;
             java.util.Map<String, Integer> into = to.paid.computeIfAbsent(milestone, k -> new java.util.HashMap<>());
-            parts.forEach((item, count) -> into.merge(item, Math.round(count * ratio), Integer::sum));
+            parts.forEach((item, count) -> into.merge(item, Math.round(count * scale), Integer::sum));
         });
     }
 

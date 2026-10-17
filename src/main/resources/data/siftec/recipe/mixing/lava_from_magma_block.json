@@ -9,5 +9,6 @@
       "id": "minecraft:lava",
       "amount": 20250
     }
-  ]
+  ],
+  "processing_time": 120
 }

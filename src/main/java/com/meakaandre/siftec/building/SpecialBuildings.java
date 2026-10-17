@@ -14,10 +14,33 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * Work package 10's buildings: the Equipment Workshop, the AWESOME Sink and Shop, and the Radar Tower. Using one opens
- * its window; the Sink destroys what its input port brings while it has power, for its company's points.
+ * its window; the Sink destroys what its input port brings while it has power, for its company's points. Also the
+ * HUB's Craft Station's rule: it turns by hand only ({@link #cutsRotation}).
  */
 public final class SpecialBuildings {
     private SpecialBuildings() {
+    }
+
+    /**
+     * True if the block is one of the HUB's Craft Station machines (its Presses, Mixers, Basins, cogwheel and hand cranks):
+     * the real Create machines of a HUB structure, listed in the building index under the HUB's terminal.
+     */
+    public static boolean craftStation(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
+        net.minecraft.core.BlockPos terminal = BuildingIndex.controllerOf(level, pos);
+        return terminal != null && level.getBlockEntity(terminal) instanceof com.meakaandre.siftec.hub.HubBlockEntity hub && hub.prefab && !hub.gateway();
+    }
+
+    /**
+     * The HUB's Craft Station is hand-cranked, as Satisfactory's Craft Bench is worked by hand: rotation crosses between a
+     * Craft Station machine and anything outside the station in neither direction, so only its own hand cranks turn it,
+     * never a shaft, motor or water wheel brought up to it (and it turns nothing outside either). For the rotation
+     * propagator ({@code PropagatorMixin}); always false on the client, where the index is not kept.
+     */
+    public static boolean cutsRotation(com.zurrtum.create.content.kinetics.base.KineticBlockEntity from,
+                                       com.zurrtum.create.content.kinetics.base.KineticBlockEntity to) {
+        net.minecraft.world.level.Level level = to.getLevel();
+        if (level == null || level.isClientSide() || from.getLevel() != level) return false;
+        return craftStation(level, from.getBlockPos()) != craftStation(level, to.getBlockPos());
     }
 
     /** Opens the building's window. False for any other building (it says its status instead). */
@@ -38,6 +61,15 @@ public final class SpecialBuildings {
             }
         }
         return true;
+    }
+
+    /**
+     * True if the player may operate this building (a Truck Station's mode, the Radar Tower's survey): a member of the
+     * company that owns it, through any company folded into it. One nobody owns may be used by anyone, and creative
+     * players may use anything.
+     */
+    public static boolean mayOperate(ServerPlayer player, ControllerBlockEntity c) {
+        return player.hasInfiniteMaterials() || c.companyId.isEmpty() || Companies.owns(Companies.of(player), c.companyId);
     }
 
     /** The Sink's tick: while powered, whatever its input port put in is destroyed and paid for. */
