@@ -805,8 +805,9 @@ public final class MachineTests {
         bio.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 64));
         coal.input.setItem(0, new ItemStack(Items.COAL, 64));
         // the reactor burns at full whatever the load: the smoke run's other tests (ten in-game minutes of always-running
-        // factories) may have burnt what it had; it is given its rods again
+        // factories) may have burnt what it had and filled its waste output; it is given its rods again and emptied
         nuke.input.setItem(0, new ItemStack(item("siftec:uranium_fuel_rod"), 12));
+        empty(nuke, item("siftec:uranium_waste"));
         Port coalWater = port(level, coal, PortBlock.Kind.FLUID_IN, 0), nukeWater = port(level, nuke, PortBlock.Kind.FLUID_IN, 0),
             dieselIn = port(level, diesel, PortBlock.Kind.FLUID_IN, 0), paIn = port(level, pa, PortBlock.Kind.ITEM_IN, 0),
             convA = port(level, conv, PortBlock.Kind.ITEM_IN, 0), convB = port(level, conv, PortBlock.Kind.ITEM_IN, 1);
