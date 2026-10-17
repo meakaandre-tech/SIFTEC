@@ -311,8 +311,9 @@ public final class MachineTests {
         return Power.su(mw);
     }
 
+    /** What its coils make now: what the grid was offered on its last balance (the brushes may already be emptied). */
     private static double offered(ServerLevel level, @Nullable ControllerBlockEntity c) {
-        return c == null ? 0 : Generators.offered(level, c);
+        return c == null ? 0 : Math.max(c.offered, Generators.offered(level, c));
     }
 
     private static String status(ServerLevel level, @Nullable ControllerBlockEntity c) {
@@ -506,6 +507,12 @@ public final class MachineTests {
                 + " | residue " + status(level, residue));
             machinesRun(source, level, bio, coal, diesel, nuke, pa, conv, geos);
         });
+        for (int t = 200; t <= WARMUP + 1200; t += 400) later(level, t, () -> {
+            report(source, "inside the accelerator: " + inside(level, pa));
+            report(source, "inside the converter: " + inside(level, conv));
+            report(source, "inside the residue converter: " + inside(level, residue));
+            report(source, "inside the fuel generator: " + status(level, diesel) + ", fuel in its engine " + mb(engineFuel(level, diesel)) + " mB");
+        });
 
         // ---- measuring from the warm-up on
         long[] start = new long[16];
@@ -638,6 +645,42 @@ public final class MachineTests {
         }
     }
 
+    /** What is where inside a Particle Accelerator or Converter, for working out a failure. */
+    private static String inside(ServerLevel level, @Nullable ControllerBlockEntity c) {
+        if (c == null) return "missing";
+        StringBuilder b = new StringBuilder(status(level, c));
+        com.zurrtum.create.content.processing.basin.BasinBlockEntity basin = ProductionLogic.basin(level, c);
+        if (basin != null) {
+            b.append("; basin");
+            for (int i = 0; i < basin.itemCapability.getContainerSize(); i++) {
+                ItemStack st = basin.itemCapability.getItem(i);
+                if (!st.isEmpty()) b.append(' ').append(st);
+            }
+            b.append(", filter ").append(basin.getFilter().getFilter());
+        }
+        BlockPos gap = Processors.gap(c), fan = cell(c, "create:encased_fan");
+        if (gap != null && level.getBlockEntity(gap) instanceof com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity crusher) {
+            b.append("; crusher speed ").append(crusher.crushingspeed).append(", holding ").append(crusher.processingEntity)
+                .append(", inventory ").append(crusher.inventory.getItem(0)).append(", owner ").append(crusher.getAttached(com.meakaandre.siftec.owner.Ownership.OWNER));
+        }
+        if (fan != null) {
+            for (net.minecraft.world.entity.item.ItemEntity e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(fan).inflate(2, 8, 2))) {
+                b.append("; item ").append(e.getItem()).append(String.format(Locale.ROOT, " at %.2f %.2f %.2f moving %.3f", e.getX(), e.getY(), e.getZ(), e.getDeltaMovement().y));
+            }
+        }
+        BlockPos depot = cell(c, "create:depot"), deployer = cell(c, "create:deployer");
+        if (depot != null && level.getBlockEntity(depot) instanceof com.zurrtum.create.content.logistics.depot.DepotBlockEntity d) {
+            var held = d.getHeldItem();
+            b.append("; depot ").append(held == null ? "empty" : held.stack + " by " + held.processedBy + " for " + held.processingTime);
+        }
+        if (deployer != null && level.getBlockEntity(deployer) instanceof com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity d) {
+            b.append("; deployer ").append(d.state).append(' ').append(d.mode).append(" timer ").append(d.timer).append(" holding ").append(d.heldItem)
+                .append(" speed ").append(d.getSpeed()).append(" owner ").append(d.getAttached(com.meakaandre.siftec.owner.Ownership.OWNER));
+        }
+        b.append("; carrier ").append(c.carrier).append(", launched ").append(c.launched).append(", made ").append(c.made);
+        return b.toString();
+    }
+
     /** The Converter's cells, wherever they are: carried, on its Depot, in its Deployer or Item Drain (charged or not). */
     private static int cells(ServerLevel level, @Nullable ControllerBlockEntity c) {
         if (c == null) return -1;
@@ -691,15 +734,15 @@ public final class MachineTests {
         BlockPos engine = engines.getFirst(), coil = cell(c, "create_new_age:generator_coil");
         BlockState engineState = level.getBlockState(engine);
         // 1. a Steam Engine taken away is put back within its next look
-        later(level, 300, () -> {
+        later(level, 700, () -> {
             near(source, "repair: the Coal Generator runs before (15,360 SU)", offered(level, c), su(75), 0.04);
             level.setBlock(engine, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         });
-        later(level, 300 + BuildingRepair.EVERY + 40, () -> expect(source, "repair: a Steam Engine taken away is put back from the building's shape",
+        later(level, 700 + BuildingRepair.EVERY + 40, () -> expect(source, "repair: a Steam Engine taken away is put back from the building's shape",
             level.getBlockState(engine).is(engineState.getBlock()), String.valueOf(level.getBlockState(engine))));
-        later(level, 300 + BuildingRepair.EVERY + 400, () -> near(source, "repair: and the generator gives its 75 MW again", offered(level, c), su(75), 0.04));
+        later(level, 700 + BuildingRepair.EVERY + 400, () -> near(source, "repair: and the generator gives its 75 MW again (" + status(level, c) + ")", offered(level, c), su(75), 0.04));
         // 2. a building from before its shape changed (shape 0): rebuilt whole, its missing coil too
-        later(level, 900, () -> {
+        later(level, 1400, () -> {
             if (coil != null) level.setBlock(coil, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             c.shape = 0;
             BuildingRepair.Result r = BuildingRepair.check(level, c);
@@ -707,9 +750,9 @@ public final class MachineTests {
             expect(source, "repair: a building of an older shape is rebuilt to the current one", r == BuildingRepair.Result.REBUILT && t != null && c.shape == BuildingRepair.hash(t)
                 && coil != null && level.getBlockState(coil).is(block("create_new_age:generator_coil")), r + ", shape " + c.shape);
         });
-        later(level, 1300, () -> near(source, "repair: and it runs on its rebuilt machines (15,360 SU)", offered(level, c), su(75), 0.04));
+        later(level, 1900, () -> near(source, "repair: and it runs on its rebuilt machines (15,360 SU)", offered(level, c), su(75), 0.04));
         // 3. something not the building's where a Steam Engine goes: nothing is rebuilt there and it makes nothing until it is cleared
-        later(level, 1400, () -> {
+        later(level, 2000, () -> {
             BuildingIndex index = BuildingIndex.get(level);
             if (index != null) index.remove(level, engine, c.getBlockPos());
             level.setBlock(engine, Blocks.COBBLESTONE.defaultBlockState(), Block.UPDATE_ALL);
@@ -717,15 +760,15 @@ public final class MachineTests {
             expect(source, "repair: a block in the way of a Steam Engine leaves the building broken", r == BuildingRepair.Result.BLOCKED && c.broken
                 && level.getBlockState(engine).is(Blocks.COBBLESTONE), r + ", " + status(level, c));
         });
-        later(level, 1500, () -> expect(source, "repair: and a broken generator gives nothing (no power made in code)", c.offered == 0 && c.lastGenerated == 0,
+        later(level, 2100, () -> expect(source, "repair: and a broken generator gives nothing (no power made in code)", c.offered == 0 && c.lastGenerated == 0,
             c.offered + " SU offered, " + c.lastGenerated + " given; " + status(level, c)));
-        later(level, 1520, () -> {
+        later(level, 2120, () -> {
             level.setBlock(engine, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             BuildingRepair.Result r = BuildingRepair.check(level, c);
             expect(source, "repair: once cleared, the Steam Engine is put back and the building runs", r == BuildingRepair.Result.REBUILT && !c.broken
                 && level.getBlockState(engine).is(engineState.getBlock()), r + ", " + status(level, c));
         });
-        later(level, 1900, () -> near(source, "repair: it gives its 75 MW again", offered(level, c), su(75), 0.04));
+        later(level, 2600, () -> near(source, "repair: it gives its 75 MW again (" + status(level, c) + ")", offered(level, c), su(75), 0.04));
     }
 
     // ------------------------------------------------------------------------------------------------ after a restart

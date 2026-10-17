@@ -84,6 +84,11 @@ public class PortBlockEntity extends SmartBlockEntity {
     public @Nullable Storage<FluidVariant> fluids(@Nullable Direction side) {
         if (!serves(side, true)) return null;
         Storage<FluidVariant> inner = ProductionLogic.fluids(level, target, out());
+        // a machine that takes fluid only from one side (Diesel Generators' engine, from below): the port reaches it there
+        for (Direction d : Direction.values()) {
+            if (inner != null) break;
+            inner = ProductionLogic.fluids(level, target, d);
+        }
         if (inner == null) return null;
         return kind() == PortBlock.Kind.FLUID_IN ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
     }
