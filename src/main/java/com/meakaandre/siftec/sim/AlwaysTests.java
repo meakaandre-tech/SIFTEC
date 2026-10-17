@@ -75,16 +75,6 @@ public final class AlwaysTests {
     /** Chunk loads in twin B's area while it is supposed to be unloaded. */
     private static int bLoads;
     private static boolean watchB;
-    private static int traced;
-
-    /** TEMP: logs who adds a ticket to a chunk of twin B while it is watched. */
-    public static void ticketAdded(long pos, net.minecraft.server.level.Ticket ticket) {
-        if (!watchB || traced >= 12) return;
-        int cx = ChunkPos.getX(pos), cz = ChunkPos.getZ(pos);
-        if (cx < B.x0() >> 4 || cx > B.x1() >> 4 || cz < B.z0Area() >> 4 || cz > B.z1Area() >> 4) return;
-        traced++;
-        Siftec.LOGGER.info("SELFTEST always ticket added to twin B chunk {},{}: {}", cx, cz, ticket, new Throwable("ticket"));
-    }
     private static @Nullable UUID truckA, truckB;
 
     private AlwaysTests() {
@@ -446,15 +436,13 @@ public final class AlwaysTests {
     }
 
     private static int loadedB(ServerLevel level) {
-        traced = 0;
         int loaded = 0;
         StringBuilder which = new StringBuilder();
         for (int cx = B.x0() >> 4; cx <= B.x1() >> 4; cx++)
             for (int cz = B.z0Area() >> 4; cz <= B.z1Area() >> 4; cz++) {
                 if (!level.hasChunk(cx, cz)) continue;
                 loaded++;
-                which.append(' ').append(cx).append(',').append(cz).append(" [").append(level.getChunkSource().getChunkDebugData(new ChunkPos(cx, cz)))
-                    .append(" tickets ").append(level.getDataStorage().computeIfAbsent(net.minecraft.world.level.TicketStorage.TYPE).getTicketDebugString(ChunkPos.pack(cx, cz), false)).append(']');
+                which.append(' ').append(cx).append(',').append(cz).append(" [").append(level.getChunkSource().getChunkDebugData(new ChunkPos(cx, cz)))).append(']');
             }
         if (loaded > 0) Siftec.LOGGER.info("SELFTEST always twin B chunks still loaded:{} (truck set off in {}, {}); forced {}", which,
             (B.ox + 16) >> 4, (B.oz + 3) >> 4, level.getForceLoadedChunks().size());
