@@ -1,0 +1,60 @@
+all Fabric versions of travelersbackpack:
+  SmhjfeWr 26.3-11.4.1 ['26.3'] 2026-09-29
+  I6Fg8UrJ 26.2-11.3.3 ['26.2'] 2026-09-29
+  NUbnGgy9 26.1.2-11.2.11 ['26.1.1', '26.1.2'] 2026-09-29
+  5rC23dXQ 26.3-11.4.0 ['26.3'] 2026-09-24
+  jp51VM8M 26.2-11.3.2 ['26.2'] 2026-09-01
+  7ltEXeO3 1.21.11-10.11.11 ['1.21.11'] 2026-09-01
+  Ah1lkxJY 26.1.2-11.2.10 ['26.1.1', '26.1.2'] 2026-09-01
+  npKsvQvE 1.21.1-10.1.39 ['1.21.1'] 2026-08-29
+  G60CBuLj 1.20.1-9.1.55 ['1.20.1'] 2026-08-29
+  LfmQsEdR 1.21.11-10.11.10 ['1.21.11'] 2026-08-03
+  mjQY8slD 26.2-11.3.1 ['26.2'] 2026-07-28
+  5I4utX2T 1.21.1-10.1.38 ['1.21.1'] 2026-07-28
+  ZgfhEJnC 26.1.2-11.2.9 ['26.1.1', '26.1.2'] 2026-07-28
+  NXJGtmmW 1.21.1-10.1.37 ['1.21.1'] 2026-07-22
+  5H4yAyuO 1.20.1-9.1.54 ['1.20.1'] 2026-07-22
+  8zYSDRGA 26.2-11.3.0 ['26.2'] 2026-07-17
+  YDNzgBWY 26.1.2-11.2.8 ['26.1.1', '26.1.2'] 2026-07-17
+  onVoNuy1 26.1.2-11.2.7 ['26.1.1', '26.1.2'] 2026-05-31
+  fTwokW7g 1.20.1-9.1.53 ['1.20.1'] 2026-05-27
+  ODmeRFc0 1.21.1-10.1.36 ['1.21.1'] 2026-05-20
+  Q6rEigkb 26.1.2-11.2.6 ['26.1.1', '26.1.2'] 2026-05-11
+  CoCSwzdR 26.1.2-11.2.5 ['26.1.1', '26.1.2'] 2026-05-09
+  ZP0ddKyI 26.1.2-11.2.4 ['26.1.1', '26.1.2'] 2026-05-05
+  FVGa8X6z 26.1.2-11.2.3 ['26.1.1', '26.1.2'] 2026-05-04
+  RfI8MfzH 1.21.1-10.1.35 ['1.21.1'] 2026-05-04
+  q2caASeP 1.20.1-9.1.52 ['1.20.1'] 2026-05-04
+  BgyhpzMJ 26.1.2-11.2.2 ['26.1.1', '26.1.2'] 2026-04-26
+  lGcINzRB 26.1.2-11.2.1 ['26.1.1', '26.1.2'] 2026-04-16
+  RKAxLV5H 26.1.2-11.2.0 ['26.1.1', '26.1.2'] 2026-04-15
+  G9VMJl43 26.1.1-11.1.0 ['26.1.1', '26.1.2'] 2026-04-08
+  XbEGJQSG 1.21.11-10.11.9 ['1.21.11'] 2026-03-28
+  D3V21Ir2 1.21.11-10.11.8 ['1.21.11'] 2026-03-27
+  3nT2UR2a 1.21.11-10.11.7 ['1.21.11'] 2026-03-26
+  85PLLyUF 1.21.1-10.1.34 ['1.21.1'] 2026-03-26
+  E4UZZZAV 1.20.1-9.1.51 ['1.20.1'] 2026-03-26
+  hIiloTnQ 1.20.1-9.1.50 ['1.20.1'] 2026-02-03
+  8JL58SeM 1.20.1-9.1.49 ['1.20.1'] 2026-01-29
+  uQ0xHxTz 1.21.10-10.10.6 ['1.21.10'] 2026-01-29
+  jDSDEMgY 1.21.11-10.11.5 ['1.21.11'] 2026-01-29
+  lNx2626W 1.21.11-10.11.4 ['1.21.11'] 2026-01-29
+travelersbackpack: 26.3-11.4.1 for 26.3 https://cdn.modrinth.com/data/rlloIFEV/versions/SmhjfeWr/travelersbackpack-fabric-26.3-11.4.1.jar
+  dependency optional: project SaCpeal4 version None
+  dependency optional: project DMu0oBKf version None
+  dependency optional: project tagwiZkJ version None
+  dependency optional: project yn9u3ypm version None
+  dependency optional: project 5aaWibi9 version None
+  dependency optional: project yBW8D80W version None
+  dependency optional: project nfn13YXA version None
+  dependency optional: project u6dRKJwZ version None
+  dependency required: project ohNO6lps version None
+  forge-config-api-port: 26.3.1 for 26.3 https://cdn.modrinth.com/data/ohNO6lps/versions/JpKvrr9J/ForgeConfigAPIPort-v26.3.1-mc26.3.x-Fabric.jar
+    dependency required: project P7dR8mSH version None
+    fabric-api: the build's own (gradle.properties) is used
+    dependency optional: project mOgUt4GM version None
+  dependency optional: project vRYk0bv7 version None
+  dependency optional: project HnD1GX6e version None
+  dependency optional: project fRiHVvU7 version None
+  dependency optional: project jtmvUHXj version None
+  dependency required: project P7dR8mSH version None
