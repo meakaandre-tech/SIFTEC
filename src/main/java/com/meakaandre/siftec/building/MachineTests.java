@@ -660,6 +660,8 @@ public final class MachineTests {
                 if (!st.isEmpty()) b.append(' ').append(st);
             }
             b.append(", filter ").append(basin.getFilter().getFilter());
+            Storage<FluidVariant> tanks = FluidStorage.SIDED.find(level, basin.getBlockPos(), null);
+            if (tanks != null) for (StorageView<FluidVariant> v : tanks) if (!v.isResourceBlank() && v.getAmount() > 0) b.append(", ").append(mb(v.getAmount())).append(" mB ").append(BuiltInRegistries.FLUID.getKey(v.getResource().getFluid()));
         }
         BlockPos gap = Processors.gap(c), fan = cell(c, "create:encased_fan");
         if (gap != null && level.getBlockEntity(gap) instanceof com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity crusher) {

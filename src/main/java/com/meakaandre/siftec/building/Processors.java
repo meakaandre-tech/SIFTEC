@@ -197,7 +197,9 @@ public final class Processors {
         }
         if (!out && c.problem.equals("siftec.building.full")) return;
         c.problem = "";
-        // the next Core into the fan's column, once the last has gone up into the wheels
+        // the next Core into the fan's column, once the last has gone up into the wheels, and only while things move
+        // there (an item in a chunk not ticking its entities would hang in the air, or be lost while it loads)
+        if (!level.isPositionEntityTicking(fan.above())) return;
         Item core = ProcessorRecipe.item(r.core());
         if (core == net.minecraft.world.item.Items.AIR) return;
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, column(fan, gap))) if (e.getItem().is(core)) return;
