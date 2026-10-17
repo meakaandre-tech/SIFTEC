@@ -53,6 +53,8 @@ import java.util.List;
 public final class BuildingLogic {
     /** The speed a building's motor turns its machines at. */
     public static final float MOTOR_RPM = 64;
+    /** A fan blowing up a column (the Particle Accelerator's): Create's most, so the air carries its Core into the wheels. */
+    public static final float LIFT_RPM = 256;
     /** Items the Smelter puts on its Depot at once (the Depot holds one stack; a few at a time keeps the gaps short). */
     static final int SMELTER_BATCH = 4;
 
@@ -98,7 +100,12 @@ public final class BuildingLogic {
             // a fan turned the wrong way would suck instead of blow: the motor turns so it blows away from it
             Direction toward = motor.getBlockState().getValue(com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING);
             BlockState next = level.getBlockState(pos.relative(toward));
-            if (next.getBlock() instanceof EncasedFanBlock) rpm *= next.getValue(EncasedFanBlock.FACING).getAxisDirection().getStep();
+            if (next.getBlock() instanceof EncasedFanBlock) {
+                // a fan that lifts things up a column into Crushing Wheels (the Particle Accelerator's) runs at full
+                // speed: slower, its air holds an item hovering short of the wheels
+                if (next.getValue(EncasedFanBlock.FACING) == Direction.UP) rpm = (int) LIFT_RPM;
+                rpm *= next.getValue(EncasedFanBlock.FACING).getAxisDirection().getStep();
+            }
             // two Crushing Wheels crush only turning against each other: the right one's motor runs the other way
             if (next.getBlock() instanceof com.zurrtum.create.content.kinetics.crusher.CrushingWheelBlock && t != null) {
                 for (BuildingTemplate.Cell cell : t.members) if (p.at(cell).equals(pos) && cell.x() > 0) rpm = -rpm;

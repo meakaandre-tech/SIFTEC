@@ -390,9 +390,10 @@ public final class MachineTests {
             return 1;
         }
         BuildingTemplate.forget();
-        BuildingTests.platform(level, X - 16, Z - 6, X + 290, Z + 40, Y, 22);
+        // facing north, the buildings stand north of their anchors, and their storages and augmenters behind them
+        BuildingTests.platform(level, X - 16, Z - 52, X + 290, Z + 8, Y, 22);
         List<BlockPos> geo = geysers(level);
-        for (BlockPos g : geo) BuildingTests.platform(level, g.getX() - 10, g.getZ() - 4, g.getX() + 10, g.getZ() + 22, Y, 14);
+        for (BlockPos g : geo) BuildingTests.platform(level, g.getX() - 10, g.getZ() - 22, g.getX() + 10, g.getZ() + 4, Y, 14);
         later(level, 10, () -> setUp(source, level, geo));
         report(source, "test site ready at " + X + " " + Y + " " + Z + "; geysers at " + geo.stream().map(BlockPos::toShortString).toList()
             + "; the checks report over the next three minutes");
@@ -665,7 +666,7 @@ public final class MachineTests {
         }
         if (fan != null) {
             for (net.minecraft.world.entity.item.ItemEntity e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(fan).inflate(2, 8, 2))) {
-                b.append("; item ").append(e.getItem()).append(String.format(Locale.ROOT, " at %.2f %.2f %.2f moving %.3f", e.getX(), e.getY(), e.getZ(), e.getDeltaMovement().y));
+                b.append(level.isPositionEntityTicking(e.blockPosition()) ? "; item " : "; (not ticking) item ").append(e.getItem()).append(String.format(Locale.ROOT, " at %.2f %.2f %.2f moving %.3f", e.getX(), e.getY(), e.getZ(), e.getDeltaMovement().y));
             }
         }
         BlockPos depot = cell(c, "create:depot"), deployer = cell(c, "create:deployer");

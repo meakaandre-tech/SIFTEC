@@ -163,6 +163,7 @@ public final class Processors {
             }
             upward(level, c, gap);
         }
+        lift(level, fan);
         // what the wheels crushed comes out over them, marked as theirs
         boolean out = false;
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(gap).expandTowards(0, 3, 0).inflate(0.6))) {
@@ -225,6 +226,18 @@ public final class Processors {
             }
         }
         Siftec.LOGGER.info("SIFTEC: building {} at {}: its Crushing Wheels carried downward; both now turn the other way", c.buildingId, c.getBlockPos().toShortString());
+    }
+
+    /** The fan under the column runs at {@link BuildingLogic#LIFT_RPM} (a building from before ran it slower). */
+    private static void lift(ServerLevel level, BlockPos fan) {
+        for (Direction d : Direction.values()) {
+            if (!(level.getBlockEntity(fan.relative(d)) instanceof MotorBlockEntity motor) || motor.speedBehavior == null) continue;
+            int now = motor.speedBehavior.getValue();
+            if (now != 0 && Math.abs(now) != (int) BuildingLogic.LIFT_RPM) {
+                motor.speedBehavior.setValue((int) Math.signum(now) * (int) BuildingLogic.LIFT_RPM);
+                motor.setChanged();
+            }
+        }
     }
 
     // ------------------------------------------------------------------------------------------------ Converter
@@ -351,6 +364,12 @@ public final class Processors {
         if (r.haunt() == null || !on.is(ProcessorRecipe.item(r.haunt()))) return;
         if (!(level.getBlockEntity(depotPos) instanceof DepotBlockEntity d) || d.getHeldItem() == null) return;
         TransportedItemStack held = d.getHeldItem();
+        // the Deployer's result keeps what the fan found for the item before it (the Core: nothing to haunt), so the
+        // fan would never look again: it looks at the new item afresh
+        if (held.processedBy == AllFanProcessingTypes.HAUNTING && held.processingTime < 0) {
+            held.processedBy = null;
+            held.processingTime = 0;
+        }
         int most = Math.max(1, r.seconds() * 20 / 4);
         if (held.processedBy == AllFanProcessingTypes.HAUNTING && held.processingTime > most) held.processingTime = most;
     }
