@@ -72,6 +72,7 @@
     "SiftEntryMixin",
     "SlotMixin",
     "SmartTankMixin",
+    "TicketTraceMixin",
     "TunnelMixin",
     "building.BasinTypeMixin",
     "building.BrassBasinInventoryMixin",
