@@ -413,11 +413,26 @@ public final class AlwaysTests {
             SimData.Vehicle v = truckB == null ? null : SimData.get(server).vehicle(truckB.toString());
             expect(source, "twin B: its Truck drives its route by time", v != null, v == null ? "not in the simulation" : "at " + Math.round(v.x) + ", " + Math.round(v.z));
             report(source, Factories.stats().line());
+            describe(source, server, B);
         });
+        later(server, RUN / 2, () -> describe(source, server, B));
         later(server, RUN, () -> check(source, began, false));
     }
 
     // ------------------------------------------------------------------------------------------------ counting
+
+    /** Each simulated building of a twin as the simulation holds it, and its links, for working out a failure. */
+    private static void describe(CommandSourceStack source, MinecraftServer server, Twin t) {
+        SimData data = SimData.get(server);
+        for (SimData.Node n : nodes(server, t)) {
+            int links = 0;
+            for (SimData.Link l : data.stored.links) if (l.from.equals(n.key())) links++;
+            report(source, "node " + n.building + " at " + n.blockPos().toShortString() + ": sim " + n.sim + ", mode " + n.mode + ", recipes " + n.recipes.size()
+                + ", powered " + n.powered + ", su " + n.su + ", in " + n.in + ", out " + n.out + ", made " + n.made + ", mined " + n.mined + ", mine " + n.mineItem + "/" + n.minePeriod
+                + ", energy " + Math.round(n.energy) + ", tripped " + n.tripped + ", caps " + n.inCap + "/" + n.outCap + ", connectors " + n.connectors.size() + ", links out " + links
+                + ", simTime " + n.simTime);
+        }
+    }
 
     /** The simulation's nodes of a twin. */
     private static List<SimData.Node> nodes(MinecraftServer server, Twin t) {

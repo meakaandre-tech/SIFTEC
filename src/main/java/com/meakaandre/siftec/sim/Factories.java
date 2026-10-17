@@ -82,8 +82,8 @@ public final class Factories {
     public record Stats(int nodes, int simulated, int groups, int vehicles, double mainMsPerTick, double workerMsPerStep,
                         double workerMsPerTick, long catchUps, long snapshots) {
         public String line() {
-            return String.format(java.util.Locale.ROOT, "SIFTEC factories: %d/%d simulated in %d groups, %d vehicles; %.3f ms/tick (server %.3f, worker %.3f a step)",
-                simulated, nodes, groups, vehicles, mainMsPerTick + workerMsPerTick, mainMsPerTick, workerMsPerStep);
+            return String.format(java.util.Locale.ROOT, "SIFTEC factories: %d/%d simulated in %d groups, %d vehicles; %.3f ms/tick (server %.3f, worker %.3f a step); %d snapshots, %d catch-ups",
+                simulated, nodes, groups, vehicles, mainMsPerTick + workerMsPerTick, mainMsPerTick, workerMsPerStep, snapshots, catchUps);
         }
     }
 
