@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:conversion_core_limestone_sulfur",
+  "ingredient": "siftec:reanimated_sam",
+  "results": [
+    {
+      "id": "siftec:incomplete_conversion_limestone_sulfur"
+    }
+  ]
+}

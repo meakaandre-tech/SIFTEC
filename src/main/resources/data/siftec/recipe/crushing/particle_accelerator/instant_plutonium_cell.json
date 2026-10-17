@@ -1,0 +1,11 @@
+{
+  "type": "create:crushing",
+  "ingredient": "siftec:particle_charge_instant_plutonium_cell",
+  "processing_time": 20,
+  "results": [
+    {
+      "id": "siftec:encased_plutonium_cell",
+      "count": 20
+    }
+  ]
+}

@@ -101,6 +101,29 @@ public class ControllerBlockEntity extends BlockEntity {
     long idleAt = Long.MIN_VALUE, awakeUntil;
     /** SU a generator gave on its last tick (a Power Storage: SU-ticks it took, negative when it gave). */
     public double lastGenerated;
+    /** A generator: SU its machines offered the grid this tick, and the share of it the grid drew (and the tick it did). */
+    public double offered;
+    public float load;
+    public long loadAt = Long.MIN_VALUE;
+    /** A generator: its load over the last ticks (its boilers' water follows the least of them), water owed and given (droplets). */
+    final float[] loadWindow = new float[Generators.WATER_WINDOW];
+    public double waterOwed;
+    public long waterUsed;
+    /** What its machines say is wrong ("" if nothing), as a lang key: a generator's fuel, water, geyser. */
+    public String machineProblem = "";
+    /** SU-ticks a generator has given since it loaded, and waste a nuclear plant has given out (for the selftests). */
+    public double energyGiven;
+    public long wasteMade;
+    /** Cores the Particle Accelerator has dropped into its fan's column (for the selftests). */
+    public long launched;
+    /** A Particle Accelerator or Converter: the SU it draws this tick (Satisfactory's power over its recipe's cycle). */
+    public double demandSu;
+    /** The Converter's cell, while it is neither on the Depot, in the Deployer's hand nor in the Item Drain. */
+    public ItemStack carrier = ItemStack.EMPTY;
+    /** The template its blocks were last checked against ({@link BuildingRepair}); 0 for a building from before. */
+    public int shape;
+    /** Its machines are not all there and cannot be rebuilt yet (something stands where they go): it does nothing. */
+    public boolean broken;
     /** Its grid as last balanced, and its part in it. */
     public com.meakaandre.siftec.power.@Nullable GridStats grid;
     com.meakaandre.siftec.power.@Nullable PowerMember member;
@@ -109,6 +132,7 @@ public class ControllerBlockEntity extends BlockEntity {
     boolean removing;
     private int ticks;
     private boolean indexed;
+    private long repairTried;
     private @Nullable Storage<ItemVariant> storage;
 
     public ControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -174,12 +198,18 @@ public class ControllerBlockEntity extends BlockEntity {
 
     public void serverTick() {
         if (!(level instanceof ServerLevel server) || removing) return;
-        if (!indexed) {
-            indexed = true;
-            Buildings.reindex(server, this);
+        if (!indexed && (repairTried == 0 || server.getGameTime() - repairTried >= 20)) {
+            // its blocks are checked against its shape (and rebuilt where they differ) before they are listed again
+            repairTried = server.getGameTime();
+            indexed = BuildingRepair.check(server, this) != BuildingRepair.Result.WAITING;
+            if (removing) return;
         }
-        BuildingLogic.tick(server, this);
+        if (!broken) BuildingLogic.tick(server, this);
         if (++ticks % 20 != 0) return;
+        // its machines are looked over every few seconds and anything missing is put back; a missing piece of shell
+        // brings the building down
+        if (indexed && ticks % BuildingRepair.EVERY == 0) BuildingRepair.check(server, this);
+        if (!indexed || broken || removing) return;
         BlockPos missing = Buildings.missingMember(server, this);
         if (missing != null) Buildings.collapse(server, this, missing);
     }
@@ -222,6 +252,8 @@ public class ControllerBlockEntity extends BlockEntity {
         for (int i = 0; i < buffer.getContainerSize(); i++) held.add(buffer.getItem(i));
         view.store("Buffer", ItemStack.OPTIONAL_CODEC.listOf(), held);
         view.store("Line", ItemStack.OPTIONAL_CODEC.listOf(), new ArrayList<>(line));
+        view.store("Carrier", ItemStack.OPTIONAL_CODEC, carrier);
+        view.putInt("Shape", shape);
     }
 
     @Override
@@ -256,5 +288,7 @@ public class ControllerBlockEntity extends BlockEntity {
         for (int i = 0; i < buffer.getContainerSize(); i++) buffer.setItem(i, i < held.size() ? held.get(i) : ItemStack.EMPTY);
         line.clear();
         line.addAll(view.read("Line", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of()));
+        carrier = view.read("Carrier", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        shape = view.getIntOr("Shape", 0);
     }
 }

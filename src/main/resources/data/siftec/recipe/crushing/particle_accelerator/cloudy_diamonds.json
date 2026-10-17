@@ -1,0 +1,11 @@
+{
+  "type": "create:crushing",
+  "ingredient": "siftec:particle_charge_cloudy_diamonds",
+  "processing_time": 20,
+  "results": [
+    {
+      "id": "minecraft:diamond",
+      "count": 2
+    }
+  ]
+}

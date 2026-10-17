@@ -53,6 +53,8 @@ import java.util.List;
 public final class BuildingLogic {
     /** The speed a building's motor turns its machines at. */
     public static final float MOTOR_RPM = 64;
+    /** A fan blowing up a column (the Particle Accelerator's): Create's most, so the air carries its Core into the wheels. */
+    public static final float LIFT_RPM = 256;
     /** Items the Smelter puts on its Depot at once (the Depot holds one stack; a few at a time keeps the gaps short). */
     static final int SMELTER_BATCH = 4;
 
@@ -98,7 +100,12 @@ public final class BuildingLogic {
             // a fan turned the wrong way would suck instead of blow: the motor turns so it blows away from it
             Direction toward = motor.getBlockState().getValue(com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING);
             BlockState next = level.getBlockState(pos.relative(toward));
-            if (next.getBlock() instanceof EncasedFanBlock) rpm *= next.getValue(EncasedFanBlock.FACING).getAxisDirection().getStep();
+            if (next.getBlock() instanceof EncasedFanBlock) {
+                // a fan that lifts things up a column into Crushing Wheels (the Particle Accelerator's) runs at full
+                // speed: slower, its air holds an item hovering short of the wheels
+                if (next.getValue(EncasedFanBlock.FACING) == Direction.UP) rpm = (int) LIFT_RPM;
+                rpm *= next.getValue(EncasedFanBlock.FACING).getAxisDirection().getStep();
+            }
             // two Crushing Wheels crush only turning against each other: the right one's motor runs the other way
             if (next.getBlock() instanceof com.zurrtum.create.content.kinetics.crusher.CrushingWheelBlock && t != null) {
                 for (BuildingTemplate.Cell cell : t.members) if (p.at(cell).equals(pos) && cell.x() > 0) rpm = -rpm;
@@ -107,6 +114,29 @@ public final class BuildingLogic {
             motor.setChanged();
         }
         syncFilter(level, c);
+        formTanks(level, c);
+        Processors.ensureCell(level, c);
+    }
+
+    /**
+     * Joins the building's Fluid Tanks into the tanks its template draws (a boiler of 2 by 2 by 2, of 3 by 3 by 8), as Create
+     * does when a player puts tanks side by side, and lets each boiler count the Steam Engines on it.
+     */
+    static void formTanks(ServerLevel level, ControllerBlockEntity c) {
+        List<BlockPos> tanks = cells(c, create("fluid_tank"));
+        tanks.sort(java.util.Comparator.<BlockPos>comparingInt(BlockPos::getY).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ));
+        for (BlockPos pos : tanks) {
+            if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity tank && tank.isController()
+                && tank.getWidth() == 1 && tank.getHeight() == 1) {
+                com.zurrtum.create.api.connectivity.ConnectivityHandler.formMulti(tank);
+            }
+        }
+        for (BlockPos pos : tanks) {
+            if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity tank && tank.isController()) {
+                tank.updateBoilerState();
+                tank.updateBoilerTemperature();
+            }
+        }
     }
 
     /** The Basin's filter follows the controller's. */
@@ -150,7 +180,8 @@ public final class BuildingLogic {
             case "basin" -> ProductionLogic.heat(level, c);
             case "assembly" -> ProductionLogic.assemble(level, c, def);
             case "packager" -> ProductionLogic.pack(level, c);
-            case "processor" -> ProductionLogic.process(level, c, def);
+            case "processor" -> Processors.tick(level, c, def);
+            case "power" -> Generators.tick(level, c, def);
             case "extractor" -> ExtractorLogic.extract(level, c, def);
             case "pressurizer" -> ExtractorLogic.pressurize(level, c, def);
             case "well_extractor" -> ExtractorLogic.wellExtract(level, c, def);
@@ -203,7 +234,7 @@ public final class BuildingLogic {
                 yield onLine || ProductionLogic.basinHasInput(level, c, true);
             }
             case "packager" -> !c.input.getItem(0).isEmpty() || ProductionLogic.packagerHolds(level, c);
-            case "processor" -> c.progress > 0 || ProductionLogic.processorReady(level, c, def);
+            case "processor" -> ProductionLogic.basinHasInput(level, c, true) || Processors.busy(level, c) || Processors.ready(level, c, def);
             case "extractor" -> !c.problem.equals("siftec.building.full");
             case "sink" -> !c.input.getItem(0).isEmpty();
             default -> true;

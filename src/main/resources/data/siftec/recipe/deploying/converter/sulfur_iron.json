@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:conversion_core_sulfur_iron",
+  "ingredient": "siftec:reanimated_sam",
+  "results": [
+    {
+      "id": "siftec:incomplete_conversion_sulfur_iron"
+    }
+  ]
+}

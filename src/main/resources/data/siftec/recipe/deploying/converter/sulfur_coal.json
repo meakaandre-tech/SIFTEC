@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:conversion_core_sulfur_coal",
+  "ingredient": "siftec:reanimated_sam",
+  "results": [
+    {
+      "id": "siftec:incomplete_conversion_sulfur_coal"
+    }
+  ]
+}

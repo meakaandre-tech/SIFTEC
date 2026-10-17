@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/incomplete_conversion_iron_ore_limestone",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 7356560
+      }
+    ]
+  }
+}

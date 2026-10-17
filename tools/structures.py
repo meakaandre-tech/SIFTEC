@@ -427,79 +427,140 @@ def power_storage():
     return f.done()
 
 
+# ---- the generators' machines (Power tab): a real Create boiler (Fluid Tank over Blaze Burners, or over Create: New
+# Age's Heaters in the Nuclear Power Plant) drives Steam Engines, Diesel Generators' engine drives the Fuel Generator and
+# the geyser's turbine the Geothermal Generator; the shaft turns Create: New Age generator coils, ringed with magnets, and
+# carbon brushes take their energy for the grid. The magnets are what make the MW: a coil gives the SU its magnets take
+# off the shaft as New Age energy, so magnets x RPM = Satisfactory's MW x 204.8.
+ENGINE = "create:steam_engine[face=wall,facing={},waterlogged=false]"
+POWERED_SHAFT = "create:powered_shaft[axis={}]"
+SHAFT_A = "create:shaft[axis={}]"
+COG_A = "create:cogwheel[axis={}]"
+LARGE_COG = "create:large_cogwheel[axis={}]"
+COIL_A = "create_new_age:generator_coil[axis={}]"
+BRUSHES = "create_new_age:carbon_brushes[facing={}]"
+NETHERITE, FLUXUATED = "create_new_age:netherite_magnet", "create_new_age:fluxuated_magnetite"
+HEATER = "create_new_age:heater[blaze=none]"
+VENT = "create_new_age:reactor_heat_vent[facing=down]"
+ROD = "create_new_age:reactor_rod[axis=y,lit=false]"
+ACCEPTOR = "create_new_age:reactor_fuel_acceptor[facing={}]"
+DIESEL_ENGINE = "createdieselgenerators:diesel_engine[facing={},powered=false,waterlogged=false]"
+
+
+def ring(axis, x, y, z):
+    """The twelve cells round a generator coil (two out from it, square corners left out), cardinal ones first: where
+    New Age looks for its magnets."""
+    near = [(-2, 0), (2, 0), (0, -2), (0, 2), (-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (1, -2), (-1, 2), (1, 2)]
+    out = []
+    for a, b in near:
+        if axis == "x":
+            out.append((x, y + a, z + b))
+        elif axis == "z":
+            out.append((x + a, y + b, z))
+        else:
+            out.append((x + a, y, z + b))
+    return out
+
+
+def coil(f, x, y, z, axis, magnets, filler=LIGHT):
+    """A generator coil with its ring: `magnets` are the magnet blocks, in the ring's order; the rest of the ring is
+    `filler` (no magnet)."""
+    f.set(x, y, z, COIL_A.format(axis))
+    for k, at in enumerate(ring(axis, x, y, z)):
+        f.set(*at, magnets[k] if k < len(magnets) else filler)
+
+
+def generator_box(f, y1, y2, side=ORANGE):
+    """The house: a dark floor with a hazard front, walls of `side` with dark corners from y1 to y2, the inside air."""
+    f.box(-(f.w // 2), 0, 0, f.w // 2, 0, f.d - 1, DARK)
+    f.hazard_x(-(f.w // 2), f.w // 2, 0, 0)
+    f.walls(1, y2, DARK, side)
+
+
 def biomass_burner():
-    # 3 by 3, 6 high: a fire behind glass in an orange box with a dark chimney; fuel goes in at the back, the connector on
-    # the roof
-    f = Frame(3, 3)
-    f.box(-1, 0, 0, 1, 0, 2, DARK)
-    f.walls(1, 2, DARK, ORANGE)
-    f.set(0, 1, 0, GLASS)
-    f.set(0, 2, 0, GLASS)
-    f.set(0, 1, 1, "minecraft:campfire[lit=false,signal_fire=false,waterlogged=false,facing=south]")
-    f.box(-1, 3, 0, 1, 3, 2, DARK)
-    f.set(0, 3, 1, LIGHT)
-    f.box(1, 4, 2, 1, 5, 2, DARK)
+    # 5 wide, 6 deep, 10 high: an orange house with glass sides. At the back a Blaze Burner under a four-high Fluid Tank
+    # (a boiler of size 4: one heat level), its Steam Engine on the tank's front driving a shaft that turns one generator
+    # coil with four netherite magnets (96 SU a turn at 64 RPM: 6,144 SU, 30 MW) and the carbon brushes in the left wall.
+    # The burner is fed from the fuel port at the back; the boiler is a closed loop (Satisfactory's burner takes no water).
+    f = Frame(5, 6)
+    generator_box(f, 1, 8)
+    f.window_side(2, 1, 3, 2, 4)
+    f.window_front(0, 0, 1, 2, 3)
+    f.checker(-2, 0, 2, 5, 9)
+    f.set(1, 1, 5, BURNER)
+    f.box(1, 2, 5, 1, 5, 5, TANK)
+    f.set(1, 5, 4, ENGINE.format("south"))
+    f.set(1, 5, 3, AIR)
+    f.set(1, 5, 2, POWERED_SHAFT.format("x"))
+    f.set(0, 5, 2, SHAFT_A.format("x"))
+    coil(f, -1, 5, 2, "x", [NETHERITE] * 4)
+    f.set(-2, 5, 2, BRUSHES.format("east"))
     f.set(1, 1, 0, CONTROLLER)
-    f.port(0, 0, 2, "north", "item_in", (1, 1, 0))
-    f.set(-1, 4, 1, CONNECTOR)
+    f.port(0, 0, 5, "north", "item_in", (1, 1, 0))
+    f.set(0, 10, 2, CONNECTOR)
     return f.done()
 
 
-def turbine_hall(f, y, z):
-    """A turbine at x = 1 turning two generator coils toward the left, at height y and depth z."""
-    f.set(1, y, z, TURBINE.format("west"))
-    f.set(0, y, z, COIL)
-    f.set(-1, y, z, COIL)
-
-
 def coal_generator():
-    # 5 by 5, 9 high: an orange boiler house with glass sides, two furnaces under a boiler (a fluid tank of water) and the
-    # turbine and coils above, two dark smokestacks; coal in at the back left, water in at the back middle
-    f = Frame(5, 5)
-    f.box(-2, 0, 0, 2, 0, 4, DARK)
-    f.hazard_x(-2, 2, 0, 0)
-    f.walls(1, 5, DARK, ORANGE)
-    f.window_front(0, -1, 1, 3, 4)
-    f.window_side(-2, 1, 3, 3, 4)
-    f.window_side(2, 1, 3, 3, 4)
-    f.checker(-2, 0, 2, 4, 6)
-    f.box(-2, 7, 4, -2, 8, 4, DARK)
-    f.box(2, 7, 4, 2, 8, 4, DARK)
-    f.set(-1, 1, 2, "minecraft:blast_furnace[facing=south,lit=false]")
-    f.set(1, 1, 2, "minecraft:blast_furnace[facing=south,lit=false]")
-    f.set(0, 1, 2, TANK)
-    turbine_hall(f, 3, 2)
+    # 7 wide, 8 deep, 10 high: an orange boiler house with glass sides and two dark smokestacks. At the back a 2 by 2 by 2
+    # Fluid Tank (size 8: two heat levels) over two Blaze Burners, two Steam Engines on its front driving one shaft that turns
+    # a generator coil with ten netherite magnets (240 SU a turn at 64 RPM: 15,360 SU, 75 MW), the carbon brushes beside
+    # it. Coal goes into the burners from the item port; water comes in at the fluid port into the intake tank, from which
+    # the boiler drinks Satisfactory's 45 m3 a minute at full load.
+    f = Frame(7, 8)
+    generator_box(f, 1, 8)
+    f.window_side(-3, 2, 5, 3, 6)
+    f.window_side(3, 2, 5, 3, 6)
+    f.window_front(0, -1, 1, 2, 3)
+    f.checker(-3, 0, 3, 7, 9)
+    f.box(-3, 10, 7, -3, 11, 7, DARK)
+    f.box(3, 10, 7, 3, 11, 7, DARK)
+    f.box(1, 1, 5, 2, 2, 6, DARK)
+    f.set(1, 3, 5, BURNER)
+    f.set(2, 3, 5, BURNER)
+    f.set(1, 3, 6, DARK)
+    f.set(2, 3, 6, DARK)
+    f.box(1, 4, 5, 2, 5, 6, TANK)
+    for x in (1, 2):
+        f.set(x, 5, 4, ENGINE.format("south"))
+        f.set(x, 5, 3, AIR)
+        f.set(x, 5, 2, POWERED_SHAFT.format("x"))
+    f.set(0, 5, 2, SHAFT_A.format("x"))
+    coil(f, -1, 5, 2, "x", [NETHERITE] * 10)
+    f.set(-2, 5, 2, BRUSHES.format("east"))
+    f.set(0, 1, 6, TANK)
     f.set(1, 1, 0, CONTROLLER)
-    f.port(-1, 0, 4, "north", "item_in", (1, 1, 0))
-    f.port(0, 0, 4, "north", "fluid_in", (0, 1, 2))
-    f.set(0, 7, 2, CONNECTOR)
+    f.port(-1, 0, 7, "north", "item_in", (1, 1, 0))
+    f.port(0, 0, 7, "north", "fluid_in", (0, 1, 6))
+    f.set(0, 10, 2, CONNECTOR)
     return f.done()
 
 
 def fuel_generator():
-    # 5 by 5, 8 high: a dark engine house with an orange band and glass, a fuel tank feeding it, the turbine and coils
-    # above; fuel in at the back
-    f = Frame(5, 5)
-    f.box(-2, 0, 0, 2, 0, 4, DARK)
-    f.hazard_x(-2, 2, 0, 0)
-    f.walls(1, 5, DARK, LIGHT)
+    # 5 wide, 6 deep, 9 high: a dark engine house with an orange band and glass. Inside, Diesel Generators' engine turns a
+    # generator coil at 256 RPM; its eight netherite magnets and one fluxuated magnetite take 200 SU a turn (51,200 SU,
+    # 250 MW), and the carbon brushes beside it give that to the grid. Fuel goes straight into the engine at the fuel port.
+    f = Frame(5, 6)
+    generator_box(f, 1, 7, side=LIGHT)
     f.walls(3, 3, ORANGE, ORANGE)
     f.window_front(0, -1, 1, 1, 2)
-    f.window_side(-2, 1, 3, 4, 5)
-    f.window_side(2, 1, 3, 4, 5)
-    f.box(-2, 6, 0, 2, 6, 4, ORANGE)
-    f.set(-1, 1, 2, TANK)
-    f.set(1, 1, 2, DARK)
-    turbine_hall(f, 4, 2)
+    f.window_side(-2, 1, 4, 5, 6)
+    f.window_side(2, 1, 4, 5, 6)
+    f.box(-2, 8, 0, 2, 8, 5, ORANGE)
+    f.set(1, 4, 2, DIESEL_ENGINE.format("west"))
+    coil(f, 0, 4, 2, "x", [NETHERITE] * 8 + [FLUXUATED])
+    f.set(-1, 4, 2, BRUSHES.format("east"))
     f.set(1, 1, 0, CONTROLLER)
-    f.port(-1, 0, 4, "north", "fluid_in", (-1, 1, 2))
-    f.set(0, 7, 2, CONNECTOR)
+    f.port(1, 0, 5, "north", "fluid_in", (1, 4, 2))
+    f.set(0, 9, 2, CONNECTOR)
     return f.done()
 
 
 def geothermal_generator():
-    # 5 by 5, 8 high, on four legs over a sulfur geyser: the vent cell under the middle is left as air, so the geyser
-    # breathes; an acid tank and the turbine inside an orange house, the acid out at the back
+    # 5 wide, 5 deep, 10 high, on four legs over a sulfur geyser: the vent cell under the middle is left as air, so the
+    # geyser breathes. Inside an orange house the geyser's turbine turns two generator coils with twenty netherite magnets
+    # (480 SU a turn) at the speed the geyser gives: 256 RPM at a pure geyser's peak (600 MW), so the power swings with the
+    # geyser as in Satisfactory. The acid tank and its port are at the back.
     f = Frame(5, 5)
     f.box(-2, 0, 0, 2, 0, 4, AIR)
     for x in (-2, 2):
@@ -507,45 +568,83 @@ def geothermal_generator():
             f.set(x, 0, z, DARK)
     f.box(-2, 1, 0, 2, 1, 4, DARK)
     f.hazard_x(-2, 2, 1, 0)
-    f.walls(2, 5, DARK, ORANGE)
-    f.window_front(0, -1, 1, 3, 4)
-    f.window_side(-2, 1, 3, 3, 4)
-    f.window_side(2, 1, 3, 3, 4)
-    f.checker(-2, 0, 2, 4, 6)
+    f.walls(2, 8, DARK, ORANGE)
+    f.window_side(-2, 1, 3, 2, 2)
+    f.window_side(2, 1, 3, 2, 2)
+    f.checker(-2, 0, 2, 4, 9)
     f.set(-1, 2, 2, TANK)
-    turbine_hall(f, 4, 2)
+    f.set(1, 5, 2, TURBINE.format("west"))
+    coil(f, 0, 5, 2, "x", [NETHERITE] * 12)
+    coil(f, -1, 5, 2, "x", [NETHERITE] * 8)
+    f.set(-2, 5, 2, BRUSHES.format("east"))
     f.set(1, 1, 0, CONTROLLER)
     f.port(-1, 2, 4, "north", "fluid_out", (-1, 2, 2))
-    f.set(0, 7, 2, CONNECTOR)
+    f.set(0, 10, 2, CONNECTOR)
     return f.done()
+
+
+# The Nuclear Power Plant's layout (Build Gun frame), shared with building/Reactors.java through siftec_content.json
+NUCLEAR_BOILERS = ((-8, 7), (6, 7))      # each boiler's lowest x and z: 3 by 3 by 8 Fluid Tanks from y 4 to 11
+NUCLEAR_ENGINE_ROWS = range(4, 10)       # six rows of three Steam Engines on each boiler's front
+NUCLEAR_SHAFT_Z = 4
 
 
 def nuclear_power_plant():
-    # 9 wide, 11 deep, 14 high (Satisfactory's reactor and its two cooling towers): a dark reactor hall with an orange band
-    # and glass round three reactor rods, a water tank and the turbine and coils; two round cooling towers behind it, light
-    # with orange and dark bands. Rods and water in at the back, waste out at the front.
-    f = Frame(9, 11)
+    # 21 wide, 11 deep, 17 high (Satisfactory's reactor and its two cooling towers). The two cooling towers are Create
+    # boilers: 3 by 3 by 8 Fluid Tanks (eighteen heat levels each) over nine of Create: New Age's Heaters, which take the
+    # heat of the reactor below them: a layer of New Age heat vents over seven reactor rods each, fed by six fuel
+    # acceptors at the sides. Eighteen Steam Engines on the front of each tower drive six shafts joined by a column of
+    # cogwheels; two large-to-small cogwheel steps take it from 64 to 256 RPM, where seven generator coils with 83
+    # netherite magnets and one fluxuated magnetite take 2,000 SU a turn (512,000 SU, 2,500 MW) and the carbon brushes at
+    # the end give it to the grid. Rods in and waste out at the controller's ports, water into the intake tank at the back.
+    f = Frame(21, 11)
     f.pad()
-    f.hall(-3, 1, 3, 6, 1, 7, side=DARK, corner=DARK)
-    f.walls(4, 4, ORANGE, ORANGE, -3, 3, 1, 6)
-    f.window_front(1, -2, 2, 2, 3)
-    f.window_side(-3, 2, 5, 5, 6)
-    f.window_side(3, 2, 5, 5, 6)
-    f.hazard_x(-3, 3, 1, 1)
-    f.checker(-3, 1, 3, 6, 8)
-    f.box(0, 1, 4, 0, 3, 4, "create_new_age:reactor_rod")
-    f.set(-2, 1, 4, TANK)
-    turbine_hall(f, 5, 4)
-    for cx in (-2, 2):
-        f.drum(cx, 8, 1, 12, 1, LIGHT, band=ORANGE, every=4)
-        f.set(cx, 13, 8, DARK)
+    f.walls(1, 14, DARK, DARK)
+    f.walls(5, 5, ORANGE, ORANGE)
+    f.walls(10, 10, ORANGE, ORANGE)
+    f.window_front(0, -8, -2, 2, 4)
+    f.window_front(0, 2, 8, 2, 4)
+    f.window_side(-10, 2, 8, 6, 9)
+    f.window_side(10, 6, 8, 6, 9)
+    f.hazard_x(-10, 10, 1, 0)
+    f.checker(-10, 0, 10, 10, 15)
+    for bx, bz in NUCLEAR_BOILERS:
+        f.box(bx, 4, bz, bx + 2, 11, bz + 2, TANK)
+        f.box(bx, 3, bz, bx + 2, 3, bz + 2, HEATER)
+        f.box(bx, 2, bz, bx + 2, 2, bz + 2, VENT)
+        f.box(bx, 1, bz, bx + 2, 1, bz + 2, DARK)
+        # seven rods: two rows of three and one, each row fed along its line by a fuel acceptor outside the boiler
+        west = bx < 0
+        ax = bx - 1 if west else bx + 3
+        for k, z in enumerate(range(bz, bz + 3)):
+            f.set(ax, 1, z, ACCEPTOR.format("east" if west else "west"))
+            n = 3 if k < 2 else 1
+            for i in range(n):
+                f.set(bx + i if west else bx + 2 - i, 1, z, ROD)
+        for y in NUCLEAR_ENGINE_ROWS:
+            for x in range(bx, bx + 3):
+                f.set(x, y, bz - 1, ENGINE.format("south"))
+                f.set(x, y, bz - 2, AIR)
+                f.set(x, y, NUCLEAR_SHAFT_Z, POWERED_SHAFT.format("x"))
+    for y in NUCLEAR_ENGINE_ROWS:
+        for x in range(-5, 6):
+            f.set(x, y, NUCLEAR_SHAFT_Z, SHAFT_A.format("x") if x != 0 else COG_A.format("x"))
+    # the column of cogwheels joins the six rows; then 64 -> 128 -> 256 RPM through two large and small cogwheel steps
+    f.set(0, 10, 4, COG_A.format("x"))
+    f.set(1, 10, 4, LARGE_COG.format("x"))
+    f.set(1, 11, 3, COG_A.format("x"))
+    f.set(2, 11, 3, LARGE_COG.format("x"))
+    f.set(2, 12, 2, COG_A.format("x"))
+    for k, x in enumerate(range(3, 10)):
+        coil(f, x, 12, 2, "x", [NETHERITE] * 12 if k < 6 else [NETHERITE] * 11 + [FLUXUATED])
+    f.set(10, 12, 2, BRUSHES.format("west"))
+    f.set(-2, 1, 9, TANK)
     f.set(1, 1, 1, CONTROLLER)
     f.port(0, 0, 0, "south", "item_out", (1, 1, 1))
     f.port(0, 0, 10, "north", "item_in", (1, 1, 1))
-    f.port(-2, 0, 10, "north", "fluid_in", (-2, 1, 4))
-    f.set(0, 9, 3, CONNECTOR)
+    f.port(-2, 0, 10, "north", "fluid_in", (-2, 1, 9))
+    f.set(0, 16, 5, CONNECTOR)
     return f.done()
-
 
 def alien_power_augmenter():
     # 5 by 5, 7 high: brass and glass round a glowing core, orange lid; Alien Power Matrices in at the back
@@ -893,8 +992,10 @@ def resource_well_extractor():
 
 def particle_accelerator():
     # 13 wide, 21 deep, 10 high (Satisfactory's 24 by 38): a long oval track of light and dark panels with glass round an
-    # orange console hall in the middle. Inside the hall, Encased Fans blow up between two Crushing Wheels at full speed;
-    # the building runs the recipe its filter picks. Two items and a fluid in at the back, the item out at the front.
+    # orange console hall in the middle. Inside the hall, at the back, a Mixer over a Brass Basin packs a recipe's inputs
+    # into its Core; the building drops the Core into the column over an Encased Fan, which blows it up between two
+    # Crushing Wheels turning against each other, and what the wheels crush it into comes out over them. Two items and a
+    # fluid in at the back (into the Basin), the item out at the front.
     f = Frame(13, 21)
     f.pad()
     # the track: an oval ring two blocks high
@@ -914,29 +1015,37 @@ def particle_accelerator():
     f.checker(-3, 6, 3, 14, 8)
     f.box(-1, 9, 8, 1, 9, 12, ORANGE)
     f.hazard_x(-3, 3, 1, 6)
-    # the crusher: two wheels turning against each other, the fans blowing up into the gap between them
+    # the Core maker at the back
+    f.set(0, 1, 13, BRASS_BASIN)
+    f.set(0, 2, 13, AIR)
+    mixer(f, 0, 3, 13)
+    # the crusher: the fan blows up through the column between the two wheels, which turn so the gap carries upward
+    f.set(0, 0, 10, MOTOR.format("up"))
+    f.set(0, 1, 10, "create:encased_fan[facing=up]")
+    f.box(0, 2, 10, 0, 3, 10, AIR)
     f.set(-1, 4, 10, "create:crushing_wheel[axis=z]")
     f.set(1, 4, 10, "create:crushing_wheel[axis=z]")
     f.set(0, 4, 10, AIR)
     f.set(-1, 4, 9, MOTOR.format("north"))
     f.set(1, 4, 9, MOTOR.format("north"))
-    f.set(0, 1, 10, "create:encased_fan[facing=up]")
-    f.set(0, 0, 10, MOTOR.format("up"))
-    f.box(0, 2, 10, 0, 3, 10, AIR)
-    f.set(-2, 1, 13, TANK)
+    # where the crushed goods come out, over the wheels, under a dark cap
+    f.box(0, 5, 10, 0, 6, 10, AIR)
+    f.set(0, 7, 10, DARK)
     f.set(1, 1, 6, CONTROLLER)
     f.port(0, 0, 0, "south", "item_out", (1, 1, 6))
-    f.port(-2, 0, 20, "north", "item_in", (1, 1, 6))
-    f.port(0, 0, 20, "north", "item_in", (1, 1, 6))
-    f.port(2, 0, 20, "north", "fluid_in", (-2, 1, 13))
+    f.port(-2, 0, 20, "north", "item_in", (0, 1, 13))
+    f.port(0, 0, 20, "north", "item_in", (0, 1, 13))
+    f.port(2, 0, 20, "north", "fluid_in", (0, 1, 13))
     f.set(0, 10, 10, CONNECTOR)
     return f.done()
 
 
 def converter():
-    # 9 wide, 9 deep, 11 high (Satisfactory's 16 by 16): a dark tower with orange corners and glass round a glowing core,
-    # where an Encased Fan blows through soul fire (Create's haunting) onto a Depot; the building runs the recipe its filter
-    # picks. Two items in at the back, the item and a fluid out at the front.
+    # 9 wide, 9 deep, 11 high (Satisfactory's 16 by 16): a dark tower with orange corners and glass round a glowing core.
+    # At the back a Mixer over a Brass Basin packs a recipe's inputs into its Core; on the Depot in front of it a Deployer
+    # adds the last of a second input (or the Converter Cell a fluid is carried in), and an Encased Fan blowing through
+    # soul fire (Create's haunting) turns it into what the recipe makes. A fluid comes out of its cell in the Item Drain
+    # beside the Depot. Two items in at the back (into the Basin), the item and the fluid out at the front.
     f = Frame(9, 9)
     f.pad()
     f.hall(-3, 1, 3, 7, 1, 7, side=DARK, corner=ORANGE)
@@ -947,21 +1056,28 @@ def converter():
     f.checker(-3, 1, 3, 7, 8)
     f.drum(0, 4, 9, 9, 1, ORANGE)
     f.set(0, 10, 4, "minecraft:amethyst_block")
+    f.box(-1, 4, 3, 1, 6, 5, "minecraft:purple_stained_glass")
+    f.set(0, 5, 4, "minecraft:amethyst_block")
+    # the Core maker
+    f.set(-1, 1, 6, BRASS_BASIN)
+    f.set(-1, 2, 6, AIR)
+    mixer(f, -1, 3, 6)
+    # the haunting line: motor, fan, soul fire, the Depot under the Deployer, and the Item Drain behind the Depot
     f.set(-2, 1, 4, MOTOR.format("east"))
     f.set(-1, 1, 4, "create:encased_fan[facing=east]")
     f.set(0, 1, 4, "minecraft:soul_campfire[lit=true,signal_fire=false,waterlogged=false,facing=south]")
     f.set(1, 1, 4, DEPOT)
-    f.box(-1, 4, 3, 1, 6, 5, "minecraft:purple_stained_glass")
-    f.set(0, 5, 4, "minecraft:amethyst_block")
-    f.set(2, 1, 3, TANK)
+    f.set(1, 2, 4, AIR)
+    f.set(1, 3, 4, DEPLOYER)
+    f.set(1, 3, 3, MOTOR.format("north"))
+    f.set(1, 1, 5, DRAIN)
     f.set(1, 1, 1, CONTROLLER)
     f.port(-1, 0, 0, "south", "item_out", (1, 1, 1))
-    f.port(1, 0, 0, "south", "fluid_out", (2, 1, 3))
-    f.port(-1, 0, 8, "north", "item_in", (1, 1, 1))
-    f.port(1, 0, 8, "north", "item_in", (1, 1, 1))
+    f.port(1, 0, 0, "south", "fluid_out", (1, 1, 5))
+    f.port(-1, 0, 8, "north", "item_in", (-1, 1, 6))
+    f.port(1, 0, 8, "north", "item_in", (-1, 1, 6))
     f.set(-2, 9, 4, CONNECTOR)
     return f.done()
-
 
 # ------------------------------------------------------------------------------------------------ work package 10
 

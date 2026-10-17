@@ -1,0 +1,11 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:charged_nitrogen_cell",
+  "result": {
+    "id": "siftec:converter_cell"
+  },
+  "fluid_result": {
+    "id": "siftec:nitrogen",
+    "amount": 38880
+  }
+}

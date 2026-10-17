@@ -1,0 +1,11 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:charged_ionized_fuel_cell",
+  "result": {
+    "id": "siftec:converter_cell"
+  },
+  "fluid_result": {
+    "id": "siftec:ionized_fuel",
+    "amount": 64800
+  }
+}

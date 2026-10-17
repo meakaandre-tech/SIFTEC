@@ -1,0 +1,20 @@
+{
+  "fluid": "siftec:rocket_fuel",
+  "normal": {
+    "speed": 256.0,
+    "strength": 51200.0,
+    "burn_rate": 0.138889
+  },
+  "modular": {
+    "speed": 256.0,
+    "strength": 51200.0,
+    "burn_rate": 0.138889
+  },
+  "huge": {
+    "speed": 256.0,
+    "strength": 51200.0,
+    "burn_rate": 0.138889
+  },
+  "sound_pitch": 0.8,
+  "burner_multiplier": 1.0
+}

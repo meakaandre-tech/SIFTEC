@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:conversion_core_pink_diamonds",
+  "ingredient": "siftec:quartz_crystal",
+  "results": [
+    {
+      "id": "siftec:incomplete_conversion_pink_diamonds"
+    }
+  ]
+}

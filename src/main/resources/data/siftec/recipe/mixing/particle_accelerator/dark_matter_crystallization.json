@@ -1,0 +1,16 @@
+{
+  "type": "create:mixing",
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 64800,
+      "fluid": "siftec:dark_matter_residue"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:particle_charge_dark_matter_crystallization"
+    }
+  ],
+  "processing_time": 120
+}

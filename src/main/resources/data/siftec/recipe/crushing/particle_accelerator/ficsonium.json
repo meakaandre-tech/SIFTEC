@@ -1,0 +1,10 @@
+{
+  "type": "create:crushing",
+  "ingredient": "siftec:particle_charge_ficsonium",
+  "processing_time": 20,
+  "results": [
+    {
+      "id": "siftec:ficsonium"
+    }
+  ]
+}

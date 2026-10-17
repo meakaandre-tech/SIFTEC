@@ -64,6 +64,14 @@ public interface PowerMember {
     default void sunk(double su) {
     }
 
+    /**
+     * True for a generator whose machines have what they need but are still getting going (a boiler heating up, an
+     * engine spinning up): a grid short of power while one is starting has no power yet, but its fuse holds.
+     */
+    default boolean starting() {
+        return false;
+    }
+
     default boolean holdsFuse() {
         return false;
     }

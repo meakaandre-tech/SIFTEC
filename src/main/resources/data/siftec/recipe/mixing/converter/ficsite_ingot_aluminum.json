@@ -1,0 +1,22 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:aluminum_ingot",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_ficsite_ingot_aluminum"
+    }
+  ],
+  "processing_time": 80
+}

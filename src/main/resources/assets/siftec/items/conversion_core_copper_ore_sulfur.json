@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/conversion_core_copper_ore_sulfur",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 11563232
+      }
+    ]
+  }
+}

@@ -60,9 +60,7 @@ import java.util.Map;
  * Generators and storage hold the grid's fuse; using one while sneaking resets it.
  */
 public final class BuildingPower {
-    /** Satisfactory's geothermal output on a normal vent averages 200 MW; here a whole interval's worth comes out in a burst. */
-    public static final double GEYSER_AVERAGE_MW = 200, GEYSER_BURST_MW = 2000, GEYSER_INTERVAL_S = 45;
-    /** Sulfuric acid a second of eruption leaves in the Geothermal Generator's tank (the old Geyser Engine's rate). */
+    /** Sulfuric acid a second of running leaves in the Geothermal Generator's tank (the old Geyser Engine's rate). */
     public static final int ACID_PER_SECOND = 50;
     /** Ticks an Alien Power Matrix keeps an Augmenter fed (Satisfactory feeds it five a minute). */
     public static final int MATRIX_TICKS = 240;
@@ -112,8 +110,14 @@ public final class BuildingPower {
          */
         @Override
         public double demand() {
-            if (c.isRemoved()) return 0;
-            return BuildingLogic.idle(level, c, def) ? STANDBY_SU : def.su();
+            if (c.isRemoved() || c.broken) return 0;
+            if (BuildingLogic.idle(level, c, def)) {
+                c.demandSu = STANDBY_SU;
+                return STANDBY_SU;
+            }
+            // the Particle Accelerator and the Converter draw Satisfactory's power for where they are in their recipe's cycle
+            c.demandSu = def.logic().equals("processor") ? Processors.demand(level, c, def) : def.su();
+            return c.demandSu;
         }
 
         @Override
@@ -130,7 +134,7 @@ public final class BuildingPower {
             if (motors.isEmpty()) return;
             // each motor gets its share of the building's SU as FE; a New Age motor fed less than its full need gives
             // SU in proportion, so it gives exactly this share
-            long fe = Math.round(Power.feOfSu(def.su() / (double) motors.size()));
+            long fe = Math.round(Power.feOfSu(c.demandSu / (double) motors.size()));
             for (BlockPos pos : motors) {
                 if (level.getBlockEntity(pos) instanceof MotorBlockEntity motor) {
                     var storage = motor.getEnergyStorage();
@@ -277,10 +281,33 @@ public final class BuildingPower {
         };
     }
 
+    /** mB in a cubic metre of fluid (siftec_content.json "mb_per_m3"). */
+    public static int mbPerM3() {
+        readFuel();
+        return mbPerM3;
+    }
+
+    /** True if the waste a fuel rod leaves fits into the plant's output now. */
+    static boolean wasteFits(ControllerBlockEntity c, ItemStack rod) {
+        readFuel();
+        String id = BuiltInRegistries.ITEM.getKey(rod.getItem()).toString();
+        String waste = WASTE.get(id);
+        if (waste == null) return true;
+        Item wasteItem = BuiltInRegistries.ITEM.getValue(Identifier.parse(waste));
+        int n = WASTE_COUNT.getOrDefault(id, 1);
+        ItemStack out = c.output.getItem(0);
+        return out.isEmpty() || out.is(wasteItem) && out.getCount() + n <= out.getMaxStackSize();
+    }
+
+    /** True if the Geothermal Generator's acid tank has room for a second's acid. */
+    static boolean acidRoom(Level level, ControllerBlockEntity c) {
+        return !tankFull(level, tank(c));
+    }
+
     /**
-     * A generator. Its fuel is banked as energy (SU-ticks): an item or a little fluid is taken whenever the bank runs
-     * low, and each tick the grid's draw comes off it. Water (the Coal Generator, the Nuclear Power Plant) is drawn from
-     * its tank at Satisfactory's rate times the load; with none, it gives nothing.
+     * A generator: its machines make the power ({@link Generators}), and it offers the grid what its coils' carbon brushes
+     * hold this tick, no more. What the grid draws comes out of the brushes, and the share of it (the load) sets how fast
+     * its fuel burns. Nothing is ever made here: with its machines stopped or broken it offers nothing.
      */
     static final class Generator extends FuseHolder {
         final ServerLevel level;
@@ -301,121 +328,30 @@ public final class BuildingPower {
 
         @Override
         public double capacity() {
-            if (c.isRemoved() || c.tripped) return 0;
-            c.problem = "";
-            if (def.power().equals("geothermal")) return geyser();
-            if (def.water() > 0 && !hasFluid(level, tank(c), Fluids.WATER)) {
-                c.problem = "siftec.power.no_water";
+            if (c.isRemoved() || c.tripped || c.broken) {
+                c.offered = 0;
                 return 0;
             }
-            if (c.energy < full && !refuel()) {
-                if (c.energy <= 0) {
-                    if (c.problem.isEmpty()) c.problem = "siftec.power.no_fuel";
-                    return 0;
-                }
-                return Math.min(full, c.energy);
-            }
-            return full;
+            double su = Generators.offered(level, c);
+            c.offered = su;
+            c.problem = su > 0 ? "" : c.machineProblem.isEmpty() ? "siftec.power.starting" : c.machineProblem;
+            return su;
         }
 
-        /** Takes the next fuel into the bank. False if there is none (or a reactor's waste has nowhere to go). */
-        private boolean refuel() {
-            String kind = def.power();
-            if (kind.equals("fuel")) {
-                // a bucket's worth at most at a time, so the bank never holds much more than the tank gave it
-                Storage<FluidVariant> tank = tankStorage(level, tank(c));
-                if (tank == null) return false;
-                for (StorageView<FluidVariant> view : tank) {
-                    if (view.isResourceBlank() || view.getAmount() < FluidConstants.BUCKET / 1000) continue;
-                    double perMb = fluidMj(kind, view.getResource().getFluid());
-                    if (perMb <= 0) continue;
-                    long mb = Math.max(1, Math.min(view.getAmount() / (FluidConstants.BUCKET / 1000), 10));
-                    try (Transaction tx = Transaction.openOuter()) {
-                        long took = tank.extract(view.getResource(), mb * (FluidConstants.BUCKET / 1000), tx);
-                        if (took <= 0) continue;
-                        tx.commit();
-                        c.energy += Power.suTicksOfMj(perMb * took / (FluidConstants.BUCKET / 1000.0));
-                        c.setChanged();
-                        return true;
-                    }
-                }
-                c.problem = "siftec.power.no_fuel";
-                return false;
-            }
-            ItemStack in = c.input.getItem(0);
-            double mj = itemMj(kind, in);
-            if (mj <= 0) return false;
-            String id = BuiltInRegistries.ITEM.getKey(in.getItem()).toString();
-            String waste = WASTE.get(id);
-            if (waste != null) {
-                Item wasteItem = BuiltInRegistries.ITEM.getValue(Identifier.parse(waste));
-                ItemStack out = c.output.getItem(0);
-                int n = WASTE_COUNT.getOrDefault(id, 1);
-                if (!out.isEmpty() && (!out.is(wasteItem) || out.getCount() + n > out.getMaxStackSize())) {
-                    c.problem = "siftec.power.waste_full";
-                    return false;
-                }
-                if (out.isEmpty()) c.output.setItem(0, new ItemStack(wasteItem, n));
-                else out.grow(n);
-                c.output.setChanged();
-            }
-            in.shrink(1);
-            c.input.setChanged();
-            c.energy += Power.suTicksOfMj(mj);
-            c.made++;
-            c.setChanged();
-            return true;
-        }
-
-        /** While the geyser under it erupts: a burst at 2,000 MW until an interval's worth of energy is out. */
-        private double geyser() {
-            BlockPos vent = vent(level, c);
-            if (vent == null) {
-                c.problem = "siftec.power.no_geyser";
-                return 0;
-            }
-            if (tankFull(level, tank(c))) {
-                c.problem = "siftec.power.acid_full";
-                return 0;
-            }
-            BlockState state = level.getBlockState(vent);
-            boolean erupting = Vents.gasEscapes(level, vent) && state.getValue(PotentSulfurBlock.STATE) == PotentSulfurState.ERUPTING;
-            if (!erupting) {
-                if (c.erupting) {
-                    c.erupting = false;
-                    c.setChanged();
-                }
-                c.energy = 0;
-                c.problem = "siftec.power.waiting";
-                return 0;
-            }
-            if (!c.erupting) {
-                // a new eruption: one interval of the average output, to come out as a burst
-                c.erupting = true;
-                c.made++;
-                c.energy = Power.su(GEYSER_AVERAGE_MW) * GEYSER_INTERVAL_S * 20;
-                c.setChanged();
-            }
-            return c.energy <= 0 ? 0 : Math.min(Power.su(GEYSER_BURST_MW), c.energy);
+        /** Its machines have their fuel (and water) but make nothing yet: a boiler heating up, an engine spinning up. */
+        @Override
+        public boolean starting() {
+            return !c.isRemoved() && !c.tripped && !c.broken && c.offered <= 0 && c.machineProblem.isEmpty();
         }
 
         @Override
         public void generated(double su) {
-            if (su <= 0) {
-                lit(false);
-                return;
-            }
-            c.energy = Math.max(0, c.energy - su);
+            c.loadAt = level.getGameTime();
+            c.load = c.offered > 0 ? (float) Math.min(1, Math.max(0, su / c.offered)) : 0;
             c.lastGenerated = su;
-            if (def.water() > 0) {
-                // m3 a minute at full load, as mB a tick at this load
-                c.fluidOwed += def.water() * mbPerM3 / 1200.0 * (su / full);
-                long mb = (long) c.fluidOwed;
-                if (mb > 0) {
-                    drain(level, tank(c), Fluids.WATER, mb);
-                    c.fluidOwed -= mb;
-                }
-            }
+            if (su <= 0) return;
+            Generators.take(level, c, su);
+            c.energyGiven += su;
             if (def.power().equals("geothermal")) {
                 c.fluidOwed += ACID_PER_SECOND / 20.0;
                 long mb = (long) c.fluidOwed;
@@ -424,7 +360,6 @@ public final class BuildingPower {
                     c.fluidOwed -= mb;
                 }
             }
-            lit(true);
         }
 
         @Override
@@ -433,50 +368,122 @@ public final class BuildingPower {
             if (stats.tripped || stats.produced <= 0) c.lastGenerated = 0;
         }
 
+        /** SU-ticks of fuel it holds: in its machines (burner fuel, the engine's tank, the rods) and at its input. */
         @Override
         public double reserve() {
             String kind = def.power();
             if (kind.equals("geothermal")) return Double.POSITIVE_INFINITY;
-            double r = Math.max(0, c.energy);
-            if (kind.equals("fuel")) {
-                Storage<FluidVariant> tank = tankStorage(level, tank(c));
-                if (tank != null) for (StorageView<FluidVariant> view : tank) {
-                    if (!view.isResourceBlank()) r += Power.suTicksOfMj(fluidMj(kind, view.getResource().getFluid()) * view.getAmount() / (FluidConstants.BUCKET / 1000.0));
+            double r = 0;
+            switch (kind) {
+                case "biomass", "coal" -> {
+                    List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
+                    for (BlockPos pos : burners) {
+                        if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b) {
+                            r += full / Math.max(1, burners.size()) * b.getRemainingBurnTime();
+                        }
+                    }
                 }
-            } else {
-                ItemStack in = c.input.getItem(0);
-                r += Power.suTicksOfMj(itemMj(kind, in) * in.getCount());
+                case "fuel" -> {
+                    BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
+                    if (at != null && level.getBlockEntity(at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
+                        r += Power.suTicksOfMj(fluidMj(kind, e.siftec$fuel().getFluid()) * e.siftec$fuel().getAmount() / (FluidConstants.BUCKET / 1000.0));
+                    }
+                }
+                case "nuclear" -> {
+                    int rods = Math.max(1, BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod")).size());
+                    r += full * Generators.rodFuel(level, c) / (double) rods;
+                }
+                default -> {
+                }
             }
+            ItemStack in = c.input.getItem(0);
+            r += Power.suTicksOfMj(itemMj(kind, in) * in.getCount());
             return r;
         }
 
-        /**
-         * A Geothermal Generator away gives its geyser's average (Satisfactory's 200 MW) rather than whatever part of a
-         * burst it was at, unless it last had no geyser or no room for its acid.
-         */
+        /** Away, a Geothermal Generator gives its geyser's average, not whatever part of its swing it was at. */
         @Override
         public double steady(double capacity) {
             if (!def.power().equals("geothermal")) return capacity;
-            return c.problem.equals("siftec.power.no_geyser") || c.problem.equals("siftec.power.acid_full") ? 0 : Power.su(GEYSER_AVERAGE_MW);
+            BlockPos vent = vent(level, c);
+            if (vent == null || c.problem.equals("siftec.power.acid_full")) return 0;
+            return Power.su(switch (com.meakaandre.siftec.geyser.GeyserPurity.of(level, vent)) {
+                case IMPURE -> 100.0;
+                case PURE -> 400.0;
+                default -> 200.0;
+            });
         }
 
+        /** Burns what it gave while it was away: out of its machines' fuel first, then its input. */
         @Override
         public void spend(double suTicks) {
-            if (suTicks <= 0 || def.power().equals("geothermal")) return;
-            c.energy -= suTicks;
-            while (c.energy < 0 && refuel()) {
-                // each refuel banks the next item (or a little fluid)
+            String kind = def.power();
+            if (suTicks <= 0 || kind.equals("geothermal")) return;
+            double left = suTicks;
+            switch (kind) {
+                case "biomass", "coal" -> {
+                    List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
+                    double per = full / Math.max(1, burners.size());
+                    for (BlockPos pos : burners) {
+                        if (left <= 0) break;
+                        if (!(level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b)) continue;
+                        int ticks = (int) Math.min(b.getRemainingBurnTime(), Math.ceil(left / per));
+                        ((com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor) b).siftec$setRemainingBurnTime(b.getRemainingBurnTime() - ticks);
+                        left -= ticks * per;
+                    }
+                }
+                case "fuel" -> {
+                    BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
+                    if (at != null && level.getBlockEntity(at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
+                        double perMb = fluidMj(kind, e.siftec$fuel().getFluid());
+                        if (perMb > 0) {
+                            long mb = (long) Math.ceil(left / Power.suTicksOfMj(perMb));
+                            long took = drainAny(level, at, mb);
+                            left -= Power.suTicksOfMj(perMb * took);
+                        }
+                    }
+                }
+                case "nuclear" -> {
+                    // the rods burn a tick of fuel each for every tick at full power
+                    long ticks = (long) Math.ceil(left / full);
+                    for (BlockPos pos : BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod"))) {
+                        if (level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity rod) {
+                            rod.fuel = (int) Math.max(0, rod.fuel - ticks);
+                            rod.setChanged();
+                        }
+                    }
+                    left = 0;
+                }
+                default -> {
+                }
             }
-            c.energy = Math.max(0, c.energy);
+            while (left > 0) {
+                ItemStack in = c.input.getItem(0);
+                double mj = itemMj(kind, in);
+                if (mj <= 0) break;
+                in.shrink(1);
+                c.input.setChanged();
+                c.made++;
+                left -= Power.suTicksOfMj(mj);
+            }
             c.setChanged();
         }
+    }
 
-        private void lit(boolean on) {
-            if (c.running == on) return;
-            c.running = on;
-            c.setChanged();
-            BuildingPower.visual(level, c, on);
+    /** Drains mB of whatever fluid a block's tank holds; how many mB came out. */
+    private static long drainAny(Level level, BlockPos pos, long mb) {
+        Storage<FluidVariant> tank = ProductionLogic.fluids(level, pos, null);
+        if (tank == null) return 0;
+        long took = 0;
+        try (Transaction tx = Transaction.openOuter()) {
+            for (StorageView<FluidVariant> view : tank) {
+                if (view.isResourceBlank()) continue;
+                took += tank.extract(view.getResource(), (mb - took) * (FluidConstants.BUCKET / 1000), tx) / (FluidConstants.BUCKET / 1000);
+                if (took >= mb) break;
+            }
+            tx.commit();
         }
+        return took;
     }
 
     // ------------------------------------------------------------------------------------------------ augmenter
@@ -581,8 +588,20 @@ public final class BuildingPower {
 
     // ------------------------------------------------------------------------------------------------ fluids and looks
 
-    /** The fluid tank inside a building (water, fuel or acid), or null. */
-    static @Nullable BlockPos tank(ControllerBlockEntity c) {
+    /**
+     * The tank a generator's fluid port works on (the Coal Generator's and the Nuclear Power Plant's water intake, the
+     * Geothermal Generator's acid tank), or else its first Fluid Tank; null if it has none.
+     */
+    public static @Nullable BlockPos tank(ControllerBlockEntity c) {
+        Placement p = c.placement();
+        BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
+        if (t != null) {
+            for (BuildingTemplate.Cell cell : t.members) {
+                if (cell.state().is(ModBlocks.BUILDING_PORT.get()) && cell.state().getValue(PortBlock.KIND).fluid() && cell.target() != null) {
+                    return p.at(cell.target()[0], cell.target()[1], cell.target()[2]);
+                }
+            }
+        }
         return BuildingLogic.cell(c, net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", "fluid_tank")));
     }
 
@@ -630,10 +649,7 @@ public final class BuildingPower {
         return v == null ? null : Vents.findVent(level, p.at(v[0], v[1], v[2]));
     }
 
-    /**
-     * A generator's look follows whether it runs: its fires (campfires, furnaces) are lit and its turbine turns the
-     * generator coils while it gives power.
-     */
+    /** A generator's look follows whether it runs: its fires (campfires, furnaces) are lit while it gives power. */
     static void visual(ServerLevel level, ControllerBlockEntity c, boolean on) {
         Placement p = c.placement();
         BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
@@ -646,7 +662,6 @@ public final class BuildingPower {
                 && state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) != on) {
                 level.setBlock(pos, state.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT, on), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
             }
-            if (state.is(ModBlocks.TURBINE.get()) && level.getBlockEntity(pos) instanceof TurbineBlockEntity turbine) turbine.run(on);
         }
     }
 
@@ -660,8 +675,13 @@ public final class BuildingPower {
             case "storage" -> parts.add(Component.translatable("siftec.power.stored", Power.suHours(c.energy),
                 Power.suHours(Power.su(STORAGE_MWH) * Power.TICKS_PER_HOUR)));
             case "augmenter" -> parts.add(Component.translatable("siftec.power.augmenter", Power.su((float) Power.su(def.mw())), c.fedTicks > 0 ? 30 : 10));
-            case "biomass", "coal", "fuel", "nuclear", "geothermal" -> parts.add(Component.translatable("siftec.power.gives",
-                Power.su((float) c.lastGenerated), Power.su((float) Power.su(def.power().equals("geothermal") ? GEYSER_BURST_MW : def.mw()))));
+            case "biomass", "coal", "fuel", "nuclear", "geothermal" -> {
+                parts.add(Component.translatable("siftec.power.gives", Power.su((float) c.lastGenerated), Power.su((float) c.offered)));
+                if (def.power().equals("geothermal") && level instanceof ServerLevel server) {
+                    BlockPos vent = vent(level, c);
+                    if (vent != null) parts.add(Component.translatable("siftec.power.geyser", Component.translatable(com.meakaandre.siftec.geyser.GeyserPurity.of(server, vent).key())));
+                }
+            }
             default -> {
                 if (def.su() > 0) parts.add(Component.translatable(!c.powered ? "siftec.power.no_power" : c.idle ? "siftec.building.idle" : "siftec.building.su", Power.fmt(def.su())));
             }
@@ -688,6 +708,17 @@ public final class BuildingPower {
         String waste = WASTE.get(id);
         if (waste == null) return;
         ItemStack out = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(waste)), WASTE_COUNT.getOrDefault(id, 1) * used);
+        // the Nuclear Power Plant's own reactor: its waste goes to the plant's output, which the plant made room for
+        BlockPos plant = BuildingIndex.controllerOf(level, acceptor);
+        if (plant != null && level.getBlockEntity(plant) instanceof ControllerBlockEntity c) {
+            ItemStack slot = c.output.getItem(0);
+            if (slot.isEmpty()) c.output.setItem(0, out.copy());
+            else if (ItemStack.isSameItemSameComponents(slot, out)) slot.grow(out.getCount());
+            else net.minecraft.world.Containers.dropItemStack(level, plant.getX() + 0.5, plant.getY() + 1.1, plant.getZ() + 0.5, out.copy());
+            c.output.setChanged();
+            c.wasteMade += out.getCount();
+            return;
+        }
         for (net.minecraft.core.Direction side : net.minecraft.core.Direction.values()) {
             if (out.isEmpty()) break;
             var into = net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, acceptor.relative(side), side.getOpposite());

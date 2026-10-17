@@ -1,0 +1,20 @@
+{
+  "fluid": "siftec:turbofuel",
+  "normal": {
+    "speed": 256.0,
+    "strength": 51200.0,
+    "burn_rate": 0.25
+  },
+  "modular": {
+    "speed": 256.0,
+    "strength": 51200.0,
+    "burn_rate": 0.25
+  },
+  "huge": {
+    "speed": 256.0,
+    "strength": 51200.0,
+    "burn_rate": 0.25
+  },
+  "sound_pitch": 0.8,
+  "burner_multiplier": 1.0
+}

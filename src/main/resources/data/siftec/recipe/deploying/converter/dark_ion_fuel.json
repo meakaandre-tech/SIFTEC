@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:conversion_core_dark_ion_fuel",
+  "ingredient": "siftec:dark_matter_crystal",
+  "results": [
+    {
+      "id": "siftec:incomplete_conversion_dark_ion_fuel"
+    }
+  ]
+}

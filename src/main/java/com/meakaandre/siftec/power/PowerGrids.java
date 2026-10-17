@@ -239,7 +239,7 @@ public final class PowerGrids {
         List<PowerMember> m = grid.members;
         double boost = 0, boosted = 0, flat = 0, demand = 0, stored = 0, storeCap = 0, chargeWant = 0, sinkWant = 0;
         int gens = 0, uses = 0, stores = 0;
-        boolean tripped = false, fuse = false;
+        boolean tripped = false, fuse = false, starting = false;
         // each generator is asked once a tick: asking takes its next fuel when it runs low
         double[] caps = new double[m.size()], demands = new double[m.size()], boosts = new double[m.size()];
         grid.caps = caps;
@@ -263,6 +263,7 @@ public final class PowerGrids {
                 chargeWant += Math.max(0, Math.min(p.chargeRate(), p.storeCapacity() - p.stored()));
             }
             sinkWant += Math.max(0, p.sink());
+            starting |= p.starting();
             if (p.holdsFuse()) {
                 fuse = true;
                 tripped |= p.tripped();
@@ -314,8 +315,9 @@ public final class PowerGrids {
                 }
                 used = capacity;
                 charge = -shortBy;
-            } else if (fuse) {
-                // more than the grid can make or store: the fuse blows, as in Satisfactory
+            } else if (fuse && !starting) {
+                // more than the grid can make or store: the fuse blows, as in Satisfactory (not while a generator's
+                // machines are still getting going: until then the grid just has no power)
                 on = false;
                 tripped = true;
                 for (PowerMember p : m) if (p.holdsFuse()) p.trip(true);

@@ -1,0 +1,10 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_caterium_ore_copper",
+  "results": [
+    {
+      "id": "create:raw_zinc",
+      "count": 12
+    }
+  ]
+}

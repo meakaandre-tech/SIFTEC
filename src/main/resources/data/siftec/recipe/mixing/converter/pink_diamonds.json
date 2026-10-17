@@ -1,0 +1,21 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "siftec:quartz_crystal",
+    "siftec:quartz_crystal"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_pink_diamonds"
+    }
+  ],
+  "processing_time": 80
+}

@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:conversion_core_caterium_ore_quartz",
+  "ingredient": "siftec:reanimated_sam",
+  "results": [
+    {
+      "id": "siftec:incomplete_conversion_caterium_ore_quartz"
+    }
+  ]
+}

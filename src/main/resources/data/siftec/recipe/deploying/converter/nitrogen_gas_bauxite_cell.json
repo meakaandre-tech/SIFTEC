@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:incomplete_conversion_nitrogen_gas_bauxite",
+  "ingredient": "siftec:converter_cell",
+  "results": [
+    {
+      "id": "siftec:loaded_conversion_nitrogen_gas_bauxite"
+    }
+  ]
+}

@@ -56,8 +56,7 @@ import java.util.List;
  * work; the building only carries the item along;</li>
  * <li>packager: empty canisters and tanks go onto the Depot under the Spout, which fills them; packaged fluids go into
  * the Item Drain, which empties them; each at Satisfactory's time;</li>
- * <li>processor (the Particle Accelerator and the Converter): the building runs the recipe its filter picks from its
- * nine input slots and its tank, at Satisfactory's time, while its machines turn.</li>
+ * <li>processor (the Particle Accelerator and the Converter): {@link Processors}, on their machines.</li>
  * </ul>
  */
 public final class ProductionLogic {
@@ -221,7 +220,7 @@ public final class ProductionLogic {
     }
 
     /** Takes one item matching the cost out of the Basin's input slots (0 to 8), or its output slots (9 to 17). */
-    private static ItemStack takeFromBasin(BasinBlockEntity basin, Milestone.Cost cost, boolean output) {
+    static ItemStack takeFromBasin(BasinBlockEntity basin, Milestone.Cost cost, boolean output) {
         Container inv = basin.itemCapability;
         int from = output ? 9 : 0, to = output ? Math.min(18, inv.getContainerSize()) : 9;
         for (int i = from; i < to; i++) {
@@ -235,7 +234,7 @@ public final class ProductionLogic {
         return ItemStack.EMPTY;
     }
 
-    private static ItemStack held(Level level, Station s) {
+    static ItemStack held(Level level, Station s) {
         if (s.kind.equals("drain")) {
             return level.getBlockEntity(s.at) instanceof ItemDrainBlockEntity d && d.heldItem != null ? d.heldItem.stack : ItemStack.EMPTY;
         }
@@ -243,7 +242,7 @@ public final class ProductionLogic {
         return ItemStack.EMPTY;
     }
 
-    private static ItemStack lift(Level level, Station s) {
+    static ItemStack lift(Level level, Station s) {
         if (s.kind.equals("drain")) {
             if (!(level.getBlockEntity(s.at) instanceof ItemDrainBlockEntity d) || d.heldItem == null) return ItemStack.EMPTY;
             ItemStack out = d.heldItem.stack.copy();
@@ -259,7 +258,7 @@ public final class ProductionLogic {
         return out;
     }
 
-    private static boolean put(Level level, Station s, ItemStack stack) {
+    static boolean put(Level level, Station s, ItemStack stack) {
         if (s.kind.equals("drain")) {
             if (!(level.getBlockEntity(s.at) instanceof ItemDrainBlockEntity d) || d.heldItem != null) return false;
             // in from above: it is drained in the middle and stays there, the cell below it being the floor
@@ -274,7 +273,7 @@ public final class ProductionLogic {
     }
 
     /** Puts what is left of a finished item into the building's output; false if it does not fit. */
-    private static boolean deliver(ControllerBlockEntity c, ItemStack stack) {
+    static boolean deliver(ControllerBlockEntity c, ItemStack stack) {
         ItemStack out = c.output.getItem(0);
         if (out.isEmpty()) {
             c.output.setItem(0, stack.copy());
@@ -287,7 +286,7 @@ public final class ProductionLogic {
         return true;
     }
 
-    private static boolean outputHasRoom(ControllerBlockEntity c, ItemStack stack) {
+    static boolean outputHasRoom(ControllerBlockEntity c, ItemStack stack) {
         ItemStack out = c.output.getItem(0);
         return out.isEmpty() || ItemStack.isSameItemSameComponents(out, stack) && out.getCount() + stack.getCount() <= out.getMaxStackSize();
     }
@@ -401,7 +400,7 @@ public final class ProductionLogic {
     }
 
     /** An item taken out of the Basin that could not be used goes back into its input slots. */
-    private static void giveBack(BasinBlockEntity basin, ItemStack stack) {
+    static void giveBack(BasinBlockEntity basin, ItemStack stack) {
         Container inv = basin.itemCapability;
         for (int i = 0; i < 9 && !stack.isEmpty(); i++) {
             ItemStack s = inv.getItem(i);
@@ -606,73 +605,6 @@ public final class ProductionLogic {
         if (def == null || !def.logic().equals("processor") || stack.isEmpty()) return false;
         List<Milestone.Cost> inputs = processorInputs(c, def);
         return !inputs.isEmpty() && inputs.get(slot % inputs.size()).matches(stack);
-    }
-
-    private static int have(ControllerBlockEntity c, Milestone.Cost cost) {
-        int n = 0;
-        for (int i = 0; i < c.buffer.getContainerSize(); i++) if (cost.matches(c.buffer.getItem(i))) n += c.buffer.getItem(i).getCount();
-        return n;
-    }
-
-    private static boolean ready(Level level, ControllerBlockEntity c, ProcessorRecipe r, @Nullable BlockPos tank) {
-        for (Milestone.Cost cost : r.inputs()) if (have(c, cost) < cost.count()) return false;
-        if (r.fluidIn() != null && mbAt(level, tank, ProcessorRecipe.fluid(r.fluidIn())) < r.fluidInMb()) return false;
-        if (r.fluidOut() != null) {
-            Fluid made = ProcessorRecipe.fluid(r.fluidOut());
-            if (made == Fluids.EMPTY || fill(level, tank, made, r.fluidOutMb(), true) < r.fluidOutMb()) return false;
-        }
-        return r.outItem() == null || r.item() != Items.AIR && outputHasRoom(c, new ItemStack(r.item(), r.outCount()));
-    }
-
-    /** True if the building has what one of its filter's recipes needs, and room for what it makes. */
-    static boolean processorReady(Level level, ControllerBlockEntity c, BuildingDef def) {
-        BlockPos tank = BuildingLogic.cell(c, create("fluid_tank"));
-        for (ProcessorRecipe r : processorRecipes(c, def)) if (ready(level, c, r, tank)) return true;
-        return false;
-    }
-
-    static void process(ServerLevel level, ControllerBlockEntity c, BuildingDef def) {
-        List<ProcessorRecipe> recipes = processorRecipes(c, def);
-        if (recipes.isEmpty()) {
-            c.problem = c.filter.isEmpty() ? "siftec.building.no_filter_set" : "siftec.building.no_recipe";
-            c.progress = 0;
-            return;
-        }
-        BlockPos tank = BuildingLogic.cell(c, create("fluid_tank"));
-        ProcessorRecipe r = null;
-        for (ProcessorRecipe each : recipes) {
-            if (ready(level, c, each, tank)) {
-                r = each;
-                break;
-            }
-        }
-        if (!c.powered) {
-            c.problem = "siftec.building.stopped";
-            return;
-        }
-        c.problem = "";
-        if (r == null) {
-            c.progress = 0;
-            return;
-        }
-        if (++c.progress < r.seconds() * 20) return;
-        c.progress = 0;
-        for (Milestone.Cost cost : r.inputs()) {
-            int left = cost.count();
-            for (int i = 0; i < c.buffer.getContainerSize() && left > 0; i++) {
-                ItemStack s = c.buffer.getItem(i);
-                if (!cost.matches(s)) continue;
-                int n = Math.min(left, s.getCount());
-                s.shrink(n);
-                left -= n;
-            }
-        }
-        c.buffer.setChanged();
-        if (r.fluidIn() != null) drain(level, tank, ProcessorRecipe.fluid(r.fluidIn()), r.fluidInMb());
-        if (r.fluidOut() != null) fill(level, tank, ProcessorRecipe.fluid(r.fluidOut()), r.fluidOutMb(), false);
-        if (r.outItem() != null) deliver(c, new ItemStack(r.item(), r.outCount()));
-        c.made++;
-        c.setChanged();
     }
 
     // ------------------------------------------------------------------------------------------------ status

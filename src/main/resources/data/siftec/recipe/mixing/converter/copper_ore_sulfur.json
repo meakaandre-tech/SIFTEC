@@ -1,0 +1,31 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:mixing",
+  "ingredients": [
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur",
+    "cgs:sulfur"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_copper_ore_sulfur"
+    }
+  ],
+  "processing_time": 120
+}

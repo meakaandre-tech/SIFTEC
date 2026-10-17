@@ -1,0 +1,13 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:diamond",
+    "minecraft:diamond"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_time_crystal"
+    }
+  ],
+  "processing_time": 200
+}

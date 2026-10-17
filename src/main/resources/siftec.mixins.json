@@ -75,7 +75,9 @@
     "TunnelMixin",
     "building.BasinTypeMixin",
     "building.BrassBasinInventoryMixin",
-    "building.BlazeBurnerAccessor"
+    "building.BlazeBurnerAccessor",
+    "building.BoilerWaterMixin",
+    "building.BurnerLoadMixin"
   ],
   "client": [
     "client.BeltNoPulleyMixin",

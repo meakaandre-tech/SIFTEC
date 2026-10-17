@@ -1,0 +1,11 @@
+{
+  "type": "create:crushing",
+  "ingredient": "siftec:particle_charge_plutonium_pellet",
+  "processing_time": 20,
+  "results": [
+    {
+      "id": "siftec:plutonium_pellet",
+      "count": 30
+    }
+  ]
+}

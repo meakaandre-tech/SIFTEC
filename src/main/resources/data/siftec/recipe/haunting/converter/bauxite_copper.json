@@ -1,0 +1,10 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_bauxite_copper",
+  "results": [
+    {
+      "id": "siftec:raw_bauxite",
+      "count": 12
+    }
+  ]
+}

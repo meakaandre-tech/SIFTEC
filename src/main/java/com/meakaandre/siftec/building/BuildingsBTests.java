@@ -517,7 +517,8 @@ public final class BuildingsBTests {
         beltInto(level, pa, new int[]{-2, 0, 20}, new ItemStack(Items.DIAMOND), 20, 120, 64);
         pipeInto(level, pa, new int[]{2, 0, 20}, fluid("siftec:dark_matter_residue"), 8);
         BlockPos paChest = chestAt(level, pa, new int[]{0, 0, 0});
-        power(level, source, pa, 1, powered);
+        // Dark Matter Crystal draws up to 1,500 MW at the top of its cycle
+        power(level, source, pa, 4, powered);
         measures.add(new Measure("Particle Accelerator: 30 Dark Matter Crystals a minute (2 s each)", () -> made(pac), 27, 31, 1));
 
         // ---- Converter: Time Crystal (2 Diamond, 10 s: 6 a minute), its soul fire and fan turning
@@ -635,6 +636,9 @@ public final class BuildingsBTests {
             && pac != null && pac.filter.is(item("siftec:dark_matter_crystal")), (mc == null ? "-" : mc.filter.toString()) + ", " + (pac == null ? "-" : pac.filter.toString()));
         long before = pac == null ? -1 : pac.made;
         // its belt ran dry before the restart: more diamonds through its input port, and the residue piped in again
+        // the state selftest clears the test companies just after a restart; the buildings' machines run their company's
+        // unlocked recipes only, so the company is made again (with its milestones) once that has run
+        later(level, 100, () -> company(level));
         BlockPos diamondsIn = pa.at(-2, 0, 20);
         var port = ItemStorage.SIDED.find(level, diamondsIn, level.getBlockState(diamondsIn).hasProperty(PortBlock.FACING)
             ? level.getBlockState(diamondsIn).getValue(PortBlock.FACING) : null);
@@ -645,10 +649,10 @@ public final class BuildingsBTests {
             }
         }
         pipeInto(level, pa, new int[]{2, 0, 20}, fluid("siftec:dark_matter_residue"), 8);
-        later(level, 200, () -> {
+        later(level, 400, () -> {
             ControllerBlockEntity p2 = controller(level, pa);
             expect(source, "restart: the Particle Accelerator is back on its grid and goes on making", p2 != null && p2.powered && p2.made > before,
-                p2 == null ? "no controller" : before + " -> " + p2.made + ", " + BuildingLogic.status(level, p2).getString());
+                p2 == null ? "no controller" : before + " -> " + p2.made + ", " + MachineTests.inside(level, p2));
             report(source, "restart result: " + passed + " passed, " + failed + " failed");
         });
         return 1;

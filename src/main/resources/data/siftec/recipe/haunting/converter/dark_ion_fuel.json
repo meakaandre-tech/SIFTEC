@@ -1,0 +1,13 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:loaded_conversion_dark_ion_fuel",
+  "results": [
+    {
+      "id": "siftec:charged_ionized_fuel_cell"
+    },
+    {
+      "id": "siftec:compacted_coal",
+      "count": 4
+    }
+  ]
+}

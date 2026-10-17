@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "siftec:item/conversion_core_bauxite_caterium",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 11563232
+      }
+    ]
+  }
+}

@@ -207,6 +207,10 @@ lang.update({
     "siftec.power.no_geyser": "no geyser under it",
     "siftec.power.no_geyser_place": "A Geothermal Generator has to stand over a sulfur geyser, with a block of air over the geyser's water",
     "siftec.power.waiting": "waiting for the next eruption",
+    "siftec.power.wrong_fuel": "it does not burn that",
+    "siftec.power.no_engine": "its engine is missing (Create: Diesel Generators is not installed)",
+    "siftec.power.starting": "its machines are starting up",
+    "siftec.power.geyser": "on a %s geyser",
     "siftec.power.acid_full": "acid tank full: pipe the sulfuric acid away",
     "siftec.power.lines_full": "That connector takes no more wires",
     "siftec.power.too_long": "Too long: this wire can reach %s blocks",
@@ -552,6 +556,18 @@ for pid, (pname, recipe_list) in content.PROCESSORS.items():
         if p.get("also"): r["also"] = {"item": _item_id(p["also"][0]), "count": p["also"][1]}
         if p["fluid_out"]: r["fluid_out"] = {"fluid": recipes.FLUID_IDS[p["fluid_out"][0]], "mb": p["fluid_out"][1]}
         if p["alt"]: r["alt"] = "alt_" + p["alt"]
+        # how the building's machines run it (recipes.processors): the Core its Mixer makes, the Deployer's steps, what the
+        # fan haunts or the Crushing Wheels crush, the charged cell its Item Drain empties, and Satisfactory's MW over the
+        # recipe's cycle
+        ch = content.PROCESSOR_CHAINS[(pid, p["name"])]
+        if ch["core"]: r["core"] = "siftec:" + ch["core"]
+        if ch.get("crush"): r["crush"] = "siftec:" + ch["crush"]
+        if ch.get("haunt"): r["haunt"] = ch["haunt"]
+        if ch["steps"]: r["steps"] = [{"on": on, "apply": recipes.item(a), "makes": m} for on, a, m in ch["steps"]]
+        if ch["charged"]: r["charged"] = "siftec:" + ch["charged"]
+        if ch["batch"] > 1: r["batch"] = ch["batch"]
+        r["mw"] = list(p["mw"])
+        r["name"] = p["name"]
         out.append(r)
     data["processors"][pid] = out
     lang[f"block.siftec.{pid}"] = pname
@@ -826,17 +842,7 @@ for aid, info in recipes.ALTS.items():
     data["alternates"].append({"id": "alt_" + aid, "building": building, "requires": needs_of(used)})
     lang[f"siftec.alt.alt_{aid}"] = info["name"]
     lang[f"siftec.alt.alt_{aid}.text"] = info["text"]
-for machine, (pname, recipe_list) in content.PROCESSORS.items():
-    for p in recipe_list:
-        if not p["alt"]: continue
-        used = {_item_id(n) for n, c in p["in"]} | {"siftec:building/" + machine}
-        if p["fluid_in"]: used.add(recipes.FLUID_IDS[p["fluid_in"][0]])
-        data["alternates"].append({"id": "alt_" + p["alt"], "building": machine, "requires": needs_of(used)})
-        lang[f"siftec.alt.alt_{p['alt']}"] = p["name"]
-        made_text = ", ".join(x for x in (f"{p['out'][1]} {p['out'][0]}" if p["out"] else "", f"{p['also'][1]} {p['also'][0]}" if p.get("also") else "",
-                                           f"{p['fluid_out'][1]} mB {p['fluid_out'][0]}" if p["fluid_out"] else "") if x)
-        took = ", ".join([f"{c} {n}" for n, c in p["in"]] + ([f"{p['fluid_in'][1]} mB {p['fluid_in'][0]}"] if p["fluid_in"] else []))
-        lang[f"siftec.alt.alt_{p['alt']}.text"] = f"{took} makes {made_text} ({pname})"
+# (the Particle Accelerator's and the Converter's alternates are among recipes.ALTS: their machines' recipes carry them)
 print("alternates:", len(data["alternates"]), "; with nothing required:", [a["id"] for a in data["alternates"] if not a["requires"]])
 # ---- what the Manufacturer, the Quantum Encoder and the Packager run (building/BuildingLogic.java): the steps of each
 # recipe and the milestone, MAM node or alternate it needs, so the building only takes on a recipe its company has
@@ -986,8 +992,22 @@ for kind, table in content.GENERATOR_FUEL.items():
 # each rod's energy is New Age's fuel's for a uranium rod and twice that for plutonium (as in Satisfactory)
 NA_DATA = os.path.join(ROOT, "data", "create_new_age")
 write(os.path.join(NA_DATA, "tags", "item", "nuclear", "fuel.json"), {"replace": True, "values": ["siftec:uranium_fuel_rod", "siftec:plutonium_fuel_rod"]})
-write(os.path.join(NA_DATA, "tags", "item", "nuclear", "energy_28800.json"), {"replace": True, "values": ["siftec:uranium_fuel_rod"]})
-write(os.path.join(NA_DATA, "tags", "item", "nuclear", "energy_57600.json"), {"replace": True, "values": ["siftec:plutonium_fuel_rod"]})
+# A rod lasts Satisfactory's time in the Nuclear Power Plant (2,500 MW): a uranium rod 750,000 MJ (5 minutes), plutonium
+# 1,500,000 MJ (10 minutes). New Age burns one unit of fuel a tick in every rod, and the plant has content.NUCLEAR_RODS
+# of them, so a rod's energy is its ticks times that.
+for rod, (mj, waste, n) in content.GENERATOR_FUEL["nuclear"].items():
+    ticks = round(mj / 2500 * 20)
+    write(os.path.join(NA_DATA, "tags", "item", "nuclear", f"energy_{ticks * content.NUCLEAR_RODS}.json"), {"replace": True, "values": [rod]})
+data["nuclear"] = {"rods": content.NUCLEAR_RODS, "boilers": [list(b) for b in structures.NUCLEAR_BOILERS], "levels": 36}
+# Diesel Generators burns a fluid only if it has a fuel type: Satisfactory's Turbofuel, Rocket Fuel and Ionized Fuel get
+# one at the Fuel Generator's 1.0 numbers (250 MW, MJ a m3), for an engine anywhere; the Fuel Generator's own engine is
+# held to them for every fuel it burns (Diesel Generators' own Fuel and biodiesel too, mixin DieselEngineMixin)
+for fname, mj in content.GENERATOR_FUEL["fuel"].items():
+    fid = recipes.FLUID_IDS[content.SAT_FLUIDS[fname]]
+    if not fid.startswith("siftec:"): continue
+    per = {"speed": 256.0, "strength": round(250 * 204.8, 1), "burn_rate": round(250 / 20 / (mj / content.MB_PER_M3), 6)}
+    write(os.path.join(ROOT, "data", "siftec", "createdieselgenerators", "fuel_type", fid.split(":")[1] + ".json"),
+          {"fluid": fid, "normal": per, "modular": per, "huge": per, "sound_pitch": 0.8, "burner_multiplier": 1.0})
 # thorium, which New Age's own fuel is made from, does not generate (its ore is switched off with the fuel)
 write(os.path.join(NA_DATA, "worldgen", "placed_feature", "thorium_ore.json"), {"feature": "create_new_age:thorium_ore",
       "placement": [{"type": "minecraft:count", "count": 0}]})
@@ -1035,6 +1055,7 @@ lang.update({
     "siftec.building.mined": "%s mined",
     "siftec.building.no_node": "no node under it",
     "siftec.building.full": "output full",
+    "siftec.building.blocked": "something stands where its machines go: clear it and the building rebuilds them",
     "siftec.building.stopped": "not turning",
     "siftec.building.storage": "%s of %s slots used",
     # work package 9

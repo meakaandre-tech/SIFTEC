@@ -34,6 +34,8 @@ jobs:
           curl -fsSL -o libs/create-fly-26.3.jar https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
           # Create: New Age (power: wires, connectors, motors, the reactor), the fork's fabric-26.3 build
           curl -fsSL -o libs/create-new-age-26.3.jar https://github.com/meakaandre-tech/Create-New-Age/releases/download/fabric-26.3-latest/create-new-age-fabric-26.3.jar
+          # Create: Diesel Generators (the Fuel Generator's engine), the fork's fabric-26.3 build
+          curl -fsSL -o libs/createdieselgenerators-26.3.jar https://github.com/meakaandre-tech/Create-Diesel-Generators/releases/download/fabric-26.3-latest/createdieselgenerators-fabric-26.3.jar
           ls -l libs
       - name: Download Traveler's Backpack and its dependencies
         shell: bash

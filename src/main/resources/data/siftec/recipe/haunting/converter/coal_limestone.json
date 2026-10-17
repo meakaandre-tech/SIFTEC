@@ -1,0 +1,10 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_coal_limestone",
+  "results": [
+    {
+      "id": "minecraft:coal",
+      "count": 12
+    }
+  ]
+}

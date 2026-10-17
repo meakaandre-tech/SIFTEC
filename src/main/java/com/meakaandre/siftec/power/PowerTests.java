@@ -168,8 +168,9 @@ public final class PowerTests {
         return total / (FluidConstants.BUCKET / 1000);
     }
 
+    /** The tank its fluid port fills (a generator's water intake). */
     private static @Nullable BlockPos tank(ControllerBlockEntity c) {
-        return BuildingLogic.cell(c, BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", "fluid_tank")));
+        return BuildingPower.tank(c);
     }
 
     private static Item item(String id) {
@@ -217,7 +218,7 @@ public final class PowerTests {
         for (int x = 0; x < dx; x++) {
             for (int z = 0; z < dz; z++) {
                 level.setBlock(from.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
-                for (int y = 0; y < 14; y++) {
+                for (int y = 0; y < 20; y++) {
                     BlockPos p = from.offset(x, y, z);
                     if (!level.getBlockState(p).isAir()) level.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
                 }
@@ -237,15 +238,15 @@ public final class PowerTests {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
         BlockPos s = site();
-        for (int cx = (s.getX() >> 4) - 1; cx <= ((s.getX() + 48) >> 4) + 1; cx++)
+        for (int cx = (s.getX() >> 4) - 1; cx <= ((s.getX() + 84) >> 4) + 1; cx++)
             for (int cz = (s.getZ() >> 4) - 1; cz <= ((s.getZ() + 40) >> 4) + 1; cz++) level.setChunkForced(cx, cz, true);
         // grid 1: Coal Generator, Power Pole Mk.1, Constructor, two motors a player wired up
         BlockPos genAt = s.offset(4, 0, 10), poleAt = s.offset(12, 0, 6), conAt = s.offset(20, 0, 10), motorA = s.offset(12, 0, 2), motorB = s.offset(14, 0, 2);
         // grid 2: Biomass Burner, Power Storage, Alien Power Augmenter, Nuclear Power Plant and a Constructor on a Power Pole Mk.3
-        BlockPos burnAt = s.offset(4, 0, 30), storeAt = s.offset(10, 0, 30), augAt = s.offset(16, 0, 30), nukeAt = s.offset(26, 0, 30),
+        BlockPos burnAt = s.offset(4, 0, 30), storeAt = s.offset(10, 0, 30), augAt = s.offset(16, 0, 30), nukeAt = s.offset(66, 0, 26),
             pole3At = s.offset(16, 0, 22), con2At = s.offset(36, 0, 30);
         if (!restart) {
-            floor(level, s, 48, 40);
+            floor(level, s, 84, 40);
             ControllerBlockEntity gen = build(level, source, "coal_generator", genAt, Direction.SOUTH);
             ControllerBlockEntity pole = build(level, source, "power_pole_mk1", poleAt, Direction.SOUTH);
             ControllerBlockEntity con = build(level, source, "constructor", conAt, Direction.SOUTH);
@@ -263,7 +264,7 @@ public final class PowerTests {
             if (burner != null) burner.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 64));
             if (nuke != null) {
                 fill(level, tank(nuke), Fluids.WATER, 16000);
-                nuke.input.setItem(0, new ItemStack(item("siftec:uranium_fuel_rod"), 2));
+                nuke.input.setItem(0, new ItemStack(item("siftec:uranium_fuel_rod"), 4));
             }
             report(source, "setup: coal generator " + (gen != null) + ", pole " + (pole != null) + ", constructor " + (con != null) + ", player motors " + (ma != null) + " " + (mb != null)
                 + "; burner " + (burner != null) + ", storage " + (store != null) + ", augmenter " + (aug != null) + ", nuclear plant " + (nuke != null)
