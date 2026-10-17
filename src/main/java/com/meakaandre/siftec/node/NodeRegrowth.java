@@ -89,7 +89,8 @@ public final class NodeRegrowth {
                 if (inChunk == null) continue;
                 for (long at : inChunk.toLongArray()) {
                     pos.set(at);
-                    if (!level.isLoaded(pos)) continue;
+                    // a chunk that is loaded but not ticking is left alone: reading it would keep it loaded
+                    if (!level.isLoaded(pos) || !level.shouldTickBlocksAt(pos)) continue;
                     NodeSavedData.Site site = sites.get(at);
                     if (site == null) continue;
                     BlockState state = level.getBlockState(pos);

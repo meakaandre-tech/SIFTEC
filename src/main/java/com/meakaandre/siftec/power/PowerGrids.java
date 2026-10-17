@@ -128,8 +128,8 @@ public final class PowerGrids {
             AbstractElectricalConnector c = it.next();
             // a connector whose chunk stopped ticking leaves: a grid with no ticking connector is balanced by the factory
             // simulation (work package 17); it joins again when it ticks
-            if (c.isRemoved() || c.getLevel() != level || !level.isLoaded(c.getBlockPos()) || level.getBlockEntity(c.getBlockPos()) != c
-                || !level.shouldTickBlocksAt(c.getBlockPos())) {
+            if (c.isRemoved() || c.getLevel() != level || !level.isLoaded(c.getBlockPos()) || !level.shouldTickBlocksAt(c.getBlockPos())
+                || level.getBlockEntity(c.getBlockPos()) != c) {
                 it.remove();
                 continue;
             }

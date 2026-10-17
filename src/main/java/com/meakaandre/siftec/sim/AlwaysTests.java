@@ -446,6 +446,7 @@ public final class AlwaysTests {
     }
 
     private static int loadedB(ServerLevel level) {
+        traced = 0;
         int loaded = 0;
         StringBuilder which = new StringBuilder();
         for (int cx = B.x0() >> 4; cx <= B.x1() >> 4; cx++)
