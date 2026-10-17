@@ -404,12 +404,13 @@ public final class AlwaysTests {
         server.tickRateManager().requestGameToSprint(RUN);
         // a moment later: B is unloaded and simulated
         later(server, 200, () -> {
-            int loaded = 0;
-            for (int cx = B.x0() >> 4; cx <= B.x1() >> 4; cx++) for (int cz = B.z0Area() >> 4; cz <= B.z1Area() >> 4; cz++) if (level.hasChunk(cx, cz)) loaded++;
+            int loaded = loadedB(level), ticking = 0;
+            for (int cx = B.x0() >> 4; cx <= B.x1() >> 4; cx++)
+                for (int cz = B.z0Area() >> 4; cz <= B.z1Area() >> 4; cz++) if (level.shouldTickBlocksAt(new BlockPos(cx << 4, Y, cz << 4))) ticking++;
             List<SimData.Node> nodes = nodes(server, B);
             long sim = nodes.stream().filter(n -> n.sim).count();
-            expect(source, "twin B: its chunks unloaded and its buildings simulated", loaded == 0 && sim >= 6 && sim == nodes.size(),
-                loaded + " chunks loaded, " + sim + " of " + nodes.size() + " buildings simulated");
+            expect(source, "twin B: its chunks stopped ticking and its buildings are simulated", ticking == 0 && sim >= 6 && sim == nodes.size(),
+                ticking + " chunks ticking, " + loaded + " still loaded, " + sim + " of " + nodes.size() + " buildings simulated");
             SimData.Vehicle v = truckB == null ? null : SimData.get(server).vehicle(truckB.toString());
             expect(source, "twin B: its Truck drives its route by time", v != null, v == null ? "not in the simulation" : "at " + Math.round(v.x) + ", " + Math.round(v.z));
             report(source, Factories.stats().line());
@@ -432,6 +433,12 @@ public final class AlwaysTests {
                 + ", energy " + Math.round(n.energy) + ", tripped " + n.tripped + ", caps " + n.inCap + "/" + n.outCap + ", connectors " + n.connectors.size() + ", links out " + links
                 + ", simTime " + n.simTime);
         }
+    }
+
+    private static int loadedB(ServerLevel level) {
+        int loaded = 0;
+        for (int cx = B.x0() >> 4; cx <= B.x1() >> 4; cx++) for (int cz = B.z0Area() >> 4; cz <= B.z1Area() >> 4; cz++) if (level.hasChunk(cx, cz)) loaded++;
+        return loaded;
     }
 
     /** The simulation's nodes of a twin. */
@@ -529,7 +536,7 @@ public final class AlwaysTests {
         report(source, tag + "twin A " + a + " rods (" + da + "), constructor made " + (conA == null ? "?" : conA.made) + "; twin B " + b + " rods (" + db + ")");
         expect(source, tag + "both twins made rods at the Constructor's rate (about 15 a minute)", a >= 100 && b >= 100, a + " and " + b);
         expect(source, tag + "the unloaded twin holds the same rods as the loaded one, within one craft", Math.abs(a - b) <= 1, a + " against " + b);
-        expect(source, tag + "no chunk of twin B was loaded meanwhile", bLoads == 0, bLoads + " loads");
+        expect(source, tag + "no chunk of twin B was loaded meanwhile, and none is loaded now", bLoads == 0 && loadedB(level) == 0, bLoads + " loads, " + loadedB(level) + " loaded now");
         long stopsA = truckStops(server, level, truckA), stopsB = truckStops(server, level, truckB);
         expect(source, tag + "both Trucks drove their loops, stopping at the stations", stopsA >= 4 && stopsB >= 4, "A " + stopsA + " stops, B " + stopsB);
         long sim = nodes(server, B).stream().filter(n -> n.sim).count();
