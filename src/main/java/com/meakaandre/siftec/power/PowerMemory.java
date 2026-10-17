@@ -254,6 +254,13 @@ public class PowerMemory extends SavedData {
             owner.setDirty();
         }
 
+        /** A simulated consumer's demand: what it asks for now, as the simulation runs it. */
+        public void simulateDemand(double demand) {
+            if (this.demand == demand) return;
+            this.demand = demand;
+            owner.setDirty();
+        }
+
         /** What it gave the grid since last asked (SU-ticks): the simulation burns that from its fuel. */
         public double takeSpent() {
             double s = spent;

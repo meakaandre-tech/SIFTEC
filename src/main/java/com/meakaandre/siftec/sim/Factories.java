@@ -259,11 +259,6 @@ public final class Factories {
                 Buffers b = Buffers.of(level, n);
                 if (b != null) b.write(level, n, n.blockPos());
                 if (be instanceof ControllerBlockEntity c) SimAccess.handBack(level, c, n);
-                PowerMemory.Remembered r = PowerMemory.get(level).at(level, n.blockPos());
-                if (r != null) {
-                    r.takeSpent();
-                    r.simulate(r.capacity(), r.demand(), n.stored, Sim.fuelEnergy(n));
-                }
             }
         }
         n.sim = false;
@@ -482,10 +477,11 @@ public final class Factories {
             Node n = data.node(e.getKey());
             ServerLevel level = n == null ? null : level(s, n.dim);
             if (n == null || level == null || !n.sim) continue;
+            // a generator or Power Storage in such a grid is its remembered self (PowerMemory burns and charges it, and
+            // hands that over when it is back); a consumer asks for what the simulation says it needs
+            if (Sim.generator(n) || n.power.equals("storage")) continue;
             PowerMemory.Remembered r = PowerMemory.get(level).at(level, n.blockPos());
-            if (r == null) continue;
-            double cap = Sim.generator(n) ? (n.tripped ? 0 : Math.min(n.fullSu, Sim.fuelEnergy(n) / STEP)) : 0;
-            r.simulate(cap, Sim.demand(n, now), n.stored, Sim.fuelEnergy(n));
+            if (r != null) r.simulateDemand(Sim.demand(n, now));
         }
         data.setDirty();
         mainLastNanos += System.nanoTime() - t0;
@@ -642,8 +638,8 @@ public final class Factories {
     }
 
     /**
-     * A simulated member of a grid PowerGrids balances: whether that grid gave it power, and the fuel its stand-in gave
-     * away meanwhile (burnt here).
+     * A simulated member of a grid PowerGrids balances: whether that grid gave it power; a generator's fuel and a
+     * Power Storage's charge are its remembered stand-in's (PowerMemory), which hands them over when it is back.
      */
     private static void mixedBefore(@Nullable ServerLevel level, Node n) {
         if (level == null) return;
@@ -653,7 +649,6 @@ public final class Factories {
         if (n.su > 0) n.powered = stats != null && stats.powered && !stats.tripped;
         PowerMemory.Remembered r = PowerMemory.get(level).at(level, n.blockPos());
         if (r != null) {
-            if (Sim.generator(n)) Sim.burn(n, r.takeSpent());
             if (n.power.equals("storage")) n.stored = r.stored();
             if (Sim.holdsFuse(n)) n.tripped = r.tripped();
         }
