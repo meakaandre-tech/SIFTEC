@@ -565,6 +565,7 @@ for pid, (pname, recipe_list) in content.PROCESSORS.items():
         if ch.get("haunt"): r["haunt"] = ch["haunt"]
         if ch["steps"]: r["steps"] = [{"on": on, "apply": recipes.item(a), "makes": m} for on, a, m in ch["steps"]]
         if ch["charged"]: r["charged"] = "siftec:" + ch["charged"]
+        if ch["batch"] > 1: r["batch"] = ch["batch"]
         r["mw"] = list(p["mw"])
         r["name"] = p["name"]
         out.append(r)

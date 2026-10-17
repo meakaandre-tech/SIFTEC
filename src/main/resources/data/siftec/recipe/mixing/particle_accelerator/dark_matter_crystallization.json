@@ -3,7 +3,7 @@
   "fluid_ingredients": [
     {
       "type": "fluid_stack",
-      "amount": 32400,
+      "amount": 64800,
       "fluid": "siftec:dark_matter_residue"
     }
   ],
@@ -12,5 +12,5 @@
       "id": "siftec:particle_charge_dark_matter_crystallization"
     }
   ],
-  "processing_time": 60
+  "processing_time": 120
 }

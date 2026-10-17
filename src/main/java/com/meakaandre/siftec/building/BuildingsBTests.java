@@ -649,7 +649,7 @@ public final class BuildingsBTests {
         later(level, 200, () -> {
             ControllerBlockEntity p2 = controller(level, pa);
             expect(source, "restart: the Particle Accelerator is back on its grid and goes on making", p2 != null && p2.powered && p2.made > before,
-                p2 == null ? "no controller" : before + " -> " + p2.made + ", " + BuildingLogic.status(level, p2).getString());
+                p2 == null ? "no controller" : before + " -> " + p2.made + ", " + MachineTests.inside(level, p2));
             report(source, "restart result: " + passed + " passed, " + failed + " failed");
         });
         return 1;

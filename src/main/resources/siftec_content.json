@@ -5706,6 +5706,7 @@
             "makes": "siftec:incomplete_conversion_ficsite_ingot_aluminum"
           }
         ],
+        "batch": 2,
         "mw": [
           100,
           400
@@ -6121,6 +6122,7 @@
           }
         ],
         "charged": "siftec:charged_ionized_fuel_cell",
+        "batch": 2,
         "mw": [
           100,
           400
@@ -6179,6 +6181,7 @@
         },
         "core": "siftec:particle_charge_dark_matter_crystal",
         "crush": "siftec:particle_charge_dark_matter_crystal",
+        "batch": 2,
         "mw": [
           500,
           1500
@@ -6199,6 +6202,7 @@
         },
         "core": "siftec:particle_charge_diamonds",
         "crush": "siftec:particle_charge_diamonds",
+        "batch": 2,
         "mw": [
           250,
           750
@@ -6300,6 +6304,7 @@
         "alt": "alt_cloudy_diamonds",
         "core": "siftec:particle_charge_cloudy_diamonds",
         "crush": "siftec:particle_charge_cloudy_diamonds",
+        "batch": 2,
         "mw": [
           250,
           750
@@ -6320,6 +6325,7 @@
         "alt": "alt_dark_matter_crystallization",
         "core": "siftec:particle_charge_dark_matter_crystallization",
         "crush": "siftec:particle_charge_dark_matter_crystallization",
+        "batch": 2,
         "mw": [
           500,
           1500
@@ -6345,6 +6351,7 @@
         "alt": "alt_dark_matter_trap",
         "core": "siftec:particle_charge_dark_matter_trap",
         "crush": "siftec:particle_charge_dark_matter_trap",
+        "batch": 2,
         "mw": [
           500,
           1500
@@ -6390,6 +6397,7 @@
         "alt": "alt_oil_based_diamonds",
         "core": "siftec:particle_charge_oil_based_diamonds",
         "crush": "siftec:particle_charge_oil_based_diamonds",
+        "batch": 2,
         "mw": [
           250,
           750
@@ -6411,6 +6419,7 @@
         "alt": "alt_petroleum_diamonds",
         "core": "siftec:particle_charge_petroleum_diamonds",
         "crush": "siftec:particle_charge_petroleum_diamonds",
+        "batch": 2,
         "mw": [
           250,
           750
@@ -6436,6 +6445,7 @@
         "alt": "alt_turbo_diamonds",
         "core": "siftec:particle_charge_turbo_diamonds",
         "crush": "siftec:particle_charge_turbo_diamonds",
+        "batch": 2,
         "mw": [
           250,
           750
@@ -13397,9 +13407,9 @@
     "siftec:mixing/converter/coal_limestone": 120,
     "siftec:mixing/converter/copper_ore_quartz": 120,
     "siftec:mixing/converter/copper_ore_sulfur": 120,
-    "siftec:mixing/converter/dark_ion_fuel": 60,
+    "siftec:mixing/converter/dark_ion_fuel": 120,
     "siftec:mixing/converter/dark_matter_residue": 120,
-    "siftec:mixing/converter/ficsite_ingot_aluminum": 40,
+    "siftec:mixing/converter/ficsite_ingot_aluminum": 80,
     "siftec:mixing/converter/ficsite_ingot_caterium": 80,
     "siftec:mixing/converter/ficsite_ingot_iron": 120,
     "siftec:mixing/converter/iron_ore_limestone": 120,
@@ -13512,18 +13522,18 @@
     "siftec:mixing/manufacturer/uranium_fuel_unit_core": 6000,
     "siftec:mixing/manufacturer/xeno_zapper_core": 960,
     "siftec:mixing/melon_jam": 200,
-    "siftec:mixing/particle_accelerator/cloudy_diamonds": 60,
-    "siftec:mixing/particle_accelerator/dark_matter_crystal": 40,
-    "siftec:mixing/particle_accelerator/dark_matter_crystallization": 60,
-    "siftec:mixing/particle_accelerator/dark_matter_trap": 40,
-    "siftec:mixing/particle_accelerator/diamonds": 40,
+    "siftec:mixing/particle_accelerator/cloudy_diamonds": 120,
+    "siftec:mixing/particle_accelerator/dark_matter_crystal": 80,
+    "siftec:mixing/particle_accelerator/dark_matter_crystallization": 120,
+    "siftec:mixing/particle_accelerator/dark_matter_trap": 80,
+    "siftec:mixing/particle_accelerator/diamonds": 80,
     "siftec:mixing/particle_accelerator/ficsonium": 120,
     "siftec:mixing/particle_accelerator/instant_plutonium_cell": 2400,
     "siftec:mixing/particle_accelerator/nuclear_pasta": 2400,
-    "siftec:mixing/particle_accelerator/oil_based_diamonds": 60,
-    "siftec:mixing/particle_accelerator/petroleum_diamonds": 40,
+    "siftec:mixing/particle_accelerator/oil_based_diamonds": 120,
+    "siftec:mixing/particle_accelerator/petroleum_diamonds": 80,
     "siftec:mixing/particle_accelerator/plutonium_pellet": 1200,
-    "siftec:mixing/particle_accelerator/turbo_diamonds": 60,
+    "siftec:mixing/particle_accelerator/turbo_diamonds": 120,
     "siftec:mixing/quantum_encoder/alien_power_matrix_core": 480,
     "siftec:mixing/quantum_encoder/ficsonium_fuel_rod_core": 480,
     "siftec:mixing/quantum_encoder/neural_quantum_processor_core": 400,

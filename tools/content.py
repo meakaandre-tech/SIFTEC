@@ -720,15 +720,20 @@ PROCESSOR_MW = {"particle_accelerator": {"Dark Matter Crystal": (500, 1500), "Di
                                          "Instant Plutonium Cell": (250, 750), "Oil-Based Diamonds": (250, 750),
                                          "Petroleum Diamonds": (250, 750), "Turbo Diamonds": (250, 750)},
                 "converter": {}}
+# A Core carries at least this many seconds of its recipe: the Mixer that packs it takes about two and a half seconds
+# a go (Create's own stroke), so a shorter recipe's Core holds two or three of its crafts, and the Crushing Wheels or the
+# haunting give two or three crafts' results for it (the same items a minute as Satisfactory)
+CORE_SECONDS = 4
 for _machine, (_pname, _list) in PROCESSORS.items():
     for _r in _list:
         _s, _label = slug(_r["name"]), _r["name"]
         _r["mw"] = PROCESSOR_MW[_machine].get(_label, (100, 400))
-        _ch = {"steps": [], "charged": None}
+        _b = max(1, -(-CORE_SECONDS // _r["seconds"]))
+        _ch = {"steps": [], "charged": None, "batch": _b}
         if _machine == "particle_accelerator":
             _ch["core"] = "particle_charge_" + _s
             PARTS.append((_ch["core"], _label + " Particle Charge", "minecraft:item/fire_charge", 0xA0C8FF))
-            _ch["mix"] = list(_r["in"])
+            _ch["mix"] = [(_n, _c * _b) for _n, _c in _r["in"]]
             _ch["crush"] = _ch["core"]
             PROCESSOR_CHAINS[(_machine, _r["name"])] = _ch
             continue
@@ -736,10 +741,10 @@ for _machine, (_pname, _list) in PROCESSORS.items():
         _applied = []
         if len(_ins) == 2:
             (_main, _mn), (_second, _sn) = _ins
-            _ch["mix"] = [(_main, _mn)] + ([(_second, _sn - 1)] if _sn > 1 else [])
+            _ch["mix"] = [(_main, _mn * _b)] + ([(_second, _sn * _b - 1)] if _sn * _b > 1 else [])
             _applied.append(_second)
         elif len(_ins) == 1:
-            _ch["mix"] = list(_ins)
+            _ch["mix"] = [(_n, _c * _b) for _n, _c in _ins]
         elif _ins:
             raise SystemExit(f"Converter recipe {_label}: more than two inputs")
         else:
@@ -753,6 +758,9 @@ for _machine, (_pname, _list) in PROCESSORS.items():
                 PARTS.append((CHARGED_CELLS[_fluid], "Charged " + _fluid.title() + " Cell", "minecraft:item/experience_bottle", None))
             _ch["charged"] = CHARGED_CELLS[_fluid]
         _ch["core"] = "conversion_core_" + _s if _ch["mix"] else None
+        if not _ch["core"]:
+            # no Core (Excited Photonic Matter): the cell goes round once each recipe time
+            _ch["batch"] = _b = 1
         if _ch["core"]:
             PARTS.append((_ch["core"], _label + " Conversion Core", "minecraft:item/magma_cream", 0xB070E0))
         _on = "siftec:" + (_ch["core"] or CONVERTER_CELL)

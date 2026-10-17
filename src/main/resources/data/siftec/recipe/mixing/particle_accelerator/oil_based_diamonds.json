@@ -11,7 +11,7 @@
   "fluid_ingredients": [
     {
       "type": "fluid_stack",
-      "amount": 32400,
+      "amount": 64800,
       "fluid": "createdieselgenerators:crude_oil"
     }
   ],
@@ -20,5 +20,5 @@
       "id": "siftec:particle_charge_oil_based_diamonds"
     }
   ],
-  "processing_time": 60
+  "processing_time": 120
 }

@@ -166,6 +166,7 @@ public final class Processors {
         lift(level, fan);
         // what the wheels crushed comes out over them, marked as theirs
         boolean out = false;
+        int results = 0;
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(gap).expandTowards(0, 3, 0).inflate(0.6))) {
             Optional<BlockPos> from = AllSynchedDatas.BYPASS_CRUSHING_WHEEL.get(e);
             if (from == null || from.isEmpty() || !from.get().equals(gap) || e.getItem().isEmpty()) continue;
@@ -179,13 +180,15 @@ public final class Processors {
             if (slot.isEmpty()) c.output.setItem(0, stack.copyWithCount(fit));
             else slot.grow(fit);
             c.output.setChanged();
+            if (r.outItem() != null && stack.is(ProcessorRecipe.item(r.outItem()))) results += fit;
             stack.shrink(fit);
             if (stack.isEmpty()) e.discard();
             else e.setItem(stack);
             out = true;
         }
         if (out) {
-            c.made++;
+            // crafts made: a Core carries one or more crafts' results
+            c.made += Math.max(1, results / Math.max(1, r.outCount()));
             c.setChanged();
         }
         if (!c.powered) {
@@ -287,9 +290,10 @@ public final class Processors {
                 handOver(level, c, r, basin, on, deployerPos);
                 haunt(level, depotPos, r, on);
             } else if (ProductionLogic.outputHasRoom(c, on)) {
-                // the result: out it goes
-                ProductionLogic.deliver(c, ProductionLogic.lift(level, depot));
-                c.made++;
+                // the result: out it goes (a Core of a short recipe carries more than one craft's)
+                ItemStack result = ProductionLogic.lift(level, depot);
+                c.made += r.outItem() != null && result.is(ProcessorRecipe.item(r.outItem())) ? Math.max(1, result.getCount() / Math.max(1, r.outCount())) : 1;
+                ProductionLogic.deliver(c, result);
                 c.setChanged();
             } else {
                 c.problem = "siftec.building.full";

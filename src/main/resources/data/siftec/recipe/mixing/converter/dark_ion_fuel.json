@@ -13,6 +13,22 @@
     "siftec:packaged_rocket_fuel",
     "siftec:packaged_rocket_fuel",
     "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:packaged_rocket_fuel",
+    "siftec:dark_matter_crystal",
+    "siftec:dark_matter_crystal",
+    "siftec:dark_matter_crystal",
+    "siftec:dark_matter_crystal",
     "siftec:dark_matter_crystal",
     "siftec:dark_matter_crystal",
     "siftec:dark_matter_crystal"
@@ -22,5 +38,5 @@
       "id": "siftec:conversion_core_dark_ion_fuel"
     }
   ],
-  "processing_time": 60
+  "processing_time": 120
 }

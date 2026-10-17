@@ -507,16 +507,18 @@ PROCESSING = {}
 
 def processors():
     global _under
-    emptied = set()
+    emptied, done_empty = {}, set()
     for machine, (pname, recipe_list) in content.PROCESSORS.items():
         for p in recipe_list:
             ch = content.PROCESSOR_CHAINS[(machine, p["name"])]
             s = content.slug(p["name"])
-            ticks = round(p["seconds"] * TICKS)
-            outs = [x for x in (p["out"], p.get("also")) if x]
+            b = ch["batch"]
+            ticks = round(p["seconds"] * TICKS) * b
+            # a Core carries b crafts (content.CORE_SECONDS): its results are b crafts' worth
+            outs = [(n, c * b) for n, c in (x for x in (p["out"], p.get("also")) if x)]
             if p["alt"]:
                 took = ", ".join([f"{c} {n}" for n, c in p["in"]] + ([f"{p['fluid_in'][1]} mB {p['fluid_in'][0]}"] if p["fluid_in"] else []))
-                made_text = ", ".join([f"{c} {n}" for n, c in outs] + ([f"{p['fluid_out'][1]} mB {p['fluid_out'][0]}"] if p["fluid_out"] else []))
+                made_text = ", ".join([f"{c // b} {n}" for n, c in outs] + ([f"{p['fluid_out'][1]} mB {p['fluid_out'][0]}"] if p["fluid_out"] else []))
                 alt(p["alt"], p["name"], f"{took} makes {made_text} ({pname})")
                 _under = None
             else:
@@ -525,7 +527,7 @@ def processors():
             paths = {}
             if ch["mix"] or p["fluid_in"]:
                 paths["mix"] = mix(f"{machine}/{s}", items=[n for n, c in ch["mix"] for _ in range(c)],
-                                   fluids=[p["fluid_in"]] if p["fluid_in"] else [], results=["siftec:" + ch["core"]], time=ticks)
+                                   fluids=[(p["fluid_in"][0], p["fluid_in"][1] * b)] if p["fluid_in"] else [], results=["siftec:" + ch["core"]], time=ticks)
             if machine == "particle_accelerator":
                 paths["crush"] = add("crushing", f"{machine}/{s}", {"type": "create:crushing", "ingredient": item("siftec:" + ch["crush"]),
                                                                    "processing_time": 20, "results": results(outs)})
@@ -537,9 +539,13 @@ def processors():
                     haunted.append(res("siftec:" + ch["charged"]))
                 haunted += results(outs)
                 paths["haunt"] = add("haunting", f"{machine}/{s}", {"type": "create:haunting", "ingredient": item(ch["haunt"]), "results": haunted})
-                if ch["charged"] and ch["charged"] not in emptied:
-                    emptied.add(ch["charged"])
-                    fname, fmb = p["fluid_out"]
+                if ch["charged"]:
+                    # a charged cell is emptied the same for every recipe that fills it
+                    if emptied.setdefault(ch["charged"], b * p["fluid_out"][1]) != b * p["fluid_out"][1]:
+                        raise SystemExit(f"{p['name']}: its charged cell would hold another amount than another recipe's")
+                if ch["charged"] and ch["charged"] not in done_empty:
+                    done_empty.add(ch["charged"])
+                    fname, fmb = p["fluid_out"][0], p["fluid_out"][1] * b
                     paths["empty"] = add("emptying", f"{machine}/{ch['charged']}", {"type": "create:emptying", "ingredient": item("siftec:" + ch["charged"]),
                                                                                  "result": res("siftec:" + content.CONVERTER_CELL), "fluid_result": fl_out(fname, fmb)})
             PROCESSING[(machine, p["name"])] = paths

@@ -81,7 +81,8 @@ from its shape and says so in the log (`building/BuildingRepair.java`); while so
 it makes nothing at all, never power or items in code.
 
 The **Particle Accelerator** and the **Converter** run on their machines too (`building/Processors.java`): a Mixer
-packs each recipe's inputs into its Core in a Brass Basin at Satisfactory's time. In the Particle Accelerator an Encased
+packs each recipe's inputs into its Core in a Brass Basin at Satisfactory's time (a recipe of under 4 seconds packs two
+or three crafts into one Core, for the Mixer's own stroke, and gives that many crafts' results for it). In the Particle Accelerator an Encased
 Fan blows each Core up between two Crushing Wheels, whose crushing gives the result. In the Converter the Core goes on a
 Depot, a Deployer adds the recipe's second input, and an Encased Fan blowing through soul fire haunts it into the
 result; a fluid comes out in a Converter Cell an Item Drain empties into the fluid port. Their power rises from

@@ -565,7 +565,9 @@ public final class MachineTests {
                 nuke == null ? "missing" : nuke.made + " rods, " + nuke.wasteMade + " waste made, " + out[2] + " taken out");
             // Particle Accelerator and Converters
             near(source, "Particle Accelerator: 30 Diamonds a minute, out of its Crushing Wheels", (out[0] - start[7]) / (double) MINUTES, 30, 0.07);
-            expect(source, "every Diamond came from a Core the fan blew up into the wheels", pa != null && pa.launched - start[10] >= out[0] - start[7] && out[0] > start[7],
+            // a Diamonds Core carries two crafts (2 s each: content.CORE_SECONDS), so each gives two Diamonds
+            expect(source, "every Diamond came from a Core the fan blew up into the wheels, two a Core", pa != null && 2 * (pa.launched - start[10]) >= out[0] - start[7]
+                    && 2 * (pa.launched - start[10]) <= out[0] - start[7] + 4 && out[0] > start[7],
                 (pa == null ? "?" : pa.launched - start[10]) + " Cores launched, " + (out[0] - start[7]) + " Diamonds");
             near(source, "its least power over a cycle is 250 MW (51,200 SU)", paDemand[0], su(250), 0.07);
             near(source, "its most power over a cycle is 750 MW (153,600 SU)", paDemand[1], su(750), 0.05);
@@ -647,7 +649,7 @@ public final class MachineTests {
     }
 
     /** What is where inside a Particle Accelerator or Converter, for working out a failure. */
-    private static String inside(ServerLevel level, @Nullable ControllerBlockEntity c) {
+    static String inside(ServerLevel level, @Nullable ControllerBlockEntity c) {
         if (c == null) return "missing";
         StringBuilder b = new StringBuilder(status(level, c));
         com.zurrtum.create.content.processing.basin.BasinBlockEntity basin = ProductionLogic.basin(level, c);

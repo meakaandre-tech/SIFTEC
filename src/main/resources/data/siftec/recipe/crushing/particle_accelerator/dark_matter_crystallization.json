@@ -4,7 +4,8 @@
   "processing_time": 20,
   "results": [
     {
-      "id": "siftec:dark_matter_crystal"
+      "id": "siftec:dark_matter_crystal",
+      "count": 2
     }
   ]
 }
