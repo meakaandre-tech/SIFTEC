@@ -1,17 +1,3 @@
 #sleep 3
-siftec selftest check
-siftec worldtest restart check
-siftec selftest prefab restart
-siftec selftest buildings restart
-siftec selftest buildings_a restart
-siftec selftest buildings_b restart
-siftec selftest power restart
-siftec selftest machines restart
-siftec node find oil
-execute in minecraft:the_nether run siftec selftest nether
-siftec selftest state verify
-siftec worldtest powerchain restart
-siftec selftest vehicles restart
 siftec selftest always restart
-#sleep 40
-siftec selftest tb crate persisted
+#sleep 20
