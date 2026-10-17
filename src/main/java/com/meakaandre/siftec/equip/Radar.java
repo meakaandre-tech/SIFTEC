@@ -60,25 +60,28 @@ public final class Radar {
         Set<String> collected = Set.copyOf(company.collected);
         BlockPos at = c.getBlockPos();
         int cx = Math.floorDiv(at.getX(), Collectibles.CELL), cz = Math.floorDiv(at.getZ(), Collectibles.CELL);
-        NodeMap.async(level.getServer(), () -> {
-            List<Collectibles.Spot> found = new ArrayList<>();
-            for (int dx = -CELLS; dx <= CELLS; dx++) {
+        // the crash sites in range, a row of cells at a time on the worker thread
+        List<Integer> rows = new ArrayList<>();
+        for (int dx = -CELLS; dx <= CELLS; dx++) rows.add(dx);
+        List<Collectibles.Spot> found = new ArrayList<>();
+        NodeMap.batched(level.getServer(), rows, 1, batch -> {
+            List<Collectibles.Spot> out = new ArrayList<>();
+            for (int dx : batch) {
                 for (int dz = -CELLS; dz <= CELLS; dz++) {
                     Collectibles.inCell(level, cx + dx, cz + dz).ifPresent(spot -> {
-                        if (spot.type() == Collectible.CRASH_SITE && !collected.contains(spot.key())) found.add(spot);
+                        if (spot.type() == Collectible.CRASH_SITE && !collected.contains(spot.key())) out.add(spot);
                     });
                 }
             }
-            List<int[]> out = new ArrayList<>();
-            for (Collectibles.Spot s : found) out.add(new int[]{s.x(), 0, s.z()});
             return out;
         }, spots -> {
-            if (spots == null) return;
-            int found = 0;
-            for (int[] s : spots) if (company.revealed.add(s[0] + "," + s[2])) found++;
-            if (found == 0) return;
+            if (spots != null) found.addAll(spots);
+        }, () -> {
+            int fresh = 0;
+            for (Collectibles.Spot s : found) if (company.revealed.add(s.x() + "," + s.z())) fresh++;
+            if (fresh == 0) return;
             Companies.save(level.getServer());
-            Companies.tell(level.getServer(), company, Component.translatable("siftec.radar.revealed", found).withStyle(ChatFormatting.GOLD));
+            Companies.tell(level.getServer(), company, Component.translatable("siftec.radar.revealed", fresh).withStyle(ChatFormatting.GOLD));
         });
     }
 
@@ -97,34 +100,38 @@ public final class Radar {
         BlockPos pos = c.getBlockPos();
         Company company = Companies.of(player);
         player.sendSystemMessage(Component.translatable("siftec.radar.title").withStyle(ChatFormatting.GOLD));
-        // every lookup samples the world generator: the whole sweep runs on the node map's worker thread
         List<NodeType> types = new ArrayList<>();
         for (NodeType type : NodeType.values()) if (type.dimension() == server.dimension() && type.onScanner(company)) types.add(type);
         List<Collectible> objects = new ArrayList<>();
         for (Collectible type : Collectible.values()) if (type.scannerToken.isEmpty() || company.hasToken(type.scannerToken)) objects.add(type);
         Set<String> collected = Set.copyOf(company.collected);
         Terrain.Border border = Terrain.Border.of(server);
-        NodeMap.async(server.getServer(), () -> {
-            List<Component> lines = new ArrayList<>();
-            for (NodeType type : types) {
-                Optional<Node> node = NodeMap.nearest(server, pos.getX(), pos.getZ(), type, NODE_CELLS, border, NodeMap.SEARCH_NANOS / 4);
-                if (node.isEmpty()) continue;
-                Node n = node.get();
-                lines.add(line(NodeBlock.label(type, node), n.x() - pos.getX(), n.z() - pos.getZ(), n.x(), n.z()));
-            }
-            if (server.dimension() == Level.OVERWORLD) {
-                for (Collectible type : objects) {
+        // every lookup samples the world generator: one resource at a time on the worker thread, in small pieces
+        List<Object> wanted = new ArrayList<>(types);
+        if (server.dimension() == Level.OVERWORLD) wanted.addAll(objects);
+        List<Component> lines = new ArrayList<>();
+        NodeMap.batched(server.getServer(), wanted, 1, batch -> {
+            List<Component> out = new ArrayList<>();
+            for (Object what : batch) {
+                if (what instanceof NodeType type) {
+                    Optional<Node> node = NodeMap.nearest(server, pos.getX(), pos.getZ(), type, NODE_CELLS, border, NodeMap.SEARCH_NANOS / 4);
+                    if (node.isEmpty()) continue;
+                    Node n = node.get();
+                    out.add(line(NodeBlock.label(type, node), n.x() - pos.getX(), n.z() - pos.getZ(), n.x(), n.z()));
+                } else if (what instanceof Collectible type) {
                     Optional<Collectibles.Spot> spot = Collectibles.nearest(server, pos.getX(), pos.getZ(), type, collected, OBJECT_CELLS, border, NodeMap.SEARCH_NANOS / 4);
                     if (spot.isEmpty()) continue;
                     Collectibles.Spot s = spot.get();
                     Component name = Component.translatable("siftec.scanner.target." + (type == Collectible.CRASH_SITE ? "hard_drive" : type.id()));
-                    lines.add(line(name, s.x() - pos.getX(), s.z() - pos.getZ(), s.x(), s.z()).copy().withStyle(ChatFormatting.AQUA));
+                    out.add(line(name, s.x() - pos.getX(), s.z() - pos.getZ(), s.x(), s.z()).copy().withStyle(ChatFormatting.AQUA));
                 }
             }
-            return lines;
-        }, lines -> {
+            return out;
+        }, part -> {
+            if (part != null) lines.addAll(part);
+        }, () -> {
             if (player.isRemoved()) return;
-            if (lines == null || lines.isEmpty()) player.sendSystemMessage(Component.translatable("siftec.radar.nothing"));
+            if (lines.isEmpty()) player.sendSystemMessage(Component.translatable("siftec.radar.nothing"));
             else lines.forEach(player::sendSystemMessage);
         });
     }

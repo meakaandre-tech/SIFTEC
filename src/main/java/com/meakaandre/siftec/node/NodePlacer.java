@@ -26,8 +26,8 @@ import java.util.Set;
  * its position ({@link NodeSites}), stands on its middle, and
  * a <b>clump</b> of ordinary breakable blocks (the stone, the ore and the raw ore block, more ore the purer the node)
  * is piled over and round it; it is placed once and never comes back, and a miner can only go on once it is mined.
- * Each chunk places only its own columns of a site, the first time it loads, so no neighbouring chunk is ever forced
- * to load or generate. The height of a surface patch comes from the world generator (the middle height of the ground
+ * Each chunk places only its own columns of a site, the first time it loads, and reads and writes no block outside
+ * itself, so no neighbouring chunk is ever forced to load or generate. The height of a surface patch comes from the world generator (the middle height of the ground
  * across the patch), so every chunk works out the same one. Cave and Nether patches take the floor found when the
  * chunk holding the middle of the node loads.
  */
@@ -44,8 +44,12 @@ public final class NodePlacer {
     private static final int HEADROOM = 6;
     /** Trees and plants are cleared this far above the pad. */
     private static final int CLEAR_PLANTS = 24;
-    /** The deepest the fill under a pad goes looking for solid ground. */
-    private static final int MAX_FILL = 40;
+    /**
+     * The deepest the fill under a pad goes looking for solid ground: a pad never stands on a tall pillar (over a
+     * ravine, a pond the generator missed, or a cave's drop). Caves and the Nether get less, their floors being found
+     * where the node stands.
+     */
+    private static final int MAX_FILL = 10, MAX_FILL_UNDERGROUND = 4;
 
     private record Queued(ResourceKey<Level> dimension, int x, int z) {
     }
@@ -162,15 +166,13 @@ public final class NodePlacer {
                 if (height == NodeSavedData.NO_HEIGHT) {
                     // only the chunk with the middle of the node can choose the height
                     if (node.x() >> 4 != chunkX || node.z() >> 4 != chunkZ) continue;
-                    height = chooseHeight(level, node);
+                    height = chooseHeight(level, node, chunkX, chunkZ);
                     data.setHeight(node.key(), height);
                     if (height == NO_PLACE) continue;
-                    // neighbours that loaded earlier have been waiting for this
+                    // neighbours that loaded earlier have been waiting for this: each places its own piece, in turn
                     for (int dx = -1; dx <= 1; dx++) {
                         for (int dz = -1; dz <= 1; dz++) {
-                            if ((dx != 0 || dz != 0) && level.hasChunk(chunkX + dx, chunkZ + dz)) {
-                                any |= placePiece(level, data, node, chunkX + dx, chunkZ + dz, height);
-                            }
+                            if ((dx != 0 || dz != 0) && level.hasChunk(chunkX + dx, chunkZ + dz)) requeue(level, chunkX + dx, chunkZ + dz);
                         }
                     }
                 }
@@ -191,6 +193,13 @@ public final class NodePlacer {
         return any;
     }
 
+    /** Places a loaded chunk's pieces again from the queue (they are placed once: a piece already down is skipped). */
+    private static void requeue(ServerLevel level, int chunkX, int chunkZ) {
+        synchronized (QUEUE) {
+            QUEUE.add(new Queued(level.dimension(), chunkX, chunkZ));
+        }
+    }
+
     private static boolean placePiece(ServerLevel level, NodeSavedData data, Node node, int chunkX, int chunkZ, int height) {
         long piece = NodeSavedData.piece(node.key(), chunkX, chunkZ);
         if (data.isPlaced(piece)) return false;
@@ -199,8 +208,11 @@ public final class NodePlacer {
         return placed;
     }
 
-    /** The floor a cave or Nether node stands on, found under the middle of the node. NO_PLACE if there is none fit to stand on. */
-    private static int chooseHeight(ServerLevel level, Node node) {
+    /**
+     * The floor a cave or Nether node stands on, found under the middle of the node. NO_PLACE if there is none fit to
+     * stand on. Only the chunk holding the middle of the node is read.
+     */
+    private static int chooseHeight(ServerLevel level, Node node, int chunkX, int chunkZ) {
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         boolean nether = node.type().where == NodeType.Where.NETHER;
         if (nether) {
@@ -208,7 +220,7 @@ public final class NodePlacer {
             java.util.List<Integer> floors = new java.util.ArrayList<>();
             int top = Math.min(level.getMaxY() - 3, level.getMinY() + level.dimensionType().logicalHeight() - 3);
             for (int y = level.getMinY() + 1; y <= top; y++) {
-                if (isFloor(level, pos, node.x(), y, node.z()) && supported(level, pos, node, y)) floors.add(y);
+                if (isFloor(level, pos, node.x(), y, node.z()) && supported(level, pos, node, y, chunkX, chunkZ)) floors.add(y);
             }
             if (floors.isEmpty()) return NO_PLACE;
             if (level.getHeight() <= 256) {
@@ -219,26 +231,35 @@ public final class NodePlacer {
             // a tall Nether of many layers: any of its floors, picked by the node, so every layer gets some
             return floors.get((int) Long.remainderUnsigned(hash(node.key(), 7, 11), floors.size()));
         }
+        // a sulfur cave: the nearest floor to the pocket's middle that the pad can sit on, not over a drop or lava
+        int min = level.getMinY() + 1, max = level.getMaxY() - 3;
         for (int d = 0; d <= 32; d++) {
-            if (isFloor(level, pos, node.x(), node.y() - d, node.z())) return node.y() - d;
-            if (d > 0 && isFloor(level, pos, node.x(), node.y() + d, node.z())) return node.y() + d;
+            for (int y : d == 0 ? new int[]{node.y()} : new int[]{node.y() - d, node.y() + d}) {
+                if (y < min || y > max) continue;
+                if (isFloor(level, pos, node.x(), y, node.z()) && supported(level, pos, node, y, chunkX, chunkZ)) return y;
+            }
         }
-        return node.y();
+        // no floor fit to stand on: left out, rather than a pad hanging in the air on a pillar of fill
+        return NO_PLACE;
     }
 
-    /** True if most of a pad at this height has solid ground under it: not over lava or a drop. */
-    private static boolean supported(ServerLevel level, BlockPos.MutableBlockPos pos, Node node, int y) {
+    /**
+     * True if most of a pad at this height has solid ground under it: not over lava or a drop. Only the pad's columns
+     * inside this chunk are looked at, so a neighbouring chunk is never loaded for it (the middle always is inside).
+     */
+    private static boolean supported(ServerLevel level, BlockPos.MutableBlockPos pos, Node node, int y, int chunkX, int chunkZ) {
         int solid = 0, total = 0;
         for (int dx = -RADIUS; dx <= RADIUS; dx++) {
             for (int dz = -RADIUS; dz <= RADIUS; dz++) {
                 if (dx * dx + dz * dz > PAD_RADIUS * PAD_RADIUS) continue;
+                if (node.x() + dx >> 4 != chunkX || node.z() + dz >> 4 != chunkZ) continue;
                 total++;
                 BlockState state = level.getBlockState(pos.set(node.x() + dx, y, node.z() + dz));
                 BlockState under = level.getBlockState(pos.set(node.x() + dx, y - 1, node.z() + dz));
                 if (!state.isAir() && state.getFluidState().isEmpty() || !under.isAir() && under.getFluidState().isEmpty()) solid++;
             }
         }
-        return solid * 4 >= total * 3;
+        return total > 0 && solid * 4 >= total * 3;
     }
 
     /** Height recorded for a cave or Nether node that has nowhere to stand: it is left out. */
@@ -280,6 +301,7 @@ public final class NodePlacer {
         BlockState fill = pad;
         BlockState air = Blocks.AIR.defaultBlockState();
         boolean cave = node.type().where == NodeType.Where.SULFUR_CAVE;
+        int maxFill = cave || node.type().where == NodeType.Where.NETHER ? MAX_FILL_UNDERGROUND : MAX_FILL;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         int flags = Block.UPDATE_CLIENTS;
         boolean any = false;
@@ -296,7 +318,7 @@ public final class NodePlacer {
                 int roof = cave ? level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - 4 : Integer.MAX_VALUE;
                 // the pad and the fill below it; the flare starts lower the further out it is
                 int top = height - out;
-                for (int y = top, depth = 0; y > minY && depth < MAX_FILL; y--, depth++) {
+                for (int y = top, depth = 0; y > minY && depth < maxFill; y--, depth++) {
                     BlockState here = level.getBlockState(pos.set(x, y, z));
                     boolean solid = !here.isAir() && !here.canBeReplaced() && here.getFluidState().isEmpty() && !plant(here);
                     if (out == 0 && y == height) {

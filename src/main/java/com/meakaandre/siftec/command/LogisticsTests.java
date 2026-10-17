@@ -56,7 +56,8 @@ import java.util.List;
 
 /**
  * Selftests for work package 7, logistics, run by the smoke test: {@code /siftec selftest logistics}. Self-moving
- * belts at every belt tier (and none before Logistics), a shaft-driven belt and a Speed Governor well past the old
+ * belts at every belt tier (and none before Logistics), belts that no shaft or motor drives or is driven by (a running
+ * motor on a belt's shaft, a belt an older world saved in a network), a Speed Governor well past the old
  * company speed limit, the Andesite Tunnel splitting evenly and merging, Drone Ports carrying a package, and the
  * Dimensional Depot uploading from an Item Vault. Every check prints "SELFTEST logistics"; failures say FAIL.
  */
@@ -139,6 +140,31 @@ public final class LogisticsTests {
         return out;
     }
 
+    /**
+     * The id of a test company whose belts carry at least this many items a minute: it has done the milestone of the
+     * slowest belt tier that does (the fastest, if none is that fast). For other selftests that need belts that move.
+     */
+    public static String beltCompany(ServerLevel level, int itemsPerMinute) {
+        List<String> tokens = beltTokens();
+        String token = tokens.isEmpty() ? "" : tokens.getLast();
+        for (String t : tokens) {
+            if (Integer.parseInt(t.substring(5)) >= itemsPerMinute) {
+                token = t;
+                break;
+            }
+        }
+        String id = "selftest_belts_" + token.replace(':', '_');
+        CompanyData data = CompanyData.get(level.getServer());
+        if (data.byId(id) == null) {
+            Company c = new Company();
+            c.id = id;
+            c.name = id;
+            for (Milestone m : Milestones.all()) if (m.tokens().contains(token)) c.done.add(m.id());
+            data.companies().put(id, c);
+        }
+        return id;
+    }
+
     /** A Create belt with no shaft driving it, from {@code from} to {@code to} in a straight line, belonging to a company. */
     private static void belt(ServerLevel level, BlockPos from, BlockPos to, String companyId) {
         int dx = Integer.signum(to.getX() - from.getX()), dz = Integer.signum(to.getZ() - from.getZ());
@@ -216,7 +242,7 @@ public final class LogisticsTests {
             drones(source, level);
             depot(source, level);
         });
-        later(level, 1300, () -> report(source, "done: " + passed + " passed, " + failed + " failed"));
+        later(level, 1500, () -> report(source, "done: " + passed + " passed, " + failed + " failed"));
         report(source, "test site ready; the test runs in a second and reports in about a minute");
         return 1;
     }
@@ -224,7 +250,7 @@ public final class LogisticsTests {
     /**
      * One shaftless belt per belt tier, and one for a company before Logistics. Each gets one item; its speed is measured
      * over {@link #MEASURE_TICKS} ticks and must be the tier's items a minute (single items, one per block of belt).
-     * Then a belt a Creative Motor drives at 200 RPM, owned by a Belt Mk.1 company: it runs at 200, nothing breaks.
+     * Then belts beside a running Creative Motor, owned by a Belt Mk.1 company: no shaft links them, so they run at 24 RPM.
      */
     private static void belts(CommandSourceStack source, ServerLevel level) {
         List<String> tokens = new ArrayList<>(beltTokens());
@@ -262,35 +288,65 @@ public final class LogisticsTests {
                     String.format(java.util.Locale.ROOT, "measured %.1f items/min, %.3f -> %.3f blocks", measured, start[0], now));
             });
         }
-        // driven by a shaft at 200 RPM: that is its speed, whatever the company's belt tier, and nothing breaks
+        // belts never connect to shafts: a Creative Motor at 200 RPM on a belt's end shaft turns neither the belt nor a
+        // shaft at its other end; the belt runs at its company's Belt Mk.1 speed and is linked to nothing
         int row = tokens.size();
         Company slow = company(level, source, "selftest_belt_shaft", "belt:60");
         BlockPos from = new BlockPos(X, Y, Z + 3 * row), to = from.east(BELT_LENGTH - 1);
-        belt(level, from, to, slow.id);
-        BlockPos motorPos = from.north();
+        BlockPos motorPos = from.north(), beyond = to.south();
+        // the motor is running before the belt is put down on the shafts, as a player would build it
         level.setBlock(motorPos, AllBlocks.CREATIVE_MOTOR.defaultBlockState().setValue(BlockStateProperties.FACING, Direction.SOUTH), Block.UPDATE_ALL);
-        BlockEntity motorBe = level.getBlockEntity(motorPos);
-        if (motorBe != null) motorBe.setAttached(Ownership.OWNER, slow.id);
-        if (motorBe instanceof CreativeMotorBlockEntity motor) motor.generatedSpeed.setValue(200);
-        // which way a driven belt runs depends on the sign of its speed: turned round if it runs the wrong way
-        later(level, 10, () -> {
-            if (beltAt(level, from) instanceof BeltBlockEntity b && b.getSpeed() != 0 && b.getMovementFacing() != Direction.EAST
-                && level.getBlockEntity(motorPos) instanceof CreativeMotorBlockEntity motor) {
-                motor.generatedSpeed.setValue(-motor.generatedSpeed.getValue());
-            }
-        });
+        if (level.getBlockEntity(motorPos) instanceof CreativeMotorBlockEntity motor) motor.generatedSpeed.setValue(200);
+        level.setBlock(beyond, AllBlocks.SHAFT.defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.Z), Block.UPDATE_ALL);
+        belt(level, from, to, slow.id);
         later(level, 40, () -> {
             BeltBlockEntity b = beltAt(level, from);
-            expect(source, "a belt a shaft drives at 200 RPM runs at 200 RPM for a Belt Mk.1 company (no speed limit)",
-                b != null && Math.abs(b.getSpeed()) == 200 && b.hasSource(), b == null ? level.getBlockState(from).toString() : b.getSpeed() + " RPM");
+            BeltBlockEntity last = beltAt(level, to);
+            float shaft = level.getBlockEntity(beyond) instanceof KineticBlockEntity k ? k.getSpeed() : -1;
+            float motor = level.getBlockEntity(motorPos) instanceof KineticBlockEntity k ? k.getSpeed() : 0;
+            expect(source, "a belt on a running motor's shaft is not driven by it: it runs at its company's 24 RPM, linked to nothing",
+                b != null && last != null && Math.abs(Math.abs(b.getSpeed()) - SelfMovingBelts.rpm(60)) < 0.01f && b.getMovementFacing() == Direction.EAST
+                    && !SelfMovingBelts.linked(b) && !SelfMovingBelts.linked(last) && motor != 0,
+                b == null ? level.getBlockState(from).toString() : b.getSpeed() + " RPM toward " + b.getMovementFacing() + ", source " + b.hasSource()
+                    + ", network " + b.hasNetwork() + "; motor " + motor + " RPM");
+            expect(source, "a belt turns no shaft: the shaft at its far end stands still", shaft == 0, shaft + " RPM");
             feed(level, from, Direction.EAST, new ItemStack(Items.IRON_INGOT));
         });
         float[] start = {0};
         later(level, 45, () -> start[0] = lead(level, from));
         later(level, 45 + MEASURE_TICKS, () -> {
             float measured = (lead(level, from) - start[0]) / MEASURE_TICKS * 1200;
-            expect(source, "an item on the shaft-driven belt moves at 500 items/min", start[0] >= 0 && Math.abs(measured - 500) <= 15,
+            expect(source, "an item on the belt beside the motor moves at the company's 60 items/min", start[0] >= 0 && Math.abs(measured - 60) <= 2,
                 String.format(java.util.Locale.ROOT, "measured %.1f items/min", measured));
+        });
+        // a belt an older world saved inside a kinetic network (taking a motor's rotation, and handing it on to a shaft):
+        // its first ticks take it out, and the shaft it was turning stops
+        BlockPos oldFrom = from.south(2 * 3), oldTo = oldFrom.east(7), oldMotor = oldFrom.north(), oldShaft = oldTo.south();
+        level.setBlock(oldMotor, AllBlocks.CREATIVE_MOTOR.defaultBlockState().setValue(BlockStateProperties.FACING, Direction.SOUTH), Block.UPDATE_ALL);
+        if (level.getBlockEntity(oldMotor) instanceof CreativeMotorBlockEntity motor) motor.generatedSpeed.setValue(200);
+        belt(level, oldFrom, oldTo, slow.id);
+        level.setBlock(oldShaft, AllBlocks.SHAFT.defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.Z), Block.UPDATE_ALL);
+        later(level, 5, () -> {
+            for (BlockPos p : new BlockPos[]{oldFrom, oldTo}) {
+                if (beltAt(level, p) instanceof BeltBlockEntity b) {
+                    b.setSource(oldMotor);
+                    b.setSpeed(200);
+                }
+            }
+            if (level.getBlockEntity(oldShaft) instanceof KineticBlockEntity k) {
+                k.setSource(oldTo);
+                k.setSpeed(200);
+            }
+        });
+        later(level, 45, () -> {
+            BeltBlockEntity b = beltAt(level, oldFrom), e = beltAt(level, oldTo);
+            float shaft = level.getBlockEntity(oldShaft) instanceof KineticBlockEntity k ? k.getSpeed() : -1;
+            boolean shaftSource = level.getBlockEntity(oldShaft) instanceof KineticBlockEntity k && k.hasSource();
+            expect(source, "a belt saved in a kinetic network is taken out of it, and the shaft it turned stops",
+                b != null && e != null && !SelfMovingBelts.linked(b) && !SelfMovingBelts.linked(e) && shaft == 0 && !shaftSource
+                    && Math.abs(Math.abs(b.getSpeed()) - SelfMovingBelts.rpm(60)) < 0.01f,
+                b == null ? "no belt" : "belt source " + b.hasSource() + ", network " + b.hasNetwork() + ", theoretical " + b.getTheoreticalSpeed()
+                    + ", speed " + b.getSpeed() + "; shaft " + shaft + " RPM, source " + shaftSource);
         });
     }
 
@@ -409,6 +465,38 @@ public final class LogisticsTests {
             expect(source, "the drone delivered the package (5 iron ingots) and came home on one fire charge",
                 a != null && a.state == DronePortBlockEntity.IDLE && a.fuel().getCount() == 2 && a.items.getItem(PortContainer.OUT).isEmpty() && inside == 5,
                 (a == null ? "home port missing" : "home state " + a.state + ", fire charges " + a.fuel().getCount()) + "; arrived " + arrived + " holding " + inside);
+        });
+        // a far port in land nobody has loaded: the drone waits a minute there, gives up and brings the package home,
+        // where it waits to leave again (it is not dropped, and the drone does not hang about for ever)
+        BlockPos lonely = home.south(4), nowhere = home.offset(20_000, 0, 0);
+        level.setBlock(lonely, ModBlocks.DRONE_PORT.get().defaultBlockState(), Block.UPDATE_ALL);
+        if (!(level.getBlockEntity(lonely) instanceof DronePortBlockEntity stray)) return;
+        stray.companyId = c.id;
+        stray.hasDrone = true;
+        stray.destination = nowhere;
+        stray.items.setItem(PortContainer.FUEL, new ItemStack(Items.FIRE_CHARGE, 64));
+        stray.items.setItem(PortContainer.OUT, PackageItem.containing(List.of(new ItemStack(Items.GOLD_INGOT, 3))));
+        stray.setChanged();
+        later(level, 60, () -> {
+            if (level.getBlockEntity(lonely) instanceof DronePortBlockEntity p) {
+                expect(source, "a drone sets off for a port in unloaded land", p.state == DronePortBlockEntity.OUTBOUND && !level.isLoaded(nowhere), "state " + p.state);
+                p.land();
+            }
+        });
+        later(level, 60 + DronePortBlockEntity.GIVE_UP_TICKS + 60, () -> {
+            if (level.getBlockEntity(lonely) instanceof DronePortBlockEntity p) {
+                expect(source, "after a minute waiting at the unloaded port the drone gives up and heads home",
+                    p.gaveUp && p.state == DronePortBlockEntity.HOMEBOUND, "state " + p.state + ", gave up " + p.gaveUp);
+                p.land();
+            }
+        });
+        later(level, 60 + DronePortBlockEntity.GIVE_UP_TICKS + 90, () -> {
+            DronePortBlockEntity p = level.getBlockEntity(lonely) instanceof DronePortBlockEntity q ? q : null;
+            ItemStack back = p == null ? ItemStack.EMPTY : p.items.getItem(PortContainer.OUT);
+            int gold = PackageItem.isPackage(back) ? countIn(PackageItem.getContents(back), Items.GOLD_INGOT) : 0;
+            expect(source, "home again, the port holds the package among those waiting to leave",
+                p != null && p.state == DronePortBlockEntity.IDLE && gold == 3 && "siftec.drone.gave_up".equals(p.statusKey()),
+                p == null ? "port missing" : "state " + p.state + ", waiting to leave " + back + ", status " + p.statusKey());
         });
     }
 

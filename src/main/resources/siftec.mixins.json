@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "BeltInventoryAccessor",
+    "BeltNoShaftMixin",
     "BeltProcessingMixin",
     "BeltSelfMovingMixin",
     "BeltSpeedMixin",
@@ -77,6 +78,8 @@
     "building.BlazeBurnerAccessor"
   ],
   "client": [
+    "client.BeltNoPulleyMixin",
+    "client.BeltVisualNoPulleyMixin",
     "client.BuildGunNudgeMixin",
     "client.BuildGunScrollMixin",
     "client.ContainerScreenAccessor",

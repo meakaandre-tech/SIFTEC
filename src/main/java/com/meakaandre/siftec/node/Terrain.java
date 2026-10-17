@@ -16,10 +16,17 @@ import org.jspecify.annotations.Nullable;
  * game itself does from its world generation threads, so it may run off the server thread.
  */
 public final class Terrain {
-    /** The top solid block of a column and the biome just above it. */
-    public record Column(int y, Holder<Biome> biome) {
+    /**
+     * The top solid block of a column and the biome just above it, and whether water stands over that ground: a sea
+     * or river biome, or any lake or pond the generator fills (its surface is above the ground).
+     */
+    public record Column(int y, Holder<Biome> biome, boolean wet) {
+        public Column(int y, Holder<Biome> biome) {
+            this(y, biome, false);
+        }
+
         public boolean water() {
-            return Terrain.isWater(biome);
+            return wet || Terrain.isWater(biome);
         }
     }
 
@@ -59,12 +66,33 @@ public final class Terrain {
 
     /** The ground of a column as the generator makes it (water and plants not counted), or null for an empty or void column. */
     public static @Nullable Column column(ServerLevel level, int x, int z) {
+        return column(level, x, z, true);
+    }
+
+    /** As {@link #column(ServerLevel, int, int)}; without {@code lakes} only sea and river biomes count as water (one noise sample fewer). */
+    public static @Nullable Column column(ServerLevel level, int x, int z, boolean lakes) {
         if (voidColumn(level, x, z)) return null;
-        int top = level.getChunkSource().getGenerator().getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, level, level.getChunkSource().randomState()) - 1;
+        var generator = level.getChunkSource().getGenerator();
+        var random = level.getChunkSource().randomState();
+        int top = generator.getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, level, random) - 1;
         if (top < level.getMinY()) return null;
         Holder<Biome> biome = biome(level, x, top + 1, z);
         if (isVoid(biome)) return null;
-        return new Column(top, biome);
+        return new Column(top, biome, lakes && wet(level, x, z, top));
+    }
+
+    /** True if the generator puts water (or lava) over this column's ground, whose top block is at {@code ground}. */
+    public static boolean wet(ServerLevel level, int x, int z, int ground) {
+        int surface = level.getChunkSource().getGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, level, level.getChunkSource().randomState()) - 1;
+        return surface > ground;
+    }
+
+    /** True if the generator puts water over this column: its surface stands above its ground. */
+    public static boolean wet(ServerLevel level, int x, int z) {
+        var generator = level.getChunkSource().getGenerator();
+        var random = level.getChunkSource().randomState();
+        int ground = generator.getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, level, random);
+        return generator.getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, level, random) > ground;
     }
 
     /** True if the point is inside the world border, read on the server thread and handed to a search. */

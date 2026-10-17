@@ -307,9 +307,11 @@ public final class MapClient {
 
     private static void want(long region, long every, LongArrayList regions, LongArrayList versions) {
         if (regions.size() >= 24 || regions.contains(region) || !FOG.containsKey(region)) return;
-        if (ClientTiles.askedWithin(region, every)) return;
+        // the disk copy is read first, so only a tile that changed since is sent again
+        long version = ClientTiles.version(region);
+        if (ClientTiles.loading(region) || ClientTiles.askedWithin(region, every)) return;
         regions.add(region);
-        versions.add(ClientTiles.version(region));
+        versions.add(version);
     }
 
     /** Opens the fullscreen map, if the company has it and the player is in the Overworld. */

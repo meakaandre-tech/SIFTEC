@@ -4,7 +4,6 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.map.MapGrid;
 import com.meakaandre.siftec.map.MapTile;
 import com.mojang.blaze3d.platform.NativeImage;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
@@ -14,12 +13,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 /**
  * The client's map tiles: kept on disk per map ({@code siftec/map/<map id>/} in the game folder) so a world's map is
  * there at once on the next visit and only changed tiles are sent again, and turned into textures for the screen in
  * the manner of Satisfactory's map: soft ground colours, light from the north-west, contour lines every 16 blocks
  * (darker every 64), and the fog of war over what the company has not explored.
+ * <p>
+ * Cached tiles are read from disk on a background thread, never while drawing; only regions the company has explored
+ * are read at all; and only the {@link #KEPT} regions used most recently keep their tile and texture.
  */
 public final class ClientTiles {
     /** Fog: a dark blue-grey with a faint diagonal weave. */
@@ -27,16 +30,31 @@ public final class ClientTiles {
     /** Explored but not recorded yet. */
     private static final int UNKNOWN = 0x5A626A;
 
-    private static final class Entry {
+    /** Regions whose tile and texture are kept in memory; the least recently used beyond this are let go. */
+    private static final int KEPT = 192;
+
+    private static final class Slot {
         @Nullable MapTile tile;
         @Nullable DynamicTexture texture;
         @Nullable Identifier id;
         boolean stale = true;
         long asked;
         boolean fromDisk;
+        /** True while its cached tile is being read from disk: no tile asked for yet, so the disk copy's version counts. */
+        boolean loading;
     }
 
-    private static final Long2ObjectOpenHashMap<Entry> TILES = new Long2ObjectOpenHashMap<>();
+    /** By region, in the order last used (oldest first). */
+    private static final java.util.LinkedHashMap<Long, Slot> TILES = new java.util.LinkedHashMap<>(256, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, Slot> eldest) {
+            if (size() <= KEPT) return false;
+            release(eldest.getValue());
+            return true;
+        }
+    };
+    /** Bumped whenever every tile is let go (a new map), so a disk read that finishes afterwards is dropped. */
+    private static int generation;
 
     private ClientTiles() {
     }
@@ -47,35 +65,63 @@ public final class ClientTiles {
         return Minecraft.getInstance().gameDirectory.toPath().resolve("siftec").resolve("map").resolve(id);
     }
 
-    private static Entry entry(long region) {
-        Entry e = TILES.get(region);
+    private static void release(Slot e) {
+        if (e.id != null) Minecraft.getInstance().getTextureManager().release(e.id);
+        e.texture = null;
+        e.id = null;
+        e.tile = null;
+    }
+
+    private static Slot entry(long region) {
+        Slot e = TILES.get(region);
         if (e != null) return e;
-        e = new Entry();
+        e = new Slot();
         TILES.put(region, e);
         Path dir = dir();
         if (dir != null) {
+            // read on a background thread; the tile turns up a frame or two later
             Path file = dir.resolve("r." + MapGrid.keyX(region) + "." + MapGrid.keyZ(region) + ".bin");
-            if (Files.exists(file)) {
+            Slot fresh = e;
+            fresh.loading = true;
+            int gen = generation;
+            net.minecraft.util.Util.ioPool().execute(() -> {
+                MapTile read = null;
                 try {
-                    e.tile = MapTile.unpack(Files.readAllBytes(file));
-                    e.fromDisk = true;
+                    if (Files.exists(file)) read = MapTile.unpack(Files.readAllBytes(file));
                 } catch (IOException ex) {
                     Siftec.LOGGER.warn("SIFTEC map: unreadable cached tile {}", file, ex);
                 }
-            }
+                MapTile tile = read;
+                Minecraft.getInstance().execute(() -> {
+                    fresh.loading = false;
+                    // the map was cleared, or the server sent a newer tile, while it was read
+                    if (gen != generation || TILES.get(region) != fresh || tile == null) return;
+                    if (fresh.tile == null || fresh.tile.version < tile.version) {
+                        fresh.tile = tile;
+                        fresh.fromDisk = true;
+                        fresh.stale = true;
+                    }
+                });
+            });
         }
         return e;
     }
 
+    /** True while the region's cached tile is still being read: it is not asked of the server until it is. */
+    public static boolean loading(long region) {
+        Slot e = TILES.get(region);
+        return e != null && e.loading;
+    }
+
     /** The version held for a region (0 for none). */
     public static long version(long region) {
-        Entry e = entry(region);
+        Slot e = entry(region);
         return e.tile == null ? 0 : e.tile.version;
     }
 
     /** True if the region was asked for less than {@code ms} ago; marks it asked otherwise. */
     public static boolean askedWithin(long region, long ms) {
-        Entry e = entry(region);
+        Slot e = entry(region);
         long now = System.currentTimeMillis();
         if (now - e.asked < ms) return true;
         e.asked = now;
@@ -91,7 +137,7 @@ public final class ClientTiles {
             Siftec.LOGGER.warn("SIFTEC map: bad tile from the server", e);
             return;
         }
-        Entry e = entry(region);
+        Slot e = entry(region);
         e.tile = tile;
         e.stale = true;
         Path dir = dir();
@@ -109,15 +155,16 @@ public final class ClientTiles {
 
     /** The region's fog changed: drawn again next time it is shown. */
     public static void fogChanged(long region) {
-        Entry e = TILES.get(region);
+        Slot e = TILES.get(region);
         if (e != null) e.stale = true;
     }
 
     /** The region's texture, drawn or redrawn as needed; null when nothing is known there. */
     public static @Nullable Identifier texture(long region) {
-        Entry e = entry(region);
+        // a region the company has not explored at all is plain fog: nothing is read or kept for it
         long[] fog = MapClient.FOG.get(region);
         if (fog == null) return null;
+        Slot e = entry(region);
         if (e.texture == null) {
             e.id = Siftec.id("map/tile_" + Long.toHexString(region));
             e.texture = new DynamicTexture(() -> "siftec map tile", MapGrid.REGION_PX, MapGrid.REGION_PX, false);
@@ -138,7 +185,7 @@ public final class ClientTiles {
     /** The height recorded at a block, or null. */
     public static @Nullable Integer height(int x, int z) {
         long region = MapGrid.regionOfBlock(x, z);
-        Entry e = TILES.get(region);
+        Slot e = TILES.get(region);
         if (e == null || e.tile == null) return null;
         int px = Math.floorMod(x, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS, pz = Math.floorMod(z, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS;
         int i = MapTile.index(px, pz);
@@ -146,10 +193,9 @@ public final class ClientTiles {
     }
 
     public static void clear() {
-        for (Entry e : TILES.values()) {
-            if (e.id != null) Minecraft.getInstance().getTextureManager().release(e.id);
-        }
+        for (Slot e : TILES.values()) release(e);
         TILES.clear();
+        generation++;
     }
 
     // ------------------------------------------------------------------------------------------------ drawing

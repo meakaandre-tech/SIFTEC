@@ -194,7 +194,7 @@ public final class BuildingsBTests {
 
     // ------------------------------------------------------------------------------------------------ belts and pipes
 
-    /** A Create belt from {@code from} to {@code to} on the ground, driven by a Creative Motor beside its first block. */
+    /** A Create belt from {@code from} to {@code to} on the ground, owned by a company whose belts run at least this fast (RPM). */
     private static void belt(ServerLevel level, BlockPos from, BlockPos to, int rpm) {
         int dx = to.getX() - from.getX(), dz = to.getZ() - from.getZ();
         Direction along = dx != 0 ? (dx > 0 ? Direction.EAST : Direction.WEST) : (dz > 0 ? Direction.SOUTH : Direction.NORTH);
@@ -203,16 +203,14 @@ public final class BuildingsBTests {
         level.setBlock(from, shaftState, Block.UPDATE_ALL);
         level.setBlock(to, shaftState, Block.UPDATE_ALL);
         BeltConnectorItem.createBelts(level, from, to);
-        Direction side = along.getClockWise();
-        BlockPos motorPos = from.relative(side);
-        level.setBlock(motorPos, block("create:creative_motor").defaultBlockState().setValue(BlockStateProperties.FACING, side.getOpposite()), Block.UPDATE_ALL);
-        if (level.getBlockEntity(motorPos) instanceof CreativeMotorBlockEntity motor) motor.generatedSpeed.setValue(rpm);
-        later(level, 10, () -> {
-            if (level.getBlockEntity(from) instanceof BeltBlockEntity b && b.getSpeed() != 0 && b.getMovementFacing() != along
-                && level.getBlockEntity(motorPos) instanceof CreativeMotorBlockEntity motor) {
-                motor.generatedSpeed.setValue(-motor.generatedSpeed.getValue());
-            }
-        });
+        // belts move by themselves at their company's speed (no shaft drives one): owned by a company fast enough
+        String company = com.meakaandre.siftec.command.LogisticsTests.beltCompany(level, (int) Math.ceil(rpm * com.meakaandre.siftec.tweak.SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM));
+        int length = Math.abs(dx) + Math.abs(dz);
+        for (int i = 0; i <= length; i++) {
+            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(from.relative(along, i));
+            if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company);
+            if (be instanceof BeltBlockEntity b) com.meakaandre.siftec.tweak.SelfMovingBelts.recheck(b);
+        }
     }
 
     private static boolean feed(ServerLevel level, BlockPos beltStart, Direction along, ItemStack one) {

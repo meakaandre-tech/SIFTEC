@@ -197,6 +197,7 @@ public final class ExplorationTests {
         int sloopsNear = 0, crash = 0, crashFreeNear = 0, crashNear = 0, crashPower = 0, crashPowerNear = 0, crashParts = 0;
         int oc = Math.floorDiv(origin[0], Collectibles.CELL), oz = Math.floorDiv(origin[1], Collectibles.CELL);
         boolean same = true;
+        List<String> onNodes = new java.util.ArrayList<>();
         for (int dx = -25; dx <= 25; dx++) {
             for (int dz = -25; dz <= 25; dz++) {
                 Optional<Collectibles.Spot> s = Collectibles.inCell(level, oc + dx, oz + dz);
@@ -204,6 +205,15 @@ public final class ExplorationTests {
                 if (s.isEmpty()) continue;
                 Collectibles.Spot spot = s.get();
                 counts.merge(spot.type(), 1, Integer::sum);
+                // never on a node's site: a node within its reach plus the wreckage's room
+                int keep = com.meakaandre.siftec.node.NodePlacer.REACH + 3;
+                for (int cx = Math.floorDiv(spot.x() - keep, NodeMap.CELL); cx <= Math.floorDiv(spot.x() + keep, NodeMap.CELL); cx++) {
+                    for (int cz = Math.floorDiv(spot.z() - keep, NodeMap.CELL); cz <= Math.floorDiv(spot.z() + keep, NodeMap.CELL); cz++) {
+                        for (com.meakaandre.siftec.node.Node n : NodeMap.inCell(level, cx, cz)) {
+                            if (Math.abs(n.x() - spot.x()) <= keep && Math.abs(n.z() - spot.z()) <= keep && onNodes.size() < 3) onNodes.add(spot + " by " + n);
+                        }
+                    }
+                }
                 double d = Math.sqrt(Math.pow(spot.x() - origin[0], 2) + Math.pow(spot.z() - origin[1], 2));
                 if (spot.type() == Collectible.SOMERSLOOP && d < 1000) sloopsNear++;
                 if (spot.type() == Collectible.CRASH_SITE) {
@@ -224,6 +234,7 @@ public final class ExplorationTests {
         int spheres = counts.getOrDefault(Collectible.MERCER_SPHERE, 0), sloops = counts.getOrDefault(Collectible.SOMERSLOOP, 0);
         expect(source, "from the seed: Mercer Spheres common, Somersloops rare and only far from spawn, crash sites in between",
             same && spheres > crash && crash > sloops && sloops > 0 && sloopsNear == 0, spheres + " spheres, " + sloops + " Somersloops, " + crash + " crash sites in 51x51 cells");
+        expect(source, "no Mercer Sphere, Somersloop or crash pod lies on or beside a node's site", onNodes.isEmpty(), String.valueOf(onNodes));
         expect(source, "crash sites: near spawn they open freely; further out some want parts, and past 900 blocks some want power",
             crashFreeNear == crashNear && crashParts > 0 && crashPower > 0 && crashPowerNear == 0,
             crashNear + " near spawn, " + crashParts + " want parts, " + crashPower + " want power");

@@ -76,12 +76,18 @@ public final class CrashSites {
 
     /** The block a powered pod's wire connector stands in: the first side of the pod with room and ground under it. */
     public static @Nullable BlockPos connectorSpot(ServerLevel level, BlockPos pod) {
+        return connectorSpot(level, pod, null);
+    }
+
+    /** As above, looking only inside {@code only} when given (world generation never reads a neighbouring chunk). */
+    private static @Nullable BlockPos connectorSpot(ServerLevel level, BlockPos pod, net.minecraft.world.level.@Nullable ChunkPos only) {
         for (Direction side : Direction.Plane.HORIZONTAL) {
             BlockPos at = pod.relative(side);
-            if (isConnector(level.getBlockState(at))) return at;
+            if (Collectibles.inside(only, at) && isConnector(level.getBlockState(at))) return at;
         }
         for (Direction side : Direction.Plane.HORIZONTAL) {
             BlockPos at = pod.relative(side);
+            if (!Collectibles.inside(only, at)) continue;
             if (level.getBlockState(at).canBeReplaced() && level.getBlockState(at.below()).isFaceSturdy(level, at.below(), Direction.UP)) return at;
         }
         return null;
@@ -138,7 +144,12 @@ public final class CrashSites {
      * connector each time). True if one is there now.
      */
     public static boolean placeConnector(ServerLevel level, BlockPos pod) {
-        BlockPos at = connectorSpot(level, pod);
+        return placeConnector(level, pod, null);
+    }
+
+    /** As above; with {@code only}, the connector goes on a side inside that chunk or (for now) nowhere. */
+    private static boolean placeConnector(ServerLevel level, BlockPos pod, net.minecraft.world.level.@Nullable ChunkPos only) {
+        BlockPos at = connectorSpot(level, pod, only);
         Data data = Data.get(level.getServer());
         String key = podKey(level, pod);
         if (at != null && isConnector(level.getBlockState(at))) {
@@ -170,6 +181,14 @@ public final class CrashSites {
 
     /** A few broken pieces of casing and scorched ground next to the pod, and its wire connector if it wants power. */
     public static void wreckage(ServerLevel level, BlockPos pod) {
+        wreckage(level, pod, null);
+    }
+
+    /**
+     * As above; with {@code only} (world generation), nothing outside that chunk is read or changed. A pod at the chunk's
+     * edge may then get its connector later, when someone first tries to open it.
+     */
+    public static void wreckage(ServerLevel level, BlockPos pod, net.minecraft.world.level.@Nullable ChunkPos only) {
         Block casing = BuiltInRegistries.BLOCK.getOptional(Identifier.parse("create:andesite_casing")).orElse(Blocks.IRON_BLOCK);
         long h = hash(pod);
         for (int i = 0; i < 6; i++) {
@@ -177,6 +196,7 @@ public final class CrashSites {
             int dx = (int) Long.remainderUnsigned(h >>> 16, 5) - 2, dz = (int) Long.remainderUnsigned(h >>> 24, 5) - 2;
             if (Math.abs(dx) <= 1 && Math.abs(dz) <= 1) continue;  // the cells round the pod stay clear for its connector
             BlockPos at = pod.offset(dx, 0, dz);
+            if (!Collectibles.inside(only, at)) continue;
             // settle onto the ground within a couple of blocks, and never replace anything solid
             for (int drop = 0; drop < 3 && level.getBlockState(at.below()).canBeReplaced(); drop++) at = at.below();
             if (!level.getBlockState(at).canBeReplaced() || level.getBlockState(at.below()).canBeReplaced()) continue;
@@ -184,6 +204,6 @@ public final class CrashSites {
             if (i % 3 == 0) level.setBlock(at.below(), piece, Block.UPDATE_CLIENTS);
             else level.setBlock(at, piece, Block.UPDATE_CLIENTS);
         }
-        if (requirement(level, pod).kind() == Requirement.Kind.POWER) placeConnector(level, pod);
+        if (requirement(level, pod).kind() == Requirement.Kind.POWER) placeConnector(level, pod, only);
     }
 }

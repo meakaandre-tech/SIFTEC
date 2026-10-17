@@ -26,13 +26,17 @@ import java.util.List;
 /**
  * A Drone Port with one Cardboard Drone. When packages are waiting and there are fire charges for the trip,
  * the drone carries every waiting package to the chosen port, unloads, and flies home. The trip is worked
- * out by time, so it goes on over land that is not loaded; the drone you see is only drawn where it can be.
+ * out by time, so it goes on over land that is not loaded; the drone you see is only drawn where it can be. If the far
+ * port's chunk stays unloaded for {@link #GIVE_UP_TICKS}, the drone gives up and flies home with the packages, which the
+ * port holds (back among those waiting to leave, so they go again on the next trip); none are ever dropped.
  */
 public class DronePortBlockEntity extends BlockEntity {
     public static final int IDLE = 0, OUTBOUND = 1, HOMEBOUND = 2;
     /** Blocks per tick, and the fire charges burned per this many blocks of a round trip. */
     private static final double SPEED = 0.8;
     private static final int BLOCKS_PER_CHARGE = 100, GROUND_TICKS = 40, CRUISE = 12;
+    /** How long a drone waits at a far port whose chunk is not loaded before it gives up and comes home. */
+    public static final int GIVE_UP_TICKS = 1200;
 
     public String companyId = "";
     public final PortContainer items = new PortContainer(this::setChanged);
@@ -40,6 +44,10 @@ public class DronePortBlockEntity extends BlockEntity {
     public @Nullable BlockPos destination;
     public int state = IDLE;
     private int ticks, total;
+    /** Ticks the drone has waited at the far port for its chunk to load. */
+    private int waited;
+    /** True from giving up on an unloaded far port until the next trip: what it carried came home. */
+    public boolean gaveUp;
     private final List<ItemStack> cargo = new ArrayList<>();
     private @Nullable Display shown;
 
@@ -58,6 +66,7 @@ public class DronePortBlockEntity extends BlockEntity {
         if (destination == null) return "siftec.drone.no_destination";
         if (state == OUTBOUND) return ticks > 0 ? "siftec.drone.outbound" : "siftec.drone.waiting";
         if (state == HOMEBOUND) return "siftec.drone.homebound";
+        if (gaveUp) return "siftec.drone.gave_up";
         if (items.empty(PortContainer.OUT, PortContainer.FUEL)) return "siftec.drone.idle";
         return items.getItem(PortContainer.FUEL).getCount() < chargesNeeded() ? "siftec.drone.no_fuel" : "siftec.drone.idle";
     }
@@ -75,6 +84,8 @@ public class DronePortBlockEntity extends BlockEntity {
             }
             total = ticks = (int) (Math.sqrt(destination.distSqr(worldPosition)) / SPEED) + GROUND_TICKS;
             state = OUTBOUND;
+            waited = 0;
+            gaveUp = false;
             setChanged();
             return;
         }
@@ -82,19 +93,33 @@ public class DronePortBlockEntity extends BlockEntity {
         show(server);
         if (ticks > 0) return;
         if (state == HOMEBOUND) {
-            // anything that could not be delivered comes back as an arrival
-            for (ItemStack stack : cargo) {
-                ItemStack left = items.add(stack, PortContainer.IN, PortContainer.SIZE);
-                if (!left.isEmpty()) net.minecraft.world.Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.2, worldPosition.getZ() + 0.5, left);
+            // anything that could not be delivered: after giving up on an unloaded port it waits to leave again, otherwise
+            // it comes back as an arrival; what fits nowhere stays held in the port (it is dropped only if the port is broken)
+            for (int i = 0; i < cargo.size(); i++) {
+                ItemStack left = cargo.get(i);
+                if (gaveUp) left = items.add(left, PortContainer.OUT, PortContainer.FUEL);
+                left = items.add(left, PortContainer.IN, PortContainer.SIZE);
+                cargo.set(i, left);
             }
-            cargo.clear();
+            cargo.removeIf(ItemStack::isEmpty);
             state = IDLE;
             hide();
             setChanged();
             return;
         }
-        // at the far port: unload what fits; wait for room, or for its chunk to load
-        if (level.getGameTime() % 20 != 0 || destination == null || !level.isLoaded(destination)) return;
+        // at the far port: unload what fits; wait for room, or for its chunk to load, but not for ever
+        if (level.getGameTime() % 20 != 0 || destination == null) return;
+        if (!level.isLoaded(destination)) {
+            waited += 20;
+            if (waited < GIVE_UP_TICKS) return;
+            waited = 0;
+            gaveUp = true;
+            state = HOMEBOUND;
+            ticks = total;
+            setChanged();
+            return;
+        }
+        waited = 0;
         if (level.getBlockEntity(destination) instanceof DronePortBlockEntity other) {
             for (int i = 0; i < cargo.size(); i++) cargo.set(i, other.items.add(cargo.get(i), PortContainer.IN, PortContainer.SIZE));
             cargo.removeIf(ItemStack::isEmpty);
@@ -103,6 +128,11 @@ public class DronePortBlockEntity extends BlockEntity {
         state = HOMEBOUND;
         ticks = total;
         setChanged();
+    }
+
+    /** Ends the flight under way at once (the selftests: a long trip without the wait). */
+    public void land() {
+        if (state != IDLE) ticks = 0;
     }
 
     /** Where the drone is on its way, for drawing it. */
@@ -168,6 +198,8 @@ public class DronePortBlockEntity extends BlockEntity {
         view.putInt("State", state);
         view.putInt("Ticks", ticks);
         view.putInt("Total", total);
+        view.putInt("Waited", waited);
+        view.putBoolean("GaveUp", gaveUp);
         if (destination != null) view.store("Destination", BlockPos.CODEC, destination);
         List<ItemStack> slots = new ArrayList<>();
         for (int i = 0; i < PortContainer.SIZE; i++) slots.add(items.getItem(i));
@@ -183,6 +215,8 @@ public class DronePortBlockEntity extends BlockEntity {
         state = view.getIntOr("State", IDLE);
         ticks = view.getIntOr("Ticks", 0);
         total = view.getIntOr("Total", 0);
+        waited = view.getIntOr("Waited", 0);
+        gaveUp = view.getBooleanOr("GaveUp", false);
         destination = view.read("Destination", BlockPos.CODEC).orElse(null);
         List<ItemStack> slots = view.read("Items", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of());
         for (int i = 0; i < PortContainer.SIZE; i++) items.setItem(i, i < slots.size() ? slots.get(i) : ItemStack.EMPTY);

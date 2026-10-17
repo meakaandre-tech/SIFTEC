@@ -56,6 +56,14 @@ public final class MapServer {
     private static final int BATCH = 64;
     /** Tiles sent for one request at most. */
     private static final int TILES_PER_REQUEST = 12;
+    /** Chunks a Radar Tower's sweep guesses in one go on the worker thread. */
+    private static final int RADAR_BATCH = 48;
+    /** A player's tile requests are answered at most this often (ticks); the client asks once a second. */
+    private static final int TILE_REQUEST_TICKS = 10;
+    /** Regions of a tile request looked at, at most. */
+    private static final int REQUEST_REGIONS = 64;
+    /** Regions of seed POIs kept per company; past this the cache is emptied and worked out again as needed. */
+    private static final int SEED_REGIONS_KEPT = 4096;
 
     private static @Nullable String mapId;
     /** Per company: what the seed puts in each explored region (nodes, wells, crash sites, artifacts). */
@@ -67,6 +75,10 @@ public final class MapServer {
     private static final Set<String> RUNNING = new HashSet<>();
     /** Which company each online player was last sent the map of. */
     private static final Map<UUID, String> SYNCED = new HashMap<>();
+    /** When each player's last tile request was answered (server ticks). */
+    private static final Map<UUID, Integer> TILE_ASKED = new HashMap<>();
+    /** Players last sent an empty list of company players: an empty list is sent once, not every half second. */
+    private static final Set<UUID> NO_MATES = new HashSet<>();
     /** Packed tiles, kept while their version is current. */
     private static final Long2ObjectOpenHashMap<byte[]> PACKED = new Long2ObjectOpenHashMap<>();
     private static final it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap PACKED_AT = new it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap();
@@ -111,13 +123,20 @@ public final class MapServer {
             PENDING.clear();
             RUNNING.clear();
             SYNCED.clear();
+            TILE_ASKED.clear();
+            NO_MATES.clear();
             PACKED.clear();
             PACKED_AT.clear();
             mapId = null;
         });
         ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> MapTerrain.loaded(level, chunk));
         ServerPlayerEvents.JOIN.register(MapServer::sync);
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> SYNCED.remove(handler.getPlayer().getUUID()));
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            UUID id = handler.getPlayer().getUUID();
+            SYNCED.remove(id);
+            TILE_ASKED.remove(id);
+            NO_MATES.remove(id);
+        });
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
             // a death that left a Death Crate already has its marker, on the crate
             if (entity instanceof ServerPlayer player && !Companies.isFake(player) && !com.meakaandre.siftec.death.DeathCrates.placedJustNow(player)) deathMarker(player);
@@ -174,7 +193,9 @@ public final class MapServer {
         CompanyData data = CompanyData.get(server);
         cleared.forEach((id, chunks) -> {
             Company company = data.byId(id);
-            if (company != null) send(server, company, new MapPayloads.FogDelta(chunks.toLongArray()));
+            if (company == null) return;
+            send(server, company, new MapPayloads.FogDelta(chunks.toLongArray()));
+            uncovered(server, company, chunks);
         });
         fresh.forEach((id, regions) -> {
             if (!regions.isEmpty()) PENDING.computeIfAbsent(id, k -> new LongOpenHashSet()).addAll(regions);
@@ -195,6 +216,9 @@ public final class MapServer {
                     mates.add(new MapPayloads.Mate(other.getGameProfile().name(), other.getX(), other.getY(), other.getZ(), other.getYRot()));
                 }
             }
+            // nobody to show: one empty list clears the client's, then nothing until someone turns up
+            if (mates.isEmpty() && !NO_MATES.add(player.getUUID())) continue;
+            if (!mates.isEmpty()) NO_MATES.remove(player.getUUID());
             send(player, new MapPayloads.Mates(mates));
         }
     }
@@ -287,10 +311,39 @@ public final class MapServer {
 
     // ------------------------------------------------------------------------------------------------ points of interest
 
+    /** What a region shows the company: its seed POIs and what was found there, in the chunks it has explored only. */
     private static List<MapPoi> merged(List<MapPoi> seed, long region, String companyId) {
-        List<MapPoi> out = new ArrayList<>(seed);
-        out.addAll(MapTerrain.foundFor(region, companyId));
+        List<MapPoi> out = new ArrayList<>();
+        for (MapPoi p : seed) if (MapFog.explored(companyId, p.x() >> 4, p.z() >> 4)) out.add(p);
+        for (MapPoi p : MapTerrain.foundFor(region, companyId)) if (MapFog.explored(companyId, p.x() >> 4, p.z() >> 4)) out.add(p);
         return out;
+    }
+
+    /**
+     * Chunks the company just explored: the regions they are in are sent again if a POI stands in one of them (POIs are
+     * only sent for explored chunks). Regions whose POIs are not worked out yet are left to the pending work.
+     */
+    private static void uncovered(MinecraftServer server, Company company, it.unimi.dsi.fastutil.longs.LongList chunks) {
+        Long2ObjectOpenHashMap<List<MapPoi>> seed = SEED.get(company.id);
+        if (seed == null) return;
+        LongOpenHashSet fresh = new LongOpenHashSet(chunks);
+        LongOpenHashSet regions = new LongOpenHashSet();
+        for (long c : chunks) regions.add(MapGrid.regionOfChunk(MapGrid.keyX(c), MapGrid.keyZ(c)));
+        List<MapPayloads.RegionPois> out = new ArrayList<>();
+        for (long region : regions) {
+            List<MapPoi> s = seed.get(region);
+            if (s == null) continue;
+            boolean shows = false;
+            for (MapPoi p : s) if (fresh.contains(MapGrid.key(p.x() >> 4, p.z() >> 4))) shows = true;
+            if (!shows) for (MapPoi p : MapTerrain.foundFor(region, company.id)) if (fresh.contains(MapGrid.key(p.x() >> 4, p.z() >> 4))) shows = true;
+            if (!shows) continue;
+            out.add(new MapPayloads.RegionPois(region, merged(s, region, company.id)));
+            if (out.size() >= BATCH) {
+                send(server, company, new MapPayloads.Pois(out));
+                out = new ArrayList<>();
+            }
+        }
+        if (!out.isEmpty()) send(server, company, new MapPayloads.Pois(out));
     }
 
     /** Works out the company's seed POIs again for every region it has explored. */
@@ -339,6 +392,8 @@ public final class MapServer {
                     return;
                 }
                 Long2ObjectOpenHashMap<List<MapPoi>> seed = SEED.computeIfAbsent(id, k -> new Long2ObjectOpenHashMap<>());
+                // a company that has explored very far: forget what it has not looked at lately rather than keep it all
+                if (seed.size() + result.size() > SEED_REGIONS_KEPT) seed.clear();
                 List<MapPayloads.RegionPois> out = new ArrayList<>();
                 for (var e : result.long2ObjectEntrySet()) {
                     seed.put(e.getLongKey(), e.getValue());
@@ -367,6 +422,8 @@ public final class MapServer {
             for (int cz = Math.floorDiv(minZ, NodeMap.CELL); cz <= Math.floorDiv(maxZ - 1, NodeMap.CELL); cz++) {
                 for (Node node : NodeMap.inCell(level, cx, cz)) {
                     if (node.x() < minX || node.x() >= maxX || node.z() < minZ || node.z() >= maxZ || !knows.nodes.contains(node.type())) continue;
+                    // a cave or Nether node with nowhere to stand was left out of the world: not on the map either
+                    if (NodeMap.placeless(node)) continue;
                     int y = NodeMap.groundOf(node).map(g -> g + 1).orElse(level.getSeaLevel());
                     out.add(new MapPoi(node.type().isFluid() ? MapPoi.Kind.WELL : MapPoi.Kind.NODE, node.type().id(), node.purity().ordinal(), node.x(), y, node.z()));
                 }
@@ -412,9 +469,15 @@ public final class MapServer {
     private static void tiles(ServerPlayer player, MapPayloads.TileRequest request) {
         Company company = Companies.find(player);
         if (!unlocked(company) || request.regions().length != request.versions().length) return;
+        // at most one request answered every so often per player, and only so many of its regions looked at
+        int now = player.level().getServer().getTickCount();
+        Integer last = TILE_ASKED.get(player.getUUID());
+        if (last != null && now - last < TILE_REQUEST_TICKS && now >= last) return;
+        TILE_ASKED.put(player.getUUID(), now);
         Long2ObjectOpenHashMap<long[]> fog = MapFog.of(company.id);
         int sent = 0;
-        for (int i = 0; i < request.regions().length && sent < TILES_PER_REQUEST; i++) {
+        int looked = Math.min(request.regions().length, REQUEST_REGIONS);
+        for (int i = 0; i < looked && sent < TILES_PER_REQUEST; i++) {
             long region = request.regions()[i];
             if (!fog.containsKey(region)) continue;
             MapTile tile = MapTerrain.tile(region);
@@ -448,6 +511,7 @@ public final class MapServer {
         int ccx = at.getX() >> 4, ccz = at.getZ() >> 4;
         LongArrayList cleared = MapFog.reveal(company.id, ccx, ccz, radius, newRegions);
         if (!cleared.isEmpty()) {
+            uncovered(server, company, cleared);
             // the touched regions' whole fog: far fewer bytes than the chunks one by one
             LongOpenHashSet touched = new LongOpenHashSet();
             for (long c : cleared) touched.add(MapGrid.regionOfChunk(MapGrid.keyX(c), MapGrid.keyZ(c)));
@@ -470,13 +534,14 @@ public final class MapServer {
         }
         if (wanted.isEmpty()) return;
         int sea = level.getSeaLevel();
-        long[] chunks = wanted.toLongArray();
-        NodeMap.async(server, () -> {
-            List<MapTerrain.Guess> guesses = new ArrayList<>(chunks.length);
-            for (long c : chunks) guesses.add(MapTerrain.guess(level, MapGrid.keyX(c), MapGrid.keyZ(c), sea));
+        // thousands of chunks: guessed a small batch at a time, so the shared worker is never held up for long
+        NodeMap.batched(server, wanted, RADAR_BATCH, batch -> {
+            List<MapTerrain.Guess> guesses = new ArrayList<>(batch.size());
+            for (long c : batch) guesses.add(MapTerrain.guess(level, MapGrid.keyX(c), MapGrid.keyZ(c), sea));
             return guesses;
         }, guesses -> {
             if (guesses != null) MapTerrain.apply(guesses);
+        }, () -> {
         });
     }
 

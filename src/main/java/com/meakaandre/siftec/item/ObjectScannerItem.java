@@ -128,16 +128,21 @@ public class ObjectScannerItem extends Item {
             return InteractionResult.SUCCESS;
         }
         java.util.Set<String> collected = java.util.Set.copyOf(company.collected);
-        // an Ancient City's Somersloop: found as /locate finds cities (server thread), then weighed against the rest
-        BlockPos city = looking == Collectible.SOMERSLOOP ? AncientCities.nearest(server, player.blockPosition(), collected) : null;
         com.meakaandre.siftec.node.Terrain.Border border = com.meakaandre.siftec.node.Terrain.Border.of(server);
         double px = player.getX(), pz = player.getZ();
-        // searched on the node map's worker thread (it samples the world generator), answered when done
-        com.meakaandre.siftec.node.NodeMap.async(server.getServer(),
-            () -> Collectibles.nearest(server, px, pz, looking, collected, 48, border, com.meakaandre.siftec.node.NodeMap.SEARCH_NANOS), found -> {
+        BlockPos at = player.blockPosition();
+        // searched on the node map's worker thread (it samples the world generator), answered when done; Ancient City
+        // Somersloops are found there too, from the seed, so nothing runs on the server thread or generates a chunk
+        record Found(java.util.Optional<Collectibles.Spot> spot, List<BlockPos> cities) {
+        }
+        com.meakaandre.siftec.node.NodeMap.async(server.getServer(), () -> new Found(
+            Collectibles.nearest(server, px, pz, looking, collected, 48, border, com.meakaandre.siftec.node.NodeMap.SEARCH_NANOS),
+            looking == Collectible.SOMERSLOOP ? AncientCities.candidates(server, at) : List.of()), found -> {
                 if (player.isRemoved()) return;
                 int[] best = null;
-                if (found != null && found.isPresent()) best = new int[]{found.get().x(), found.get().z()};
+                if (found != null && found.spot().isPresent()) best = new int[]{found.spot().get().x(), found.spot().get().z()};
+                // the nearest city whose Somersloop the company has not collected yet
+                BlockPos city = found == null ? null : AncientCities.pick(server.getServer(), found.cities(), Companies.of(player).collected);
                 if (city != null && (best == null || dist(px, pz, city.getX(), city.getZ()) < dist(px, pz, best[0], best[1]))) {
                     best = new int[]{city.getX(), city.getZ()};
                 }
