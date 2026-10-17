@@ -15,6 +15,11 @@ public abstract class PropagatorMixin {
     @org.spongepowered.asm.mixin.injection.Inject(method = "getConveyedSpeed", at = @At("RETURN"), cancellable = true)
     private static void siftec$governor(KineticBlockEntity from, KineticBlockEntity to, org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Float> cir) {
         float worked = cir.getReturnValueF();
+        // no speed is passed between the HUB's Craft Station and anything outside it (see siftec$craftStation)
+        if (worked != 0 && com.meakaandre.siftec.building.SpecialBuildings.cutsRotation(from, to)) {
+            cir.setReturnValue(0f);
+            return;
+        }
         if (from instanceof com.meakaandre.siftec.governor.GovernorBlockEntity governor) cir.setReturnValue(governor.exact(from, to, worked));
         else if (to instanceof com.meakaandre.siftec.governor.GovernorBlockEntity governor) cir.setReturnValue(governor.exact(from, to, worked));
     }

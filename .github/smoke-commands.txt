@@ -17,6 +17,7 @@ siftec selftest fixes
 siftec selftest ownership
 siftec selftest datafix
 siftec selftest powerfix
+siftec selftest buildingfix
 siftec selftest state setup
 siftec selftest state check
 siftec worldtest nodes 2000

@@ -27,7 +27,9 @@ public final class SpecialBuildings {
      */
     public static boolean craftStation(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
         net.minecraft.core.BlockPos terminal = BuildingIndex.controllerOf(level, pos);
-        return terminal != null && level.getBlockEntity(terminal) instanceof com.meakaandre.siftec.hub.HubBlockEntity hub && hub.prefab && !hub.gateway();
+        // never loads a chunk: this is asked while rotation propagates
+        return terminal != null && level.isLoaded(terminal) && level.getBlockEntity(terminal) instanceof com.meakaandre.siftec.hub.HubBlockEntity hub
+            && hub.prefab && !hub.gateway();
     }
 
     /**

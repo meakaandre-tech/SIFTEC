@@ -251,12 +251,13 @@ public final class BuildingLogic {
             return;
         }
         BlockPos drillPos = cell(c, create("mechanical_drill"));
-        if (powered && !turning(level, drillPos)) {
-            c.problem = "siftec.building.stopped";
-            return;
-        }
+        // full first: a full miner is idle, and its Drill stands because it draws no power
         if (!room(level, c)) {
             c.problem = "siftec.building.full";
+            return;
+        }
+        if (powered && !turning(level, drillPos)) {
+            c.problem = "siftec.building.stopped";
             return;
         }
         c.problem = "";
@@ -427,7 +428,8 @@ public final class BuildingLogic {
             held = null;
         }
         boolean fan = turning(level, cell(c, create("encased_fan")));
-        c.problem = fan ? "" : "siftec.building.stopped";
+        // an idle Smelter's fan stands (it draws no power): that is not a fault
+        c.problem = fan || c.idle && c.powered ? "" : "siftec.building.stopped";
         if (held != null && !held.stack.isEmpty() || !fan) return;
         // the Depot is free: the next few ores go on, each to take Satisfactory's time under the lava's blast
         ItemStack in = c.input.getItem(0);
