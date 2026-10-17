@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_ficsite_ingot_aluminum",
+  "results": [
+    {
+      "id": "siftec:ficsite_ingot"
+    }
+  ]
+}

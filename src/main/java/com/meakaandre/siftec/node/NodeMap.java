@@ -695,6 +695,11 @@ public final class NodeMap {
 
     // ---- types and purity
 
+    /** A purity drawn by the nodes' rule from a hash and a distance from spawn (sulfur geysers have theirs this way too). */
+    public static Purity purityOf(long h, double distance) {
+        return purity(h, distance);
+    }
+
     /** Impure is the common one near spawn, pure the common one far out. */
     private static Purity purity(long h, double distance) {
         float t = (float) Math.clamp((distance - NEAR) / (FAR - NEAR), 0, 1);

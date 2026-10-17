@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_bauxite_caterium"
+    }
+  ],
+  "processing_time": 120
+}

@@ -1,0 +1,17 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:brass_ingot",
+    "create:brass_ingot",
+    "create:brass_ingot",
+    "create:brass_ingot",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_ficsite_ingot_caterium"
+    }
+  ],
+  "processing_time": 80
+}

@@ -697,7 +697,76 @@ for _key, _name, _building, _alt, _secs, _ins, _outs, _unlock in sat_recipes():
             _r["out"] = (n, a)
         else:
             _r["also"] = (n, a)
+    _r["unlock"] = unlock_id(_unlock)
     PROCESSORS["converter" if _building == "Converter" else "particle_accelerator"][1].append(_r)
+
+# How the two buildings run each recipe on their Create machines (Build Gun tab). Satisfactory's counts do not fit a
+# one-item Create recipe, so a Mixer on a Brass Basin first packs the inputs into the recipe's Core, as the Manufacturer
+# does:
+#   Particle Accelerator: the Core is blown up into the Crushing Wheels, whose crushing recipe gives the result.
+#   Converter: the Mixer takes all of the main input and all but one of the second; on the Depot a Deployer adds that
+#   last one ("Incomplete <recipe>"), and for a fluid also the Converter Cell the fluid is carried in ("Loaded <recipe>");
+#   the fan's haunting turns it into the result, or into a charged cell the Item Drain empties, giving the cell back.
+#   Excited Photonic Matter takes nothing: the empty cell itself is haunted.
+# The Converter Cell is part of the building's machine (it is never made or used up).
+CONVERTER_CELL = "converter_cell"
+PARTS.append((CONVERTER_CELL, "Converter Cell", "minecraft:item/glass_bottle", None))
+PROCESSOR_CHAINS = {}  # (machine, recipe name) -> {"mix": [(part, n)], "core", "steps": [(on, applied, makes)], "haunt" or "crush", "charged"}
+CHARGED_CELLS = {}     # fluid name -> charged cell part id
+# Satisfactory 1.0's power over a recipe's cycle (MW, from its least to its most; SatisfactoryTools data1.0.json)
+PROCESSOR_MW = {"particle_accelerator": {"Dark Matter Crystal": (500, 1500), "Diamonds": (250, 750), "Ficsonium": (500, 1500),
+                                         "Nuclear Pasta": (500, 1500), "Plutonium Pellet": (250, 750), "Cloudy Diamonds": (250, 750),
+                                         "Dark Matter Crystallization": (500, 1500), "Dark Matter Trap": (500, 1500),
+                                         "Instant Plutonium Cell": (250, 750), "Oil-Based Diamonds": (250, 750),
+                                         "Petroleum Diamonds": (250, 750), "Turbo Diamonds": (250, 750)},
+                "converter": {}}
+for _machine, (_pname, _list) in PROCESSORS.items():
+    for _r in _list:
+        _s, _label = slug(_r["name"]), _r["name"]
+        _r["mw"] = PROCESSOR_MW[_machine].get(_label, (100, 400))
+        _ch = {"steps": [], "charged": None}
+        if _machine == "particle_accelerator":
+            _ch["core"] = "particle_charge_" + _s
+            PARTS.append((_ch["core"], _label + " Particle Charge", "minecraft:item/fire_charge", 0xA0C8FF))
+            _ch["mix"] = list(_r["in"])
+            _ch["crush"] = _ch["core"]
+            PROCESSOR_CHAINS[(_machine, _r["name"])] = _ch
+            continue
+        _ins = sorted(_r["in"], key=lambda p: p[1], reverse=True)
+        _applied = []
+        if len(_ins) == 2:
+            (_main, _mn), (_second, _sn) = _ins
+            _ch["mix"] = [(_main, _mn)] + ([(_second, _sn - 1)] if _sn > 1 else [])
+            _applied.append(_second)
+        elif len(_ins) == 1:
+            _ch["mix"] = list(_ins)
+        elif _ins:
+            raise SystemExit(f"Converter recipe {_label}: more than two inputs")
+        else:
+            _ch["mix"] = []
+        if _r["fluid_out"]:
+            if _ch["mix"]:
+                _applied.append("siftec:" + CONVERTER_CELL)
+            _fluid = _r["fluid_out"][0]
+            if _fluid not in CHARGED_CELLS:
+                CHARGED_CELLS[_fluid] = "charged_" + slug(_fluid) + "_cell"
+                PARTS.append((CHARGED_CELLS[_fluid], "Charged " + _fluid.title() + " Cell", "minecraft:item/experience_bottle", None))
+            _ch["charged"] = CHARGED_CELLS[_fluid]
+        _ch["core"] = "conversion_core_" + _s if _ch["mix"] else None
+        if _ch["core"]:
+            PARTS.append((_ch["core"], _label + " Conversion Core", "minecraft:item/magma_cream", 0xB070E0))
+        _on = "siftec:" + (_ch["core"] or CONVERTER_CELL)
+        for _a in _applied:
+            if _a == "siftec:" + CONVERTER_CELL:
+                _made = "loaded_conversion_" + _s
+                PARTS.append((_made, "Loaded " + _label + " Cell", "minecraft:item/honey_bottle", None))
+            else:
+                _made = "incomplete_conversion_" + _s
+                PARTS.append((_made, "Incomplete " + _label + " Conversion", "minecraft:item/magma_cream", 0x704090))
+            _ch["steps"].append((_on, _a, "siftec:" + _made))
+            _on = "siftec:" + _made
+        _ch["haunt"] = _on
+        PROCESSOR_CHAINS[(_machine, _r["name"])] = _ch
 
 # AWESOME Sink (AWESOME Sink and Shop tab): points for one of each item. Every Satisfactory part has Satisfactory's own
 # value (where a part is the same item as a vanilla one, Satisfactory's value wins). A spare Hard Drive is 1,000 (a
@@ -1184,12 +1253,15 @@ BUILDINGS = [
     ("explorer", "Explorer", "logistics", BUILD_COSTS["Explorer"], mam("Quartz", "Display Systems"), False, {"prefab": "vehicle"}),
 ]
 # The buildings whose Basin is a Brass Basin (four stacks of each item), for the recipe checkers
-BRASS_BASIN_BUILDINGS = ("manufacturer", "blender")
+BRASS_BASIN_BUILDINGS = ("manufacturer", "blender", "particle_accelerator", "converter")
 # Buildings that stand over a resource node and can only go down once its clump is mined (the miners, extractors)
 NODE_BUILDINGS = {b[0] for b in BUILDINGS if "node" in b[6]}
 # What the generators burn, at Satisfactory 1.0's energy in MJ (a fluid's per m3): the Biomass Burners (the HUB's two and
 # the building), the Coal Generator, the Fuel Generator, the Nuclear Power Plant (and a New Age reactor a player builds:
 # each rod leaves Satisfactory's waste), and the Alien Power Augmenter's Alien Power Matrix (it only keeps it fed).
+# the Nuclear Power Plant's reactor rods (tools/structures.py, nuclear_power_plant): two rows of three and one under each
+# of its two boilers
+NUCLEAR_RODS = 14
 GENERATOR_FUEL = {
     "biomass": {"#minecraft:leaves": 15, "#minecraft:logs": 100, "#siftec:mycelia": 20, "siftec:biomass": 180, "siftec:solid_biofuel": 450},
     "coal": {"minecraft:coal": 300, "siftec:compacted_coal": 630, "siftec:petroleum_coke": 180},

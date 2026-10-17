@@ -1,0 +1,16 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam",
+    "siftec:reanimated_sam"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_dark_matter_residue"
+    }
+  ],
+  "processing_time": 120
+}

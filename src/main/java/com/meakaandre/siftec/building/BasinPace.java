@@ -39,7 +39,8 @@ public final class BasinPace {
         c.nextCraft = level.getGameTime() + ticks;
         // the Manufacturer's and the Quantum Encoder's Mixer only makes the Core: the building counts what leaves its line
         BuildingDef def = c.def();
-        if (def == null || !def.logic().equals("assembly")) c.made++;
+        // and the Particle Accelerator and the Converter count what comes out of their crusher or haunting
+        if (def == null || !def.logic().equals("assembly") && !def.logic().equals("processor")) c.made++;
         c.setChanged();
     }
 }

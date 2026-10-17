@@ -1,0 +1,19 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:time_crystal"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 16200,
+      "fluid": "siftec:dark_matter_residue"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:particle_charge_dark_matter_trap"
+    }
+  ],
+  "processing_time": 40
+}

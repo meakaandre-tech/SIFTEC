@@ -1,0 +1,21 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite",
+    "siftec:raw_bauxite"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_raw_quartz_bauxite"
+    }
+  ],
+  "processing_time": 120
+}

@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:conversion_core_time_crystal",
+  "results": [
+    {
+      "id": "siftec:time_crystal"
+    }
+  ]
+}

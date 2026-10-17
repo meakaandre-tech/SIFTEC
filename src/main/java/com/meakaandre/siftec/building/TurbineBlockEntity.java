@@ -8,21 +8,24 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 /**
- * A generator building's turbine: it turns the generator coils beside it at 64 RPM while the generator gives power,
- * the way the steam engine or the engine of the real thing would. It is only the look: the power itself is the
- * generator's own ({@link BuildingPower}).
+ * The Geothermal Generator's turbine, driven by the geyser under it: it turns the generator coils beside it at the speed
+ * the geyser gives ({@link Generators#geyserMw}), and the coils make the power from that. It can bear the coils' whole
+ * drag at any speed.
  */
 public class TurbineBlockEntity extends GeneratingKineticBlockEntity {
-    public static final float RPM = 64, SU = 16384;
-    public boolean running;
+    /** SU a turn it can bear: more than its coils' magnets and their own drag (480 + 2 x 24). */
+    public static final float SU_PER_RPM = 600;
+    public float speed;
 
     public TurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
-    public void run(boolean on) {
-        if (running == on) return;
-        running = on;
+    /** Turns at this speed from now on (0 stops it). */
+    public void drive(float rpm) {
+        float next = Math.round(rpm * 4) / 4f;
+        if (next == speed) return;
+        speed = next;
         setChanged();
         updateGeneratedRotation();
     }
@@ -35,25 +38,24 @@ public class TurbineBlockEntity extends GeneratingKineticBlockEntity {
 
     @Override
     public float getGeneratedSpeed() {
-        return running ? RPM : 0;
+        return speed;
     }
 
     @Override
     public float calculateAddedStressCapacity() {
-        float perRpm = SU / RPM;
-        lastCapacityProvided = perRpm;
-        return perRpm;
+        lastCapacityProvided = SU_PER_RPM;
+        return SU_PER_RPM;
     }
 
     @Override
     protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        view.putBoolean("Running", running);
+        view.putFloat("Speed", speed);
     }
 
     @Override
     protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        running = view.getBooleanOr("Running", false);
+        speed = view.getFloatOr("Speed", 0f);
     }
 }

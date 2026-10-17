@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_pink_diamonds",
+  "results": [
+    {
+      "id": "minecraft:diamond"
+    }
+  ]
+}

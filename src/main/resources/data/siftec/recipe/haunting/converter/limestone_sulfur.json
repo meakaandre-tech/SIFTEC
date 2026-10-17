@@ -1,0 +1,10 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_limestone_sulfur",
+  "results": [
+    {
+      "id": "minecraft:stone",
+      "count": 12
+    }
+  ]
+}

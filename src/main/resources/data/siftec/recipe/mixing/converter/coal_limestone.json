@@ -1,0 +1,47 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_coal_limestone"
+    }
+  ],
+  "processing_time": 120
+}

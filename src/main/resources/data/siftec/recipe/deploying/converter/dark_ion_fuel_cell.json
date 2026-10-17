@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:incomplete_conversion_dark_ion_fuel",
+  "ingredient": "siftec:converter_cell",
+  "results": [
+    {
+      "id": "siftec:loaded_conversion_dark_ion_fuel"
+    }
+  ]
+}

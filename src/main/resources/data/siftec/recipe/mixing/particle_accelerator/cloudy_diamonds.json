@@ -1,0 +1,47 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones",
+    "#siftec:stones"
+  ],
+  "results": [
+    {
+      "id": "siftec:particle_charge_cloudy_diamonds"
+    }
+  ],
+  "processing_time": 60
+}

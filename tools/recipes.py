@@ -499,6 +499,54 @@ def carried_over():
     hand("Sulfur", [(1, "minecraft:sulfur")], 4, name="sulfur_from_block")
 
 
+# The Particle Accelerator's and the Converter's recipes on their machines (content.PROCESSOR_CHAINS): the Mixer's Core,
+# the Crushing Wheels' crushing or the Deployer's steps and the fan's haunting, and the Item Drain emptying a charged
+# cell. Each recipe's paths, for building/Processors.java.
+PROCESSING = {}
+
+
+def processors():
+    global _under
+    emptied = set()
+    for machine, (pname, recipe_list) in content.PROCESSORS.items():
+        for p in recipe_list:
+            ch = content.PROCESSOR_CHAINS[(machine, p["name"])]
+            s = content.slug(p["name"])
+            ticks = round(p["seconds"] * TICKS)
+            outs = [x for x in (p["out"], p.get("also")) if x]
+            if p["alt"]:
+                took = ", ".join([f"{c} {n}" for n, c in p["in"]] + ([f"{p['fluid_in'][1]} mB {p['fluid_in'][0]}"] if p["fluid_in"] else []))
+                made_text = ", ".join([f"{c} {n}" for n, c in outs] + ([f"{p['fluid_out'][1]} mB {p['fluid_out'][0]}"] if p["fluid_out"] else []))
+                alt(p["alt"], p["name"], f"{took} makes {made_text} ({pname})")
+                _under = None
+            else:
+                end_alts()
+                _under = p["unlock"]
+            paths = {}
+            if ch["mix"] or p["fluid_in"]:
+                paths["mix"] = mix(f"{machine}/{s}", items=[n for n, c in ch["mix"] for _ in range(c)],
+                                   fluids=[p["fluid_in"]] if p["fluid_in"] else [], results=["siftec:" + ch["core"]], time=ticks)
+            if machine == "particle_accelerator":
+                paths["crush"] = add("crushing", f"{machine}/{s}", {"type": "create:crushing", "ingredient": item("siftec:" + ch["crush"]),
+                                                                   "processing_time": 20, "results": results(outs)})
+            else:
+                for k, (on, applied, makes) in enumerate(ch["steps"]):
+                    paths.setdefault("deploy", []).append(deploy(on, applied, makes, name=f"{machine}/{s}" + ("_cell" if applied.endswith("converter_cell") else "")))
+                haunted = []
+                if ch["charged"]:
+                    haunted.append(res("siftec:" + ch["charged"]))
+                haunted += results(outs)
+                paths["haunt"] = add("haunting", f"{machine}/{s}", {"type": "create:haunting", "ingredient": item(ch["haunt"]), "results": haunted})
+                if ch["charged"] and ch["charged"] not in emptied:
+                    emptied.add(ch["charged"])
+                    fname, fmb = p["fluid_out"]
+                    paths["empty"] = add("emptying", f"{machine}/{ch['charged']}", {"type": "create:emptying", "ingredient": item("siftec:" + ch["charged"]),
+                                                                                 "result": res("siftec:" + content.CONVERTER_CELL), "fluid_result": fl_out(fname, fmb)})
+            PROCESSING[(machine, p["name"])] = paths
+    end_alts()
+    under(None)
+
+
 def build():
     OUT.clear()
     ALTS.clear()
@@ -507,7 +555,9 @@ def build():
     KITCHEN.clear()
     LOCKED.clear()
     SATISFACTORY.clear()
+    PROCESSING.clear()
     satisfactory()
+    processors()
     equipment_by_machine()
     backpack_upgrades()
     vanilla()

@@ -332,23 +332,9 @@ public final class Buildings {
             if (!level.getBlockState(pos).isAir()) level.setBlock(pos, Blocks.AIR.defaultBlockState(), SET);
         }
         for (BuildingTemplate.Cell cell : t.members) level.setBlock(p.at(cell), p.orient(cell.state()), SET);
-        for (BuildingTemplate.Cell cell : t.members) {
-            BlockPos pos = p.at(cell);
-            if (level.getBlockEntity(pos) instanceof PortBlockEntity port) {
-                Direction out = p.orient(cell.state().getValue(PortBlock.FACING));
-                port.target = cell.target() != null ? p.at(cell.target()[0], cell.target()[1], cell.target()[2]) : pos.relative(out.getOpposite());
-                port.controller = controllerPos;
-                port.setChanged();
-            }
-        }
-        // the machines inside are the company's, so they run the recipes it has unlocked
-        if (company != null) {
-            for (BuildingTemplate.Cell cell : t.members) {
-                BlockEntity be = level.getBlockEntity(p.at(cell));
-                if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company.id);
-            }
-        }
+        wire(level, p, t, controllerPos, company == null ? "" : company.id);
         if (level.getBlockEntity(controllerPos) instanceof ControllerBlockEntity controller) {
+            controller.shape = BuildingRepair.hash(t);
             controller.buildingId = p.def().id();
             controller.anchor = p.anchor();
             controller.facing = p.facing();
@@ -364,6 +350,27 @@ public final class Buildings {
         Siftec.LOGGER.info("SIFTEC: building {} placed at {} facing {}{} ({} blocks, {} refund stacks)", p.def().id(), controllerPos.toShortString(),
             p.facing(), p.flip() ? " flipped" : "", t.members.size(), refund.size());
         return check;
+    }
+
+    /**
+     * Joins up a building's blocks once they are set: each port is told the cell it feeds or drains and its controller,
+     * and the machines inside are the company's, so they run the recipes it has unlocked.
+     */
+    static void wire(ServerLevel level, Placement p, BuildingTemplate t, BlockPos controllerPos, String companyId) {
+        for (BuildingTemplate.Cell cell : t.members) {
+            BlockPos pos = p.at(cell);
+            if (level.getBlockEntity(pos) instanceof PortBlockEntity port) {
+                Direction out = p.orient(cell.state().getValue(PortBlock.FACING));
+                port.target = cell.target() != null ? p.at(cell.target()[0], cell.target()[1], cell.target()[2]) : pos.relative(out.getOpposite());
+                port.controller = controllerPos;
+                port.setChanged();
+            }
+        }
+        if (companyId.isEmpty()) return;
+        for (BuildingTemplate.Cell cell : t.members) {
+            BlockEntity be = level.getBlockEntity(p.at(cell));
+            if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, companyId);
+        }
     }
 
     /**
@@ -402,6 +409,8 @@ public final class Buildings {
         out.addAll(controller.takeContents());
         BlockPos controllerPos = controller.getBlockPos().immutable();
         if (p != null) out.addAll(takeDown(level, p, controllerPos));
+        // the Converter's cell is part of its machine, not something it holds
+        out.removeIf(s -> s.is(Processors.cellItem()));
         if (level.getBlockState(controllerPos).getBlock() instanceof ControllerBlock) level.setBlock(controllerPos, Blocks.AIR.defaultBlockState(), SET);
         Siftec.LOGGER.info("SIFTEC: building {} at {} dismantled; {} stacks given back", controller.buildingId, controllerPos.toShortString(), out.size());
         com.meakaandre.siftec.power.PowerGrids.dirty();
@@ -537,7 +546,8 @@ public final class Buildings {
         for (BuildingTemplate.Cell cell : t.members) {
             BlockPos pos = p.at(cell);
             if (!level.isLoaded(pos)) return null;
-            if (missing == null && !paint.fits(cell.state(), level.getBlockState(pos).getBlock(), storage)) missing = pos;
+            // a machine is put back by BuildingRepair instead
+            if (missing == null && !BuildingRepair.machine(cell.state()) && !paint.fits(cell.state(), level.getBlockState(pos).getBlock(), storage)) missing = pos;
         }
         return missing;
     }

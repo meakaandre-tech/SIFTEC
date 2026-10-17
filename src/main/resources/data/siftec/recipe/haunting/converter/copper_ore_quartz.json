@@ -1,0 +1,10 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_copper_ore_quartz",
+  "results": [
+    {
+      "id": "minecraft:raw_copper",
+      "count": 12
+    }
+  ]
+}

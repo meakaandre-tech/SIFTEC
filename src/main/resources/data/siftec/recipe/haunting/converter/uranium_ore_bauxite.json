@@ -1,0 +1,10 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_uranium_ore_bauxite",
+  "results": [
+    {
+      "id": "siftec:uranium",
+      "count": 12
+    }
+  ]
+}

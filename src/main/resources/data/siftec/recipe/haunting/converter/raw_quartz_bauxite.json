@@ -1,0 +1,10 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_raw_quartz_bauxite",
+  "results": [
+    {
+      "id": "minecraft:quartz",
+      "count": 12
+    }
+  ]
+}

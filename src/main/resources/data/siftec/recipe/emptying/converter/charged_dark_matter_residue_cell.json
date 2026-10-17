@@ -1,0 +1,11 @@
+{
+  "type": "create:emptying",
+  "ingredient": "siftec:charged_dark_matter_residue_cell",
+  "result": {
+    "id": "siftec:converter_cell"
+  },
+  "fluid_result": {
+    "id": "siftec:dark_matter_residue",
+    "amount": 32400
+  }
+}

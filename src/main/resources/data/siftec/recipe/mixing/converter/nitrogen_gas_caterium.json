@@ -1,0 +1,23 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc",
+    "create:raw_zinc"
+  ],
+  "results": [
+    {
+      "id": "siftec:conversion_core_nitrogen_gas_caterium"
+    }
+  ],
+  "processing_time": 120
+}

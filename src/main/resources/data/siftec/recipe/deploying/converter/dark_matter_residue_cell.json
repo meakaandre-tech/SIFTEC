@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "siftec:conversion_core_dark_matter_residue",
+  "ingredient": "siftec:converter_cell",
+  "results": [
+    {
+      "id": "siftec:loaded_conversion_dark_matter_residue"
+    }
+  ]
+}

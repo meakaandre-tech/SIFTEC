@@ -1,0 +1,10 @@
+{
+  "type": "create:crushing",
+  "ingredient": "siftec:particle_charge_dark_matter_crystallization",
+  "processing_time": 20,
+  "results": [
+    {
+      "id": "siftec:dark_matter_crystal"
+    }
+  ]
+}

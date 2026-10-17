@@ -107,6 +107,29 @@ public final class BuildingLogic {
             motor.setChanged();
         }
         syncFilter(level, c);
+        formTanks(level, c);
+        Processors.ensureCell(level, c);
+    }
+
+    /**
+     * Joins the building's Fluid Tanks into the tanks its template draws (a boiler of 2 by 2 by 2, of 3 by 3 by 8), as Create
+     * does when a player puts tanks side by side, and lets each boiler count the Steam Engines on it.
+     */
+    static void formTanks(ServerLevel level, ControllerBlockEntity c) {
+        List<BlockPos> tanks = cells(c, create("fluid_tank"));
+        tanks.sort(java.util.Comparator.comparingInt(BlockPos::getY).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ));
+        for (BlockPos pos : tanks) {
+            if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity tank && tank.isController()
+                && tank.getWidth() == 1 && tank.getHeight() == 1) {
+                com.zurrtum.create.api.connectivity.ConnectivityHandler.formMulti(tank);
+            }
+        }
+        for (BlockPos pos : tanks) {
+            if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity tank && tank.isController()) {
+                tank.updateBoilerState();
+                tank.updateBoilerTemperature();
+            }
+        }
     }
 
     /** The Basin's filter follows the controller's. */
@@ -150,7 +173,8 @@ public final class BuildingLogic {
             case "basin" -> ProductionLogic.heat(level, c);
             case "assembly" -> ProductionLogic.assemble(level, c, def);
             case "packager" -> ProductionLogic.pack(level, c);
-            case "processor" -> ProductionLogic.process(level, c, def);
+            case "processor" -> Processors.tick(level, c, def);
+            case "power" -> Generators.tick(level, c, def);
             case "extractor" -> ExtractorLogic.extract(level, c, def);
             case "pressurizer" -> ExtractorLogic.pressurize(level, c, def);
             case "well_extractor" -> ExtractorLogic.wellExtract(level, c, def);
@@ -203,7 +227,7 @@ public final class BuildingLogic {
                 yield onLine || ProductionLogic.basinHasInput(level, c, true);
             }
             case "packager" -> !c.input.getItem(0).isEmpty() || ProductionLogic.packagerHolds(level, c);
-            case "processor" -> c.progress > 0 || ProductionLogic.processorReady(level, c, def);
+            case "processor" -> ProductionLogic.basinHasInput(level, c, true) || Processors.busy(level, c) || Processors.ready(level, c, def);
             case "extractor" -> !c.problem.equals("siftec.building.full");
             case "sink" -> !c.input.getItem(0).isEmpty();
             default -> true;

@@ -1,0 +1,10 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:incomplete_conversion_iron_ore_limestone",
+  "results": [
+    {
+      "id": "minecraft:raw_iron",
+      "count": 12
+    }
+  ]
+}

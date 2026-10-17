@@ -557,6 +557,207 @@
       "id": "charged_superposition_oscillator"
     },
     {
+      "id": "converter_cell"
+    },
+    {
+      "id": "conversion_core_bauxite_caterium"
+    },
+    {
+      "id": "incomplete_conversion_bauxite_caterium"
+    },
+    {
+      "id": "conversion_core_bauxite_copper"
+    },
+    {
+      "id": "incomplete_conversion_bauxite_copper"
+    },
+    {
+      "id": "conversion_core_caterium_ore_copper"
+    },
+    {
+      "id": "incomplete_conversion_caterium_ore_copper"
+    },
+    {
+      "id": "conversion_core_caterium_ore_quartz"
+    },
+    {
+      "id": "incomplete_conversion_caterium_ore_quartz"
+    },
+    {
+      "id": "conversion_core_coal_iron"
+    },
+    {
+      "id": "incomplete_conversion_coal_iron"
+    },
+    {
+      "id": "conversion_core_coal_limestone"
+    },
+    {
+      "id": "incomplete_conversion_coal_limestone"
+    },
+    {
+      "id": "conversion_core_copper_ore_quartz"
+    },
+    {
+      "id": "incomplete_conversion_copper_ore_quartz"
+    },
+    {
+      "id": "conversion_core_copper_ore_sulfur"
+    },
+    {
+      "id": "incomplete_conversion_copper_ore_sulfur"
+    },
+    {
+      "id": "charged_dark_matter_residue_cell"
+    },
+    {
+      "id": "conversion_core_dark_matter_residue"
+    },
+    {
+      "id": "loaded_conversion_dark_matter_residue"
+    },
+    {
+      "id": "charged_excited_photonic_matter_cell"
+    },
+    {
+      "id": "conversion_core_ficsite_ingot_aluminum"
+    },
+    {
+      "id": "incomplete_conversion_ficsite_ingot_aluminum"
+    },
+    {
+      "id": "conversion_core_ficsite_ingot_caterium"
+    },
+    {
+      "id": "incomplete_conversion_ficsite_ingot_caterium"
+    },
+    {
+      "id": "conversion_core_ficsite_ingot_iron"
+    },
+    {
+      "id": "incomplete_conversion_ficsite_ingot_iron"
+    },
+    {
+      "id": "conversion_core_iron_ore_limestone"
+    },
+    {
+      "id": "incomplete_conversion_iron_ore_limestone"
+    },
+    {
+      "id": "conversion_core_limestone_sulfur"
+    },
+    {
+      "id": "incomplete_conversion_limestone_sulfur"
+    },
+    {
+      "id": "charged_nitrogen_cell"
+    },
+    {
+      "id": "conversion_core_nitrogen_gas_bauxite"
+    },
+    {
+      "id": "incomplete_conversion_nitrogen_gas_bauxite"
+    },
+    {
+      "id": "loaded_conversion_nitrogen_gas_bauxite"
+    },
+    {
+      "id": "conversion_core_nitrogen_gas_caterium"
+    },
+    {
+      "id": "incomplete_conversion_nitrogen_gas_caterium"
+    },
+    {
+      "id": "loaded_conversion_nitrogen_gas_caterium"
+    },
+    {
+      "id": "conversion_core_raw_quartz_bauxite"
+    },
+    {
+      "id": "incomplete_conversion_raw_quartz_bauxite"
+    },
+    {
+      "id": "conversion_core_raw_quartz_coal"
+    },
+    {
+      "id": "incomplete_conversion_raw_quartz_coal"
+    },
+    {
+      "id": "conversion_core_sulfur_coal"
+    },
+    {
+      "id": "incomplete_conversion_sulfur_coal"
+    },
+    {
+      "id": "conversion_core_sulfur_iron"
+    },
+    {
+      "id": "incomplete_conversion_sulfur_iron"
+    },
+    {
+      "id": "conversion_core_time_crystal"
+    },
+    {
+      "id": "conversion_core_uranium_ore_bauxite"
+    },
+    {
+      "id": "incomplete_conversion_uranium_ore_bauxite"
+    },
+    {
+      "id": "charged_ionized_fuel_cell"
+    },
+    {
+      "id": "conversion_core_dark_ion_fuel"
+    },
+    {
+      "id": "incomplete_conversion_dark_ion_fuel"
+    },
+    {
+      "id": "loaded_conversion_dark_ion_fuel"
+    },
+    {
+      "id": "conversion_core_pink_diamonds"
+    },
+    {
+      "id": "incomplete_conversion_pink_diamonds"
+    },
+    {
+      "id": "particle_charge_dark_matter_crystal"
+    },
+    {
+      "id": "particle_charge_diamonds"
+    },
+    {
+      "id": "particle_charge_ficsonium"
+    },
+    {
+      "id": "particle_charge_nuclear_pasta"
+    },
+    {
+      "id": "particle_charge_plutonium_pellet"
+    },
+    {
+      "id": "particle_charge_cloudy_diamonds"
+    },
+    {
+      "id": "particle_charge_dark_matter_crystallization"
+    },
+    {
+      "id": "particle_charge_dark_matter_trap"
+    },
+    {
+      "id": "particle_charge_instant_plutonium_cell"
+    },
+    {
+      "id": "particle_charge_oil_based_diamonds"
+    },
+    {
+      "id": "particle_charge_petroleum_diamonds"
+    },
+    {
+      "id": "particle_charge_turbo_diamonds"
+    },
+    {
       "id": "object_scanner_core"
     },
     {
@@ -5204,7 +5405,21 @@
         "out": {
           "item": "siftec:raw_bauxite",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_bauxite_caterium",
+        "haunt": "siftec:incomplete_conversion_bauxite_caterium",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_bauxite_caterium",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_bauxite_caterium"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Bauxite (Caterium)"
       },
       {
         "in": [
@@ -5221,7 +5436,21 @@
         "out": {
           "item": "siftec:raw_bauxite",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_bauxite_copper",
+        "haunt": "siftec:incomplete_conversion_bauxite_copper",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_bauxite_copper",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_bauxite_copper"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Bauxite (Copper)"
       },
       {
         "in": [
@@ -5238,7 +5467,21 @@
         "out": {
           "item": "create:raw_zinc",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_caterium_ore_copper",
+        "haunt": "siftec:incomplete_conversion_caterium_ore_copper",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_caterium_ore_copper",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_caterium_ore_copper"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Caterium Ore (Copper)"
       },
       {
         "in": [
@@ -5255,7 +5498,21 @@
         "out": {
           "item": "create:raw_zinc",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_caterium_ore_quartz",
+        "haunt": "siftec:incomplete_conversion_caterium_ore_quartz",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_caterium_ore_quartz",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_caterium_ore_quartz"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Caterium Ore (Quartz)"
       },
       {
         "in": [
@@ -5272,7 +5529,21 @@
         "out": {
           "item": "minecraft:coal",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_coal_iron",
+        "haunt": "siftec:incomplete_conversion_coal_iron",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_coal_iron",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_coal_iron"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Coal (Iron)"
       },
       {
         "in": [
@@ -5289,7 +5560,21 @@
         "out": {
           "item": "minecraft:coal",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_coal_limestone",
+        "haunt": "siftec:incomplete_conversion_coal_limestone",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_coal_limestone",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_coal_limestone"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Coal (Limestone)"
       },
       {
         "in": [
@@ -5306,7 +5591,21 @@
         "out": {
           "item": "minecraft:raw_copper",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_copper_ore_quartz",
+        "haunt": "siftec:incomplete_conversion_copper_ore_quartz",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_copper_ore_quartz",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_copper_ore_quartz"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Copper Ore (Quartz)"
       },
       {
         "in": [
@@ -5323,7 +5622,21 @@
         "out": {
           "item": "minecraft:raw_copper",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_copper_ore_sulfur",
+        "haunt": "siftec:incomplete_conversion_copper_ore_sulfur",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_copper_ore_sulfur",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_copper_ore_sulfur"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Copper Ore (Sulfur)"
       },
       {
         "in": [
@@ -5336,7 +5649,22 @@
         "fluid_out": {
           "fluid": "siftec:dark_matter_residue",
           "mb": 400
-        }
+        },
+        "core": "siftec:conversion_core_dark_matter_residue",
+        "haunt": "siftec:loaded_conversion_dark_matter_residue",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_dark_matter_residue",
+            "apply": "siftec:converter_cell",
+            "makes": "siftec:loaded_conversion_dark_matter_residue"
+          }
+        ],
+        "charged": "siftec:charged_dark_matter_residue_cell",
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Dark Matter Residue"
       },
       {
         "in": [],
@@ -5344,7 +5672,14 @@
         "fluid_out": {
           "fluid": "siftec:excited_photonic_matter",
           "mb": 400
-        }
+        },
+        "haunt": "siftec:converter_cell",
+        "charged": "siftec:charged_excited_photonic_matter_cell",
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Excited Photonic Matter"
       },
       {
         "in": [
@@ -5361,7 +5696,21 @@
         "out": {
           "item": "siftec:ficsite_ingot",
           "count": 1
-        }
+        },
+        "core": "siftec:conversion_core_ficsite_ingot_aluminum",
+        "haunt": "siftec:incomplete_conversion_ficsite_ingot_aluminum",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_ficsite_ingot_aluminum",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_ficsite_ingot_aluminum"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Ficsite Ingot (Aluminum)"
       },
       {
         "in": [
@@ -5378,7 +5727,21 @@
         "out": {
           "item": "siftec:ficsite_ingot",
           "count": 1
-        }
+        },
+        "core": "siftec:conversion_core_ficsite_ingot_caterium",
+        "haunt": "siftec:incomplete_conversion_ficsite_ingot_caterium",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_ficsite_ingot_caterium",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_ficsite_ingot_caterium"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Ficsite Ingot (Caterium)"
       },
       {
         "in": [
@@ -5395,7 +5758,21 @@
         "out": {
           "item": "siftec:ficsite_ingot",
           "count": 1
-        }
+        },
+        "core": "siftec:conversion_core_ficsite_ingot_iron",
+        "haunt": "siftec:incomplete_conversion_ficsite_ingot_iron",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_ficsite_ingot_iron",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_ficsite_ingot_iron"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Ficsite Ingot (Iron)"
       },
       {
         "in": [
@@ -5412,7 +5789,21 @@
         "out": {
           "item": "minecraft:raw_iron",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_iron_ore_limestone",
+        "haunt": "siftec:incomplete_conversion_iron_ore_limestone",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_iron_ore_limestone",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_iron_ore_limestone"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Iron Ore (Limestone)"
       },
       {
         "in": [
@@ -5429,7 +5820,21 @@
         "out": {
           "item": "minecraft:stone",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_limestone_sulfur",
+        "haunt": "siftec:incomplete_conversion_limestone_sulfur",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_limestone_sulfur",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_limestone_sulfur"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Limestone (Sulfur)"
       },
       {
         "in": [
@@ -5446,7 +5851,27 @@
         "fluid_out": {
           "fluid": "siftec:nitrogen",
           "mb": 480
-        }
+        },
+        "core": "siftec:conversion_core_nitrogen_gas_bauxite",
+        "haunt": "siftec:loaded_conversion_nitrogen_gas_bauxite",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_nitrogen_gas_bauxite",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_nitrogen_gas_bauxite"
+          },
+          {
+            "on": "siftec:incomplete_conversion_nitrogen_gas_bauxite",
+            "apply": "siftec:converter_cell",
+            "makes": "siftec:loaded_conversion_nitrogen_gas_bauxite"
+          }
+        ],
+        "charged": "siftec:charged_nitrogen_cell",
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Nitrogen Gas (Bauxite)"
       },
       {
         "in": [
@@ -5463,7 +5888,27 @@
         "fluid_out": {
           "fluid": "siftec:nitrogen",
           "mb": 480
-        }
+        },
+        "core": "siftec:conversion_core_nitrogen_gas_caterium",
+        "haunt": "siftec:loaded_conversion_nitrogen_gas_caterium",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_nitrogen_gas_caterium",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_nitrogen_gas_caterium"
+          },
+          {
+            "on": "siftec:incomplete_conversion_nitrogen_gas_caterium",
+            "apply": "siftec:converter_cell",
+            "makes": "siftec:loaded_conversion_nitrogen_gas_caterium"
+          }
+        ],
+        "charged": "siftec:charged_nitrogen_cell",
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Nitrogen Gas (Caterium)"
       },
       {
         "in": [
@@ -5480,7 +5925,21 @@
         "out": {
           "item": "minecraft:quartz",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_raw_quartz_bauxite",
+        "haunt": "siftec:incomplete_conversion_raw_quartz_bauxite",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_raw_quartz_bauxite",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_raw_quartz_bauxite"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Raw Quartz (Bauxite)"
       },
       {
         "in": [
@@ -5497,7 +5956,21 @@
         "out": {
           "item": "minecraft:quartz",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_raw_quartz_coal",
+        "haunt": "siftec:incomplete_conversion_raw_quartz_coal",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_raw_quartz_coal",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_raw_quartz_coal"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Raw Quartz (Coal)"
       },
       {
         "in": [
@@ -5514,7 +5987,21 @@
         "out": {
           "item": "cgs:sulfur",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_sulfur_coal",
+        "haunt": "siftec:incomplete_conversion_sulfur_coal",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_sulfur_coal",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_sulfur_coal"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Sulfur (Coal)"
       },
       {
         "in": [
@@ -5531,7 +6018,21 @@
         "out": {
           "item": "cgs:sulfur",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_sulfur_iron",
+        "haunt": "siftec:incomplete_conversion_sulfur_iron",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_sulfur_iron",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_sulfur_iron"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Sulfur (Iron)"
       },
       {
         "in": [
@@ -5544,7 +6045,14 @@
         "out": {
           "item": "siftec:time_crystal",
           "count": 1
-        }
+        },
+        "core": "siftec:conversion_core_time_crystal",
+        "haunt": "siftec:conversion_core_time_crystal",
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Time Crystal"
       },
       {
         "in": [
@@ -5561,7 +6069,21 @@
         "out": {
           "item": "siftec:uranium",
           "count": 12
-        }
+        },
+        "core": "siftec:conversion_core_uranium_ore_bauxite",
+        "haunt": "siftec:incomplete_conversion_uranium_ore_bauxite",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_uranium_ore_bauxite",
+            "apply": "siftec:reanimated_sam",
+            "makes": "siftec:incomplete_conversion_uranium_ore_bauxite"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Uranium Ore (Bauxite)"
       },
       {
         "in": [
@@ -5583,7 +6105,27 @@
           "fluid": "siftec:ionized_fuel",
           "mb": 400
         },
-        "alt": "alt_dark_ion_fuel"
+        "alt": "alt_dark_ion_fuel",
+        "core": "siftec:conversion_core_dark_ion_fuel",
+        "haunt": "siftec:loaded_conversion_dark_ion_fuel",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_dark_ion_fuel",
+            "apply": "siftec:dark_matter_crystal",
+            "makes": "siftec:incomplete_conversion_dark_ion_fuel"
+          },
+          {
+            "on": "siftec:incomplete_conversion_dark_ion_fuel",
+            "apply": "siftec:converter_cell",
+            "makes": "siftec:loaded_conversion_dark_ion_fuel"
+          }
+        ],
+        "charged": "siftec:charged_ionized_fuel_cell",
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Dark-Ion Fuel"
       },
       {
         "in": [
@@ -5601,7 +6143,21 @@
           "item": "minecraft:diamond",
           "count": 1
         },
-        "alt": "alt_pink_diamonds"
+        "alt": "alt_pink_diamonds",
+        "core": "siftec:conversion_core_pink_diamonds",
+        "haunt": "siftec:incomplete_conversion_pink_diamonds",
+        "steps": [
+          {
+            "on": "siftec:conversion_core_pink_diamonds",
+            "apply": "siftec:quartz_crystal",
+            "makes": "siftec:incomplete_conversion_pink_diamonds"
+          }
+        ],
+        "mw": [
+          100,
+          400
+        ],
+        "name": "Pink Diamonds"
       }
     ],
     "particle_accelerator": [
@@ -5620,7 +6176,14 @@
         "out": {
           "item": "siftec:dark_matter_crystal",
           "count": 1
-        }
+        },
+        "core": "siftec:particle_charge_dark_matter_crystal",
+        "crush": "siftec:particle_charge_dark_matter_crystal",
+        "mw": [
+          500,
+          1500
+        ],
+        "name": "Dark Matter Crystal"
       },
       {
         "in": [
@@ -5633,7 +6196,14 @@
         "out": {
           "item": "minecraft:diamond",
           "count": 1
-        }
+        },
+        "core": "siftec:particle_charge_diamonds",
+        "crush": "siftec:particle_charge_diamonds",
+        "mw": [
+          250,
+          750
+        ],
+        "name": "Diamonds"
       },
       {
         "in": [
@@ -5654,7 +6224,14 @@
         "out": {
           "item": "siftec:ficsonium",
           "count": 1
-        }
+        },
+        "core": "siftec:particle_charge_ficsonium",
+        "crush": "siftec:particle_charge_ficsonium",
+        "mw": [
+          500,
+          1500
+        ],
+        "name": "Ficsonium"
       },
       {
         "in": [
@@ -5671,7 +6248,14 @@
         "out": {
           "item": "siftec:nuclear_pasta",
           "count": 1
-        }
+        },
+        "core": "siftec:particle_charge_nuclear_pasta",
+        "crush": "siftec:particle_charge_nuclear_pasta",
+        "mw": [
+          500,
+          1500
+        ],
+        "name": "Nuclear Pasta"
       },
       {
         "in": [
@@ -5688,7 +6272,14 @@
         "out": {
           "item": "siftec:plutonium_pellet",
           "count": 30
-        }
+        },
+        "core": "siftec:particle_charge_plutonium_pellet",
+        "crush": "siftec:particle_charge_plutonium_pellet",
+        "mw": [
+          250,
+          750
+        ],
+        "name": "Plutonium Pellet"
       },
       {
         "in": [
@@ -5706,7 +6297,14 @@
           "item": "minecraft:diamond",
           "count": 1
         },
-        "alt": "alt_cloudy_diamonds"
+        "alt": "alt_cloudy_diamonds",
+        "core": "siftec:particle_charge_cloudy_diamonds",
+        "crush": "siftec:particle_charge_cloudy_diamonds",
+        "mw": [
+          250,
+          750
+        ],
+        "name": "Cloudy Diamonds"
       },
       {
         "in": [],
@@ -5719,7 +6317,14 @@
           "item": "siftec:dark_matter_crystal",
           "count": 1
         },
-        "alt": "alt_dark_matter_crystallization"
+        "alt": "alt_dark_matter_crystallization",
+        "core": "siftec:particle_charge_dark_matter_crystallization",
+        "crush": "siftec:particle_charge_dark_matter_crystallization",
+        "mw": [
+          500,
+          1500
+        ],
+        "name": "Dark Matter Crystallization"
       },
       {
         "in": [
@@ -5737,7 +6342,14 @@
           "item": "siftec:dark_matter_crystal",
           "count": 2
         },
-        "alt": "alt_dark_matter_trap"
+        "alt": "alt_dark_matter_trap",
+        "core": "siftec:particle_charge_dark_matter_trap",
+        "crush": "siftec:particle_charge_dark_matter_trap",
+        "mw": [
+          500,
+          1500
+        ],
+        "name": "Dark Matter Trap"
       },
       {
         "in": [
@@ -5755,7 +6367,14 @@
           "item": "siftec:encased_plutonium_cell",
           "count": 20
         },
-        "alt": "alt_instant_plutonium_cell"
+        "alt": "alt_instant_plutonium_cell",
+        "core": "siftec:particle_charge_instant_plutonium_cell",
+        "crush": "siftec:particle_charge_instant_plutonium_cell",
+        "mw": [
+          250,
+          750
+        ],
+        "name": "Instant Plutonium Cell"
       },
       {
         "in": [],
@@ -5768,7 +6387,14 @@
           "item": "minecraft:diamond",
           "count": 2
         },
-        "alt": "alt_oil_based_diamonds"
+        "alt": "alt_oil_based_diamonds",
+        "core": "siftec:particle_charge_oil_based_diamonds",
+        "crush": "siftec:particle_charge_oil_based_diamonds",
+        "mw": [
+          250,
+          750
+        ],
+        "name": "Oil-Based Diamonds"
       },
       {
         "in": [
@@ -5782,7 +6408,14 @@
           "item": "minecraft:diamond",
           "count": 1
         },
-        "alt": "alt_petroleum_diamonds"
+        "alt": "alt_petroleum_diamonds",
+        "core": "siftec:particle_charge_petroleum_diamonds",
+        "crush": "siftec:particle_charge_petroleum_diamonds",
+        "mw": [
+          250,
+          750
+        ],
+        "name": "Petroleum Diamonds"
       },
       {
         "in": [
@@ -5800,7 +6433,14 @@
           "item": "minecraft:diamond",
           "count": 3
         },
-        "alt": "alt_turbo_diamonds"
+        "alt": "alt_turbo_diamonds",
+        "core": "siftec:particle_charge_turbo_diamonds",
+        "crush": "siftec:particle_charge_turbo_diamonds",
+        "mw": [
+          250,
+          750
+        ],
+        "name": "Turbo Diamonds"
       }
     ]
   },
@@ -7120,6 +7760,18 @@
     "siftec:mixing/quantum_encoder/superposition_oscillator_core": "quantum_encoding",
     "seq:charged_superposition_oscillator": "quantum_encoding",
     "siftec:emptying/quantum_encoder/superposition_oscillator_drain": "quantum_encoding",
+    "siftec:haunting/converter/ficsite_ingot_aluminum": "matter_conversion",
+    "siftec:haunting/converter/ficsite_ingot_caterium": "matter_conversion",
+    "siftec:haunting/converter/ficsite_ingot_iron": "matter_conversion",
+    "siftec:haunting/converter/time_crystal": "matter_conversion",
+    "siftec:haunting/converter/dark_ion_fuel": "alt_dark_ion_fuel",
+    "siftec:crushing/particle_accelerator/dark_matter_crystal": "quantum_encoding",
+    "siftec:crushing/particle_accelerator/ficsonium": "peak_efficiency",
+    "siftec:crushing/particle_accelerator/nuclear_pasta": "particle_enrichment",
+    "siftec:crushing/particle_accelerator/plutonium_pellet": "particle_enrichment",
+    "siftec:crushing/particle_accelerator/dark_matter_crystallization": "alt_dark_matter_crystallization",
+    "siftec:crushing/particle_accelerator/dark_matter_trap": "alt_dark_matter_trap",
+    "siftec:crushing/particle_accelerator/instant_plutonium_cell": "alt_instant_plutonium_cell",
     "siftec:mixing/manufacturer/object_scanner_core": "field_research",
     "seq:object_scanner": "field_research",
     "siftec:mixing/manufacturer/jetpack_core": "jetpack",
@@ -7223,6 +7875,79 @@
     "siftec:sequenced_assembly/quantum_encoder/ficsonium_fuel_rod": "peak_efficiency",
     "siftec:sequenced_assembly/quantum_encoder/neural_quantum_processor": "quantum_encoding",
     "siftec:sequenced_assembly/quantum_encoder/superposition_oscillator": "quantum_encoding",
+    "siftec:mixing/converter/bauxite_caterium": "matter_conversion",
+    "siftec:deploying/converter/bauxite_caterium": "matter_conversion",
+    "siftec:haunting/converter/bauxite_caterium": "matter_conversion",
+    "siftec:mixing/converter/bauxite_copper": "matter_conversion",
+    "siftec:deploying/converter/bauxite_copper": "matter_conversion",
+    "siftec:haunting/converter/bauxite_copper": "matter_conversion",
+    "siftec:mixing/converter/caterium_ore_copper": "matter_conversion",
+    "siftec:deploying/converter/caterium_ore_copper": "matter_conversion",
+    "siftec:haunting/converter/caterium_ore_copper": "matter_conversion",
+    "siftec:mixing/converter/caterium_ore_quartz": "matter_conversion",
+    "siftec:deploying/converter/caterium_ore_quartz": "matter_conversion",
+    "siftec:haunting/converter/caterium_ore_quartz": "matter_conversion",
+    "siftec:mixing/converter/coal_iron": "matter_conversion",
+    "siftec:deploying/converter/coal_iron": "matter_conversion",
+    "siftec:haunting/converter/coal_iron": "matter_conversion",
+    "siftec:mixing/converter/coal_limestone": "matter_conversion",
+    "siftec:deploying/converter/coal_limestone": "matter_conversion",
+    "siftec:haunting/converter/coal_limestone": "matter_conversion",
+    "siftec:mixing/converter/copper_ore_quartz": "matter_conversion",
+    "siftec:deploying/converter/copper_ore_quartz": "matter_conversion",
+    "siftec:haunting/converter/copper_ore_quartz": "matter_conversion",
+    "siftec:mixing/converter/copper_ore_sulfur": "matter_conversion",
+    "siftec:deploying/converter/copper_ore_sulfur": "matter_conversion",
+    "siftec:haunting/converter/copper_ore_sulfur": "matter_conversion",
+    "siftec:mixing/converter/dark_matter_residue": "quantum_encoding",
+    "siftec:deploying/converter/dark_matter_residue_cell": "quantum_encoding",
+    "siftec:haunting/converter/dark_matter_residue": "quantum_encoding",
+    "siftec:emptying/converter/charged_dark_matter_residue_cell": "quantum_encoding",
+    "siftec:haunting/converter/excited_photonic_matter": "quantum_encoding",
+    "siftec:emptying/converter/charged_excited_photonic_matter_cell": "quantum_encoding",
+    "siftec:mixing/converter/ficsite_ingot_aluminum": "matter_conversion",
+    "siftec:deploying/converter/ficsite_ingot_aluminum": "matter_conversion",
+    "siftec:mixing/converter/ficsite_ingot_caterium": "matter_conversion",
+    "siftec:deploying/converter/ficsite_ingot_caterium": "matter_conversion",
+    "siftec:mixing/converter/ficsite_ingot_iron": "matter_conversion",
+    "siftec:deploying/converter/ficsite_ingot_iron": "matter_conversion",
+    "siftec:mixing/converter/iron_ore_limestone": "matter_conversion",
+    "siftec:deploying/converter/iron_ore_limestone": "matter_conversion",
+    "siftec:haunting/converter/iron_ore_limestone": "matter_conversion",
+    "siftec:mixing/converter/limestone_sulfur": "matter_conversion",
+    "siftec:deploying/converter/limestone_sulfur": "matter_conversion",
+    "siftec:haunting/converter/limestone_sulfur": "matter_conversion",
+    "siftec:mixing/converter/nitrogen_gas_bauxite": "matter_conversion",
+    "siftec:deploying/converter/nitrogen_gas_bauxite": "matter_conversion",
+    "siftec:deploying/converter/nitrogen_gas_bauxite_cell": "matter_conversion",
+    "siftec:haunting/converter/nitrogen_gas_bauxite": "matter_conversion",
+    "siftec:emptying/converter/charged_nitrogen_cell": "matter_conversion",
+    "siftec:mixing/converter/nitrogen_gas_caterium": "matter_conversion",
+    "siftec:deploying/converter/nitrogen_gas_caterium": "matter_conversion",
+    "siftec:deploying/converter/nitrogen_gas_caterium_cell": "matter_conversion",
+    "siftec:haunting/converter/nitrogen_gas_caterium": "matter_conversion",
+    "siftec:mixing/converter/raw_quartz_bauxite": "matter_conversion",
+    "siftec:deploying/converter/raw_quartz_bauxite": "matter_conversion",
+    "siftec:haunting/converter/raw_quartz_bauxite": "matter_conversion",
+    "siftec:mixing/converter/raw_quartz_coal": "matter_conversion",
+    "siftec:deploying/converter/raw_quartz_coal": "matter_conversion",
+    "siftec:haunting/converter/raw_quartz_coal": "matter_conversion",
+    "siftec:mixing/converter/sulfur_coal": "matter_conversion",
+    "siftec:deploying/converter/sulfur_coal": "matter_conversion",
+    "siftec:haunting/converter/sulfur_coal": "matter_conversion",
+    "siftec:mixing/converter/sulfur_iron": "matter_conversion",
+    "siftec:deploying/converter/sulfur_iron": "matter_conversion",
+    "siftec:haunting/converter/sulfur_iron": "matter_conversion",
+    "siftec:mixing/converter/time_crystal": "matter_conversion",
+    "siftec:mixing/converter/uranium_ore_bauxite": "matter_conversion",
+    "siftec:deploying/converter/uranium_ore_bauxite": "matter_conversion",
+    "siftec:haunting/converter/uranium_ore_bauxite": "matter_conversion",
+    "siftec:mixing/particle_accelerator/dark_matter_crystal": "quantum_encoding",
+    "siftec:mixing/particle_accelerator/diamonds": "matter_conversion",
+    "siftec:crushing/particle_accelerator/diamonds": "matter_conversion",
+    "siftec:mixing/particle_accelerator/ficsonium": "peak_efficiency",
+    "siftec:mixing/particle_accelerator/nuclear_pasta": "particle_enrichment",
+    "siftec:mixing/particle_accelerator/plutonium_pellet": "particle_enrichment",
     "siftec:sequenced_assembly/manufacturer/object_scanner": "field_research",
     "siftec:sequenced_assembly/manufacturer/jetpack": "jetpack",
     "siftec:sequenced_assembly/manufacturer/parachute": "mam_mycelia_parachute",
@@ -7390,7 +8115,25 @@
     "siftec:mixing/refinery/pure_copper_ingot": "alt_pure_copper_ingot",
     "siftec:mixing/refinery/pure_iron_ingot": "alt_pure_iron_ingot",
     "siftec:mixing/refinery/sloppy_alumina": "alt_sloppy_alumina",
-    "siftec:mixing/blender/diluted_fuel": "alt_diluted_fuel"
+    "siftec:mixing/blender/diluted_fuel": "alt_diluted_fuel",
+    "siftec:mixing/converter/dark_ion_fuel": "alt_dark_ion_fuel",
+    "siftec:deploying/converter/dark_ion_fuel": "alt_dark_ion_fuel",
+    "siftec:deploying/converter/dark_ion_fuel_cell": "alt_dark_ion_fuel",
+    "siftec:emptying/converter/charged_ionized_fuel_cell": "alt_dark_ion_fuel",
+    "siftec:mixing/converter/pink_diamonds": "alt_pink_diamonds",
+    "siftec:deploying/converter/pink_diamonds": "alt_pink_diamonds",
+    "siftec:haunting/converter/pink_diamonds": "alt_pink_diamonds",
+    "siftec:mixing/particle_accelerator/cloudy_diamonds": "alt_cloudy_diamonds",
+    "siftec:crushing/particle_accelerator/cloudy_diamonds": "alt_cloudy_diamonds",
+    "siftec:mixing/particle_accelerator/dark_matter_crystallization": "alt_dark_matter_crystallization",
+    "siftec:mixing/particle_accelerator/dark_matter_trap": "alt_dark_matter_trap",
+    "siftec:mixing/particle_accelerator/instant_plutonium_cell": "alt_instant_plutonium_cell",
+    "siftec:mixing/particle_accelerator/oil_based_diamonds": "alt_oil_based_diamonds",
+    "siftec:crushing/particle_accelerator/oil_based_diamonds": "alt_oil_based_diamonds",
+    "siftec:mixing/particle_accelerator/petroleum_diamonds": "alt_petroleum_diamonds",
+    "siftec:crushing/particle_accelerator/petroleum_diamonds": "alt_petroleum_diamonds",
+    "siftec:mixing/particle_accelerator/turbo_diamonds": "alt_turbo_diamonds",
+    "siftec:crushing/particle_accelerator/turbo_diamonds": "alt_turbo_diamonds"
   },
   "alternates": [
     {
@@ -7604,11 +8347,8 @@
       "id": "alt_fine_black_powder",
       "building": "assembler",
       "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
-        "control_system_development",
-        "oil_processing",
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "part_assembly",
         "mam_sulfur_compacted_coal"
       ]
@@ -7802,6 +8542,8 @@
       "id": "alt_tempered_caterium_ingot",
       "building": "foundry",
       "requires": [
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "basic_steel_production",
         "oil_processing"
       ]
@@ -7837,13 +8579,11 @@
       "id": "alt_classic_battery",
       "building": "manufacturer",
       "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
-        "control_system_development",
-        "oil_processing",
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "bauxite_refinement",
         "industrial_manufacturing",
+        "oil_processing",
         "hub_upgrade_2"
       ]
     },
@@ -7882,14 +8622,12 @@
       "id": "alt_infused_uranium_cell",
       "building": "manufacturer",
       "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
-        "control_system_development",
-        "oil_processing",
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "industrial_manufacturing",
         "mam_caterium_quickwire",
-        "mam_quartz_silica"
+        "mam_quartz_silica",
+        "hub_upgrade_1"
       ]
     },
     {
@@ -8029,10 +8767,9 @@
       "id": "alt_leached_caterium_ingot",
       "building": "refinery",
       "requires": [
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "oil_processing",
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
         "control_system_development"
       ]
     },
@@ -8041,9 +8778,8 @@
       "building": "refinery",
       "requires": [
         "oil_processing",
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "control_system_development"
       ]
     },
@@ -8052,9 +8788,8 @@
       "building": "refinery",
       "requires": [
         "oil_processing",
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "control_system_development"
       ]
     },
@@ -8069,6 +8804,8 @@
       "id": "alt_pure_caterium_ingot",
       "building": "refinery",
       "requires": [
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "oil_processing"
       ]
     },
@@ -8173,9 +8910,10 @@
         "hub_upgrade_3",
         "advanced_aluminum_production",
         "particle_enrichment",
-        "coal_power",
-        "basic_steel_production",
-        "oil_processing"
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
+        "oil_processing",
+        "hub_upgrade_1"
       ]
     },
     {
@@ -8197,9 +8935,8 @@
       "requires": [
         "control_system_development",
         "hub_upgrade_1",
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "oil_processing"
       ]
     },
@@ -8207,11 +8944,10 @@
       "id": "alt_nitro_rocket_fuel",
       "building": "blender",
       "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
-        "control_system_development",
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
         "oil_processing",
+        "control_system_development",
         "advanced_aluminum_production"
       ]
     },
@@ -8219,11 +8955,10 @@
       "id": "alt_turbo_blend_fuel",
       "building": "blender",
       "requires": [
-        "hub_upgrade_3",
-        "coal_power",
-        "basic_steel_production",
-        "control_system_development",
-        "oil_processing"
+        "matter_conversion",
+        "mam_alien_sam_reanimation",
+        "oil_processing",
+        "control_system_development"
       ]
     },
     {
@@ -8239,8 +8974,16 @@
       "building": "converter",
       "requires": [
         "matter_conversion",
+        "mam_alien_sam_reanimation",
         "quantum_encoding",
-        "mam_sulfur_rocket_fuel"
+        "oil_processing",
+        "mam_sulfur_ionized_fuel",
+        "control_system_development",
+        "hub_upgrade_3",
+        "advanced_aluminum_production",
+        "particle_enrichment",
+        "mam_sulfur_rocket_fuel",
+        "mam_sulfur_turbofuel"
       ]
     },
     {
@@ -12646,6 +13389,30 @@
     "siftec:mixing/brass_blend_with_coal": 80,
     "siftec:mixing/brass_blend_with_sand": 80,
     "siftec:mixing/brass_blend_with_sulfur": 80,
+    "siftec:mixing/converter/bauxite_caterium": 120,
+    "siftec:mixing/converter/bauxite_copper": 120,
+    "siftec:mixing/converter/caterium_ore_copper": 120,
+    "siftec:mixing/converter/caterium_ore_quartz": 120,
+    "siftec:mixing/converter/coal_iron": 120,
+    "siftec:mixing/converter/coal_limestone": 120,
+    "siftec:mixing/converter/copper_ore_quartz": 120,
+    "siftec:mixing/converter/copper_ore_sulfur": 120,
+    "siftec:mixing/converter/dark_ion_fuel": 60,
+    "siftec:mixing/converter/dark_matter_residue": 120,
+    "siftec:mixing/converter/ficsite_ingot_aluminum": 40,
+    "siftec:mixing/converter/ficsite_ingot_caterium": 80,
+    "siftec:mixing/converter/ficsite_ingot_iron": 120,
+    "siftec:mixing/converter/iron_ore_limestone": 120,
+    "siftec:mixing/converter/limestone_sulfur": 120,
+    "siftec:mixing/converter/nitrogen_gas_bauxite": 120,
+    "siftec:mixing/converter/nitrogen_gas_caterium": 120,
+    "siftec:mixing/converter/pink_diamonds": 80,
+    "siftec:mixing/converter/raw_quartz_bauxite": 120,
+    "siftec:mixing/converter/raw_quartz_coal": 120,
+    "siftec:mixing/converter/sulfur_coal": 120,
+    "siftec:mixing/converter/sulfur_iron": 120,
+    "siftec:mixing/converter/time_crystal": 200,
+    "siftec:mixing/converter/uranium_ore_bauxite": 120,
     "siftec:mixing/coolant": 120,
     "siftec:mixing/drilling_mud": 120,
     "siftec:mixing/foundry/aluminum_ingot": 80,
@@ -12745,6 +13512,18 @@
     "siftec:mixing/manufacturer/uranium_fuel_unit_core": 6000,
     "siftec:mixing/manufacturer/xeno_zapper_core": 960,
     "siftec:mixing/melon_jam": 200,
+    "siftec:mixing/particle_accelerator/cloudy_diamonds": 60,
+    "siftec:mixing/particle_accelerator/dark_matter_crystal": 40,
+    "siftec:mixing/particle_accelerator/dark_matter_crystallization": 60,
+    "siftec:mixing/particle_accelerator/dark_matter_trap": 40,
+    "siftec:mixing/particle_accelerator/diamonds": 40,
+    "siftec:mixing/particle_accelerator/ficsonium": 120,
+    "siftec:mixing/particle_accelerator/instant_plutonium_cell": 2400,
+    "siftec:mixing/particle_accelerator/nuclear_pasta": 2400,
+    "siftec:mixing/particle_accelerator/oil_based_diamonds": 60,
+    "siftec:mixing/particle_accelerator/petroleum_diamonds": 40,
+    "siftec:mixing/particle_accelerator/plutonium_pellet": 1200,
+    "siftec:mixing/particle_accelerator/turbo_diamonds": 60,
     "siftec:mixing/quantum_encoder/alien_power_matrix_core": 480,
     "siftec:mixing/quantum_encoder/ficsonium_fuel_rod_core": 480,
     "siftec:mixing/quantum_encoder/neural_quantum_processor_core": 400,
@@ -12825,5 +13604,19 @@
     "augmenter": {
       "siftec:alien_power_matrix": 1
     }
+  },
+  "nuclear": {
+    "rods": 14,
+    "boilers": [
+      [
+        -8,
+        7
+      ],
+      [
+        6,
+        7
+      ]
+    ],
+    "levels": 36
   }
 }

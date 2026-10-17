@@ -23,7 +23,9 @@ CRAFTING = {"minecraft:crafting_shaped", "minecraft:crafting_shapeless"}
 # what the world gives: node resources, fluids from extractors, and the world finds
 RAW = {"minecraft:raw_iron", "minecraft:raw_copper", "create:raw_zinc", "minecraft:coal", "minecraft:quartz", "siftec:raw_bauxite", "siftec:uranium",
        "siftec:sam", "cgs:sulfur", "#siftec:stones", "minecraft:stone", "minecraft:water", "createdieselgenerators:crude_oil", "siftec:nitrogen",
-       "minecraft:lava", "siftec:hard_drive", "siftec:mercer_sphere", "siftec:somersloop"}
+       "minecraft:lava", "siftec:hard_drive", "siftec:mercer_sphere", "siftec:somersloop",
+       # the Converter's cell is part of its machine: the building has one, and its Item Drain gives it back every time
+       "siftec:converter_cell"}
 # pack tags the MAM takes, of things the pack itself makes
 TAGS = {"#siftec:preserves": ["siftec:pickled_" + w for w in ("tomato", "onion", "cabbage", "pumpkin", "carrot", "beetroot", "kelp")]
         + ["siftec:" + w + "_jam" for w in ("sweet_berry", "glow_berry", "apple", "melon")]}

@@ -1,0 +1,35 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke",
+    "siftec:petroleum_coke"
+  ],
+  "results": [
+    {
+      "id": "siftec:particle_charge_petroleum_diamonds"
+    }
+  ],
+  "processing_time": 40
+}

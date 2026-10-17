@@ -1,0 +1,31 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal",
+    "minecraft:coal"
+  ],
+  "results": [
+    {
+      "id": "siftec:particle_charge_diamonds"
+    }
+  ],
+  "processing_time": 40
+}

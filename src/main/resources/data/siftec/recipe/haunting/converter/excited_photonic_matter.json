@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredient": "siftec:converter_cell",
+  "results": [
+    {
+      "id": "siftec:charged_excited_photonic_matter_cell"
+    }
+  ]
+}

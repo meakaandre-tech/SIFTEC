@@ -1,0 +1,20 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "siftec:plutonium_waste",
+    "siftec:singularity_cell"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 64800,
+      "fluid": "siftec:dark_matter_residue"
+    }
+  ],
+  "results": [
+    {
+      "id": "siftec:particle_charge_ficsonium"
+    }
+  ],
+  "processing_time": 120
+}

@@ -110,6 +110,18 @@ public class BuildingIndex extends SavedData {
         }
     }
 
+    /** Every block listed for one controller (a building being rebuilt to a new shape). */
+    public List<BlockPos> members(Level level, BlockPos controller) {
+        List<BlockPos> out = new ArrayList<>();
+        Long2LongOpenHashMap map = byDimension.get(dim(level));
+        if (map == null) return out;
+        long c = controller.asLong();
+        map.long2LongEntrySet().forEach(e -> {
+            if (e.getLongValue() == c) out.add(BlockPos.of(e.getLongKey()));
+        });
+        return out;
+    }
+
     /** How many blocks are listed for one controller (selftests). */
     public int count(Level level, BlockPos controller) {
         Long2LongOpenHashMap map = byDimension.get(dim(level));
