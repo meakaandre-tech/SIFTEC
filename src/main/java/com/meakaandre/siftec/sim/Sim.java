@@ -32,7 +32,7 @@ import java.util.Map;
  * their Truck Stations to load and unload.</li>
  * </ol>
  * Nothing here touches the world; what has to (a delivery to a building whose chunk ticks, Sink points, a drone landing
- * at a loaded port, a vehicle reaching loaded land) is left in the data for the server thread ({@link SimTicker}).
+ * at a loaded port, a vehicle reaching loaded land) is left in the data for the server thread ({@link Factories}).
  */
 public final class Sim {
     /** What an idle powered building draws (BuildingPower.STANDBY_SU). */

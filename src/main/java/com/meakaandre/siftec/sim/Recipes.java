@@ -55,7 +55,7 @@ public final class Recipes {
         loaded = false;
     }
 
-    static synchronized void load(MinecraftServer server) {
+    public static synchronized void load(MinecraftServer server) {
         if (loaded) return;
         loaded = true;
         Set<String> live = new HashSet<>();

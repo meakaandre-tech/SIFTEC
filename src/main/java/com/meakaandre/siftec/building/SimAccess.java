@@ -229,7 +229,7 @@ public final class SimAccess {
         } else {
             candidates.addAll(Recipes.ofType(type));
         }
-        candidates.removeIf(p -> !ticks.containsKey(p.id()));
+        candidates.removeIf(p -> !ticks.containsKey(p.id()) || !unlocked(c, p.id()));
         String own = "/" + def.id() + "/";
         candidates.sort(java.util.Comparator.comparing((Recipes.Parsed p) -> !p.id().contains(own)));
         if (c.filter.isEmpty()) candidates.removeIf(p -> !p.id().contains(own));
@@ -243,6 +243,15 @@ public final class SimAccess {
             r.fout.putAll(p.fluidsOut());
             n.recipes.add(r);
         }
+    }
+
+    /** Whether the building's company may run a recipe (by its id), as RecipeLocks lets its machines. */
+    private static boolean unlocked(ControllerBlockEntity c, String recipeId) {
+        JsonObject raw = Milestones.raw();
+        JsonObject locks = raw != null && raw.has("recipe_locks") ? raw.getAsJsonObject("recipe_locks") : null;
+        if (locks == null || !locks.has(recipeId)) return true;
+        var company = ProductionLogic.company(c);
+        return company != null && company.has(locks.get(recipeId).getAsString());
     }
 
     /** The Manufacturer and the Quantum Encoder: the Core's inputs plus each step's item or fluid, the result at the line's end. */

@@ -65,7 +65,7 @@ public final class AlwaysTests {
     private static final int OX = -9000, OZ = -9000, Y = 150, B_OFFSET = 600;
     /** Ticks for the Biomass Burners to light before the miners go down, and the ten minutes. */
     private static final int WARMUP = 300, RUN = 12_000;
-    private static final String ROD = "siftec:iron_rod";
+    private static final String ROD = "siftec:iron_rod", COMPANY = "selftest_always";
 
     private record Later(long at, Runnable run) {
     }
@@ -130,6 +130,37 @@ public final class AlwaysTests {
 
     private static Block block(String id) {
         return BuiltInRegistries.BLOCK.getValue(Identifier.parse(id));
+    }
+
+    /** The twins' company: every milestone done, so its machines run every standard recipe. */
+    private static com.meakaandre.siftec.company.Company company(MinecraftServer server) {
+        var data = com.meakaandre.siftec.company.CompanyData.get(server);
+        com.meakaandre.siftec.company.Company c = data.companies().get(COMPANY);
+        if (c == null) {
+            c = new com.meakaandre.siftec.company.Company();
+            c.id = COMPANY;
+            c.name = "Selftest Always Running";
+            data.companies().put(COMPANY, c);
+        }
+        for (var m : com.meakaandre.siftec.hub.Milestones.all()) c.done.add(m.id());
+        for (var m : com.meakaandre.siftec.hub.Milestones.phases()) c.done.add(m.id());
+        com.meakaandre.siftec.company.Companies.save(server);
+        return c;
+    }
+
+    /** A building put down for the company as in creative (no cost), or null (said why). */
+    private static @Nullable ControllerBlockEntity put(ServerLevel level, CommandSourceStack source, String id, BlockPos anchor, Direction facing) {
+        var def = com.meakaandre.siftec.building.Buildings.def(id);
+        if (def == null) return null;
+        var p = new com.meakaandre.siftec.building.Placement(def, anchor, facing, false);
+        var check = com.meakaandre.siftec.building.Buildings.place(level, p, company(level.getServer()), null, true);
+        if (!check.ok()) {
+            report(source, "could not place " + id + " at " + anchor.toShortString() + ": " + check.message().getString()
+                + (check.blocked.isEmpty() ? "" : " (first blocked " + check.blocked.getFirst().toShortString() + " " + level.getBlockState(check.blocked.getFirst()) + ")"));
+            return null;
+        }
+        var t = com.meakaandre.siftec.building.BuildingTemplate.of(def);
+        return t != null && level.getBlockEntity(p.at(t.controller)) instanceof ControllerBlockEntity c ? c : null;
     }
 
     // ------------------------------------------------------------------------------------------------ the twins
@@ -246,13 +277,13 @@ public final class AlwaysTests {
         NodeLook look = NodeLook.of(NodeType.IRON);
         level.setBlock(t.node().below(), look.patchStone(), Block.UPDATE_ALL);
         NodeSites.put(level, t.node(), look, Purity.NORMAL);
-        ControllerBlockEntity l = PowerTests.build(level, source, "truck_station", t.stationL(), Direction.NORTH);
-        ControllerBlockEntity u = PowerTests.build(level, source, "truck_station", t.stationU(), Direction.NORTH);
-        ControllerBlockEntity con = PowerTests.build(level, source, "constructor", t.constructor(), Direction.EAST);
-        ControllerBlockEntity sm = PowerTests.build(level, source, "smelter", t.smelter(), Direction.EAST);
-        ControllerBlockEntity st = PowerTests.build(level, source, "storage_container", t.storage(), Direction.EAST);
-        ControllerBlockEntity burner = PowerTests.build(level, source, "biomass_burner", t.burner(), Direction.EAST);
-        ControllerBlockEntity pole = PowerTests.build(level, source, "power_pole_mk3", t.pole(), Direction.EAST);
+        ControllerBlockEntity l = put(level, source, "truck_station", t.stationL(), Direction.NORTH);
+        ControllerBlockEntity u = put(level, source, "truck_station", t.stationU(), Direction.NORTH);
+        ControllerBlockEntity con = put(level, source, "constructor", t.constructor(), Direction.EAST);
+        ControllerBlockEntity sm = put(level, source, "smelter", t.smelter(), Direction.EAST);
+        ControllerBlockEntity st = put(level, source, "storage_container", t.storage(), Direction.EAST);
+        ControllerBlockEntity burner = put(level, source, "biomass_burner", t.burner(), Direction.EAST);
+        ControllerBlockEntity pole = put(level, source, "power_pole_mk3", t.pole(), Direction.EAST);
         if (l != null) l.unload = false;
         if (u != null) u.unload = true;
         if (con != null) BuildingLogic.setFilter(level, con, new ItemStack(item(ROD)));
@@ -269,6 +300,7 @@ public final class AlwaysTests {
         Vec3 start = route.getFirst();
         truck.snapTo(start.x, start.y, start.z, Direction.WEST.toYRot(), 0);
         truck.fuelMj = VehicleKind.TRUCK.tankMj();
+        truck.companyId = COMPANY;
         truck.route.addAll(route);
         if (l != null && u != null) {
             Vec3 dl = TruckStations.dock(l), du = TruckStations.dock(u);
@@ -346,7 +378,7 @@ public final class AlwaysTests {
             ControllerBlockEntity burner = controller(level, t.burner(), "biomass_burner");
             expect(source, (t == A ? "twin A" : "twin B") + ": its Biomass Burner gives power before the miner goes down",
                 burner != null && burner.offered > 0, burner == null ? "no burner" : BuildingLogic.status(level, burner).getString());
-            ControllerBlockEntity miner = PowerTests.build(level, source, "miner_mk1", t.miner(), Direction.EAST);
+            ControllerBlockEntity miner = put(level, source, "miner_mk1", t.miner(), Direction.EAST);
             ControllerBlockEntity pole = controller(level, t.pole(), "power_pole_mk3");
             boolean wired = PowerTests.wire(PowerTests.connector(level, miner), PowerTests.connector(level, pole));
             expect(source, (t == A ? "twin A" : "twin B") + ": the Miner Mk.1 goes down on the node and is wired", miner != null && wired, "");

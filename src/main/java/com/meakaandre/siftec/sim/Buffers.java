@@ -82,7 +82,8 @@ final class Buffers {
             if (target instanceof ControllerBlockEntity tc) {
                 if (role == Role.IN) {
                     b.addSlots(seen, tc.input, 0, 1, Role.IN);
-                    b.addSlots(seen, tc.buffer, 0, tc.buffer.getContainerSize(), Role.IN);
+                    // only the Particle Accelerator and the Converter take their ingredients into the nine buffer slots
+                    if (n.logic.equals("processor")) b.addSlots(seen, tc.buffer, 0, tc.buffer.getContainerSize(), Role.IN);
                 } else {
                     b.addSlots(seen, tc.output, 0, 1, Role.OUT);
                 }

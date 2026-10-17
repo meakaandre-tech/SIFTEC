@@ -97,7 +97,7 @@ the Logistics milestones through Satisfactory's belt tiers: Logistics 60 items/m
 480, Mk.5 780 and Peak Efficiency 1,200 (single items, one per block of belt: 2.5 items/min per RPM). Items run from
 the end the belt was started at. An Andesite Tunnel over a belt with belts leaving at its sides splits evenly between
 straight on and each side, and a belt running into its side merges in (`tweak/TunnelSplitter.java`). Drone Ports fly
-Create packages between ports, burning fire charges for each trip. A Dimensional Depot on an Item Vault uploads the
+Create packages between ports, burning fire charges for each trip, unloaded land or not. A Dimensional Depot on an Item Vault uploads the
 vault's contents to the company's cloud at Satisfactory 1.0's rates (15 items a minute and one stack of each item,
 raised by the MAM's Upload Upgrade and Depot Expansion research to 240 a minute and five stacks), which members take
 out from the Cloud button above their inventory, `/depot`, or any depot; with the Manual Depot Uploader research they
@@ -121,6 +121,29 @@ front of each station) you want it to stop at, and press V again. With nobody in
 itself in a loop, stopping five seconds at each dock while the station loads or unloads it and fills its tank. A station serves only its own company's vehicles, and only its company switches it. A vehicle
 that falls out of the bottom of the world comes back to the dock of the Truck Station it last stopped at (else beside
 its company's HUB), cargo and all. Its storage window stays open only near it and only for its company's members.
+
+## Always-running factories
+
+Factories keep running everywhere, all the time, as in Satisfactory, and nothing keeps a chunk loaded for them: claims
+load nothing (`sim/`). While a building's chunk ticks it runs for real, and is recorded now and then: its recipe at
+Satisfactory's time, where its belts and pipes lead (their length and speed, an Andesite Tunnel's split), its wire
+connectors, and every half second what its buffers hold. When its chunk stops ticking (unloaded, or loaded but out of
+simulation distance) the server runs it as a simulation instead (`sim/Sim.java`): groups of linked buildings are stepped
+together twice a second on a worker thread, a miner breaking its node at its Mk's speed after the purity's regrowth, the
+Smelter smelting its batches, the Basin buildings, Manufacturer, Packager, Particle Accelerator and Converter running
+their recipes, extractors filling their tanks, the AWESOME Sink paying its company, belts and pipes carrying at their
+speed, and every power grid balanced across all its parts, loaded or not (grids entirely in chunks that do not tick
+too): generators burn fuel for what is drawn, Power Storage charges and drains, and a grid that runs short blows its
+fuse. When the chunk ticks again the catch-up writes what changed into the building in one step: output buffers filled,
+inputs and fuel used up, its charge, fuse and counters, capped by what its buffers hold. Plain Create machines a player
+built themselves pause while unloaded, as do things already on a belt in an unloaded chunk.
+
+A Truck, Tractor or Explorer driving its route by itself, and Drone Ports' drones, go on by time: a vehicle in land
+that stops ticking leaves the world into the simulation, drives each leg in the time it last took for real (its length
+at the autopilot's speed if it never has), burns its fuel, loads and unloads at each Truck Station, and comes back into
+the world where it would be as soon as that land ticks again. A drone unloads at a far port whose chunk does not tick
+into that port's simulation. The map shows both where they are or would be. The debug overlay (F3) has a line with
+what the simulation runs and the time it takes, on the server thread and on its worker.
 
 ## Progression
 

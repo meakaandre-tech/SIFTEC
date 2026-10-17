@@ -27,7 +27,7 @@ import java.util.Map;
  * <li>{@link Vehicle}: a Truck, Tractor or Explorer driving its route by time while the land it is on does not tick.</li>
  * </ul>
  * Plain Java objects, so new fields never need a migration ({@link JsonSavedData}). Read and changed only on the server
- * thread, except while a step runs on the simulation's worker ({@link SimTicker}), which the save waits for.
+ * thread, except while a step runs on the simulation's worker ({@link Factories}), which the save waits for.
  */
 public class SimData extends JsonSavedData<SimData.Stored> {
     public static class Stored {
@@ -266,7 +266,7 @@ public class SimData extends JsonSavedData<SimData.Stored> {
 
         @Override
         public <T> DataResult<T> encode(SimData data, DynamicOps<T> ops, T prefix) {
-            SimTicker.join();
+            Factories.join();
             return BASE.encode(data, ops, prefix);
         }
     };
