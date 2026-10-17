@@ -667,6 +667,9 @@ public final class MachineTests {
         if (mixer != null && level.getBlockEntity(mixer) instanceof com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity m) {
             b.append("; mixer ").append(m.getSpeed()).append(" RPM, running ").append(m.running).append(' ').append(m.runningTicks).append('/').append(m.processingTicks)
                 .append(", next craft in ").append(c.nextCraft - level.getGameTime());
+            com.meakaandre.siftec.company.Company co = com.meakaandre.siftec.owner.Ownership.of(m);
+            b.append(", its company ").append(co == null ? "none" : co.id + " (matter_conversion " + co.has("matter_conversion") + ", quantum_encoding " + co.has("quantum_encoding") + ")");
+            if (basin != null) b.append(", basin can go on ").append(basin.canContinueProcessing());
         }
         for (int k = 0; k < 3; k++) {
             Port fp = port(level, c, PortBlock.Kind.FLUID_IN, k);
