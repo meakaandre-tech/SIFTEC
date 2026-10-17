@@ -442,7 +442,7 @@ public final class AlwaysTests {
             for (int cz = B.z0Area() >> 4; cz <= B.z1Area() >> 4; cz++) {
                 if (!level.hasChunk(cx, cz)) continue;
                 loaded++;
-                which.append(' ').append(cx).append(',').append(cz).append(" [").append(level.getChunkSource().getChunkDebugData(new ChunkPos(cx, cz)))).append(']');
+                which.append(' ').append(cx).append(',').append(cz).append(" [").append(level.getChunkSource().getChunkDebugData(new ChunkPos(cx, cz))).append(']');
             }
         if (loaded > 0) Siftec.LOGGER.info("SELFTEST always twin B chunks still loaded:{} (truck set off in {}, {}); forced {}", which,
             (B.ox + 16) >> 4, (B.oz + 3) >> 4, level.getForceLoadedChunks().size());
