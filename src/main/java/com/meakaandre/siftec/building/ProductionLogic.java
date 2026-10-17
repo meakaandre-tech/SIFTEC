@@ -48,7 +48,8 @@ import java.util.List;
  * <li>heat: the Foundry's, Refinery's and Blender's Blaze Burner is kept lit while the building has power (Satisfactory's
  * machines are electric), so the Mixer over it runs its heated recipes;</li>
  * <li>assembly (the Manufacturer and the Quantum Encoder): the Mixer over the Brass Basin makes the recipe's Core (paced
- * by {@link BasinPace}); the building puts the Core (or, for a recipe of single items, its first input) on the first Depot
+ * by {@link BasinPace} on its own timer); the line takes one item each recipe time on a second timer
+ * ({@link ControllerBlockEntity#lineNext}), so Core and line run side by side, each at Satisfactory's rate; the building puts the Core (or, for a recipe of single items, its first input) on the first Depot
  * of its line and moves it on from Depot to Depot as each step is done there: the Spout fills it, each Deployer adds the
  * last one of one input (the building hands each Deployer that input from the Basin), and the Quantum Encoder's Item
  * Drain takes the Dark Matter Residue off. The finished item goes to the building's output. Create's own recipes do the
@@ -91,6 +92,23 @@ public final class ProductionLogic {
             fuel.siftec$setRemainingBurnTime(400);
             burner.updateBlockState();
         }
+    }
+
+    /**
+     * True if the building's Basins hold something to work on: an item in an input slot, or fluid in an input tank (and,
+     * with {@code outputs}, a made item waiting, as the Manufacturer's Core waits for its line).
+     */
+    static boolean basinHasInput(Level level, ControllerBlockEntity c, boolean outputs) {
+        List<BlockPos> basins = BuildingLogic.cells(c, create("basin"));
+        basins.addAll(BuildingLogic.cells(c, com.meakaandre.siftec.registry.ModBlocks.BRASS_BASIN.get()));
+        for (BlockPos pos : basins) {
+            if (!(level.getBlockEntity(pos) instanceof BasinBlockEntity basin)) continue;
+            Container inv = basin.itemCapability;
+            int to = Math.min(outputs ? 18 : 9, inv.getContainerSize());
+            for (int i = 0; i < to; i++) if (!inv.getItem(i).isEmpty()) return true;
+            if (basin.inputTank != null && !basin.inputTank.isEmpty()) return true;
+        }
+        return false;
     }
 
     // ------------------------------------------------------------------------------------------------ assembly
@@ -363,13 +381,14 @@ public final class ProductionLogic {
         if (a.steps.isEmpty()) return;
         Station first = line.get(route[0]);
         if (!held(level, first).isEmpty()) return;
-        // one goes on each recipe time, so the line runs at Satisfactory's rate however fast the Mixer makes Cores
-        if (level.getGameTime() < c.nextCraft) return;
+        // one goes on each recipe time, so the line runs at Satisfactory's rate however fast the Mixer makes Cores. The line
+        // keeps its own time: the Mixer's (nextCraft, BasinPace) paces the Cores alone, so neither waits for the other
+        if (level.getGameTime() < c.lineNext) return;
         ItemStack next = takeFromBasin(basin, a.first, a.core);
         if (next.isEmpty()) return;
         if (put(level, first, next)) {
             c.line.set(route[0], next.copy());
-            c.nextCraft = level.getGameTime() + a.ticks;
+            c.lineNext = level.getGameTime() + a.ticks;
             c.setChanged();
         } else {
             giveBack(basin, next);
@@ -443,6 +462,13 @@ public final class ProductionLogic {
     static boolean packagerTakes(ItemStack stack) {
         for (Pack p : packs()) if (stack.is(p.in)) return true;
         return false;
+    }
+
+    /** True while something lies on the Packager's Depot or in its Item Drain. */
+    static boolean packagerHolds(Level level, ControllerBlockEntity c) {
+        BlockPos depotPos = BuildingLogic.cell(c, create("depot")), drainPos = BuildingLogic.cell(c, create("item_drain"));
+        return depotPos != null && !held(level, new Station(depotPos, "depot", null)).isEmpty()
+            || drainPos != null && !held(level, new Station(drainPos, "drain", null)).isEmpty();
     }
 
     static void pack(ServerLevel level, ControllerBlockEntity c) {
@@ -596,6 +622,13 @@ public final class ProductionLogic {
             if (made == Fluids.EMPTY || fill(level, tank, made, r.fluidOutMb(), true) < r.fluidOutMb()) return false;
         }
         return r.outItem() == null || r.item() != Items.AIR && outputHasRoom(c, new ItemStack(r.item(), r.outCount()));
+    }
+
+    /** True if the building has what one of its filter's recipes needs, and room for what it makes. */
+    static boolean processorReady(Level level, ControllerBlockEntity c, BuildingDef def) {
+        BlockPos tank = BuildingLogic.cell(c, create("fluid_tank"));
+        for (ProcessorRecipe r : processorRecipes(c, def)) if (ready(level, c, r, tank)) return true;
+        return false;
     }
 
     static void process(ServerLevel level, ControllerBlockEntity c, BuildingDef def) {

@@ -22,9 +22,10 @@ import java.util.Set;
 /**
  * The pack's power grids, balanced Satisfactory's way on top of Create: New Age's wires.
  * <p>
- * A grid is every loaded New Age connector joined by wires, reaching over unloaded stretches of a line through the
- * {@link WireMap}. Its members are what its connectors stand on ({@link Members}): Build Gun buildings, the HUB's
- * Biomass Burners, and any New Age block a player wired up themselves. New Age's own way of passing energy along
+ * A grid is every New Age connector joined by wires, loaded or not: the {@link WireMap} knows the wires of the ones
+ * that are not. Its members are what its connectors stand on ({@link Members}): Build Gun buildings, the HUB's
+ * Biomass Burners, and any New Age block a player wired up themselves. A member that is not loaded keeps its part in
+ * the grid as it last was ({@link PowerMemory}), so a grid runs the same wherever the players are, as in Satisfactory. New Age's own way of passing energy along
  * wires (each source pushing down the shortest path, within each wire's limit) is switched off; instead, every tick:
  * <ol>
  * <li>the generators' capacity is added up (an Alien Power Augmenter raises it by 10%, or 30% fed);</li>
@@ -56,6 +57,10 @@ public final class PowerGrids {
         final Inbox inbox = new Inbox();
         /** SU the grid could still take last tick from what is pushed in (its spare demand and storage room). */
         double room;
+        /** The memory of each real member, kept up to date every tick ({@link PowerMemory}). */
+        final Map<PowerMember, PowerMemory.Remembered> memory = new IdentityHashMap<>();
+        /** What each member offered, asked for and boosted by on the last tick, in the order of {@link #members}. */
+        double[] caps = new double[0], demands = new double[0], boosts = new double[0];
     }
 
     private static final class Built {
@@ -101,6 +106,13 @@ public final class PowerGrids {
         return b;
     }
 
+    /**
+     * Works the grids out again. A grid is every position joined by wires, as the live connectors hold them and as the
+     * {@link WireMap} remembers them, so it reaches through connectors that are not loaded and through loaded ones
+     * that do not tick. A connector that is loaded (ticking or not) brings its real member; one that is not loaded
+     * brings what {@link PowerMemory} remembers of its member, as does a loaded connector whose member's own chunk is
+     * not loaded. So a grid never loses a generator, a Power Storage or a consumer because part of it stopped ticking.
+     */
     private static void rebuild(ServerLevel level, Built b) {
         Map<AbstractElectricalConnector, Grid> old = new IdentityHashMap<>(b.byConnector);
         b.grids.clear();
@@ -111,56 +123,114 @@ public final class PowerGrids {
         Map<BlockPos, AbstractElectricalConnector> at = new HashMap<>();
         for (var it = loaded.iterator(); it.hasNext(); ) {
             AbstractElectricalConnector c = it.next();
-            if (c.isRemoved() || c.getLevel() != level || level.getBlockEntity(c.getBlockPos()) != c) {
+            if (c.isRemoved() || c.getLevel() != level || !level.isLoaded(c.getBlockPos()) || level.getBlockEntity(c.getBlockPos()) != c) {
                 it.remove();
                 continue;
             }
             at.put(c.getBlockPos(), c);
         }
         WireMap map = WireMap.get(level);
-        for (AbstractElectricalConnector start : at.values()) {
-            if (b.byConnector.containsKey(start)) continue;
+        PowerMemory memory = PowerMemory.get(level);
+        var remembered = memory.byConnector(level);
+        Set<BlockPos> done = new java.util.HashSet<>();
+        for (AbstractElectricalConnector first : List.copyOf(at.values())) {
+            if (done.contains(first.getBlockPos())) continue;
             Grid grid = new Grid();
-            Deque<AbstractElectricalConnector> queue = new ArrayDeque<>();
-            queue.add(start);
-            b.byConnector.put(start, grid);
+            List<BlockPos> away = new ArrayList<>();
+            Deque<BlockPos> queue = new ArrayDeque<>();
+            queue.add(first.getBlockPos());
+            done.add(first.getBlockPos());
             while (!queue.isEmpty()) {
-                AbstractElectricalConnector c = queue.poll();
-                grid.connectors.add(c);
-                for (BlockPos end : c.getConnectorPositions().keySet()) {
-                    List<BlockPos> next = level.isLoaded(end) ? List.of(end) : map.loadedBeyond(level, c.getBlockPos(), end);
-                    for (BlockPos p : next) {
-                        AbstractElectricalConnector o = at.get(p);
-                        if (o != null && !b.byConnector.containsKey(o)) {
-                            b.byConnector.put(o, grid);
-                            queue.add(o);
-                        }
-                    }
+                BlockPos pos = queue.poll();
+                AbstractElectricalConnector c = live(level, at, pos);
+                Set<BlockPos> ends = map.links(level, pos);
+                if (c != null) {
+                    grid.connectors.add(c);
+                    b.byConnector.put(c, grid);
+                    ends.addAll(c.getConnectorPositions().keySet());
+                } else {
+                    away.add(pos);
                 }
+                for (BlockPos end : ends) if (done.add(end.immutable())) queue.add(end.immutable());
             }
             Map<Object, PowerMember> members = new LinkedHashMap<>();
-            for (AbstractElectricalConnector c : grid.connectors) Members.resolve(level, c, members);
+            for (AbstractElectricalConnector c : grid.connectors) {
+                BlockPos key = Members.resolve(level, c, members);
+                PowerMember real = key == null ? null : members.get(key);
+                for (PowerMemory.Remembered r : listOr(remembered.get(c.getBlockPos().asLong()))) {
+                    if (key == null || r.key != key.asLong()) memory.drop(level, r);
+                }
+                if (key == null) continue;
+                if (real == null) {
+                    // its own block's chunk is not loaded: it stands in for it
+                    PowerMemory.Remembered r = memory.away(level, key);
+                    if (r != null) members.putIfAbsent(key, r);
+                } else {
+                    grid.memory.put(real, memory.track(level, c.getBlockPos(), key, real));
+                }
+            }
+            for (BlockPos pos : away) {
+                for (PowerMemory.Remembered r : listOr(remembered.get(pos.asLong()))) members.putIfAbsent(BlockPos.of(r.key), PowerMemory.standIn(r));
+            }
             grid.members.addAll(members.values());
             // a grid that keeps its connectors keeps what was pushed into it
-            Grid before = old.get(start);
+            Grid before = old.get(first);
             if (before != null) grid.inbox.fe = before.inbox.fe;
             b.grids.add(grid);
         }
     }
 
+    private static List<PowerMemory.Remembered> listOr(@Nullable List<PowerMemory.Remembered> list) {
+        return list == null ? List.of() : list;
+    }
+
+    /** The connector at a position if it is loaded (whether it ticks or not), without loading anything. */
+    private static @Nullable AbstractElectricalConnector live(ServerLevel level, Map<BlockPos, AbstractElectricalConnector> at, BlockPos pos) {
+        AbstractElectricalConnector c = at.get(pos);
+        if (c != null) return c;
+        if (!level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof AbstractElectricalConnector found) || found.isRemoved()) return null;
+        at.put(pos.immutable(), found);
+        return found;
+    }
+
+    /** True if a connector or member of the grid went away since it was worked out (broken, or its chunk unloaded). */
+    private static boolean stale(Grid grid) {
+        for (AbstractElectricalConnector c : grid.connectors) if (c.isRemoved()) return true;
+        for (PowerMember m : grid.members) if (m.gone()) return true;
+        return false;
+    }
+
     private static void tick(ServerLevel level) {
         if (!LOADED.containsKey(level) || LOADED.get(level).isEmpty() && !BUILT.containsKey(level)) return;
         Built b = built(level);
+        // a chunk that unloaded this tick: its part of the grid is remembered before the grid is balanced without it
+        for (Grid grid : b.grids) {
+            if (stale(grid)) {
+                rebuild(level, b);
+                break;
+            }
+        }
         Set<BlockPos> live = new java.util.HashSet<>();
         for (Grid grid : b.grids) {
             try {
                 solve(grid);
+                remember(grid);
             } catch (RuntimeException e) {
                 Siftec.LOGGER.error("SIFTEC: power grid at {} failed to balance", grid.connectors.isEmpty() ? "?" : grid.connectors.getFirst().getBlockPos(), e);
             }
             if (grid.stats.powered && grid.stats.produced > 0) for (AbstractElectricalConnector c : grid.connectors) live.add(c.getBlockPos());
         }
         if (level.getGameTime() % 20 == 0) Poles.set(level, live);
+    }
+
+    /** Each real member's part in this tick, kept in case its chunk unloads before the next. */
+    private static void remember(Grid grid) {
+        if (grid.memory.isEmpty() || grid.caps.length != grid.members.size()) return;
+        for (int i = 0; i < grid.members.size(); i++) {
+            PowerMember p = grid.members.get(i);
+            PowerMemory.Remembered r = grid.memory.get(p);
+            if (r != null) r.update(p, grid.caps[i], grid.demands[i], grid.boosts[i]);
+        }
     }
 
     /** Balances one grid for this tick (see the class comment). */
@@ -171,15 +241,19 @@ public final class PowerGrids {
         int gens = 0, uses = 0, stores = 0;
         boolean tripped = false, fuse = false;
         // each generator is asked once a tick: asking takes its next fuel when it runs low
-        double[] caps = new double[m.size()];
+        double[] caps = new double[m.size()], demands = new double[m.size()], boosts = new double[m.size()];
+        grid.caps = caps;
+        grid.demands = demands;
+        grid.boosts = boosts;
         for (int i = 0; i < m.size(); i++) {
             PowerMember p = m.get(i);
-            boost += p.boost();
+            double bo = boosts[i] = p.boost();
+            boost += bo;
             double c = caps[i] = p.capacity();
             if (c > 0 || p.holdsFuse() && p.storeCapacity() <= 0) gens++;
             if (p.boostable()) boosted += c;
             else flat += c;
-            double d = p.demand();
+            double d = demands[i] = p.demand();
             if (d > 0) uses++;
             demand += d;
             if (p.storeCapacity() > 0) {

@@ -67,6 +67,11 @@ public class Siftec implements ModInitializer {
         com.meakaandre.siftec.vehicle.Vehicles.register();
         com.meakaandre.siftec.guide.GuideTests.register();
         com.meakaandre.siftec.command.ReviewFixTests.register();
+        com.meakaandre.siftec.command.BackpackFixTests.register();
+        com.meakaandre.siftec.command.OwnershipFixTests.register();
+        com.meakaandre.siftec.command.DataFixTests.register();
+        com.meakaandre.siftec.command.PowerFixTests.register();
+        com.meakaandre.siftec.command.BuildingFixTests.register();
         com.meakaandre.siftec.power.PowerGrids.register();
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> com.meakaandre.siftec.building.BuildingPower.forget());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.building.BuildingPower.forget());

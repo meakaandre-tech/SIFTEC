@@ -100,6 +100,31 @@ public class HubBurnerBlockEntity extends BlockEntity implements PowerMember {
     }
 
     @Override
+    public boolean gone() {
+        return isRemoved();
+    }
+
+    @Override
+    public double reserve() {
+        ItemStack in = fuel.getItem(0);
+        return Math.max(0, energy) + Power.suTicksOfMj(BuildingPower.itemMj("biomass", in) * in.getCount());
+    }
+
+    @Override
+    public void spend(double suTicks) {
+        if (suTicks <= 0) return;
+        energy -= suTicks;
+        ItemStack in = fuel.getItem(0);
+        double mj = BuildingPower.itemMj("biomass", in);
+        while (energy < 0 && mj > 0 && !in.isEmpty()) {
+            in.shrink(1);
+            energy += Power.suTicksOfMj(mj);
+        }
+        energy = Math.max(0, energy);
+        fuel.setChanged();
+    }
+
+    @Override
     public boolean tripped() {
         return tripped;
     }

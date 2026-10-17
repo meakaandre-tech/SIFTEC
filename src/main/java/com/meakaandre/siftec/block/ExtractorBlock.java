@@ -45,6 +45,17 @@ public class ExtractorBlock extends KineticBlock implements IBE<ExtractorBlockEn
         return ModBlockEntities.EXTRACTOR.get();
     }
 
+    /** Says why it gives nothing, if it does not (no running Pressurizer near, or every one near is full). */
+    @Override
+    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+        if (!(level.getBlockEntity(pos) instanceof ExtractorBlockEntity be) || be.problem.isEmpty()) return net.minecraft.world.InteractionResult.PASS;
+        if (player instanceof net.minecraft.server.level.ServerPlayer server) {
+            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.building.status", state.getBlock().getName(),
+                net.minecraft.network.chat.Component.translatable(be.problem)));
+        }
+        return net.minecraft.world.InteractionResult.SUCCESS;
+    }
+
     // the front looks at whoever placed it
     @Override
     protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.state.BlockState> builder) {

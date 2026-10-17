@@ -25,5 +25,6 @@
       "id": "siftec:coolant",
       "amount": 40500
     }
-  ]
+  ],
+  "processing_time": 120
 }

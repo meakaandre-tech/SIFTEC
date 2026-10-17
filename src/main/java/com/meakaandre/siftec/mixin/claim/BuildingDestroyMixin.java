@@ -11,13 +11,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Nothing breaks a Build Gun building's block through the game's block-breaking call: a Wither's charge, a mob, an item
- * or another mod's tool alike. Buildings come down only with the Build Gun, which takes its blocks away itself.
+ * or another mod's tool alike. The same goes for the shell and terminal of a HUB or Wormhole Gateway structure
+ * ({@link com.meakaandre.siftec.prefab.Prefabs#isPart}). Buildings come down only with the Build Gun, which takes
+ * their blocks away itself.
  */
 @Mixin(Level.class)
 public abstract class BuildingDestroyMixin {
     @Inject(method = "destroyBlock(Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/entity/Entity;I)Z", at = @At("HEAD"), cancellable = true)
     private void siftec$keepBuildings(BlockPos pos, boolean drop, Entity breaker, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
         Level self = (Level) (Object) this;
-        if (!self.isClientSide() && Buildings.protectedAt(self, pos)) cir.setReturnValue(false);
+        if (!self.isClientSide() && (Buildings.protectedAt(self, pos) || com.meakaandre.siftec.prefab.Prefabs.isPart(self.getBlockState(pos)))) cir.setReturnValue(false);
     }
 }

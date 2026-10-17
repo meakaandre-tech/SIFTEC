@@ -202,5 +202,6 @@
     {
       "id": "siftec:hazmat_suit_core"
     }
-  ]
+  ],
+  "processing_time": 960
 }

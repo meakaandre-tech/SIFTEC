@@ -43,5 +43,6 @@
     {
       "id": "travelersbackpack:crafting_upgrade"
     }
-  ]
+  ],
+  "processing_time": 240
 }

@@ -508,7 +508,7 @@ public final class MapServer {
 
     /** True if the player may change or remove the marker: their own, or a company marker of their company. */
     public static boolean mayEdit(MapMarker m, String player, String companyId) {
-        return m.owner.equals(player) || (m.company && !m.death && !companyId.isEmpty() && m.companyId.equals(companyId));
+        return m.owner.equals(player) || (m.company && !m.death && com.meakaandre.siftec.company.Companies.same(m.companyId, companyId));
     }
 
     private static void edit(ServerPlayer player, MapPayloads.MarkerEdit payload) {

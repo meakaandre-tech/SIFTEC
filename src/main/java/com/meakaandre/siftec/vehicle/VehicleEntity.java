@@ -248,7 +248,7 @@ public class VehicleEntity extends Entity {
     void record(ServerLevel level) {
         Vec3 here = position();
         if (here.distanceTo(route.getLast()) >= POINT_SPACING) route.add(here);
-        BlockPos station = TruckStations.near(level, here);
+        BlockPos station = TruckStations.near(level, here, this);
         if (station == null) return;
         boolean again = !stopStation.isEmpty() && stopStation.getLast().equals(station) && route.size() - 1 - stopAt.getLast() < 6;
         if (again) return;
@@ -401,7 +401,7 @@ public class VehicleEntity extends Entity {
         if (lastStation != null) {
             level.getChunk(lastStation);
             var station = TruckStations.at(level, lastStation);
-            if (station != null) spot = TruckStations.dock(station);
+            if (station != null && TruckStations.serves(station, this)) spot = TruckStations.dock(station);
         }
         if (spot == null) {
             var hub = com.meakaandre.siftec.claim.Claims.hubOf(level.getServer(), companyId);

@@ -417,8 +417,10 @@ public final class BuildingsATests {
         int wired = 0;
         for (ControllerBlockEntity c : powered) if (c != null && com.meakaandre.siftec.power.PowerTests.wire(com.meakaandre.siftec.power.PowerTests.connector(level, c), poleConnector)) wired++;
         expect(source, "power: the Augmenter, Constructor, Smelter and miners are wired to a Power Pole Mk.3", wired == powered.size(), wired + " of " + powered.size());
-        later(level, 40, () -> expect(source, "power: the Constructor's New Age motor runs on the grid at 64 RPM, giving its 4 MW (819 SU)",
-            cc != null && cc.powered && motorTurns(level, cc), cc == null ? "no controller" : BuildingLogic.status(level, cc).getString()));
+        // (an idle Constructor draws next to nothing and its motor stands, as Satisfactory's idle machines do: it is
+        // checked once its belt has brought it ingots)
+        later(level, 200, () -> expect(source, "power: the Constructor's New Age motor runs on the grid at 64 RPM, giving its 4 MW (819 SU)",
+            cc != null && cc.powered && (cc.idle || motorTurns(level, cc)), cc == null ? "no controller" : BuildingLogic.status(level, cc).getString()));
 
         // ---- the HUB: costs 20 Raw Iron from the player, gives the Build Gun, gives the iron back when picked up
         hubTest(source, level, company);
@@ -695,7 +697,8 @@ public final class BuildingsATests {
             && m.speedBehavior != null && m.speedBehavior.getValue() == (int) BuildingLogic.MOTOR_RPM, motors.isEmpty() ? "no motor" : String.valueOf(level.getBlockEntity(motors.getFirst())));
         later(level, 60, () -> {
             ControllerBlockEntity c2 = controller(level, con);
-            expect(source, "restart: the Constructor is back on its grid and its motor turns", c2 != null && c2.powered && motorTurns(level, c2),
+            // idle (its belt has run dry by now) it draws next to nothing and its motor stands; working, the motor turns
+            expect(source, "restart: the Constructor is back on its grid and its motor turns while it works", c2 != null && c2.powered && (c2.idle || motorTurns(level, c2)),
                 c2 == null ? "no controller" : BuildingLogic.status(level, c2).getString());
         });
         Placement mk1 = Buildings.snapToNode(level, at("miner_mk1", X + 41, Z + 3));

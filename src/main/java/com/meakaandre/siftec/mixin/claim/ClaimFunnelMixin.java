@@ -10,7 +10,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Funnels, crafters, basins and the like do not attach to an inventory across someone else's claim border. */
+/**
+ * Funnels, crafters, basins and the like do not attach to an inventory across someone else's claim border, nor to a
+ * building's machines or controller from outside it (only its ports take and give).
+ */
 @Mixin(CapManipulationBehaviourBase.class)
 public abstract class ClaimFunnelMixin {
     @Shadow
@@ -22,7 +25,8 @@ public abstract class ClaimFunnelMixin {
         Level level = self.getLevel();
         if (level == null || level.isClientSide()) return;
         BlockPos target = self.getTarget().getOpposite().getPos();
-        if (Claims.crosses(level, self.getPos(), target)) {
+        // nor to a building's blocks other than its ports
+        if (Claims.crosses(level, self.getPos(), target) || com.meakaandre.siftec.building.Buildings.sealed(level, self.getPos(), target)) {
             targetCapability = null;
             ci.cancel();
         }

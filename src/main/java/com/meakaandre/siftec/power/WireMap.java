@@ -23,9 +23,9 @@ import java.util.Set;
 
 /**
  * Every wire in the world, by the positions of the New Age connectors at its ends: a map that can be read without
- * loading any chunk. New Age only joins connectors that are both loaded; with this map a grid reaches over the land
- * between two loaded stretches of a line ({@link #loadedBeyond}), so a Power Tower line keeps the machines at its far
- * end running while the towers in the middle are not loaded.
+ * loading any chunk. New Age only joins connectors that are both loaded; with this map a grid ({@link PowerGrids})
+ * reaches over connectors that are not loaded, so a Power Tower line keeps the machines at its far end running while
+ * the towers in the middle are not loaded, and the members of unloaded stretches keep their part ({@link PowerMemory}).
  * <p>
  * Kept up to date by the connectors (mixins on New Age's connector): a wire strung or cut, a connector broken (its
  * wires go with it), and a connector that loads (its own list is the truth for one the map does not know yet; one the

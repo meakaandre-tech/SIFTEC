@@ -83,5 +83,6 @@
     {
       "id": "siftec:trident_core"
     }
-  ]
+  ],
+  "processing_time": 960
 }

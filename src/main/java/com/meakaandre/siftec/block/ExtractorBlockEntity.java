@@ -17,6 +17,12 @@ import net.minecraft.world.level.storage.ValueOutput;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The placeable Resource Well Extractor block: on a nitrogen node, turned by a shaft on top, it fills its tank. Like the
+ * Build Gun's Resource Well Extractor it needs a running Resource Well Pressurizer of its company within
+ * {@link com.meakaandre.siftec.building.ExtractorLogic#WELL_RANGE} blocks, and counts toward that Pressurizer's
+ * {@link com.meakaandre.siftec.building.ExtractorLogic#WELL_EXTRACTORS}; one left over gives nothing, and using it says why.
+ */
 public class ExtractorBlockEntity extends KineticBlockEntity {
     /** Fluid is counted in droplets: 81 to the millibucket. */
     private static final int MB = 81;
@@ -27,6 +33,8 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
     private float progress;
     private Optional<Node> node = Optional.empty();
     private int recheck;
+    /** What is wrong right now ("" if nothing), as a lang key: no running Pressurizer near, or every one near is full. */
+    public String problem = "";
 
     public ExtractorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -42,14 +50,19 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (level == null || level.isClientSide()) return;
+        if (!(level instanceof net.minecraft.server.level.ServerLevel server)) return;
         if (recheck-- <= 0) {
             recheck = 40;
-            node = Mining.nodeUnder(level, worldPosition).filter(n -> n.type() == NodeType.NITROGEN);
+            node = Mining.nodeUnder(server, worldPosition).filter(n -> n.type() == NodeType.NITROGEN);
         }
         float speed = Math.abs(getSpeed());
         FluidEntry nitrogen = ModFluids.ALL.get("nitrogen");
-        if (speed == 0 || node.isEmpty() || nitrogen == null) return;
+        if (node.isEmpty() || nitrogen == null) return;
+        // it asks for its well every tick, turning or not, so it keeps its place at its Pressurizer
+        var company = com.meakaandre.siftec.owner.Ownership.of(this);
+        var draw = com.meakaandre.siftec.building.ExtractorLogic.draw(server, worldPosition, company == null ? "" : company.id);
+        problem = draw.purity() != null ? "" : draw.full() ? "siftec.building.well_full" : "siftec.building.no_well";
+        if (speed == 0 || draw.purity() == null) return;
         progress += speed * node.get().purity().multiplier;
         while (progress >= CYCLE) {
             progress -= CYCLE;

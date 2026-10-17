@@ -416,6 +416,23 @@ public final class TravelersBackpackCompat {
         return n;
     }
 
+    /**
+     * May the player take what the backpack's crafting grid makes, by click, shift-click (shift-craft), number key or
+     * drop: not a locked item ({@link Locks#mayTake}, which tells them why), nor on the server the result of a recipe
+     * their company has not unlocked ({@link com.meakaandre.siftec.owner.RecipeLocks}). The grid's result slot
+     * (ResultSlotExt) answers mayPickup itself, so the vanilla check in mixin/SlotMixin never sees it.
+     */
+    public static boolean mayTakeResult(Player player, com.tiviacz.travelersbackpack.inventory.menu.BackpackBaseMenu menu, ItemStack result) {
+        if (!Locks.mayTake(player, result)) return false;
+        if (!(player instanceof ServerPlayer server) || result.isEmpty() || menu.getWrapper() == null || menu.getWrapper().getUpgradeManager() == null) return true;
+        var upgrade = menu.getWrapper().getUpgradeManager().getUpgrade(com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade.class).orElse(null);
+        var recipe = upgrade == null ? null : upgrade.resultSlots.getRecipeUsed();
+        if (recipe == null || !com.meakaandre.siftec.owner.RecipeLocks.blocked(server, recipe.value())) return true;
+        Milestone lock = Milestones.get(com.meakaandre.siftec.owner.RecipeLocks.lockOf(server.level().getServer(), recipe.value()));
+        if (lock != null) server.sendOverlayMessage(Component.translatable("siftec.lock.item", lock.name()));
+        return false;
+    }
+
     /** May this player put this upgrade into their backpack: only once their company has unlocked it. */
     public static boolean mayUseUpgrade(Player player, ItemStack stack) {
         return Locks.allowed(player, stack);

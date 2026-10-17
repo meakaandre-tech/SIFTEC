@@ -43,6 +43,8 @@ public final class BuildGun {
         public String building = "";
         public boolean dismantle;
         public @Nullable Placement spot;
+        /** Where the client's hologram was before the server snapped it onto a node (the spot it sent). */
+        public @Nullable BlockPos aimed;
     }
 
     private static final Map<UUID, Selection> SELECTIONS = new HashMap<>();
@@ -116,7 +118,7 @@ public final class BuildGun {
     }
 
     /** What a use does, for a player of a company (the selftests use a fake player for their own company). */
-    static void act(ServerPlayer player, Company company) {
+    public static void act(ServerPlayer player, Company company) {
         Selection sel = selection(player);
         ServerLevel level = player.level();
         if (sel.dismantle) {
@@ -171,7 +173,7 @@ public final class BuildGun {
         Component message;
         if (def.vehicle()) {
             // a vehicle goes down as one entity (vehicle/Vehicles.java); its cost comes back when it is taken back
-            Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.place(level, p, company, player.getInventory(), player.hasInfiniteMaterials());
+            Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.place(level, p, company, com.meakaandre.siftec.backpack.Carried.of(player), player.hasInfiniteMaterials());
             ok = check.ok();
             message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
         } else if (def.structure()) {
@@ -182,7 +184,7 @@ public final class BuildGun {
             ok = check.ok();
             message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
         } else {
-            Buildings.Check check = Buildings.place(level, p, company, player.getInventory(), player.hasInfiniteMaterials());
+            Buildings.Check check = Buildings.place(level, p, company, com.meakaandre.siftec.backpack.Carried.of(player), player.hasInfiniteMaterials());
             ok = check.ok();
             message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
         }
@@ -259,7 +261,7 @@ public final class BuildGun {
     public static @Nullable Component mayDismantle(ServerPlayer player, Company company, @Nullable String ownerId, AABB box) {
         if (player.hasInfiniteMaterials()) return null;
         if (ownerId != null && !ownerId.isEmpty()) {
-            return !company.id.isEmpty() && company.id.equals(ownerId) ? null : Component.translatable("siftec.build_gun.not_yours");
+            return Companies.owns(company, ownerId) ? null : Component.translatable("siftec.build_gun.not_yours");
         }
         com.meakaandre.siftec.claim.Claims.Claim claim = com.meakaandre.siftec.claim.Claims.foreign(player.level(), box, company.id);
         return claim == null ? null : Component.translatable("siftec.claim.denied", com.meakaandre.siftec.claim.Claims.holder(player.level(), claim));
@@ -274,54 +276,62 @@ public final class BuildGun {
                 SENT.remove(player.getUUID());
                 continue;
             }
-            Selection sel = selection(player);
-            BuildGunPayloads.View view;
-            com.meakaandre.siftec.vehicle.VehicleEntity vehicle = sel.dismantle ? com.meakaandre.siftec.vehicle.Vehicles.aimed(player) : null;
-            if (vehicle != null) {
-                AABB box = vehicle.getBoundingBox();
-                Component refused = mayDismantle(player, Companies.of(player), vehicle.companyId, box);
-                view = BuildGunPayloads.View.of(refused == null, refused != null ? refused : Component.translatable("siftec.build_gun.dismantle_vehicle", vehicle.getName()),
-                    BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1e-4, box.maxY - 1e-4, box.maxZ - 1e-4));
-            } else if (sel.dismantle) {
-                BlockHitResult hit = aimed(player);
-                ControllerBlockEntity controller = hit == null ? null : controllerAt(player.level(), hit.getBlockPos());
-                HubBlockEntity hub = controller != null || hit == null ? null : Prefabs.structureAt(player.level(), hit.getBlockPos());
-                Placement p = controller == null ? null : controller.placement();
-                BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
-                if (hub != null) {
-                    AABB box = hubBounds(hub);
-                    Component refused = mayDismantle(player, Companies.of(player), hub.companyId, box);
-                    view = BuildGunPayloads.View.of(refused == null, refused != null ? refused
-                            : Component.translatable("siftec.build_gun.dismantle_hint", Component.translatable(hub.gateway() ? "block.siftec.wormhole_gateway" : "block.siftec.hub")),
-                        BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1, box.maxY - 1, box.maxZ - 1));
-                } else if (p == null || t == null) {
-                    view = BuildGunPayloads.View.of(false, Component.translatable("siftec.build_gun.dismantle_aim"), null, null);
-                } else {
-                    AABB box = p.bounds(t);
-                    Component refused = mayDismantle(player, Companies.of(player), controller.companyId, box);
-                    view = BuildGunPayloads.View.of(refused == null, refused != null ? refused : Component.translatable("siftec.build_gun.dismantle_hint", p.def().name()),
-                        BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1, box.maxY - 1, box.maxZ - 1));
-                }
-            } else {
-                Placement p = sel.spot;
-                if (p == null || !reachable(player, p)) continue;
-                if (p.def().vehicle()) {
-                    Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.check(player.level(), p, Companies.of(player), player.getInventory(), player.hasInfiniteMaterials());
-                    view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable("siftec.build_gun.fits_vehicle", p.def().name()) : check.message(),
-                        p.anchor(), p.anchor());
-                } else if (p.def().structure()) {
-                    Prefabs.Check check = hubCheck(player, p);
-                    view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable(p.def().hub() ? "siftec.build_gun.fits_hub" : "siftec.build_gun.fits_gateway")
-                        : check.message(), p.anchor(), p.anchor());
-                } else {
-                    Buildings.Check check = Buildings.check(player.level(), p, Companies.of(player), player.getInventory(), player.hasInfiniteMaterials());
-                    view = BuildGunPayloads.View.of(check.ok(), check.message(), p.anchor(), p.anchor());
-                }
-            }
+            BuildGunPayloads.View view = view(player);
+            if (view == null) continue;
             if (view.equals(SENT.get(player.getUUID()))) continue;
             SENT.put(player.getUUID(), view);
             ServerPlayNetworking.send(player, view);
         }
+    }
+
+    /** What a player's hologram should show now (see {@link BuildGunPayloads.View}), or null if there is nothing to say. */
+    public static BuildGunPayloads.@Nullable View view(ServerPlayer player) {
+        Selection sel = selection(player);
+        BuildGunPayloads.View view;
+        com.meakaandre.siftec.vehicle.VehicleEntity vehicle = sel.dismantle ? com.meakaandre.siftec.vehicle.Vehicles.aimed(player) : null;
+        if (vehicle != null) {
+            AABB box = vehicle.getBoundingBox();
+            Component refused = mayDismantle(player, Companies.of(player), vehicle.companyId, box);
+            view = BuildGunPayloads.View.of(refused == null, refused != null ? refused : Component.translatable("siftec.build_gun.dismantle_vehicle", vehicle.getName()),
+                BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1e-4, box.maxY - 1e-4, box.maxZ - 1e-4));
+        } else if (sel.dismantle) {
+            BlockHitResult hit = aimed(player);
+            ControllerBlockEntity controller = hit == null ? null : controllerAt(player.level(), hit.getBlockPos());
+            HubBlockEntity hub = controller != null || hit == null ? null : Prefabs.structureAt(player.level(), hit.getBlockPos());
+            Placement p = controller == null ? null : controller.placement();
+            BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
+            if (hub != null) {
+                AABB box = hubBounds(hub);
+                Component refused = mayDismantle(player, Companies.of(player), hub.companyId, box);
+                view = BuildGunPayloads.View.of(refused == null, refused != null ? refused
+                        : Component.translatable("siftec.build_gun.dismantle_hint", Component.translatable(hub.gateway() ? "block.siftec.wormhole_gateway" : "block.siftec.hub")),
+                    BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1, box.maxY - 1, box.maxZ - 1));
+            } else if (p == null || t == null) {
+                view = BuildGunPayloads.View.of(false, Component.translatable("siftec.build_gun.dismantle_aim"), null, null);
+            } else {
+                AABB box = p.bounds(t);
+                Component refused = mayDismantle(player, Companies.of(player), controller.companyId, box);
+                view = BuildGunPayloads.View.of(refused == null, refused != null ? refused : Component.translatable("siftec.build_gun.dismantle_hint", p.def().name()),
+                    BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1, box.maxY - 1, box.maxZ - 1));
+            }
+        } else {
+            Placement p = sel.spot;
+            if (p == null || !reachable(player, p)) return null;
+            if (p.def().vehicle()) {
+                Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.check(player.level(), p, Companies.of(player), com.meakaandre.siftec.backpack.Carried.of(player), player.hasInfiniteMaterials());
+                view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable("siftec.build_gun.fits_vehicle", p.def().name()) : check.message(),
+                    p.anchor(), p.anchor());
+            } else if (p.def().structure()) {
+                Prefabs.Check check = hubCheck(player, p);
+                view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable(p.def().hub() ? "siftec.build_gun.fits_hub" : "siftec.build_gun.fits_gateway")
+                    : check.message(), p.anchor(), p.anchor());
+            } else {
+                Buildings.Check check = Buildings.check(player.level(), p, Companies.of(player), com.meakaandre.siftec.backpack.Carried.of(player), player.hasInfiniteMaterials());
+                // where it really goes (a miner snapped onto its node), and the spot the client sent, so it can move its hologram there
+                view = BuildGunPayloads.View.of(check.ok(), check.message(), p.anchor(), p.anchor()).from(sel.aimed == null ? p.anchor() : sel.aimed);
+            }
+        }
+        return view;
     }
 
     // ------------------------------------------------------------------------------------------------ events
@@ -330,14 +340,7 @@ public final class BuildGun {
         PayloadTypeRegistry.serverboundPlay().register(BuildGunPayloads.Select.TYPE, BuildGunPayloads.Select.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BuildGunPayloads.View.TYPE, BuildGunPayloads.View.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BuildGunPayloads.Tab.TYPE, BuildGunPayloads.Tab.STREAM_CODEC);
-        ServerPlayNetworking.registerGlobalReceiver(BuildGunPayloads.Select.TYPE, (payload, context) -> {
-            ServerPlayer player = context.player();
-            Selection sel = selection(player);
-            sel.building = payload.building();
-            sel.dismantle = payload.dismantle();
-            BuildingDef def = Buildings.def(payload.building());
-            sel.spot = def != null && payload.hasSpot() ? new Placement(def, payload.anchor(), Direction.from2DDataValue(payload.facing()), payload.flip()) : null;
-        });
+        ServerPlayNetworking.registerGlobalReceiver(BuildGunPayloads.Select.TYPE, (payload, context) -> selected(context.player(), payload));
         // the gun works on whatever it points at, so using it on a block never opens or uses that block
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             ItemStack stack = player.getItemInHand(hand);
@@ -355,8 +358,23 @@ public final class BuildGun {
         });
     }
 
+    /**
+     * What a client said it picked and where its hologram is. Only the server knows where the ore nodes are, so a miner's
+     * spot is snapped onto the node near it here ({@link Buildings#snapToNode}); the snapped spot is what is built and
+     * what the client is told ({@link BuildGunPayloads.View#from}), so its hologram moves onto the node too.
+     */
+    public static void selected(ServerPlayer player, BuildGunPayloads.Select payload) {
+        Selection sel = selection(player);
+        sel.building = payload.building();
+        sel.dismantle = payload.dismantle();
+        BuildingDef def = Buildings.def(payload.building());
+        Placement spot = def != null && payload.hasSpot() ? new Placement(def, payload.anchor(), Direction.from2DDataValue(payload.facing()), payload.flip()) : null;
+        sel.aimed = spot == null ? null : spot.anchor();
+        sel.spot = spot == null ? null : Buildings.snapToNode(player.level(), spot);
+    }
+
     /** The building a selftest picks, as a client would (the selftest has no client). */
-    static void select(Player player, String building, boolean dismantle, @Nullable Placement spot) {
+    public static void select(Player player, String building, boolean dismantle, @Nullable Placement spot) {
         Selection sel = selection(player);
         sel.building = building;
         sel.dismantle = dismantle;

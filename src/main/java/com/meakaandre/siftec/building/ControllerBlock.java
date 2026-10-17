@@ -99,7 +99,7 @@ public class ControllerBlock extends Block implements EntityBlock {
     /** A building's settings are its company's to change (anyone may look). */
     private static boolean mayUse(ServerPlayer player, ControllerBlockEntity controller) {
         return player.hasInfiniteMaterials() || controller.companyId.isEmpty()
-            || com.meakaandre.siftec.company.Companies.of(player).id.equals(controller.companyId);
+            || com.meakaandre.siftec.company.Companies.owns(com.meakaandre.siftec.company.Companies.of(player), controller.companyId);
     }
 
     @Override

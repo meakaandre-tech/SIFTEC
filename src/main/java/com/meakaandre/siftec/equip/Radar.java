@@ -85,6 +85,11 @@ public final class Radar {
     /** Using the tower: the nearest node of every resource the company's scanner knows, and the nearest of each collectible. */
     public static void use(ServerPlayer player, ControllerBlockEntity c) {
         if (!(player.level() instanceof ServerLevel server)) return;
+        // the survey is the owning company's: what it lists depends on that company's scanner research
+        if (!com.meakaandre.siftec.building.SpecialBuildings.mayOperate(player, c)) {
+            player.sendOverlayMessage(Component.translatable("siftec.build_gun.not_yours"));
+            return;
+        }
         if (!c.powered) {
             player.sendOverlayMessage(Component.translatable("siftec.radar.no_power"));
             return;

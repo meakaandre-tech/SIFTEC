@@ -45,7 +45,9 @@ import java.util.Map;
  * How a Build Gun building takes part in its power grid ({@link PowerGrids}), by its definition's {@code power}:
  * <ul>
  * <li>a powered building (any with SU and no power role of its own) is a consumer: on a grid with power, its New Age
- * motors are given exactly the FE for its SU every tick, so they turn its machines; with none, they stop;</li>
+ * motors are given exactly the FE for its SU every tick, so they turn its machines; with none, they stop. Like
+ * Satisfactory's machines it draws only while it works: idle (nothing to work on, its output full) it asks only
+ * {@link #STANDBY_SU} and its motors wind down until there is work again ({@link BuildingLogic#working});</li>
  * <li>"biomass", "coal", "fuel", "nuclear": generators that burn what their input port brings (and the water their fluid
  * port brings) at Satisfactory's energy, for what the grid draws from them only, and give Satisfactory's MW;</li>
  * <li>"geothermal": the Geothermal Generator over a sulfur geyser, giving a burst at each eruption and leaving sulfuric
@@ -64,6 +66,8 @@ public final class BuildingPower {
     public static final int ACID_PER_SECOND = 50;
     /** Ticks an Alien Power Matrix keeps an Augmenter fed (Satisfactory feeds it five a minute). */
     public static final int MATRIX_TICKS = 240;
+    /** What an idle powered building draws: next to nothing (Satisfactory's idle machines draw none). */
+    public static final double STANDBY_SU = 1;
     /** Satisfactory's Power Storage: 100 MWh, charged at up to 100 MW. */
     public static final double STORAGE_MWH = 100, STORAGE_CHARGE_MW = 100;
 
@@ -101,15 +105,27 @@ public final class BuildingPower {
             this.def = def;
         }
 
+        /**
+         * Its SU while it works, and only {@link #STANDBY_SU} while it is idle (nothing to work on, or its output full),
+         * as Satisfactory's machines draw power only while they run. The standby draw keeps it on its grid, so it still
+         * knows whether it has power (a blown fuse stops it), at next to no cost.
+         */
         @Override
         public double demand() {
-            return c.isRemoved() ? 0 : def.su();
+            if (c.isRemoved()) return 0;
+            return BuildingLogic.idle(level, c, def) ? STANDBY_SU : def.su();
+        }
+
+        @Override
+        public boolean gone() {
+            return c.isRemoved();
         }
 
         @Override
         public void supplied(boolean on) {
             c.powered = on;
-            if (!on) return;
+            // idle, its motors get nothing and wind down until there is work again
+            if (!on || c.idle) return;
             List<BlockPos> motors = motors(c);
             if (motors.isEmpty()) return;
             // each motor gets its share of the building's SU as FE; a New Age motor fed less than its full need gives
@@ -151,6 +167,11 @@ public final class BuildingPower {
         @Override
         public boolean holdsFuse() {
             return true;
+        }
+
+        @Override
+        public boolean gone() {
+            return c.isRemoved();
         }
 
         @Override
@@ -412,6 +433,44 @@ public final class BuildingPower {
             if (stats.tripped || stats.produced <= 0) c.lastGenerated = 0;
         }
 
+        @Override
+        public double reserve() {
+            String kind = def.power();
+            if (kind.equals("geothermal")) return Double.POSITIVE_INFINITY;
+            double r = Math.max(0, c.energy);
+            if (kind.equals("fuel")) {
+                Storage<FluidVariant> tank = tankStorage(level, tank(c));
+                if (tank != null) for (StorageView<FluidVariant> view : tank) {
+                    if (!view.isResourceBlank()) r += Power.suTicksOfMj(fluidMj(kind, view.getResource().getFluid()) * view.getAmount() / (FluidConstants.BUCKET / 1000.0));
+                }
+            } else {
+                ItemStack in = c.input.getItem(0);
+                r += Power.suTicksOfMj(itemMj(kind, in) * in.getCount());
+            }
+            return r;
+        }
+
+        /**
+         * A Geothermal Generator away gives its geyser's average (Satisfactory's 200 MW) rather than whatever part of a
+         * burst it was at, unless it last had no geyser or no room for its acid.
+         */
+        @Override
+        public double steady(double capacity) {
+            if (!def.power().equals("geothermal")) return capacity;
+            return c.problem.equals("siftec.power.no_geyser") || c.problem.equals("siftec.power.acid_full") ? 0 : Power.su(GEYSER_AVERAGE_MW);
+        }
+
+        @Override
+        public void spend(double suTicks) {
+            if (suTicks <= 0 || def.power().equals("geothermal")) return;
+            c.energy -= suTicks;
+            while (c.energy < 0 && refuel()) {
+                // each refuel banks the next item (or a little fluid)
+            }
+            c.energy = Math.max(0, c.energy);
+            c.setChanged();
+        }
+
         private void lit(boolean on) {
             if (c.running == on) return;
             c.running = on;
@@ -450,6 +509,31 @@ public final class BuildingPower {
                 }
             }
             return c.fedTicks > 0 ? 0.3 : 0.1;
+        }
+
+        @Override
+        public int boostTicks() {
+            ItemStack in = c.input.getItem(0);
+            return Math.max(0, c.fedTicks) + (itemMj("augmenter", in) > 0 ? in.getCount() * MATRIX_TICKS : 0);
+        }
+
+        @Override
+        public void spendBoost(int ticks) {
+            int left = ticks;
+            while (left > 0) {
+                if (c.fedTicks <= 0) {
+                    ItemStack in = c.input.getItem(0);
+                    if (itemMj("augmenter", in) <= 0) break;
+                    in.shrink(1);
+                    c.input.setChanged();
+                    c.fedTicks = MATRIX_TICKS;
+                    c.made++;
+                }
+                int n = Math.min(left, c.fedTicks);
+                c.fedTicks -= n;
+                left -= n;
+            }
+            c.setChanged();
         }
 
         @Override
@@ -579,7 +663,7 @@ public final class BuildingPower {
             case "biomass", "coal", "fuel", "nuclear", "geothermal" -> parts.add(Component.translatable("siftec.power.gives",
                 Power.su((float) c.lastGenerated), Power.su((float) Power.su(def.power().equals("geothermal") ? GEYSER_BURST_MW : def.mw()))));
             default -> {
-                if (def.su() > 0) parts.add(Component.translatable(c.powered ? "siftec.building.su" : "siftec.power.no_power", Power.fmt(def.su())));
+                if (def.su() > 0) parts.add(Component.translatable(!c.powered ? "siftec.power.no_power" : c.idle ? "siftec.building.idle" : "siftec.building.su", Power.fmt(def.su())));
             }
         }
         if (c.tripped) parts.add(Component.translatable("siftec.power.fuse_blown"));

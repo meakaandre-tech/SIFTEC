@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.blueprint;
 
+import com.meakaandre.siftec.backpack.Carried;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.registry.ModItems;
 import net.minecraft.core.BlockPos;
@@ -13,7 +14,6 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -235,7 +235,7 @@ public final class Blueprints {
 
     /**
      * Used on a block: the first use puts up a hologram of the blueprint where it would stand and says what is
-     * missing; a second use on the same spot builds it, taking every block from the player's inventory.
+     * missing; a second use on the same spot builds it, taking every block from the player's inventory and backpack.
      */
     public static void use(ServerPlayer player, ItemStack stack, BlockPos base) {
         ServerLevel level = player.level();
@@ -267,7 +267,8 @@ public final class Blueprints {
             player.sendOverlayMessage(Component.translatable("siftec.lock.item", lock == null ? "?" : lock.name()));
             return;
         }
-        Inventory inventory = player.getInventory();
+        // the blocks come from the inventory and the backpack alike
+        Carried inventory = Carried.of(player);
         boolean missing = false;
         if (!player.hasInfiniteMaterials()) {
             for (Map.Entry<Item, Integer> entry : need.entrySet()) {

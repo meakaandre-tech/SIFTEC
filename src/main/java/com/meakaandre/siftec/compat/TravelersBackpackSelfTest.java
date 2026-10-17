@@ -63,6 +63,10 @@ import java.util.Map;
  * <li>{@code fixes}: the review's fixes that need a real player: a shift-click leaving part of a stack in a backpack slot
  * saves what is left (fix 3); a Build Gun in the backpack stays out of the crate and the crafting grid's stacks go into
  * it and back (fix 4).</li>
+ * <li>{@code fixes2}: the crafting grid keeps to the locks: a locked result cannot be taken out by a click nor made by
+ * shift-crafting, and can once its milestone is done. (The backpack window's Cloud button is the client's to check: it
+ * logs "SELFTEST tb-client" the first time the window opens, see client/CloudButton.java; the server side of what the
+ * backpack pays for is {@code /siftec selftest backpackfix}.)</li>
  * </ul>
  */
 public final class TravelersBackpackSelfTest {
@@ -92,7 +96,8 @@ public final class TravelersBackpackSelfTest {
                         .then(Commands.literal("keep").executes(context -> crateKeep(context.getSource())))
                         .then(Commands.literal("kept").executes(context -> crateKept(context.getSource(), false)))
                         .then(Commands.literal("persisted").executes(context -> crateKept(context.getSource(), true))))
-                    .then(Commands.literal("fixes").executes(context -> fixes(context.getSource())))))));
+                    .then(Commands.literal("fixes").executes(context -> fixes(context.getSource())))
+                    .then(Commands.literal("fixes2").executes(context -> fixes2(context.getSource())))))));
     }
 
     private static List<ServerPlayer> players(CommandSourceStack source) {
@@ -558,6 +563,91 @@ public final class TravelersBackpackSelfTest {
         }
         grid.setItem(0, ItemStack.EMPTY);
         clearAll(player);
+    }
+
+    // ------------------------------------------------------------------------------------------------ the crafting grid's locks
+
+    /** The Flywheel: crafted by hand (siftec:crafting/flywheel), locked to HUB Upgrade 6. */
+    private static final String FLYWHEEL_LOCK = "hub_upgrade_6";
+
+    private static int fixes2(CommandSourceStack source) {
+        for (ServerPlayer player : players(source)) gridLocks(source, player);
+        return 1;
+    }
+
+    /** How many of the item the player carries, inventory and backpack. */
+    private static int carried(ServerPlayer player, net.minecraft.world.item.Item item) {
+        int n = player.getInventory().countItem(item);
+        ItemStackHandler storage = TravelersBackpackCompat.storage(player);
+        if (storage != null) for (int i = 0; i < storage.getSlots(); i++) if (storage.getStackInSlot(i).is(item)) n += storage.getStackInSlot(i).getCount();
+        return n;
+    }
+
+    /**
+     * A locked recipe on the backpack's 3x3 grid: its result shows, but a click does not take it and a shift-click
+     * crafts nothing; once the company has the milestone both work.
+     */
+    private static void gridLocks(CommandSourceStack source, ServerPlayer player) {
+        Company company = Companies.of(player);
+        boolean hadLock = company.done.contains(FLYWHEEL_LOCK);
+        company.done.add(CRAFTING_NODE);
+        company.done.remove(FLYWHEEL_LOCK);
+        Companies.save(source.getServer());
+        player.closeContainer();
+        clearAll(player);
+        if (TravelersBackpackCompat.gridSize(player) < 3) TravelersBackpackCompat.installCraftingUpgrade(player, new ItemStack(ModItems.CRAFTING_UPGRADE));
+        BackpackBaseMenu menu = openWithGrid(player);
+        CraftingUpgrade upgrade = menu == null ? null : menu.getWrapper().getUpgradeManager().getUpgrade(CraftingUpgrade.class).orElse(null);
+        Slot result = null;
+        if (menu != null) for (Slot slot : menu.slots) if (slot instanceof com.tiviacz.travelersbackpack.inventory.menu.slot.ResultSlotExt) result = slot;
+        if (menu == null || upgrade == null || result == null || TravelersBackpackCompat.gridSize(player) < 3) {
+            expect(source, "fixes2: the backpack has its 3x3 crafting grid open", false, state(player));
+            restoreLock(source, company, hadLock);
+            return;
+        }
+        net.minecraft.world.item.Item flywheel = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse("create:flywheel"));
+        net.minecraft.world.item.Item rod = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse("siftec:iron_rod"));
+        net.minecraft.world.item.Item sheet = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse("create:iron_sheet"));
+        net.minecraft.world.item.Item shaft = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse("create:shaft"));
+        // RSR / SAS / RSR, two of everything so one craft leaves a second one on the grid
+        net.minecraft.world.item.Item[] pattern = {rod, sheet, rod, sheet, shaft, sheet, rod, sheet, rod};
+        for (int i = 0; i < 9; i++) upgrade.craftSlots.setItem(i, new ItemStack(pattern[i], 2));
+        menu.slotChangedCraftingGrid(upgrade, player.level(), player);
+        menu.broadcastChanges();
+        ItemStack shown = result.getItem().copy();
+        boolean survival = !player.hasInfiniteMaterials();
+        expect(source, "fixes2: a locked recipe's result shows on the backpack's grid", shown.is(flywheel), shown + (survival ? "" : " (creative: locks do not apply)"));
+        boolean mayPickup = result.mayPickup(player);
+        int index = menu.slots.indexOf(result);
+        menu.clicked(index, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        boolean clickTook = menu.getCarried().is(flywheel);
+        menu.setCarried(ItemStack.EMPTY);
+        menu.quickMoveStack(player, index);
+        int made = carried(player, flywheel);
+        boolean gridKept = upgrade.craftSlots.getItem(4).is(shaft) && upgrade.craftSlots.getItem(4).getCount() == 2;
+        expect(source, "fixes2: a locked result cannot be taken out of the backpack's grid by a click", survival && !mayPickup && !clickTook,
+            "mayPickup " + mayPickup + ", click took it " + clickTook);
+        expect(source, "fixes2: nor made by shift-crafting, and the grid keeps its items", survival && made == 0 && gridKept,
+            made + " flywheels made, shaft slot " + upgrade.craftSlots.getItem(4));
+        // once unlocked, the same grid crafts
+        company.done.add(FLYWHEEL_LOCK);
+        menu.slotChangedCraftingGrid(upgrade, player.level(), player);
+        boolean mayNow = result.mayPickup(player);
+        menu.quickMoveStack(player, index);
+        int madeNow = carried(player, flywheel);
+        expect(source, "fixes2: once the milestone is done, the grid's result can be taken and shift-crafted", mayNow && madeNow >= 1,
+            "mayPickup " + mayNow + ", " + madeNow + " flywheels made");
+        for (int i = 0; i < 9; i++) upgrade.craftSlots.setItem(i, ItemStack.EMPTY);
+        menu.slotChangedCraftingGrid(upgrade, player.level(), player);
+        player.closeContainer();
+        clearAll(player);
+        restoreLock(source, company, hadLock);
+    }
+
+    private static void restoreLock(CommandSourceStack source, Company company, boolean had) {
+        if (had) company.done.add(FLYWHEEL_LOCK);
+        else company.done.remove(FLYWHEEL_LOCK);
+        Companies.save(source.getServer());
     }
 
     private static int crateKeep(CommandSourceStack source) {

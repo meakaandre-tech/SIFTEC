@@ -110,7 +110,7 @@ public class DepotBlockEntity extends BlockEntity {
             if (!level.getBlockState(next).is(com.zurrtum.create.AllBlocks.ITEM_VAULT)) continue;
             // only from containers the depot's company may reach: unclaimed land or its own claim
             com.meakaandre.siftec.claim.Claims.Claim claim = com.meakaandre.siftec.claim.Claims.at(level, next);
-            if (claim != null && !claim.company.equals(company.id)) continue;
+            if (claim != null && !Companies.owns(company, claim.company)) continue;
             Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, next, side.getOpposite());
             if (storage == null || !storage.supportsExtraction()) continue;
             try (Transaction tx = Transaction.openOuter()) {

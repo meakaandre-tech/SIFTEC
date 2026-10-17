@@ -78,4 +78,34 @@ public interface PowerMember {
     /** The grid as it was balanced this tick, for status lines. */
     default void grid(GridStats stats) {
     }
+
+    /** True once the block this member stands for is gone (broken, or its chunk unloaded): its grid is worked out again at once. */
+    default boolean gone() {
+        return false;
+    }
+
+    // ---- while it is not loaded (PowerMemory)
+
+    /** SU-ticks of fuel a generator holds, banked and waiting at its input: what it can still give while it is not loaded. */
+    default double reserve() {
+        return Double.POSITIVE_INFINITY;
+    }
+
+    /** SU it gives while it is not loaded, given what it could give this tick (a Geothermal Generator: its geyser's average, not a burst). */
+    default double steady(double capacity) {
+        return capacity;
+    }
+
+    /** Burns this many SU-ticks of its fuel: what it gave while it was not loaded, taken when it loads again. */
+    default void spend(double suTicks) {
+    }
+
+    /** Ticks an Alien Power Augmenter's fed boost lasts on what it holds (its matrices), while it is not loaded. */
+    default int boostTicks() {
+        return Integer.MAX_VALUE;
+    }
+
+    /** Uses up this many ticks of an Augmenter's fed boost: what it gave while it was not loaded. */
+    default void spendBoost(int ticks) {
+    }
 }

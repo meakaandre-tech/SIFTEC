@@ -14,6 +14,7 @@ import org.antarcticgardens.cna.content.electricity.connector.ElectricalConnecto
 import org.antarcticgardens.cna.content.motor.MotorBlockEntity;
 import org.antarcticgardens.cna.content.motor.extension.MotorExtensionBlockEntity;
 import org.antarcticgardens.cna.energy.EnergyStorage;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -31,24 +32,32 @@ final class Members {
     private Members() {
     }
 
-    static void resolve(ServerLevel level, AbstractElectricalConnector connector, Map<Object, PowerMember> out) {
+    /**
+     * Adds what the connector stands on to {@code out}; returns where that member is (its key), or null if nothing. A
+     * member whose own block is not loaded is not added, but its position is still returned.
+     */
+    static @Nullable BlockPos resolve(ServerLevel level, AbstractElectricalConnector connector, Map<Object, PowerMember> out) {
         BlockPos pos = connector.getBlockPos();
         BlockPos controller = BuildingIndex.controllerOf(level, pos);
+        // a building across a chunk border whose controller's chunk is not loaded: its memory stands in (never loaded for this)
+        if (controller != null && !level.isLoaded(controller)) return controller;
         if (controller != null && level.getBlockEntity(controller) instanceof ControllerBlockEntity c) {
             PowerMember m = BuildingPower.member(level, c);
-            if (m != null) out.putIfAbsent(controller, m);
-            return;
+            if (m == null) return null;
+            out.putIfAbsent(controller, m);
+            return controller;
         }
-        BlockPos support = connector.getSupportingBlockPos();
+        BlockPos support = connector.getSupportingBlockPos().immutable();
+        if (!level.isLoaded(support)) return support;
         BlockEntity be = level.getBlockEntity(support);
         if (be instanceof PowerMember m) {
-            out.putIfAbsent(support.immutable(), m);
-            return;
+            out.putIfAbsent(support, m);
+            return support;
         }
-        if (be == null || be instanceof AbstractElectricalConnector && be != connector) return;
+        if (be == null || be instanceof AbstractElectricalConnector && be != connector) return null;
         if (be instanceof MotorBlockEntity motor) {
-            out.putIfAbsent(support.immutable(), new Motor(motor));
-            return;
+            out.putIfAbsent(support, new Motor(motor));
+            return support;
         }
         Direction side;
         try {
@@ -57,10 +66,12 @@ final class Members {
             side = null;
         }
         EnergyStorage storage = EnergyStorage.findForBlock(level, support, side);
-        if (storage == null) return;
+        if (storage == null) return null;
         boolean pull = connector instanceof ElectricalConnectorBlockEntity e && e.getMode().pull;
-        if (storage.supportsExtraction() && pull) out.putIfAbsent(support.immutable(), new Source(storage));
-        else if (storage.supportsInsertion()) out.putIfAbsent(support.immutable(), new Sink(storage));
+        if (storage.supportsExtraction() && pull) out.putIfAbsent(support, new Source(storage, be));
+        else if (storage.supportsInsertion()) out.putIfAbsent(support, new Sink(storage, be));
+        else return null;
+        return support;
     }
 
     /** A New Age motor a player wired up: it asks for what it needs to give its full SU, while it is set to run. */
@@ -69,6 +80,11 @@ final class Members {
 
         Motor(MotorBlockEntity motor) {
             this.motor = motor;
+        }
+
+        @Override
+        public boolean gone() {
+            return motor.isRemoved();
         }
 
         private double fullSu() {
@@ -103,9 +119,16 @@ final class Members {
         /** At most this much FE a tick, so a big buffer does not make the generators burn hard for nothing. */
         private static final long MAX_FE = 2048;
         final EnergyStorage storage;
+        final BlockEntity be;
 
-        Sink(EnergyStorage storage) {
+        Sink(EnergyStorage storage, BlockEntity be) {
             this.storage = storage;
+            this.be = be;
+        }
+
+        @Override
+        public boolean gone() {
+            return be.isRemoved();
         }
 
         @Override
@@ -127,9 +150,16 @@ final class Members {
     /** A New Age block that gives energy, wired with a connector set to pull: a generator of what it holds. */
     static final class Source implements PowerMember {
         final EnergyStorage storage;
+        final BlockEntity be;
 
-        Source(EnergyStorage storage) {
+        Source(EnergyStorage storage, BlockEntity be) {
             this.storage = storage;
+            this.be = be;
+        }
+
+        @Override
+        public boolean gone() {
+            return be.isRemoved();
         }
 
         @Override

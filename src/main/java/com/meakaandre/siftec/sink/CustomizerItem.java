@@ -33,7 +33,7 @@ public class CustomizerItem extends Item {
 
     /** Opens the paint window for a building, if the player's company may change it. */
     public static void open(ServerPlayer player, ControllerBlockEntity c) {
-        if (!player.hasInfiniteMaterials() && !c.companyId.isEmpty() && !Companies.of(player).id.equals(c.companyId)) {
+        if (!player.hasInfiniteMaterials() && !c.companyId.isEmpty() && !Companies.owns(Companies.of(player), c.companyId)) {
             player.sendOverlayMessage(Component.translatable("siftec.build_gun.not_yours"));
             return;
         }

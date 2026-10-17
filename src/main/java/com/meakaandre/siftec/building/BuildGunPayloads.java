@@ -39,9 +39,11 @@ public final class BuildGunPayloads {
 
     /**
      * Server to client: the server's verdict on the hologram's spot (with what only the server knows: unlocks,
-     * company land), or in dismantle mode the box of the building aimed at.
+     * company land), or in dismantle mode the box of the building aimed at. For a building, {@code min} is the anchor it
+     * really goes to and {@code from} the anchor the client sent: they differ when the server snapped a miner onto the
+     * node near it (only the server knows where the nodes are), and the client then shows its hologram at {@code min}.
      */
-    public record View(boolean ok, Component message, boolean hasBox, BlockPos min, BlockPos max) implements CustomPacketPayload {
+    public record View(boolean ok, Component message, boolean hasBox, BlockPos min, BlockPos max, BlockPos from) implements CustomPacketPayload {
         public static final Type<View> TYPE = new Type<>(Siftec.id("build_gun_view"));
         public static final StreamCodec<RegistryFriendlyByteBuf, View> STREAM_CODEC = StreamCodec.of(
             (buf, p) -> {
@@ -50,11 +52,23 @@ public final class BuildGunPayloads {
                 buf.writeBoolean(p.hasBox);
                 buf.writeBlockPos(p.min);
                 buf.writeBlockPos(p.max);
+                buf.writeBlockPos(p.from);
             },
-            buf -> new View(buf.readBoolean(), ComponentSerialization.STREAM_CODEC.decode(buf), buf.readBoolean(), buf.readBlockPos(), buf.readBlockPos()));
+            buf -> new View(buf.readBoolean(), ComponentSerialization.STREAM_CODEC.decode(buf), buf.readBoolean(), buf.readBlockPos(), buf.readBlockPos(), buf.readBlockPos()));
 
         public static View of(boolean ok, Component message, @Nullable BlockPos min, @Nullable BlockPos max) {
-            return new View(ok, message, min != null && max != null, min == null ? BlockPos.ZERO : min, max == null ? BlockPos.ZERO : max);
+            BlockPos at = min == null ? BlockPos.ZERO : min;
+            return new View(ok, message, min != null && max != null, at, max == null ? BlockPos.ZERO : max, at);
+        }
+
+        /** The same verdict, for a hologram the client sent at {@code sent}. */
+        public View from(BlockPos sent) {
+            return new View(ok, message, hasBox, min, max, sent.immutable());
+        }
+
+        /** True if the server moved the spot the client sent (a miner snapped onto a node). */
+        public boolean snapped() {
+            return hasBox && !min.equals(from);
         }
 
         @Override

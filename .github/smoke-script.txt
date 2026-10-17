@@ -412,6 +412,15 @@ key Escape
 sleep 1
 cmd siftec selftest tb fixes
 sleep 2
+cmd siftec selftest tb fixes2
+sleep 2
+cmd siftec selftest backpackfix
+sleep 3
+key e
+sleep 2
+shot
+key Escape
+sleep 1
 cmd siftec selftest tb crate keep
 sleep 1
 cmd kill @a

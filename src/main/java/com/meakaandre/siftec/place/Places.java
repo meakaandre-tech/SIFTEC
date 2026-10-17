@@ -105,7 +105,7 @@ public final class Places {
                 data.setDirty();
                 continue;
             }
-            if (place.company.equals(company)) out.add(place);
+            if (com.meakaandre.siftec.company.Companies.same(place.company, company)) out.add(place);
         }
         out.sort((a, b) -> a.name.compareToIgnoreCase(b.name));
         return out;
@@ -118,7 +118,7 @@ public final class Places {
     /** For the self-test: how many places a company has, without dropping any. */
     public static int count(MinecraftServer server, String company) {
         int n = 0;
-        for (Place place : Data.get(server).stored.places.values()) if (place.company.equals(company)) n++;
+        for (Place place : Data.get(server).stored.places.values()) if (com.meakaandre.siftec.company.Companies.same(place.company, company)) n++;
         return n;
     }
 

@@ -72,8 +72,17 @@ public final class TruckStations {
         return new Vec3(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
     }
 
-    /** The station whose dock is within {@link #DOCK_RANGE} of a spot, nearest first; null if none. */
-    public static @Nullable BlockPos near(ServerLevel level, Vec3 spot) {
+    /**
+     * True if the station serves this vehicle: a station serves only its own company's vehicles (one folded into another
+     * company counts as that company's), and one nobody owns serves nobody's.
+     */
+    public static boolean serves(ControllerBlockEntity c, VehicleEntity vehicle) {
+        if (c.companyId.isEmpty() || vehicle.companyId.isEmpty()) return c.companyId.isEmpty() && vehicle.companyId.isEmpty();
+        return com.meakaandre.siftec.company.Companies.same(c.companyId, vehicle.companyId);
+    }
+
+    /** The station of the vehicle's company whose dock is within {@link #DOCK_RANGE} of a spot, nearest first; null if none. */
+    public static @Nullable BlockPos near(ServerLevel level, Vec3 spot, VehicleEntity vehicle) {
         Set<BlockPos> known = KNOWN.get(level.dimension());
         if (known == null) return null;
         BlockPos best = null;
@@ -87,7 +96,7 @@ public final class TruckStations {
                 gone.add(pos);
                 continue;
             }
-            if (Math.abs(dock.y - spot.y) > 2) continue;
+            if (Math.abs(dock.y - spot.y) > 2 || !serves(c, vehicle)) continue;
             double dx = dock.x - spot.x, dz = dock.z - spot.z, d = dx * dx + dz * dz;
             if (d <= bestDist) {
                 bestDist = d;
@@ -114,7 +123,7 @@ public final class TruckStations {
      */
     public static long dock(ServerLevel level, BlockPos controller, VehicleEntity vehicle) {
         ControllerBlockEntity c = at(level, controller);
-        if (c == null) return 0;
+        if (c == null || !serves(c, vehicle)) return 0;
         long moved = 0;
         Storage<ItemVariant> cargo = ContainerStorage.of(vehicle.cargo, null);
         for (Storage<ItemVariant> vault : vaults(level, c)) {
@@ -144,8 +153,12 @@ public final class TruckStations {
         vehicle.addFuel(took * perMb);
     }
 
-    /** Using the terminal switches between loading and unloading. */
+    /** Using the terminal switches between loading and unloading; only a member of the station's company may. */
     static void use(ServerPlayer player, ControllerBlockEntity c, BuildingDef def) {
+        if (!SpecialBuildings.mayOperate(player, c)) {
+            player.sendOverlayMessage(Component.translatable("siftec.build_gun.not_yours"));
+            return;
+        }
         c.unload = !c.unload;
         c.setChanged();
         player.sendOverlayMessage(Component.translatable("siftec.building.station_mode", def.name(),

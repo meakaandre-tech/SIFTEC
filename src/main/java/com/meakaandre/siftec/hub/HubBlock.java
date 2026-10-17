@@ -3,11 +3,9 @@ package com.meakaandre.siftec.hub;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
-import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -21,19 +19,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * The HUB Terminal (milestones) and the Wormhole Gateway's terminal (phases), each the controller of its whole
- * structure. Each belongs to the company that placed it. Using it opens the milestone screen; sneaking and using it
- * twice picks the whole structure up (an old single-block one as well) and gives the item back.
+ * structure. Each belongs to the company that placed it. Using it opens the milestone screen; only the Build Gun's
+ * dismantle mode takes either down.
  */
 public class HubBlock extends Block implements EntityBlock {
     public final boolean gateway;
-    /** Who sneak-used which terminal last, and when: the second sneak-use within five seconds picks it up. */
-    private static final Map<UUID, long[]> ARMED = new HashMap<>();
 
     public HubBlock(boolean gateway, Properties properties) {
         // a HUB holds land: it cannot be broken, blown up or pushed, or its claim would be left behind
@@ -69,24 +62,11 @@ public class HubBlock extends Block implements EntityBlock {
             server.sendOverlayMessage(Component.translatable("siftec.hub.not_yours", owner.name));
             return InteractionResult.SUCCESS;
         }
-        Component name = Component.translatable(gateway ? "block.siftec.wormhole_gateway" : "block.siftec.hub");
-        if (player.isShiftKeyDown() && !gateway) {
-            // the HUB is a Build Gun building: only the gun's dismantle mode takes it down
-            server.sendOverlayMessage(Component.translatable("siftec.prefab.hub_gun"));
-            return InteractionResult.SUCCESS;
-        }
         if (player.isShiftKeyDown()) {
-            long now = level.getGameTime();
-            long[] armed = ARMED.get(player.getUUID());
-            if (armed == null || armed[0] != pos.asLong() || now - armed[1] > 100) {
-                ARMED.put(player.getUUID(), new long[]{pos.asLong(), now});
-                server.sendOverlayMessage(Component.translatable("siftec.prefab.dismantle_confirm", name));
-                return InteractionResult.SUCCESS;
-            }
-            ARMED.remove(player.getUUID());
-            ServerLevel serverLevel = server.level();
-            Prefabs.give(serverLevel, server, pos, Prefabs.dismantle(serverLevel, hub));
-            server.sendOverlayMessage(Component.translatable("siftec.prefab.dismantled", name));
+            // the HUB and the Wormhole Gateway are Build Gun buildings: only the gun's dismantle mode takes them down
+            server.sendOverlayMessage(gateway
+                ? Component.translatableWithFallback("siftec.prefab.gateway_gun", "Take the Wormhole Gateway down with the Build Gun's dismantle mode (X): its parts and progress are kept")
+                : Component.translatable("siftec.prefab.hub_gun"));
             return InteractionResult.SUCCESS;
         }
         HubMenu.open(server, mine, pos, gateway);

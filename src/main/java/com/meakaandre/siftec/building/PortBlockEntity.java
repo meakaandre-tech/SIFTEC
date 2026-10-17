@@ -73,7 +73,10 @@ public class PortBlockEntity extends SmartBlockEntity {
             var slots = ContainerStorage.of(basin.itemCapability, null).getSlots();
             return FilteringStorage.extractOnlyOf(new CombinedStorage<>(new java.util.ArrayList<>(slots.subList(9, Math.min(18, slots.size())))));
         }
-        Storage<ItemVariant> inner = ItemStorage.SIDED.find(level, target, out());
+        // the controller's slots (a miner's ore, the Smelter's ore and ingots, a generator's fuel) are reached only from
+        // its ports: it registers no item storage of its own, so nothing beside it can take from or put into it
+        Storage<ItemVariant> inner = level.getBlockEntity(target) instanceof ControllerBlockEntity controller ? controller.storage()
+            : ItemStorage.SIDED.find(level, target, out());
         if (inner == null) return null;
         return kind() == PortBlock.Kind.ITEM_IN ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
     }
