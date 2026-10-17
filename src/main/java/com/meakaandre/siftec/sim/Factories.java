@@ -106,6 +106,7 @@ public final class Factories {
         ServerLifecycleEvents.SERVER_STOPPED.register(s -> {
             join();
             server = null;
+            LEVELS.clear();
             MIXED.clear();
             GRIDS.clear();
             GRIDS_FOR.clear();
@@ -202,8 +203,17 @@ public final class Factories {
         lastSimulated = simulated;
     }
 
+    private static final Map<String, ServerLevel> LEVELS = new HashMap<>();
+
     static @Nullable ServerLevel level(MinecraftServer s, String dim) {
-        for (ServerLevel level : s.getAllLevels()) if (level.dimension().identifier().toString().equals(dim)) return level;
+        ServerLevel known = LEVELS.get(dim);
+        if (known != null && known.getServer() == s) return known;
+        for (ServerLevel level : s.getAllLevels()) {
+            if (level.dimension().identifier().toString().equals(dim)) {
+                LEVELS.put(dim, level);
+                return level;
+            }
+        }
         return null;
     }
 
