@@ -791,6 +791,8 @@ public final class MachineTests {
     // ------------------------------------------------------------------------------------------------ after a restart
 
     private static void afterRestart(CommandSourceStack source, ServerLevel level) {
+        // the state selftest clears the test companies after a restart: the machines run their company's recipes only
+        LATER.add(new Later(level.getGameTime() + 100, () -> company(level)));
         ControllerBlockEntity bio = controller(level, "biomass_burner", BIOMASS), coal = controller(level, "coal_generator", COAL),
             diesel = controller(level, "fuel_generator", DIESEL), nuke = controller(level, "nuclear_power_plant", NUCLEAR),
             pa = controller(level, "particle_accelerator", ACCELERATOR), conv = controller(level, "converter", CONVERTER);
