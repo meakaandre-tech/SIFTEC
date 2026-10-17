@@ -44,6 +44,8 @@ public class NodeSavedData extends SavedData {
     private int originX, originZ;
     private final LongSet placed = new LongOpenHashSet();
     private final Long2IntOpenHashMap heights = new Long2IntOpenHashMap();
+    /** The nodes that had nowhere to stand (height NO_PLACE), readable from the node map's worker thread. */
+    private final java.util.Set<Long> unplaceable = java.util.concurrent.ConcurrentHashMap.newKeySet();
     /** Nodes placed as a flat pad (all nodes started since pads came in); the others keep their old mound. */
     private final LongSet flat = new LongOpenHashSet();
 
@@ -58,13 +60,17 @@ public class NodeSavedData extends SavedData {
             Purity purity = Purity.byName(e.purity());
             if (look == null || look.fluid() || purity == null) continue;
             this.sites.computeIfAbsent(e.dimension(), k -> new Long2ObjectOpenHashMap<>()).put(e.pos(), new Site(look, purity, e.regrowAt()));
+            index(e.dimension(), e.pos());
         }
         this.flat.addAll(flat);
         this.hasOrigin = hasOrigin;
         this.originX = originX;
         this.originZ = originZ;
         this.placed.addAll(placed);
-        for (int i = 0; i + 1 < heights.size(); i += 2) this.heights.put(heights.get(i).longValue(), heights.get(i + 1).intValue());
+        for (int i = 0; i + 1 < heights.size(); i += 2) {
+            this.heights.put(heights.get(i).longValue(), heights.get(i + 1).intValue());
+            if (heights.get(i + 1).intValue() == NodePlacer.NO_PLACE) unplaceable.add(heights.get(i));
+        }
     }
 
     private List<Long> packHeights() {
@@ -128,6 +134,57 @@ public class NodeSavedData extends SavedData {
 
     /** Every ore node by dimension, then by {@link net.minecraft.core.BlockPos#asLong} position. */
     private final Map<String, Long2ObjectOpenHashMap<Site>> sites = new HashMap<>();
+    /** The same nodes' positions by dimension, then by chunk ({@link net.minecraft.world.level.ChunkPos#pack}-style key). */
+    private final Map<String, Long2ObjectOpenHashMap<it.unimi.dsi.fastutil.longs.LongArrayList>> byChunk = new HashMap<>();
+
+    /** A chunk's key from a block position's packed long. */
+    public static long chunkOf(long pos) {
+        net.minecraft.core.BlockPos p = net.minecraft.core.BlockPos.of(pos);
+        return chunkKey(p.getX() >> 4, p.getZ() >> 4);
+    }
+
+    public static long chunkKey(int chunkX, int chunkZ) {
+        return ((long) chunkX << 32) ^ (chunkZ & 0xffffffffL);
+    }
+
+    private void index(String dimension, long pos) {
+        Long2ObjectOpenHashMap<it.unimi.dsi.fastutil.longs.LongArrayList> map = byChunk.computeIfAbsent(dimension, k -> new Long2ObjectOpenHashMap<>());
+        long chunk = chunkOf(pos);
+        it.unimi.dsi.fastutil.longs.LongArrayList list = map.get(chunk);
+        if (list == null) {
+            list = new it.unimi.dsi.fastutil.longs.LongArrayList(2);
+            map.put(chunk, list);
+        }
+        if (!list.contains(pos)) list.add(pos);
+    }
+
+    private void unindex(String dimension, long pos) {
+        var map = byChunk.get(dimension);
+        if (map == null) return;
+        long chunk = chunkOf(pos);
+        var list = map.get(chunk);
+        if (list == null) return;
+        list.rem(pos);
+        if (list.isEmpty()) map.remove(chunk);
+    }
+
+    /** The ore nodes in one chunk of a dimension, by position; null when it has none. Read only. */
+    public it.unimi.dsi.fastutil.longs.@Nullable LongList sitesIn(String dimension, long chunk) {
+        var map = byChunk.get(dimension);
+        return map == null ? null : map.get(chunk);
+    }
+
+    /** How many chunks of a dimension hold ore nodes. */
+    public int chunksWithSites(String dimension) {
+        var map = byChunk.get(dimension);
+        return map == null ? 0 : map.size();
+    }
+
+    /** The chunks of a dimension that hold ore nodes (keys as {@link #chunkKey}). Read only. */
+    public it.unimi.dsi.fastutil.longs.LongSet siteChunks(String dimension) {
+        var map = byChunk.get(dimension);
+        return map == null ? it.unimi.dsi.fastutil.longs.LongSets.EMPTY_SET : map.keySet();
+    }
 
     private List<SiteEntry> packSites() {
         List<SiteEntry> out = new ArrayList<>();
@@ -152,13 +209,17 @@ public class NodeSavedData extends SavedData {
     public Site putSite(String dimension, long pos, NodeLook look, Purity purity, long regrowAt) {
         Site site = new Site(look, purity, regrowAt);
         sites(dimension).put(pos, site);
+        index(dimension, pos);
         setDirty();
         return site;
     }
 
     public void removeSite(String dimension, long pos) {
         Long2ObjectOpenHashMap<Site> map = sites.get(dimension);
-        if (map != null && map.remove(pos) != null) setDirty();
+        if (map != null && map.remove(pos) != null) {
+            unindex(dimension, pos);
+            setDirty();
+        }
     }
 
     public void setRegrowAt(Site site, long regrowAt) {
@@ -215,7 +276,14 @@ public class NodeSavedData extends SavedData {
 
     public void setHeight(long node, int y) {
         heights.put(node, y);
+        if (y == NodePlacer.NO_PLACE) unplaceable.add(node);
+        else unplaceable.remove(node);
         setDirty();
+    }
+
+    /** The nodes left out for having nowhere to stand: a live view, safe to read from any thread. */
+    public java.util.Set<Long> unplaceable() {
+        return java.util.Collections.unmodifiableSet(unplaceable);
     }
 
     public boolean isFlat(long node) {

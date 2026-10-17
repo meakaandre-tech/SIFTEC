@@ -67,6 +67,8 @@ public final class NodeMap {
     private static volatile long cacheSeed = Long.MIN_VALUE;
     /** The point the map is measured from (world spawn when the world was new); null until settled. */
     private static volatile int @Nullable [] origin;
+    /** Nodes left out for having nowhere to stand (NodeSavedData's live set): never offered by a search or the map. */
+    private static volatile java.util.Set<Long> unplaceable = java.util.Set.of();
     /** Biome samples taken, for the selftest. */
     public static final AtomicLong SAMPLES = new AtomicLong();
 
@@ -110,7 +112,29 @@ public final class NodeMap {
             data.setOrigin(spawn.getX(), spawn.getZ());
         }
         clearCaches();
+        unplaceable = data.unplaceable();
         origin = new int[]{data.originX(), data.originZ()};
+    }
+
+    /** True for a node that was left out (a cave or Nether node with nowhere to stand): nothing should point at it. */
+    public static boolean placeless(Node node) {
+        return unplaceable.contains(node.key());
+    }
+
+    /** Cells kept worked out at most (per kind); past this every cache is emptied and cells are worked out again as asked. */
+    private static final int CELLS_KEPT = 32_768;
+
+    /** Keeps the caches bounded: a long-running server that has seen much of the world starts them afresh. */
+    private static void trimCaches() {
+        int cells = 0;
+        for (Map<Long, List<Node>> m : CACHE.values()) cells += m.size();
+        if (cells > CELLS_KEPT || SULFUR.size() > CELLS_KEPT || LAND.size() > 4 * CELLS_KEPT || GROUND.size() > CELLS_KEPT || PAD.size() > CELLS_KEPT) {
+            CACHE.clear();
+            SULFUR.clear();
+            LAND.clear();
+            GROUND.clear();
+            PAD.clear();
+        }
     }
 
     private static void clearCaches() {
@@ -131,6 +155,7 @@ public final class NodeMap {
     public static void clear() {
         clearCaches();
         origin = null;
+        unplaceable = java.util.Set.of();
         cacheSeed = Long.MIN_VALUE;
     }
 
@@ -181,6 +206,8 @@ public final class NodeMap {
         long key = cellKey(cellX, cellZ);
         List<Node> cached = cells.get(key);
         if (cached == null) {
+            trimCaches();
+            cells = CACHE.computeIfAbsent(level.dimension(), k -> new ConcurrentHashMap<>());
             cached = level.dimension() == Level.NETHER ? nether(level, cellX, cellZ, from) : overworld(level, cellX, cellZ, from);
             cells.put(key, cached);
         }
@@ -195,6 +222,7 @@ public final class NodeMap {
         long key = cellKey(cellX, cellZ);
         Optional<Node> cached = SULFUR.get(key);
         if (cached == null) {
+            trimCaches();
             cached = Optional.ofNullable(sulfur(level, cellX, cellZ, from));
             SULFUR.put(key, cached);
         }
@@ -215,7 +243,7 @@ public final class NodeMap {
     /** The node of this type (any type when null) whose centre is within {@code range} blocks of the column. */
     public static Optional<Node> near(ServerLevel level, int x, int z, int range, NodeType type) {
         for (Node node : inCell(level, Math.floorDiv(x, CELL), Math.floorDiv(z, CELL))) {
-            if ((type == null || node.type() == type) && Math.abs(node.x() - x) <= range && Math.abs(node.z() - z) <= range) {
+            if ((type == null || node.type() == type) && !placeless(node) && Math.abs(node.x() - x) <= range && Math.abs(node.z() - z) <= range) {
                 return Optional.of(node);
             }
         }
@@ -228,8 +256,8 @@ public final class NodeMap {
     }
 
     /**
-     * The height of a surface node's pad: the middle value of the generator's ground height (water counts as
-     * ground, so a pad in a lake sits level with its surface) at 13 points across the pad. Trees and other
+     * The height of a surface node's pad: the middle value of the generator's ground height (the ground under any
+     * water, so a pad by a pond sits on the ground and not up at the water's surface) at 13 points across the pad. Trees and other
      * features are not part of it. Worked out with the cell, on the worker thread; here only if that missed it.
      */
     public static int padHeight(ServerLevel level, Node node) {
@@ -240,6 +268,17 @@ public final class NodeMap {
         return y;
     }
 
+    /** Points round a pad's middle that must be dry: a pad with two or more of them in water is not placed. */
+    private static final int[][] SHORE_POINTS = {{3, 0}, {-3, 0}, {0, 3}, {0, -3}};
+
+    private static boolean padWet(ServerLevel level, int x, int z) {
+        int wet = 0;
+        for (int[] d : SHORE_POINTS) {
+            if (Terrain.wet(level, x + d[0], z + d[1]) && ++wet >= 2) return true;
+        }
+        return false;
+    }
+
     private static final int[][] PAD_POINTS = {{0, 0}, {2, 0}, {-2, 0}, {0, 2}, {0, -2}, {2, 2}, {2, -2}, {-2, 2}, {-2, -2}, {3, 0}, {-3, 0}, {0, 3}, {0, -3}};
 
     private static int padHeight(ServerLevel level, int x, int z) {
@@ -247,7 +286,7 @@ public final class NodeMap {
         var random = level.getChunkSource().randomState();
         int[] ys = new int[PAD_POINTS.length];
         for (int i = 0; i < ys.length; i++) {
-            ys[i] = generator.getBaseHeight(x + PAD_POINTS[i][0], z + PAD_POINTS[i][1], net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG, level, random) - 1;
+            ys[i] = generator.getBaseHeight(x + PAD_POINTS[i][0], z + PAD_POINTS[i][1], net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG, level, random) - 1;
         }
         Arrays.sort(ys);
         return Math.max(ys[ys.length / 2], level.getMinY() + 1);
@@ -283,7 +322,7 @@ public final class NodeMap {
                     if (cellOutside(border, cx + dx, cz + dz)) continue;
                     List<Node> nodes = cave ? sulfurIn(level, cx + dx, cz + dz).map(List::of).orElse(List.of()) : surface(level, cx + dx, cz + dz);
                     for (Node node : nodes) {
-                        if (node.type() != type || !border.contains(node.x(), node.z())) continue;
+                        if (node.type() != type || placeless(node) || !border.contains(node.x(), node.z())) continue;
                         double distance = node.distanceTo(x, z);
                         if (distance < bestDistance) {
                             bestDistance = distance;
@@ -334,6 +373,38 @@ public final class NodeMap {
             }
             T done = result;
             server.execute(() -> then.accept(done));
+        });
+    }
+
+    /**
+     * Runs a long job in small pieces on the worker thread: each piece of {@code size} items is its own task, and the
+     * next is queued only once it is done, so whatever else waits for the worker (a scanner, the cells of chunks being
+     * generated) runs in between. {@code each} gets every piece's answer on the server thread (null if it failed), and
+     * {@code done} runs there after the last.
+     */
+    public static <I, R> void batched(MinecraftServer server, List<I> items, int size, java.util.function.Function<List<I>, R> piece,
+                                      Consumer<@Nullable R> each, Runnable done) {
+        List<I> all = List.copyOf(items);
+        batchStep(server, all, 0, Math.max(1, size), piece, each, done);
+    }
+
+    private static <I, R> void batchStep(MinecraftServer server, List<I> all, int from, int size, java.util.function.Function<List<I>, R> piece,
+                                         Consumer<@Nullable R> each, Runnable done) {
+        if (from >= all.size()) {
+            server.execute(done);
+            return;
+        }
+        WORKER.execute(() -> {
+            R result;
+            try {
+                result = piece.apply(all.subList(from, Math.min(all.size(), from + size)));
+            } catch (RuntimeException e) {
+                com.meakaandre.siftec.Siftec.LOGGER.warn("Background search failed", e);
+                result = null;
+            }
+            R answer = result;
+            server.execute(() -> each.accept(answer));
+            batchStep(server, all, from + size, size, piece, each, done);
         });
     }
 
@@ -398,9 +469,11 @@ public final class NodeMap {
             z = spot.z();
             column = spot.column();
         } else if (column.water()) {
-            // no nodes in the sea
+            // no nodes in the sea, a river or a lake
             return List.of();
         }
+        // nor on a lake's shore, where most of the pad would stand in the water on a pillar of fill
+        if (padWet(level, x, z)) return List.of();
         Holder<Biome> biome = column.biome();
         double distance = Math.sqrt(Math.pow(x - originX, 2) + Math.pow(z - originZ, 2));
         int total = 0;

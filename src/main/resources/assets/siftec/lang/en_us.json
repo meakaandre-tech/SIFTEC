@@ -865,6 +865,7 @@
   "siftec.drone.collect": "Arrived packages: %s. Click to collect",
   "siftec.drone.fuel": "Fire charges: %s (a trip needs %s)",
   "siftec.drone.fuel_how": "Click the port with fire charges, or feed them in by funnel",
+  "siftec.drone.gave_up": "The far port stayed unloaded: the drone brought its packages home",
   "siftec.drone.has_drone": "This port already has its drone",
   "siftec.drone.homebound": "Drone on its way home",
   "siftec.drone.idle": "Drone ready. It leaves when packages are waiting",

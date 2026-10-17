@@ -275,7 +275,7 @@ lang.update({"siftec.place.not_yours": "That belongs to another company", "sifte
              "siftec.drone.no_drone": "No drone here. Click the port with a Cardboard Drone", "siftec.drone.has_drone": "This port already has its drone",
              "siftec.drone.no_destination": "No destination yet. Click the port empty-handed to pick one",
              "siftec.drone.idle": "Drone ready. It leaves when packages are waiting", "siftec.drone.no_fuel": "Drone waiting for fuel: a trip needs %s fire charges",
-             "siftec.drone.outbound": "Drone on its way out", "siftec.drone.waiting": "Drone waiting to unload at the far port", "siftec.drone.homebound": "Drone on its way home",
+             "siftec.drone.outbound": "Drone on its way out", "siftec.drone.waiting": "Drone waiting to unload at the far port", "siftec.drone.homebound": "Drone on its way home", "siftec.drone.gave_up": "The far port stayed unloaded: the drone brought its packages home",
              "siftec.drone.choose": "Click to send packages here", "siftec.drone.chosen": "Packages go here",
              "siftec.drone.waiting_count": "%s packages waiting to leave", "siftec.drone.take_drone": "Click to take the drone out",
              "siftec.drone.away": "The drone is away", "siftec.drone.collect": "Arrived packages: %s. Click to collect",

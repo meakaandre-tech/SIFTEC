@@ -30,7 +30,8 @@ import java.util.Set;
  */
 public class MapScreen extends Screen {
     private static final int PANEL = 140, BAR = 16, FOOT = 14, ROW = 12;
-    private static final double MIN_SCALE = 0.03, MAX_SCALE = 4;
+    /** Zoomed out no further than about a hundred regions on screen, so the tiles drawn stay few and cached. */
+    private static final double MIN_SCALE = 0.15, MAX_SCALE = 4;
     /** Categories whose kinds are folded out in the panel. */
     private static final Set<String> OPEN = new HashSet<>();
     private static double lastScale = 0.5;

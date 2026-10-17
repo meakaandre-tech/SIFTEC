@@ -2,7 +2,6 @@ package com.meakaandre.siftec.collect;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.registry.ModBlocks;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
@@ -26,6 +25,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,17 +34,22 @@ import java.util.Set;
  * the chunks round its centre piece are loaded too, the Somersloop is put in the middle of the reinforced deepslate
  * frame, on its sill. Where each city's Somersloop went is saved, so the Object Scanner can point at it.
  * <p>
- * Before a city has been reached, the scanner finds it as the game's own /locate does, from the seed.
+ * Before a city has been reached, the scanner finds it from the seed: where the game's structure placement would put
+ * one, in a deep dark biome. That search only reads the seed and the biome noise, on the node map's worker thread, so it
+ * never loads or generates a chunk and never holds up the server.
  */
 public final class AncientCities {
     /** Cities seen in loaded chunks and waiting for the chunks round their frame: start chunk -> its start. */
     private static final Map<Long, StructureStart> WAITING = new HashMap<>();
-    /** The nearest city the scanner found from each 256-block square, so /locate's search runs once per square. */
-    private static final Map<Long, Located> LOCATED = new HashMap<>();
-
-    /** A remembered locate result, or none found. */
-    private record Located(@Nullable BlockPos pos) {
-    }
+    /**
+     * The nearest cities found from each 256-block square, nearest first, so the search runs once per square. A
+     * city whose Somersloop the company has collected is passed over for the next one in the list.
+     */
+    private static final Map<Long, List<BlockPos>> LOCATED = new java.util.concurrent.ConcurrentHashMap<>();
+    /** Squares remembered at most; the cache is emptied when it grows past this. */
+    private static final int LOCATED_MAX = 512;
+    /** How many cities each square remembers, and how far out (in placement regions) the search looks. */
+    private static final int CITIES_KEPT = 6, SEARCH_REGIONS = 24;
 
     /** A chunk position as one number (x low, z high). */
     static long pack(int chunkX, int chunkZ) {
@@ -183,32 +188,81 @@ public final class AncientCities {
     // ------------------------------------------------------------------------------------------------ finding
 
     /**
-     * The nearest Ancient City Somersloop from here that the company has not collected: where it was put if its city has
-     * been reached, or the city's centre from the seed (as /locate finds it) if not. Server thread only.
+     * The cities nearest a spot, nearest first (their start chunks' middles). Reads only the seed and the biome noise:
+     * safe on the node map's worker thread, and it never loads or generates a chunk. Cached by 256-block square.
      */
-    public static @Nullable BlockPos nearest(ServerLevel level, BlockPos from, Set<String> collected) {
+    public static List<BlockPos> candidates(ServerLevel level, BlockPos from) {
         long square = pack(from.getX() >> 8, from.getZ() >> 8);
-        Located found = LOCATED.get(square);
-        if (found == null) {
-            found = new Located(locate(level, from));
-            LOCATED.put(square, found);
-        }
-        BlockPos city = found.pos();
-        if (city == null) return null;
-        BlockPos placed = Data.get(level.getServer()).at(pack(city.getX() >> 4, city.getZ() >> 4));
-        if (placed != null) return collected.contains(CollectibleBlock.key(placed)) ? null : placed;
-        return city;
+        List<BlockPos> known = LOCATED.get(square);
+        if (known != null) return known;
+        List<BlockPos> found = locate(level, from);
+        if (LOCATED.size() >= LOCATED_MAX) LOCATED.clear();
+        LOCATED.put(square, found);
+        return found;
     }
 
-    private static @Nullable BlockPos locate(ServerLevel level, BlockPos from) {
+    /**
+     * Of these cities (from {@link #candidates}), the nearest Somersloop the company has not collected: where it was put
+     * if its city has been reached, or the city's centre if not. Once one is collected the next city is offered. Server
+     * thread only.
+     */
+    public static @Nullable BlockPos pick(MinecraftServer server, List<BlockPos> cities, Set<String> collected) {
+        Data data = Data.get(server);
+        for (BlockPos city : cities) {
+            BlockPos placed = data.at(pack(city.getX() >> 4, city.getZ() >> 4));
+            if (placed == null) return city;
+            if (!collected.contains(CollectibleBlock.key(placed))) return placed;
+        }
+        return null;
+    }
+
+    private static List<BlockPos> locate(ServerLevel level, BlockPos from) {
         try {
             Holder<Structure> city = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(BuiltinStructures.ANCIENT_CITY);
-            Pair<BlockPos, Holder<Structure>> hit = level.getChunkSource().getGenerator()
-                .findNearestMapStructure(level, HolderSet.direct(city), from, 48, false);
-            return hit == null ? null : hit.getFirst();
+            var state = level.getChunkSource().getGeneratorState();
+            List<BlockPos> out = new java.util.ArrayList<>();
+            for (var placement : state.getPlacementsForStructure(city)) {
+                if (placement instanceof net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement spread) {
+                    out.addAll(spreadCities(level, state, spread, city.value(), from));
+                }
+            }
+            out.sort(java.util.Comparator.comparingDouble(p -> p.distSqr(new BlockPos(from.getX(), p.getY(), from.getZ()))));
+            return List.copyOf(out.subList(0, Math.min(CITIES_KEPT, out.size())));
         } catch (RuntimeException e) {
             Siftec.LOGGER.warn("Could not look for Ancient Cities", e);
-            return null;
+            return List.of();
         }
+    }
+
+    /**
+     * The chunks a random-spread placement offers round a spot, ring by ring, that pass its own frequency and exclusion
+     * tests and lie in a biome the city may start in (sampled at the city's depth). Stops a ring after it has enough.
+     */
+    private static List<BlockPos> spreadCities(ServerLevel level, net.minecraft.world.level.chunk.ChunkGeneratorStructureState state,
+                                               net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement spread,
+                                               Structure city, BlockPos from) {
+        List<BlockPos> out = new java.util.ArrayList<>();
+        int spacing = spread.spacing();
+        int rx = Math.floorDiv(from.getX() >> 4, spacing), rz = Math.floorDiv(from.getZ() >> 4, spacing);
+        long seed = state.getLevelSeed();
+        HolderSet<net.minecraft.world.level.biome.Biome> biomes = city.biomes();
+        int y = Math.max(level.getMinY() + 8, -27);
+        int extra = -1;
+        for (int ring = 0; ring <= SEARCH_REGIONS; ring++) {
+            for (int dx = -ring; dx <= ring; dx++) {
+                for (int dz = -ring; dz <= ring; dz++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+                    var chunk = spread.getPotentialStructureChunk(seed, rx + dx, rz + dz);
+                    if (!spread.isStructureChunk(state, chunk.x(), chunk.z())) continue;
+                    int x = (chunk.x() << 4) + 8, z = (chunk.z() << 4) + 8;
+                    if (!biomes.contains(com.meakaandre.siftec.node.Terrain.biome(level, x, y, z))) continue;
+                    out.add(new BlockPos(x, y, z));
+                }
+            }
+            // one ring past the one where enough turned up: a city in the next ring can still be nearer than the last found
+            if (extra < 0 && out.size() >= CITIES_KEPT) extra = ring + 1;
+            if (extra >= 0 && ring >= extra) break;
+        }
+        return out;
     }
 }

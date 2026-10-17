@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.node;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
@@ -23,7 +22,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * block grows back. If something has got into the spot meanwhile (anything its ore may not simply replace), it waits
  * until the spot is clear: it never deletes what is there. The purity sets the regrowth; a miner's Mk never does.
  * The time it grows back at is kept with the node in {@link NodeSavedData}, as a game time, so it holds through
- * chunks unloading and server restarts: a node whose chunk is not loaded grows back as soon as it is.
+ * chunks unloading and server restarts: a node whose chunk is not loaded grows back as soon as it is. Only nodes in
+ * loaded chunks are looked at each tick (the nodes are kept by chunk), however many the world has.
  */
 public final class NodeRegrowth {
     private NodeRegrowth() {
@@ -47,8 +47,19 @@ public final class NodeRegrowth {
         return server == null ? level.getGameTime() : server.overworld().getGameTime();
     }
 
+    /** The loaded chunks of each dimension (keys as {@link NodeSavedData#chunkKey}), kept from the chunk events. */
+    private static final java.util.Map<String, it.unimi.dsi.fastutil.longs.LongOpenHashSet> LOADED = new java.util.HashMap<>();
+
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(NodeRegrowth::tick);
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) ->
+            LOADED.computeIfAbsent(level.dimension().identifier().toString(), k -> new it.unimi.dsi.fastutil.longs.LongOpenHashSet())
+                .add(NodeSavedData.chunkKey(chunk.getPos().x(), chunk.getPos().z())));
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> {
+            var set = LOADED.get(level.dimension().identifier().toString());
+            if (set != null) set.remove(NodeSavedData.chunkKey(chunk.getPos().x(), chunk.getPos().z()));
+        });
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> LOADED.clear());
         // a node's ore is a plain block: using it with an empty hand still says what node it is
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             if (hand != InteractionHand.MAIN_HAND || !player.getMainHandItem().isEmpty() || !(player instanceof ServerPlayer)) return InteractionResult.PASS;
@@ -62,18 +73,32 @@ public final class NodeRegrowth {
         long now = server.overworld().getGameTime();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (ServerLevel level : server.getAllLevels()) {
-            var sites = data.sites(level.dimension().identifier().toString());
-            if (sites.isEmpty()) continue;
-            for (Long2ObjectMap.Entry<NodeSavedData.Site> e : sites.long2ObjectEntrySet()) {
-                pos.set(e.getLongKey());
-                if (!level.isLoaded(pos)) continue;
-                NodeSavedData.Site site = e.getValue();
-                BlockState state = level.getBlockState(pos);
-                if (site.grown()) {
-                    // its ore has gone, however: the spot is empty from now and grows back after its purity's time
-                    if (!site.look.isNodeBlock(state)) data.setRegrowAt(site, now + ticks(site.purity));
-                } else if (now >= site.regrowAt() && regrow(level, pos, site)) {
-                    data.setRegrowAt(site, NodeSavedData.GROWN);
+            String dim = level.dimension().identifier().toString();
+            var loaded = LOADED.get(dim);
+            if (loaded == null || loaded.isEmpty() || data.chunksWithSites(dim) == 0) continue;
+            // the nodes in loaded chunks: walk whichever of the two is smaller
+            it.unimi.dsi.fastutil.longs.LongArrayList chunks = new it.unimi.dsi.fastutil.longs.LongArrayList();
+            if (loaded.size() <= data.chunksWithSites(dim)) {
+                for (long c : loaded) if (data.sitesIn(dim, c) != null) chunks.add(c);
+            } else {
+                for (long c : data.siteChunks(dim)) if (loaded.contains(c)) chunks.add(c);
+            }
+            var sites = data.sites(dim);
+            for (long chunk : chunks) {
+                var inChunk = data.sitesIn(dim, chunk);
+                if (inChunk == null) continue;
+                for (long at : inChunk.toLongArray()) {
+                    pos.set(at);
+                    if (!level.isLoaded(pos)) continue;
+                    NodeSavedData.Site site = sites.get(at);
+                    if (site == null) continue;
+                    BlockState state = level.getBlockState(pos);
+                    if (site.grown()) {
+                        // its ore has gone, however: the spot is empty from now and grows back after its purity's time
+                        if (!site.look.isNodeBlock(state)) data.setRegrowAt(site, now + ticks(site.purity));
+                    } else if (now >= site.regrowAt() && regrow(level, pos, site)) {
+                        data.setRegrowAt(site, NodeSavedData.GROWN);
+                    }
                 }
             }
         }

@@ -258,7 +258,7 @@ public final class PowerFixTests {
         }
     }
 
-    /** A Creative Motor at 200 RPM two blocks north of a belt's start, with a clutch between; a powered clutch cuts the belt off. */
+    /** A Creative Motor at 200 RPM two blocks north of a belt's start, with a clutch between (powered or not). */
     private static void clutched(ServerLevel level, BlockPos from, boolean cutOff) {
         BlockPos clutch = from.north(), motor = from.north(2);
         BlockState c = AllBlocks.CLUTCH.defaultBlockState().setValue(RotatedPillarKineticBlock.AXIS, Direction.Axis.Z).setValue(GearshiftBlock.POWERED, cutOff);
@@ -268,6 +268,10 @@ public final class PowerFixTests {
         if (level.getBlockEntity(motor) instanceof CreativeMotorBlockEntity m) m.generatedSpeed.setValue(200);
     }
 
+    /**
+     * Belts never connect to shafts (this replaces the clutch rule this fix first had): a motor through a clutch, engaged
+     * or not, turns no belt, and every belt runs at its company's self-moving speed.
+     */
     private static void belts(CommandSourceStack source, ServerLevel level) {
         Company c = company(level, COMPANY, "hub_upgrade_4");
         float self = SelfMovingBelts.rpm(SelfMovingBelts.itemsPerMinute(c));
@@ -281,12 +285,12 @@ public final class PowerFixTests {
             BeltBlockEntity a = level.getBlockEntity(cut) instanceof BeltBlockEntity b ? b : null;
             BeltBlockEntity d = level.getBlockEntity(driven) instanceof BeltBlockEntity b ? b : null;
             BeltBlockEntity f = level.getBlockEntity(free) instanceof BeltBlockEntity b ? b : null;
-            expect(source, "15: a belt cut off from its motor by a clutch (powered by redstone) stands still", a != null && a.getSpeed() == 0,
-                a == null ? "no belt" : a.getSpeed() + " RPM, has a drive " + SelfMovingBelts.drive(level, a) + ", clutch " + level.getBlockState(cut.north()));
-            expect(source, "15: through an unpowered clutch the motor drives the belt", d != null && Math.abs(d.getSpeed()) == 200,
-                d == null ? "no belt" : d.getSpeed() + " RPM");
-            expect(source, "15: a belt with no drive at all moves by itself at " + self + " RPM", f != null && self > 0 && Math.abs(Math.abs(f.getSpeed()) - self) < 0.01f,
-                f == null ? "no belt" : f.getSpeed() + " RPM, has a drive " + SelfMovingBelts.drive(level, f));
+            for (var e : new Object[][]{{"behind an engaged clutch", a}, {"behind a disengaged clutch and a running motor", d}, {"with nothing beside it", f}}) {
+                BeltBlockEntity b = (BeltBlockEntity) e[1];
+                expect(source, "15: a belt " + e[0] + " runs at its company's " + self + " RPM, linked to nothing",
+                    b != null && self > 0 && Math.abs(Math.abs(b.getSpeed()) - self) < 0.01f && !SelfMovingBelts.linked(b),
+                    b == null ? "no belt" : b.getSpeed() + " RPM, source " + b.hasSource() + ", network " + b.hasNetwork() + ", theoretical " + b.getTheoreticalSpeed());
+            }
         });
     }
 

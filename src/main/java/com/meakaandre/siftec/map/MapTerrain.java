@@ -383,7 +383,7 @@ public final class MapTerrain {
         short[] height = new short[4];
         for (int s = 0; s < 4; s++) {
             int x = (cx << 4) + (s & 1) * 8 + 4, z = (cz << 4) + (s >> 1) * 8 + 4;
-            Terrain.Column col = Terrain.column(level, x, z);
+            Terrain.Column col = Terrain.column(level, x, z, false);
             if (col == null) {
                 colour[s] = 0x202020 | MapTile.KNOWN | MapTile.GUESSED;
                 height[s] = (short) level.getMinY();

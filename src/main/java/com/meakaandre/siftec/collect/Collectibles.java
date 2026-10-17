@@ -91,6 +91,8 @@ public final class Collectibles {
         long key = key(cellX, cellZ);
         Optional<Spot> cached = CACHE.get(key);
         if (cached == null) {
+            // bounded: a server that has seen much of the world starts the cache afresh
+            if (CACHE.size() > 65_536) CACHE.clear();
             cached = compute(level, seed, cellX, cellZ, from[0], from[1]);
             CACHE.put(key, cached);
         }
@@ -122,7 +124,7 @@ public final class Collectibles {
         }
         if (type == null) return Optional.empty();
         // a Somersloop lies deep underground: the ground above it does not matter
-        if (type == Collectible.SOMERSLOOP) return Optional.of(new Spot(x, z, type));
+        if (type == Collectible.SOMERSLOOP) return nearNode(level, x, z) ? Optional.empty() : Optional.of(new Spot(x, z, type));
         Terrain.Column column = Terrain.column(level, x, z);
         if (column == null) {
             // over void (floating islands): somewhere on the cell's land, or nowhere
@@ -133,7 +135,24 @@ public final class Collectibles {
         } else if (column.water()) {
             return Optional.empty();
         }
+        // never on a node's patch or among its clump, nor where a node's site would cut it away
+        if (nearNode(level, x, z)) return Optional.empty();
         return Optional.of(new Spot(x, z, type));
+    }
+
+    /** How far a collectible keeps from a node: the node's whole site, plus the room the wreckage or slate patch takes. */
+    private static final int NODE_CLEARANCE = com.meakaandre.siftec.node.NodePlacer.REACH + 3;
+
+    /** True if any node's site (a surface pad, a cave or Nether pad, its clump) reaches within clearance of the column. */
+    private static boolean nearNode(ServerLevel level, int x, int z) {
+        for (int cx = Math.floorDiv(x - NODE_CLEARANCE, NodeMap.CELL); cx <= Math.floorDiv(x + NODE_CLEARANCE, NodeMap.CELL); cx++) {
+            for (int cz = Math.floorDiv(z - NODE_CLEARANCE, NodeMap.CELL); cz <= Math.floorDiv(z + NODE_CLEARANCE, NodeMap.CELL); cz++) {
+                for (com.meakaandre.siftec.node.Node node : NodeMap.inCell(level, cx, cz)) {
+                    if (Math.abs(node.x() - x) <= NODE_CLEARANCE && Math.abs(node.z() - z) <= NODE_CLEARANCE) return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** The height a Somersloop's pocket is dug at, from the seed. */
@@ -201,15 +220,24 @@ public final class Collectibles {
         long piece = NodeSavedData.piece(mix(((long) spot.x() << 32) ^ spot.z() ^ 0x51065), chunkX, chunkZ);
         if (data.isPlaced(piece)) return false;
         data.markPlaced(piece);
-        return place(level, spot);
+        return place(level, spot, new net.minecraft.world.level.ChunkPos(chunkX, chunkZ));
     }
 
-    /** Puts one spot's blocks in the world. */
+    /** Puts one spot's blocks in the world, all of them (its chunks are loaded: the selftests). */
     public static boolean place(ServerLevel level, Spot spot) {
+        return place(level, spot, null);
+    }
+
+    /**
+     * Puts one spot's blocks in the world. With {@code only}, nothing outside that chunk is read or changed: the part of
+     * a slate patch, pocket or wreckage that would reach into a neighbouring chunk is left out, so world generation never
+     * loads or generates another chunk.
+     */
+    public static boolean place(ServerLevel level, Spot spot, net.minecraft.world.level.@org.jspecify.annotations.Nullable ChunkPos only) {
         BlockState block = ModBlocks.COLLECTIBLES.get(spot.type()).get().defaultBlockState();
         if (spot.type() == Collectible.SOMERSLOOP) {
             BlockPos at = new BlockPos(spot.x(), deepY(level.getSeed(), spot.x(), spot.z()), spot.z());
-            pocket(level, at);
+            pocket(level, at, only);
             level.setBlock(at, block, Block.UPDATE_CLIENTS);
             return true;
         }
@@ -224,14 +252,14 @@ public final class Collectibles {
         if (y <= level.getMinY()) return false;
         BlockPos ground = new BlockPos(spot.x(), y - 1, spot.z());
         if (spot.type() == Collectible.MERCER_SPHERE) {
-            siftslatePatch(level, ground);
+            siftslatePatch(level, ground, only);
             // it floats: one block of air between the patch and the sphere
             level.setBlock(ground.above(), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             level.setBlock(ground.above(2), block, Block.UPDATE_CLIENTS);
             return true;
         }
         level.setBlock(ground.above(), block, Block.UPDATE_CLIENTS);
-        CrashSites.wreckage(level, ground.above());
+        CrashSites.wreckage(level, ground.above(), only);
         return true;
     }
 
@@ -241,7 +269,12 @@ public final class Collectibles {
     }
 
     /** A small rough disc of siftslate set into the ground. */
-    private static void siftslatePatch(ServerLevel level, BlockPos centre) {
+    /** True if the position may be touched: anywhere without a chunk to keep to, else only inside that chunk. */
+    static boolean inside(net.minecraft.world.level.@org.jspecify.annotations.Nullable ChunkPos only, BlockPos at) {
+        return only == null || at.getX() >> 4 == only.x() && at.getZ() >> 4 == only.z();
+    }
+
+    private static void siftslatePatch(ServerLevel level, BlockPos centre, net.minecraft.world.level.@org.jspecify.annotations.Nullable ChunkPos only) {
         BlockState slate = siftslate();
         long h = mix(((long) centre.getX() << 32) ^ centre.getZ() ^ 0x5D1F7L);
         for (int dx = -2; dx <= 2; dx++) {
@@ -249,6 +282,7 @@ public final class Collectibles {
                 int d = dx * dx + dz * dz;
                 if (d > 5 || d >= 4 && ((h >>> ((dx + 2) * 5 + dz + 2)) & 1) == 0) continue;  // ragged edge
                 BlockPos at = centre.offset(dx, 0, dz);
+                if (!inside(only, at)) continue;
                 // settle onto the ground there: down past air and plants, a block or two at most
                 for (int i = 0; i < 2 && level.getBlockState(at).canBeReplaced(); i++) at = at.below();
                 BlockState was = level.getBlockState(at);
@@ -262,11 +296,12 @@ public final class Collectibles {
     }
 
     /** A small hollow round a Somersloop: three by three, two high, its floor and walls left as they were. */
-    private static void pocket(ServerLevel level, BlockPos at) {
+    private static void pocket(ServerLevel level, BlockPos at, net.minecraft.world.level.@org.jspecify.annotations.Nullable ChunkPos only) {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
                 for (int dy = 0; dy <= 1; dy++) {
                     BlockPos p = at.offset(dx, dy, dz);
+                    if (!inside(only, p)) continue;
                     BlockState was = level.getBlockState(p);
                     if (was.is(Blocks.BEDROCK) || was.hasBlockEntity()) continue;
                     level.setBlock(p, Blocks.CAVE_AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
