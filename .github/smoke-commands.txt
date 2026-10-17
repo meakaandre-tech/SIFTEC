@@ -18,6 +18,7 @@ siftec selftest ownership
 siftec selftest datafix
 siftec selftest powerfix
 siftec selftest buildingfix
+siftec selftest machines
 siftec selftest state setup
 siftec selftest state check
 siftec worldtest nodes 2000
@@ -41,4 +42,4 @@ siftec worldtest geyser wet 160
 siftec worldtest processor
 siftec worldtest automate
 siftec worldtest powerchain setup
-#sleep 220
+#sleep 250

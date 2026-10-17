@@ -42,8 +42,9 @@ anything, and dispensers, open-ended pipes and contraptions putting their blocks
 across another company's claim. A company's building is dismantled only by its own members, wherever it stands; one
 nobody owns comes down only for players the land lets build there. Creative players skip claims, unlocks and costs.
 Only the Build Gun takes a building down: no hand, wrench, Deployer (but the building's own), drill, piston, contraption,
-explosion, Wither or Blueprint Designer's sneak-clear takes one of its blocks. The same holds for the HUB and the Wormhole Gateway. A block lost anyway (a command, another mod)
-brings the building down with its refund and contents, but gives nothing back for itself. Dismantled, a building's tanks
+explosion, Wither or Blueprint Designer's sneak-clear takes one of its blocks. The same holds for the HUB and the Wormhole Gateway. A block of its shell lost anyway (a command, another mod)
+brings the building down with its refund and contents, but gives nothing back for itself; one of its machines lost that
+way is put back from the building's shape. Dismantled, a building's tanks
 come back as packaged fluid (1 m3 a package; other fluids as full buckets).
 
 ## Power
@@ -56,11 +57,36 @@ takes 4, 7 or 10 wires, a machine one). `power/PowerGrids.java` balances every w
 tick, in place of New Age's own path-finding: generators give, and burn fuel for, only what is used; spare power
 charges Power Storage (100 MWh, 100 MW); a shortfall is covered from storage, and past that the fuse blows and the
 grid goes dark until it is reset (sneak-use a generator or Power Storage). Lines keep working over unloaded chunks
-(`power/WireMap.java`). The generators (`building/BuildingPower.java`): Biomass Burner 30 MW, Coal Generator 75 MW (with
-water), Fuel Generator 250 MW, Geothermal Generator (a burst at every eruption of the sulfur geyser under it, sulfuric
-acid as waste), Nuclear Power Plant 2,500 MW (Uranium and Plutonium Fuel Rods, Satisfactory's waste), and the Alien
-Power Augmenter (500 MW, +10% to its grid, +30% fed Alien Power Matrices). A New Age reactor a player builds burns the
-same rods.
+(`power/WireMap.java`). The generators make their power on real machines inside them (`building/Generators.java`),
+and give the grid only what their New Age generator coils made, collected in their carbon brushes; the share of it the
+grid draws sets how fast their fuel burns:
+
+- **Biomass Burner** (30 MW) and **Coal Generator** (75 MW): a Create boiler (a Fluid Tank over Blaze Burners) drives
+  Steam Engines, which turn a New Age generator coil. The building puts the next fuel into a burner at Satisfactory's
+  megajoules (Solid Biofuel 450 MJ, Coal 300 MJ...); the Coal Generator's boiler drinks 45 m3 of water a minute at full,
+  through its water port.
+- **Fuel Generator** (250 MW): Diesel Generators' engine block, fed at the fuel port, burning Fuel, Turbofuel, Rocket
+  Fuel or Ionized Fuel for Satisfactory's burn times (20, 7.5, 4.17 and 3 m3 a minute at full).
+- **Nuclear Power Plant** (2,500 MW): New Age's reactor (fuel acceptors, rods, heat vents) heats two 18-level boilers of
+  Steam Engines; it burns at full whatever the load, as Satisfactory 1.0's does: a Uranium Fuel Rod every 5 minutes
+  (a Plutonium one every 10), 240 m3 of water a minute, and 50 Uranium Waste (10 Plutonium Waste) a rod at its output.
+- **Geothermal Generator**: its geyser drives its turbine and coils, following the geyser's purity (impure 100, normal
+  200, pure 400 MW on average) and swinging up and down over a minute (50-150, 100-300, 200-600 MW), with sulfuric acid
+  as waste.
+- **Alien Power Augmenter** (500 MW, +10% to its grid, +30% fed Alien Power Matrices). A New Age reactor a player
+  builds burns the same rods.
+
+A building whose machines are missing or wrong (a block taken out, a save from before its shape changed) is rebuilt
+from its shape and says so in the log (`building/BuildingRepair.java`); while something not its own stands in the way
+it makes nothing at all, never power or items in code.
+
+The **Particle Accelerator** and the **Converter** run on their machines too (`building/Processors.java`): a Mixer
+packs each recipe's inputs into its Core in a Brass Basin at Satisfactory's time. In the Particle Accelerator an Encased
+Fan blows each Core up between two Crushing Wheels, whose crushing gives the result. In the Converter the Core goes on a
+Depot, a Deployer adds the recipe's second input, and an Encased Fan blowing through soul fire haunts it into the
+result; a fluid comes out in a Converter Cell an Item Drain empties into the fluid port. Their power rises from
+Satisfactory's least to its most over each recipe cycle (Particle Accelerator 250-750 or 500-1,500 MW, Converter
+100-400 MW).
 
 ## Logistics
 
@@ -194,8 +220,9 @@ lights, office furniture and cups (taken from the Shop for a few parts once owne
 
     ./gradlew build
 
-Create Fly is not on a Maven repository: put its jar at `libs/create-fly-26.3.jar` first (the CI downloads the
-`pack-26.3-latest` release of meakaandre-tech/Create-Fly). The built jar is in `build/libs/`.
+Create Fly, Create: New Age and Diesel Generators are not on a Maven repository: put their jars at
+`libs/create-fly-26.3.jar`, `libs/create-new-age-26.3.jar` and `libs/createdieselgenerators-26.3.jar` first (the CI
+downloads the latest 26.3 releases of the meakaandre-tech forks). The built jar is in `build/libs/`.
 
 The CI (`.github/workflows/build.yml`) builds on every push to `main`, starts a dedicated server with the
 pack's mods, runs the self-tests in `.github/smoke-commands*.txt` (`/siftec selftest ...`), publishes the logs

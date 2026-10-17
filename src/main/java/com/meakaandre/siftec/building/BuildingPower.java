@@ -338,6 +338,12 @@ public final class BuildingPower {
             return su;
         }
 
+        /** Its machines have their fuel (and water) but make nothing yet: a boiler heating up, an engine spinning up. */
+        @Override
+        public boolean starting() {
+            return !c.isRemoved() && !c.tripped && !c.broken && c.offered <= 0 && c.machineProblem.isEmpty();
+        }
+
         @Override
         public void generated(double su) {
             c.loadAt = level.getGameTime();

@@ -517,7 +517,8 @@ public final class BuildingsBTests {
         beltInto(level, pa, new int[]{-2, 0, 20}, new ItemStack(Items.DIAMOND), 20, 120, 64);
         pipeInto(level, pa, new int[]{2, 0, 20}, fluid("siftec:dark_matter_residue"), 8);
         BlockPos paChest = chestAt(level, pa, new int[]{0, 0, 0});
-        power(level, source, pa, 1, powered);
+        // Dark Matter Crystal draws up to 1,500 MW at the top of its cycle
+        power(level, source, pa, 4, powered);
         measures.add(new Measure("Particle Accelerator: 30 Dark Matter Crystals a minute (2 s each)", () -> made(pac), 27, 31, 1));
 
         // ---- Converter: Time Crystal (2 Diamond, 10 s: 6 a minute), its soul fire and fan turning

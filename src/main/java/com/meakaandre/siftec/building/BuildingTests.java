@@ -165,6 +165,15 @@ public final class BuildingTests {
         return n;
     }
 
+    /** A block of the building's shell: not a machine, the controller or a port. */
+    private static @org.jspecify.annotations.Nullable BlockPos shellOf(Placement p) {
+        BuildingTemplate t = BuildingTemplate.of(p.def());
+        for (BuildingTemplate.Cell cell : t.members) {
+            if (cell != t.controller && !BuildingRepair.machine(cell.state()) && !(cell.state().getBlock() instanceof PortBlock) && !cell.state().isAir()) return p.at(cell);
+        }
+        return null;
+    }
+
     private static BlockPos cellOf(Placement p, String block) {
         BuildingTemplate t = BuildingTemplate.of(p.def());
         for (BuildingTemplate.Cell cell : t.members) {
@@ -333,11 +342,19 @@ public final class BuildingTests {
         expect(source, "dismantling leaves nothing", standing(level, a) == 0 && index.count(level, controllerA) == 0 && level.getBlockState(controllerA).isAir()
             && dropsNear(level, controllerA).isEmpty(), standing(level, a) + " blocks left, " + index.count(level, controllerA) + " listed");
 
-        // breaking from the core block: the press goes (as a command or another mod might do it); the building follows
+        // breaking a block of its shell (as a command or another mod might do it); the building follows
         Placement e = new Placement(def, new BlockPos(X - 12, Y, Z), Direction.WEST, false);
         placeAsSurvival(level, e, company, wallet(2, 4));
-        BlockPos pressE = cellOf(e, "create:mechanical_press"), controllerE = e.at(t.controller);
-        level.setBlock(pressE, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+        BlockPos shellE = shellOf(e), controllerE = e.at(t.controller);
+        if (shellE != null) level.setBlock(shellE, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+        // a machine lost the same way is put back from the building's shape (BuildingRepair), the building stays up
+        Placement g = new Placement(def, new BlockPos(X - 12, Y, Z - 16), Direction.NORTH, false);
+        placeAsSurvival(level, g, company, wallet(2, 4));
+        BlockPos pressG = cellOf(g, "create:mechanical_press");
+        level.setBlock(pressG, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+        later(level, BuildingRepair.EVERY + 40, () -> expect(source, "a lost machine (its press) is put back and the building stays up",
+            level.getBlockState(pressG).is(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse("create:mechanical_press")))
+                && standing(level, g) == t.members.size(), standing(level, g) + " of " + t.members.size() + " blocks standing, " + level.getBlockState(pressG)));
         // and the controller of another one
         Placement f = new Placement(def, new BlockPos(X - 12, Y, Z + 12), Direction.NORTH, false);
         placeAsSurvival(level, f, company, wallet(2, 4));
@@ -345,7 +362,7 @@ public final class BuildingTests {
         level.setBlock(controllerF, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         later(level, 45, () -> {
             List<ItemStack> dropsE = dropsNear(level, controllerE);
-            expect(source, "breaks with refund from its core block", standing(level, e) == 0 && index.count(level, controllerE) == 0
+            expect(source, "breaks with refund from a block of its shell", standing(level, e) == 0 && index.count(level, controllerE) == 0
                     && count(dropsE, "create:iron_sheet") == 2 && count(dropsE, "siftec:iron_rod") == 4,
                 standing(level, e) + " blocks left, dropped " + count(dropsE, "create:iron_sheet") + " sheets and " + count(dropsE, "siftec:iron_rod") + " rods");
             List<ItemStack> dropsF = dropsNear(level, controllerF);
@@ -353,8 +370,8 @@ public final class BuildingTests {
                     && count(dropsF, "create:iron_sheet") == 2 && count(dropsF, "siftec:iron_rod") == 4,
                 standing(level, f) + " blocks left, dropped " + count(dropsF, "create:iron_sheet") + " sheets and " + count(dropsF, "siftec:iron_rod") + " rods");
             // B and C stay up for the restart test
-            report(source, "result: " + passed + " passed, " + failed + " failed");
         });
+        later(level, BuildingRepair.EVERY + 60, () -> report(source, "result: " + passed + " passed, " + failed + " failed"));
     }
 
     /** Places as a survival player of the company would (cost taken, land checked); dev buildings are allowed here. */
