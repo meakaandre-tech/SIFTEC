@@ -207,6 +207,10 @@ lang.update({
     "siftec.power.no_geyser": "no geyser under it",
     "siftec.power.no_geyser_place": "A Geothermal Generator has to stand over a sulfur geyser, with a block of air over the geyser's water",
     "siftec.power.waiting": "waiting for the next eruption",
+    "siftec.power.wrong_fuel": "it does not burn that",
+    "siftec.power.no_engine": "its engine is missing (Create: Diesel Generators is not installed)",
+    "siftec.power.starting": "its machines are starting up",
+    "siftec.power.geyser": "on a %s geyser",
     "siftec.power.acid_full": "acid tank full: pipe the sulfuric acid away",
     "siftec.power.lines_full": "That connector takes no more wires",
     "siftec.power.too_long": "Too long: this wire can reach %s blocks",
@@ -1050,6 +1054,7 @@ lang.update({
     "siftec.building.mined": "%s mined",
     "siftec.building.no_node": "no node under it",
     "siftec.building.full": "output full",
+    "siftec.building.blocked": "something stands where its machines go: clear it and the building rebuilds them",
     "siftec.building.stopped": "not turning",
     "siftec.building.storage": "%s of %s slots used",
     # work package 9

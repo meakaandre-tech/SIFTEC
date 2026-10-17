@@ -402,9 +402,9 @@ public final class BuildingPower {
             BlockPos vent = vent(level, c);
             if (vent == null || c.problem.equals("siftec.power.acid_full")) return 0;
             return Power.su(switch (com.meakaandre.siftec.geyser.GeyserPurity.of(level, vent)) {
-                case IMPURE -> 100;
-                case PURE -> 400;
-                default -> 200;
+                case IMPURE -> 100.0;
+                case PURE -> 400.0;
+                default -> 200.0;
             });
         }
 

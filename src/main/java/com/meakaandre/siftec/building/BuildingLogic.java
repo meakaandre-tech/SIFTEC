@@ -117,7 +117,7 @@ public final class BuildingLogic {
      */
     static void formTanks(ServerLevel level, ControllerBlockEntity c) {
         List<BlockPos> tanks = cells(c, create("fluid_tank"));
-        tanks.sort(java.util.Comparator.comparingInt(BlockPos::getY).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ));
+        tanks.sort(java.util.Comparator.<BlockPos>comparingInt(BlockPos::getY).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ));
         for (BlockPos pos : tanks) {
             if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity tank && tank.isController()
                 && tank.getWidth() == 1 && tank.getHeight() == 1) {
