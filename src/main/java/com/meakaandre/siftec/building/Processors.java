@@ -80,6 +80,13 @@ public final class Processors {
         // the Mixer makes only this recipe's Core (none for a recipe with no Core)
         ItemStack want = r.core() != null ? new ItemStack(ProcessorRecipe.item(r.core())) : new ItemStack(cellItem());
         if (!ItemStack.isSameItem(basin.getFilter().getFilter(), want)) basin.getFilter().setFilter(want);
+        // a Mixer looks for its next recipe only when its Basin's contents change: one left waiting with a full Basin (the
+        // inputs stopped coming while it waited out the last recipe) looks again once a second
+        BlockPos mixer = BuildingLogic.cell(c, create("mechanical_mixer"));
+        if (mixer != null && level.getGameTime() % 20 == 0 && level.getGameTime() >= c.nextCraft
+            && level.getBlockEntity(mixer) instanceof com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity m && !m.running) {
+            m.basinChecker.scheduleUpdate();
+        }
         if (def.id().equals("particle_accelerator")) accelerate(level, c, r, basin);
         else convert(level, c, r, basin);
     }
