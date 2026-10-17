@@ -12,5 +12,6 @@ execute in minecraft:the_nether run siftec selftest nether
 siftec selftest state verify
 siftec worldtest powerchain restart
 siftec selftest vehicles restart
+siftec selftest always restart
 #sleep 40
 siftec selftest tb crate persisted

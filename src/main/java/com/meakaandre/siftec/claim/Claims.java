@@ -12,11 +12,7 @@ import com.meakaandre.siftec.save.JsonSavedData;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -24,8 +20,6 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
@@ -34,7 +28,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.TicketType;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Enemy;
@@ -59,24 +52,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Land claims. A company's first HUB claims the 5 by 5 chunks around it and a Claim Marker the 3 by 3 around it.
  * Inside a claim only the company's members (and their machines) can place, break or use anything; explosions,
  * fire and fluids from outside, pistons, hoppers and funnels reaching across the border are stopped as well.
- * Claimed chunks stay loaded while at least one member is online, with a ticket of our own that is never saved.
+ * A claim keeps no chunk loaded: its factories keep running anyway, simulated while their chunks do not tick
+ * ({@link com.meakaandre.siftec.sim.Factories}).
  */
 public final class Claims {
     public static final int HUB_RADIUS = 2, MARKER_RADIUS = 1, HUB_SPACING = 8;
     public static final int HUB_CHUNKS = 25, MARKER_CHUNKS = 9;
-    /** Radius 2 is the ticket level of a /forceload: the chunk itself ticks entities and block entities. */
-    private static final int TICKET_RADIUS = 2;
-    /** Keeps claimed chunks loaded. Not saved, so after a restart nothing is loaded until a member joins. */
-    public static final TicketType TICKET = Registry.register(BuiltInRegistries.TICKET_TYPE, Siftec.id("claim"),
-        new TicketType(TicketType.NO_TIMEOUT, TicketType.FLAG_LOADING | TicketType.FLAG_SIMULATION | TicketType.FLAG_KEEP_DIMENSION_ACTIVE));
-    /** The chunks this mod holds a ticket on right now, per dimension. */
-    private static final Map<ResourceKey<Level>, LongSet> LOADED = new HashMap<>();
 
     /** One claimed chunk: who holds it and which block (HUB or marker) made the claim. */
     public static class Claim {
@@ -89,8 +75,6 @@ public final class Claims {
         public static class Stored {
             /** "dimension|chunk" -> claim */
             Map<String, Claim> chunks = new HashMap<>();
-            /** Set once the vanilla force-loads older versions put on claimed chunks have been taken off. */
-            boolean ticketsMigrated;
         }
 
         static final Codec<Data> CODEC = JsonSavedData.codec(Data::new);
@@ -153,7 +137,6 @@ public final class Claims {
         Data data = Data.get(server);
         for (Claim claim : data.chunks().values()) if (claim.company.equals(from)) claim.company = to;
         changed(server);
-        refreshLoading(server);
     }
 
     public static @Nullable Claim at(Level level, int chunkX, int chunkZ) {
@@ -262,11 +245,6 @@ public final class Claims {
         UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> entityCheck(player, level, entity));
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) ->
             entity instanceof Player ? InteractionResult.PASS : entityCheck(player, level, entity));
-        ServerPlayerEvents.JOIN.register(player -> refreshLoading(player.level().getServer()));
-        // the player is still in the player list while this runs, so they are left out by hand
-        ServerPlayerEvents.LEAVE.register(player -> refreshLoading(player.level().getServer(), player.getUUID()));
-        ServerLifecycleEvents.SERVER_STARTED.register(Claims::migrateTickets);
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LOADED.clear());
         ServerChunkEvents.CHUNK_LOAD.register(Claims::heal);
         StateSelfTest.register();
     }
@@ -394,7 +372,6 @@ public final class Claims {
             }
         }
         changed(level.getServer());
-        refreshLoading(level.getServer());
         return claimed;
     }
 
@@ -416,7 +393,6 @@ public final class Claims {
         if (gone.isEmpty()) return 0;
         for (String key : gone) chunks.remove(key);
         changed(level.getServer());
-        refreshLoading(level.getServer());
         return gone.size();
     }
 
@@ -439,89 +415,10 @@ public final class Claims {
         return block instanceof HubBlock hub && !hub.gateway || block instanceof ClaimMarkerBlock;
     }
 
-    /** Older versions force-loaded claims the vanilla way, which is saved with the world; take those off once. */
-    private static void migrateTickets(MinecraftServer server) {
-        Data data = Data.get(server);
-        if (data.stored.ticketsMigrated || data.broken()) return;
-        int n = 0;
-        for (ServerLevel level : server.getAllLevels()) {
-            Long2ObjectMap<Claim> claims = data.index.get(level.dimension());
-            if (claims == null) continue;
-            for (long packed : claims.keySet()) {
-                if (level.getForceLoadedChunks().contains(packed)) {
-                    level.setChunkForced(ChunkPos.getX(packed), ChunkPos.getZ(packed), false);
-                    n++;
-                }
-            }
-        }
-        data.stored.ticketsMigrated = true;
-        data.setDirty();
-        Siftec.LOGGER.info("SIFTEC: took the old saved force-load off {} claimed chunks; claims now load only while a member is online", n);
-    }
-
-    public static void refreshLoading(MinecraftServer server) {
-        refreshLoading(server, (UUID) null);
-    }
-
-    /** Keeps claimed chunks loaded while a member of the company is online, and lets them go when none is. */
-    public static void refreshLoading(MinecraftServer server, @Nullable UUID leaving) {
-        refreshLoading(server, uuid -> !uuid.equals(leaving) && server.getPlayerList().getPlayer(uuid) != null);
-    }
-
-    /** The same, with who counts as online given (the self-test has no players to join). */
-    public static void refreshLoading(MinecraftServer server, java.util.function.Predicate<UUID> isOnline) {
-        CompanyData companies = CompanyData.get(server);
-        Map<String, Boolean> online = new HashMap<>();
-        Data data = Data.get(server);
-        for (ServerLevel level : server.getAllLevels()) {
-            LongSet want = new LongOpenHashSet();
-            Long2ObjectMap<Claim> claims = data.index.get(level.dimension());
-            if (claims != null) {
-                for (Long2ObjectMap.Entry<Claim> e : claims.long2ObjectEntrySet()) {
-                    boolean on = online.computeIfAbsent(e.getValue().company, id -> {
-                        Company company = companies.byId(id);
-                        if (company == null) return false;
-                        for (String member : company.members) {
-                            UUID uuid;
-                            try {
-                                uuid = UUID.fromString(member);
-                            } catch (IllegalArgumentException ex) {
-                                continue;
-                            }
-                            if (isOnline.test(uuid)) return true;
-                        }
-                        return false;
-                    });
-                    if (on) want.add(e.getLongKey());
-                }
-            }
-            LongSet have = LOADED.computeIfAbsent(level.dimension(), k -> new LongOpenHashSet());
-            for (long packed : new LongOpenHashSet(have)) {
-                if (want.contains(packed)) continue;
-                level.getChunkSource().removeTicketWithRadius(TICKET, new ChunkPos(ChunkPos.getX(packed), ChunkPos.getZ(packed)), TICKET_RADIUS);
-                have.remove(packed);
-            }
-            for (long packed : want) {
-                if (!have.add(packed)) continue;
-                level.getChunkSource().addTicketWithRadius(TICKET, new ChunkPos(ChunkPos.getX(packed), ChunkPos.getZ(packed)), TICKET_RADIUS);
-            }
-        }
-    }
-
-    /** How many chunks this mod keeps loaded right now. */
-    public static int loadedCount() {
-        int n = 0;
-        for (LongSet set : LOADED.values()) n += set.size();
-        return n;
-    }
-
     /** For the self-test: removes every claim held by the company. */
     public static void releaseCompany(MinecraftServer server, String company) {
         Data data = Data.get(server);
-        if (data.chunks().values().removeIf(claim -> claim.company.equals(company))) {
-            changed(server);
-            refreshLoading(server);
-        }
+        if (data.chunks().values().removeIf(claim -> claim.company.equals(company))) changed(server);
     }
 
     public static int total(MinecraftServer server) {

@@ -242,6 +242,10 @@ public final class MapHud {
             double sx = v.sx(pin.x() + 0.5), sy = v.sy(pin.z() + 0.5);
             if (v.inside(sx, sy, 8)) MapIcons.centred(g, MapIcons.PIN, (int) Math.round(sx), (int) Math.round(sy) - 7, 0xFFFFA530);
         }
+        for (MapPayloads.Mover m : MapClient.movers) {
+            double sx = v.sx(m.x()), sy = v.sy(m.z());
+            if (v.inside(sx, sy, 8)) MapDraw.mover(g, m, (float) sx, (float) sy);
+        }
         if (MapFilters.showsPlayers()) {
             for (MapPayloads.Mate mate : MapClient.mates) {
                 double sx = v.sx(mate.x()), sy = v.sy(mate.z());

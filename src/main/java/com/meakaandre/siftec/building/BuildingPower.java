@@ -287,6 +287,22 @@ public final class BuildingPower {
         return mbPerM3;
     }
 
+    /** The waste a fuel rod leaves (its id and how many), or null if it leaves none. */
+    public static String @Nullable [] wasteOf(ItemStack rod) {
+        readFuel();
+        String id = BuiltInRegistries.ITEM.getKey(rod.getItem()).toString();
+        String waste = WASTE.get(id);
+        return waste == null ? null : new String[]{waste, String.valueOf(WASTE_COUNT.getOrDefault(id, 1))};
+    }
+
+    /** True for the buildings that hold their grid's fuse: generators, the Augmenter and Power Storage. */
+    public static boolean holdsFuse(BuildingDef def) {
+        return switch (def.power()) {
+            case "biomass", "coal", "fuel", "nuclear", "geothermal", "augmenter", "storage" -> true;
+            default -> false;
+        };
+    }
+
     /** True if the waste a fuel rod leaves fits into the plant's output now. */
     static boolean wasteFits(ControllerBlockEntity c, ItemStack rod) {
         readFuel();

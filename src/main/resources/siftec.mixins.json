@@ -84,6 +84,7 @@
     "client.BeltVisualNoPulleyMixin",
     "client.BuildGunNudgeMixin",
     "client.BuildGunScrollMixin",
+    "client.DebugEntriesInvoker",
     "client.ContainerScreenAccessor",
     "client.ScreenInvoker"
   ],

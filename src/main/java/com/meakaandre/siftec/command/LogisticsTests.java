@@ -466,37 +466,64 @@ public final class LogisticsTests {
                 a != null && a.state == DronePortBlockEntity.IDLE && a.fuel().getCount() == 2 && a.items.getItem(PortContainer.OUT).isEmpty() && inside == 5,
                 (a == null ? "home port missing" : "home state " + a.state + ", fire charges " + a.fuel().getCount()) + "; arrived " + arrived + " holding " + inside);
         });
-        // a far port in land nobody has loaded: the drone waits a minute there, gives up and brings the package home,
-        // where it waits to leave again (it is not dropped, and the drone does not hang about for ever)
-        BlockPos lonely = home.south(4), nowhere = home.offset(20_000, 0, 0);
+        // a far port whose chunk does not tick (work package 17): the drone unloads there all the same, into the
+        // simulation's record of that port, and comes home; loaded again, the port holds the package
+        BlockPos lonely = home.south(4), nowhere = home.offset(5_000, 0, 0);
+        level.setChunkForced(nowhere.getX() >> 4, nowhere.getZ() >> 4, true);
+        level.getChunk(nowhere.getX() >> 4, nowhere.getZ() >> 4);
+        level.setBlock(nowhere.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(nowhere, ModBlocks.DRONE_PORT.get().defaultBlockState(), Block.UPDATE_ALL);
+        if (level.getBlockEntity(nowhere) instanceof DronePortBlockEntity faraway) {
+            faraway.companyId = c.id;
+            faraway.setChanged();
+        }
         level.setBlock(lonely, ModBlocks.DRONE_PORT.get().defaultBlockState(), Block.UPDATE_ALL);
         if (!(level.getBlockEntity(lonely) instanceof DronePortBlockEntity stray)) return;
         stray.companyId = c.id;
         stray.hasDrone = true;
         stray.destination = nowhere;
-        stray.items.setItem(PortContainer.FUEL, new ItemStack(Items.FIRE_CHARGE, 64));
-        stray.items.setItem(PortContainer.OUT, PackageItem.containing(List.of(new ItemStack(Items.GOLD_INGOT, 3))));
         stray.setChanged();
-        later(level, 60, () -> {
+        // the far port ticks once (the simulation learns of it), then its chunk is let go; then the drone sets off
+        later(level, 60, () -> level.setChunkForced(nowhere.getX() >> 4, nowhere.getZ() >> 4, false));
+        later(level, 140, () -> {
+            if (!(level.getBlockEntity(lonely) instanceof DronePortBlockEntity p)) return;
+            p.items.setItem(PortContainer.FUEL, new ItemStack(Items.FIRE_CHARGE, 64));
+            p.items.setItem(PortContainer.OUT, PackageItem.containing(List.of(new ItemStack(Items.GOLD_INGOT, 3))));
+            p.setChanged();
+        });
+        later(level, 200, () -> {
             if (level.getBlockEntity(lonely) instanceof DronePortBlockEntity p) {
-                expect(source, "a drone sets off for a port in unloaded land", p.state == DronePortBlockEntity.OUTBOUND && !level.isLoaded(nowhere), "state " + p.state);
+                var far = com.meakaandre.siftec.sim.Factories.node(level, nowhere);
+                expect(source, "a drone sets off for a port whose chunk does not tick", p.state == DronePortBlockEntity.OUTBOUND && !level.isLoaded(nowhere)
+                    && far != null && far.sim, "state " + p.state + ", far port " + (far == null ? "unknown" : far.sim ? "simulated" : "not simulated"));
                 p.land();
             }
         });
-        later(level, 60 + DronePortBlockEntity.GIVE_UP_TICKS + 60, () -> {
-            if (level.getBlockEntity(lonely) instanceof DronePortBlockEntity p) {
-                expect(source, "after a minute waiting at the unloaded port the drone gives up and heads home",
-                    p.gaveUp && p.state == DronePortBlockEntity.HOMEBOUND, "state " + p.state + ", gave up " + p.gaveUp);
-                p.land();
-            }
-        });
-        later(level, 60 + DronePortBlockEntity.GIVE_UP_TICKS + 90, () -> {
+        later(level, 260, () -> {
             DronePortBlockEntity p = level.getBlockEntity(lonely) instanceof DronePortBlockEntity q ? q : null;
-            ItemStack back = p == null ? ItemStack.EMPTY : p.items.getItem(PortContainer.OUT);
-            int gold = PackageItem.isPackage(back) ? countIn(PackageItem.getContents(back), Items.GOLD_INGOT) : 0;
-            expect(source, "home again, the port holds the package among those waiting to leave",
-                p != null && p.state == DronePortBlockEntity.IDLE && gold == 3 && "siftec.drone.gave_up".equals(p.statusKey()),
-                p == null ? "port missing" : "state " + p.state + ", waiting to leave " + back + ", status " + p.statusKey());
+            var far = com.meakaandre.siftec.sim.Factories.node(level, nowhere);
+            long arrived = 0;
+            if (far != null) for (int i = 10; i < far.slots.size(); i++) if (!far.slots.get(i).empty()) arrived += far.slots.get(i).count;
+            expect(source, "there it unloads into the simulated port and heads home: no waiting, nothing brought back",
+                p != null && p.state == DronePortBlockEntity.HOMEBOUND && arrived == 1 && !level.isLoaded(nowhere),
+                p == null ? "port missing" : "state " + p.state + ", packages at the far port " + arrived);
+            if (p != null) p.land();
+        });
+        later(level, 300, () -> {
+            DronePortBlockEntity p = level.getBlockEntity(lonely) instanceof DronePortBlockEntity q ? q : null;
+            expect(source, "home again, nothing waits to leave", p != null && p.state == DronePortBlockEntity.IDLE && p.items.empty(PortContainer.OUT, PortContainer.FUEL),
+                p == null ? "port missing" : "state " + p.state + ", status " + p.statusKey());
+            // the far port's chunk loads again: the catch-up puts the package in its arrivals
+            level.setChunkForced(nowhere.getX() >> 4, nowhere.getZ() >> 4, true);
+            level.getChunk(nowhere.getX() >> 4, nowhere.getZ() >> 4);
+        });
+        later(level, 360, () -> {
+            DronePortBlockEntity far = level.getBlockEntity(nowhere) instanceof DronePortBlockEntity q ? q : null;
+            ItemStack arrived = far == null ? ItemStack.EMPTY : far.items.getItem(PortContainer.IN);
+            int gold = PackageItem.isPackage(arrived) ? countIn(PackageItem.getContents(arrived), Items.GOLD_INGOT) : 0;
+            expect(source, "loaded again, the far port holds the package (3 gold ingots) among its arrivals", gold == 3,
+                far == null ? "port missing" : "arrivals " + arrived);
+            level.setChunkForced(nowhere.getX() >> 4, nowhere.getZ() >> 4, false);
         });
     }
 

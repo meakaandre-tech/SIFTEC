@@ -204,6 +204,40 @@ public final class MapPayloads {
         }
     }
 
+    /** A vehicle on its route or a drone in flight, as the map shows it (driven by time where its land does not tick). */
+    public record Mover(String kind, double x, double z, float yaw, boolean simulated) {
+        void write(FriendlyByteBuf buf) {
+            buf.writeUtf(kind);
+            buf.writeDouble(x);
+            buf.writeDouble(z);
+            buf.writeFloat(yaw);
+            buf.writeBoolean(simulated);
+        }
+
+        static Mover read(FriendlyByteBuf buf) {
+            return new Mover(buf.readUtf(32), buf.readDouble(), buf.readDouble(), buf.readFloat(), buf.readBoolean());
+        }
+    }
+
+    /** Server to client, once a second: the company's vehicles and drones in the player's dimension, where they are or would be. */
+    public record Movers(List<Mover> movers) implements CustomPacketPayload {
+        public static final Type<Movers> TYPE = typeOf("map_movers");
+        public static final StreamCodec<RegistryFriendlyByteBuf, Movers> CODEC = StreamCodec.of((buf, p) -> {
+            buf.writeVarInt(p.movers.size());
+            for (Mover m : p.movers) m.write(buf);
+        }, buf -> {
+            int n = buf.readVarInt();
+            List<Mover> list = new ArrayList<>(n);
+            for (int i = 0; i < n; i++) list.add(Mover.read(buf));
+            return new Movers(list);
+        });
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /**
      * Server to client, from the smoke run's {@code /siftec worldtest map}: opens or closes the map, centred and zoomed,
      * or switches a filter (key presses under the CI's virtual display are not reliable enough).

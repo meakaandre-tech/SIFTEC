@@ -179,6 +179,17 @@ public final class MapDraw {
         MapIcons.turned(g, MapIcons.ARROW, x, y, (float) Math.toRadians(mate.yaw() + 180), MATE);
     }
 
+    /** A vehicle on its route or a drone in flight: its icon, brighter where it is really there, dimmer where it is driven by time. */
+    public static void mover(GuiGraphicsExtractor g, MapPayloads.Mover m, float x, float y) {
+        int icon = m.kind().equals("drone") ? MapIcons.DRONE : MapIcons.TRUCK;
+        MapIcons.centred(g, icon, Math.round(x), Math.round(y), m.simulated() ? 0xC0D8B070 : 0xFFFFC060);
+    }
+
+    /** The name the map gives a vehicle or drone. */
+    public static Component moverName(MapPayloads.Mover m) {
+        return m.kind().equals("drone") ? Component.translatable("siftec.map.drone") : Component.translatable("entity.siftec." + m.kind());
+    }
+
     /** The player themself. */
     public static void self(GuiGraphicsExtractor g, float x, float y) {
         Minecraft mc = Minecraft.getInstance();
