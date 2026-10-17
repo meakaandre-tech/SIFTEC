@@ -660,8 +660,17 @@ public final class MachineTests {
                 if (!st.isEmpty()) b.append(' ').append(st);
             }
             b.append(", filter ").append(basin.getFilter().getFilter());
-            Storage<FluidVariant> tanks = FluidStorage.SIDED.find(level, basin.getBlockPos(), null);
+            Storage<FluidVariant> tanks = ProductionLogic.fluids(level, basin.getBlockPos(), null);
             if (tanks != null) for (StorageView<FluidVariant> v : tanks) if (!v.isResourceBlank() && v.getAmount() > 0) b.append(", ").append(mb(v.getAmount())).append(" mB ").append(BuiltInRegistries.FLUID.getKey(v.getResource().getFluid()));
+        }
+        BlockPos mixer = cell(c, "create:mechanical_mixer");
+        if (mixer != null && level.getBlockEntity(mixer) instanceof com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity m) {
+            b.append("; mixer ").append(m.getSpeed()).append(" RPM, running ").append(m.running).append(' ').append(m.runningTicks).append('/').append(m.processingTicks)
+                .append(", next craft in ").append(c.nextCraft - level.getGameTime());
+        }
+        for (int k = 0; k < 3; k++) {
+            Port fp = port(level, c, PortBlock.Kind.FLUID_IN, k);
+            if (fp != null) b.append("; fluid port ").append(fp.pos().toShortString()).append(" reaches ").append(FluidStorage.SIDED.find(level, fp.pos(), fp.side()) != null);
         }
         BlockPos gap = Processors.gap(c), fan = cell(c, "create:encased_fan");
         if (gap != null && level.getBlockEntity(gap) instanceof com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity crusher) {

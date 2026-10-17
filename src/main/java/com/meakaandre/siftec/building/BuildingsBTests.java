@@ -636,6 +636,8 @@ public final class BuildingsBTests {
             && pac != null && pac.filter.is(item("siftec:dark_matter_crystal")), (mc == null ? "-" : mc.filter.toString()) + ", " + (pac == null ? "-" : pac.filter.toString()));
         long before = pac == null ? -1 : pac.made;
         // its belt ran dry before the restart: more diamonds through its input port, and the residue piped in again
+        report(source, "restart: the Particle Accelerator as it loaded: " + MachineTests.inside(level, controller(level, pa)));
+        later(level, 200, () -> report(source, "restart: the Particle Accelerator 10 s on: " + MachineTests.inside(level, controller(level, pa))));
         BlockPos diamondsIn = pa.at(-2, 0, 20);
         var port = ItemStorage.SIDED.find(level, diamondsIn, level.getBlockState(diamondsIn).hasProperty(PortBlock.FACING)
             ? level.getBlockState(diamondsIn).getValue(PortBlock.FACING) : null);
