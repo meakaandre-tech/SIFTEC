@@ -84,7 +84,7 @@ public final class BuildingRepair {
             cells.add(pos.asLong());
             if (pos.equals(at)) continue;
             BlockState now = level.getBlockState(pos);
-            if (paint.fits(cell.state(), now.getBlock(), storage)) continue;
+            if (paint.fits(cell, now.getBlock(), storage)) continue;
             // a missing piece of shell on a building of the current shape is left to bring it down
             if (!reshape && !machine(cell.state())) continue;
             boolean ours = at.equals(BuildingIndex.controllerOf(level, pos));
@@ -93,7 +93,7 @@ public final class BuildingRepair {
                 continue;
             }
             if (!now.isAir()) spilled.addAll(Buildings.contents(level, pos));
-            level.setBlock(pos, p.orient(paint.look(cell.state(), storage)), Block.UPDATE_ALL);
+            level.setBlock(pos, p.orient(paint.look(cell, storage)), Block.UPDATE_ALL);
             if (index != null) index.put(level, pos, at);
             rebuilt.add(pos);
         }

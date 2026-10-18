@@ -1,0 +1,59 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "create:block/brass_casing",
+    "side": "create:block/brass_casing",
+    "face": "minecraft:block/white_concrete"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        4,
+        0
+      ],
+      "to": [
+        16,
+        12,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#side"
+        },
+        "down": {
+          "texture": "#side"
+        },
+        "south": {
+          "texture": "#face"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        5,
+        1.5
+      ],
+      "to": [
+        15,
+        11,
+        1.51
+      ],
+      "faces": {
+        "south": {
+          "texture": "#face"
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.sink;
 
+import com.meakaandre.siftec.building.Paint;
 import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.cosmetic.Banners;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
@@ -58,7 +60,7 @@ public class ShopMenu extends ChestMenu {
     }
 
     /** The picture for an entry: the thing itself where it is an item, a stand-in otherwise. */
-    static Item icon(Shop.Entry e) {
+    public static Item icon(Shop.Entry e) {
         return switch (e.kind()) {
             case "customizer" -> ModItems.CUSTOMIZER.get();
             case "swatch" -> item("minecraft:orange_dye");
@@ -75,7 +77,45 @@ public class ShopMenu extends ChestMenu {
             }
             case "decor" -> ModBlocks.DECOR.containsKey(e.arg()) ? ModBlocks.DECOR.get(e.arg()).asItem() : Items.BARRIER;
             case "cup" -> ModItems.CUPS.containsKey(e.arg()) ? ModItems.CUPS.get(e.arg()) : Items.BARRIER;
+            case "sign" -> e.arg().equals("label_sign") ? ModBlocks.LABEL_SIGN.get().asItem() : ModBlocks.DISPLAY_SIGN.get().asItem();
+            case "unlock" -> Items.PAINTING;
+            case "material" -> {
+                String kind = Shop.materials().getOrDefault(e.arg(), "");
+                String built = switch (kind) {
+                    case "wall" -> "minecraft:white_concrete";
+                    case "roof" -> "minecraft:orange_terracotta";
+                    default -> Paint.FOUNDATION_TOP;
+                };
+                String block = Shop.materialBlock(e.arg(), built);
+                yield item(block == null ? "minecraft:barrier" : block);
+            }
+            case "pattern" -> e.arg().equals("factory_zone") ? Items.BLACK_CONCRETE : Items.YELLOW_CONCRETE;
+            case "emote" -> Items.ARMOR_STAND;
+            case "helmet" -> switch (e.arg()) {
+                case "gold" -> Items.GOLDEN_HELMET;
+                case "copper" -> item("minecraft:copper_helmet");
+                case "diamond" -> Items.DIAMOND_HELMET;
+                case "turtle" -> Items.TURTLE_HELMET;
+                default -> Items.NETHERITE_HELMET;
+            };
+            case "trim" -> {
+                String[] trim = Shop.trims().get(e.arg());
+                yield trim == null ? Items.BARRIER : item(trim[0] + "_armor_trim_smithing_template");
+            }
+            case "banner" -> Items.WHITE_BANNER;
+            case "golden_cart" -> item("create:cart_assembler");
+            case "boom_box" -> ModBlocks.BOOM_BOX.get().asItem();
+            case "tape" -> ModItems.TAPES.containsKey(e.arg()) ? ModItems.TAPES.get(e.arg()) : Items.BARRIER;
             default -> Items.BARRIER;
+        };
+    }
+
+    /** What taking one of an owned entry costs in parts, if anything. */
+    static Shop.@org.jspecify.annotations.Nullable Goods goods(Shop.Entry e) {
+        return switch (e.kind()) {
+            case "decor", "cup", "sign" -> Shop.goods(e.arg());
+            case "boom_box" -> Shop.goods("boom_box");
+            default -> null;
         };
     }
 
@@ -103,7 +143,7 @@ public class ShopMenu extends ChestMenu {
             if (e.kind().equals("swatch")) lore.add(Component.translatable("siftec.shop.swatches", company.swatches.size(), Shop.MAX_SWATCHES).withStyle(ChatFormatting.GRAY));
             if (owned) {
                 lore.add(Component.translatable(e.kind().equals("swatch") ? "siftec.shop.full" : "siftec.shop.owned").withStyle(ChatFormatting.GREEN));
-                Shop.Goods goods = e.kind().equals("decor") || e.kind().equals("cup") ? Shop.goods(e.arg()) : null;
+                Shop.Goods goods = goods(e);
                 if (goods != null) {
                     for (Milestone.Cost cost : goods.cost()) {
                         int carried = Math.min(cost.carried(player.getInventory()), cost.count());
@@ -115,11 +155,17 @@ public class ShopMenu extends ChestMenu {
                     } else {
                         lore.add(Component.translatable("siftec.shop.take_free").withStyle(ChatFormatting.YELLOW));
                     }
-                } else if (e.kind().equals("customizer")) {
+                } else if (e.kind().equals("customizer") || e.kind().equals("tape")) {
                     lore.add(Component.translatable("siftec.shop.take_free").withStyle(ChatFormatting.YELLOW));
+                } else if (e.kind().equals("banner")) {
+                    lore.add(Component.translatable(company.banner.isEmpty() ? "siftec.shop.banner_none" : "siftec.shop.banner_take").withStyle(ChatFormatting.YELLOW));
+                    lore.add(Component.translatable("siftec.shop.banner_set").withStyle(ChatFormatting.GRAY));
+                } else {
+                    lore.add(Component.translatable("siftec.shop.use." + e.kind()).withStyle(ChatFormatting.GRAY));
                 }
             } else {
                 lore.add(Component.translatable("siftec.shop.price", e.coupons()).withStyle(have >= e.coupons() ? ChatFormatting.GREEN : ChatFormatting.RED));
+                if (!e.inSeason()) lore.add(Component.translatable("siftec.shop.season", months(e.months())).withStyle(ChatFormatting.GOLD));
             }
             ItemStack stack = SinkMenu.button(icon(e), Component.translatable("siftec.shop.entry." + e.id()), lore);
             if (owned) stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
@@ -155,7 +201,21 @@ public class ShopMenu extends ChestMenu {
         refresh();
     }
 
+    /** "December", "October": a holiday set's months. */
+    static Component months(List<Integer> months) {
+        net.minecraft.network.chat.MutableComponent out = Component.empty();
+        for (int i = 0; i < months.size(); i++) {
+            if (i > 0) out.append(", ");
+            out.append(Component.translatable("siftec.month." + months.get(i)));
+        }
+        return out;
+    }
+
     private void buy(Shop.Entry e) {
+        if (!e.inSeason() && !player.hasInfiniteMaterials()) {
+            player.sendOverlayMessage(Component.translatable("siftec.shop.out_of_season", months(e.months())));
+            return;
+        }
         Item coupon = ModItems.FICSIT_COUPON.get();
         if (!player.hasInfiniteMaterials()) {
             if (player.getInventory().countItem(coupon) < e.coupons()) {
@@ -174,8 +234,23 @@ public class ShopMenu extends ChestMenu {
         ItemStack made;
         switch (e.kind()) {
             case "customizer" -> made = new ItemStack(ModItems.CUSTOMIZER.get());
-            case "decor", "cup" -> {
-                Shop.Goods goods = Shop.goods(e.arg());
+            case "tape" -> made = new ItemStack(icon(e));
+            case "banner" -> {
+                ItemStack held = player.getMainHandItem();
+                if (held.getItem() instanceof net.minecraft.world.item.BannerItem) {
+                    company.banner = Banners.write(player.level().getServer(), held);
+                    Companies.tell(player.level().getServer(), company, Component.translatable("siftec.shop.banner_new").withStyle(ChatFormatting.GOLD));
+                    return;
+                }
+                ItemStack copy = Banners.read(player.level().getServer(), company);
+                if (copy.isEmpty()) {
+                    player.sendOverlayMessage(Component.translatable("siftec.shop.banner_none"));
+                    return;
+                }
+                made = copy;
+            }
+            case "decor", "cup", "sign", "boom_box" -> {
+                Shop.Goods goods = goods(e);
                 if (goods == null) return;
                 if (!goods.needs().isEmpty() && !company.has(goods.needs()) && !player.hasInfiniteMaterials()) {
                     Milestone needs = Milestones.get(goods.needs());
@@ -194,7 +269,7 @@ public class ShopMenu extends ChestMenu {
                 made = new ItemStack(icon(e));
             }
             default -> {
-                player.sendOverlayMessage(Component.translatable("siftec.shop.owned"));
+                player.sendOverlayMessage(Component.translatable("siftec.shop.use." + e.kind()));
                 return;
             }
         }

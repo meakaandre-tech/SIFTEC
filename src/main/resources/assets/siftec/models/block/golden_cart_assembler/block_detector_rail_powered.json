@@ -1,0 +1,9 @@
+{
+  "parent": "create:block/cart_assembler/block_detector_rail_powered",
+  "textures": {
+    "4": "minecraft:block/gold_block",
+    "6": "minecraft:block/raw_gold_block",
+    "translation_chassis_side": "minecraft:block/gold_block",
+    "particle": "minecraft:block/gold_block"
+  }
+}

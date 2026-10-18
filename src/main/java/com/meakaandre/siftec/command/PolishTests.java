@@ -207,6 +207,7 @@ public final class PolishTests {
             run(source, "9 legacy", () -> legacy(source, level));
             run(source, "10 HUB burners", () -> hubBurners(source, level));
             run(source, "2 geysers", () -> geysers(source, level));
+            run(source, "1 shop", () -> ShopTests.run(source, level, X + 120, Y, Z + 100));
             finish(source, level);
         });
         report(source, "test site ready; the checks report over the next minute");

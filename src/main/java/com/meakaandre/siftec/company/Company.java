@@ -41,6 +41,8 @@ public class Company {
     public int couponsPrinted;
     /** What the company has bought in the AWESOME Shop: entry ids (a swatch slot counts in {@link #swatches}). */
     public Set<String> shop = new LinkedHashSet<>();
+    /** The company's banner (the AWESOME Shop's banner designer): the banner item, as JSON; empty for none. */
+    public String banner = "";
     /**
      * The company's colour swatches, each "primary/secondary" dye names ("industrial" for the dark grey panels as
      * built). The first is the default every company has; the AWESOME Shop sells more slots.

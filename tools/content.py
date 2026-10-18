@@ -224,7 +224,7 @@ MILESTONES = [
 
     # Tier 1
     (1, "base_building", "Base Building",
-     "Foundations, ramps and walls, Lookout Tower; girders, scaffolding, ladders, casings, copycat blocks, windows, doors and seats",
+     "Foundations, walls and roofs (Build Gun, Foundations tab), Lookout Tower; girders, scaffolding, ladders, casings, copycat blocks, windows, doors and seats",
      [C + "metal_girder", C + "andesite_scaffolding", C + "andesite_ladder", C + "copper_ladder", C + "copper_scaffolding", C + "copycat_panel",
       C + "copycat_step"], []),
     (1, "logistics", "Logistics",
@@ -894,9 +894,17 @@ EQUIPMENT_COSTS = {name: sat_cost(cost) for name, cost in SF.EQUIPMENT.items() i
 #   skin:<id>        a casing skin for Build Gun buildings (SKINS), or a Storage Container skin (STORAGE_SKINS)
 #   decor:<id>       a decoration (DECOR): once bought, members take them from the Shop for their part cost
 #   cup:<id>         a player cosmetic held in the hand (CUPS), taken the same way
-# The tab's other entries (signs and billboards, foundation, floor, wall and roof materials, holiday sets, helmet skins
-# and suit trims, emote packs, the company banner designer, the Golden Cart Assembler skin and the Boom Box) need the
-# systems they decorate first: foundations, signs, emotes, banners and vehicles are not in the pack yet.
+#   sign:<id>        a sign (SIGNS): members take them from the Shop for their part cost, and write on them as on a sign
+#   unlock:<id>      Build Gun buildings whose unlock is "shop:<entry id>" (the Billboard Set's two billboards)
+#   material:<id>    a foundation, wall or roof material for the Customizer (MATERIALS)
+#   pattern:<id>     a floor pattern the Customizer paints on a foundation's top (PATTERNS)
+#   emote:<id>       an emote (EMOTES): /emote <id>
+#   helmet:<id>      a helmet look (HELMET_SKINS), and trim:<id> a suit trim (SUIT_TRIMS): the Customizer used in the air
+#   banner           the company banner designer: a banner used on the Shop becomes the company's; members take copies
+#   golden_cart      the Golden Cart Assembler skin: the Customizer turns a Cart Assembler golden, and back
+#   boom_box, tape:<id>  the Boom Box (taken for its part cost) and its cassette tapes (taken free)
+# An entry with a sixth field is seasonal (a holiday set): the months (1 to 12) it can be bought in; once bought, it
+# can be taken all year.
 SWATCH_MAX = 18
 # finish id -> (name, the block the primary-colour panels become; "{colour}" is the swatch's primary colour)
 FINISHES = {"painted": ("Painted", "minecraft:{colour}_concrete"), "unpainted": ("Unpainted", "create:industrial_iron_block"),
@@ -968,6 +976,75 @@ DECOR = [
 ]
 # the leaves of the Office Plant are drawn green, not in the pot's colour
 DECOR_TEXTURES = {"office_plant": {"top": "minecraft:block/azalea_leaves"}}
+# holiday sets (seasonal): FICSMAS in December, the Harvest set in October
+_SNOW, _SPRUCE, _RED = "minecraft:block/snow", "minecraft:block/spruce_leaves", "minecraft:block/red_wool"
+DECOR += [
+    ("ficsmas_tree", "FICSMAS Tree", "holiday", 8, _SPRUCE,
+     [([7, 0, 7], [9, 3, 9], "trunk"), ([2, 3, 2], [14, 7, 14]), ([4, 7, 4], [12, 11, 12]), ([6, 11, 6], [10, 14, 10]), ([7, 14, 7], [9, 16, 9], "star")],
+     "8 minecraft:spruce_leaves, 1 minecraft:gold_ingot"),
+    ("ficsmas_gift", "FICSMAS Gift", "holiday", 0, _RED,
+     [([3, 0, 3], [13, 8, 13]), ([7, 0, 2.9], [9, 8.1, 13.1], "ribbon"), ([2.9, 0, 7], [13.1, 8.1, 9], "ribbon"), ([6, 8, 6], [10, 10, 10], "ribbon")],
+     "2 minecraft:red_wool, 1 minecraft:gold_nugget"),
+    ("ficsmas_snowman", "FICSMAS Snowman", "holiday", 0, _SNOW,
+     [([3, 0, 3], [13, 8, 13]), ([4.5, 8, 4.5], [11.5, 13, 11.5]), ([5.5, 13, 5.5], [10.5, 16, 10.5]),
+      ([7.5, 14, 10.5], [8.5, 15, 13], "nose")], "4 minecraft:snow_block, 1 minecraft:carrot"),
+    ("harvest_lantern", "Harvest Lantern", "holiday", 12, "minecraft:block/pumpkin_side",
+     [([7, 0, 7], [9, 6, 9], "stand"), ([4, 6, 4], [12, 13, 12]), ([7.5, 13, 7.5], [8.5, 15, 8.5], "stand")],
+     "1 minecraft:carved_pumpkin, 1 minecraft:torch, 2 Iron Rod"),
+    ("harvest_scarecrow", "Harvest Scarecrow", "holiday", 0, "minecraft:block/hay_block_side",
+     [([7, 0, 7], [9, 10, 9], "pole"), ([5, 6, 6], [11, 12, 10]), ([1, 10, 7], [15, 11, 9], "pole"), ([5.5, 12, 5.5], [10.5, 16, 10.5], "head")],
+     "2 minecraft:hay_block, 1 minecraft:carved_pumpkin, 2 #minecraft:planks"),
+]
+DECOR_TEXTURES.update({
+    "ficsmas_tree": {"trunk": "minecraft:block/spruce_log", "star": "minecraft:block/gold_block"},
+    "ficsmas_gift": {"ribbon": "minecraft:block/gold_block"},
+    "ficsmas_snowman": {"nose": "minecraft:block/orange_concrete"},
+    "harvest_lantern": {"stand": "minecraft:block/iron_block", "top": "minecraft:block/pumpkin_top"},
+    "harvest_scarecrow": {"pole": "minecraft:block/stripped_spruce_log", "head": "minecraft:block/carved_pumpkin"},
+})
+DECEMBER, OCTOBER = [12], [10]
+# Signs (Signs and billboards): written on like a sign (use one to write), drawn as Create panels. (id, name, part cost,
+# panel (from, to) in the model facing south, against the wall at the north, the panel's texture)
+SIGNS = [("label_sign", "Label Sign", "1 Iron Sheet", ([0, 4, 0], [16, 12, 1.5]), "create:block/brass_casing"),
+         ("display_sign", "Display Sign", "2 Iron Sheet, 2 Wire", ([0, 0, 0], [16, 16, 1.5]), "create:block/andesite_casing")]
+# a billboard's sign: its whole face; (id, board width and height in blocks, where the face's middle is from the sign's cell)
+BILLBOARD_SIGNS = [("billboard_small_sign", 8, 4, (0, 1.5)), ("billboard_large_sign", 16, 8, (0, 3.5))]
+# Foundation, wall and roof materials and floor patterns (the Customizer on a Foundations-tab building).
+# material id -> (name, what it is for, {built block: the block it becomes})
+FOUNDATION_TOP, FOUNDATION_BODY = "minecraft:light_gray_concrete", "minecraft:gray_concrete"
+WALL_BODY, ROOF_BODY = "minecraft:white_concrete", "minecraft:orange_terracotta"
+MATERIALS = {
+    "concrete": ("Concrete", "foundation", {FOUNDATION_TOP: "minecraft:smooth_stone", FOUNDATION_BODY: "minecraft:stone"}),
+    "grip_metal": ("Grip Metal", "foundation", {FOUNDATION_TOP: "create:industrial_iron_block", FOUNDATION_BODY: "minecraft:iron_block"}),
+    "coated_concrete": ("Coated Concrete", "foundation", {FOUNDATION_TOP: "minecraft:white_concrete", FOUNDATION_BODY: "minecraft:light_gray_concrete"}),
+    "asphalt": ("Asphalt", "foundation", {FOUNDATION_TOP: "minecraft:polished_blackstone", FOUNDATION_BODY: "minecraft:blackstone"}),
+    "concrete_wall": ("Concrete Wall", "wall", {WALL_BODY: "minecraft:smooth_stone"}),
+    "steel_wall": ("Steel Wall", "wall", {WALL_BODY: "create:industrial_iron_block"}),
+    "tar_roof": ("Tar Roof", "roof", {ROOF_BODY: "minecraft:black_terracotta"}),
+    "metal_roof": ("Metal Roof", "roof", {ROOF_BODY: "minecraft:iron_block"}),
+    "glass_roof": ("Glass Roof", "roof", {ROOF_BODY: "minecraft:glass"}),
+}
+# floor patterns: painted on a foundation's top in yellow (and black for the Factory Zone), on its 8 by 8 cells
+PATTERNS = {"pathway": "Pathway", "factory_zone": "Factory Zone", "dotted_line": "Dotted Line", "solid_line": "Solid Line",
+            "arrow": "Arrow", "factory_icon": "Factory Icon", "transportation_icon": "Transportation Icon", "number": "Number"}
+# emotes: (id, name, coupons); the Wave is free
+EMOTES = [("wave", "Wave", 0), ("point", "Point", 1), ("clap", "Clap", 2), ("facepalm", "Facepalm", 2), ("heart", "Heart", 3), ("dance", "Dance", 3)]
+# helmet looks (the equipment model a worn helmet is drawn with) and suit trims (pattern, material; on every armour piece)
+HELMET_SKINS = {"gold": ("Gold Helmet", "minecraft:gold", 3), "copper": ("Copper Helmet", "minecraft:copper", 3),
+                "diamond": ("Diamond Helmet", "minecraft:diamond", 5), "turtle": ("Turtle Shell Helmet", "minecraft:turtle_scute", 5),
+                "netherite": ("Netherite Helmet", "minecraft:netherite", 8)}
+SUIT_TRIMS = {"ficsit_orange": ("FICSIT Orange trim", "minecraft:flow", "minecraft:copper", 3),
+              "caterium": ("Caterium trim", "minecraft:silence", "minecraft:gold", 3),
+              "quartz": ("Quartz trim", "minecraft:wayfinder", "minecraft:quartz", 3),
+              "sam": ("SAM trim", "minecraft:spire", "minecraft:amethyst", 3),
+              "carbon": ("Carbon trim", "minecraft:snout", "minecraft:netherite", 3)}
+# the Boom Box and its cassette tapes (each plays one of the game's songs); the first tape comes free
+BOOM_BOX_COST = "2 Iron Sheet, 5 Wire"
+TAPES = [("tape_cat", "Cassette Tape: Cat", "minecraft:cat"), ("tape_blocks", "Cassette Tape: Blocks", "minecraft:blocks"),
+         ("tape_chirp", "Cassette Tape: Chirp", "minecraft:chirp"), ("tape_far", "Cassette Tape: Far", "minecraft:far"),
+         ("tape_mall", "Cassette Tape: Mall", "minecraft:mall"), ("tape_stal", "Cassette Tape: Stal", "minecraft:stal"),
+         ("tape_strad", "Cassette Tape: Strad", "minecraft:strad"), ("tape_pigstep", "Cassette Tape: Pigstep", "minecraft:pigstep")]
+
 # player cosmetics held in the hand: (id, name, part cost, what has to be done first ("" for nothing))
 CUPS = [("coffee_cup", "FICSIT Coffee Cup", "2 Iron Sheet", ""),
         ("employee_of_the_planet_cup", "Employee of the Planet Cup", "4 minecraft:gold_ingot", "phase_5")]
@@ -999,7 +1076,23 @@ SHOP = [("customizer", "Customizer", "Customizer", 0, "customizer"),
        ("decor_filing_cabinet", "Filing Cabinet", "Furniture", 3, "decor:filing_cabinet"),
        ("decor_office_plant", "Office Plant", "Furniture", 3, "decor:office_plant"),
        ("cup_coffee_cup", "FICSIT Coffee Cup", "Player cosmetics", 1, "cup:coffee_cup"),
-       ("cup_employee_of_the_planet_cup", "Employee of the Planet Cup", "Player cosmetics", 1, "cup:employee_of_the_planet_cup")]
+       ("cup_employee_of_the_planet_cup", "Employee of the Planet Cup", "Player cosmetics", 1, "cup:employee_of_the_planet_cup")] \
+    + [("sign_label", "Label Sign Bundle", "Signs", 2, "sign:label_sign"),
+       ("sign_display", "Display Sign Bundle", "Signs", 5, "sign:display_sign"),
+       ("billboard_set", "Billboard Set", "Signs", 10, "unlock:billboard_set")] \
+    + [(f"material_{k}", f"{n} material", f"{w.title()} materials", c, f"material:{k}")
+       for (k, (n, w, _)), c in zip(MATERIALS.items(), (3, 5, 6, 4, 3, 5, 2, 3, 5))] \
+    + [(f"pattern_{k}", f"{n} floor pattern", "Floor patterns", c, f"pattern:{k}") for (k, n), c in zip(PATTERNS.items(), (6, 2, 4, 5, 1, 3, 3, 2))] \
+    + [(f"decor_{d}", n, "Holiday sets", c, f"decor:{d}", m) for d, n, c, m in
+       (("ficsmas_tree", "FICSMAS Tree", 5, DECEMBER), ("ficsmas_gift", "FICSMAS Gift", 2, DECEMBER), ("ficsmas_snowman", "FICSMAS Snowman", 3, DECEMBER),
+        ("harvest_lantern", "Harvest Lantern", 2, OCTOBER), ("harvest_scarecrow", "Harvest Scarecrow", 3, OCTOBER))] \
+    + [(f"emote_{k}", f"{n} emote", "Emotes", c, f"emote:{k}") for k, n, c in EMOTES] \
+    + [(f"helmet_{k}", f"{n} look", "Helmet skins", c, f"helmet:{k}") for k, (n, _, c) in HELMET_SKINS.items()] \
+    + [(f"trim_{k}", n, "Suit trims", c, f"trim:{k}") for k, (n, _, _, c) in SUIT_TRIMS.items()] \
+    + [("company_banner", "Company Banner Designer", "Company", 5, "banner"),
+       ("golden_cart", "Golden Cart Assembler skin", "Vehicles", 50, "golden_cart"),
+       ("boom_box", "Boom Box", "Music", 3, "boom_box")] \
+    + [(t, n, "Music", 0 if i == 0 else 1, f"tape:{t}") for i, (t, n, _) in enumerate(TAPES)]
 
 # Furnace burn times, in ticks (coal is 1600), after Satisfactory's energy values. A Blaze Burner burns anything a
 # furnace burns, so these heat boilers too.
@@ -1265,6 +1358,18 @@ BUILDINGS = [
     # the Drone Port: Satisfactory's raised landing pad with the loading terminal underneath (the terminal is the Drone
     # Port block, which keeps the drone, its packages, fire charges and flight); the drone takes off from and lands on the pad
     ("drone_port", "Drone Port", "logistics", BUILD_COSTS["Drone Port"], "aeronautical_engineering", False, {"logic": "drone_port"}),
+    # the Foundations tab: 8 by 8 foundations, 8-wide walls and a sloped roof, snapped to an 8-block grid by the Build Gun
+    # and given their materials and floor patterns by the Customizer (MATERIALS, PATTERNS); and the AWESOME Shop's two
+    # billboards (Billboard Set), written on at the sign at the foot of their face
+    ("foundation_1m", "Foundation (1 m)", "foundations", "3 Stone, 2 Iron Sheet", "base_building", False, {"logic": "foundation"}),
+    ("foundation_2m", "Foundation (2 m)", "foundations", "5 Stone, 2 Iron Sheet", "base_building", False, {"logic": "foundation"}),
+    ("foundation_4m", "Foundation (4 m)", "foundations", "6 Stone, 2 Iron Sheet", "base_building", False, {"logic": "foundation"}),
+    ("wall_4m", "Basic Wall (4 m)", "foundations", "2 Stone, 2 Iron Sheet", "base_building", False, {"logic": "foundation"}),
+    ("roof_4m", "Roof (4 m)", "foundations", "3 Stone, 2 Iron Sheet", "base_building", False, {"logic": "foundation"}),
+    ("billboard_small", "Small Billboard", "foundations", "3 Encased Industrial Beam, 4 Copper Sheet, 1 Crystal Oscillator", "shop:billboard_set", False,
+     {"logic": "foundation"}),
+    ("billboard_large", "Large Billboard", "foundations", "12 Encased Industrial Beam, 20 Copper Sheet, 5 Crystal Oscillator", "shop:billboard_set", False,
+     {"logic": "foundation"}),
 ]
 # The buildings whose Basin is a Brass Basin (four stacks of each item), for the recipe checkers
 BRASS_BASIN_BUILDINGS = ("manufacturer", "blender", "particle_accelerator", "converter")

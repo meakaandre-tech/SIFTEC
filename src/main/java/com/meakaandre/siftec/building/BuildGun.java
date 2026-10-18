@@ -96,8 +96,21 @@ public final class BuildGun {
         }
         Direction facing = player.getDirection();
         for (int i = turns & 3; i > 0; i--) facing = facing.getClockWise();
+        Placement p = new Placement(def, anchor.immutable(), facing, flip);
+        // foundations, walls and roofs snap to an 8-block grid, so they line up with each other
+        if (def.logic().equals("foundation") && !def.id().startsWith("billboard_")) p = snapToGrid(p);
         // a miner snaps onto the node it is aimed near, so its drill stands right over it
-        return Buildings.snapToNode(player.level(), new Placement(def, anchor.immutable(), facing, flip));
+        return Buildings.snapToNode(player.level(), p);
+    }
+
+    /** The placement moved (by up to 4 blocks either way) so its corner is on the 8-block grid. */
+    public static Placement snapToGrid(Placement p) {
+        BuildingTemplate t = BuildingTemplate.of(p.def());
+        if (t == null) return p;
+        BlockPos a = p.at(t.minX, 0, 0), b = p.at(t.maxX, 0, t.depth - 1);
+        int x = Math.min(a.getX(), b.getX()), z = Math.min(a.getZ(), b.getZ());
+        int dx = Math.round(x / 8f) * 8 - x, dz = Math.round(z / 8f) * 8 - z;
+        return new Placement(p.def(), p.anchor().offset(dx, 0, dz), p.facing(), p.flip());
     }
 
     /** A client's hologram spot is believed only near the player (it may be nudged a little past the aim). */

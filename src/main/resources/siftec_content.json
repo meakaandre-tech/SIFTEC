@@ -7038,6 +7038,333 @@
       "category": "Player cosmetics",
       "coupons": 1,
       "gives": "cup:employee_of_the_planet_cup"
+    },
+    {
+      "id": "sign_label",
+      "category": "Signs",
+      "coupons": 2,
+      "gives": "sign:label_sign"
+    },
+    {
+      "id": "sign_display",
+      "category": "Signs",
+      "coupons": 5,
+      "gives": "sign:display_sign"
+    },
+    {
+      "id": "billboard_set",
+      "category": "Signs",
+      "coupons": 10,
+      "gives": "unlock:billboard_set"
+    },
+    {
+      "id": "material_concrete",
+      "category": "Foundation materials",
+      "coupons": 3,
+      "gives": "material:concrete"
+    },
+    {
+      "id": "material_grip_metal",
+      "category": "Foundation materials",
+      "coupons": 5,
+      "gives": "material:grip_metal"
+    },
+    {
+      "id": "material_coated_concrete",
+      "category": "Foundation materials",
+      "coupons": 6,
+      "gives": "material:coated_concrete"
+    },
+    {
+      "id": "material_asphalt",
+      "category": "Foundation materials",
+      "coupons": 4,
+      "gives": "material:asphalt"
+    },
+    {
+      "id": "material_concrete_wall",
+      "category": "Wall materials",
+      "coupons": 3,
+      "gives": "material:concrete_wall"
+    },
+    {
+      "id": "material_steel_wall",
+      "category": "Wall materials",
+      "coupons": 5,
+      "gives": "material:steel_wall"
+    },
+    {
+      "id": "material_tar_roof",
+      "category": "Roof materials",
+      "coupons": 2,
+      "gives": "material:tar_roof"
+    },
+    {
+      "id": "material_metal_roof",
+      "category": "Roof materials",
+      "coupons": 3,
+      "gives": "material:metal_roof"
+    },
+    {
+      "id": "material_glass_roof",
+      "category": "Roof materials",
+      "coupons": 5,
+      "gives": "material:glass_roof"
+    },
+    {
+      "id": "pattern_pathway",
+      "category": "Floor patterns",
+      "coupons": 6,
+      "gives": "pattern:pathway"
+    },
+    {
+      "id": "pattern_factory_zone",
+      "category": "Floor patterns",
+      "coupons": 2,
+      "gives": "pattern:factory_zone"
+    },
+    {
+      "id": "pattern_dotted_line",
+      "category": "Floor patterns",
+      "coupons": 4,
+      "gives": "pattern:dotted_line"
+    },
+    {
+      "id": "pattern_solid_line",
+      "category": "Floor patterns",
+      "coupons": 5,
+      "gives": "pattern:solid_line"
+    },
+    {
+      "id": "pattern_arrow",
+      "category": "Floor patterns",
+      "coupons": 1,
+      "gives": "pattern:arrow"
+    },
+    {
+      "id": "pattern_factory_icon",
+      "category": "Floor patterns",
+      "coupons": 3,
+      "gives": "pattern:factory_icon"
+    },
+    {
+      "id": "pattern_transportation_icon",
+      "category": "Floor patterns",
+      "coupons": 3,
+      "gives": "pattern:transportation_icon"
+    },
+    {
+      "id": "pattern_number",
+      "category": "Floor patterns",
+      "coupons": 2,
+      "gives": "pattern:number"
+    },
+    {
+      "id": "decor_ficsmas_tree",
+      "category": "Holiday sets",
+      "coupons": 5,
+      "gives": "decor:ficsmas_tree",
+      "season": [
+        12
+      ]
+    },
+    {
+      "id": "decor_ficsmas_gift",
+      "category": "Holiday sets",
+      "coupons": 2,
+      "gives": "decor:ficsmas_gift",
+      "season": [
+        12
+      ]
+    },
+    {
+      "id": "decor_ficsmas_snowman",
+      "category": "Holiday sets",
+      "coupons": 3,
+      "gives": "decor:ficsmas_snowman",
+      "season": [
+        12
+      ]
+    },
+    {
+      "id": "decor_harvest_lantern",
+      "category": "Holiday sets",
+      "coupons": 2,
+      "gives": "decor:harvest_lantern",
+      "season": [
+        10
+      ]
+    },
+    {
+      "id": "decor_harvest_scarecrow",
+      "category": "Holiday sets",
+      "coupons": 3,
+      "gives": "decor:harvest_scarecrow",
+      "season": [
+        10
+      ]
+    },
+    {
+      "id": "emote_wave",
+      "category": "Emotes",
+      "coupons": 0,
+      "gives": "emote:wave"
+    },
+    {
+      "id": "emote_point",
+      "category": "Emotes",
+      "coupons": 1,
+      "gives": "emote:point"
+    },
+    {
+      "id": "emote_clap",
+      "category": "Emotes",
+      "coupons": 2,
+      "gives": "emote:clap"
+    },
+    {
+      "id": "emote_facepalm",
+      "category": "Emotes",
+      "coupons": 2,
+      "gives": "emote:facepalm"
+    },
+    {
+      "id": "emote_heart",
+      "category": "Emotes",
+      "coupons": 3,
+      "gives": "emote:heart"
+    },
+    {
+      "id": "emote_dance",
+      "category": "Emotes",
+      "coupons": 3,
+      "gives": "emote:dance"
+    },
+    {
+      "id": "helmet_gold",
+      "category": "Helmet skins",
+      "coupons": 3,
+      "gives": "helmet:gold"
+    },
+    {
+      "id": "helmet_copper",
+      "category": "Helmet skins",
+      "coupons": 3,
+      "gives": "helmet:copper"
+    },
+    {
+      "id": "helmet_diamond",
+      "category": "Helmet skins",
+      "coupons": 5,
+      "gives": "helmet:diamond"
+    },
+    {
+      "id": "helmet_turtle",
+      "category": "Helmet skins",
+      "coupons": 5,
+      "gives": "helmet:turtle"
+    },
+    {
+      "id": "helmet_netherite",
+      "category": "Helmet skins",
+      "coupons": 8,
+      "gives": "helmet:netherite"
+    },
+    {
+      "id": "trim_ficsit_orange",
+      "category": "Suit trims",
+      "coupons": 3,
+      "gives": "trim:ficsit_orange"
+    },
+    {
+      "id": "trim_caterium",
+      "category": "Suit trims",
+      "coupons": 3,
+      "gives": "trim:caterium"
+    },
+    {
+      "id": "trim_quartz",
+      "category": "Suit trims",
+      "coupons": 3,
+      "gives": "trim:quartz"
+    },
+    {
+      "id": "trim_sam",
+      "category": "Suit trims",
+      "coupons": 3,
+      "gives": "trim:sam"
+    },
+    {
+      "id": "trim_carbon",
+      "category": "Suit trims",
+      "coupons": 3,
+      "gives": "trim:carbon"
+    },
+    {
+      "id": "company_banner",
+      "category": "Company",
+      "coupons": 5,
+      "gives": "banner"
+    },
+    {
+      "id": "golden_cart",
+      "category": "Vehicles",
+      "coupons": 50,
+      "gives": "golden_cart"
+    },
+    {
+      "id": "boom_box",
+      "category": "Music",
+      "coupons": 3,
+      "gives": "boom_box"
+    },
+    {
+      "id": "tape_cat",
+      "category": "Music",
+      "coupons": 0,
+      "gives": "tape:tape_cat"
+    },
+    {
+      "id": "tape_blocks",
+      "category": "Music",
+      "coupons": 1,
+      "gives": "tape:tape_blocks"
+    },
+    {
+      "id": "tape_chirp",
+      "category": "Music",
+      "coupons": 1,
+      "gives": "tape:tape_chirp"
+    },
+    {
+      "id": "tape_far",
+      "category": "Music",
+      "coupons": 1,
+      "gives": "tape:tape_far"
+    },
+    {
+      "id": "tape_mall",
+      "category": "Music",
+      "coupons": 1,
+      "gives": "tape:tape_mall"
+    },
+    {
+      "id": "tape_stal",
+      "category": "Music",
+      "coupons": 1,
+      "gives": "tape:tape_stal"
+    },
+    {
+      "id": "tape_strad",
+      "category": "Music",
+      "coupons": 1,
+      "gives": "tape:tape_strad"
+    },
+    {
+      "id": "tape_pigstep",
+      "category": "Music",
+      "coupons": 1,
+      "gives": "tape:tape_pigstep"
     }
   ],
   "swatch_max": 18,
@@ -7475,8 +7802,279 @@
           "count": 1
         }
       ]
+    },
+    {
+      "id": "ficsmas_tree",
+      "light": 8,
+      "shape": [
+        2,
+        0,
+        2,
+        14,
+        16,
+        14
+      ],
+      "cost": [
+        {
+          "item": "minecraft:spruce_leaves",
+          "count": 8
+        },
+        {
+          "item": "minecraft:gold_ingot",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "ficsmas_gift",
+      "light": 0,
+      "shape": [
+        2.9000000000000004,
+        0,
+        2.9000000000000004,
+        13.1,
+        10,
+        13.1
+      ],
+      "cost": [
+        {
+          "item": "minecraft:red_wool",
+          "count": 2
+        },
+        {
+          "item": "minecraft:gold_nugget",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "ficsmas_snowman",
+      "light": 0,
+      "shape": [
+        3,
+        0,
+        3,
+        13,
+        16,
+        13
+      ],
+      "cost": [
+        {
+          "item": "minecraft:snow_block",
+          "count": 4
+        },
+        {
+          "item": "minecraft:carrot",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "harvest_lantern",
+      "light": 12,
+      "shape": [
+        4,
+        0,
+        4,
+        12,
+        15,
+        12
+      ],
+      "cost": [
+        {
+          "item": "minecraft:carved_pumpkin",
+          "count": 1
+        },
+        {
+          "item": "minecraft:torch",
+          "count": 1
+        },
+        {
+          "item": "siftec:iron_rod",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "harvest_scarecrow",
+      "light": 0,
+      "shape": [
+        1,
+        0,
+        1,
+        15,
+        16,
+        15
+      ],
+      "cost": [
+        {
+          "item": "minecraft:hay_block",
+          "count": 2
+        },
+        {
+          "item": "minecraft:carved_pumpkin",
+          "count": 1
+        },
+        {
+          "item": "#minecraft:planks",
+          "count": 2
+        }
+      ]
     }
   ],
+  "signs": [
+    {
+      "id": "label_sign",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "display_sign",
+      "cost": [
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        },
+        {
+          "item": "siftec:wire",
+          "count": 2
+        }
+      ]
+    }
+  ],
+  "boom_box": {
+    "cost": [
+      {
+        "item": "create:iron_sheet",
+        "count": 2
+      },
+      {
+        "item": "siftec:wire",
+        "count": 5
+      }
+    ]
+  },
+  "tapes": {
+    "tape_cat": "minecraft:cat",
+    "tape_blocks": "minecraft:blocks",
+    "tape_chirp": "minecraft:chirp",
+    "tape_far": "minecraft:far",
+    "tape_mall": "minecraft:mall",
+    "tape_stal": "minecraft:stal",
+    "tape_strad": "minecraft:strad",
+    "tape_pigstep": "minecraft:pigstep"
+  },
+  "materials": {
+    "concrete": {
+      "kind": "foundation",
+      "blocks": {
+        "minecraft:light_gray_concrete": "minecraft:smooth_stone",
+        "minecraft:gray_concrete": "minecraft:stone"
+      }
+    },
+    "grip_metal": {
+      "kind": "foundation",
+      "blocks": {
+        "minecraft:light_gray_concrete": "create:industrial_iron_block",
+        "minecraft:gray_concrete": "minecraft:iron_block"
+      }
+    },
+    "coated_concrete": {
+      "kind": "foundation",
+      "blocks": {
+        "minecraft:light_gray_concrete": "minecraft:white_concrete",
+        "minecraft:gray_concrete": "minecraft:light_gray_concrete"
+      }
+    },
+    "asphalt": {
+      "kind": "foundation",
+      "blocks": {
+        "minecraft:light_gray_concrete": "minecraft:polished_blackstone",
+        "minecraft:gray_concrete": "minecraft:blackstone"
+      }
+    },
+    "concrete_wall": {
+      "kind": "wall",
+      "blocks": {
+        "minecraft:white_concrete": "minecraft:smooth_stone"
+      }
+    },
+    "steel_wall": {
+      "kind": "wall",
+      "blocks": {
+        "minecraft:white_concrete": "create:industrial_iron_block"
+      }
+    },
+    "tar_roof": {
+      "kind": "roof",
+      "blocks": {
+        "minecraft:orange_terracotta": "minecraft:black_terracotta"
+      }
+    },
+    "metal_roof": {
+      "kind": "roof",
+      "blocks": {
+        "minecraft:orange_terracotta": "minecraft:iron_block"
+      }
+    },
+    "glass_roof": {
+      "kind": "roof",
+      "blocks": {
+        "minecraft:orange_terracotta": "minecraft:glass"
+      }
+    }
+  },
+  "patterns": [
+    "pathway",
+    "factory_zone",
+    "dotted_line",
+    "solid_line",
+    "arrow",
+    "factory_icon",
+    "transportation_icon",
+    "number"
+  ],
+  "emotes": [
+    "wave",
+    "point",
+    "clap",
+    "facepalm",
+    "heart",
+    "dance"
+  ],
+  "helmet_skins": {
+    "gold": "minecraft:gold",
+    "copper": "minecraft:copper",
+    "diamond": "minecraft:diamond",
+    "turtle": "minecraft:turtle_scute",
+    "netherite": "minecraft:netherite"
+  },
+  "suit_trims": {
+    "ficsit_orange": {
+      "pattern": "minecraft:flow",
+      "material": "minecraft:copper"
+    },
+    "caterium": {
+      "pattern": "minecraft:silence",
+      "material": "minecraft:gold"
+    },
+    "quartz": {
+      "pattern": "minecraft:wayfinder",
+      "material": "minecraft:quartz"
+    },
+    "sam": {
+      "pattern": "minecraft:spire",
+      "material": "minecraft:amethyst"
+    },
+    "carbon": {
+      "pattern": "minecraft:snout",
+      "material": "minecraft:netherite"
+    }
+  },
   "cups": [
     {
       "id": "coffee_cup",
@@ -13274,6 +13872,154 @@
       "guide": [
         "The Drone Port is a landing pad on legs with its loading terminal underneath. Use the terminal to pick which of your company's ports its drone flies to.",
         "Packages go in at the back port and fire charges at the left one; what arrives comes out of the right one. The drone takes off from the pad with everything waiting, burning fire charges for the distance, and lands on the other pad."
+      ]
+    },
+    {
+      "id": "foundation_1m",
+      "category": "foundations",
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 3
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        }
+      ],
+      "unlock": "base_building",
+      "logic": "foundation",
+      "guide": [
+        "An 8 by 8 foundation, one block thick. Foundations, walls and roofs snap to an 8-block grid so they line up.",
+        "Use the Customizer on it for a material (Concrete, Grip Metal, Coated Concrete, Asphalt) or a floor pattern from the AWESOME Shop."
+      ]
+    },
+    {
+      "id": "foundation_2m",
+      "category": "foundations",
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 5
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        }
+      ],
+      "unlock": "base_building",
+      "logic": "foundation",
+      "guide": [
+        "An 8 by 8 foundation, two blocks thick, snapped to the 8-block grid.",
+        "The Customizer gives it a material or a floor pattern bought in the AWESOME Shop."
+      ]
+    },
+    {
+      "id": "foundation_4m",
+      "category": "foundations",
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 6
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        }
+      ],
+      "unlock": "base_building",
+      "logic": "foundation",
+      "guide": [
+        "An 8 by 8 foundation, four blocks thick, snapped to the 8-block grid.",
+        "The Customizer gives it a material or a floor pattern bought in the AWESOME Shop."
+      ]
+    },
+    {
+      "id": "wall_4m",
+      "category": "foundations",
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 2
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        }
+      ],
+      "unlock": "base_building",
+      "logic": "foundation",
+      "guide": [
+        "A wall 8 wide and 4 high, snapped to the 8-block grid.",
+        "The Customizer gives it the Concrete or Steel wall material from the AWESOME Shop."
+      ]
+    },
+    {
+      "id": "roof_4m",
+      "category": "foundations",
+      "cost": [
+        {
+          "item": "#siftec:stones",
+          "count": 3
+        },
+        {
+          "item": "create:iron_sheet",
+          "count": 2
+        }
+      ],
+      "unlock": "base_building",
+      "logic": "foundation",
+      "guide": [
+        "A roof over 8 by 8, rising four blocks toward the back, snapped to the 8-block grid.",
+        "The Customizer gives it the Tar, Metal or Glass roof material from the AWESOME Shop."
+      ]
+    },
+    {
+      "id": "billboard_small",
+      "category": "foundations",
+      "cost": [
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 3
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 4
+        },
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 1
+        }
+      ],
+      "unlock": "shop:billboard_set",
+      "logic": "foundation",
+      "guide": [
+        "A billboard 8 wide and 4 high (the AWESOME Shop's Billboard Set). Use the sign at the foot of its face to write on it.",
+        "The text fills the board; dye and glow ink colour and light it, as on a sign."
+      ]
+    },
+    {
+      "id": "billboard_large",
+      "category": "foundations",
+      "cost": [
+        {
+          "item": "siftec:encased_industrial_beam",
+          "count": 12
+        },
+        {
+          "item": "create:copper_sheet",
+          "count": 20
+        },
+        {
+          "item": "siftec:crystal_oscillator",
+          "count": 5
+        }
+      ],
+      "unlock": "shop:billboard_set",
+      "logic": "foundation",
+      "guide": [
+        "A billboard 16 wide and 8 high (the AWESOME Shop's Billboard Set). Use the sign at the foot of its face to write on it.",
+        "The text fills the board; dye and glow ink colour and light it, as on a sign."
       ]
     }
   ],

@@ -21,8 +21,21 @@ public final class Shop {
     /** The most colour swatches a company can have. */
     public static final int MAX_SWATCHES = 18;
 
-    /** One thing the Shop sells. {@code gives} is "customizer", "swatch", "finish:<id>", "skin:<id>", "decor:<id>" or "cup:<id>". */
-    public record Entry(String id, String category, int coupons, String gives) {
+    /**
+     * One thing the Shop sells. {@code gives} is "customizer", "swatch", "finish:<id>", "skin:<id>", "decor:<id>",
+     * "cup:<id>", "sign:<id>", "unlock:<id>", "material:<id>", "pattern:<id>", "emote:<id>", "helmet:<id>", "trim:<id>",
+     * "banner", "golden_cart", "boom_box" or "tape:<id>". A holiday set's entry can be bought only in its months.
+     */
+    public record Entry(String id, String category, int coupons, String gives, List<Integer> months) {
+        public Entry(String id, String category, int coupons, String gives) {
+            this(id, category, coupons, gives, List.of());
+        }
+
+        /** True if it can be bought this month (always, but for a holiday set out of its season). */
+        public boolean inSeason() {
+            return months.isEmpty() || months.contains(java.time.LocalDate.now().getMonthValue());
+        }
+
         public String kind() {
             int colon = gives.indexOf(':');
             return colon < 0 ? gives : gives.substring(0, colon);
@@ -49,6 +62,13 @@ public final class Shop {
     private static final Map<String, Goods> GOODS = new LinkedHashMap<>();
     private static final Map<String, String> FINISHES = new LinkedHashMap<>(), SKINS = new LinkedHashMap<>(), STORAGE_SKINS = new LinkedHashMap<>();
     private static final List<String> DYES = new ArrayList<>();
+    /** material id -> its kind ("foundation", "wall", "roof") and what each built block becomes under it */
+    private static final Map<String, String> MATERIAL_KINDS = new LinkedHashMap<>();
+    private static final Map<String, Map<String, String>> MATERIALS = new LinkedHashMap<>();
+    private static final List<String> PATTERNS = new ArrayList<>(), EMOTES = new ArrayList<>();
+    /** helmet look id -> equipment asset; suit trim id -> {pattern, material} */
+    private static final Map<String, String> HELMETS = new LinkedHashMap<>();
+    private static final Map<String, String[]> TRIMS = new LinkedHashMap<>();
     private static boolean loaded;
 
     private Shop() {
@@ -65,7 +85,29 @@ public final class Shop {
         JsonObject raw = Milestones.raw();
         for (JsonElement e : raw.getAsJsonArray("shop")) {
             JsonObject o = e.getAsJsonObject();
-            ENTRIES.add(new Entry(o.get("id").getAsString(), o.get("category").getAsString(), o.get("coupons").getAsInt(), o.get("gives").getAsString()));
+            List<Integer> months = new ArrayList<>();
+            if (o.has("season")) for (JsonElement m : o.getAsJsonArray("season")) months.add(m.getAsInt());
+            ENTRIES.add(new Entry(o.get("id").getAsString(), o.get("category").getAsString(), o.get("coupons").getAsInt(), o.get("gives").getAsString(),
+                List.copyOf(months)));
+        }
+        for (JsonElement e : raw.getAsJsonArray("signs")) {
+            JsonObject o = e.getAsJsonObject();
+            GOODS.put(o.get("id").getAsString(), new Goods(o.get("id").getAsString(), costs(o), ""));
+        }
+        GOODS.put("boom_box", new Goods("boom_box", costs(raw.getAsJsonObject("boom_box")), ""));
+        for (Map.Entry<String, JsonElement> e : raw.getAsJsonObject("materials").entrySet()) {
+            JsonObject o = e.getValue().getAsJsonObject();
+            MATERIAL_KINDS.put(e.getKey(), o.get("kind").getAsString());
+            Map<String, String> map = new LinkedHashMap<>();
+            for (Map.Entry<String, JsonElement> b : o.getAsJsonObject("blocks").entrySet()) map.put(b.getKey(), b.getValue().getAsString());
+            MATERIALS.put(e.getKey(), map);
+        }
+        for (JsonElement e : raw.getAsJsonArray("patterns")) PATTERNS.add(e.getAsString());
+        for (JsonElement e : raw.getAsJsonArray("emotes")) EMOTES.add(e.getAsString());
+        for (Map.Entry<String, JsonElement> e : raw.getAsJsonObject("helmet_skins").entrySet()) HELMETS.put(e.getKey(), e.getValue().getAsString());
+        for (Map.Entry<String, JsonElement> e : raw.getAsJsonObject("suit_trims").entrySet()) {
+            JsonObject o = e.getValue().getAsJsonObject();
+            TRIMS.put(e.getKey(), new String[]{o.get("pattern").getAsString(), o.get("material").getAsString()});
         }
         for (JsonElement e : raw.getAsJsonArray("decor")) {
             JsonObject o = e.getAsJsonObject();
@@ -121,6 +163,41 @@ public final class Shop {
         return DYES;
     }
 
+    /** Foundation, wall and roof materials: id -> kind ("foundation", "wall", "roof"). */
+    public static Map<String, String> materials() {
+        load();
+        return MATERIAL_KINDS;
+    }
+
+    /** The block a built block becomes under a material, or null if the material leaves it be. */
+    public static @Nullable String materialBlock(String material, String built) {
+        load();
+        Map<String, String> map = MATERIALS.get(material);
+        return map == null ? null : map.get(built);
+    }
+
+    public static List<String> patterns() {
+        load();
+        return PATTERNS;
+    }
+
+    public static List<String> emotes() {
+        load();
+        return EMOTES;
+    }
+
+    /** Helmet looks: id -> the equipment asset a worn helmet is drawn with. */
+    public static Map<String, String> helmets() {
+        load();
+        return HELMETS;
+    }
+
+    /** Suit trims: id -> {trim pattern, trim material}. */
+    public static Map<String, String[]> trims() {
+        load();
+        return TRIMS;
+    }
+
     /** True if the company may use this finish ("painted" always) or skin ("" always). */
     public static boolean hasFinish(Company company, String finish) {
         return finish.equals("painted") || owns(company, "finish:" + finish);
@@ -134,6 +211,11 @@ public final class Shop {
     public static boolean owns(Company company, String gives) {
         for (Entry e : entries()) if (e.gives().equals(gives)) return e.owned(company);
         return false;
+    }
+
+    /** The same, for a member: a creative player has everything. */
+    public static boolean owns(net.minecraft.server.level.ServerPlayer player, Company company, String gives) {
+        return player.hasInfiniteMaterials() || owns(company, gives);
     }
 
     /** What happens when the company buys an entry (the coupons are already paid): it is remembered, or a swatch added. */

@@ -269,6 +269,34 @@ BUILDING_GUIDE = {
         "Packages go in at the back port and fire charges at the left one; what arrives comes out of the right one. The drone "
         "takes off from the pad with everything waiting, burning fire charges for the distance, and lands on the other pad.",
     ],
+    "foundation_1m": [
+        "An 8 by 8 foundation, one block thick. Foundations, walls and roofs snap to an 8-block grid so they line up.",
+        "Use the Customizer on it for a material (Concrete, Grip Metal, Coated Concrete, Asphalt) or a floor pattern from the AWESOME Shop.",
+    ],
+    "foundation_2m": [
+        "An 8 by 8 foundation, two blocks thick, snapped to the 8-block grid.",
+        "The Customizer gives it a material or a floor pattern bought in the AWESOME Shop.",
+    ],
+    "foundation_4m": [
+        "An 8 by 8 foundation, four blocks thick, snapped to the 8-block grid.",
+        "The Customizer gives it a material or a floor pattern bought in the AWESOME Shop.",
+    ],
+    "wall_4m": [
+        "A wall 8 wide and 4 high, snapped to the 8-block grid.",
+        "The Customizer gives it the Concrete or Steel wall material from the AWESOME Shop.",
+    ],
+    "roof_4m": [
+        "A roof over 8 by 8, rising four blocks toward the back, snapped to the 8-block grid.",
+        "The Customizer gives it the Tar, Metal or Glass roof material from the AWESOME Shop.",
+    ],
+    "billboard_small": [
+        "A billboard 8 wide and 4 high (the AWESOME Shop's Billboard Set). Use the sign at the foot of its face to write on it.",
+        "The text fills the board; dye and glow ink colour and light it, as on a sign.",
+    ],
+    "billboard_large": [
+        "A billboard 16 wide and 8 high (the AWESOME Shop's Billboard Set). Use the sign at the foot of its face to write on it.",
+        "The text fills the board; dye and glow ink colour and light it, as on a sign.",
+    ],
     "tractor": [
         "The Tractor is a small, quick hauler with three rows of storage. Right-click it to drive: W and S for throttle, A "
         "and D to steer, Space to brake.",

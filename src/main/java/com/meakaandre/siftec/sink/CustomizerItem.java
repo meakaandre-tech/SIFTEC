@@ -19,9 +19,26 @@ public class CustomizerItem extends Item {
         super(properties);
     }
 
+    /** Used in the air: the helmet skins and suit trims for what the player wears. */
+    @Override
+    public InteractionResult use(net.minecraft.world.level.Level level, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        if (player instanceof ServerPlayer server) OutfitMenu.open(server);
+        return InteractionResult.SUCCESS;
+    }
+
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (!(context.getPlayer() instanceof ServerPlayer player)) return InteractionResult.SUCCESS;
+        // a Cart Assembler: the Golden Cart Assembler skin, on or off
+        if (com.meakaandre.siftec.cosmetic.GoldenCart.is(context.getLevel().getBlockState(context.getClickedPos()))) {
+            if (!Shop.owns(player, Companies.of(player), "golden_cart")) {
+                player.sendOverlayMessage(Component.translatable("siftec.customizer.locked"));
+            } else {
+                com.meakaandre.siftec.cosmetic.GoldenCart.toggle(context.getLevel(), context.getClickedPos());
+                player.sendOverlayMessage(Component.translatable("siftec.customizer.golden_cart"));
+            }
+            return InteractionResult.SUCCESS;
+        }
         BlockPos controller = BuildingIndex.controllerOf(context.getLevel(), context.getClickedPos());
         if (controller == null || !(context.getLevel().getBlockEntity(controller) instanceof ControllerBlockEntity c)) {
             player.sendOverlayMessage(Component.translatable("siftec.customizer.not_building"));

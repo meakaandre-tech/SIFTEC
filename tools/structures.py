@@ -163,8 +163,10 @@ class Frame:
     front row (where the player stands) away. Directions in block states are as built facing north: south is the front,
     east is to the player's right."""
 
-    def __init__(self, width, depth):
-        assert width % 2 == 1, "a building is an odd number of blocks wide, so it has a middle column"
+    def __init__(self, width, depth, even=False):
+        # a building is an odd number of blocks wide, so it has a middle column; the Foundations tab's 8-wide pieces
+        # (even=True) have theirs just right of the middle
+        assert width % 2 == 1 or even, "a building is an odd number of blocks wide, so it has a middle column"
         self.w, self.d = width, depth
         self.cells, self.nbt = {}, {}
 
@@ -1252,6 +1254,52 @@ def drone_port():
     return f.done()
 
 
+# ------------------------------------------------------------------------------------------------ the Foundations tab
+# 8 by 8 foundations, 8-wide walls and a roof (Satisfactory's sizes in blocks), built of the blocks their materials
+# replace (content.py MATERIALS): a foundation's top light grey concrete and body grey, a wall's panels white, a
+# roof's tiles orange terracotta. The controller is the middle of the front edge.
+F_TOP, F_BODY, W_BODY, R_BODY = "minecraft:light_gray_concrete", "minecraft:gray_concrete", "minecraft:white_concrete", "minecraft:orange_terracotta"
+
+
+def foundation(height):
+    f = Frame(8, 8, even=True)
+    f.box(-4, 0, 0, 3, height - 2, 7, F_BODY) if height > 1 else None
+    f.box(-4, height - 1, 0, 3, height - 1, 7, F_TOP)
+    f.set(0, 0, 0, CONTROLLER)
+    return f.done()
+
+
+def wall():
+    f = Frame(8, 1, even=True)
+    f.box(-4, 0, 0, 3, 3, 0, W_BODY)
+    f.set(0, 0, 0, CONTROLLER)
+    return f.done()
+
+
+def roof():
+    # rising one block every two toward the back: a stepped slope four blocks high
+    f = Frame(8, 8, even=True)
+    for z in range(8):
+        h = z // 2
+        f.box(-4, h, z, 3, h, z, R_BODY)
+    f.set(0, 0, 0, CONTROLLER)
+    return f.done()
+
+
+def billboard(width, height, post_x):
+    # a board on two posts, a dark rim round a white face; its sign (the text) at the foot of the face, in front of it
+    f = Frame(width, 2, even=True)
+    left, right = -(width // 2), width // 2 - 1
+    for x in post_x:
+        f.box(x, 0, 1, x, 1, 1, LIGHT)
+    f.box(left, 2, 1, right, height + 1, 1, DARK)
+    f.box(left + 1, 3, 1, right - 1, height, 1, W_BODY)
+    f.set(0, 2, 1, W_BODY)
+    f.set(0, 2, 0, f"siftec:billboard_{'small' if width == 8 else 'large'}_sign[facing=south,waterlogged=false]")
+    f.set(post_x[0], 0, 0, CONTROLLER)
+    return f.done()
+
+
 BUILT = {"test_building": test_building, "test_miner": test_miner,
          "constructor": constructor, "smelter": smelter,
          "miner_mk1": lambda: miner(8, ORANGE, ORANGE), "miner_mk2": lambda: miner(9, LIGHT, ORANGE),
@@ -1267,7 +1315,10 @@ BUILT = {"test_building": test_building, "test_miner": test_miner,
          "resource_well_pressurizer": resource_well_pressurizer, "resource_well_extractor": resource_well_extractor,
          "particle_accelerator": particle_accelerator, "converter": converter,
          "equipment_workshop": equipment_workshop, "awesome_sink": awesome_sink, "awesome_shop": awesome_shop, "radar_tower": radar_tower,
-         "truck_station": truck_station, "drone_port": drone_port}
+         "truck_station": truck_station, "drone_port": drone_port,
+         "foundation_1m": lambda: foundation(1), "foundation_2m": lambda: foundation(2), "foundation_4m": lambda: foundation(4),
+         "wall_4m": wall, "roof_4m": roof,
+         "billboard_small": lambda: billboard(8, 4, (-3, 2)), "billboard_large": lambda: billboard(16, 8, (-6, 5))}
 
 if __name__ == "__main__":
     for bid, make in BUILT.items():

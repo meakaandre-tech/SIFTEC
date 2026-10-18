@@ -32,6 +32,9 @@ public class SiftecClient implements ClientModInitializer {
             com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer.SplitShaftRenderState> split =
             com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer::new;
         BlockEntityRendererRegistry.register(ModBlockEntities.GOVERNOR.get(), split);
+        // the AWESOME Shop's signs and billboards, and the cosmetics drawn on players and blocks
+        BlockEntityRendererRegistry.register(ModBlockEntities.SHOP_SIGN.get(), ShopSignRenderer::new);
+        CosmeticsClient.register();
         // custom fluids borrow water's textures and are told apart by colour
         for (FluidEntry fluid : ModFluids.ALL.values()) {
             AllFluidConfigs.MODEL.put(fluid.still, new FluidModel.Unbaked(

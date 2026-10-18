@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "siftec:block/ficsmas_gift"
+    },
+    "facing=west": {
+      "model": "siftec:block/ficsmas_gift",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "siftec:block/ficsmas_gift",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "siftec:block/ficsmas_gift",
+      "y": 270
+    }
+  }
+}

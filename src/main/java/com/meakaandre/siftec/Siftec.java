@@ -83,6 +83,7 @@ public class Siftec implements ModInitializer {
         com.meakaandre.siftec.building.LegacyConversion.register();
         com.meakaandre.siftec.drone.DroneEntity.register();
         com.meakaandre.siftec.command.PolishTests.register();
+        com.meakaandre.siftec.cosmetic.Emotes.register();
         com.meakaandre.siftec.compat.ToxicShot.register();
     }
 
