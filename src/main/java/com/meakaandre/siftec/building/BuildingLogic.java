@@ -116,6 +116,7 @@ public final class BuildingLogic {
         syncFilter(level, c);
         formTanks(level, c);
         Processors.ensureCell(level, c);
+        if (def.logic().equals("drone_port")) SpecialBuildings.dronePortPlaced(level, c);
     }
 
     /**
@@ -506,13 +507,18 @@ public final class BuildingLogic {
                 parts.add(Component.translatable("siftec.building.storage", used, total));
             }
             case "truck_station" -> TruckStations.status(level, c, parts);
+            case "drone_port" -> {
+                if (SpecialBuildings.droneTerminal(level, c) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port) {
+                    parts.add(Component.translatable(port.statusKey(), port.chargesNeeded()));
+                }
+            }
             default -> {
             }
         }
         ProductionLogic.status(level, c, def, parts);
         ExtractorLogic.status(level, c, def, parts);
         if (!def.logic().equals("storage") && !def.logic().isEmpty() && !def.logic().equals("power") && !def.logic().contains("extractor")
-            && !def.logic().equals("pressurizer") && !java.util.Set.of("workshop", "shop", "radar", "truck_station").contains(def.logic())) {
+            && !def.logic().equals("pressurizer") && !java.util.Set.of("workshop", "shop", "radar", "truck_station", "drone_port").contains(def.logic())) {
             parts.add(Component.translatable("siftec.building.made", c.made));
         }
         BuildingPower.status(level, c, def, parts);

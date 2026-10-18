@@ -7,7 +7,10 @@ import com.meakaandre.siftec.sink.ShopMenu;
 import com.meakaandre.siftec.sink.Sink;
 import com.meakaandre.siftec.sink.SinkMenu;
 import com.meakaandre.siftec.workshop.WorkshopMenu;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -58,11 +61,30 @@ public final class SpecialBuildings {
             }
             case "radar" -> Radar.use(player, c);
             case "truck_station" -> TruckStations.use(player, c, def);
+            case "drone_port" -> {
+                if (!mayOperate(player, c)) player.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
+                else if (droneTerminal(player.level(), c) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port) com.meakaandre.siftec.drone.DroneMenu.open(player, port);
+            }
             default -> {
                 return false;
             }
         }
         return true;
+    }
+
+    /** The Drone Port building's loading terminal (the Drone Port block under its pad), or null. */
+    public static @Nullable BlockEntity droneTerminal(net.minecraft.world.level.Level level, ControllerBlockEntity c) {
+        BlockPos at = BuildingLogic.cell(c, com.meakaandre.siftec.registry.ModBlocks.DRONE_PORT.get());
+        return at == null ? null : level.getBlockEntity(at);
+    }
+
+    /** A Drone Port building put down: its terminal is the company's, and it is on the company's list of ports. */
+    static void dronePortPlaced(ServerLevel level, ControllerBlockEntity c) {
+        if (!(droneTerminal(level, c) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port)) return;
+        port.companyId = c.companyId;
+        port.setChanged();
+        BlockPos pos = port.getBlockPos();
+        if (!c.companyId.isEmpty()) com.meakaandre.siftec.place.Places.add(level, pos, com.meakaandre.siftec.place.Places.DRONE_PORT, c.companyId, "Port " + pos.getX() + ", " + pos.getZ());
     }
 
     /**

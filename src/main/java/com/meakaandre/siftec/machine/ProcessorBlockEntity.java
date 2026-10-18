@@ -1,38 +1,37 @@
 package com.meakaandre.siftec.machine;
 
-import com.meakaandre.siftec.hub.Milestone;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
-import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Prediction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.Containers;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The old single-block Converter or Particle Accelerator, as an old world still has it. It makes nothing any more
+ * (the Build Gun buildings of the same names run their recipes on real machines): it only keeps what it held, and the
+ * first time it ticks it is turned into the building, or taken away with its cost given back
+ * ({@link com.meakaandre.siftec.building.LegacyConversion}).
+ */
 public class ProcessorBlockEntity extends KineticBlockEntity {
-    private static final int MB = 81, INPUTS = 9, OUTPUT = 9;
+    private static final int MB = 81;
 
     public final Items items = new Items();
     public SmartFluidTankBehaviour tank;
-    private int selected;
-    private float progress;
+    private boolean queued;
 
     public ProcessorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -45,192 +44,53 @@ public class ProcessorBlockEntity extends KineticBlockEntity {
         behaviours.add(tank);
     }
 
-    private List<ProcessorRecipe> recipes() {
-        return getBlockState().getBlock() instanceof ProcessorBlock block ? ProcessorRecipe.of(block.machine) : List.of();
-    }
-
-    private @Nullable ProcessorRecipe recipe() {
-        List<ProcessorRecipe> list = recipes();
-        return list.isEmpty() ? null : list.get(Math.floorMod(selected, list.size()));
-    }
-
-    /** Selects a recipe by its place in the machine's list (the selftest uses it). */
-    public void select(int index) {
-        selected = index;
-        progress = 0;
-        setChanged();
-    }
-
-    /** True if everything the selected recipe needs is in and there is room for what it makes. */
-    public boolean readyNow() {
-        ProcessorRecipe recipe = recipe();
-        return recipe != null && ready(recipe);
-    }
-
-    /** An empty-handed click: take the output, or (sneaking) switch to the next recipe. */
-    public void use(Player player) {
-        if (!(player instanceof ServerPlayer server)) return;
-        ItemStack out = items.stacks.get(OUTPUT);
-        if (!player.isShiftKeyDown() && !out.isEmpty()) {
-            items.stacks.set(OUTPUT, ItemStack.EMPTY);
-            player.getInventory().placeItemBackInInventory(out, Prediction.SERVER_ONLY);
-            setChanged();
-            return;
-        }
-        if (player.isShiftKeyDown() && !recipes().isEmpty()) {
-            for (int tries = 0; tries < recipes().size(); tries++) {
-                selected = Math.floorMod(selected + 1, recipes().size());
-                if (unlocked(recipes().get(selected))) break;
-            }
-            progress = 0;
-            // what was waiting for the old recipe comes back out
-            for (int i = 0; i < INPUTS; i++) {
-                ItemStack stack = items.stacks.get(i);
-                if (stack.isEmpty()) continue;
-                items.stacks.set(i, ItemStack.EMPTY);
-                player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
-            }
-            setChanged();
-        }
-        ProcessorRecipe recipe = recipe();
-        if (recipe != null) server.sendOverlayMessage(Component.translatable("siftec.processor.selected", recipe.label()));
-    }
-
-    /**
-     * True if this input slot may hold the stack. The nine slots are shared out among the selected recipe's
-     * ingredients (slot i belongs to ingredient i mod n), so a plentiful ingredient can never fill the slots the
-     * scarce one needs and stall the machine.
-     */
-    private boolean slotTakes(int slot, ItemStack stack) {
-        ProcessorRecipe recipe = recipe();
-        if (slot >= INPUTS || recipe == null || stack.isEmpty()) return false;
-        List<Milestone.Cost> inputs = recipe.inputs();
-        if (inputs.isEmpty()) return false;
-        return inputs.get(slot % inputs.size()).matches(stack);
-    }
-
-    /** Puts a held stack into the inputs if the selected recipe uses it. */
-    public boolean insert(ItemStack stack) {
-        ProcessorRecipe recipe = recipe();
-        if (recipe == null || !recipe.uses(stack)) return false;
-        for (int i = 0; i < INPUTS && !stack.isEmpty(); i++) {
-            if (!slotTakes(i, stack)) continue;
-            ItemStack slot = items.stacks.get(i);
-            if (slot.isEmpty()) {
-                items.stacks.set(i, stack.copy());
-                stack.setCount(0);
-            } else if (ItemStack.isSameItemSameComponents(slot, stack)) {
-                int move = Math.min(stack.getCount(), slot.getMaxStackSize() - slot.getCount());
-                slot.grow(move);
-                stack.shrink(move);
-            }
-        }
-        setChanged();
-        return true;
-    }
-
-    private int have(Milestone.Cost cost) {
-        int n = 0;
-        for (int i = 0; i < INPUTS; i++) if (cost.matches(items.stacks.get(i))) n += items.stacks.get(i).getCount();
-        return n;
-    }
-
-    /** An alternate only runs once the company this machine belongs to has picked it from a Hard Drive. */
-    private boolean unlocked(ProcessorRecipe recipe) {
-        if (recipe.alt() == null) return true;
-        com.meakaandre.siftec.company.Company company = com.meakaandre.siftec.owner.Ownership.of(this);
-        return company != null && company.has(recipe.alt());
-    }
-
-    private boolean ready(ProcessorRecipe recipe) {
-        if (!unlocked(recipe)) return false;
-        for (Milestone.Cost cost : recipe.inputs()) if (have(cost) < cost.count()) return false;
-        FluidStack held = tank.getPrimaryHandler().getFluid();
-        if (recipe.fluidIn() != null) {
-            Fluid needed = ProcessorRecipe.fluid(recipe.fluidIn());
-            if (needed == Fluids.EMPTY || held.isEmpty() || held.getFluid() != needed || held.getAmount() < recipe.fluidInMb() * MB) return false;
-        }
-        if (recipe.outItem() != null) {
-            ItemStack out = items.stacks.get(OUTPUT);
-            if (recipe.item() == net.minecraft.world.item.Items.AIR) return false;
-            if (!out.isEmpty() && (!out.is(recipe.item()) || out.getCount() + recipe.outCount() > out.getMaxStackSize())) return false;
-        }
-        if (recipe.fluidOut() != null) {
-            Fluid made = ProcessorRecipe.fluid(recipe.fluidOut());
-            if (made == Fluids.EMPTY) return false;
-            if (!held.isEmpty() && (held.getFluid() != made || held.getAmount() + recipe.fluidOutMb() * MB > 4000 * MB)) return false;
-        }
-        return true;
+    /** Which building this was: "converter" or "particle_accelerator". */
+    public String machine() {
+        return getBlockState().getBlock() instanceof ProcessorBlock block ? block.machine : "";
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (level == null || level.isClientSide()) return;
-        ProcessorRecipe recipe = recipe();
-        float speed = Math.abs(getSpeed());
-        if (recipe == null || speed == 0 || !ready(recipe)) {
-            progress = 0;
-            return;
+        if (queued || !(level instanceof ServerLevel server)) return;
+        queued = true;
+        com.meakaandre.siftec.building.LegacyConversion.queue(server, worldPosition);
+    }
+
+    /** Everything it held, emptied out of it. */
+    public List<ItemStack> takeAll() {
+        List<ItemStack> out = new ArrayList<>();
+        for (int i = 0; i < items.stacks.size(); i++) {
+            ItemStack stack = items.stacks.get(i);
+            if (!stack.isEmpty()) out.add(stack);
+            items.stacks.set(i, ItemStack.EMPTY);
         }
-        // a recipe's time is what it takes at 32 RPM
-        progress += speed / 32f;
-        if (progress < recipe.seconds() * 20f) return;
-        progress = 0;
-        for (Milestone.Cost cost : recipe.inputs()) {
-            int left = cost.count();
-            for (int i = 0; i < INPUTS && left > 0; i++) {
-                ItemStack stack = items.stacks.get(i);
-                if (!cost.matches(stack)) continue;
-                int take = Math.min(left, stack.getCount());
-                stack.shrink(take);
-                if (stack.isEmpty()) items.stacks.set(i, ItemStack.EMPTY);
-                left -= take;
-            }
-        }
-        if (recipe.fluidIn() != null) tank.getPrimaryHandler().extract(tank.getPrimaryHandler().getFluid(), recipe.fluidInMb() * MB);
-        if (recipe.outItem() != null) {
-            ItemStack out = items.stacks.get(OUTPUT);
-            if (out.isEmpty()) items.stacks.set(OUTPUT, new ItemStack(recipe.item(), recipe.outCount()));
-            else out.grow(recipe.outCount());
-        }
-        if (recipe.fluidOut() != null) tank.getPrimaryHandler().insert(new FluidStack(ProcessorRecipe.fluid(recipe.fluidOut()), recipe.fluidOutMb() * MB));
-        setChanged();
+        return out;
     }
 
     @Override
     public float calculateStressApplied() {
-        lastStressApplied = 64f;
+        lastStressApplied = 0f;
         return lastStressApplied;
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        if (level != null) Containers.dropContents(level, worldPosition, items);
     }
 
     @Override
     protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        view.putInt("Selected", selected);
-        view.putFloat("Progress", progress);
         view.store("Items", ItemStack.OPTIONAL_CODEC.listOf(), List.copyOf(items.stacks));
     }
 
     @Override
     protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        selected = view.getIntOr("Selected", 0);
-        progress = view.getFloatOr("Progress", 0);
         List<ItemStack> saved = view.read("Items", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of());
         for (int i = 0; i < items.stacks.size(); i++) items.stacks.set(i, i < saved.size() ? saved.get(i) : ItemStack.EMPTY);
     }
 
-    /** Nine input slots, which only take what the selected recipe uses, and one output slot. */
+    /** What it held: nothing goes in any more, and everything comes out. */
     public class Items implements WorldlyContainer {
         private static final int[] SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        final NonNullList<ItemStack> stacks = NonNullList.withSize(10, ItemStack.EMPTY);
+        public final NonNullList<ItemStack> stacks = NonNullList.withSize(10, ItemStack.EMPTY);
 
         @Override
         public int[] getSlotsForFace(Direction side) {
@@ -239,17 +99,17 @@ public class ProcessorBlockEntity extends KineticBlockEntity {
 
         @Override
         public boolean canPlaceItem(int slot, ItemStack stack) {
-            return slotTakes(slot, stack);
+            return false;
         }
 
         @Override
         public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
-            return canPlaceItem(slot, stack);
+            return false;
         }
 
         @Override
         public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-            return slot == OUTPUT;
+            return true;
         }
 
         @Override

@@ -252,7 +252,7 @@ lang.update({"siftec.jetpack.empty": "Jetpack: out of fuel. It burns Solid Biofu
              "siftec.crash.somersloop": "There was a Somersloop in the wreckage too",
              "siftec.radar.title": "Radar Tower: nearest of each, from here", "siftec.radar.line": "%s: %s blocks %s (x %s, z %s)",
              "siftec.radar.nothing": "Nothing in range", "siftec.radar.no_power": "The Radar Tower has no power",
-             "siftec.radar.revealed": "Radar Tower: %s new crash sites found. They are on the map",
+             "siftec.radar.revealed": "Radar Tower: %s new crash sites found. They are on the map", "siftec.radar.geysers": "Radar Tower: %s geysers found. They are on the map",
              "siftec.map.unlocked": "Field Research: the Map is yours. M opens it, and the minimap is at the top right (N hides it)"})
 # the map (work package 15): compass strip, minimap, fullscreen map with its filter panel and markers
 lang.update({"key.category.siftec.map": "SIFTEC Map", "key.siftec.map.open": "Open the map", "key.siftec.map.minimap": "Show or hide the minimap",
@@ -367,7 +367,7 @@ for fid, (fname, tint) in PRESERVE_ICONS.items():
     lang[f"item.siftec.{fid}"] = fname
     write(f"{A}/models/item/{fid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/honey_bottle" if fid == "mead" else "minecraft:item/potion"}})
     item_def(fid, f"siftec:item/{fid}", tint)
-lang.update({"siftec.season.locked": "Your company has not researched Automated Cooking yet (MAM, Nutrients)", "siftec.season.already": "That food is already seasoned",
+lang.update({"siftec.season.locked": "Your company has not researched Automated Cooking yet (MAM, Nutrients)", "siftec.preserve.locked": "Throwing jars needs the Preserved Foods research (MAM, Nutrients)", "siftec.season.already": "That food is already seasoned",
              "siftec.season.short": "You need %s of the ingredient: one for each item of food", "siftec.season.long": "Seasoned with glowstone: effects last twice as long",
              "siftec.season.strong": "Seasoned with blaze powder: effects one level stronger", "siftec.season.bonus": "Seasoned with nether wart: one more effect at random"})
 lang["item.siftec.toxic_shot"] = "Toxic Shot"
@@ -501,7 +501,7 @@ lang.update({"item.siftec.object_scanner": "Object Scanner", "siftec.collect.alr
              "siftec.scanner.target.hard_drive": "Crash Site (Hard Drive)", "siftec.scanner.target.mercer_sphere": "Mercer Sphere",
              "siftec.scanner.target.somersloop": "Somersloop", "siftec.scanner.target.sweet_berries": "Sweet Berry Bush",
              "siftec.scanner.target.apples": "Apple Tree", "siftec.scanner.target.glow_berries": "Glow Berries",
-             "siftec.scanner.target.mobs": "Hostile Mob",
+             "siftec.scanner.target.mobs": "Hostile Mob", "siftec.scanner.target.geyser": "Geyser", "siftec.scanner.searching": "Scanning for %s...",
              "siftec.mam.tree_started": "MAM: the %s research tree is open to your company",
              "siftec.crash.needs_power": "The pod is sealed. Wire its connector to a grid with %s MW (%s SU) to spare; it has %s SU"})
 write(f"{A}/models/item/object_scanner.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/compass_16"}})
@@ -882,7 +882,7 @@ lang.update({"siftec.workshop.title": "Equipment Workshop",
 # ---- Build Gun and its buildings (building/BuildGun.java, building/Buildings.java)
 data["buildings"] = []
 LOGICS = {"basin", "smelter", "miner", "portable_miner", "storage", "power", "assembly", "packager", "extractor", "pressurizer",
-          "well_extractor", "processor", "workshop", "sink", "shop", "radar", "truck_station"}
+          "well_extractor", "processor", "workshop", "sink", "shop", "radar", "truck_station", "drone_port"}
 POWERS = {"pole", "storage", "augmenter", "biomass", "coal", "fuel", "geothermal", "nuclear"}
 for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if tab not in content.BUILD_TABS:

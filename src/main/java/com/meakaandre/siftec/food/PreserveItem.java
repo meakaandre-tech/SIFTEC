@@ -19,7 +19,8 @@ import java.util.Optional;
 
 /**
  * A pickle, a jam or mead. Eaten, it heals more than plain food and gives its ingredient's effect stronger and
- * for longer. Sneak and use it to throw the jar instead: it bursts like a splash potion with the same effect.
+ * for longer. Sneak and use it to throw the jar instead (once the company has the Preserved Foods research): it bursts
+ * like a splash potion with the same effect.
  */
 public class PreserveItem extends Item {
     public final Food.Intrinsic intrinsic;
@@ -32,6 +33,11 @@ public class PreserveItem extends Item {
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (!player.isShiftKeyDown() || intrinsic.effect == null) return super.use(level, player, hand);
+        // throwing a jar is the Preserved Foods research's ("food:preserves")
+        if (player instanceof net.minecraft.server.level.ServerPlayer server && !mayThrow(server)) {
+            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.preserve.locked"));
+            return InteractionResult.FAIL;
+        }
         if (level instanceof ServerLevel server) {
             ItemStack jar = new ItemStack(Items.SPLASH_POTION);
             jar.set(DataComponents.POTION_CONTENTS, new PotionContents(Optional.empty(), Optional.empty(),
@@ -40,5 +46,10 @@ public class PreserveItem extends Item {
             player.getItemInHand(hand).consume(1, player);
         }
         return InteractionResult.SUCCESS;
+    }
+
+    /** True if the player's company may throw jars: it has done the research carrying "food:preserves" (creative always may). */
+    public static boolean mayThrow(net.minecraft.server.level.ServerPlayer player) {
+        return player.hasInfiniteMaterials() || com.meakaandre.siftec.company.Companies.of(player).hasToken(Food.TOKEN_PRESERVES);
     }
 }

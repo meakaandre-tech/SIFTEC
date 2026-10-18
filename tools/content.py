@@ -247,7 +247,7 @@ MILESTONES = [
 
     # Tier 3 (Wormhole Phase 1)
     (3, "coal_power", "Coal Power",
-     "Coal Generator, Water Extractor, Fluid Pipe, Mechanical Pump, Fluid Tank, Hose Pulley, Steam Engine and Blaze Burner, coal nodes on the scanner",
+     "Coal Generator, Water Extractor, Fluid Pipe, Mechanical Pump, Fluid Tank (one block wide until Petroleum Power), Hose Pulley, Steam Engine and Blaze Burner, coal nodes on the scanner",
      [C + "steam_engine", C + "blaze_burner", C + "empty_blaze_burner", C + "fluid_pipe", C + "mechanical_pump", C + "fluid_tank", C + "hose_pulley"],
      ["scanner:coal"]),
     (3, "vehicular_transport", "Vehicular Transport",
@@ -283,8 +283,8 @@ MILESTONES = [
     (5, "fluid_packaging", "Fluid Packaging",
      "Packager (Spout and Item Drain), Empty Canister and packaged fluids, Liquid Biofuel, Portable Fluid Interface",
      [C + "spout", C + "item_drain", C + "portable_fluid_interface", "createdieselgenerators:canister"], []),
-    (5, "petroleum_power", "Petroleum Power", "Fuel Generator (51,200 SU), Diesel Engines",
-     ["createdieselgenerators:diesel_engine", "createdieselgenerators:large_diesel_engine", "createdieselgenerators:huge_diesel_engine"], []),
+    (5, "petroleum_power", "Petroleum Power", "Fuel Generator (51,200 SU), Diesel Engines; larger Fluid Tanks (up to 3 by 3; one block wide before)",
+     ["createdieselgenerators:diesel_engine", "createdieselgenerators:large_diesel_engine", "createdieselgenerators:huge_diesel_engine"], ["tanks:large"]),
 
     # Tier 6
     (6, "industrial_manufacturing", "Industrial Manufacturing",
@@ -309,8 +309,8 @@ MILESTONES = [
 
     # Tier 8
     (8, "aeronautical_engineering", "Aeronautical Engineering",
-     "Drone Port and Drone (Create's package network), sulfur nodes on the scanner",
-     ["siftec:drone_port", "siftec:cardboard_drone", C + "packager", C + "package_frogport", C + "repackager", C + "stock_link", C + "stock_ticker",
+     "Drone Port (a Build Gun building) and Drone (Create's package network), sulfur nodes on the scanner",
+     ["siftec:cardboard_drone", C + "packager", C + "package_frogport", C + "repackager", C + "stock_link", C + "stock_ticker",
       C + "redstone_requester", C + "factory_gauge", C + "chain_conveyor"], ["scanner:sulfur"]),
     (8, "nuclear_power", "Nuclear Power",
      "Nuclear Power Plant (512,000 SU); Encased Uranium Cell, Electromagnetic Control Rod, Uranium Fuel Rod and Magnetic Field Generator; "
@@ -321,12 +321,12 @@ MILESTONES = [
     (8, "leading_edge_production", "Leading-edge Production", "Miner Mk.3; Turbo Motor and Thermal Propulsion Rocket", [], []),
     (8, "particle_enrichment", "Particle Enrichment",
      "Particle Accelerator; Nitric Acid, Non-Fissile Uranium, Plutonium, Copper Powder, Pressure Conversion Cube and Nuclear Pasta",
-     ["siftec:particle_accelerator"], []),
+     [], []),
 
     # Tier 9 (Wormhole Phase 4)
     (9, "matter_conversion", "Matter Conversion",
      "Converter; Ficsite, Diamonds, Time Crystal, Biochemical Sculptor, Reanimated SAM and SAM Fluctuator; SAM nodes on the scanner",
-     ["siftec:converter"], ["scanner:sam"]),
+     [], ["scanner:sam"]),
     (9, "quantum_encoding", "Quantum Encoding",
      "Quantum Encoder; Excited Photonic Matter, Dark Matter, Superposition Oscillator, Neural-Quantum Processor and AI Expansion Server", [], []),
     (9, "ficsit_blueprints_mk3", "FICSIT Blueprints Mk.3", "Blueprint Designer Mk.3", ["siftec:blueprint_designer_mk3"], []),
@@ -375,7 +375,10 @@ MILESTONES = [(t, mid, name, _sat_cost(_by_sat[mid][1]), _mmss(_by_sat[mid][2]),
 # Switched off for good: they can be neither crafted nor placed.
 DISABLED = [C + "water_wheel", C + "large_water_wheel", C + "blaze_cake", C + "blaze_cake_base", C + "creative_blaze_cake",
             "the_sift:sift_portal", "the_sift:sift_rift", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill",
-            C + "schematic", "farmersdelight:wheat_dough"]   # Create's dough replaces Farmer's Delight's
+            C + "schematic", "farmersdelight:wheat_dough",   # Create's dough replaces Farmer's Delight's
+            # the old single-block Drone Port, Converter and Particle Accelerator: Build Gun buildings now (an old world's are
+            # turned into the buildings when they load, building/LegacyConversion.java)
+            "siftec:drone_port", "siftec:converter", "siftec:particle_accelerator"]
 
 # Wormhole phases, delivered at the Wormhole Gateway. Phase n opens the tiers listed.
 PHASES = [
@@ -515,7 +518,7 @@ MAM = [
                                C + "powered_toggle_latch", C + "analog_lever", C + "redstone_contact"], []),
         ("Display Systems", "10 Crystal Oscillator, 100 Modular Frame", "Display Link, Display Board and Nixie Tube; the Explorer",
          ["Crystal Oscillator"], [C + "display_link", C + "display_board", C + "nixie_tube"], []),
-        ("Radar Technology", "50 Crystal Oscillator, 50 Heavy Modular Frame, 50 Computer", "Radar Tower (clears the map's fog over about a kilometre round it, showing its crash sites)",
+        ("Radar Technology", "50 Crystal Oscillator, 50 Heavy Modular Frame, 50 Computer", "Radar Tower (clears the map's fog over about a kilometre round it, showing its crash sites and geysers)",
          ["Crystal Oscillator"], [], []),
         ("Tidal Research", "4 minecraft:nautilus_shell, 32 minecraft:prismarine_shard, 20 Quartz Crystal",
          "Trident (Manufacturer: 10 Steel Pipe, 5 Crystal Oscillator, 50 Quickwire, 16 prismarine shard)", ["Crystal Oscillator"], [], []),
@@ -539,14 +542,14 @@ MAM = [
         ("Turbofuel", "1 Hard Drive, 15 Compacted Coal, 50 Packaged Fuel", "Turbofuel", ["Experimental Power Generation"], ["siftec:turbofuel_bucket"], []),
         ("Rocket Fuel", "1 Hard Drive, 10 Empty Fluid Tank, 100 Packaged Turbofuel", "Rocket Fuel, packed and unpacked", ["Turbofuel"], [], []),
         ("Ionized Fuel", "1 Hard Drive, 100 Time Crystal, 200 Packaged Rocket Fuel", "Ionized Fuel, packed and unpacked", ["Rocket Fuel"], [], []),
-        ("Geothermal Power", "100 High-Speed Connector, 1000 Quickwire, 50 Motor", "Geothermal Generator (Geyser Engine) over a sulfur geyser",
-         ["Experimental Power Generation"], [], []),
+        ("Geothermal Power", "100 High-Speed Connector, 1000 Quickwire, 50 Motor", "Geothermal Generator (Geyser Engine) over a sulfur geyser; geysers on the Object Scanner",
+         ["Experimental Power Generation"], [], ["object:geysers"]),
     ]),
     ("alien", "Alien Technology", "siftec:mercer_sphere", [
         ("Mercer Sphere Analysis", "1 Mercer Sphere", "The Object Scanner finds Mercer Spheres", [], [], ["object:mercer_sphere"]),
         ("Somersloop Analysis", "1 Somersloop", "The Object Scanner finds Somersloops", [], [], ["object:somersloop"]),
         ("SAM Analysis", "10 SAM", "SAM nodes on the scanner", [], [], ["scanner:sam"]),
-        ("SAM Reanimation", "20 SAM", "Reanimated SAM (fan haunting)", ["SAM Analysis"], [], []),
+        ("SAM Reanimation", "20 SAM", "Reanimated SAM (Constructor: 4 SAM)", ["SAM Analysis"], [], []),
         ("SAM Fluctuator", "10 Reanimated SAM, 100 Steel Pipe, 200 Wire", "SAM Fluctuator", ["SAM Reanimation"], [], []),
         ("Dimensional Depot", "1 Mercer Sphere, 11 SAM Fluctuator", "Dimensional Depot: uploads the Item Vault it sits on to the company's cloud",
          ["Mercer Sphere Analysis", "SAM Fluctuator"], ["siftec:dimensional_depot"], []),
@@ -1259,6 +1262,9 @@ BUILDINGS = [
     ("tractor", "Tractor", "logistics", BUILD_COSTS["Tractor"], "vehicular_transport", False, {"prefab": "vehicle"}),
     ("truck", "Truck", "logistics", BUILD_COSTS["Truck"], "logistics_mk4", False, {"prefab": "vehicle"}),
     ("explorer", "Explorer", "logistics", BUILD_COSTS["Explorer"], mam("Quartz", "Display Systems"), False, {"prefab": "vehicle"}),
+    # the Drone Port: Satisfactory's raised landing pad with the loading terminal underneath (the terminal is the Drone
+    # Port block, which keeps the drone, its packages, fire charges and flight); the drone takes off from and lands on the pad
+    ("drone_port", "Drone Port", "logistics", BUILD_COSTS["Drone Port"], "aeronautical_engineering", False, {"logic": "drone_port"}),
 ]
 # The buildings whose Basin is a Brass Basin (four stacks of each item), for the recipe checkers
 BRASS_BASIN_BUILDINGS = ("manufacturer", "blender", "particle_accelerator", "converter")

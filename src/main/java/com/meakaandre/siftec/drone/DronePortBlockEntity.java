@@ -1,13 +1,10 @@
 package com.meakaandre.siftec.drone;
 
 import com.meakaandre.siftec.equip.Ziplines;
-import com.meakaandre.siftec.mixin.BlockDisplayInvoker;
-import com.meakaandre.siftec.mixin.DisplayInvoker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -24,17 +21,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Drone Port with one Cardboard Drone. When packages are waiting and there are fire charges for the trip,
- * the drone carries every waiting package to the chosen port, unloads, and flies home. The trip is worked
- * out by time, so it goes on over land that is not loaded; the drone you see is only drawn where it can be. A far port
- * whose chunk does not tick takes the packages all the same: the factory simulation unloads them into it (work package
- * 17), and while this port's own chunk does not tick the simulation flies its drone (SimData's drone ports).
+ * A Drone Port's loading terminal, under the landing pad of the Drone Port building, with one Cardboard Drone. When
+ * packages are waiting and there are fire charges for the trip, the drone takes off from the pad, carries every waiting
+ * package to the chosen port's pad, unloads, and flies home to land on its own pad again. The trip is worked out by time,
+ * so it goes on over land that is not loaded; the drone you see ({@link DroneEntity}) is only drawn where it can be. A
+ * far port whose chunk does not tick takes the packages all the same: the factory simulation unloads them into it (work
+ * package 17), and while this port's own chunk does not tick the simulation flies its drone (SimData's drone ports).
+ * <p>
+ * An old single-block port (one that is no building's) is turned into the building when it first ticks
+ * ({@link com.meakaandre.siftec.building.LegacyConversion}).
  */
 public class DronePortBlockEntity extends BlockEntity {
     public static final int IDLE = 0, OUTBOUND = 1, HOMEBOUND = 2;
     /** Blocks per tick, and the fire charges burned per this many blocks of a round trip. */
     private static final double SPEED = 0.8;
     private static final int BLOCKS_PER_CHARGE = 100, GROUND_TICKS = 40, CRUISE = 12;
+    /** Ticks the drone takes to climb off its pad, and to come down onto the other: half of GROUND_TICKS each. */
+    private static final int CLIMB_TICKS = GROUND_TICKS / 2;
+    /** The landing pad's deck is this far over the terminal, straight up (tools/structures.py, drone_port). */
+    public static final int PAD_DY = 10;
 
     public String companyId = "";
     public final PortContainer items = new PortContainer(this::setChanged);
@@ -43,7 +48,8 @@ public class DronePortBlockEntity extends BlockEntity {
     public int state = IDLE;
     private int ticks, total;
     private final List<ItemStack> cargo = new ArrayList<>();
-    private @Nullable Display shown;
+    private @Nullable DroneEntity shown;
+    private boolean legacyQueued;
 
     public DronePortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -71,9 +77,26 @@ public class DronePortBlockEntity extends BlockEntity {
 
     public void serverTick() {
         if (!(level instanceof ServerLevel server)) return;
-        if (server.getGameTime() % 20 == 0) com.meakaandre.siftec.sim.Factories.port(server, this);
+        if (!legacyQueued && com.meakaandre.siftec.building.BuildingIndex.controllerOf(server, worldPosition) == null) {
+            // an old single-block port: it becomes the Drone Port building
+            legacyQueued = true;
+            com.meakaandre.siftec.building.LegacyConversion.queue(server, worldPosition);
+        }
+        if (server.getGameTime() % 20 == 0) {
+            com.meakaandre.siftec.sim.Factories.port(server, this);
+            // the port it flies to may have been an old single-block one, moved into its building since
+            if (destination != null) {
+                BlockPos moved = com.meakaandre.siftec.building.LegacyConversion.moved(server.getServer(), destination);
+                if (!moved.equals(destination)) {
+                    destination = moved;
+                    setChanged();
+                }
+            }
+        }
         if (state == IDLE) {
-            if (shown != null) hide();
+            // a drone at home sits on the pad
+            if (hasDrone && !legacyQueued) park(server);
+            else if (shown != null) hide();
             if (!hasDrone || destination == null || level.getGameTime() % 20 != 0 || items.empty(PortContainer.OUT, PortContainer.FUEL)) return;
             int charges = chargesNeeded();
             if (items.getItem(PortContainer.FUEL).getCount() < charges) return;
@@ -136,30 +159,72 @@ public class DronePortBlockEntity extends BlockEntity {
         if (state != IDLE) ticks = 0;
     }
 
+    /** The middle of this port's landing pad, where its drone sits and takes off from. */
+    public net.minecraft.world.phys.Vec3 pad() {
+        return padOf(worldPosition);
+    }
+
+    /** The middle of the landing pad over a port's terminal (straight over it, whichever way the port faces). */
+    public static net.minecraft.world.phys.Vec3 padOf(BlockPos terminal) {
+        return new net.minecraft.world.phys.Vec3(terminal.getX() + 0.5, terminal.getY() + PAD_DY + 1, terminal.getZ() + 0.5);
+    }
+
+    /**
+     * Where the drone is this many ticks into a trip from one pad to another taking {@code total} ticks: it climbs
+     * straight up off the first pad, flies over at cruising height, and comes straight down onto the other.
+     */
+    public static net.minecraft.world.phys.Vec3 along(net.minecraft.world.phys.Vec3 from, net.minecraft.world.phys.Vec3 to, int elapsed, int total) {
+        int cruise = Math.max(1, total - 2 * CLIMB_TICKS);
+        if (elapsed <= CLIMB_TICKS) {
+            double up = ease(elapsed / (double) CLIMB_TICKS);
+            return new net.minecraft.world.phys.Vec3(from.x, from.y + CRUISE * up, from.z);
+        }
+        if (elapsed >= total - CLIMB_TICKS) {
+            double up = ease(Math.max(0, total - elapsed) / (double) CLIMB_TICKS);
+            return new net.minecraft.world.phys.Vec3(to.x, to.y + CRUISE * up, to.z);
+        }
+        double t = Math.min(1, (elapsed - CLIMB_TICKS) / (double) cruise);
+        return new net.minecraft.world.phys.Vec3(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t + CRUISE, from.z + (to.z - from.z) * t);
+    }
+
+    private static double ease(double t) {
+        t = Math.clamp(t, 0, 1);
+        return t * t * (3 - 2 * t);
+    }
+
     /** Where the drone is on its way, for drawing it. */
     private void show(ServerLevel server) {
         if (destination == null) return;
-        double done = total == 0 ? 1 : 1 - ticks / (double) total;
-        double t = state == OUTBOUND ? done : 1 - done;
-        double climb = Math.min(1, Math.min(t, 1 - t) * 10);
-        double x = worldPosition.getX() + (destination.getX() - worldPosition.getX()) * t;
-        double y = worldPosition.getY() + 1.2 + (destination.getY() - worldPosition.getY()) * t + CRUISE * climb;
-        double z = worldPosition.getZ() + (destination.getZ() - worldPosition.getZ()) * t;
-        if (!server.isLoaded(BlockPos.containing(x, y, z))) {
+        net.minecraft.world.phys.Vec3 home = pad(), away = padOf(destination);
+        boolean out = state == OUTBOUND;
+        net.minecraft.world.phys.Vec3 from = out ? home : away, to = out ? away : home;
+        int elapsed = total - ticks;
+        net.minecraft.world.phys.Vec3 at = ticks <= 0 && out ? away : along(from, to, elapsed, total);
+        float yaw = (float) (Math.atan2(-(to.x - from.x), to.z - from.z) * net.minecraft.util.Mth.RAD_TO_DEG);
+        place(server, at, yaw, ticks > 0, !cargo.isEmpty());
+    }
+
+    /** The drone at home on its pad, its propellers still. */
+    private void park(ServerLevel server) {
+        place(server, pad(), shown != null ? shown.getYRot() : 0, false, false);
+    }
+
+    private void place(ServerLevel server, net.minecraft.world.phys.Vec3 at, float yaw, boolean flying, boolean loaded) {
+        if (!server.isLoaded(BlockPos.containing(at))) {
             hide();
             return;
         }
         if (shown == null || shown.isRemoved()) {
-            Display.BlockDisplay display = net.minecraft.world.entity.EntityTypes.BLOCK_DISPLAY.create(server, EntitySpawnReason.TRIGGERED);
-            if (display == null) return;
-            ((BlockDisplayInvoker) display).siftec$show(BuiltInRegistries.BLOCK.getOptional(Identifier.parse("create:cardboard_block")).orElse(Blocks.OAK_PLANKS).defaultBlockState());
-            ((DisplayInvoker) display).siftec$glide(2);
-            display.setPos(x, y, z);
-            server.addFreshEntity(display);
-            display.addTag(Ziplines.TAG);
-            shown = display;
+            DroneEntity drone = DroneEntity.TYPE.create(server, EntitySpawnReason.TRIGGERED);
+            if (drone == null) return;
+            drone.snapTo(at.x, at.y, at.z, yaw, 0);
+            drone.addTag(Ziplines.TAG);
+            server.addFreshEntity(drone);
+            shown = drone;
         }
-        shown.setPos(x, y, z);
+        shown.setPos(at.x, at.y, at.z);
+        shown.setYRot(yaw);
+        shown.set(flying, loaded);
     }
 
     private void hide() {
@@ -263,6 +328,39 @@ public class DronePortBlockEntity extends BlockEntity {
         state = n.state;
         ticks = n.ticks;
         total = n.total;
+        setChanged();
+    }
+
+    /** Everything a port keeps, so an old single-block port's can move into the building's terminal. */
+    public record Snapshot(String companyId, boolean hasDrone, @Nullable BlockPos destination, int state, int ticks, int total,
+                           List<ItemStack> slots, List<ItemStack> cargo) {
+    }
+
+    /** Takes everything out of this port (it holds nothing afterwards, so breaking it drops nothing). */
+    public Snapshot takeSnapshot() {
+        List<ItemStack> slots = new ArrayList<>();
+        for (int i = 0; i < PortContainer.SIZE; i++) slots.add(items.removeItemNoUpdate(i));
+        Snapshot snap = new Snapshot(companyId, hasDrone, destination, state, ticks, total, slots, List.copyOf(cargo));
+        cargo.clear();
+        hasDrone = false;
+        state = IDLE;
+        hide();
+        setChanged();
+        return snap;
+    }
+
+    /** Puts a snapshot into this port, the trip under way and all. */
+    public void apply(Snapshot snap) {
+        companyId = snap.companyId();
+        hasDrone = snap.hasDrone();
+        destination = snap.destination();
+        state = snap.state();
+        ticks = snap.ticks();
+        total = snap.total();
+        for (int i = 0; i < PortContainer.SIZE; i++) items.setItem(i, i < snap.slots().size() ? snap.slots().get(i) : ItemStack.EMPTY);
+        cargo.clear();
+        cargo.addAll(snap.cargo());
+        cargo.removeIf(ItemStack::isEmpty);
         setChanged();
     }
 

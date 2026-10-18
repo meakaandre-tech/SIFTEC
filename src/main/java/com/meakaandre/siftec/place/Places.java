@@ -115,6 +115,12 @@ public final class Places {
         return place.dimension.equals(level.dimension().identifier().toString()) && place.pos().equals(pos);
     }
 
+    /** The name of the place at a spot, or null if there is none there. */
+    public static @org.jspecify.annotations.Nullable String nameAt(ServerLevel level, BlockPos pos) {
+        for (Place place : Data.get(level.getServer()).stored.places.values()) if (same(place, level, pos)) return place.name;
+        return null;
+    }
+
     /** For the self-test: how many places a company has, without dropping any. */
     public static int count(MinecraftServer server, String company) {
         int n = 0;

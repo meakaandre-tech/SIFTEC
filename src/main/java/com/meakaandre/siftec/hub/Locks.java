@@ -32,6 +32,12 @@ public final class Locks {
         for (Milestone m : Milestones.all()) {
             for (Identifier item : m.items()) BY_ITEM.putIfAbsent(item, m);
         }
+        // the Nutrients research's tokens: what each holds back needs the research that carries it
+        for (Map.Entry<String, java.util.List<String>> e : com.meakaandre.siftec.food.Food.tokenItems().entrySet()) {
+            Milestone carrier = carrier(e.getKey());
+            if (carrier == null) continue;
+            for (String id : e.getValue()) BY_ITEM.putIfAbsent(Identifier.parse(id), carrier);
+        }
         for (Identifier item : Milestones.disabled()) BY_ITEM.put(item, DISABLED);
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             ItemStack stack = player.getItemInHand(hand);
@@ -43,6 +49,12 @@ public final class Locks {
             }
             return InteractionResult.FAIL;
         });
+    }
+
+    /** The milestone or research node that carries a token, such as "food:preserves"; null if none does. */
+    public static Milestone carrier(String token) {
+        for (Milestone m : Milestones.all()) if (m.tokens().contains(token)) return m;
+        return null;
     }
 
     public static Milestone lockOf(Item item) {

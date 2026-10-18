@@ -33,7 +33,7 @@ import java.util.function.Predicate;
  * Object Scanner: finds the nearest thing of the kind it is set to. Crash sites (their Hard Drives) from the start;
  * Mercer Spheres and Somersloops once their Alien Technology analysis is done; hostile mobs after Hostile Organism
  * Detection; and the wild food the Nutrients tree starts with (sweet berry bushes, apple trees, glow berries) once its
- * first research for each is done. Sneak to switch what it looks for. Aimed at a resource node, it says what node it is
+ * first research for each is done; sulfur geysers once Geothermal Power is researched. Sneak to switch what it looks for. Aimed at a resource node, it says what node it is
  * (type and purity) and, while it is empty, how long until it grows back.
  */
 public class ObjectScannerItem extends Item {
@@ -41,7 +41,9 @@ public class ObjectScannerItem extends Item {
     public enum Target {
         HARD_DRIVE(Collectible.CRASH_SITE, ""), MERCER_SPHERE(Collectible.MERCER_SPHERE, "object:mercer_sphere"),
         SOMERSLOOP(Collectible.SOMERSLOOP, "object:somersloop"), SWEET_BERRIES(null, "object:sweet_berries"),
-        APPLES(null, "object:apples"), GLOW_BERRIES(null, "object:glow_berries"), MOBS(null, "object:mobs");
+        APPLES(null, "object:apples"), GLOW_BERRIES(null, "object:glow_berries"), MOBS(null, "object:mobs"),
+        /** Sulfur geysers, from the Geothermal Power research. */
+        GEYSER(null, "object:geysers");
 
         public final @Nullable Collectible collectible;
         /** The research the scanner needs for it; empty for none. */
@@ -73,6 +75,8 @@ public class ObjectScannerItem extends Item {
 
     private static final Map<UUID, Target> SELECTED = new ConcurrentHashMap<>();
     private static final int MOB_RANGE = 64, PLANT_CHUNKS = 5;
+    /** How far the scanner looks for geysers: it has the land this many chunks round it searched first. */
+    public static final int GEYSER_CHUNKS = 16;
 
     public ObjectScannerItem(Properties properties) {
         super(properties);
@@ -113,6 +117,19 @@ public class ObjectScannerItem extends Item {
             }
             if (nearest == null) tellNone(player, name);
             else tellFound(player, nearest.getName(), nearest.getBlockX(), nearest.getBlockZ());
+            return InteractionResult.SUCCESS;
+        }
+        if (target == Target.GEYSER) {
+            // geysers come from the game's own cave features: the land round the scanner is searched (generated in the
+            // background where nobody has been), then the nearest geyser on record is the answer
+            player.sendOverlayMessage(Component.translatable("siftec.scanner.searching", name));
+            int px = player.getBlockX(), pz = player.getBlockZ();
+            com.meakaandre.siftec.geyser.GeyserSearch.search(server, player.blockPosition(), GEYSER_CHUNKS, found -> {
+                if (player.isRemoved()) return;
+                List<BlockPos> near = com.meakaandre.siftec.map.MapTerrain.geysersNear(px, pz, GEYSER_CHUNKS * 16 + 16);
+                if (near.isEmpty()) tellNone(player, name);
+                else tellFound(player, name, near.getFirst().getX(), near.getFirst().getZ());
+            });
             return InteractionResult.SUCCESS;
         }
         Predicate<BlockState> plant = target.plant();

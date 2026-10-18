@@ -1179,6 +1179,79 @@ def truck_station():
     return f.done()
 
 
+# the Drone Port's landing spot (Build Gun frame): its drone takes off from and lands on the pad here, straight over the
+# loading terminal (DRONE_TERMINAL), so the spot is the terminal's whatever way the port faces (DronePortBlockEntity)
+DRONE_TERMINAL = (0, 1, 11)
+DRONE_PAD_Y = 11
+
+
+def drone_port():
+    # Satisfactory's Drone Port at 1 m = 1 block: 23 by 23 (its 24 by 24), 15 high. A raised landing pad on four legs:
+    # a light deck with a yellow and black hazard rim, an orange landing ring and a dark touchdown square in the middle,
+    # lamps at its corners and a beacon mast at the back; a ladder up the front left leg. Underneath, the base: an orange
+    # hall with dark corners and framed glass on its own pad, with the loading terminal (the Drone Port block, which keeps
+    # the drone, its packages and fire charges) straight under the touchdown square, and the controller in its front wall.
+    # Ports on the base's pad: packages in at the back, fire charges in on the left, arrivals out on the right.
+    f = Frame(23, 23)
+    lamp = "siftec:prefab_lamp"
+    # the legs: 2 by 2 dark pillars at the corners with hazard feet, braced under the deck
+    for lx, lz in ((-11, 0), (10, 0), (-11, 21), (10, 21)):
+        f.box(lx, 0, lz, lx + 1, 9, lz + 1, DARK)
+        for i, (x, z) in enumerate(((lx, lz), (lx + 1, lz), (lx + 1, lz + 1), (lx, lz + 1))):
+            f.set(x, 0, z, YELLOW if i % 2 == 0 else BLACK)
+        f.box(lx, 9, lz, lx + 1, 9, lz + 1, ORANGE)
+    for x in range(-9, 10):
+        f.set(x, 9, 0, DARK)
+        f.set(x, 9, 22, DARK)
+    for z in range(2, 21):
+        f.set(-11, 9, z, DARK)
+        f.set(11, 9, z, DARK)
+    # the base's pad and hall
+    f.pad(-6, 6, 4, 18)
+    f.hall(-5, 5, 5, 17, 1, 6, side=ORANGE, corner=DARK)
+    f.checker(-5, 5, 5, 17, 7)
+    f.window_side(-5, 8, 14, 3, 5)
+    f.window_side(5, 8, 14, 3, 5)
+    f.window_front(5, -3, -2, 3, 5)
+    f.window_front(5, 2, 3, 3, 5)
+    f.window_front(17, -2, 2, 3, 5)
+    # a doorway to the terminal, the controller beside it
+    f.box(0, 1, 5, 0, 2, 5, AIR)
+    f.set(1, 2, 5, CONTROLLER)
+    # the base holds the deck up: dark columns from the hall's corners to the deck
+    for x, z in ((-5, 5), (5, 5), (-5, 17), (5, 17)):
+        f.box(x, 8, z, x, 9, z, DARK)
+    # the loading terminal under the touchdown square
+    f.set(*DRONE_TERMINAL, "siftec:drone_port")
+    # the deck
+    cx, cz = 0, 11
+    for x in range(-11, 12):
+        for z in range(0, 23):
+            rim = x in (-11, 11) or z in (0, 22)
+            d = ((x - cx) ** 2 + (z - cz) ** 2) ** 0.5
+            if rim:
+                spec = YELLOW if (x + z) % 2 == 0 else BLACK
+            elif abs(x - cx) <= 1 and abs(z - cz) <= 1:
+                spec = DARK
+            elif 6.5 <= d < 7.5:
+                spec = ORANGE
+            else:
+                spec = PAD
+            f.set(x, 10, z, spec)
+    for x, z in ((-11, 0), (11, 0), (-11, 22), (11, 22)):
+        f.set(x, 11, z, lamp)
+    # a beacon mast on the back rim
+    f.box(10, 11, 22, 10, 13, 22, DARK)
+    f.set(10, 14, 22, lamp)
+    # a ladder up the front left leg and through the deck
+    for y in range(1, 11):
+        f.set(-9, y, 1, ladder("east"))
+    f.port(0, 0, 18, "north", "item_in", DRONE_TERMINAL)
+    f.port(-6, 0, 11, "west", "item_in", DRONE_TERMINAL)
+    f.port(6, 0, 11, "east", "item_out", DRONE_TERMINAL)
+    return f.done()
+
+
 BUILT = {"test_building": test_building, "test_miner": test_miner,
          "constructor": constructor, "smelter": smelter,
          "miner_mk1": lambda: miner(8, ORANGE, ORANGE), "miner_mk2": lambda: miner(9, LIGHT, ORANGE),
@@ -1194,7 +1267,7 @@ BUILT = {"test_building": test_building, "test_miner": test_miner,
          "resource_well_pressurizer": resource_well_pressurizer, "resource_well_extractor": resource_well_extractor,
          "particle_accelerator": particle_accelerator, "converter": converter,
          "equipment_workshop": equipment_workshop, "awesome_sink": awesome_sink, "awesome_shop": awesome_shop, "radar_tower": radar_tower,
-         "truck_station": truck_station}
+         "truck_station": truck_station, "drone_port": drone_port}
 
 if __name__ == "__main__":
     for bid, make in BUILT.items():

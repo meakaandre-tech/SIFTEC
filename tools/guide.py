@@ -263,6 +263,12 @@ BUILDING_GUIDE = {
         "dock in front of it.",
         "Its fuel tank fills up every vehicle that docks. Its terminal switches between loading and unloading.",
     ],
+    "drone_port": [
+        "The Drone Port is a landing pad on legs with its loading terminal underneath. Use the terminal to pick which of your "
+        "company's ports its drone flies to.",
+        "Packages go in at the back port and fire charges at the left one; what arrives comes out of the right one. The drone "
+        "takes off from the pad with everything waiting, burning fire charges for the distance, and lands on the other pad.",
+    ],
     "tractor": [
         "The Tractor is a small, quick hauler with three rows of storage. Right-click it to drive: W and S for throttle, A "
         "and D to steer, Space to brake.",

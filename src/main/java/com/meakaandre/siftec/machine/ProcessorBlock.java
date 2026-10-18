@@ -23,9 +23,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The Converter and the Particle Accelerator. A shaft goes in the top. Items go in by hand, belt, funnel
- * or hopper; pipes connect on the sides. An empty-handed click takes the output; sneak and click to pick
- * which recipe it makes.
+ * The old single-block Converter and Particle Accelerator, kept only so old worlds load: each is turned into the Build
+ * Gun building of the same name the first time it ticks ({@link ProcessorBlockEntity}). It makes nothing.
  */
 public class ProcessorBlock extends KineticBlock implements IBE<ProcessorBlockEntity>, ItemInventoryProvider<ProcessorBlockEntity>,
     FluidInventoryProvider<ProcessorBlockEntity> {
@@ -47,18 +46,9 @@ public class ProcessorBlock extends KineticBlock implements IBE<ProcessorBlockEn
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (stack.isEmpty()) return InteractionResult.TRY_WITH_EMPTY_HAND;
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
-        ProcessorBlockEntity be = getBlockEntity(level, pos);
-        if (be == null || !be.insert(stack)) return InteractionResult.TRY_WITH_EMPTY_HAND;
-        return InteractionResult.SUCCESS;
-    }
-
-    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
-        withBlockEntityDo(level, pos, be -> be.use(player));
+        // it makes nothing any more: using it turns it into the building now
+        if (level instanceof net.minecraft.server.level.ServerLevel server) com.meakaandre.siftec.building.LegacyConversion.queue(server, pos);
         return InteractionResult.SUCCESS;
     }
 

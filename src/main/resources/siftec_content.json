@@ -2144,7 +2144,9 @@
         "createdieselgenerators:engine_turbocharger",
         "createdieselgenerators:lighter"
       ],
-      "tokens": [],
+      "tokens": [
+        "tanks:large"
+      ],
       "desc": true
     },
     {
@@ -2502,7 +2504,6 @@
       ],
       "seconds": 600,
       "items": [
-        "siftec:drone_port",
         "siftec:cardboard_drone",
         "create:packager",
         "create:package_frogport",
@@ -2655,7 +2656,6 @@
       ],
       "seconds": 1200,
       "items": [
-        "siftec:particle_accelerator",
         "siftec:copper_powder",
         "siftec:encased_plutonium_cell",
         "siftec:incomplete_plutonium_fuel_rod",
@@ -2689,7 +2689,6 @@
       ],
       "seconds": 900,
       "items": [
-        "siftec:converter",
         "siftec:biochemical_sculptor",
         "siftec:ficsite_ingot",
         "siftec:ficsite_trigon",
@@ -2964,6 +2963,9 @@
     "create:schematic_and_quill",
     "create:schematic",
     "farmersdelight:wheat_dough",
+    "siftec:drone_port",
+    "siftec:converter",
+    "siftec:particle_accelerator",
     "travelersbackpack:bat",
     "travelersbackpack:bee",
     "travelersbackpack:blaze",
@@ -4939,7 +4941,9 @@
       ],
       "seconds": 3,
       "items": [],
-      "tokens": [],
+      "tokens": [
+        "object:geysers"
+      ],
       "needs": [
         "mam_sulfur_experimental_power_generation"
       ]
@@ -10810,31 +10814,6 @@
       ]
     },
     {
-      "item": "siftec:drone_port",
-      "cost": [
-        {
-          "item": "siftec:heavy_modular_frame",
-          "count": 20
-        },
-        {
-          "item": "siftec:high_speed_connector",
-          "count": 20
-        },
-        {
-          "item": "siftec:alclad_aluminum_sheet",
-          "count": 50
-        },
-        {
-          "item": "siftec:aluminum_casing",
-          "count": 50
-        },
-        {
-          "item": "siftec:radio_control_unit",
-          "count": 10
-        }
-      ]
-    },
-    {
       "item": "siftec:cardboard_drone",
       "cost": [
         {
@@ -13263,6 +13242,38 @@
         "The Explorer is the fastest vehicle on the planet, built for scouting rather than cargo: one row of storage. Right-click it to drive.",
         "It burns Fuel, Liquid Biofuel or Turbofuel: use a bucket on it, or dock it at a Truck Station. Sneak and right-click for its storage.",
         "Press V while driving to record a route through Truck Stations. Get out, and it drives the route by itself."
+      ]
+    },
+    {
+      "id": "drone_port",
+      "category": "logistics",
+      "cost": [
+        {
+          "item": "siftec:heavy_modular_frame",
+          "count": 20
+        },
+        {
+          "item": "siftec:high_speed_connector",
+          "count": 20
+        },
+        {
+          "item": "siftec:alclad_aluminum_sheet",
+          "count": 50
+        },
+        {
+          "item": "siftec:aluminum_casing",
+          "count": 50
+        },
+        {
+          "item": "siftec:radio_control_unit",
+          "count": 10
+        }
+      ],
+      "unlock": "aeronautical_engineering",
+      "logic": "drone_port",
+      "guide": [
+        "The Drone Port is a landing pad on legs with its loading terminal underneath. Use the terminal to pick which of your company's ports its drone flies to.",
+        "Packages go in at the back port and fire charges at the left one; what arrives comes out of the right one. The drone takes off from the pad with everything waiting, burning fire charges for the distance, and lands on the other pad."
       ]
     }
   ],
