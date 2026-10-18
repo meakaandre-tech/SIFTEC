@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: ["main", "polish-pass"]
+    branches: ["main", "polish-pass", "polish-compile"]
   workflow_dispatch:
 
 permissions:
