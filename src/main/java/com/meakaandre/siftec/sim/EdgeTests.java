@@ -889,17 +889,21 @@ public final class EdgeTests {
         store.energy = charge;
         store.setChanged();
         for (ControllerBlockEntity c : new ControllerBlockEntity[]{con, store, burner}) Factories.recordNow(level, c);
-        BlockPos sp = store.getBlockPos(), bp = burner.getBlockPos();
+        BlockPos sp = store.getBlockPos(), bp = burner.getBlockPos(), cp = con.getBlockPos();
         later(server, 40, () -> {
             none(level, s);
-            until(server, () -> unloaded(level, s), 600, () -> later(server, 200, () -> {
-                SimData.Node st = Factories.node(level, sp), bn = Factories.node(level, bp);
-                boolean ok = st != null && st.sim && st.stored > 0 && st.stored < charge && bn != null && !bn.tripped;
-                expect("battery: on a grid wholly unloaded the Power Storage is simulated and covers the shortfall; the fuse holds", ok,
-                    "storage " + (st == null ? "unknown" : (st.sim ? "simulated" : "not simulated") + ", " + Math.round(st.stored) + " of " + Math.round(charge))
-                        + "; burner " + (bn == null ? "unknown" : bn.tripped ? "fuse blown" : "fuse holds"));
-                closed();
-            }));
+            until(server, () -> unloaded(level, s), 600, () -> {
+                SimData.Node first = Factories.node(level, sp);
+                double taken = first == null ? -1 : first.stored;
+                later(server, 200, () -> {
+                    SimData.Node st = Factories.node(level, sp), bn = Factories.node(level, bp), cn = Factories.node(level, cp);
+                    boolean ok = st != null && st.sim && st.stored > 0 && bn != null && !bn.tripped && cn != null && cn.powered;
+                    expect("battery: on a grid wholly unloaded the Power Storage is simulated and covers the Constructor's draw; the fuse holds", ok,
+                        "storage " + (st == null ? "unknown" : (st.sim ? "simulated" : "not simulated") + ", " + Math.round(st.stored) + " from " + Math.round(taken))
+                            + "; burner " + (bn == null ? "unknown" : bn.tripped ? "fuse blown" : "fuse holds") + "; Constructor " + (cn == null ? "unknown" : cn.powered ? "powered" : "not powered"));
+                    closed();
+                });
+            });
         });
     }
 
