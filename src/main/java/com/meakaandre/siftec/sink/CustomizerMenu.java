@@ -86,7 +86,7 @@ public class CustomizerMenu extends ChestMenu {
 
     /** A foundation's, wall's or roof's window: its materials on the top row, a foundation's floor patterns on the third. */
     private void refreshMaterials(String kind, Paint paint) {
-        ItemStack own = SinkMenu.button(Items.GRAY_CONCRETE, Component.translatable("siftec.customizer.material", Component.translatable("siftec.customizer.skin_none")), List.of());
+        ItemStack own = SinkMenu.button(item("minecraft:gray_concrete"), Component.translatable("siftec.customizer.material", Component.translatable("siftec.customizer.skin_none")), List.of());
         if (paint.material().isEmpty()) own.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         view.setItem(0, own);
         int k = 1;
@@ -100,13 +100,13 @@ public class CustomizerMenu extends ChestMenu {
             if (k < 9) view.setItem(k++, stack);
         }
         if (!kind.equals("foundation")) return;
-        ItemStack none = SinkMenu.button(Items.LIGHT_GRAY_CONCRETE, Component.translatable("siftec.customizer.pattern", Component.translatable("siftec.customizer.pattern_none")), List.of());
+        ItemStack none = SinkMenu.button(item("minecraft:light_gray_concrete"), Component.translatable("siftec.customizer.pattern", Component.translatable("siftec.customizer.pattern_none")), List.of());
         if (paint.pattern().isEmpty()) none.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         view.setItem(PALETTE, none);
         k = 1;
         for (String pattern : Shop.patterns()) {
             boolean open = Shop.owns(player, company, "pattern:" + pattern);
-            ItemStack stack = SinkMenu.button(open ? (pattern.equals("factory_zone") ? Items.BLACK_CONCRETE : Items.YELLOW_CONCRETE) : Items.BARRIER,
+            ItemStack stack = SinkMenu.button(open ? (pattern.equals("factory_zone") ? item("minecraft:black_concrete") : item("minecraft:yellow_concrete")) : Items.BARRIER,
                 Component.translatable("siftec.customizer.pattern", Component.translatable("siftec.pattern." + pattern)),
                 open ? List.of() : List.of(Component.translatable("siftec.customizer.locked").withStyle(ChatFormatting.RED)));
             if (paint.pattern().equals(pattern)) stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);

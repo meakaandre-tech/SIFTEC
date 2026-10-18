@@ -56,6 +56,10 @@ final class ShopTests {
         PolishTests.expect(source, "1: " + what, ok, detail);
     }
 
+    private static Block block(String id) {
+        return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse(id));
+    }
+
     private static Company fresh(ServerLevel level, String id) {
         CompanyData data = CompanyData.get(level.getServer());
         Company c = new Company();
@@ -129,9 +133,9 @@ final class ShopTests {
         Buildings.repaint(level, c, Paint.NONE.withMaterial("asphalt").withPattern("solid_line"));
         // the line runs down the middle two columns (across -1 and 0), the material elsewhere
         BlockState line = level.getBlockState(snapped.at(-1, 0, 4)), side = level.getBlockState(snapped.at(-4, 0, 4));
-        boolean painted = line.is(Blocks.YELLOW_CONCRETE) && side.is(Blocks.POLISHED_BLACKSTONE);
+        boolean painted = line.is(block("minecraft:yellow_concrete")) && side.is(block("minecraft:polished_blackstone"));
         Buildings.repaint(level, c, Paint.NONE);
-        boolean back = level.getBlockState(snapped.at(-4, 0, 4)).is(Blocks.LIGHT_GRAY_CONCRETE) && level.getBlockState(snapped.at(-1, 0, 4)).is(Blocks.LIGHT_GRAY_CONCRETE);
+        boolean back = level.getBlockState(snapped.at(-4, 0, 4)).is(block("minecraft:light_gray_concrete")) && level.getBlockState(snapped.at(-1, 0, 4)).is(block("minecraft:light_gray_concrete"));
         expect(source, "the Customizer gives a foundation a material (Asphalt) and a floor pattern (Solid Line), and takes them off again", painted && back,
             "line " + line + ", side " + side + ", back as built " + back);
         BuildingDef roof = Buildings.def("roof_4m");
@@ -166,11 +170,11 @@ final class ShopTests {
         fake.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
 
         // the company banner: kept by the company, copies named for it
-        ItemStack banner = new ItemStack(Items.ORANGE_BANNER);
+        ItemStack banner = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse("minecraft:orange_banner")));
         rich.banner = Banners.write(level.getServer(), banner);
         ItemStack copy = Banners.read(level.getServer(), rich);
         expect(source, "the banner designer keeps a banner as the company's and hands out copies named for it",
-            copy.is(Items.ORANGE_BANNER) && copy.getHoverName().getString().contains("Selftest Shop") && Banners.read(level.getServer(), poor).isEmpty(), copy.toString());
+            copy.is(banner.getItem()) && copy.getHoverName().getString().contains("Selftest Shop") && Banners.read(level.getServer(), poor).isEmpty(), copy.toString());
 
         // the Golden Cart Assembler: a Cart Assembler state, switched on and off, still Create's block
         BlockPos cart = new BlockPos(x, y, z + 20);

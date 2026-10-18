@@ -83,7 +83,7 @@ public class ShopSignRenderer implements BlockEntityRenderer<ShopSignBlockEntity
         float scale = Math.min(block.faceWidth * 0.85f / Math.max(widest, 24), block.faceHeight * 0.8f / (n * LINE));
         ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
-        ms.mulPose(Axis.YP.rotationDegrees(-state.yRot));
+        ms.rotateDegrees(Axis.YP, -state.yRot);
         // the panel lies against the wall behind (the north side as it faces south), 1.5 pixels thick
         ms.translate(block.faceX, block.faceY, -0.5 + 1.5 / 16 + 0.005);
         ms.scale(scale, -scale, scale);

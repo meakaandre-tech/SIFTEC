@@ -89,7 +89,7 @@ public class ShopMenu extends ChestMenu {
                 String block = Shop.materialBlock(e.arg(), built);
                 yield item(block == null ? "minecraft:barrier" : block);
             }
-            case "pattern" -> e.arg().equals("factory_zone") ? Items.BLACK_CONCRETE : Items.YELLOW_CONCRETE;
+            case "pattern" -> e.arg().equals("factory_zone") ? item("minecraft:black_concrete") : item("minecraft:yellow_concrete");
             case "emote" -> Items.ARMOR_STAND;
             case "helmet" -> switch (e.arg()) {
                 case "gold" -> Items.GOLDEN_HELMET;
@@ -102,7 +102,7 @@ public class ShopMenu extends ChestMenu {
                 String[] trim = Shop.trims().get(e.arg());
                 yield trim == null ? Items.BARRIER : item(trim[0] + "_armor_trim_smithing_template");
             }
-            case "banner" -> Items.WHITE_BANNER;
+            case "banner" -> item("minecraft:white_banner");
             case "golden_cart" -> item("create:cart_assembler");
             case "boom_box" -> ModBlocks.BOOM_BOX.get().asItem();
             case "tape" -> ModItems.TAPES.containsKey(e.arg()) ? ModItems.TAPES.get(e.arg()) : Items.BARRIER;
