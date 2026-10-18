@@ -1,5 +1,7 @@
 package com.meakaandre.siftec.building;
 
+import com.meakaandre.siftec.sink.Shop;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.Siftec;
@@ -126,11 +128,13 @@ public final class Buildings {
      * what the company has done. Unlocks belong to the company, so every member builds what one of them unlocked.
      */
     public static boolean locked(BuildingDef def, Company company) {
+        if (def.unlock().startsWith("shop:")) return !Shop.owns(company, "unlock:" + def.unlock().substring(5));
         return !def.unlock().isEmpty() && !company.has(def.unlock());
     }
 
     /** The name of what unlocks the building (a milestone or MAM node), or its id if no such milestone is known. */
     public static Component unlockName(BuildingDef def) {
+        if (def.unlock().startsWith("shop:")) return Component.translatable("siftec.shop.entry." + def.unlock().substring(5));
         Milestone m = Milestones.get(def.unlock());
         return m == null ? Component.literal(def.unlock()) : m.name();
     }
@@ -436,7 +440,7 @@ public final class Buildings {
             index.remove(level, pos, controllerPos);
             if (pos.equals(controllerPos)) continue;
             BlockState now = level.getBlockState(pos);
-            if (!paint.fits(cell.state(), now.getBlock(), storage)) continue;
+            if (!paint.fits(cell, now.getBlock(), storage)) continue;
             out.addAll(contents(level, pos));
             remove.add(pos);
         }
@@ -548,7 +552,7 @@ public final class Buildings {
             BlockPos pos = p.at(cell);
             if (!level.isLoaded(pos)) return null;
             // a machine is put back by BuildingRepair instead
-            if (missing == null && !BuildingRepair.machine(cell.state()) && !paint.fits(cell.state(), level.getBlockState(pos).getBlock(), storage)) missing = pos;
+            if (missing == null && !BuildingRepair.machine(cell.state()) && !paint.fits(cell, level.getBlockState(pos).getBlock(), storage)) missing = pos;
         }
         return missing;
     }
@@ -568,7 +572,7 @@ public final class Buildings {
         for (BuildingTemplate.Cell cell : t.members) {
             BlockPos pos = p.at(cell);
             if (!level.isLoaded(pos)) continue;
-            BlockState want = paint.look(cell.state(), storage);
+            BlockState want = paint.look(cell, storage);
             if (level.getBlockState(pos).getBlock() != want.getBlock()) level.setBlock(pos, p.orient(want), SET);
         }
     }

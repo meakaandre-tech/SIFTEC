@@ -8,8 +8,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Water in a Create Fluid Tank boils away in the Nether. */
+/**
+ * Water in a Create Fluid Tank boils away in the Nether; and a company's tanks stay one block wide until Petroleum
+ * Power ({@link com.meakaandre.siftec.tweak.TankSizes}).
+ */
 @Mixin(value = FluidTankBlockEntity.class, remap = false)
 public abstract class FluidTankMixin {
     @Shadow
@@ -22,5 +26,10 @@ public abstract class FluidTankMixin {
     private void siftec$boil(CallbackInfo ci) {
         FluidTankBlockEntity self = (FluidTankBlockEntity) (Object) this;
         if (isController() && tankInventory != null) NetherWater.boil(self.getLevel(), self.getBlockPos(), tankInventory, tankInventory.getFluid());
+    }
+
+    @Inject(method = "getMaxWidth", at = @At("HEAD"), cancellable = true)
+    private void siftec$petroleum(CallbackInfoReturnable<Integer> cir) {
+        if (com.meakaandre.siftec.tweak.TankSizes.small((FluidTankBlockEntity) (Object) this)) cir.setReturnValue(1);
     }
 }

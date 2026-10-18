@@ -14,13 +14,20 @@
     "BoundTickerMixin",
     "building.BasinOperatorAccessor",
     "building.BasinPaceMixin",
+    "building.BasinTypeMixin",
+    "building.BlazeBurnerAccessor",
+    "building.BoilerWaterMixin",
+    "building.BrassBasinInventoryMixin",
     "building.BreakerAccessor",
+    "building.BurnerLoadMixin",
     "building.MinerDrillBrokenMixin",
     "building.MinerDrillMixin",
     "building.MixerPaceMixin",
     "building.PressPaceMixin",
+    "CartAssemblerGoldenMixin",
     "claim.BuildingDestroyMixin",
     "claim.BuildingDropsMixin",
+    "claim.ChuteSealMixin",
     "claim.ClaimAssemblyMixin",
     "claim.ClaimBlockItemMixin",
     "claim.ClaimBreakerMixin",
@@ -46,9 +53,9 @@
     "ItemCombinerResultMixin",
     "KineticCapacityMixin",
     "LevelChunkMixin",
-    "NodeBucketMixin",
     "ManualApplicationMixin",
     "NetworkNoLoadMixin",
+    "NodeBucketMixin",
     "PlayerDeathCrateMixin",
     "PotentSulfurMixin",
     "power.ConnectorAccessor",
@@ -73,11 +80,7 @@
     "SlotMixin",
     "SmartTankMixin",
     "TunnelMixin",
-    "building.BasinTypeMixin",
-    "building.BrassBasinInventoryMixin",
-    "building.BlazeBurnerAccessor",
-    "building.BoilerWaterMixin",
-    "building.BurnerLoadMixin"
+    "VehiclePickMixin"
   ],
   "client": [
     "client.BeltNoPulleyMixin",
@@ -86,7 +89,8 @@
     "client.BuildGunScrollMixin",
     "client.DebugEntriesInvoker",
     "client.ContainerScreenAccessor",
-    "client.ScreenInvoker"
+    "client.ScreenInvoker",
+    "client.PlayerEmoteMixin"
   ],
   "injectors": {
     "defaultRequire": 1

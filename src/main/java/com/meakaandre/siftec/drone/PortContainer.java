@@ -10,12 +10,11 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * A Drone Port's slots: nine packages waiting to leave, one stack of fire charges, nine packages that have
- * arrived. Belts, funnels and hoppers put packages and fire charges in from the top and sides, and take
- * arrivals out from below.
+ * arrived. The building's input ports put packages and fire charges in; its output port takes arrivals out.
  */
 public class PortContainer extends SimpleContainer implements WorldlyContainer {
     public static final int OUT = 0, FUEL = 9, IN = 10, SIZE = 19;
-    private static final int[] FEED = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, TAKE = {10, 11, 12, 13, 14, 15, 16, 17, 18};
+    private static final int[] ALL = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
     private final Runnable changed;
 
     public PortContainer(Runnable changed) {
@@ -31,7 +30,9 @@ public class PortContainer extends SimpleContainer implements WorldlyContainer {
 
     @Override
     public int[] getSlotsForFace(Direction side) {
-        return side == Direction.DOWN ? TAKE : FEED;
+        // the Drone Port building's ports reach the terminal from any side: what goes in where, and what may come out,
+        // is decided per slot below (packages and fire charges in, arrivals out)
+        return ALL;
     }
 
     @Override

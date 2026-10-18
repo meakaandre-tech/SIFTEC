@@ -289,6 +289,49 @@ public final class MapTerrain {
         FOUND_CHANGED.add(region);
     }
 
+    /**
+     * Geysers found in a chunk that is not loaded (a Radar Tower's or the Object Scanner's search had it generated):
+     * they replace the chunk's geysers on record, and anything else found there stays. When the chunk is loaded for real
+     * it is recorded as usual.
+     */
+    public static void addFound(ServerLevel level, int cx, int cz, List<BlockPos> geysers) {
+        if (root == null || !MapServer.mapped(level)) return;
+        long region = MapGrid.regionOfChunk(cx, cz);
+        Long2ObjectOpenHashMap<List<Found>> byChunk = found(region);
+        long key = MapGrid.key(cx, cz);
+        List<Found> before = byChunk.get(key);
+        List<Found> now = new ArrayList<>();
+        if (before != null) for (Found f : before) if (f.poi().kind() != MapPoi.Kind.GEYSER) now.add(f);
+        for (BlockPos p : geysers) now.add(new Found(new MapPoi(MapPoi.Kind.GEYSER, "", 0, p.getX(), p.getY(), p.getZ()), ""));
+        if (now.equals(before == null ? List.of() : before)) return;
+        if (now.isEmpty()) byChunk.remove(key);
+        else byChunk.put(key, now);
+        FOUND_CHANGED.add(region);
+    }
+
+    /** Every geyser on record within this many blocks of a spot (the Object Scanner's), nearest first. */
+    public static List<BlockPos> geysersNear(int x, int z, int blocks) {
+        List<BlockPos> out = new ArrayList<>();
+        if (root == null) return out;
+        int r = Math.max(0, Math.floorDiv(blocks, MapGrid.REGION_BLOCKS)) + 1;
+        long centre = MapGrid.regionOfChunk(x >> 4, z >> 4);
+        int rx = MapGrid.keyX(centre), rz = MapGrid.keyZ(centre);
+        long max = (long) blocks * blocks;
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dz = -r; dz <= r; dz++) {
+                for (List<Found> list : found(MapGrid.key(rx + dx, rz + dz)).values()) {
+                    for (Found f : list) {
+                        if (f.poi().kind() != MapPoi.Kind.GEYSER) continue;
+                        long ddx = f.poi().x() - x, ddz = f.poi().z() - z;
+                        if (ddx * ddx + ddz * ddz <= max) out.add(new BlockPos(f.poi().x(), f.poi().y(), f.poi().z()));
+                    }
+                }
+            }
+        }
+        out.sort(java.util.Comparator.comparingLong(p -> (long) (p.getX() - x) * (p.getX() - x) + (long) (p.getZ() - z) * (p.getZ() - z)));
+        return out;
+    }
+
     /** What was found in a region, by chunk (loaded from disk the first time). */
     private static Long2ObjectOpenHashMap<List<Found>> found(long region) {
         Long2ObjectOpenHashMap<List<Found>> byChunk = FOUND.get(region);

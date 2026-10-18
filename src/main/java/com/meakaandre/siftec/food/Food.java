@@ -84,6 +84,21 @@ public final class Food {
         public static final Profile NONE = new Profile(Set.of(), Prep.RAW);
     }
 
+    /** The Nutrients research's tokens: Bulk Fermentation's vinegar, Preserved Foods' pickles and jams, Cider and Mead. */
+    public static final String TOKEN_VINEGAR = "food:vinegar", TOKEN_PRESERVES = "food:preserves", TOKEN_BREWING = "food:brewing";
+
+    /**
+     * What each of those tokens holds back, whatever recipe or mod would make it and however it is crafted
+     * ({@link com.meakaandre.siftec.hub.Locks}): the item needs the research that carries the token.
+     */
+    public static Map<String, List<String>> tokenItems() {
+        List<String> preserves = new ArrayList<>();
+        for (String id : PRESERVES.keySet()) if (!id.equals("mead")) preserves.add("siftec:" + id);
+        return Map.of(TOKEN_VINEGAR, List.of("siftec:vinegar_bucket", "siftec:vinegar_bottle"),
+            TOKEN_PRESERVES, List.copyOf(preserves),
+            TOKEN_BREWING, List.of("siftec:mead", "siftec:mead_bucket", "siftec:cider_bucket"));
+    }
+
     /** Pickles, jams and mead: each keeps the effect of what it was made from, at the Preserved level. */
     public static final Map<String, Intrinsic> PRESERVES = new java.util.LinkedHashMap<>();
 

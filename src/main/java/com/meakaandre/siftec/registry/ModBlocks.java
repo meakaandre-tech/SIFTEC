@@ -214,6 +214,23 @@ public class ModBlocks {
         }
     }
 
+    /** The AWESOME Shop's signs (cosmetic/ShopSignBlock.java): a Label Sign and a Display Sign, and a billboard's own sign. */
+    public static final Supplier<com.meakaandre.siftec.cosmetic.ShopSignBlock> LABEL_SIGN = block("label_sign",
+        properties -> new com.meakaandre.siftec.cosmetic.ShopSignBlock(1, 0.5f, 0, 0, 4, 12, properties), ModBlocks::signProperties);
+    public static final Supplier<com.meakaandre.siftec.cosmetic.ShopSignBlock> DISPLAY_SIGN = block("display_sign",
+        properties -> new com.meakaandre.siftec.cosmetic.ShopSignBlock(1, 1, 0, 0, 0, 16, properties), ModBlocks::signProperties);
+    public static final Supplier<com.meakaandre.siftec.cosmetic.ShopSignBlock> BILLBOARD_SMALL_SIGN = blockOnly("billboard_small_sign",
+        properties -> new com.meakaandre.siftec.cosmetic.ShopSignBlock(6, 2, -0.5f, 1.5f, 0, 16, properties), ModBlocks::signProperties);
+    public static final Supplier<com.meakaandre.siftec.cosmetic.ShopSignBlock> BILLBOARD_LARGE_SIGN = blockOnly("billboard_large_sign",
+        properties -> new com.meakaandre.siftec.cosmetic.ShopSignBlock(14, 6, -0.5f, 3.5f, 0, 16, properties), ModBlocks::signProperties);
+    /** The Boom Box (cosmetic/BoomBoxBlock.java): a jukebox that plays the Shop's cassette tapes. */
+    public static final Supplier<com.meakaandre.siftec.cosmetic.BoomBoxBlock> BOOM_BOX = block("boom_box", com.meakaandre.siftec.cosmetic.BoomBoxBlock::new,
+        () -> BlockBehaviour.Properties.of().strength(1.5F, 6.0F).sound(SoundType.METAL).noOcclusion());
+
+    private static BlockBehaviour.Properties signProperties() {
+        return BlockBehaviour.Properties.of().strength(1.0F).sound(SoundType.METAL).noCollision().noOcclusion();
+    }
+
     private static <T extends Block> Supplier<T> hidden(
         String name, Function<BlockBehaviour.Properties, T> factory, Supplier<BlockBehaviour.Properties> properties
     ) {

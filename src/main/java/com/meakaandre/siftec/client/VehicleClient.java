@@ -29,6 +29,7 @@ public final class VehicleClient {
 
     public static void register() {
         for (var type : Vehicles.types().values()) EntityRendererRegistry.register(type, VehicleRenderer::new);
+        EntityRendererRegistry.register(com.meakaandre.siftec.drone.DroneEntity.TYPE, DroneRenderer::new);
         KeyMappingHelper.registerKeyMapping(RECORD);
         ClientTickEvents.END_CLIENT_TICK.register(VehicleClient::tick);
     }

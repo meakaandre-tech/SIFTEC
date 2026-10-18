@@ -23,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -52,6 +53,17 @@ public final class BuildGunClient {
     public static final KeyMapping PONDER = new KeyMapping("key.siftec.build_gun.ponder", InputConstants.KEY_H, CATEGORY);
 
     private static final Object SHAPE = "siftec:build_gun_shape", BLOCKED = "siftec:build_gun_blocked", TARGET = "siftec:build_gun_target";
+    /** The twelve edges of a vehicle's turned body (corner indices from VehicleEntity.bodyCorners), each its own outline. */
+    private static final int[][] EDGES = {{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
+    private static final Object[] VEHICLE_EDGE = new Object[EDGES.length];
+
+    static {
+        for (int i = 0; i < EDGES.length; i++) VEHICLE_EDGE[i] = "siftec:build_gun_vehicle_" + i;
+    }
+
+    private static void removeVehicleEdges(Outliner outliner) {
+        for (Object key : VEHICLE_EDGE) outliner.remove(key);
+    }
     private static final int GREEN = 0x5CD65C, RED = 0xE03C3C, BLUE = 0x4AA8FF;
 
     private static int category;
@@ -244,10 +256,20 @@ public final class BuildGunClient {
             outliner.remove(BLOCKED);
             shown = null;
             BuildGunPayloads.View v = verdict;
-            if (v != null && v.hasBox()) {
+            // a vehicle: the outline is its turned body, along its whole length
+            com.meakaandre.siftec.vehicle.VehicleEntity vehicle = v != null && v.hasBox() ? com.meakaandre.siftec.vehicle.Vehicles.aimed(player) : null;
+            if (vehicle != null) {
+                outliner.remove(TARGET);
+                Vec3[] c = vehicle.bodyCorners(0.05);
+                for (int i = 0; i < EDGES.length; i++) {
+                    outliner.showLine(VEHICLE_EDGE[i], c[EDGES[i][0]], c[EDGES[i][1]]).colored(v.ok() ? RED : BLUE).disableLineNormals().lineWidth(1 / 12f);
+                }
+            } else if (v != null && v.hasBox()) {
+                removeVehicleEdges(outliner);
                 AABB box = new AABB(v.min().getX(), v.min().getY(), v.min().getZ(), v.max().getX() + 1, v.max().getY() + 1, v.max().getZ() + 1);
                 outliner.showAABB(TARGET, box).colored(v.ok() ? RED : BLUE).disableLineNormals().lineWidth(1 / 12f).withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
             } else {
+                removeVehicleEdges(outliner);
                 outliner.remove(TARGET);
             }
             if (ticks % 10 == 0) player.sendOverlayMessage(Component.translatable("siftec.build_gun.overlay_dismantle",
@@ -255,6 +277,7 @@ public final class BuildGunClient {
             return;
         }
         outliner.remove(TARGET);
+        removeVehicleEdges(outliner);
         if (spot == null) {
             outliner.remove(SHAPE);
             outliner.remove(BLOCKED);
@@ -354,6 +377,7 @@ public final class BuildGunClient {
         outliner.remove(SHAPE);
         outliner.remove(BLOCKED);
         outliner.remove(TARGET);
+        removeVehicleEdges(outliner);
         shown = null;
         frozen = null;
         nudge = false;

@@ -252,7 +252,7 @@ lang.update({"siftec.jetpack.empty": "Jetpack: out of fuel. It burns Solid Biofu
              "siftec.crash.somersloop": "There was a Somersloop in the wreckage too",
              "siftec.radar.title": "Radar Tower: nearest of each, from here", "siftec.radar.line": "%s: %s blocks %s (x %s, z %s)",
              "siftec.radar.nothing": "Nothing in range", "siftec.radar.no_power": "The Radar Tower has no power",
-             "siftec.radar.revealed": "Radar Tower: %s new crash sites found. They are on the map",
+             "siftec.radar.revealed": "Radar Tower: %s new crash sites found. They are on the map", "siftec.radar.geysers": "Radar Tower: %s geysers found. They are on the map",
              "siftec.map.unlocked": "Field Research: the Map is yours. M opens it, and the minimap is at the top right (N hides it)"})
 # the map (work package 15): compass strip, minimap, fullscreen map with its filter panel and markers
 lang.update({"key.category.siftec.map": "SIFTEC Map", "key.siftec.map.open": "Open the map", "key.siftec.map.minimap": "Show or hide the minimap",
@@ -367,7 +367,7 @@ for fid, (fname, tint) in PRESERVE_ICONS.items():
     lang[f"item.siftec.{fid}"] = fname
     write(f"{A}/models/item/{fid}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/honey_bottle" if fid == "mead" else "minecraft:item/potion"}})
     item_def(fid, f"siftec:item/{fid}", tint)
-lang.update({"siftec.season.locked": "Your company has not researched Automated Cooking yet (MAM, Nutrients)", "siftec.season.already": "That food is already seasoned",
+lang.update({"siftec.season.locked": "Your company has not researched Automated Cooking yet (MAM, Nutrients)", "siftec.preserve.locked": "Throwing jars needs the Preserved Foods research (MAM, Nutrients)", "siftec.season.already": "That food is already seasoned",
              "siftec.season.short": "You need %s of the ingredient: one for each item of food", "siftec.season.long": "Seasoned with glowstone: effects last twice as long",
              "siftec.season.strong": "Seasoned with blaze powder: effects one level stronger", "siftec.season.bonus": "Seasoned with nether wart: one more effect at random"})
 lang["item.siftec.toxic_shot"] = "Toxic Shot"
@@ -501,7 +501,7 @@ lang.update({"item.siftec.object_scanner": "Object Scanner", "siftec.collect.alr
              "siftec.scanner.target.hard_drive": "Crash Site (Hard Drive)", "siftec.scanner.target.mercer_sphere": "Mercer Sphere",
              "siftec.scanner.target.somersloop": "Somersloop", "siftec.scanner.target.sweet_berries": "Sweet Berry Bush",
              "siftec.scanner.target.apples": "Apple Tree", "siftec.scanner.target.glow_berries": "Glow Berries",
-             "siftec.scanner.target.mobs": "Hostile Mob",
+             "siftec.scanner.target.mobs": "Hostile Mob", "siftec.scanner.target.geyser": "Geyser", "siftec.scanner.searching": "Scanning for %s...",
              "siftec.mam.tree_started": "MAM: the %s research tree is open to your company",
              "siftec.crash.needs_power": "The pod is sealed. Wire its connector to a grid with %s MW (%s SU) to spare; it has %s SU"})
 write(f"{A}/models/item/object_scanner.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/compass_16"}})
@@ -589,7 +589,7 @@ data["sink_rarity"] = content.SINK_RARITY
 data["sink_enchant"] = content.SINK_ENCHANT
 data["sink_refused"] = content.SINK_REFUSED
 data["coupons"] = {"first": content.COUPON_FIRST, "first_cost": content.COUPON_FIRST_COST, "last": content.COUPON_LAST, "cap": content.COUPON_CAP}
-data["shop"] = [{"id": i, "category": cat, "coupons": n, "gives": g} for i, name, cat, n, g in content.SHOP]
+data["shop"] = [dict({"id": e[0], "category": e[2], "coupons": e[3], "gives": e[4]}, **({"season": e[5]} if len(e) > 5 else {})) for e in content.SHOP]
 data["swatch_max"] = content.SWATCH_MAX
 data["dyes"] = content.DYES
 data["finishes"] = {k: b for k, (n, b) in content.FINISHES.items()}
@@ -601,15 +601,20 @@ for k, (n, b) in content.FINISHES.items():
 for k, (n, b) in list(content.SKINS.items()) + list(content.STORAGE_SKINS.items()):
     lang[f"siftec.skin.{k}"] = n
     check(b, "skin")
-for i, name, cat, n, g in content.SHOP:
+for i, name, cat, n, g, *_ in content.SHOP:
     lang[f"siftec.shop.entry.{i}"] = name
     lang[f"siftec.shop.category.{cat.lower().replace(' ', '_')}"] = cat
 _decor_ids = {d[0] for d in content.DECOR}
 _cup_ids = {c[0] for c in content.CUPS}
-for i, name, cat, n, g in content.SHOP:
+_shop_unlocks = {b[4][5:] for b in content.BUILDINGS if b[4].startswith("shop:")}
+for i, name, cat, n, g, *_ in content.SHOP:
     kind, _, arg = g.partition(":")
-    ok = (kind in ("customizer", "swatch") and not arg) or (kind == "finish" and arg in content.FINISHES) or \
-         (kind == "skin" and (arg in content.SKINS or arg in content.STORAGE_SKINS)) or (kind == "decor" and arg in _decor_ids) or (kind == "cup" and arg in _cup_ids)
+    ok = (kind in ("customizer", "swatch", "banner", "golden_cart", "boom_box") and not arg) or (kind == "finish" and arg in content.FINISHES) or \
+         (kind == "skin" and (arg in content.SKINS or arg in content.STORAGE_SKINS)) or (kind == "decor" and arg in _decor_ids) or (kind == "cup" and arg in _cup_ids) or \
+         (kind == "sign" and arg in {x[0] for x in content.SIGNS}) or (kind == "unlock" and arg == i and arg in _shop_unlocks) or \
+         (kind == "material" and arg in content.MATERIALS) or (kind == "pattern" and arg in content.PATTERNS) or \
+         (kind == "emote" and arg in {x[0] for x in content.EMOTES}) or (kind == "helmet" and arg in content.HELMET_SKINS) or \
+         (kind == "trim" and arg in content.SUIT_TRIMS) or (kind == "tape" and arg in {x[0] for x in content.TAPES})
     if not ok:
         raise SystemExit(f"AWESOME Shop entry {i}: gives {g!r}, which is nothing the pack has")
 lang.update({
@@ -639,6 +644,9 @@ data["decor"] = []
 for did, name, cat, light, tex, elements, cost in content.DECOR:
     for c, n in content.parse_cost(cost): check(c, "decor " + did)
     boxes = [e[:2] for e in elements]
+    for e in elements:
+        if isinstance(e[-1], str) and e[-1] not in content.DECOR_TEXTURES.get(did, {}):
+            raise SystemExit(f"decor {did}: an element is drawn with {e[-1]!r}, which DECOR_TEXTURES does not give it")
     lo = [min(b[0][i] for b in boxes) for i in range(3)]
     hi = [max(b[1][i] for b in boxes) for i in range(3)]
     # one box round the whole thing, made even round the middle so it fits whichever way the block faces
@@ -650,8 +658,10 @@ for did, name, cat, light, tex, elements, cost in content.DECOR:
     textures.update(content.DECOR_TEXTURES.get(did, {}))
     els = []
     for k, e in enumerate(elements):
-        faces = {f: {"texture": "#all"} for f in ("north", "south", "east", "west", "down")}
-        faces["up"] = {"texture": "#top" if "top" in textures else "#all"}
+        own = e[-1] if isinstance(e[-1], str) else None
+        e = e[:-1] if own else e
+        faces = {f: {"texture": "#" + (own or "all")} for f in ("north", "south", "east", "west", "down")}
+        faces["up"] = {"texture": "#" + (own or ("top" if "top" in textures else "all"))}
         el = {"from": e[0], "to": e[1], "faces": faces}
         if len(e) > 2:
             axis, angle, origin = e[2]
@@ -665,6 +675,87 @@ for did, name, cat, light, tex, elements, cost in content.DECOR:
                                                        for d, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270))}})
     item_def(did, f"siftec:block/{did}")
     write(f"{D}/loot_table/blocks/{did}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{did}"}]}]})
+# ---- the AWESOME Shop's other cosmetics (cosmetic/*, sink/*)
+data["signs"] = []
+for sid, name, cost, panel, tex in content.SIGNS:
+    for c, n in content.parse_cost(cost): check(c, "sign " + sid)
+    data["signs"].append({"id": sid, "cost": [{"item": c, "count": n} for c, n in content.parse_cost(cost)]})
+    lang[f"block.siftec.{sid}"] = name
+    faces = {f: {"texture": "#side"} for f in ("north", "east", "west", "up", "down")}
+    faces["south"] = {"texture": "#face"}
+    write(f"{A}/models/block/{sid}.json", {"parent": "minecraft:block/block", "textures": {"particle": tex, "side": tex, "face": "minecraft:block/white_concrete"},
+                                          "elements": [{"from": panel[0], "to": panel[1], "faces": faces},
+                                                       {"from": [panel[0][0] + 1, panel[0][1] + 1, panel[1][2]], "to": [panel[1][0] - 1, panel[1][1] - 1, panel[1][2] + 0.01],
+                                                        "faces": {"south": {"texture": "#face"}}}]})
+    item_def(sid, f"siftec:block/{sid}")
+    write(f"{D}/loot_table/blocks/{sid}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{sid}"}]}]})
+for bid, w, h, _ in content.BILLBOARD_SIGNS:
+    # flush with the board's white face: only the text shows
+    write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/block", "textures": {"particle": "minecraft:block/white_concrete", "face": "minecraft:block/white_concrete"},
+                                          "elements": [{"from": [0, 0, 0], "to": [16, 16, 0.5], "faces": {"south": {"texture": "#face"}}}]})
+    lang[f"block.siftec.{bid}"] = "Billboard"
+for sid in [x[0] for x in content.SIGNS] + [x[0] for x in content.BILLBOARD_SIGNS]:
+    write(f"{A}/blockstates/{sid}.json", {"variants": {f"facing={d},waterlogged={wl}": ({"model": f"siftec:block/{sid}", "y": y} if y else {"model": f"siftec:block/{sid}"})
+                                                       for d, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)) for wl in ("false", "true")}})
+# the Boom Box: a cassette player's case, its speakers, handle and tape door
+data["boom_box"] = {"cost": [{"item": c, "count": n} for c, n in content.parse_cost(content.BOOM_BOX_COST)]}
+for c, n in content.parse_cost(content.BOOM_BOX_COST): check(c, "boom box")
+_bb = {"particle": "create:block/andesite_casing", "case": "create:block/andesite_casing", "speaker": "minecraft:block/black_concrete",
+       "handle": "create:block/brass_casing", "tape": "minecraft:block/white_concrete"}
+_bb_el = [([1, 0, 4], [15, 9, 12], "case"), ([2, 2, 11.9], [6, 7, 12.2], "speaker"), ([10, 2, 11.9], [14, 7, 12.2], "speaker"),
+          ([6.5, 4, 11.9], [9.5, 7, 12.2], "tape"), ([3, 9, 7], [4, 11, 9], "handle"), ([12, 9, 7], [13, 11, 9], "handle"), ([3, 11, 7], [13, 12, 9], "handle")]
+for playing in (False, True):
+    els = []
+    for a, b, t in _bb_el:
+        els.append({"from": a, "to": b, "faces": {f: {"texture": "#" + t} for f in ("north", "south", "east", "west", "up", "down")}})
+    if playing:
+        els.append({"from": [7, 5, 12.2], "to": [9, 6, 12.3], "faces": {"south": {"texture": "#handle"}}, "light_emission": 8})
+    write(f"{A}/models/block/boom_box{'_playing' if playing else ''}.json", {"parent": "minecraft:block/block", "textures": _bb, "elements": els})
+write(f"{A}/blockstates/boom_box.json", {"variants": {f"facing={d},has_record={r}": dict({"model": f"siftec:block/boom_box{'_playing' if r == 'true' else ''}"}, **({"y": y} if y else {}))
+                                                       for d, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)) for r in ("false", "true")}})
+item_def("boom_box", "siftec:block/boom_box")
+write(f"{D}/loot_table/blocks/boom_box.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": "siftec:boom_box"}]}]})
+lang["block.siftec.boom_box"] = "Boom Box"
+data["tapes"] = {t: song for t, _, song in content.TAPES}
+for t, name, song in content.TAPES:
+    lang[f"item.siftec.{t}"] = name
+    write(f"{A}/models/item/{t}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/music_disc_" + song.split(":")[1]}})
+    item_def(t, f"siftec:item/{t}")
+# the Golden Cart Assembler: Create's models in gold (client/CosmeticsClient.java picks them for a golden Cart Assembler)
+for rail in ("activator_rail", "controller_rail", "detector_rail", "powered_rail", "regular"):
+    for powered in ("", "_powered"):
+        name = f"block_{rail}{powered}"
+        write(f"{A}/models/block/golden_cart_assembler/{name}.json", {"parent": f"create:block/cart_assembler/{name}",
+              "textures": {"4": "minecraft:block/gold_block", "6": "minecraft:block/raw_gold_block", "translation_chassis_side": "minecraft:block/gold_block",
+                           "particle": "minecraft:block/gold_block"}})
+data["materials"] = {k: {"kind": w, "blocks": b} for k, (n, w, b) in content.MATERIALS.items()}
+for k, (n, w, b) in content.MATERIALS.items():
+    lang[f"siftec.material.{k}"] = n
+    for built, to in b.items(): check(to, "material " + k)
+data["patterns"] = list(content.PATTERNS)
+for k, n in content.PATTERNS.items(): lang[f"siftec.pattern.{k}"] = n
+data["emotes"] = [e[0] for e in content.EMOTES]
+data["helmet_skins"] = {k: a for k, (n, a, c) in content.HELMET_SKINS.items()}
+data["suit_trims"] = {k: {"pattern": p, "material": m} for k, (n, p, m, c) in content.SUIT_TRIMS.items()}
+for m, name in enumerate(("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"), 1):
+    lang[f"siftec.month.{m}"] = name
+lang.update({
+    "siftec.shop.season": "On sale in %s", "siftec.shop.out_of_season": "A holiday set: on sale in %s",
+    "siftec.shop.banner_none": "Your company has no banner yet: use this entry holding a banner to make it the company's",
+    "siftec.shop.banner_take": "Click to take a copy of the company banner", "siftec.shop.banner_set": "Holding a banner: click to make it the company's",
+    "siftec.shop.banner_new": "Your company has a new banner", "siftec.shop.banner_name": "%s banner",
+    "siftec.shop.use.material": "Use the Customizer on a foundation, wall or roof", "siftec.shop.use.pattern": "Use the Customizer on a foundation",
+    "siftec.shop.use.emote": "Play it with /emote", "siftec.shop.use.helmet": "Use the Customizer in the air", "siftec.shop.use.trim": "Use the Customizer in the air",
+    "siftec.shop.use.golden_cart": "Use the Customizer on a Cart Assembler", "siftec.shop.use.unlock": "In the Build Gun's Foundations tab",
+    "siftec.shop.use.finish": "Use the Customizer on a building", "siftec.shop.use.skin": "Use the Customizer on a building",
+    "siftec.shop.use.swatch": "Use the Customizer on a building",
+    "siftec.customizer.material": "Material: %s", "siftec.customizer.pattern": "Floor pattern: %s", "siftec.customizer.pattern_none": "None",
+    "siftec.customizer.golden_cart": "Cart Assembler skin changed",
+    "siftec.outfit.title": "Customizer: your outfit", "siftec.outfit.helmet_own": "Helmet: its own look", "siftec.outfit.trim_none": "No suit trim",
+    "siftec.outfit.helmet_done": "Helmet look changed", "siftec.outfit.no_helmet": "Wear a helmet first",
+    "siftec.outfit.trim_done": "Suit trim on %s pieces", "siftec.outfit.no_armour": "Wear armour that takes a trim first",
+    "siftec.emote.unknown": "No emote called %s", "siftec.emote.locked": "Buy the %s in the AWESOME Shop first",
+})
 data["cups"] = []
 for cid, name, cost, needs in content.CUPS:
     for c, n in content.parse_cost(cost): check(c, "cup " + cid)
@@ -811,7 +902,8 @@ for path, mid in data["recipe_locks"].items():
 # the Build Gun's buildings count as what unlocks them (a node's resource needs a miner on the node)
 for _b in content.BUILDINGS:
     if _b[4]:
-        lock_of["siftec:building/" + _b[0]] = _b[4]
+        # a building from the AWESOME Shop counts as the milestone that brings the Shop
+        lock_of["siftec:building/" + _b[0]] = "resource_sink_bonus_program" if _b[4].startswith("shop:") else _b[4]
 
 
 def needs_of(things, seen=None):
@@ -882,12 +974,15 @@ lang.update({"siftec.workshop.title": "Equipment Workshop",
 # ---- Build Gun and its buildings (building/BuildGun.java, building/Buildings.java)
 data["buildings"] = []
 LOGICS = {"basin", "smelter", "miner", "portable_miner", "storage", "power", "assembly", "packager", "extractor", "pressurizer",
-          "well_extractor", "processor", "workshop", "sink", "shop", "radar", "truck_station"}
+          "well_extractor", "processor", "workshop", "sink", "shop", "radar", "truck_station", "drone_port", "foundation"}
 POWERS = {"pole", "storage", "augmenter", "biomass", "coal", "fuel", "geothermal", "nuclear"}
 for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if tab not in content.BUILD_TABS:
         raise SystemExit(f"building {bid}: unknown Build Gun tab {tab!r}")
-    if unlock and unlock not in by_id:
+    if unlock.startswith("shop:"):
+        if not any(e[0] == unlock[5:] for e in content.SHOP):
+            raise SystemExit(f"building {bid}: unlocked by {unlock!r}, which is no AWESOME Shop entry")
+    elif unlock and unlock not in by_id:
         raise SystemExit(f"building {bid}: unlocked by {unlock!r}, which is no milestone or MAM node")
     if not extra.get("prefab") and not os.path.exists(os.path.join(D, "structure", "building", bid + ".nbt")):
         raise SystemExit(f"building {bid}: no template at data/siftec/structure/building/{bid}.nbt (run tools/structures.py)")

@@ -69,6 +69,77 @@ public class CustomizerMenu extends ChestMenu {
         return def != null && def.logic().equals("storage");
     }
 
+    /** "foundation", "wall" or "roof" for a Foundations-tab building that takes materials; null for any other. */
+    private @Nullable String materialKind() {
+        ControllerBlockEntity c = building();
+        BuildingDef def = c == null ? null : c.def();
+        if (def == null || !def.logic().equals("foundation")) return null;
+        String id = def.id();
+        return id.startsWith("foundation_") ? "foundation" : id.startsWith("wall_") ? "wall" : id.startsWith("roof_") ? "roof" : null;
+    }
+
+    private List<String> materialsFor(String kind) {
+        List<String> out = new ArrayList<>();
+        for (Map.Entry<String, String> e : Shop.materials().entrySet()) if (e.getValue().equals(kind)) out.add(e.getKey());
+        return out;
+    }
+
+    /** A foundation's, wall's or roof's window: its materials on the top row, a foundation's floor patterns on the third. */
+    private void refreshMaterials(String kind, Paint paint) {
+        ItemStack own = SinkMenu.button(item("minecraft:gray_concrete"), Component.translatable("siftec.customizer.material", Component.translatable("siftec.customizer.skin_none")), List.of());
+        if (paint.material().isEmpty()) own.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+        view.setItem(0, own);
+        int k = 1;
+        for (String m : materialsFor(kind)) {
+            boolean open = Shop.owns(player, company, "material:" + m);
+            Shop.Entry e = Shop.entry("material_" + m);
+            ItemStack stack = SinkMenu.button(open && e != null ? ShopMenu.icon(e) : Items.BARRIER,
+                Component.translatable("siftec.customizer.material", Component.translatable("siftec.material." + m)),
+                open ? List.of() : List.of(Component.translatable("siftec.customizer.locked").withStyle(ChatFormatting.RED)));
+            if (paint.material().equals(m)) stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+            if (k < 9) view.setItem(k++, stack);
+        }
+        if (!kind.equals("foundation")) return;
+        ItemStack none = SinkMenu.button(item("minecraft:light_gray_concrete"), Component.translatable("siftec.customizer.pattern", Component.translatable("siftec.customizer.pattern_none")), List.of());
+        if (paint.pattern().isEmpty()) none.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+        view.setItem(PALETTE, none);
+        k = 1;
+        for (String pattern : Shop.patterns()) {
+            boolean open = Shop.owns(player, company, "pattern:" + pattern);
+            ItemStack stack = SinkMenu.button(open ? (pattern.equals("factory_zone") ? item("minecraft:black_concrete") : item("minecraft:yellow_concrete")) : Items.BARRIER,
+                Component.translatable("siftec.customizer.pattern", Component.translatable("siftec.pattern." + pattern)),
+                open ? List.of() : List.of(Component.translatable("siftec.customizer.locked").withStyle(ChatFormatting.RED)));
+            if (paint.pattern().equals(pattern)) stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+            if (k < 9) view.setItem(PALETTE + k++, stack);
+        }
+    }
+
+    private void pressMaterials(String kind, int slot, Paint paint) {
+        if (slot == 0) {
+            apply(paint.withMaterial(""));
+        } else if (slot < 9) {
+            List<String> ms = materialsFor(kind);
+            if (slot - 1 >= ms.size()) return;
+            String m = ms.get(slot - 1);
+            if (!Shop.owns(player, company, "material:" + m)) {
+                player.sendOverlayMessage(Component.translatable("siftec.customizer.locked"));
+                return;
+            }
+            apply(paint.withMaterial(m));
+        } else if (kind.equals("foundation") && slot == PALETTE) {
+            apply(paint.withPattern(""));
+        } else if (kind.equals("foundation") && slot > PALETTE && slot < PALETTE + 9) {
+            List<String> ps = Shop.patterns();
+            if (slot - PALETTE - 1 >= ps.size()) return;
+            String pattern = ps.get(slot - PALETTE - 1);
+            if (!Shop.owns(player, company, "pattern:" + pattern)) {
+                player.sendOverlayMessage(Component.translatable("siftec.customizer.locked"));
+                return;
+            }
+            apply(paint.withPattern(pattern));
+        }
+    }
+
     private static Item item(String id) {
         return BuiltInRegistries.ITEM.getOptional(Identifier.parse(id)).orElse(Items.BARRIER);
     }
@@ -92,6 +163,11 @@ public class CustomizerMenu extends ChestMenu {
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         ControllerBlockEntity c = building();
         Paint paint = c == null ? Paint.NONE : Paint.parse(c.paint);
+        String kind = materialKind();
+        if (kind != null) {
+            refreshMaterials(kind, paint);
+            return;
+        }
         for (int i = 0; i < company.swatches.size() && i < 18; i++) {
             String[] sw = company.swatches.get(i).split("/", -1);
             String secondary = sw.length > 1 ? sw[1] : "industrial";
@@ -143,6 +219,12 @@ public class CustomizerMenu extends ChestMenu {
         ControllerBlockEntity c = building();
         if (c == null) return;
         Paint paint = Paint.parse(c.paint);
+        String kind = materialKind();
+        if (kind != null) {
+            pressMaterials(kind, slot, paint);
+            refresh();
+            return;
+        }
         if (slot < 18 && slot < company.swatches.size()) {
             if (right) editing = slot;
             else apply(paint.withSwatch(company.swatches.get(slot)));

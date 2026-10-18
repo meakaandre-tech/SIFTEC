@@ -704,7 +704,6 @@ WORKSHOP = [
     ("siftec:blueprint_designer", _B["Blueprint Designer Mk.1"]),
     ("siftec:blueprint_designer_mk2", _B["Blueprint Designer Mk.2"]),
     ("siftec:blueprint_designer_mk3", _B["Blueprint Designer Mk.3"]),
-    ("siftec:drone_port", _B["Drone Port"]),
     ("siftec:cardboard_drone", _B["Drone"]),
     ("siftec:main_portal", _B["Main Portal"]),
     ("siftec:satellite_portal", _B["Satellite Portal"]),

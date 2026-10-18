@@ -1,0 +1,236 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "create:block/andesite_casing",
+    "case": "create:block/andesite_casing",
+    "speaker": "minecraft:block/black_concrete",
+    "handle": "create:block/brass_casing",
+    "tape": "minecraft:block/white_concrete"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        0,
+        4
+      ],
+      "to": [
+        15,
+        9,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#case"
+        },
+        "south": {
+          "texture": "#case"
+        },
+        "east": {
+          "texture": "#case"
+        },
+        "west": {
+          "texture": "#case"
+        },
+        "up": {
+          "texture": "#case"
+        },
+        "down": {
+          "texture": "#case"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        2,
+        11.9
+      ],
+      "to": [
+        6,
+        7,
+        12.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#speaker"
+        },
+        "south": {
+          "texture": "#speaker"
+        },
+        "east": {
+          "texture": "#speaker"
+        },
+        "west": {
+          "texture": "#speaker"
+        },
+        "up": {
+          "texture": "#speaker"
+        },
+        "down": {
+          "texture": "#speaker"
+        }
+      }
+    },
+    {
+      "from": [
+        10,
+        2,
+        11.9
+      ],
+      "to": [
+        14,
+        7,
+        12.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#speaker"
+        },
+        "south": {
+          "texture": "#speaker"
+        },
+        "east": {
+          "texture": "#speaker"
+        },
+        "west": {
+          "texture": "#speaker"
+        },
+        "up": {
+          "texture": "#speaker"
+        },
+        "down": {
+          "texture": "#speaker"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        4,
+        11.9
+      ],
+      "to": [
+        9.5,
+        7,
+        12.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tape"
+        },
+        "south": {
+          "texture": "#tape"
+        },
+        "east": {
+          "texture": "#tape"
+        },
+        "west": {
+          "texture": "#tape"
+        },
+        "up": {
+          "texture": "#tape"
+        },
+        "down": {
+          "texture": "#tape"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        9,
+        7
+      ],
+      "to": [
+        4,
+        11,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#handle"
+        },
+        "south": {
+          "texture": "#handle"
+        },
+        "east": {
+          "texture": "#handle"
+        },
+        "west": {
+          "texture": "#handle"
+        },
+        "up": {
+          "texture": "#handle"
+        },
+        "down": {
+          "texture": "#handle"
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        9,
+        7
+      ],
+      "to": [
+        13,
+        11,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#handle"
+        },
+        "south": {
+          "texture": "#handle"
+        },
+        "east": {
+          "texture": "#handle"
+        },
+        "west": {
+          "texture": "#handle"
+        },
+        "up": {
+          "texture": "#handle"
+        },
+        "down": {
+          "texture": "#handle"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        11,
+        7
+      ],
+      "to": [
+        13,
+        12,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#handle"
+        },
+        "south": {
+          "texture": "#handle"
+        },
+        "east": {
+          "texture": "#handle"
+        },
+        "west": {
+          "texture": "#handle"
+        },
+        "up": {
+          "texture": "#handle"
+        },
+        "down": {
+          "texture": "#handle"
+        }
+      }
+    }
+  ]
+}

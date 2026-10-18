@@ -2,9 +2,6 @@ package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.NodeBlock;
-import com.meakaandre.siftec.machine.ProcessorBlock;
-import com.meakaandre.siftec.machine.ProcessorBlockEntity;
-import com.meakaandre.siftec.machine.ProcessorRecipe;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodePlacer;
@@ -69,7 +66,6 @@ public final class WorldTests {
                 .then(Commands.literal("geyser").then(Commands.literal("build").then(seconds.executes(c -> geyser(c, null))))
                     .then(Commands.literal("natural").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::naturalGeyser)))
                     .then(Commands.literal("wet").then(Commands.argument("seconds", IntegerArgumentType.integer(10, 600)).executes(WorldTests::wetGeyser))).then(geyserAt))
-                .then(Commands.literal("processor").executes(WorldTests::processor))
                 .then(Commands.literal("hubui").executes(WorldTests::hubUi))
                 .then(Commands.literal("geysers").then(Commands.argument("dx", IntegerArgumentType.integer()).then(Commands.argument("dz", IntegerArgumentType.integer())
                     .then(Commands.argument("half", IntegerArgumentType.integer(16, 1500)).executes(WorldTests::geyserSurvey)))));
@@ -462,48 +458,6 @@ public final class WorldTests {
             }
         });
         return 1;
-    }
-
-    // ---- processors
-
-    /** A Converter or Particle Accelerator with a two-ingredient recipe, fed far too much of one ingredient: it must still take the other. */
-    private static int processor(CommandContext<CommandSourceStack> context) {
-        CommandSourceStack source = context.getSource();
-        ServerLevel level = source.getServer().overworld();
-        BlockPos at = site(level, -24, 24);
-        for (ProcessorBlock block : List.of(ModBlocks.CONVERTER.get(), ModBlocks.PARTICLE_ACCELERATOR.get())) {
-            List<ProcessorRecipe> recipes = ProcessorRecipe.of(block.machine);
-            for (int index = 0; index < recipes.size(); index++) {
-                ProcessorRecipe recipe = recipes.get(index);
-                if (recipe.inputs().size() != 2 || recipe.fluidIn() != null || recipe.alt() != null || recipe.inputs().stream().anyMatch(c -> c.isTag() || !c.present())) continue;
-                level.setBlockAndUpdate(at, block.defaultBlockState());
-                if (!(level.getBlockEntity(at) instanceof ProcessorBlockEntity machine)) continue;
-                machine.select(index);
-                ItemStack a = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(recipe.inputs().get(0).key())), 64);
-                ItemStack b = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(recipe.inputs().get(1).key())), 64);
-                // like a hopper: the plentiful one first, into every slot that takes it
-                int slotsA = 0, slotsB = 0;
-                for (int slot = 0; slot < 9; slot++) {
-                    if (machine.items.getItem(slot).isEmpty() && machine.items.canPlaceItem(slot, a)) {
-                        machine.items.setItem(slot, a.copy());
-                        slotsA++;
-                    }
-                }
-                for (int slot = 0; slot < 9; slot++) {
-                    if (machine.items.getItem(slot).isEmpty() && machine.items.canPlaceItem(slot, b)) {
-                        machine.items.setItem(slot, b.copy());
-                        slotsB++;
-                    }
-                }
-                report(source, "processor " + block.machine + " recipe " + recipe.inputs() + ": plentiful ingredient took " + slotsA + " slots, the other " + slotsB
-                    + "; ready to run: " + machine.readyNow());
-                machine.items.clearContent();
-                level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
-                return 1;
-            }
-        }
-        report(source, "processor: no two-ingredient recipe to test");
-        return 0;
     }
 
     // ---- natural geysers: how many the world really makes

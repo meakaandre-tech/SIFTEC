@@ -7,6 +7,7 @@ import com.meakaandre.siftec.item.ObjectScannerItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 
@@ -72,6 +73,16 @@ public class ModItems {
         for (com.google.gson.JsonElement e : Milestones.raw().getAsJsonArray("cups")) {
             String id = e.getAsJsonObject().get("id").getAsString();
             CUPS.put(id, item(id, properties -> new Item(properties.stacksTo(1))).get());
+        }
+    }
+
+    /** The AWESOME Shop's cassette tapes for the Boom Box: each plays one of the game's songs. */
+    public static final Map<String, Item> TAPES = new LinkedHashMap<>();
+
+    static {
+        for (Map.Entry<String, com.google.gson.JsonElement> e : Milestones.raw().getAsJsonObject("tapes").entrySet()) {
+            ResourceKey<net.minecraft.world.item.JukeboxSong> song = ResourceKey.create(Registries.JUKEBOX_SONG, Identifier.parse(e.getValue().getAsString()));
+            TAPES.put(e.getKey(), item(e.getKey(), properties -> new Item(properties.stacksTo(1).jukeboxPlayable(song))).get());
         }
     }
 

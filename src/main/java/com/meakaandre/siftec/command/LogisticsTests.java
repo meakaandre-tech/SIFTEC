@@ -436,11 +436,14 @@ public final class LogisticsTests {
      */
     private static void drones(CommandSourceStack source, ServerLevel level) {
         Company c = company(level, source, "selftest_drones");
-        BlockPos home = new BlockPos(X + 70, Y, Z + 10), far = home.east(20), farther = home.east(80);
-        level.setBlock(home, ModBlocks.DRONE_PORT.get().defaultBlockState(), Block.UPDATE_ALL);
-        level.setBlock(far, ModBlocks.DRONE_PORT.get().defaultBlockState(), Block.UPDATE_ALL);
-        if (!(level.getBlockEntity(home) instanceof DronePortBlockEntity port)) {
-            expect(source, "the Drone Port goes down", false, level.getBlockState(home).toString());
+        // Drone Port buildings (23 by 23), on a site of their own: terminals 40 apart, a trip there burns one charge, 80 two
+        int dx = X + 400, dz = Z;
+        BuildingTests.platform(level, dx - 20, dz - 20, dx + 100, dz + 80, Y, 16);
+        BlockPos home = new BlockPos(dx, Y + 1, dz + 10), far = home.east(40), farther = home.east(80);
+        DronePortBlockEntity port = PolishTests.buildDronePort(level, c, home);
+        PolishTests.buildDronePort(level, c, far);
+        if (port == null || !(level.getBlockEntity(far) instanceof DronePortBlockEntity)) {
+            expect(source, "the Drone Port buildings go down", false, level.getBlockState(home).toString());
             return;
         }
         ItemStack parcel = PackageItem.containing(List.of(new ItemStack(Items.IRON_INGOT, 5)));
@@ -452,7 +455,7 @@ public final class LogisticsTests {
         port.destination = farther;
         int longTrip = port.chargesNeeded();
         port.destination = far;
-        expect(source, "a drone trip burns one fire charge for 20 blocks, two for 80", port.chargesNeeded() == 1 && longTrip == 2,
+        expect(source, "a drone trip burns one fire charge for 40 blocks, two for 80", port.chargesNeeded() == 1 && longTrip == 2,
             port.chargesNeeded() + " and " + longTrip);
         port.items.setItem(PortContainer.FUEL, new ItemStack(Items.FIRE_CHARGE, 3));
         port.items.setItem(PortContainer.OUT, parcel);
@@ -468,23 +471,20 @@ public final class LogisticsTests {
         });
         // a far port whose chunk does not tick (work package 17): the drone unloads there all the same, into the
         // simulation's record of that port, and comes home; loaded again, the port holds the package
-        BlockPos lonely = home.south(4), nowhere = home.offset(5_000, 0, 0);
-        level.setChunkForced(nowhere.getX() >> 4, nowhere.getZ() >> 4, true);
-        level.getChunk(nowhere.getX() >> 4, nowhere.getZ() >> 4);
-        level.setBlock(nowhere.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
-        level.setBlock(nowhere, ModBlocks.DRONE_PORT.get().defaultBlockState(), Block.UPDATE_ALL);
-        if (level.getBlockEntity(nowhere) instanceof DronePortBlockEntity faraway) {
-            faraway.companyId = c.id;
-            faraway.setChanged();
+        BlockPos lonely = home.south(40), nowhere = home.offset(5_000, 0, 0);
+        BuildingTests.platform(level, nowhere.getX() - 16, nowhere.getZ() - 16, nowhere.getX() + 16, nowhere.getZ() + 16, Y, 16);
+        DronePortBlockEntity faraway = PolishTests.buildDronePort(level, c, nowhere);
+        DronePortBlockEntity stray = PolishTests.buildDronePort(level, c, lonely);
+        if (faraway == null || stray == null) {
+            expect(source, "the far and lonely Drone Port buildings go down", false, "");
+            return;
         }
-        level.setBlock(lonely, ModBlocks.DRONE_PORT.get().defaultBlockState(), Block.UPDATE_ALL);
-        if (!(level.getBlockEntity(lonely) instanceof DronePortBlockEntity stray)) return;
         stray.companyId = c.id;
         stray.hasDrone = true;
         stray.destination = nowhere;
         stray.setChanged();
         // the far port ticks once (the simulation learns of it), then its chunk is let go; then the drone sets off
-        later(level, 60, () -> level.setChunkForced(nowhere.getX() >> 4, nowhere.getZ() >> 4, false));
+        later(level, 60, () -> forceAround(level, nowhere, false));
         later(level, 140, () -> {
             if (!(level.getBlockEntity(lonely) instanceof DronePortBlockEntity p)) return;
             p.items.setItem(PortContainer.FUEL, new ItemStack(Items.FIRE_CHARGE, 64));
@@ -514,8 +514,7 @@ public final class LogisticsTests {
             expect(source, "home again, nothing waits to leave", p != null && p.state == DronePortBlockEntity.IDLE && p.items.empty(PortContainer.OUT, PortContainer.FUEL),
                 p == null ? "port missing" : "state " + p.state + ", status " + p.statusKey());
             // the far port's chunk loads again: the catch-up puts the package in its arrivals
-            level.setChunkForced(nowhere.getX() >> 4, nowhere.getZ() >> 4, true);
-            level.getChunk(nowhere.getX() >> 4, nowhere.getZ() >> 4);
+            forceAround(level, nowhere, true);
         });
         later(level, 360, () -> {
             DronePortBlockEntity farPort = level.getBlockEntity(nowhere) instanceof DronePortBlockEntity q ? q : null;
@@ -523,8 +522,18 @@ public final class LogisticsTests {
             int gold = PackageItem.isPackage(arrived) ? countIn(PackageItem.getContents(arrived), Items.GOLD_INGOT) : 0;
             expect(source, "loaded again, the far port holds the package (3 gold ingots) among its arrivals", gold == 3,
                 farPort == null ? "port missing" : "arrivals " + arrived);
-            level.setChunkForced(nowhere.getX() >> 4, nowhere.getZ() >> 4, false);
+            forceAround(level, nowhere, false);
         });
+    }
+
+    /** Forces (or lets go) the chunks a Drone Port building's platform round a terminal loaded. */
+    private static void forceAround(ServerLevel level, BlockPos at, boolean force) {
+        for (int cx = (at.getX() - 16) >> 4; cx <= (at.getX() + 16) >> 4; cx++) {
+            for (int cz = (at.getZ() - 16) >> 4; cz <= (at.getZ() + 16) >> 4; cz++) {
+                level.setChunkForced(cx, cz, force);
+                if (force) level.getChunk(cx, cz);
+            }
+        }
     }
 
     private static int countIn(com.zurrtum.create.infrastructure.items.ItemStackHandler handler, Item item) {

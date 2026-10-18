@@ -33,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
@@ -130,6 +131,91 @@ public class VehicleEntity extends Entity {
         return new Vec3(getX() - sin * z - cos * x, getY() + y, getZ() + cos * z - sin * x);
     }
 
+    // ------------------------------------------------------------------------------------------------ its body
+
+    /** True while it moves itself: its collision box is then only the square middle of its body (see {@link #drive}). */
+    private boolean moving;
+
+    /**
+     * Its box: the whole of its turned body (its model's width and length), as the smallest box round it, so the game
+     * finds it to pick, hit and interact with along all its length; picking it is then narrowed to the body itself
+     * ({@code mixin.VehiclePickMixin}). While it moves itself it collides as the square middle of its body, and its
+     * ends are kept out of walls ({@link #bodyClear}).
+     */
+    @Override
+    protected AABB makeBoundingBox(Vec3 pos) {
+        if (kind == null) return super.makeBoundingBox(pos);
+        double hw = kind.boxWidth / 2.0;
+        if (moving) return new AABB(pos.x - hw, pos.y, pos.z - hw, pos.x + hw, pos.y + kind.boxHeight, pos.z + hw);
+        float yaw = getYRot() * Mth.DEG_TO_RAD;
+        double sin = Math.abs(Mth.sin(yaw)), cos = Math.abs(Mth.cos(yaw)), hl = kind.boxLength / 2.0;
+        double ex = cos * hw + sin * hl, ez = sin * hw + cos * hl;
+        return new AABB(pos.x - ex, pos.y, pos.z - ez, pos.x + ex, pos.y + kind.boxHeight, pos.z + ez);
+    }
+
+    /** A point in the world in the vehicle's own frame (the inverse of {@link #local}). */
+    public Vec3 toLocal(Vec3 world) {
+        float yaw = getYRot() * Mth.DEG_TO_RAD;
+        double sin = Mth.sin(yaw), cos = Mth.cos(yaw), dx = world.x - getX(), dz = world.z - getZ();
+        return new Vec3(-cos * dx - sin * dz, world.y - getY(), -sin * dx + cos * dz);
+    }
+
+    /** Its body in its own frame, grown on every side by {@code grow}. */
+    private AABB body(double grow) {
+        double hw = kind.boxWidth / 2.0 + grow, hl = kind.boxLength / 2.0 + grow;
+        return new AABB(-hw, -grow, -hl, hw, kind.boxHeight + grow, hl);
+    }
+
+    /** Where the line from {@code from} to {@code to} first meets its turned body (grown by {@code grow}), if it does. */
+    public java.util.Optional<Vec3> bodyHit(Vec3 from, Vec3 to, double grow) {
+        return body(grow).clip(toLocal(from), toLocal(to)).map(p -> local(p.x, p.y, p.z));
+    }
+
+    /** True if a point is inside its turned body. */
+    public boolean bodyContains(Vec3 point, double grow) {
+        return body(grow).contains(toLocal(point));
+    }
+
+    /** The eight corners of its turned body, bottom four first (front left, front right, back right, back left), for outlines. */
+    public Vec3[] bodyCorners(double grow) {
+        AABB b = body(grow);
+        Vec3[] out = new Vec3[8];
+        double[][] xz = {{b.minX, b.maxZ}, {b.maxX, b.maxZ}, {b.maxX, b.minZ}, {b.minX, b.minZ}};
+        for (int i = 0; i < 4; i++) {
+            out[i] = local(xz[i][0], b.minY, xz[i][1]);
+            out[i + 4] = local(xz[i][0], b.maxY, xz[i][1]);
+        }
+        return out;
+    }
+
+    /**
+     * Which squares along its length (front to back) have something solid in them above the height it can drive up (one
+     * block), as bits: its front and back stop at a wall as its middle does. The squares reach its very ends.
+     */
+    int bodyBlocked() {
+        double w = kind.boxWidth, l = kind.boxLength;
+        int n = squares();
+        double side = w * 0.7 / 2, from = getY() + 1.05, to = getY() + Math.max(1.1, kind.boxHeight - 0.05);
+        double reach = Math.max(0, l / 2 - side);
+        int mask = 0;
+        for (int i = 0; i < n; i++) {
+            double z = n == 1 ? 0 : -reach + i * (2 * reach) / (n - 1);
+            Vec3 c = local(0, 0, z);
+            if (!level().noCollision(this, new AABB(c.x - side, from, c.z - side, c.x + side, to, c.z + side))) mask |= 1 << i;
+        }
+        return mask;
+    }
+
+    /** How many squares {@link #bodyBlocked} checks along its length (the first is its back, the last its front). */
+    int squares() {
+        return Math.max(1, (int) Math.ceil(kind.boxLength / kind.boxWidth));
+    }
+
+    /** True if nothing solid stands anywhere in its body ({@link #bodyBlocked}). */
+    boolean bodyClear() {
+        return bodyBlocked() == 0;
+    }
+
     public void addFuel(double mj) {
         fuelMj = Math.min(kind.tankMj(), fuelMj + mj);
         syncFuel();
@@ -146,6 +232,8 @@ public class VehicleEntity extends Entity {
     public void tick() {
         super.tick();
         if (level().isClientSide()) {
+            // its box follows its heading as it turns
+            setBoundingBox(makeBoundingBox());
             rollO = roll;
             if (!Double.isNaN(lastX)) {
                 Vec3 f = forward();
@@ -195,6 +283,9 @@ public class VehicleEntity extends Entity {
             speed *= 0.94;
         }
         if (Math.abs(speed) < 0.003) speed = 0;
+        Vec3 before = position();
+        // what its body already stands in (a dock it parked in, say) does not hold it; only driving into more does
+        int blockedBefore = speed == 0 ? 0 : bodyBlocked();
         if (steer != 0 && speed != 0) {
             double grip = Math.min(1, Math.abs(speed) / (max * 0.3));
             setYRot(getYRot() + (float) (Mth.clamp(steer, -1, 1) * kind.turnDegrees * grip * Math.signum(speed)));
@@ -207,7 +298,20 @@ public class VehicleEntity extends Entity {
             speed *= 0.9;
         }
         setDeltaMovement(f.x * speed, vy, f.z * speed);
+        // it moves as the square middle of its body; its front and back must not end up in a wall
+        moving = true;
+        setBoundingBox(makeBoundingBox());
         move(MoverType.SELF, getDeltaMovement());
+        moving = false;
+        // the end it drives toward stops at a wall as its middle does (turning is never held back: a tail swinging
+        // past a corner does not stop it)
+        int lead = speed > 0 ? 1 << (squares() - 1) : 1;
+        if (speed != 0 && (bodyBlocked() & ~blockedBefore & lead) != 0) {
+            setPos(before.x, getY(), before.z);
+            speed *= 0.5;
+            horizontalCollision = true;
+        }
+        setBoundingBox(makeBoundingBox());
         if (horizontalCollision) speed *= 0.5;
         if (Math.abs(entityData.get(SPEED) - speed) > 0.005) entityData.set(SPEED, (float) speed);
     }

@@ -41,6 +41,11 @@
     "siftec:office_desk",
     "siftec:office_chair",
     "siftec:filing_cabinet",
-    "siftec:office_plant"
+    "siftec:office_plant",
+    "siftec:ficsmas_tree",
+    "siftec:ficsmas_gift",
+    "siftec:ficsmas_snowman",
+    "siftec:harvest_lantern",
+    "siftec:harvest_scarecrow"
   ]
 }

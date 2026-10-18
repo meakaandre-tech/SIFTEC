@@ -335,7 +335,8 @@ public final class ExplorationTests {
             Shop.entries().size() >= 30 && customizer != null && customizer.owned(fresh()) && buyer.swatches.size() == 2 && Shop.hasFinish(buyer, "copper")
                 && !Shop.hasFinish(fresh(), "copper") && Shop.hasFinish(fresh(), "painted"), Shop.entries().size() + " entries");
         boolean onlyCosmetic = true;
-        for (Shop.Entry e : Shop.entries()) onlyCosmetic &= Set.of("customizer", "swatch", "finish", "skin", "decor", "cup").contains(e.kind());
+        for (Shop.Entry e : Shop.entries()) onlyCosmetic &= Set.of("customizer", "swatch", "finish", "skin", "decor", "cup", "sign", "unlock", "material", "pattern", "emote", "helmet", "trim",
+            "banner", "golden_cart", "boom_box", "tape").contains(e.kind());
         expect(source, "Shop: nothing but cosmetics (no parts, equipment or progression)", onlyCosmetic, "");
         Paint paint = new Paint("blue", "red", "painted", "brass");
         expect(source, "Customizer paint: orange panels take the primary colour, dark grey the secondary, light grey the casing skin; a finish changes the material",

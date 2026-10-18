@@ -219,11 +219,14 @@ public final class ClaimGunTests {
         List<String> unknown = new ArrayList<>(), notLocked = new ArrayList<>(), notOpened = new ArrayList<>();
         for (BuildingDef b : Buildings.all()) {
             if (b.dev() || b.unlock().isEmpty()) continue;
-            if (Milestones.get(b.unlock()) == null) unknown.add(b.id() + ":" + b.unlock());
+            // the Billboard Set's billboards are unlocked in the AWESOME Shop
+            boolean shop = b.unlock().startsWith("shop:");
+            if (shop ? com.meakaandre.siftec.sink.Shop.entry(b.unlock().substring(5)) == null : Milestones.get(b.unlock()) == null) unknown.add(b.id() + ":" + b.unlock());
             if (!Buildings.locked(b, fresh)) notLocked.add(b.id());
             Company one = new Company();
             one.id = "selftest_gun_probe";
-            one.done.add(b.unlock());
+            if (shop) one.shop.add(b.unlock().substring(5));
+            else one.done.add(b.unlock());
             if (Buildings.locked(b, one)) notOpened.add(b.id());
         }
         expect(source, "unlocks: every building's unlock is a known milestone, Wormhole phase or MAM node", unknown.isEmpty(), String.join(", ", unknown));

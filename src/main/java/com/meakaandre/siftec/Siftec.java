@@ -79,6 +79,11 @@ public class Siftec implements ModInitializer {
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> com.meakaandre.siftec.building.BuildingPower.forget());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> com.meakaandre.siftec.building.BuildingPower.forget());
         com.meakaandre.siftec.geyser.Radiation.register();
+        com.meakaandre.siftec.geyser.GeyserSearch.register();
+        com.meakaandre.siftec.building.LegacyConversion.register();
+        com.meakaandre.siftec.drone.DroneEntity.register();
+        com.meakaandre.siftec.command.PolishTests.register();
+        com.meakaandre.siftec.cosmetic.Emotes.register();
         com.meakaandre.siftec.compat.ToxicShot.register();
     }
 

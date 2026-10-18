@@ -58,6 +58,10 @@ public class ModBlockEntities {
     public static final Entry<com.meakaandre.siftec.death.DeathCrateBlockEntity> DEATH_CRATE = register("death_crate", com.meakaandre.siftec.death.DeathCrateBlockEntity::new, ModBlocks.DEATH_CRATE.get());
     public static final Entry<com.meakaandre.siftec.building.TurbineBlockEntity> TURBINE = register("turbine", com.meakaandre.siftec.building.TurbineBlockEntity::new, ModBlocks.TURBINE.get());
 
+    /** The AWESOME Shop's signs. */
+    public static final Entry<com.meakaandre.siftec.cosmetic.ShopSignBlockEntity> SHOP_SIGN = register("shop_sign", com.meakaandre.siftec.cosmetic.ShopSignBlockEntity::new,
+        ModBlocks.LABEL_SIGN.get(), ModBlocks.DISPLAY_SIGN.get(), ModBlocks.BILLBOARD_SMALL_SIGN.get(), ModBlocks.BILLBOARD_LARGE_SIGN.get());
+
     private static <T extends BlockEntity> Entry<T> register(String name, Factory<T> factory, Block... blocks) {
         Entry<T> entry = new Entry<>();
         BlockEntityType<T> type = new BlockEntityType<>((pos, state) -> factory.create(entry.get(), pos, state), Set.of(blocks));
@@ -66,6 +70,8 @@ public class ModBlockEntities {
     }
 
     public static void register() {
+        // the Boom Box is a jukebox
+        ((net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityType) (Object) net.minecraft.world.level.block.entity.BlockEntityTypes.JUKEBOX).addValidBlock(ModBlocks.BOOM_BOX.get());
         // belts, funnels, chutes and hoppers can take a powered miner's output
         // parts pushed into a HUB or Gateway go toward the company's active milestone
         ItemStorage.SIDED.registerForBlockEntity((hub, side) -> hub.intake, HUB.get());

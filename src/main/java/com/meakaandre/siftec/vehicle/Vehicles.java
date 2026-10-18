@@ -121,10 +121,11 @@ public final class Vehicles {
         return out;
     }
 
-    /** The space it takes up, as an entity, standing at its spot. */
-    static AABB box(Vec3 at, VehicleKind kind) {
-        double hw = kind.boxWidth / 2.0;
-        return new AABB(at.x - hw, at.y, at.z - hw, at.x + hw, at.y + kind.boxHeight, at.z + hw);
+    /** The space its body takes up standing at its spot, facing the way it is put down. */
+    static AABB box(Vec3 at, VehicleKind kind, net.minecraft.core.Direction facing) {
+        double hw = kind.boxWidth / 2.0, hl = kind.boxLength / 2.0;
+        double ex = facing.getAxis() == net.minecraft.core.Direction.Axis.X ? hl : hw, ez = facing.getAxis() == net.minecraft.core.Direction.Axis.X ? hw : hl;
+        return new AABB(at.x - ex, at.y, at.z - ez, at.x + ex, at.y + kind.boxHeight, at.z + ez);
     }
 
     /**
@@ -138,7 +139,7 @@ public final class Vehicles {
             check.fail("siftec.build_gun.no_template", p.def().id());
             return check;
         }
-        AABB box = box(spot(p, kind), kind);
+        AABB box = box(spot(p, kind), kind, p.facing());
         if (!level.noCollision(box.deflate(0.05))) check.fail("siftec.vehicle.blocked");
         if (creative) return check;
         if (company != null && Buildings.locked(p.def(), company)) check.fail("siftec.build_gun.locked", Buildings.unlockName(p.def()));
@@ -188,8 +189,9 @@ public final class Vehicles {
         Vec3 end = eye.add(player.getViewVector(1f).scale(Buildings.RANGE));
         VehicleEntity best = null;
         double bestDist = Double.MAX_VALUE;
-        for (VehicleEntity v : player.level().getEntitiesOfClass(VehicleEntity.class, new AABB(eye, end).inflate(1))) {
-            var hit = v.getBoundingBox().inflate(0.2).clip(eye, end);
+        for (VehicleEntity v : player.level().getEntitiesOfClass(VehicleEntity.class, new AABB(eye, end).inflate(3))) {
+            // its turned body, along all its length (not the square box round it)
+            var hit = v.bodyHit(eye, end, 0.2);
             if (hit.isEmpty()) continue;
             double d = hit.get().distanceToSqr(eye);
             if (d < bestDist) {
