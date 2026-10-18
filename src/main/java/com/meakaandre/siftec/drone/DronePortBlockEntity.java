@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.drone;
 
-import com.meakaandre.siftec.equip.Ziplines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -218,7 +217,6 @@ public class DronePortBlockEntity extends BlockEntity {
             DroneEntity drone = DroneEntity.TYPE.create(server, EntitySpawnReason.TRIGGERED);
             if (drone == null) return;
             drone.snapTo(at.x, at.y, at.z, yaw, 0);
-            drone.addTag(Ziplines.TAG);
             server.addFreshEntity(drone);
             shown = drone;
         }

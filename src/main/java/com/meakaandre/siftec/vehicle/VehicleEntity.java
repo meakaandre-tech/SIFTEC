@@ -189,19 +189,26 @@ public class VehicleEntity extends Entity {
     }
 
     /**
-     * True if nothing solid stands in its body above the height it can drive up (one block): checked in squares along
-     * its length, so its front and back stop at a wall as its middle does.
+     * Which squares along its length (front to back) have something solid in them above the height it can drive up (one
+     * block), as bits: its front and back stop at a wall as its middle does. The squares reach its very ends.
      */
-    boolean bodyClear() {
+    int bodyBlocked() {
         double w = kind.boxWidth, l = kind.boxLength;
         int n = Math.max(1, (int) Math.ceil(l / w));
         double side = w * 0.7 / 2, from = getY() + 1.05, to = getY() + Math.max(1.1, kind.boxHeight - 0.05);
+        double reach = Math.max(0, l / 2 - side);
+        int mask = 0;
         for (int i = 0; i < n; i++) {
-            double z = n == 1 ? 0 : -l / 2 + w / 2 + i * (l - w) / (n - 1);
+            double z = n == 1 ? 0 : -reach + i * (2 * reach) / (n - 1);
             Vec3 c = local(0, 0, z);
-            if (!level().noCollision(this, new AABB(c.x - side, from, c.z - side, c.x + side, to, c.z + side))) return false;
+            if (!level().noCollision(this, new AABB(c.x - side, from, c.z - side, c.x + side, to, c.z + side))) mask |= 1 << i;
         }
-        return true;
+        return mask;
+    }
+
+    /** True if nothing solid stands anywhere in its body ({@link #bodyBlocked}). */
+    boolean bodyClear() {
+        return bodyBlocked() == 0;
     }
 
     public void addFuel(double mj) {
@@ -273,6 +280,8 @@ public class VehicleEntity extends Entity {
         if (Math.abs(speed) < 0.003) speed = 0;
         float yawBefore = getYRot();
         Vec3 before = position();
+        // what its body already stands in (a dock it parked in, say) does not hold it; only driving into more does
+        int blockedBefore = speed == 0 ? 0 : bodyBlocked();
         if (steer != 0 && speed != 0) {
             double grip = Math.min(1, Math.abs(speed) / (max * 0.3));
             setYRot(getYRot() + (float) (Mth.clamp(steer, -1, 1) * kind.turnDegrees * grip * Math.signum(speed)));
@@ -290,7 +299,7 @@ public class VehicleEntity extends Entity {
         setBoundingBox(makeBoundingBox());
         move(MoverType.SELF, getDeltaMovement());
         moving = false;
-        if (!bodyClear()) {
+        if (speed != 0 && (bodyBlocked() & ~blockedBefore) != 0) {
             setYRot(yawBefore);
             setPos(before.x, getY(), before.z);
             speed *= 0.5;
