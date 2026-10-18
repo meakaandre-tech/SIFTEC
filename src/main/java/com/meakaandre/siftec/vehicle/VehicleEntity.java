@@ -194,7 +194,7 @@ public class VehicleEntity extends Entity {
      */
     int bodyBlocked() {
         double w = kind.boxWidth, l = kind.boxLength;
-        int n = Math.max(1, (int) Math.ceil(l / w));
+        int n = squares();
         double side = w * 0.7 / 2, from = getY() + 1.05, to = getY() + Math.max(1.1, kind.boxHeight - 0.05);
         double reach = Math.max(0, l / 2 - side);
         int mask = 0;
@@ -204,6 +204,11 @@ public class VehicleEntity extends Entity {
             if (!level().noCollision(this, new AABB(c.x - side, from, c.z - side, c.x + side, to, c.z + side))) mask |= 1 << i;
         }
         return mask;
+    }
+
+    /** How many squares {@link #bodyBlocked} checks along its length (the first is its back, the last its front). */
+    int squares() {
+        return Math.max(1, (int) Math.ceil(kind.boxLength / kind.boxWidth));
     }
 
     /** True if nothing solid stands anywhere in its body ({@link #bodyBlocked}). */
@@ -278,7 +283,6 @@ public class VehicleEntity extends Entity {
             speed *= 0.94;
         }
         if (Math.abs(speed) < 0.003) speed = 0;
-        float yawBefore = getYRot();
         Vec3 before = position();
         // what its body already stands in (a dock it parked in, say) does not hold it; only driving into more does
         int blockedBefore = speed == 0 ? 0 : bodyBlocked();
@@ -299,8 +303,10 @@ public class VehicleEntity extends Entity {
         setBoundingBox(makeBoundingBox());
         move(MoverType.SELF, getDeltaMovement());
         moving = false;
-        if (speed != 0 && (bodyBlocked() & ~blockedBefore) != 0) {
-            setYRot(yawBefore);
+        // the end it drives toward stops at a wall as its middle does (turning is never held back: a tail swinging
+        // past a corner does not stop it)
+        int lead = speed > 0 ? 1 << (squares() - 1) : 1;
+        if (speed != 0 && (bodyBlocked() & ~blockedBefore & lead) != 0) {
             setPos(before.x, getY(), before.z);
             speed *= 0.5;
             horizontalCollision = true;
