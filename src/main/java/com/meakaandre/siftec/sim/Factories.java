@@ -713,6 +713,22 @@ public final class Factories {
         for (Sim.Group g : groups(s, data)) Sim.step(g, now);
     }
 
+    /**
+     * Keeps the worker busy, as a step that takes long would, until {@code release} counts down or {@code maxMillis} pass
+     * (selftests of a lagging server).
+     */
+    public static void holdWorker(java.util.concurrent.CountDownLatch release, long maxMillis) {
+        join();
+        runningGroups = List.of();
+        running = WORKER.submit(() -> {
+            try {
+                release.await(maxMillis, java.util.concurrent.TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+    }
+
     /** Runs a step now on the server thread (selftests). */
     public static void stepNow(MinecraftServer s) {
         join();

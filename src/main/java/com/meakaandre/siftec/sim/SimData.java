@@ -267,9 +267,17 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         @Override
         public <T> DataResult<T> encode(SimData data, DynamicOps<T> ops, T prefix) {
             Factories.join();
+            encodes++;
             return BASE.encode(data, ops, prefix);
         }
     };
+    /** How many times it has been written (selftests: which saves write it). */
+    private static int encodes;
+
+    public static int encodes() {
+        return encodes;
+    }
+
     static final SavedDataType<SimData> TYPE = new SavedDataType<>(Siftec.id("factories"), SimData::new, CODEC, null);
 
     public SimData() {
