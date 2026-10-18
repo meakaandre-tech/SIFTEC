@@ -894,12 +894,12 @@ public final class EdgeTests {
             none(level, s);
             until(server, () -> unloaded(level, s), 600, () -> {
                 SimData.Node first = Factories.node(level, sp);
-                double taken = first == null ? -1 : first.stored;
+                double atStart = first == null ? -1 : first.stored;
                 later(server, 200, () -> {
                     SimData.Node st = Factories.node(level, sp), bn = Factories.node(level, bp), cn = Factories.node(level, cp);
                     boolean ok = st != null && st.sim && st.stored > 0 && bn != null && !bn.tripped && cn != null && cn.powered;
                     expect("battery: on a grid wholly unloaded the Power Storage is simulated and covers the Constructor's draw; the fuse holds", ok,
-                        "storage " + (st == null ? "unknown" : (st.sim ? "simulated" : "not simulated") + ", " + Math.round(st.stored) + " from " + Math.round(taken))
+                        "storage " + (st == null ? "unknown" : (st.sim ? "simulated" : "not simulated") + ", " + Math.round(st.stored) + " from " + Math.round(atStart))
                             + "; burner " + (bn == null ? "unknown" : bn.tripped ? "fuse blown" : "fuse holds") + "; Constructor " + (cn == null ? "unknown" : cn.powered ? "powered" : "not powered"));
                     closed();
                 });
