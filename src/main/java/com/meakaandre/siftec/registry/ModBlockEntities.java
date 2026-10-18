@@ -71,7 +71,7 @@ public class ModBlockEntities {
 
     public static void register() {
         // the Boom Box is a jukebox
-        ((net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityType) (Object) BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(BlockEntityType.JUKEBOX)).addValidBlock(ModBlocks.BOOM_BOX.get());
+        ((net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityType) (Object) net.minecraft.world.level.block.entity.BlockEntityTypes.JUKEBOX).addValidBlock(ModBlocks.BOOM_BOX.get());
         // belts, funnels, chutes and hoppers can take a powered miner's output
         // parts pushed into a HUB or Gateway go toward the company's active milestone
         ItemStorage.SIDED.registerForBlockEntity((hub, side) -> hub.intake, HUB.get());
