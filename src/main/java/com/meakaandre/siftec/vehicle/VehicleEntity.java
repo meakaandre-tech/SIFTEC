@@ -78,6 +78,13 @@ public class VehicleEntity extends Entity {
     public @Nullable BlockPos lastStation;
     private int docked, stuck;
     private double lastDist = Double.MAX_VALUE;
+    /**
+     * Ticks each leg of the route took the last time it drove it for real (index: the point the leg ends at), so the
+     * factory simulation drives it by the same times while its land does not tick (work package 17).
+     */
+    public final List<Integer> legTicks = new ArrayList<>();
+    /** The tick it set off on the leg it is driving. */
+    private int legStart = -1;
     /** A selftest's pretend driver: the keys it holds while nobody sits in the seat (null: none). */
     public @Nullable VehicleInputPayload pilot;
     /** Stops it has made by itself, and loads it has moved there (items), for the selftests. */
@@ -223,6 +230,7 @@ public class VehicleEntity extends Entity {
     public void toggleRecording(@Nullable ServerPlayer driver) {
         if (!recording) {
             recording = true;
+            legTicks.clear();
             route.clear();
             stopAt.clear();
             stopStation.clear();
@@ -270,6 +278,7 @@ public class VehicleEntity extends Entity {
         double dx = goal.x - getX(), dz = goal.z - getZ(), dist = Math.sqrt(dx * dx + dz * dz);
         // got out somewhere else along the way: carry on from the nearest point
         if (dist > 24) {
+            legStart = -1;
             target = nearestPoint();
             goal = route.get(target);
             dx = goal.x - getX();
@@ -278,6 +287,11 @@ public class VehicleEntity extends Entity {
         }
         int stop = stopIndex(target);
         if (dist < (stop >= 0 ? 1.2 : 1.8)) {
+            if (docked == 0 && legStart >= 0) {
+                while (legTicks.size() < route.size()) legTicks.add(0);
+                legTicks.set(target, Math.max(1, tickCount - legStart));
+                legStart = -1;
+            }
             if (stop >= 0 && docked < DOCK_TICKS) {
                 if (docked == 0) {
                     itemsMoved += TruckStations.dock(level, stopStation.get(stop), this);
@@ -291,6 +305,7 @@ public class VehicleEntity extends Entity {
             target = (target + 1) % route.size();
             lastDist = Double.MAX_VALUE;
             stuck = 0;
+            legStart = tickCount;
             return new double[]{0, 0, 0};
         }
         // not getting any closer for a while (something in the way): try the next point
@@ -301,6 +316,7 @@ public class VehicleEntity extends Entity {
             target = (target + 1) % route.size();
             lastDist = Double.MAX_VALUE;
             stuck = 0;
+            legStart = -1;
         }
         float want = (float) (Math.atan2(-dx, dz) * Mth.RAD_TO_DEG);
         double off = Mth.wrapDegrees(want - getYRot());
@@ -502,6 +518,7 @@ public class VehicleEntity extends Entity {
         if (lastStation != null) view.store("LastStation", BlockPos.CODEC, lastStation);
         view.putBoolean("Recording", recording);
         view.putInt("StopsMade", stopsMade);
+        view.store("LegTicks", Codec.INT.listOf(), new ArrayList<>(legTicks));
     }
 
     @Override
@@ -526,6 +543,104 @@ public class VehicleEntity extends Entity {
         lastStation = view.read("LastStation", BlockPos.CODEC).orElse(null);
         recording = view.getBooleanOr("Recording", false);
         stopsMade = view.getIntOr("StopsMade", 0);
+        legTicks.clear();
+        legTicks.addAll(view.read("LegTicks", Codec.INT.listOf()).orElse(List.of()));
+        syncFuel();
+    }
+
+    // ------------------------------------------------------------------------------------------------ driving by time
+
+    /**
+     * True while it drives its route by itself: a route, nobody driving or recording, no selftest pilot. Only such a
+     * vehicle goes on by time while its land does not tick ({@link com.meakaandre.siftec.sim.SimVehicles}).
+     */
+    public boolean autonomous() {
+        return !recording && route.size() >= 2 && pilot == null && getFirstPassenger() == null;
+    }
+
+    /** Everything the time-driven vehicle needs, written into the simulation's record of it. */
+    public void toSim(com.meakaandre.siftec.sim.SimData.Vehicle v) {
+        v.uuid = getUUID().toString();
+        v.type = kind.id;
+        v.dim = level().dimension().identifier().toString();
+        v.company = companyId;
+        v.fuel = fuelMj;
+        v.speed = kind.maxSpeed;
+        v.mw = kind.mw;
+        v.tank = kind.tankMj();
+        v.slots = kind.slots();
+        v.cargo.clear();
+        for (int i = 0; i < cargo.getContainerSize(); i++) {
+            ItemStack s = cargo.getItem(i);
+            if (!s.isEmpty()) v.cargo.add(new com.meakaandre.siftec.sim.SimData.Slot(com.meakaandre.siftec.sim.Keys.of(s), s.getCount()));
+        }
+        v.refund.clear();
+        for (ItemStack s : refund) if (!s.isEmpty()) v.refund.add(new com.meakaandre.siftec.sim.SimData.Slot(com.meakaandre.siftec.sim.Keys.of(s), s.getCount()));
+        v.route.clear();
+        for (Vec3 p : route) {
+            v.route.add(p.x);
+            v.route.add(p.y);
+            v.route.add(p.z);
+        }
+        v.stopAt.clear();
+        v.stopAt.addAll(stopAt);
+        v.stopStation.clear();
+        for (BlockPos p : stopStation) v.stopStation.add(p.asLong());
+        v.legTicks.clear();
+        v.legTicks.addAll(legTicks);
+        v.target = Math.max(0, Math.min(target, route.size() - 1));
+        v.lastStation = lastStation == null ? null : lastStation.asLong();
+        v.stopsMade = stopsMade;
+        v.itemsMoved = itemsMoved;
+        v.docked = docked > 0 ? docked : -1;
+        v.x = getX();
+        v.y = getY();
+        v.z = getZ();
+        v.yaw = getYRot();
+        // how far along its leg it is, by distance
+        int n = route.size();
+        Vec3 to = route.get(v.target), from = route.get((v.target - 1 + n) % n);
+        double leg = from.distanceTo(to), left = position().distanceTo(to);
+        v.leg = leg <= 0 ? 0 : Math.max(0, Math.min(1, 1 - left / leg)) * com.meakaandre.siftec.sim.SimVehicles.legTicks(v, v.target);
+    }
+
+    /** Puts a vehicle the simulation drove back into the world as it left it. */
+    public void fromSim(com.meakaandre.siftec.sim.SimData.Vehicle v) {
+        companyId = v.company;
+        fuelMj = v.fuel;
+        for (int i = 0; i < cargo.getContainerSize(); i++) cargo.setItem(i, ItemStack.EMPTY);
+        int slot = 0;
+        for (var s : v.cargo) {
+            ItemStack stack = com.meakaandre.siftec.sim.Keys.stack(s.key, s.count);
+            while (!stack.isEmpty() && slot < cargo.getContainerSize()) {
+                ItemStack part = stack.split(stack.getMaxStackSize());
+                cargo.setItem(slot++, part);
+            }
+        }
+        refund.clear();
+        for (var s : v.refund) {
+            ItemStack stack = com.meakaandre.siftec.sim.Keys.stack(s.key, s.count);
+            if (!stack.isEmpty()) refund.add(stack);
+        }
+        route.clear();
+        for (int i = 0; i + 2 < v.route.size(); i += 3) route.add(new Vec3(v.route.get(i), v.route.get(i + 1), v.route.get(i + 2)));
+        stopAt.clear();
+        stopAt.addAll(v.stopAt);
+        stopStation.clear();
+        for (long p : v.stopStation) stopStation.add(BlockPos.of(p));
+        legTicks.clear();
+        legTicks.addAll(v.legTicks);
+        target = route.isEmpty() ? 0 : Math.max(0, Math.min(v.target, route.size() - 1));
+        lastStation = v.lastStation == null ? null : BlockPos.of(v.lastStation);
+        stopsMade = v.stopsMade;
+        itemsMoved = v.itemsMoved;
+        recording = false;
+        // standing at a stop it already loaded or unloaded at: it waits out the rest there without doing it again
+        docked = v.docked >= 0 ? Math.max(1, v.docked) : 0;
+        lastDist = Double.MAX_VALUE;
+        stuck = 0;
+        legStart = -1;
+        speed = 0;
         syncFuel();
     }
 }

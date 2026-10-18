@@ -225,6 +225,16 @@ public class MapScreen extends Screen {
             lines.add(Component.translatable(MapClient.pinned(poi.pinKey()) ? "siftec.map.click_unpin" : "siftec.map.click_pin").withColor(0x8A949E));
             found = new Hover(lines, new MapClient.Pin(poi.pinKey(), MapDraw.label(poi).getString(), poi.x(), poi.y(), poi.z(), MapDraw.icon(poi), MapDraw.colour(poi)), null);
         }
+        for (MapPayloads.Mover m : MapClient.movers) {
+            double d = sq(v.sx(m.x()) - mx, v.sy(m.z()) - my);
+            if (d >= best) continue;
+            best = d;
+            List<Component> lines = new ArrayList<>();
+            lines.add(MapDraw.moverName(m));
+            if (m.simulated()) lines.add(Component.translatable("siftec.map.by_time").withColor(0x8A949E));
+            where(lines, (int) Math.floor(m.x()), (int) Math.floor(m.z()));
+            found = new Hover(lines, null, null);
+        }
         if (MapFilters.showsPlayers()) {
             for (MapPayloads.Mate mate : MapClient.mates) {
                 double d = sq(v.sx(mate.x()) - mx, v.sy(mate.z()) - my);

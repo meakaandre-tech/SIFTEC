@@ -205,6 +205,8 @@ public class ControllerBlockEntity extends BlockEntity {
             if (removing) return;
         }
         if (!broken) BuildingLogic.tick(server, this);
+        // the factory simulation reads it now and then, to run it while its chunk does not tick (work package 17)
+        if (!broken && indexed) com.meakaandre.siftec.sim.Factories.building(server, this);
         if (++ticks % 20 != 0) return;
         // its machines are looked over every few seconds and anything missing is put back; a missing piece of shell
         // brings the building down

@@ -68,6 +68,8 @@ public final class PowerGrids {
         long tick;
         final List<Grid> grids = new ArrayList<>();
         final Map<AbstractElectricalConnector, Grid> byConnector = new IdentityHashMap<>();
+        /** Every connector position a grid reaches (loaded or not), and its grid. */
+        final it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<Grid> at = new it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<>();
     }
 
     public static void register() {
@@ -117,13 +119,17 @@ public final class PowerGrids {
         Map<AbstractElectricalConnector, Grid> old = new IdentityHashMap<>(b.byConnector);
         b.grids.clear();
         b.byConnector.clear();
+        b.at.clear();
         b.topology = topology;
         b.tick = level.getGameTime();
         Set<AbstractElectricalConnector> loaded = LOADED.getOrDefault(level, Set.of());
         Map<BlockPos, AbstractElectricalConnector> at = new HashMap<>();
         for (var it = loaded.iterator(); it.hasNext(); ) {
             AbstractElectricalConnector c = it.next();
-            if (c.isRemoved() || c.getLevel() != level || !level.isLoaded(c.getBlockPos()) || level.getBlockEntity(c.getBlockPos()) != c) {
+            // a connector whose chunk stopped ticking leaves: a grid with no ticking connector is balanced by the factory
+            // simulation (work package 17); it joins again when it ticks
+            if (c.isRemoved() || c.getLevel() != level || !level.isLoaded(c.getBlockPos()) || !level.shouldTickBlocksAt(c.getBlockPos())
+                || level.getBlockEntity(c.getBlockPos()) != c) {
                 it.remove();
                 continue;
             }
@@ -144,6 +150,7 @@ public final class PowerGrids {
                 BlockPos pos = queue.poll();
                 AbstractElectricalConnector c = live(level, at, pos);
                 Set<BlockPos> ends = map.links(level, pos);
+                b.at.put(pos.asLong(), grid);
                 if (c != null) {
                     grid.connectors.add(c);
                     b.byConnector.put(c, grid);
@@ -195,7 +202,13 @@ public final class PowerGrids {
 
     /** True if a connector or member of the grid went away since it was worked out (broken, or its chunk unloaded). */
     private static boolean stale(Grid grid) {
-        for (AbstractElectricalConnector c : grid.connectors) if (c.isRemoved()) return true;
+        boolean ticking = grid.connectors.isEmpty();
+        for (AbstractElectricalConnector c : grid.connectors) {
+            if (c.isRemoved()) return true;
+            if (!ticking && c.getLevel() instanceof ServerLevel l && l.shouldTickBlocksAt(c.getBlockPos())) ticking = true;
+        }
+        // none of its connectors ticks any more: the simulation takes the grid over
+        if (!ticking) return true;
         for (PowerMember m : grid.members) if (m.gone()) return true;
         return false;
     }
@@ -346,6 +359,15 @@ public final class PowerGrids {
     }
 
     // ------------------------------------------------------------------------------------------------ for others
+
+    /**
+     * The grid a connector position belongs to as last worked out (loaded or not), or null when no grid with a ticking
+     * connector reaches it: such a grid is balanced by the factory simulation instead ({@code sim.SimPower}).
+     */
+    public static @Nullable Grid at(ServerLevel level, long connector) {
+        Built b = BUILT.get(level);
+        return b == null ? null : b.at.get(connector);
+    }
 
     /** The grid a connector is on, as last worked out. */
     public static @Nullable Grid of(AbstractElectricalConnector connector) {

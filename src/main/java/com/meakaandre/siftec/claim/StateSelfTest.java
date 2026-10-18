@@ -34,7 +34,7 @@ import java.util.UUID;
 
 /**
  * Used by the automated test ({@code /siftec selftest state setup|check|verify}): saves far bigger than the old
- * 64 KB limit, claims given up when their block goes, explosions, the HUB budget, the spawn area, chunk loading,
+ * 64 KB limit, claims given up when their block goes, explosions, the HUB budget, the spawn area, claims loading no chunks,
  * kicking, and Build Gun buildings on claimed land with the per-company unlocks ({@link com.meakaandre.siftec.building.ClaimGunTests}). {@code verify} runs after the restart and removes everything the test made.
  */
 public final class StateSelfTest {
@@ -147,7 +147,7 @@ public final class StateSelfTest {
         report(source, "SELFTEST state spawn: radius " + com.meakaandre.siftec.config.SiftecConfig.spawnFreeRadius + ", spawn in zone " + Claims.inSpawnZone(level, spawn)
             + ", 300 blocks out in zone " + Claims.inSpawnZone(level, spawn.offset(300, 0, 300)) + ", a marker at spawn claimed " + atSpawn);
 
-        // 5. chunk loading: there are no players in the test, so who is online is given
+        // 5. claims keep no chunk loaded (work package 17: their factories run simulated instead), members online or not
         Company load = company(data, LOAD, fake(2));
         for (int i = 0; i < 4; i++) {
             Claims.Claim claim = new Claims.Claim();
@@ -156,14 +156,9 @@ public final class StateSelfTest {
             claims.chunks().put(Claims.key(Level.OVERWORLD, ((AREA + 1200) >> 4) + i, AREA >> 4), claim);
         }
         Claims.changed(server);
-        String member = load.members.iterator().next();
-        Claims.refreshLoading(server, uuid -> uuid.toString().equals(member));
-        int online = Claims.loadedCount();
-        Claims.refreshLoading(server, uuid -> false);
-        int afterLeave = Claims.loadedCount();
-        Claims.refreshLoading(server);
-        report(source, "SELFTEST state loading: member online " + online + " chunks loaded; after the last member left " + afterLeave
-            + "; with the real player list " + Claims.loadedCount());
+        boolean anyLoaded = false;
+        for (int i = 0; i < 4; i++) anyLoaded |= level.hasChunk(((AREA + 1200) >> 4) + i, AREA >> 4);
+        report(source, "SELFTEST state loading: claimed chunks keep no ticket (claimed chunks loaded: " + anyLoaded + ", members " + load.members.size() + ")");
 
         // 6. kicking, the multiplier memory and scaled payments
         Company kick = company(data, KICK, fake(3), fake(4));
@@ -265,7 +260,7 @@ public final class StateSelfTest {
                 if (Claims.at(level, ChunkPos.getX(packed), ChunkPos.getZ(packed)) != null) vanillaForced++;
             }
         }
-        report(source, "SELFTEST state loading after restart: chunks held by claims " + Claims.loadedCount() + ", claimed chunks force-loaded the vanilla way " + vanillaForced);
+        report(source, "SELFTEST state loading after restart: claimed chunks force-loaded the vanilla way " + vanillaForced + " (claims load nothing)");
         report(source, "SELFTEST state cleanup: removed " + cleanup(server) + " test companies");
         return 1;
     }

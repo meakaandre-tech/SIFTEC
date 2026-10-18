@@ -283,7 +283,6 @@ public final class Companies {
         target.leftAt.remove(me);
         save(server);
         CompanyState.recompute(server);
-        com.meakaandre.siftec.claim.Claims.refreshLoading(server);
         tell(server, target, Component.translatable("siftec.company.joined", player.getGameProfile().name(), target.name));
         return 1;
     }
@@ -358,7 +357,6 @@ public final class Companies {
         fresh.collected.addAll(old.collected);
         save(server);
         CompanyState.recompute(server);
-        com.meakaandre.siftec.claim.Claims.refreshLoading(server);
         return fresh;
     }
 

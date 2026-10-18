@@ -52,6 +52,8 @@ public final class MapClient {
     public static final Long2ObjectOpenHashMap<List<MapPoi>> POIS = new Long2ObjectOpenHashMap<>();
     public static List<MapMarker> markers = List.of();
     public static List<MapPayloads.Mate> mates = List.of();
+    /** The company's vehicles and drones (where they are, or would be where their land does not tick). */
+    public static List<MapPayloads.Mover> movers = List.of();
     /** Pinned things, by pin key, in the order pinned. */
     public static final Map<String, Pin> PINS = new LinkedHashMap<>();
     /** Filter switches that are off (see {@link MapFilters}). */
@@ -83,6 +85,7 @@ public final class MapClient {
         ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Tile.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> ClientTiles.accept(p.region(), p.data())));
         ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Markers.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> markers(p.markers())));
         ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Mates.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> mates = p.mates()));
+        ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Movers.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> movers = p.movers()));
         ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Control.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> control(p)));
         ClientTickEvents.END_CLIENT_TICK.register(MapClient::tick);
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(MapClient::reset));
@@ -118,6 +121,7 @@ public final class MapClient {
         POIS.clear();
         markers = List.of();
         mates = List.of();
+        movers = List.of();
         PINS.clear();
         SEEN.clear();
         firstMarkers = true;

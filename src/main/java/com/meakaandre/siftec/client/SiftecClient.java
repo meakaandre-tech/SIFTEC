@@ -45,6 +45,7 @@ public class SiftecClient implements ClientModInitializer {
             if (why != null) lines.add(why.copy().withStyle(net.minecraft.ChatFormatting.RED));
         });
         ClientPlayNetworking.registerGlobalReceiver(StatePayload.TYPE, (payload, context) -> ClientState.accept(payload));
+        SimDebug.register();
         // the HUB screen, and what the server says it shows
         net.minecraft.client.gui.screens.MenuScreens.register(com.meakaandre.siftec.hub.HubMenu.TYPE, HubScreen::new);
         ClientPlayNetworking.registerGlobalReceiver(com.meakaandre.siftec.hub.HubViewPayload.TYPE, (payload, context) -> net.minecraft.client.Minecraft.getInstance().execute(() -> {

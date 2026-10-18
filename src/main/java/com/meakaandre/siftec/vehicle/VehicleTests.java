@@ -361,6 +361,8 @@ public final class VehicleTests {
             expect(source, "restart: the Truck, its company, its route and its stops are back", truck.companyId.equals(COMPANY) && truck.route.size() >= 20
                 && truck.stopStation.size() == 2, truck.companyId + ", " + truck.route.size() + " points, " + truck.stopStation.size() + " stops");
             expect(source, "restart: the unloading station still unloads", b != null && b.unload, "");
+            // the smoke run's other tests (ten in-game minutes of always-running factories) may have run its tank dry
+            truck.addFuel(truck.kind.tankMj());
             Vec3 was = truck.position();
             // longer than a stop at a dock (DOCK_TICKS), so a Truck that came back standing at one has driven on by then
             later(level, VehicleEntity.DOCK_TICKS + 140, () -> {

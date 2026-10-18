@@ -103,6 +103,7 @@ public final class MapServer {
         PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Tile.TYPE, MapPayloads.Tile.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Markers.TYPE, MapPayloads.Markers.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Mates.TYPE, MapPayloads.Mates.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Movers.TYPE, MapPayloads.Movers.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Control.TYPE, MapPayloads.Control.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(MapPayloads.TileRequest.TYPE, MapPayloads.TileRequest.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(MapPayloads.MarkerEdit.TYPE, MapPayloads.MarkerEdit.CODEC);
@@ -170,6 +171,7 @@ public final class MapServer {
         int t = server.getTickCount();
         if (t % 20 == 0) explore(server);
         if (t % 10 == 5) mates(server);
+        if (t % 20 == 15) movers(server);
         if (t % 20 == 10) {
             long[] changed = MapTerrain.takeFoundChanges();
             if (changed.length > 0) foundChanged(server, changed);
@@ -222,6 +224,27 @@ public final class MapServer {
             send(player, new MapPayloads.Mates(mates));
         }
     }
+
+    /** Each player's company's vehicles and drones in their dimension, where they are or (driven by time) would be. */
+    private static void movers(MinecraftServer server) {
+        List<com.meakaandre.siftec.sim.SimVehicles.Shown> all = com.meakaandre.siftec.sim.SimVehicles.positions(server);
+        CompanyData data = CompanyData.get(server);
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            if (Companies.isFake(player)) continue;
+            Company company = data.ofMember(player.getUUID().toString());
+            String dim = player.level().dimension().identifier().toString();
+            List<MapPayloads.Mover> movers = new ArrayList<>();
+            for (var s : all) {
+                if (!s.dim().equals(dim) || company == null || !Companies.same(s.company(), company.id)) continue;
+                movers.add(new MapPayloads.Mover(s.kind(), s.x(), s.z(), s.yaw(), s.simulated()));
+            }
+            if (movers.isEmpty() && !NO_MOVERS.add(player.getUUID())) continue;
+            if (!movers.isEmpty()) NO_MOVERS.remove(player.getUUID());
+            send(player, new MapPayloads.Movers(movers));
+        }
+    }
+
+    private static final java.util.Set<UUID> NO_MOVERS = new java.util.HashSet<>();
 
     // ------------------------------------------------------------------------------------------------ sending
 

@@ -408,6 +408,7 @@ public final class Buildings {
         controller.refund.clear();
         out.addAll(controller.takeContents());
         BlockPos controllerPos = controller.getBlockPos().immutable();
+        com.meakaandre.siftec.sim.Factories.removed(level, controllerPos);
         if (p != null) out.addAll(takeDown(level, p, controllerPos));
         // the Converter's cell is part of its machine, not something it holds
         out.removeIf(s -> s.is(Processors.cellItem()));

@@ -230,6 +230,44 @@ public class PowerMemory extends SavedData {
             return away;
         }
 
+        /** Whether its grid gave it power on the last tick it was balanced. */
+        private boolean on = true;
+
+        @Override
+        public void supplied(boolean on) {
+            this.on = on;
+        }
+
+        public boolean lastOn() {
+            return on;
+        }
+
+        /**
+         * The factory simulation runs this member while its chunk does not tick (work package 17): what it can give, asks
+         * for, holds and has in fuel is what the simulation says.
+         */
+        public void simulate(double capacity, double demand, double stored, double reserve) {
+            this.capacity = capacity;
+            this.demand = demand;
+            this.stored = Math.min(stored, storeCapacity > 0 ? storeCapacity : stored);
+            this.reserve = reserve;
+            owner.setDirty();
+        }
+
+        /** A simulated consumer's demand: what it asks for now, as the simulation runs it. */
+        public void simulateDemand(double demand) {
+            if (this.demand == demand) return;
+            this.demand = demand;
+            owner.setDirty();
+        }
+
+        /** What it gave the grid since last asked (SU-ticks): the simulation burns that from its fuel. */
+        public double takeSpent() {
+            double s = spent;
+            spent = 0;
+            return s;
+        }
+
         /** SU-ticks of fuel it has given while away, not yet burnt from the real generator. */
         public double spent() {
             return spent;
