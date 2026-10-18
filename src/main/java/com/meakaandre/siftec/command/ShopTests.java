@@ -109,6 +109,10 @@ final class ShopTests {
         Placement bp = small == null ? null : new Placement(small, new BlockPos(x + 15, y, z), Direction.NORTH, false);
         boolean billboard = bp != null && Buildings.place(level, bp, rich, null, true).ok()
             && level.getBlockState(bp.at(0, 2, 0)).is(ModBlocks.BILLBOARD_SMALL_SIGN.get()) && level.getBlockEntity(bp.at(0, 2, 0)) instanceof ShopSignBlockEntity;
+        if (bp != null && level.getBlockEntity(bp.at(0, 2, 0)) instanceof ShopSignBlockEntity board) {
+            Component[] lines = {Component.literal("FICSIT"), Component.literal("Inc."), Component.empty(), Component.empty()};
+            board.setText(new SignText(List.of(lines), List.of(lines), DyeColor.BLACK, false), SignTextSlot.FRONT);
+        }
         expect(source, "the Billboard Set unlocks the billboards (a company without it cannot build them); a billboard's sign is at the foot of its face",
             lockedPoor && openRich && billboard, "locked for one without it " + lockedPoor + ", open with it " + openRich + ", built with its sign " + billboard);
 
