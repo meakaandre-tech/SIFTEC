@@ -28,6 +28,8 @@ import java.util.List;
 public class DroneRenderer extends EntityRenderer<DroneEntity, DroneRenderer.State> {
     /** How far out the motor pods sit from the middle, along each diagonal. */
     private static final float ARM = 0.55f;
+    /** How much larger than its parts' sizes it is drawn: about two blocks across, half the pad's touchdown square. */
+    private static final float SIZE = 1.6f;
 
     public DroneRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -81,7 +83,7 @@ public class DroneRenderer extends EntityRenderer<DroneEntity, DroneRenderer.Sta
     private record Parts(List<SuperByteBufferRenderState> out, float yaw, float pitch, float roll, int light) {
         private SuperByteBuffer frame(SuperByteBuffer b) {
             // turned to its heading, then leaned about its middle (just over its skids)
-            return b.rotateYDegrees(-yaw).translate(0, 0.25f, 0).rotateXDegrees(pitch).rotateZDegrees(-roll).translate(0, -0.25f, 0);
+            return b.rotateYDegrees(-yaw).scale(SIZE).translate(0, 0.25f, 0).rotateXDegrees(pitch).rotateZDegrees(-roll).translate(0, -0.25f, 0);
         }
 
         /** A block's model, its middle at (x, y, z) of the frame, scaled to sx by sy by sz and turned by yawDegrees about y. */
