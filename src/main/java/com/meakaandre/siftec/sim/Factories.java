@@ -235,12 +235,17 @@ public final class Factories {
         Buffers.Reach reach = stillLoaded ? Buffers.level(level) : Buffers.leaving(level, chunk);
         for (String k : keys) {
             Node n = data.node(k);
-            if (n == null || n.sim || n.parkedAt != Long.MIN_VALUE || !simulates(n)) continue;
+            if (n == null || n.sim || !simulates(n)) continue;
             if (ticking(level, n, at)) continue;
-            // the worker never reads a node it does not simulate, so this is safe while a step runs
-            if (present(level, reach, n)) refresh(level, reach, n);
-            n.parkedAt = now;
-            data.setDirty();
+            // the worker never reads a node it does not simulate, so this is safe while a step runs; a node read here
+            // before (it stopped, ticked and stopped again during a slow step) is read again. Only a read that worked
+            // parks it: otherwise the simulation checks it again (and forgets it if it is gone) when it takes it over
+            if (present(level, reach, n) && refresh(level, reach, n)) {
+                n.parkedAt = now;
+                data.setDirty();
+            } else {
+                n.parkedAt = Long.MIN_VALUE;
+            }
         }
     }
 
@@ -551,17 +556,20 @@ public final class Factories {
         refresh(level, Buffers.level(level), n);
     }
 
-    private static void refresh(ServerLevel level, Buffers.Reach reach, Node n) {
-        if (!reach.has(n.blockPos())) return;
+    /** Reads a node's buffers; false if they could not be read (not there, or a cell of it in a chunk not loaded). */
+    private static boolean refresh(ServerLevel level, Buffers.Reach reach, Node n) {
+        if (!reach.has(n.blockPos())) return false;
         BlockEntity be = reach.be(n.blockPos());
         if (n.kind.equals("drone_port")) {
-            if (be instanceof DronePortBlockEntity port) port.toSim(n);
-            return;
+            if (!(be instanceof DronePortBlockEntity port)) return false;
+            port.toSim(n);
+            return true;
         }
         Buffers b = Buffers.of(level, reach, n);
-        if (b == null) return;
+        if (b == null) return false;
         b.read(n);
         if (be instanceof ControllerBlockEntity c) SimAccess.snapshot(level, c, n);
+        return true;
     }
 
     /** The links from a building's output ports, as its belts and pipes run now. */
@@ -647,6 +655,7 @@ public final class Factories {
         Node n = data.nodeOrNew(level, port.getBlockPos(), "drone_port");
         if (n.sim) return;
         n.mode = "port";
+        n.parkedAt = Long.MIN_VALUE;
         port.toSim(n);
         n.recordedAt = level.getGameTime();
     }
@@ -661,7 +670,8 @@ public final class Factories {
         Node far = data.node(level, at);
         if (far == null || !far.kind.equals("drone_port")) return -1;
         if (!far.sim && level.isLoaded(at)) return -1;
-        if (busy()) return cargo.size();
+        // not simulated yet (its chunk just stopped ticking), or the worker is on a step: the drone waits a second
+        if (!far.sim || busy()) return cargo.size();
         if (running != null) join();
         Sim.pad(far.slots, Sim.PORT_SIZE);
         for (int i = 0; i < cargo.size(); i++) {
@@ -716,9 +726,13 @@ public final class Factories {
                     left = 0;
                 }
             }
-            if (left > 0) Siftec.LOGGER.info("SIFTEC: {} {} on a belt between {} and {} had nowhere to go", left, t.key, l.from, l.to);
+            t.n = left;
         }
-        l.transit.clear();
+        // what had nowhere to go yet stays on the belt (a link that is being forgotten goes with its node)
+        l.transit.removeIf(t -> t.n <= 0);
+        if (gone != null && !l.transit.isEmpty()) {
+            for (SimData.Transit t : l.transit) Siftec.LOGGER.info("SIFTEC: {} {} on a belt between {} and {} had nowhere to go", t.n, t.key, l.from, l.to);
+        }
         data.setDirty();
     }
 
