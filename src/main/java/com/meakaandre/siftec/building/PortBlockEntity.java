@@ -57,9 +57,21 @@ public class PortBlockEntity extends SmartBlockEntity {
         return state.hasProperty(PortBlock.FACING) ? state.getValue(PortBlock.FACING) : Direction.SOUTH;
     }
 
+    /**
+     * True while the building runs for real: its controller's chunk ticks and the factory simulation is not running it.
+     * A port in a chunk that ticks while its controller's does not (a building across the edge of simulation distance)
+     * passes nothing, or it and the simulation would both move the same things.
+     */
+    private boolean live() {
+        if (level == null || controller == null || level.isClientSide()) return true;
+        if (!level.isLoaded(controller) || !level.shouldTickBlocksAt(controller)) return false;
+        return !(level.getBlockEntity(controller) instanceof ControllerBlockEntity c) || !c.simulated;
+    }
+
     private boolean serves(@Nullable Direction side, boolean fluid) {
         BlockState state = getBlockState();
         if (level == null || target == null || !state.hasProperty(PortBlock.KIND)) return false;
+        if (!live()) return false;
         if (state.getValue(PortBlock.KIND).fluid() != fluid) return false;
         if (side != null && side != state.getValue(PortBlock.FACING)) return false;
         // a port never passes things on to another port (no loops)

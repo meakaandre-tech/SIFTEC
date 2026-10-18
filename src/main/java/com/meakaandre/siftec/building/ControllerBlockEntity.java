@@ -95,6 +95,13 @@ public class ControllerBlockEntity extends BlockEntity {
     public int fedTicks;
     /** A consumer had power on its last tick (while idle, its standby draw). */
     public boolean powered;
+    /**
+     * The factory simulation runs this building (its chunks stopped ticking) and has not handed it back yet: its ports
+     * pass nothing, and it does not tick, until it is caught up ({@link com.meakaandre.siftec.sim.Factories#awake}).
+     */
+    public boolean simulated;
+    /** The game time it last ran for real (a gap means it was not ticking, and may have to be caught up first). */
+    public long simTicked = Long.MIN_VALUE;
     /** A consumer has nothing to work on, so it draws only its standby power ({@link BuildingLogic#working}). Worked out each tick. */
     public boolean idle;
     /** The game time {@link #idle} was last worked out at, and until when the building counts as working after its last work. */
@@ -198,6 +205,8 @@ public class ControllerBlockEntity extends BlockEntity {
 
     public void serverTick() {
         if (!(level instanceof ServerLevel server) || removing) return;
+        // what the factory simulation did while its chunks did not tick goes in before it runs for real (work package 17)
+        if (!com.meakaandre.siftec.sim.Factories.awake(server, this)) return;
         if (!indexed && (repairTried == 0 || server.getGameTime() - repairTried >= 20)) {
             // its blocks are checked against its shape (and rebuilt where they differ) before they are listed again
             repairTried = server.getGameTime();

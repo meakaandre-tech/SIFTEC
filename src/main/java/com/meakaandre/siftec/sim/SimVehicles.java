@@ -78,7 +78,8 @@ public final class SimVehicles {
         for (SimData.Vehicle v : new ArrayList<>(data.stored.vehicles)) {
             ServerLevel level = Factories.level(server, v.dim);
             if (level == null) continue;
-            BlockPos at = BlockPos.containing(v.x, v.y, v.z);
+            double[] p = returnAt(v);
+            BlockPos at = BlockPos.containing(p[0], p[1], p[2]);
             if (level.isLoaded(at) && level.isPositionEntityTicking(at)) materialize(level, data, v);
         }
     }
@@ -97,7 +98,18 @@ public final class SimVehicles {
         Siftec.LOGGER.info("SIFTEC: {} {} left ticking land at {}; it drives its route by time", v.type, v.uuid, e.blockPosition().toShortString());
     }
 
-    /** Puts a vehicle the simulation drove back into the world, where it would be now. */
+    /**
+     * Where a vehicle comes back into the world: on a point of its route it has really reached (the stop it stands at, or
+     * the last point it passed), which it once drove over for real, never part way along a straight line between two
+     * points, which may run through a hill or over a drop.
+     */
+    static double[] returnAt(SimData.Vehicle v) {
+        if (v.points() < 1) return new double[]{v.x, v.y, v.z};
+        int i = Sim.returnPoint(v);
+        return new double[]{v.px(i), v.py(i), v.pz(i)};
+    }
+
+    /** Puts a vehicle the simulation drove back into the world, at the route point it last reached. */
     static void materialize(ServerLevel level, SimData data, SimData.Vehicle v) {
         VehicleKind kind = VehicleKind.of(v.type);
         if (kind == null) {
@@ -109,8 +121,11 @@ public final class SimVehicles {
             e.setUUID(UUID.fromString(v.uuid));
         } catch (IllegalArgumentException ignored) {
         }
+        double[] p = returnAt(v);
+        // from the last point it passed it drives the rest of that leg again
+        if (v.docked < 0) v.leg = 0;
         e.fromSim(v);
-        e.snapTo(v.x, v.y + 0.05, v.z, v.yaw, 0);
+        e.snapTo(p[0], p[1] + 0.05, p[2], v.yaw, 0);
         data.stored.vehicles.remove(v);
         if (!level.addFreshEntity(e)) {
             data.stored.vehicles.add(v);

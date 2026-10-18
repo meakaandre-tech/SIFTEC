@@ -44,5 +44,7 @@ siftec selftest polish
 siftec worldtest automate
 siftec worldtest powerchain setup
 #sleep 250
+siftec selftest always edges
+#sleep 120
 siftec selftest always setup
 #sleep 600

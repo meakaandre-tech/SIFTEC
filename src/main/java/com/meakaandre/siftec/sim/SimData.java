@@ -52,6 +52,13 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         public long simTime;
         /** The game time its model (recipes, links) was last read from the world. */
         public long recordedAt = Long.MIN_VALUE;
+        /** Every chunk it stands in (as packed chunk positions): it runs for real while any of them ticks. */
+        public List<Long> chunks = new ArrayList<>();
+        /**
+         * The game time its buffers were read as its last chunk stopped ticking, when the simulation takes it over later
+         * (the worker was busy): the simulation starts from that read, at that time. MIN_VALUE: none.
+         */
+        public long parkedAt = Long.MIN_VALUE;
 
         // ---- the model, read while it is loaded (SimRecorder)
         /** "craft", "smelt", "mine", "extract", "gen", "sink", "store", "port", or "none" (nothing to simulate). */
@@ -76,6 +83,8 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         public String fluidOut = "";
         /** mB a tick an extractor makes. */
         public double fluidRate;
+        /** A generator's water: mB a tick at full power (the Coal Generator's and the Nuclear Power Plant's), and the part of an mB owed. */
+        public double water, waterFrac;
         // generators
         /** Fuel by key (an item key, or "fluid:<id>"): megajoules per item, or per mB. */
         public Map<String, Double> fuelMj = new HashMap<>();
@@ -102,6 +111,8 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         public boolean tripped;
         /** Whether it had power over the last step. */
         public boolean powered = true;
+        /** Whether its grid was balanced by PowerGrids (part of it ticks) at the last step, rather than by the simulation. */
+        public boolean mixed;
         /** An augmenter: ticks its last matrix still feeds it. */
         public long fed, fed0;
         /** What the simulation did since the snapshot: recipes started (or breaks), items mined, SU given. */
@@ -111,9 +122,13 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         public Map<String, Long> sunk = new HashMap<>();
         /** The SU it asked for over the last step, and gave (generators), for the mixed grids and the status. */
         public double demandNow, capacityNow;
+        /** The fuel it burnt last (a generator's leftover energy goes back as that fuel). */
+        public String lastFuel = "";
 
         // ---- a Drone Port
         public List<Slot> slots = new ArrayList<>();
+        /** Its slots when it was snapshotted: the catch-up writes back only what changed since. */
+        public List<Slot> baseSlots = new ArrayList<>();
         public List<Slot> cargo = new ArrayList<>();
         public int state, ticks, total;
         public @Nullable Long destination;
@@ -236,6 +251,8 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         public long simTime;
         /** Its fuel ran out on the way: it waits there. */
         public boolean dry;
+        /** A stop (its index) at a Truck Station whose chunk ticks: the server thread loads or unloads it there. -1: none. */
+        public int dockPending = -1;
 
         public int points() {
             return route.size() / 3;
@@ -267,13 +284,44 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         @Override
         public <T> DataResult<T> encode(SimData data, DynamicOps<T> ops, T prefix) {
             Factories.join();
+            encodes++;
             return BASE.encode(data, ops, prefix);
         }
     };
+    /** How many times it has been written (selftests: which saves write it). */
+    private static int encodes;
+
+    public static int encodes() {
+        return encodes;
+    }
+
     static final SavedDataType<SimData> TYPE = new SavedDataType<>(Siftec.id("factories"), SimData::new, CODEC, null);
+
+    /** Bumped whenever nodes come or go or change their chunks, for the index of nodes by chunk ({@link Factories}). */
+    transient int version;
+    /** True while a quick save runs (a company's points): the simulation is written with the world save only. */
+    private static boolean quick;
 
     public SimData() {
         super("factories", Stored.class, Stored::new);
+    }
+
+    /**
+     * Runs a quick save of other data (a company's points, written within seconds) without this: written out of step with
+     * the chunks, a crash would lose or repeat a catch-up, and writing it waits for the worker.
+     */
+    public static void quickSave(Runnable save) {
+        quick = true;
+        try {
+            save.run();
+        } finally {
+            quick = false;
+        }
+    }
+
+    @Override
+    public boolean isDirty() {
+        return !quick && super.isDirty();
     }
 
     public static SimData get(MinecraftServer server) {
@@ -314,6 +362,9 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         if (n.sunk == null) n.sunk = new HashMap<>();
         if (n.slots == null) n.slots = new ArrayList<>();
         if (n.cargo == null) n.cargo = new ArrayList<>();
+        if (n.baseSlots == null) n.baseSlots = new ArrayList<>();
+        if (n.chunks == null) n.chunks = new ArrayList<>();
+        if (n.lastFuel == null) n.lastFuel = "";
         for (Recipe r : n.recipes) {
             if (r.in == null) r.in = new LinkedHashMap<>();
             if (r.out == null) r.out = new LinkedHashMap<>();
@@ -351,14 +402,16 @@ public class SimData extends JsonSavedData<SimData.Stored> {
             n.kind = kind;
             fix(n);
             stored.nodes.put(k, n);
+            version++;
             setDirty();
         }
         return n;
     }
 
-    /** Forgets a node and every link to or from it (the building is gone). */
+    /** Forgets a node and every link to or from it (the building is gone; {@link Factories#forget} first puts what is on those links somewhere). */
     public void remove(String key) {
         if (stored.nodes.remove(key) == null) return;
+        version++;
         stored.links.removeIf(l -> l.from.equals(key) || l.to.equals(key));
         setDirty();
     }

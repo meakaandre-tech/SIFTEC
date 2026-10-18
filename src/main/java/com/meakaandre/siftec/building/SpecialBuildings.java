@@ -63,7 +63,7 @@ public final class SpecialBuildings {
             case "truck_station" -> TruckStations.use(player, c, def);
             case "drone_port" -> {
                 if (!mayOperate(player, c)) player.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
-                else if (droneTerminal(player.level(), c) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port) com.meakaandre.siftec.drone.DroneMenu.open(player, port);
+                else if (droneTerminal(player.level(), c) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port) com.meakaandre.siftec.drone.DroneMenu.open(player, port, c.getBlockPos());
             }
             default -> {
                 return false;

@@ -81,6 +81,7 @@ public final class AlwaysTests {
     }
 
     public static void register() {
+        EdgeTests.register();
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             long now = server.overworld().getGameTime();
             for (Later l : new ArrayList<>(LATER)) {
@@ -102,6 +103,7 @@ public final class AlwaysTests {
                 .then(Commands.literal("selftest").then(Commands.literal("always")
                     .then(Commands.literal("setup").executes(AlwaysTests::setup))
                     .then(Commands.literal("restart").executes(AlwaysTests::restart))
+                    .then(Commands.literal("edges").executes(EdgeTests::start))
                     .then(Commands.literal("bench").executes(c -> {
                         bench(c.getSource());
                         return 1;
@@ -133,7 +135,7 @@ public final class AlwaysTests {
     }
 
     /** The twins' company: every milestone done, so its machines run every standard recipe. */
-    private static com.meakaandre.siftec.company.Company company(MinecraftServer server) {
+    static com.meakaandre.siftec.company.Company company(MinecraftServer server) {
         var data = com.meakaandre.siftec.company.CompanyData.get(server);
         com.meakaandre.siftec.company.Company c = data.companies().get(COMPANY);
         if (c == null) {
@@ -149,7 +151,7 @@ public final class AlwaysTests {
     }
 
     /** A building put down for the company as in creative (no cost), or null (said why). */
-    private static @Nullable ControllerBlockEntity put(ServerLevel level, CommandSourceStack source, String id, BlockPos anchor, Direction facing) {
+    static @Nullable ControllerBlockEntity put(ServerLevel level, CommandSourceStack source, String id, BlockPos anchor, Direction facing) {
         var def = com.meakaandre.siftec.building.Buildings.def(id);
         if (def == null) return null;
         var p = new com.meakaandre.siftec.building.Placement(def, anchor, facing, false);
@@ -342,7 +344,7 @@ public final class AlwaysTests {
     }
 
     /** A belt from one block to another in a line, moving from the first toward the second, at the test's fast speed. */
-    private static void belt(ServerLevel level, BlockPos from, BlockPos to) {
+    static void belt(ServerLevel level, BlockPos from, BlockPos to) {
         int dx = to.getX() - from.getX(), dz = to.getZ() - from.getZ();
         Direction along = dx != 0 ? (dx > 0 ? Direction.EAST : Direction.WEST) : (dz > 0 ? Direction.SOUTH : Direction.NORTH);
         Direction.Axis shaft = along.getClockWise().getAxis();
@@ -509,7 +511,7 @@ public final class AlwaysTests {
     }
 
     /** Everything of an item a building holds: its Basin, its vaults, its controller's slots. */
-    private static long held(ServerLevel level, ControllerBlockEntity c, Item item) {
+    static long held(ServerLevel level, ControllerBlockEntity c, Item item) {
         long n = 0;
         Set<Object> seen = new HashSet<>();
         for (Container slots : new Container[]{c.input, c.output, c.buffer}) for (int i = 0; i < slots.getContainerSize(); i++) if (slots.getItem(i).is(item)) n += slots.getItem(i).getCount();

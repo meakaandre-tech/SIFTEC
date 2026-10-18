@@ -90,7 +90,7 @@ public class DronePortBlock extends Block implements EntityBlock {
                 Places.add(server.level(), pos, Places.DRONE_PORT, port.companyId, "Port " + pos.getX() + ", " + pos.getZ());
             }
             if (com.meakaandre.siftec.company.CompanyData.get(server.level().getServer()).byId(port.companyId) != Companies.of(server)) server.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
-            else DroneMenu.open(server, port);
+            else DroneMenu.open(server, port, pos);
         }
         return InteractionResult.SUCCESS;
     }

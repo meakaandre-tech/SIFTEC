@@ -394,14 +394,14 @@ public final class BuildingPower {
                 case "biomass", "coal" -> {
                     List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
                     for (BlockPos pos : burners) {
-                        if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b) {
+                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b) {
                             r += full / Math.max(1, burners.size()) * b.getRemainingBurnTime();
                         }
                     }
                 }
                 case "fuel" -> {
                     BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
-                    if (at != null && level.getBlockEntity(at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
+                    if (at != null && level.isLoaded(at) && level.getBlockEntity(at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
                         r += Power.suTicksOfMj(fluidMj(kind, e.siftec$fuel().getFluid()) * e.siftec$fuel().getAmount() / (FluidConstants.BUCKET / 1000.0));
                     }
                 }
@@ -430,6 +430,11 @@ public final class BuildingPower {
             });
         }
 
+        /** Gives back energy the factory simulation took from its input but did not burn ({@link BuildingPower#refund}). */
+        void refund(double suTicks, String lastFuel) {
+            BuildingPower.refund(level, c, def, suTicks, lastFuel);
+        }
+
         /** Burns what it gave while it was away: out of its machines' fuel first, then its input. */
         @Override
         public void spend(double suTicks) {
@@ -442,7 +447,7 @@ public final class BuildingPower {
                     double per = full / Math.max(1, burners.size());
                     for (BlockPos pos : burners) {
                         if (left <= 0) break;
-                        if (!(level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b)) continue;
+                        if (!level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b)) continue;
                         int ticks = (int) Math.min(b.getRemainingBurnTime(), Math.ceil(left / per));
                         ((com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor) b).siftec$setRemainingBurnTime(b.getRemainingBurnTime() - ticks);
                         left -= ticks * per;
@@ -450,7 +455,7 @@ public final class BuildingPower {
                 }
                 case "fuel" -> {
                     BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
-                    if (at != null && level.getBlockEntity(at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
+                    if (at != null && level.isLoaded(at) && level.getBlockEntity(at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
                         double perMb = fluidMj(kind, e.siftec$fuel().getFluid());
                         if (perMb > 0) {
                             long mb = (long) Math.ceil(left / Power.suTicksOfMj(perMb));
@@ -463,7 +468,7 @@ public final class BuildingPower {
                     // the rods burn a tick of fuel each for every tick at full power
                     long ticks = (long) Math.ceil(left / full);
                     for (BlockPos pos : BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod"))) {
-                        if (level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity rod) {
+                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity rod) {
                             rod.fuel = (int) Math.max(0, rod.fuel - ticks);
                             rod.setChanged();
                         }
@@ -484,6 +489,59 @@ public final class BuildingPower {
             }
             c.setChanged();
         }
+    }
+
+    /**
+     * Puts energy back into a generator's machines (SU-ticks): the unburnt part of the last fuel the factory simulation
+     * took from its input while it was away. Into its Blaze Burners as burn time, its engine as the fuel it burns (or
+     * the simulation's last fuel), its reactor rods as fuel ticks.
+     */
+    static void refund(ServerLevel level, ControllerBlockEntity c, BuildingDef def, double suTicks, String lastFuel) {
+        if (suTicks <= 0) return;
+        double full = Power.su(def.mw());
+        switch (def.power()) {
+            case "biomass", "coal" -> {
+                List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
+                double per = full / Math.max(1, burners.size());
+                if (per <= 0 || burners.isEmpty()) return;
+                int each = (int) Math.min(Integer.MAX_VALUE / 2, Math.floor(suTicks / per / burners.size()));
+                for (BlockPos pos : burners) {
+                    if (each <= 0 || !level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b)) continue;
+                    var access = (com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor) b;
+                    if (b.getRemainingBurnTime() <= 0) access.siftec$setActiveFuel(com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity.FuelType.NORMAL);
+                    access.siftec$setRemainingBurnTime(b.getRemainingBurnTime() + each);
+                    b.setChanged();
+                }
+            }
+            case "fuel" -> {
+                BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
+                if (at == null || !level.isLoaded(at) || !(level.getBlockEntity(at) instanceof EngineControl e)) return;
+                net.minecraft.world.level.material.Fluid fluid = e.siftec$fuel().isEmpty() ? com.meakaandre.siftec.sim.Keys.fluidOf(lastFuel) : e.siftec$fuel().getFluid();
+                double perMb = fluidMj("fuel", fluid);
+                Storage<FluidVariant> tank = ProductionLogic.fluids(level, at, null);
+                if (perMb <= 0 || tank == null) return;
+                long mb = (long) Math.floor(suTicks / Power.suTicksOfMj(perMb));
+                if (mb <= 0) return;
+                try (Transaction tx = Transaction.openOuter()) {
+                    tank.insert(FluidVariant.of(fluid), mb * (FluidConstants.BUCKET / 1000), tx);
+                    tx.commit();
+                }
+            }
+            case "nuclear" -> {
+                if (full <= 0) return;
+                int ticks = (int) Math.min(Integer.MAX_VALUE / 2, Math.floor(suTicks / full));
+                if (ticks <= 0) return;
+                for (BlockPos pos : BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod"))) {
+                    if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity rod) {
+                        rod.fuel = (int) Math.min(org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity.MAX_FUEL, (long) rod.fuel + ticks);
+                        rod.setChanged();
+                    }
+                }
+            }
+            default -> {
+            }
+        }
+        c.setChanged();
     }
 
     /** Drains mB of whatever fluid a block's tank holds; how many mB came out. */

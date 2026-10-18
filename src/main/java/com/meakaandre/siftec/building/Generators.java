@@ -298,7 +298,7 @@ public final class Generators {
     static long rodFuel(ServerLevel level, ControllerBlockEntity c) {
         long n = 0;
         for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:reactor_rod"))) {
-            if (level.getBlockEntity(pos) instanceof ReactorRodBlockEntity rod) n += rod.fuel;
+            if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof ReactorRodBlockEntity rod) n += rod.fuel;
         }
         return n;
     }

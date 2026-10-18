@@ -5,7 +5,9 @@ import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.building.SimAccess;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
+import com.zurrtum.create.content.logistics.vault.ItemVaultBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -13,10 +15,14 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -55,30 +61,98 @@ final class Buffers {
 
     private static final long MB = FluidConstants.BUCKET / 1000;
 
-    /** The buffers of a node, or null if its block entity is not there. */
+    /**
+     * Where the buffers are read from: the level, or (for a chunk that is leaving, whose block entities are still there
+     * but which the level no longer hands out) that chunk for its own positions. Nothing here ever loads a chunk.
+     */
+    interface Reach {
+        boolean has(BlockPos pos);
+
+        @Nullable BlockEntity be(BlockPos pos);
+
+        BlockState state(BlockPos pos);
+    }
+
+    static Reach level(ServerLevel level) {
+        return new Reach() {
+            @Override
+            public boolean has(BlockPos pos) {
+                return level.isLoaded(pos);
+            }
+
+            @Override
+            public @Nullable BlockEntity be(BlockPos pos) {
+                return level.isLoaded(pos) ? level.getBlockEntity(pos) : null;
+            }
+
+            @Override
+            public BlockState state(BlockPos pos) {
+                return level.getBlockState(pos);
+            }
+        };
+    }
+
+    /** The level, except that positions in this chunk are read from the chunk itself. */
+    static Reach leaving(ServerLevel level, LevelChunk chunk) {
+        ChunkPos at = chunk.getPos();
+        return new Reach() {
+            private boolean mine(BlockPos pos) {
+                return pos.getX() >> 4 == at.x() && pos.getZ() >> 4 == at.z();
+            }
+
+            @Override
+            public boolean has(BlockPos pos) {
+                return mine(pos) || level.isLoaded(pos);
+            }
+
+            @Override
+            public @Nullable BlockEntity be(BlockPos pos) {
+                if (mine(pos)) return chunk.getBlockEntity(pos);
+                return level.isLoaded(pos) ? level.getBlockEntity(pos) : null;
+            }
+
+            @Override
+            public BlockState state(BlockPos pos) {
+                return mine(pos) ? chunk.getBlockState(pos) : level.getBlockState(pos);
+            }
+        };
+    }
+
+    /** The buffers of a node, or null if its block entity is not there or a cell it reaches is in a chunk not loaded. */
     static @Nullable Buffers of(ServerLevel level, SimData.Node n) {
+        return of(level, level(level), n);
+    }
+
+    static @Nullable Buffers of(ServerLevel level, Reach reach, SimData.Node n) {
         BlockPos pos = n.blockPos();
-        if (!level.isLoaded(pos)) return null;
+        if (!reach.has(pos)) return null;
         Buffers b = new Buffers();
         Map<Object, Boolean> seen = new IdentityHashMap<>();
-        BlockEntity be = level.getBlockEntity(pos);
+        BlockEntity be = reach.be(pos);
         if (n.kind.equals("inventory")) {
-            Storage<ItemVariant> s = ItemStorage.SIDED.find(level, pos, null);
+            Storage<ItemVariant> s = items(level, reach, pos, null);
             if (s == null) return null;
             b.items.add(new Items(s, Role.BOTH));
             return b;
         }
         if (!(be instanceof ControllerBlockEntity c)) return null;
         boolean store = n.mode.equals("store");
+        List<SimAccess.Port> ports = SimAccess.ports(c);
+        List<BlockPos> vaults = store ? SimAccess.cells(c, "create:item_vault") : List.of();
+        List<BlockPos> tanks = store ? SimAccess.cells(c, "create:fluid_tank") : List.of();
+        // every cell it reaches must be in a loaded chunk: reading or writing one that is not would load it
+        for (SimAccess.Port p : ports) if (!reach.has(p.target())) return null;
+        for (BlockPos cell : vaults) if (!reach.has(cell)) return null;
+        for (BlockPos cell : tanks) if (!reach.has(cell)) return null;
         if (n.logic.equals("portable_miner")) b.ground = SimAccess.dropSpot(c);
-        for (SimAccess.Port p : SimAccess.ports(c)) {
+        for (SimAccess.Port p : ports) {
             Role role = store ? Role.BOTH : p.kind().input() ? Role.IN : Role.OUT;
             if (p.kind().fluid()) {
-                Storage<FluidVariant> s = SimAccess.fluids(level, p.target(), null);
+                Storage<FluidVariant> s = fluids(level, reach, p.target());
                 if (s != null && seen.put(s, true) == null) b.fluids.add(new Fluids(s, role));
                 continue;
             }
-            BlockEntity target = level.getBlockEntity(p.target());
+            BlockEntity target = reach.be(p.target());
             if (target instanceof ControllerBlockEntity tc) {
                 if (role == Role.IN) {
                     b.addSlots(seen, tc.input, 0, 1, Role.IN);
@@ -91,8 +165,12 @@ final class Buffers {
                 Container inv = basin.itemCapability;
                 if (role == Role.IN) b.addSlots(seen, inv, 0, Math.min(9, inv.getContainerSize()), Role.IN);
                 else b.addSlots(seen, inv, 9, Math.min(18, inv.getContainerSize()), Role.OUT);
+            } else if (target instanceof ItemVaultBlockEntity vault) {
+                // each vault block's own slots: read straight from the block, never through its multiblock's controller
+                Container inv = vault.getInventoryOfBlock();
+                b.addSlots(seen, inv, 0, inv.getContainerSize(), role);
             } else {
-                Storage<ItemVariant> s = ItemStorage.SIDED.find(level, p.target(), null);
+                Storage<ItemVariant> s = items(level, reach, p.target(), null);
                 if (s != null && seen.put(s, true) == null) b.items.add(new Items(s, role));
             }
         }
@@ -101,21 +179,35 @@ final class Buffers {
             b.addSlots(seen, c.input, 0, 1, Role.IN);
             b.addSlots(seen, c.output, 0, 1, Role.OUT);
         }
-        if (store) {
-            for (BlockPos vault : SimAccess.cells(c, "create:item_vault")) {
-                Storage<ItemVariant> s = ItemStorage.SIDED.find(level, vault, null);
-                if (s != null && seen.put(s, true) == null) b.items.add(new Items(s, Role.BOTH));
+        for (BlockPos vault : vaults) {
+            if (reach.be(vault) instanceof ItemVaultBlockEntity v) {
+                Container inv = v.getInventoryOfBlock();
+                b.addSlots(seen, inv, 0, inv.getContainerSize(), Role.BOTH);
             }
-            for (BlockPos tank : SimAccess.cells(c, "create:fluid_tank")) {
-                Storage<FluidVariant> s = SimAccess.fluids(level, tank, null);
-                if (s != null && seen.put(s, true) == null) b.fluids.add(new Fluids(s, Role.BOTH));
-            }
+        }
+        for (BlockPos tank : tanks) {
+            Storage<FluidVariant> s = fluids(level, reach, tank);
+            if (s != null && seen.put(s, true) == null) b.fluids.add(new Fluids(s, Role.BOTH));
         }
         return b;
     }
 
+    private static @Nullable Storage<ItemVariant> items(ServerLevel level, Reach reach, BlockPos pos, @Nullable Direction side) {
+        return ItemStorage.SIDED.find(level, pos, reach.state(pos), reach.be(pos), side);
+    }
+
+    private static @Nullable Storage<FluidVariant> fluids(ServerLevel level, Reach reach, BlockPos pos) {
+        BlockState state = reach.state(pos);
+        BlockEntity be = reach.be(pos);
+        Storage<FluidVariant> s = FluidStorage.SIDED.find(level, pos, state, be, null);
+        if (s != null || !level.isLoaded(pos)) return s;
+        // what Create gives only as its own fluid inventory (the Item Drain), as the buildings read it
+        return SimAccess.fluids(level, pos, null);
+    }
+
     private void addSlots(Map<Object, Boolean> seen, Container c, int from, int to, Role role) {
         for (Slots s : slots) if (s.c == c && s.from == from) return;
+        if (to <= from) return;
         slots.add(new Slots(c, from, to, role));
     }
 
@@ -347,6 +439,25 @@ final class Buffers {
         for (ItemStack s : b.add(key, count, role)) left += s.getCount();
         for (Slots s : b.slots) s.c.setChanged();
         return before - left;
+    }
+
+    /**
+     * Puts things back where a building keeps what it made (its output, or a storage's vaults): what came off a belt or
+     * pipe that is no longer there. What fits nowhere is dropped at the building. Returns how many were handled.
+     */
+    static long putBack(ServerLevel level, SimData.Node n, String key, long count, boolean fluid) {
+        Buffers b = of(level, n);
+        if (b == null) return 0;
+        Role role = n.mode.equals("store") ? Role.BOTH : Role.OUT;
+        if (fluid) {
+            long lost = b.addFluid(key, count, role);
+            if (lost > 0) Siftec.LOGGER.info("SIFTEC: {} at {}: {} mB had no room to go back to", n.building, n.blockPos().toShortString(), lost);
+            return count;
+        }
+        BlockPos at = n.blockPos();
+        for (ItemStack s : b.add(key, count, role)) net.minecraft.world.Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, s);
+        for (Slots s : b.slots) s.c.setChanged();
+        return count;
     }
 
     /** Takes what a building whose chunk ticks has made, for a belt or pipe to a simulated one. Returns how many came. */

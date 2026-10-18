@@ -76,6 +76,8 @@ public class DronePortBlockEntity extends BlockEntity {
 
     public void serverTick() {
         if (!(level instanceof ServerLevel server)) return;
+        // what the factory simulation did while its chunk did not tick goes in before it runs for real (work package 17)
+        com.meakaandre.siftec.sim.Factories.awake(server, this);
         if (!legacyQueued && com.meakaandre.siftec.building.BuildingIndex.controllerOf(server, worldPosition) == null) {
             // an old single-block port: it becomes the Drone Port building
             legacyQueued = true;
@@ -240,6 +242,8 @@ public class DronePortBlockEntity extends BlockEntity {
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
         if (level == null) return;
+        // broken (whether its chunk ticks or not): the factory simulation forgets it, so it is never run on with what it held
+        if (level instanceof ServerLevel server) com.meakaandre.siftec.sim.Factories.removed(server, pos);
         for (ItemStack stack : contents()) net.minecraft.world.Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
         if (hasDrone) net.minecraft.world.Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(com.meakaandre.siftec.registry.ModItems.CARDBOARD_DRONE.get()));
         items.clearContent();
@@ -312,12 +316,17 @@ public class DronePortBlockEntity extends BlockEntity {
         n.flight = flightTicks();
     }
 
-    /** What the simulation did while its chunk did not tick, back into the port. */
+    /**
+     * What the simulation did while its chunk did not tick, back into the port: in its slots only what changed in the
+     * simulation since it took the port over (so what a player took out meanwhile, or a drone brought, stays as it is);
+     * the drone's cargo and flight as the simulation has them.
+     */
     public void fromSim(com.meakaandre.siftec.sim.SimData.Node n) {
-        for (int i = 0; i < PortContainer.SIZE; i++) {
-            var s = i < n.slots.size() ? n.slots.get(i) : null;
-            items.setItem(i, s == null || s.empty() ? ItemStack.EMPTY : com.meakaandre.siftec.sim.Keys.stack(s.key, s.count));
-        }
+        List<ItemStack> spill = new ArrayList<>();
+        spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.OUT, PortContainer.FUEL));
+        spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.FUEL, PortContainer.FUEL + 1));
+        spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.IN, PortContainer.SIZE));
+        if (level != null) for (ItemStack stack : spill) net.minecraft.world.Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.1, worldPosition.getZ() + 0.5, stack);
         cargo.clear();
         for (var s : n.cargo) {
             ItemStack stack = com.meakaandre.siftec.sim.Keys.stack(s.key, s.count);
@@ -327,6 +336,39 @@ public class DronePortBlockEntity extends BlockEntity {
         ticks = n.ticks;
         total = n.total;
         setChanged();
+    }
+
+    /** Slots from..to change by what the simulation's slots hold against what they held when it took over; returns what did not fit. */
+    private List<ItemStack> applyDelta(List<com.meakaandre.siftec.sim.SimData.Slot> now, List<com.meakaandre.siftec.sim.SimData.Slot> base, int from, int to) {
+        java.util.Map<String, Long> d = new java.util.LinkedHashMap<>();
+        for (int i = from; i < to; i++) {
+            if (i < now.size() && !now.get(i).empty()) d.merge(now.get(i).key, now.get(i).count, Long::sum);
+            if (i < base.size() && !base.get(i).empty()) d.merge(base.get(i).key, -base.get(i).count, Long::sum);
+        }
+        List<ItemStack> spill = new ArrayList<>();
+        for (var e : d.entrySet()) {
+            long take = -e.getValue();
+            for (int i = from; i < to && take > 0; i++) {
+                ItemStack stack = items.getItem(i);
+                if (stack.isEmpty() || !com.meakaandre.siftec.sim.Keys.of(stack).equals(e.getKey())) continue;
+                int n = (int) Math.min(take, stack.getCount());
+                items.removeItem(i, n);
+                take -= n;
+            }
+        }
+        for (var e : d.entrySet()) {
+            long give = e.getValue();
+            while (give > 0) {
+                ItemStack one = com.meakaandre.siftec.sim.Keys.stack(e.getKey(), 1);
+                if (one.isEmpty()) break;
+                int n = (int) Math.min(give, one.getMaxStackSize());
+                ItemStack rest = items.add(one.copyWithCount(n), from, to);
+                if (!rest.isEmpty()) spill.add(rest);
+                give -= n;
+            }
+        }
+        setChanged();
+        return spill;
     }
 
     /** Everything a port keeps, so an old single-block port's can move into the building's terminal. */

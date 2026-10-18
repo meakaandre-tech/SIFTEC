@@ -12,13 +12,17 @@ import com.meakaandre.siftec.power.PowerMemory;
 import com.meakaandre.siftec.power.WireMap;
 import com.meakaandre.siftec.sim.SimData.Link;
 import com.meakaandre.siftec.sim.SimData.Node;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -35,14 +39,18 @@ import java.util.concurrent.Future;
 
 /**
  * Always-running factories (work package 17): every Build Gun building, Drone Port and the inventories belts end in
- * keeps working while its chunk does not tick, without any chunk being loaded for it.
+ * keeps working while its chunks do not tick, without any chunk being loaded for it.
  * <ul>
- * <li>While a building's chunk ticks, it runs for real, and is recorded ({@link #record}): what it makes and at what
- * rate, where its belts and pipes go ({@link Tracer}), its wire connectors; every half second, what its buffers hold.</li>
- * <li>When its chunk stops ticking (unloaded, or loaded but out of simulation distance), the simulation takes over from
- * those buffers: groups of linked buildings are stepped together twice a second on a worker thread ({@link Sim}).</li>
- * <li>When its chunk ticks again, the catch-up writes what changed into the building in one go: its output buffers
- * filled, its inputs and fuel used up, its storage, fuse and counters ({@link Buffers}, {@link SimAccess#handBack}).</li>
+ * <li>While any chunk a building stands in ticks, it runs for real, and is recorded ({@link #record}): what it makes and
+ * at what rate, where its belts and pipes go ({@link Tracer}), its wire connectors; every half second, what its buffers
+ * hold.</li>
+ * <li>When the last of its chunks stops ticking (unloaded, or loaded but out of simulation distance), its buffers are
+ * read there and then, while its block entities are still there ({@link #chunkStopped}), and the simulation takes over
+ * from that: groups of linked buildings are stepped together twice a second on a worker thread ({@link Sim}).</li>
+ * <li>When one of its chunks ticks again, the catch-up writes what changed into the building in one go, before the
+ * building's first real tick ({@link #awake}): its output buffers filled, its inputs and fuel used up, its storage, fuse
+ * and counters ({@link Buffers}, {@link SimAccess#handBack}); what the simulation still had on its belts goes on into the
+ * building at their end.</li>
  * </ul>
  * The server thread only moves things across the border between ticking and simulated buildings, pays the Sinks and
  * starts the next step; the time it spends on that each tick, and what each step takes on the worker, are kept for the
@@ -68,6 +76,15 @@ public final class Factories {
     /** The power grids worked out for the last step, kept while nothing changed. */
     private static final Map<ServerLevel, List<SimPower.Grid>> GRIDS = new IdentityHashMap<>();
     private static final Map<ServerLevel, String> GRIDS_FOR = new IdentityHashMap<>();
+    /** Reads that fell due while the worker was busy (a building's or port's turn): done as soon as the step is in. */
+    private static final Map<String, Due> DUE = new LinkedHashMap<>();
+    /** Node keys by dimension and chunk, for what to read when a chunk stops ticking; rebuilt when nodes change. */
+    private static final Map<String, Map<Long, List<String>>> BY_CHUNK = new HashMap<>();
+    private static @Nullable SimData byChunkFor;
+    private static int byChunkVersion = -1;
+
+    private record Due(ServerLevel level, BlockPos pos, boolean port) {
+    }
 
     // ---- what the debug overlay shows
     private static double mainAvgNanos, workerAvgNanos;
@@ -101,6 +118,9 @@ public final class Factories {
         });
         ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
             join();
+            // every building still running for real is read now and handed to the simulation: if its chunk does not
+            // tick when the world is back, the simulation goes on from now, not from whenever it was last read
+            parkAll(s);
             stopping = true;
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(s -> {
@@ -110,6 +130,9 @@ public final class Factories {
             MIXED.clear();
             GRIDS.clear();
             GRIDS_FOR.clear();
+            DUE.clear();
+            BY_CHUNK.clear();
+            byChunkFor = null;
             runningGroups = List.of();
             Keys.serverStopped();
             Recipes.forget();
@@ -117,6 +140,13 @@ public final class Factories {
         });
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((s, manager, ok) -> Recipes.forget());
         ServerTickEvents.END_SERVER_TICK.register(Factories::tick);
+        // a chunk that stops ticking (a player leaves, logs out, teleports): what stood in it is read while it is still there
+        ServerChunkEvents.FULL_CHUNK_STATUS_CHANGE.register((level, chunk, from, to) -> {
+            if (from.isOrAfter(FullChunkStatus.BLOCK_TICKING) && !to.isOrAfter(FullChunkStatus.BLOCK_TICKING)) {
+                chunkStopped(level, chunk, to.isOrAfter(FullChunkStatus.FULL));
+            }
+        });
+        ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> chunkStopped(level, chunk, false));
         SimVehicles.register();
         SimStatsPayload.register();
     }
@@ -145,6 +175,95 @@ public final class Factories {
         return running != null && !running.isDone();
     }
 
+    // ------------------------------------------------------------------------------------------------ chunks
+
+    /** Every chunk a node stands in (its own, if it has not been recorded with more). */
+    static List<Long> chunks(Node n) {
+        return n.chunks.isEmpty() ? List.of(ChunkPos.pack(n.blockPos())) : n.chunks;
+    }
+
+    /** True if any chunk the node stands in ticks (but {@code except}): the building runs for real. */
+    static boolean ticking(ServerLevel level, Node n, long except) {
+        for (long c : chunks(n)) {
+            if (c == except) continue;
+            if (level.hasChunk(ChunkPos.getX(c), ChunkPos.getZ(c)) && level.shouldTickBlocksAt(c)) return true;
+        }
+        return false;
+    }
+
+    /** True if every chunk the node stands in is loaded: only then can the catch-up write into it. */
+    static boolean loaded(ServerLevel level, Node n) {
+        for (long c : chunks(n)) if (!level.hasChunk(ChunkPos.getX(c), ChunkPos.getZ(c))) return false;
+        return true;
+    }
+
+    private static String dim(ServerLevel level) {
+        return level.dimension().identifier().toString();
+    }
+
+    private static Map<Long, List<String>> byChunk(SimData data, String dim) {
+        if (byChunkFor != data || byChunkVersion != data.version) {
+            BY_CHUNK.clear();
+            for (Node n : data.stored.nodes.values()) {
+                Map<Long, List<String>> m = BY_CHUNK.computeIfAbsent(n.dim, k -> new HashMap<>());
+                for (long c : chunks(n)) m.computeIfAbsent(c, k -> new ArrayList<>(2)).add(n.key());
+            }
+            byChunkFor = data;
+            byChunkVersion = data.version;
+        }
+        return BY_CHUNK.getOrDefault(dim, Map.of());
+    }
+
+    /** Whether the simulation runs a node at all (one with nothing to simulate is left alone while its chunk does not tick). */
+    private static boolean simulates(Node n) {
+        return !n.mode.equals("none") || n.su > 0 || n.kind.equals("drone_port");
+    }
+
+    /**
+     * A chunk stopped ticking: each node standing in it whose every chunk has now stopped is read at once, while its block
+     * entities are still there (a chunk leaving altogether is read from itself, never through the level, which would load
+     * it again), and the simulation takes it over from that read, from now.
+     */
+    private static void chunkStopped(ServerLevel level, LevelChunk chunk, boolean stillLoaded) {
+        MinecraftServer s = server;
+        if (s == null || stopping || s != level.getServer()) return;
+        SimData data = SimData.get(s);
+        long at = chunk.getPos().pack();
+        List<String> keys = byChunk(data, dim(level)).get(at);
+        if (keys == null) return;
+        long now = level.getGameTime();
+        Buffers.Reach reach = stillLoaded ? Buffers.level(level) : Buffers.leaving(level, chunk);
+        for (String k : keys) {
+            Node n = data.node(k);
+            if (n == null || n.sim || !simulates(n)) continue;
+            if (ticking(level, n, at)) continue;
+            // the worker never reads a node it does not simulate, so this is safe while a step runs; a node read here
+            // before (it stopped, ticked and stopped again during a slow step) is read again. Only a read that worked
+            // parks it: otherwise the simulation checks it again (and forgets it if it is gone) when it takes it over
+            if (present(level, reach, n) && refresh(level, reach, n)) {
+                n.parkedAt = now;
+                data.setDirty();
+            } else {
+                n.parkedAt = Long.MIN_VALUE;
+            }
+        }
+    }
+
+    /** The server is stopping: every node still running for real is read and handed to the simulation. */
+    private static void parkAll(MinecraftServer s) {
+        SimData data = SimData.get(s);
+        long now = s.overworld().getGameTime();
+        for (Node n : data.stored.nodes.values()) {
+            if (n.sim || !simulates(n)) continue;
+            ServerLevel level = level(s, n.dim);
+            if (level == null || !ticking(level, n, Long.MIN_VALUE) || !present(level, Buffers.level(level), n)) continue;
+            refresh(level, n);
+            n.parkedAt = Long.MIN_VALUE;
+            start(level, n, now);
+        }
+        data.setDirty();
+    }
+
     // ------------------------------------------------------------------------------------------------ each tick
 
     private static void tick(MinecraftServer s) {
@@ -154,6 +273,7 @@ public final class Factories {
         if (running != null && running.isDone()) join();
         if (running == null) {
             SimData data = SimData.get(s);
+            due(s, data);
             transitions(s, data, now);
             if (now % STEP == 0) {
                 boundary(s, data, now);
@@ -167,7 +287,20 @@ public final class Factories {
         if (now % 20 == 0) SimStatsPayload.send(s, stats());
     }
 
-    /** Every node whose chunk stopped or started ticking goes over to the simulation, or is caught up. */
+    /** The reads that fell due while the worker was busy, done now that it is not. */
+    private static void due(MinecraftServer s, SimData data) {
+        if (DUE.isEmpty()) return;
+        List<Due> all = new ArrayList<>(DUE.values());
+        DUE.clear();
+        for (Due d : all) {
+            if (d.level.getServer() != s || !d.level.isLoaded(d.pos) || !d.level.shouldTickBlocksAt(d.pos)) continue;
+            BlockEntity be = d.level.getBlockEntity(d.pos);
+            if (d.port && be instanceof DronePortBlockEntity port) read(d.level, data, port);
+            else if (!d.port && be instanceof ControllerBlockEntity c) read(d.level, data, c, false);
+        }
+    }
+
+    /** Every node whose chunks stopped or started ticking goes over to the simulation, or is caught up. */
     private static void transitions(MinecraftServer s, SimData data, long now) {
         List<String> gone = new ArrayList<>();
         int nodes = 0, simulated = 0;
@@ -178,25 +311,26 @@ public final class Factories {
                 if (n.sim) simulated++;
                 continue;
             }
-            BlockPos pos = n.blockPos();
-            boolean ticking = level.isLoaded(pos) && level.shouldTickBlocksAt(pos);
+            boolean ticking = ticking(level, n, Long.MIN_VALUE);
             if (n.sim) {
-                if (ticking && !stopping) {
-                    if (!present(level, n)) gone.add(n.key());
+                if (ticking && !stopping && loaded(level, n)) {
+                    if (!present(level, Buffers.level(level), n)) gone.add(n.key());
                     else catchUp(level, data, n, now);
                 } else {
                     simulated++;
                 }
             } else if (!ticking) {
-                if (n.mode.equals("none") && n.su <= 0 && !n.kind.equals("drone_port")) continue;
-                toSim(level, data, n, now);
-                simulated++;
-            } else if (now % RECORD == 0 && !present(level, n)) {
-                gone.add(n.key());
+                if (!simulates(n)) continue;
+                if (!toSim(level, data, n, now)) gone.add(n.key());
+                else simulated++;
+            } else {
+                // it ticks again before the simulation took it over: the read made as it stopped is stale now
+                n.parkedAt = Long.MIN_VALUE;
+                if (now % RECORD == 0 && !present(level, Buffers.level(level), n)) gone.add(n.key());
             }
         }
         for (String k : gone) {
-            data.remove(k);
+            forget(s, data, k);
             Siftec.LOGGER.info("SIFTEC: the factory simulation forgot {} (nothing there any more)", k);
         }
         lastNodes = nodes;
@@ -217,38 +351,65 @@ public final class Factories {
         return null;
     }
 
-    /** True if what the node stands for is still there (its chunk is loaded). */
-    private static boolean present(ServerLevel level, Node n) {
-        BlockEntity be = level.getBlockEntity(n.blockPos());
+    /**
+     * True if what the node stands for is still there (its chunk is loaded). A building the simulation has not read yet
+     * (one a belt runs into, or one it never simulates, as the HUB) is there while any controller is.
+     */
+    private static boolean present(ServerLevel level, Buffers.Reach reach, Node n) {
+        BlockPos pos = n.blockPos();
+        if (!reach.has(pos)) return false;
+        BlockEntity be = reach.be(pos);
         return switch (n.kind) {
             case "drone_port" -> be instanceof DronePortBlockEntity;
-            case "inventory" -> net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, n.blockPos(), null) != null;
-            default -> be instanceof ControllerBlockEntity c && c.buildingId.equals(n.building);
+            case "inventory" -> net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, pos, reach.state(pos), be, null) != null;
+            default -> be instanceof ControllerBlockEntity c ? n.building.isEmpty() || c.buildingId.equals(n.building)
+                : n.building.isEmpty() && n.mode.equals("none") && be != null;
         };
     }
 
-    /** Its chunk stopped ticking: the simulation runs it from what its buffers last held. */
-    private static void toSim(ServerLevel level, SimData data, Node n, long now) {
-        // read it once more if it is still there (loaded, just not ticking)
-        if (level.isLoaded(n.blockPos())) refresh(level, n);
+    /**
+     * Its chunks stopped ticking: the simulation runs it from what its buffers held then. False if it is not there any
+     * more (broken while its chunk did not tick): it is to be forgotten.
+     */
+    private static boolean toSim(ServerLevel level, SimData data, Node n, long now) {
+        long from = now;
+        if (n.parkedAt != Long.MIN_VALUE) {
+            // read as its last chunk stopped ticking: the simulation starts from that read, at that time
+            from = Math.min(now, n.parkedAt);
+            n.parkedAt = Long.MIN_VALUE;
+        } else if (level.isLoaded(n.blockPos())) {
+            // still loaded, just not ticking: read it once more, and check it is still there
+            if (!present(level, Buffers.level(level), n)) return false;
+            refresh(level, n);
+        }
+        start(level, n, from);
+        data.setDirty();
+        return true;
+    }
+
+    /** The simulation takes a node over from what it holds now, as at game time {@code from}. */
+    private static void start(ServerLevel level, Node n, long from) {
         n.baseIn = new HashMap<>(n.in);
         n.baseOut = new HashMap<>(n.out);
         n.baseFin = new HashMap<>(n.fin);
         n.baseFout = new HashMap<>(n.fout);
+        n.baseSlots = new ArrayList<>();
+        for (SimData.Slot sl : n.slots) n.baseSlots.add(new SimData.Slot(sl.key, sl.count));
         n.made = 0;
         n.mined = 0;
         n.given = 0;
         n.energy0 = n.energy;
         n.fed0 = n.fed;
-        n.simTime = now;
+        n.simTime = from;
         n.pending.clear();
         n.pendingFluid.clear();
         n.pendingAt = Long.MIN_VALUE;
         n.nextBreak = Long.MIN_VALUE;
         n.handOver = false;
+        n.mixed = false;
         n.sim = true;
+        if (level.isLoaded(n.blockPos()) && level.getBlockEntity(n.blockPos()) instanceof ControllerBlockEntity c) c.simulated = true;
         snapshots++;
-        data.setDirty();
     }
 
     /** Its chunk ticks again: what the simulation did goes into the world, and the real building takes over. */
@@ -268,10 +429,14 @@ public final class Factories {
             default -> {
                 Buffers b = Buffers.of(level, n);
                 if (b != null) b.write(level, n, n.blockPos());
-                if (be instanceof ControllerBlockEntity c) SimAccess.handBack(level, c, n);
+                if (be instanceof ControllerBlockEntity c) {
+                    SimAccess.handBack(level, c, n);
+                    c.simulated = false;
+                }
             }
         }
         n.sim = false;
+        n.parkedAt = Long.MIN_VALUE;
         n.made = 0;
         n.mined = 0;
         n.given = 0;
@@ -279,10 +444,65 @@ public final class Factories {
         n.baseOut.clear();
         n.baseFin.clear();
         n.baseFout.clear();
+        n.baseSlots.clear();
         n.recordedAt = Long.MIN_VALUE;
         catchUps++;
         data.setDirty();
         if (be != null) refresh(level, n);
+        // what the simulation still had on belts between this and another building that runs for real now goes on into
+        // the building at the belt's end (the real belt carries nothing of it)
+        MinecraftServer s = level.getServer();
+        for (Link l : new ArrayList<>(data.stored.links)) {
+            if (l.transit.isEmpty() || !l.from.equals(n.key()) && !l.to.equals(n.key())) continue;
+            Node other = data.node(l.from.equals(n.key()) ? l.to : l.from);
+            if (other == null || !other.sim) flush(s, data, l, null);
+        }
+    }
+
+    /**
+     * A building's controller is about to tick: if the simulation was running it, the catch-up is done first, so the real
+     * building never works on inputs the simulation already used. False if it must not tick yet (part of it is in a chunk
+     * that is not loaded, so it cannot be caught up): the simulation keeps it.
+     */
+    public static boolean awake(ServerLevel level, ControllerBlockEntity c) {
+        long now = level.getGameTime();
+        if (c.simTicked == now - 1 && !c.simulated) {
+            c.simTicked = now;
+            return true;
+        }
+        if (c.simTicked == now) return !c.simulated;
+        if (stopping || !SimAccess.simulated(c.def())) {
+            c.simTicked = now;
+            c.simulated = false;
+            return true;
+        }
+        SimData data = SimData.get(level.getServer());
+        Node n = data.node(level, c.getBlockPos());
+        if (n != null && n.sim) join();
+        if (n == null || !n.sim) {
+            if (n != null) n.parkedAt = Long.MIN_VALUE;
+            c.simTicked = now;
+            c.simulated = false;
+            return true;
+        }
+        if (!loaded(level, n)) {
+            c.simulated = true;
+            return false;
+        }
+        catchUp(level, data, n, now);
+        c.simTicked = now;
+        c.simulated = false;
+        return true;
+    }
+
+    /** A Drone Port is about to tick: caught up first if the simulation was running it. */
+    public static void awake(ServerLevel level, DronePortBlockEntity port) {
+        if (stopping) return;
+        SimData data = SimData.get(level.getServer());
+        Node n = data.node(level, port.getBlockPos());
+        if (n == null || !n.sim) return;
+        join();
+        if (n.sim) catchUp(level, data, n, level.getGameTime());
     }
 
     // ------------------------------------------------------------------------------------------------ recording
@@ -293,11 +513,18 @@ public final class Factories {
         long now = level.getGameTime();
         long phase = now + (c.getBlockPos().asLong() & 0x7FFF);
         if (phase % STEP != 0) return;
-        if (busy()) return;
-        SimData data = SimData.get(level.getServer());
+        if (busy()) {
+            // the worker is still on a step: read it as soon as that is in, not at its next turn
+            DUE.put(SimData.key(level, c.getBlockPos()), new Due(level, c.getBlockPos().immutable(), false));
+            return;
+        }
+        read(level, SimData.get(level.getServer()), c, phase % RECORD == 0);
+    }
+
+    private static void read(ServerLevel level, SimData data, ControllerBlockEntity c, boolean full) {
         Node n = data.node(level, c.getBlockPos());
         if (n != null && n.sim) return;
-        if (n == null || n.recordedAt == Long.MIN_VALUE || phase % RECORD == 0) record(level, data, c);
+        if (n == null || n.recordedAt == Long.MIN_VALUE || full) record(level, data, c);
         else refresh(level, n);
     }
 
@@ -306,6 +533,11 @@ public final class Factories {
         Node n = data.nodeOrNew(level, c.getBlockPos(), "building");
         if (n.sim) return;
         SimAccess.model(level, c, n);
+        List<Long> chunks = SimAccess.chunks(c);
+        if (!chunks.equals(n.chunks)) {
+            n.chunks = chunks;
+            data.version++;
+        }
         refresh(level, n);
         for (String k : new ArrayList<>(n.in.keySet())) SimAccess.accepts(n, k);
         // what the belts and pipes into it bring: fuel to a generator, points to a Sink
@@ -321,14 +553,23 @@ public final class Factories {
 
     /** Reads what a ticking node's buffers hold now (and a building's power state), for when its chunk stops ticking. */
     static void refresh(ServerLevel level, Node n) {
-        BlockEntity be = level.getBlockEntity(n.blockPos());
+        refresh(level, Buffers.level(level), n);
+    }
+
+    /** Reads a node's buffers; false if they could not be read (not there, or a cell of it in a chunk not loaded). */
+    private static boolean refresh(ServerLevel level, Buffers.Reach reach, Node n) {
+        if (!reach.has(n.blockPos())) return false;
+        BlockEntity be = reach.be(n.blockPos());
         if (n.kind.equals("drone_port")) {
-            if (be instanceof DronePortBlockEntity port) port.toSim(n);
-            return;
+            if (!(be instanceof DronePortBlockEntity port)) return false;
+            port.toSim(n);
+            return true;
         }
-        Buffers b = Buffers.of(level, n);
-        if (b != null) b.read(n);
+        Buffers b = Buffers.of(level, reach, n);
+        if (b == null) return false;
+        b.read(n);
         if (be instanceof ControllerBlockEntity c) SimAccess.snapshot(level, c, n);
+        return true;
     }
 
     /** The links from a building's output ports, as its belts and pipes run now. */
@@ -351,6 +592,8 @@ public final class Factories {
                 } else {
                     if (e.node().equals(c.getBlockPos())) continue;
                     to = data.nodeOrNew(level, e.node(), "building");
+                    // a building it has not read yet (or never will, as the HUB): known by its id until it is
+                    if (to.building.isEmpty() && level.isLoaded(e.node()) && level.getBlockEntity(e.node()) instanceof ControllerBlockEntity tc) to.building = tc.buildingId;
                 }
                 String id = p.pos().asLong() + ">" + to.key() + ">" + e.at().asLong();
                 Link l = old.remove(id);
@@ -373,8 +616,14 @@ public final class Factories {
                 for (String k : outputs) SimAccess.accepts(to, k);
             }
         }
-        // links that no longer run: what was on them goes back to where it came from
-        for (Link l : old.values()) for (SimData.Transit t : l.transit) Sim.add(l.fluid ? n.fout : n.out, t.key, t.n);
+        // links that no longer run: what was on them goes back into the building it came from (or is dropped there)
+        for (Link l : old.values()) {
+            for (SimData.Transit t : l.transit) {
+                long back = Buffers.putBack(level, n, t.key, t.n, l.fluid);
+                if (back < t.n && !l.fluid) drop(level, n.blockPos(), t.key, t.n - back);
+            }
+            l.transit.clear();
+        }
         data.stored.links.removeIf(l -> l.from.equals(key));
         data.stored.links.addAll(made);
     }
@@ -394,11 +643,19 @@ public final class Factories {
 
     /** A Drone Port ticked (once a second): it is a node, with its flight kept up to date for the map. */
     public static void port(ServerLevel level, DronePortBlockEntity port) {
-        if (stopping || busy()) return;
-        SimData data = SimData.get(level.getServer());
+        if (stopping) return;
+        if (busy()) {
+            DUE.put(SimData.key(level, port.getBlockPos()), new Due(level, port.getBlockPos().immutable(), true));
+            return;
+        }
+        read(level, SimData.get(level.getServer()), port);
+    }
+
+    private static void read(ServerLevel level, SimData data, DronePortBlockEntity port) {
         Node n = data.nodeOrNew(level, port.getBlockPos(), "drone_port");
         if (n.sim) return;
         n.mode = "port";
+        n.parkedAt = Long.MIN_VALUE;
         port.toSim(n);
         n.recordedAt = level.getGameTime();
     }
@@ -406,14 +663,16 @@ public final class Factories {
     /**
      * A drone from a ticking port arrives at a port whose chunk does not tick: the packages go into that port's record in
      * the simulation, as far as its arrival slots hold them. Returns how many stacks are left, or -1 if no port is known
-     * there.
+     * there. While the worker is on a step nothing is handed over: the drone waits there a second and tries again.
      */
     public static int deliverToPort(ServerLevel level, BlockPos at, List<ItemStack> cargo) {
-        join();
         SimData data = SimData.get(level.getServer());
         Node far = data.node(level, at);
         if (far == null || !far.kind.equals("drone_port")) return -1;
         if (!far.sim && level.isLoaded(at)) return -1;
+        // not simulated yet (its chunk just stopped ticking), or the worker is on a step: the drone waits a second
+        if (!far.sim || busy()) return cargo.size();
+        if (running != null) join();
         Sim.pad(far.slots, Sim.PORT_SIZE);
         for (int i = 0; i < cargo.size(); i++) {
             ItemStack s = cargo.get(i);
@@ -426,10 +685,79 @@ public final class Factories {
         return cargo.size();
     }
 
-    /** A building was taken down: the simulation forgets it. */
+    /** A building (or Drone Port) was taken down: the simulation forgets it. */
     public static void removed(ServerLevel level, BlockPos controller) {
+        MinecraftServer s = level.getServer();
+        SimData data = SimData.get(s);
+        String key = SimData.key(level, controller);
+        if (data.node(key) == null) return;
         join();
-        SimData.get(level.getServer()).remove(SimData.key(level, controller));
+        forget(s, data, key);
+    }
+
+    /**
+     * Forgets a node; what the simulation had on the belts to or from it goes to the building at the other end (or is
+     * dropped where the belt was), rather than vanishing with them.
+     */
+    static void forget(MinecraftServer s, SimData data, String key) {
+        for (Link l : new ArrayList<>(data.stored.links)) {
+            if (l.from.equals(key) || l.to.equals(key)) flush(s, data, l, key);
+        }
+        data.remove(key);
+    }
+
+    /**
+     * Empties a link: what is on it goes into the building at its end, or else back into the one it came from, or else is
+     * dropped where it was going (a node that is gone, {@code gone}, takes nothing). Into the world where that building
+     * runs for real, into the simulation's record where it does not.
+     */
+    private static void flush(MinecraftServer s, SimData data, Link l, @Nullable String gone) {
+        if (l.transit.isEmpty()) return;
+        ServerLevel level = level(s, l.dim);
+        Node to = l.to.equals(gone) ? null : data.node(l.to), from = l.from.equals(gone) ? null : data.node(l.from);
+        for (SimData.Transit t : l.transit) {
+            long left = t.n;
+            if (to != null) left -= give(level, to, t.key, left, l.fluid, true);
+            if (left > 0 && from != null) left -= give(level, from, t.key, left, l.fluid, false);
+            if (left > 0 && !l.fluid && level != null) {
+                BlockPos at = BlockPos.of(to == null ? l.fromPort : l.toPort);
+                if (level.isLoaded(at)) {
+                    drop(level, at, t.key, left);
+                    left = 0;
+                }
+            }
+            t.n = left;
+        }
+        // what had nowhere to go yet stays on the belt (a link that is being forgotten goes with its node)
+        l.transit.removeIf(t -> t.n <= 0);
+        if (gone != null && !l.transit.isEmpty()) {
+            for (SimData.Transit t : l.transit) Siftec.LOGGER.info("SIFTEC: {} {} on a belt between {} and {} had nowhere to go", t.n, t.key, l.from, l.to);
+        }
+        data.setDirty();
+    }
+
+    /** Puts things into a node: at its input ({@code asInput}) or back where it keeps what it made. Returns how many went in. */
+    private static long give(@Nullable ServerLevel level, Node n, String key, long count, boolean fluid, boolean asInput) {
+        if (n.sim) {
+            long take = asInput ? Math.min(count, Sim.room(n, key, fluid)) : count;
+            if (take <= 0) return 0;
+            if (asInput) Sim.put(n, key, take, fluid);
+            else Sim.add(fluid ? n.fout : n.out, key, take);
+            return take;
+        }
+        if (level == null || !loaded(level, n)) return 0;
+        return asInput ? Buffers.insert(level, n, key, count, fluid) : Buffers.putBack(level, n, key, count, fluid);
+    }
+
+    private static void drop(ServerLevel level, BlockPos at, String key, long count) {
+        int max = Math.max(1, Keys.max(key));
+        while (count > 0) {
+            int c = (int) Math.min(count, max);
+            ItemStack stack = Keys.stack(key, c);
+            if (stack.isEmpty()) return;
+            net.minecraft.world.Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, stack);
+            count -= c;
+        }
     }
 
     // ------------------------------------------------------------------------------------------------ the border
@@ -443,10 +771,10 @@ public final class Factories {
             Node from = data.node(l.from), to = data.node(l.to);
             if (from == null || to == null || from.sim || !to.sim) continue;
             ServerLevel level = level(s, l.dim);
-            if (level == null || !level.isLoaded(from.blockPos()) || !level.shouldTickBlocksAt(from.blockPos())) continue;
+            if (level == null || !ticking(level, from, Long.MIN_VALUE) || !loaded(level, from)) continue;
             long dt = l.last == Long.MIN_VALUE ? 0 : Math.max(0, now - l.last);
             l.last = now;
-            l.allowance = Math.min(l.allowance + l.rate * l.share * dt, Math.max(1, l.rate * l.share * 40));
+            l.allowance = Sim.allow(l, dt);
             long most = Math.min((long) Math.floor(l.allowance + 1e-9), Math.max(0, l.cap - l.carrying()));
             if (most <= 0) continue;
             Map<String, Long> got = Buffers.extract(level, from, most, l.fluid);
@@ -457,7 +785,7 @@ public final class Factories {
         }
     }
 
-    /** After a step: deliveries to ticking buildings, Sink points, drones landing at ticking ports, mixed grids. */
+    /** After a step: deliveries to ticking buildings, Sink points, drones and trucks at ticking stations, power memory. */
     private static void applyResults(MinecraftServer s) {
         long t0 = System.nanoTime();
         SimData data = SimData.get(s);
@@ -471,7 +799,7 @@ public final class Factories {
                 Node to = data.node(l.to);
                 if (to == null || to.sim) continue;
                 ServerLevel level = level(s, l.dim);
-                if (level == null || !level.isLoaded(to.blockPos())) continue;
+                if (level == null || !loaded(level, to)) continue;
                 var it = l.transit.iterator();
                 while (it.hasNext()) {
                     SimData.Transit t = it.next();
@@ -482,19 +810,52 @@ public final class Factories {
                     it.remove();
                 }
             }
+            for (SimData.Vehicle v : g.vehicles) if (v.dockPending >= 0) dockReal(s, data, v);
+            // a generator or Power Storage in a grid the simulation balances by itself: its memory follows the simulation
+            for (List<Node> grid : g.grids) for (Node n : grid) syncMemory(s, n, false);
         }
         for (Map.Entry<String, Long> e : MIXED.entrySet()) {
             Node n = data.node(e.getKey());
             ServerLevel level = n == null ? null : level(s, n.dim);
             if (n == null || level == null || !n.sim) continue;
-            // a generator or Power Storage in such a grid is its remembered self (PowerMemory burns and charges it, and
-            // hands that over when it is back); a consumer asks for what the simulation says it needs
+            // a generator or Power Storage in such a grid is its remembered self (PowerGrids burns and charges it; the
+            // simulation burns what it gave from the fuel it has, before each step); a consumer asks for what it needs
             if (Sim.generator(n) || n.power.equals("storage")) continue;
             PowerMemory.Remembered r = PowerMemory.get(level).at(level, n.blockPos());
             if (r != null) r.simulateDemand(Sim.demand(n, now));
         }
         data.setDirty();
         mainLastNanos += System.nanoTime() - t0;
+    }
+
+    /**
+     * Keeps a simulated generator's or Power Storage's power memory and the simulation in step. In a mixed grid (balanced
+     * by PowerGrids) what its stand-in gave is burnt from the simulation's fuel, its stand-in is told what that fuel now
+     * holds (belts bring more), and its charge and fuse are the grid's; in a grid the simulation balances by itself its
+     * memory is told the simulation's fuel, charge and fuse, so either side always starts from the other's last state.
+     */
+    private static void syncMemory(MinecraftServer s, Node n, boolean mixed) {
+        if (!n.sim || !Sim.holdsFuse(n)) return;
+        ServerLevel level = level(s, n.dim);
+        PowerMemory.Remembered r = level == null ? null : PowerMemory.get(level).at(level, n.blockPos());
+        if (r == null) return;
+        boolean fuel = switch (n.power) {
+            case "biomass", "coal", "fuel", "nuclear" -> true;
+            default -> false;
+        };
+        double spent = r.takeSpent();
+        if (spent > 0 && fuel) {
+            Sim.burn(n, spent);
+            if (n.fullSu > 0) Sim.drink(n, spent / n.fullSu);
+        }
+        double cap = fuel ? Sim.capacity(n) : -1, reserve = fuel ? Sim.fuelEnergy(n) : -1;
+        if (mixed) {
+            if (fuel) r.simFuel(cap, reserve);
+            if (n.power.equals("storage")) n.stored = r.stored();
+            n.tripped = r.tripped();
+        } else {
+            r.fromSim(cap, reserve, n.stored, n.tripped);
+        }
     }
 
     private static void pay(MinecraftServer s, Node n) {
@@ -504,7 +865,7 @@ public final class Factories {
             points += (worth == null ? SimAccess.worth(e.getKey()) : worth) * e.getValue();
         }
         n.sunk.clear();
-        if (points > 0 && !n.company.isEmpty()) com.meakaandre.siftec.sink.Sink.pay(s, n.company, points);
+        if (points > 0 && !n.company.isEmpty()) com.meakaandre.siftec.sink.Sink.paySimulated(s, n.company, points);
     }
 
     /** A simulated drone at a ticking port: the packages go into that port's arrivals, and the drone heads home. */
@@ -524,6 +885,59 @@ public final class Factories {
             n.state = Sim.HOMEBOUND;
             n.ticks = n.total;
         }
+        data.setDirty();
+    }
+
+    /**
+     * A simulated vehicle stopped at a Truck Station whose chunk ticks (the route point it stands at does not): the station
+     * unloads it into its vaults, or loads it from them, and fills its tank, in the world.
+     */
+    private static void dockReal(MinecraftServer s, SimData data, SimData.Vehicle v) {
+        int stop = v.dockPending;
+        v.dockPending = -1;
+        if (stop < 0 || stop >= v.stopStation.size()) return;
+        ServerLevel level = level(s, v.dim);
+        Node st = data.node(SimData.key(v.dim, v.stopStation.get(stop)));
+        if (level == null || st == null || st.sim || !loaded(level, st)) return;
+        long moved = 0;
+        if (st.unload) {
+            List<SimData.Slot> keep = new ArrayList<>();
+            for (SimData.Slot c : v.cargo) {
+                if (c.empty()) continue;
+                long put = Buffers.insert(level, st, c.key, c.count, false);
+                moved += put;
+                if (c.count - put > 0) keep.add(new SimData.Slot(c.key, c.count - put));
+            }
+            v.cargo = keep;
+        } else {
+            List<SimData.Slot> cargo = new ArrayList<>(v.cargo);
+            while (cargo.size() < v.slots) cargo.add(new SimData.Slot());
+            long room = 0;
+            for (SimData.Slot c : cargo) room += c.empty() ? 64 : Math.max(0, Keys.max(c.key) - c.count);
+            Map<String, Long> got = Buffers.extract(level, st, room, false);
+            for (Map.Entry<String, Long> e : got.entrySet()) {
+                long rest = Sim.addSlots(cargo, 0, v.slots, e.getKey(), e.getValue());
+                moved += e.getValue() - rest;
+                // what does not fit after all (a smaller stack size) goes back
+                if (rest > 0) Buffers.putBack(level, st, e.getKey(), rest, false);
+            }
+            cargo.removeIf(SimData.Slot::empty);
+            v.cargo = cargo;
+        }
+        // the station's fuel tank fills the vehicle's
+        for (String fuel : st.fuelMj.keySet()) {
+            Double mj = st.fuelMj.get(fuel);
+            if (mj == null || mj <= 0) continue;
+            long want = (long) Math.floor((v.tank - v.fuel) / mj);
+            if (want <= 0) break;
+            Map<String, Long> took = Buffers.extract(level, st, want, true);
+            for (Map.Entry<String, Long> e : took.entrySet()) {
+                Double per = st.fuelMj.get(e.getKey());
+                if (per != null && per > 0) v.fuel = Math.min(v.tank, v.fuel + e.getValue() * per);
+                else Buffers.putBack(level, st, e.getKey(), e.getValue(), true);
+            }
+        }
+        v.itemsMoved += moved;
         data.setDirty();
     }
 
@@ -555,7 +969,8 @@ public final class Factories {
     static List<Sim.Group> groups(MinecraftServer s, SimData data) {
         Map<String, Map<String, Node>> byDim = new HashMap<>();
         for (Node n : data.stored.nodes.values()) byDim.computeIfAbsent(n.dim, k -> new LinkedHashMap<>()).put(n.key(), n);
-        if (data == SimData.get(s)) MIXED.clear();
+        boolean real = data == SimData.get(s);
+        if (real) MIXED.clear();
         List<Sim.Group> groups = new ArrayList<>();
         int vehicles = 0;
         for (Map.Entry<String, Map<String, Node>> dimEntry : byDim.entrySet()) {
@@ -575,8 +990,9 @@ public final class Factories {
             for (SimPower.Grid g : grids) {
                 for (Node n : g.members()) onGrid.add(n.key());
                 if (g.mixed()) {
-                    for (Node n : g.members()) mixedBefore(level, n);
+                    for (Node n : g.members()) mixedBefore(level, n, real);
                 } else {
+                    for (Node n : g.members()) n.mixed = false;
                     for (int i = 1; i < g.members().size(); i++) u.union(g.members().getFirst().key(), g.members().get(i).key());
                 }
             }
@@ -648,20 +1064,17 @@ public final class Factories {
     }
 
     /**
-     * A simulated member of a grid PowerGrids balances: whether that grid gave it power; a generator's fuel and a
-     * Power Storage's charge are its remembered stand-in's (PowerMemory), which hands them over when it is back.
+     * A simulated member of a grid PowerGrids balances: whether that grid gave it power; a generator's fuel and a Power
+     * Storage's charge and fuse are kept in step with its remembered stand-in ({@link #syncMemory}).
      */
-    private static void mixedBefore(@Nullable ServerLevel level, Node n) {
+    private static void mixedBefore(@Nullable ServerLevel level, Node n, boolean real) {
         if (level == null) return;
-        MIXED.put(n.key(), n.connectors.isEmpty() ? n.pos : n.connectors.getFirst());
+        if (real) MIXED.put(n.key(), n.connectors.isEmpty() ? n.pos : n.connectors.getFirst());
         PowerGrids.Grid grid = n.connectors.isEmpty() ? null : PowerGrids.at(level, n.connectors.getFirst());
         GridStats stats = grid == null ? null : grid.stats;
         if (n.su > 0) n.powered = stats != null && stats.powered && !stats.tripped;
-        PowerMemory.Remembered r = PowerMemory.get(level).at(level, n.blockPos());
-        if (r != null) {
-            if (n.power.equals("storage")) n.stored = r.stored();
-            if (Sim.holdsFuse(n)) n.tripped = r.tripped();
-        }
+        n.mixed = true;
+        if (real) syncMemory(level.getServer(), n, true);
     }
 
     /** Union-find over node keys. */
@@ -713,11 +1126,28 @@ public final class Factories {
         for (Sim.Group g : groups(s, data)) Sim.step(g, now);
     }
 
+    /**
+     * Keeps the worker busy, as a step that takes long would, until {@code release} counts down or {@code maxMillis} pass
+     * (selftests of a lagging server).
+     */
+    public static void holdWorker(java.util.concurrent.CountDownLatch release, long maxMillis) {
+        join();
+        runningGroups = List.of();
+        running = WORKER.submit(() -> {
+            try {
+                release.await(maxMillis, java.util.concurrent.TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+    }
+
     /** Runs a step now on the server thread (selftests). */
     public static void stepNow(MinecraftServer s) {
         join();
         SimData data = SimData.get(s);
         long now = s.overworld().getGameTime();
+        due(s, data);
         transitions(s, data, now);
         boundary(s, data, now);
         submit(s, data, now);

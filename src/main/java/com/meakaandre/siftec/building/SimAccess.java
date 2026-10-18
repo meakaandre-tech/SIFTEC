@@ -77,6 +77,16 @@ public final class SimAccess {
         return out;
     }
 
+    /** Every chunk the building stands in, as packed chunk positions, its controller's first. */
+    public static List<Long> chunks(ControllerBlockEntity c) {
+        java.util.LinkedHashSet<Long> out = new java.util.LinkedHashSet<>();
+        out.add(net.minecraft.world.level.ChunkPos.pack(c.getBlockPos()));
+        Placement p = c.placement();
+        BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
+        if (t != null) for (BuildingTemplate.Cell cell : t.members) out.add(net.minecraft.world.level.ChunkPos.pack(p.at(cell)));
+        return new ArrayList<>(out);
+    }
+
     /** Cells of a kind of block in the building (its vaults, its tanks). */
     public static List<BlockPos> cells(ControllerBlockEntity c, String blockId) {
         return BuildingLogic.cells(c, BuiltInRegistries.BLOCK.getValue(Identifier.parse(blockId)));
@@ -332,6 +342,9 @@ public final class SimAccess {
     private static void generator(ServerLevel level, ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
         String kind = def.power();
         n.fullSu = Power.su(def.mw());
+        // the Coal Generator and the Nuclear Power Plant drink water at their intake: none, no power
+        n.water = def.water() > 0 ? def.water() * BuildingPower.mbPerM3() / 1200.0 : 0;
+        if (n.water > 0) n.fluidInCap = Math.max(n.fluidInCap, 4000);
         switch (kind) {
             case "biomass", "coal", "nuclear" -> {
                 n.mode = "gen";
@@ -361,6 +374,8 @@ public final class SimAccess {
                 ItemStack in = c.input.getItem(0);
                 if (!in.isEmpty() && BuildingPower.itemMj("augmenter", in) > 0) n.fuelMj.put(Keys.of(in), 1.0);
             }
+            // Power Storage: charged and drained with its grid, wherever that grid is
+            case "storage" -> n.mode = "battery";
             default -> {
             }
         }
@@ -394,6 +409,8 @@ public final class SimAccess {
         PowerMember m = BuildingPower.member(level, c);
         BuildingDef def = c.def();
         if (m == null || def == null) return 0;
+        // a cell of it is not loaded: its machines cannot be read now (NaN: keep what was read before)
+        for (long chunk : chunks(c)) if (!level.hasChunk(net.minecraft.world.level.ChunkPos.getX(chunk), net.minecraft.world.level.ChunkPos.getZ(chunk))) return Double.NaN;
         double r = m.reserve();
         if (!Double.isFinite(r)) return 0;
         ItemStack in = c.input.getItem(0);
@@ -413,6 +430,8 @@ public final class SimAccess {
                     double spent = n.energy0 - n.energy;
                     PowerMember m = BuildingPower.member(level, c);
                     if (spent > 0 && m != null) m.spend(spent);
+                    // the last fuel the simulation took is not all burnt: what is left goes back into the machines
+                    else if (spent < 0 && m instanceof BuildingPower.Generator g) g.refund(-spent, n.lastFuel);
                 }
                 default -> {
                 }
@@ -437,7 +456,9 @@ public final class SimAccess {
         n.tripped = c.tripped;
         n.stored = c.energy;
         n.fed = n.fed0 = c.fedTicks;
-        n.energy = n.energy0 = machineEnergy(level, c);
+        double energy = machineEnergy(level, c);
+        if (!Double.isNaN(energy)) n.energy = n.energy0 = energy;
+        else n.energy0 = n.energy;
         n.unload = c.unload;
         n.powered = c.powered || n.su <= 0;
         // a recipe still waiting out its time (BasinPace) keeps waiting

@@ -113,11 +113,20 @@ public final class Sink {
 
     /** The company is paid for what its Sink took. */
     public static void pay(MinecraftServer server, String companyId, long amount) {
+        if (credit(server, companyId, amount)) Companies.save(server);
+    }
+
+    /** Points a simulated Sink earned (every step while it runs): written with the next save within a minute. */
+    public static void paySimulated(MinecraftServer server, String companyId, long amount) {
+        if (credit(server, companyId, amount)) Companies.saveSoon(server);
+    }
+
+    private static boolean credit(MinecraftServer server, String companyId, long amount) {
         Company company = CompanyData.get(server).byId(companyId);
-        if (company == null || amount <= 0) return;
+        if (company == null || amount <= 0) return false;
         company.points += amount;
         company.pointsEver += amount;
-        Companies.save(server);
+        return true;
     }
 
     /** Prints as many coupons as the company's points pay for, at most a stack at a time. Returns how many. */
