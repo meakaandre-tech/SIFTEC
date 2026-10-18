@@ -29,19 +29,23 @@ public class DroneMenu extends ChestMenu {
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final DronePortBlockEntity port;
+    /** Where it was opened (the terminal, or the building's controller): the player must stay within reach of it. */
+    private final net.minecraft.core.BlockPos at;
     private final List<Places.Place> shown = new ArrayList<>();
     private int ticks;
 
-    private DroneMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, DronePortBlockEntity port) {
+    private DroneMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, DronePortBlockEntity port, net.minecraft.core.BlockPos at) {
         super(MenuType.GENERIC_9x6, id, inventory, view, 6);
         this.view = view;
         this.player = player;
         this.port = port;
+        this.at = at.immutable();
         refresh();
     }
 
-    public static void open(ServerPlayer player, DronePortBlockEntity port) {
-        player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new DroneMenu(id, inventory, new SimpleContainer(SIZE), player, port),
+    /** Opens a port's window; {@code at} is the block it was opened at, which the player must stay within reach of. */
+    public static void open(ServerPlayer player, DronePortBlockEntity port, net.minecraft.core.BlockPos at) {
+        player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new DroneMenu(id, inventory, new SimpleContainer(SIZE), player, port, at),
             Component.translatable("block.siftec.drone_port")));
     }
 
@@ -123,8 +127,16 @@ public class DroneMenu extends ChestMenu {
         super.broadcastChanges();
     }
 
+    /**
+     * Whether the window stays open: the port still stands, the player is still there, alive and within reach of where
+     * they opened it, and still in the company the port belongs to (as the Depot's window does).
+     */
     @Override
     public boolean stillValid(Player who) {
-        return !port.isRemoved();
+        if (who != player || port.isRemoved() || player.isRemoved() || !player.isAlive()) return false;
+        if (player.level() != port.getLevel()) return false;
+        com.meakaandre.siftec.company.Company now = com.meakaandre.siftec.company.Companies.find(player);
+        if (!player.hasInfiniteMaterials() && !port.companyId.isEmpty() && (now == null || !com.meakaandre.siftec.company.Companies.owns(now, port.companyId))) return false;
+        return player.distanceToSqr(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5) <= com.meakaandre.siftec.depot.DepotMenu.REACH * com.meakaandre.siftec.depot.DepotMenu.REACH;
     }
 }

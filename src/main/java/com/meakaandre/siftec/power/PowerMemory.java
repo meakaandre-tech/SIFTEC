@@ -254,6 +254,31 @@ public class PowerMemory extends SavedData {
             owner.setDirty();
         }
 
+        /**
+         * A simulated generator in a grid balanced here (part of it ticks): its fuel is the simulation's (belts keep
+         * bringing more), so what it can give and how long that lasts are what the simulation says; what it gave was
+         * taken just before ({@link #takeSpent}) and burnt there.
+         */
+        public void simFuel(double capacity, double reserve) {
+            this.capacity = capacity;
+            this.reserve = reserve;
+            spent = 0;
+            owner.setDirty();
+        }
+
+        /**
+         * A member of a grid the simulation balances by itself (none of it ticks): it stands for what the simulation
+         * has, so that when part of the grid ticks again it starts from that, not from what it was when it went away.
+         */
+        public void fromSim(double capacity, double reserve, double stored, boolean tripped) {
+            if (capacity >= 0) this.capacity = capacity;
+            if (reserve >= 0) this.reserve = reserve;
+            spent = 0;
+            if (storeCapacity > 0) this.stored = Math.clamp(stored, 0, storeCapacity);
+            if (fuse) this.tripped = tripped;
+            owner.setDirty();
+        }
+
         /** A simulated consumer's demand: what it asks for now, as the simulation runs it. */
         public void simulateDemand(double demand) {
             if (this.demand == demand) return;

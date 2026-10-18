@@ -102,6 +102,8 @@ final class Tracer {
         int travelled = 0;
         for (int i = entry; ; i += step) {
             BlockPos seg = segs.get(i);
+            // a segment in a chunk that is not loaded: the belt is not followed past it (reading it would load the chunk)
+            if (!level.isLoaded(seg)) return;
             seen.add(seg.immutable());
             travelled++;
             if (level.getBlockState(seg.above()).getBlock() instanceof BeltTunnelBlock) {

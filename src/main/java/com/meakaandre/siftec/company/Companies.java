@@ -33,10 +33,13 @@ public final class Companies {
         });
         // valuable changes (payments, the cloud, points) are written within a few seconds instead of at the next autosave
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if (urgent && server.getTickCount() - lastUrgentSave >= URGENT_SAVE_TICKS) {
+            int since = server.getTickCount() - lastUrgentSave;
+            if (urgent && since >= URGENT_SAVE_TICKS || soon && since >= SOON_SAVE_TICKS) {
                 urgent = false;
+                soon = false;
                 lastUrgentSave = server.getTickCount();
-                server.getDataStorage().scheduleSave();
+                // the factory simulation is written with the world save only, in step with the chunks
+                com.meakaandre.siftec.sim.SimData.quickSave(() -> server.getDataStorage().scheduleSave());
             }
         });
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register(server -> {
@@ -47,6 +50,7 @@ public final class Companies {
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             running = null;
             urgent = false;
+            soon = false;
             lastUrgentSave = 0;
             com.meakaandre.siftec.save.JsonSavedData.serverStopped();
             // per-player choices held in memory belong to this server run only
@@ -123,9 +127,9 @@ public final class Companies {
         return company != null && same(company.id, ownerId);
     }
 
-    /** Ticks between two quick saves of valuable changes. */
-    private static final int URGENT_SAVE_TICKS = 100;
-    private static boolean urgent;
+    /** Ticks between two quick saves of valuable changes, and of steady trickles (a simulated Sink's points). */
+    private static final int URGENT_SAVE_TICKS = 100, SOON_SAVE_TICKS = 1200;
+    private static boolean urgent, soon;
     private static int lastUrgentSave;
 
     /**
@@ -188,6 +192,15 @@ public final class Companies {
     public static void save(MinecraftServer server) {
         CompanyData.get(server).setDirty();
         urgent = true;
+    }
+
+    /**
+     * Marks the companies changed and writes them within a minute: for what comes in steadily (a simulated Sink's points
+     * every step), which a quick save every few seconds would only repeat.
+     */
+    public static void saveSoon(MinecraftServer server) {
+        CompanyData.get(server).setDirty();
+        soon = true;
     }
 
     public static void tell(MinecraftServer server, Company company, Component message) {

@@ -45,6 +45,10 @@ public final class Sim {
     static final int DOCK_TICKS = 100;
     static final int PORT_OUT = 0, PORT_FUEL = 9, PORT_IN = 10, PORT_SIZE = 19;
     static final int IDLE = 0, OUTBOUND = 1, HOMEBOUND = 2;
+    /** The water a Coal Generator or Nuclear Power Plant drinks. */
+    static final String WATER = "fluid:minecraft:water";
+    /** Ticks a belt's unused allowance is kept for at least (a long step keeps its own length). */
+    static final int ALLOWANCE_TICKS = 40;
 
     private Sim() {
     }
@@ -178,13 +182,41 @@ public final class Sim {
         double e = Math.max(0, n.energy);
         for (Map.Entry<String, Long> f : n.in.entrySet()) {
             Double mj = n.fuelMj.get(f.getKey());
-            if (mj != null) e += suTicksOfMj(mj) * f.getValue();
+            // a fuel rod counts only while its waste has room to go
+            if (mj != null) e += suTicksOfMj(mj) * Math.min(f.getValue(), wasteRoom(n, f.getKey()));
         }
         for (Map.Entry<String, Long> f : n.fin.entrySet()) {
             Double mj = n.fuelMj.get(f.getKey());
             if (mj != null) e += suTicksOfMj(mj) * f.getValue();
         }
         return e;
+    }
+
+    /** How many of this fuel the output still has room for the waste of (BuildingPower.wasteFits); any number if it leaves none. */
+    static long wasteRoom(Node n, String fuel) {
+        String waste = n.waste.get(fuel);
+        if (waste == null) return Long.MAX_VALUE;
+        for (String k : n.out.keySet()) if (!k.equals(waste)) return 0;
+        long each = Math.max(1, n.wasteCount.getOrDefault(fuel, 1));
+        return Math.max(0, n.outCap - total(n.out)) / each;
+    }
+
+    /** What a generator can give now: its full SU while it has fuel (and water, if it drinks), else nothing. */
+    static double capacity(Node n) {
+        if (n.tripped || n.fullSu <= 0) return 0;
+        if (n.water > 0 && get(n.fin, WATER) <= 0) return 0;
+        return fuelEnergy(n) > 0 ? n.fullSu : 0;
+    }
+
+    /** A generator drinks its water for this many ticks at full power. */
+    static void drink(Node n, double ticksAtFull) {
+        if (n.water <= 0 || ticksAtFull <= 0) return;
+        n.waterFrac += n.water * ticksAtFull;
+        long mb = Math.min((long) n.waterFrac, get(n.fin, WATER));
+        add(n.fin, WATER, -mb);
+        n.waterFrac -= mb;
+        // no more water: it stops owing what it could not drink
+        if (get(n.fin, WATER) <= 0) n.waterFrac = Math.min(n.waterFrac, 1);
     }
 
     static double suTicksOfMj(double mj) {
@@ -200,7 +232,7 @@ public final class Sim {
         while (n.energy < 0) {
             String fuel = null;
             boolean fluid = false;
-            for (String k : n.in.keySet()) if (n.fuelMj.containsKey(k)) {
+            for (String k : n.in.keySet()) if (n.fuelMj.containsKey(k) && wasteRoom(n, k) > 0) {
                 fuel = k;
                 break;
             }
@@ -218,6 +250,7 @@ public final class Sim {
                 n.energy = 0;
                 return;
             }
+            n.lastFuel = fuel;
             if (fluid) {
                 long have = get(n.fin, fuel);
                 long mb = Math.min(have, (long) Math.ceil(-n.energy / per));
@@ -260,6 +293,8 @@ public final class Sim {
             } else if (generator(n)) {
                 if (!n.tripped) {
                     caps[i] = Math.min(n.fullSu, fuelEnergy(n) / dt);
+                    // a generator that drinks gives only as long as its water lasts
+                    if (n.water > 0) caps[i] = Math.min(caps[i], n.fullSu * get(n.fin, WATER) / (n.water * dt));
                     boosted += caps[i];
                 }
             } else if (n.power.equals("storage")) {
@@ -308,7 +343,10 @@ public final class Sim {
                 double give = n.power.equals("nuclear") && !n.tripped ? caps[i] : caps[i] * load;
                 n.capacityNow = caps[i];
                 if (n.power.equals("augmenter")) feedAugmenter(n, dt, on);
-                else burn(n, give * dt);
+                else {
+                    burn(n, give * dt);
+                    if (n.fullSu > 0) drink(n, give * dt / n.fullSu);
+                }
                 if (n.power.equals("geothermal") && give > 0 && !n.fluidOut.isEmpty()) {
                     n.frac += ACID_PER_TICK * dt;
                     long mb = (long) n.frac;
@@ -535,6 +573,7 @@ public final class Sim {
                 return 0;
             }
             case "gen" -> {
+                if (fluid && key.equals(WATER) && n.water > 0) return Math.max(0, n.fluidInCap - total(n.fin));
                 if (!n.fuelMj.containsKey(key)) return 0;
                 if (fluid) return Math.max(0, n.fluidInCap - total(n.fin));
                 for (String k : n.in.keySet()) if (!k.equals(key)) return 0;
@@ -575,11 +614,20 @@ public final class Sim {
         return n.out;
     }
 
+    /**
+     * A link's allowance after {@code dt} more ticks: what it carries in that time, plus what it did not use before, kept
+     * for at most {@link #ALLOWANCE_TICKS} or the step's own length, whichever is longer.
+     */
+    static double allow(Link l, long dt) {
+        double per = l.rate * l.share;
+        return Math.min(l.allowance + per * dt, Math.max(1, per * Math.max(dt, ALLOWANCE_TICKS)));
+    }
+
     /** A link takes from its source's output as fast as it carries, up to what fits on it. */
     static void pull(Link l, Node from, long now) {
         long dt = l.last == Long.MIN_VALUE ? 0 : Math.max(0, now - l.last);
         l.last = now;
-        l.allowance = Math.min(l.allowance + l.rate * l.share * dt, Math.max(1, l.rate * l.share * 40));
+        l.allowance = allow(l, dt);
         long space = Math.max(0, l.cap - l.carrying());
         Map<String, Long> src = source(from, l.fluid);
         if (src.isEmpty()) return;
@@ -787,13 +835,29 @@ public final class Sim {
         if (dx * dx + dz * dz > 1e-6) v.yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
     }
 
+    /**
+     * Where a vehicle comes back into the world: at a route point it has really reached (its stop, if it stands at one,
+     * else the last point it passed), never part way along a leg, which may cut through a hill or over a valley.
+     */
+    static int returnPoint(Vehicle v) {
+        int n = v.points();
+        if (n < 1) return 0;
+        int to = Math.floorMod(v.target, n);
+        return v.docked >= 0 ? to : Math.floorMod(to - 1, n);
+    }
+
     /** At a stop: the Truck Station unloads the vehicle into its vaults or loads it from them, and fills its tank. */
     static void dock(Vehicle v, int stop, Group g) {
         v.stopsMade++;
         long station = v.stopStation.get(stop);
         v.lastStation = station;
         Node s = g.all.get(SimData.key(v.dim, station));
-        if (s == null || !s.sim) return;
+        if (s == null) return;
+        if (!s.sim) {
+            // a station whose chunk ticks: the server thread loads or unloads the vehicle there, after the step
+            v.dockPending = stop;
+            return;
+        }
         long moved = 0;
         if (s.unload) {
             List<Slot> keep = new ArrayList<>();
