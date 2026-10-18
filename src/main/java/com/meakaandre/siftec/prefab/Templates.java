@@ -28,7 +28,7 @@ public final class Templates {
     /** Where the terminal stands in each structure. */
     public static final int[] HUB_TERMINAL = {0, 1, 5}, GATEWAY_TERMINAL = {0, 1, 7};
     /** Spots of the HUB's parts, for the tests. */
-    public static final int[] STORAGE = {3, 1, 4}, BURNER_1 = {-4, 1, 21}, BURNER_2 = {3, 1, 21}, BED = {-6, 1, 12},
+    public static final int[] STORAGE = {3, 1, 4}, BURNER_1 = {-4, 1, 19}, BURNER_2 = {3, 1, 19}, BED = {-6, 1, 12},
         TOWER = {-1, 10, 22}, FREIGHTER = {0, 22, 20};
     /**
      * The Craft Station (Satisfactory's Craft Bench, Create's way): a Press over a Basin and a Mixer over a Basin on the
@@ -197,19 +197,59 @@ public final class Templates {
         return state.hasProperty(BlockStateProperties.FACING) ? state.setValue(BlockStateProperties.FACING, Direction.UP) : state;
     }
 
-    /** A burner pad at x: empty until the upgrade, then the burner in a housing with a chimney behind and a wire connector on top. */
+    /**
+     * A HUB Biomass Burner at x on the burner deck: nothing until its upgrade, then the same machine as the Biomass Burner
+     * building (tools/structures.py, biomass_burner), fitted on the deck: an orange housing with dark corners and glass,
+     * at its back a Blaze Burner under a four-high Fluid Tank (a closed boiler), its Steam Engine driving a shaft that
+     * turns a Create: New Age generator coil ringed by four netherite magnets, the carbon brushes beside it. The HUB
+     * Burner block in the front wall takes the fuel and feeds the Blaze Burner ({@link HubBurnerBlockEntity}); the wire
+     * connector stands on it. Cells are given as the Biomass Burner's frame: x across from the burner block, y up from the
+     * deck, z back from the front wall.
+     */
     private static void burner(Template t, int x, int from) {
-        int M = HUB_MAX;
-        t.set(0, M, x, 0, 21, s("orange"));
-        t.set(0, from - 1, x, 1, 21, Template.AIR);
-        t.set(from, M, x, 1, 21, ModBlocks.HUB_BURNER.get().defaultBlockState().setValue(Facing.FACING, Direction.SOUTH));
-        // its wire connector on top: wire it to a Power Pole, or to the other burner, to put it on a grid
-        t.set(from, M, x, 2, 21, connector());
-        t.set(from, M, x - 1, 1, 21, s("metal"));
-        t.set(from, M, x + 1, 1, 21, s("metal"));
-        t.set(from, M, x, 1, 22, s("metal"));
-        t.box(from, M, x, 1, 23, x, 5, 23, s("metal"));
-        t.set(from, M, x, 6, 23, s("orange"));
+        int M = HUB_MAX, front = BURNER_1[2];
+        BlockState air = Template.AIR, orange = s("orange"), dark = s("metal"), light = s("white"), glass = s("glass");
+        // before the upgrade: the pad is bare
+        t.box(0, from - 1, x - 2, 1, front, x + 2, 9, front + 5, air);
+        t.set(0, M, x, 0, front + 2, orange);
+        // the housing: dark corners, orange sides, glass on the sides and front, a checkered roof
+        for (int fx = -2; fx <= 2; fx++) {
+            for (int fz = 0; fz <= 5; fz++) {
+                boolean edgeX = fx == -2 || fx == 2, edgeZ = fz == 0 || fz == 5;
+                for (int y = 1; y <= 8; y++) {
+                    BlockState wall = edgeX && edgeZ ? dark : edgeX || edgeZ ? orange : air;
+                    t.set(from, M, x + fx, y, front + fz, wall);
+                }
+                t.set(from, M, x + fx, 9, front + fz, (fx + fz) % 2 == 0 ? light : dark);
+            }
+        }
+        t.box(from, M, x + 2, 2, front + 1, x + 2, 4, front + 3, glass);
+        t.box(from, M, x - 1, 2, front, x + 1, 3, front, glass);
+        // the fuel inlet and its wire connector
+        t.set(from, M, x, 1, front, ModBlocks.HUB_BURNER.get().defaultBlockState().setValue(Facing.FACING, Direction.SOUTH));
+        t.set(from, M, x, 2, front, connector());
+        // the boiler: a Blaze Burner under a four-high tank, the Steam Engine on the tank's front
+        for (int[] cell : HubBurnerBlockEntity.MACHINE) {
+            t.set(from, M, x + cell[0], cell[1], front + cell[2], parse(HubBurnerBlockEntity.MACHINE_STATES[cell[3]]));
+        }
+    }
+
+    /** A block state written as "namespace:id[property=value,...]", as the building templates write them. */
+    static BlockState parse(String spec) {
+        int open = spec.indexOf('[');
+        String id = open < 0 ? spec : spec.substring(0, open);
+        BlockState state = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse(id)).defaultBlockState();
+        if (open < 0) return state;
+        for (String pair : spec.substring(open + 1, spec.length() - 1).split(",")) {
+            String[] kv = pair.split("=");
+            var property = state.getBlock().getStateDefinition().getProperty(kv[0]);
+            if (property != null) state = with(state, property, kv[1]);
+        }
+        return state;
+    }
+
+    private static <T extends Comparable<T>> BlockState with(BlockState state, net.minecraft.world.level.block.state.properties.Property<T> property, String value) {
+        return property.getValue(value).map(v -> state.setValue(property, v)).orElse(state);
     }
 
     private static void freighter(Template t) {

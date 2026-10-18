@@ -22,8 +22,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 /**
- * One of the HUB's two built-in Biomass Burners (Satisfactory's HUB Biomass Burners): a 30 MW generator, 6,144 SU, on
- * the grid of the wire connector on top of it ({@link HubBurnerBlockEntity}). HUB Upgrade 2 adds the first, HUB
+ * The fuel inlet of one of the HUB's two built-in Biomass Burners (Satisfactory's HUB Biomass Burners): a 30 MW
+ * generator, 6,144 SU, built as the Biomass Burner building is (a Blaze Burner under a boiler, a Steam Engine and a
+ * generator coil behind it), on the grid of the wire connector on top of it ({@link HubBurnerBlockEntity}). HUB Upgrade 2 adds the first, HUB
  * Upgrade 5 the second. Used with fuel it takes the fuel; used empty-handed it says how it is doing; sneaking, it
  * resets its grid's blown fuse.
  */
@@ -36,6 +37,14 @@ public class HubBurnerBlock extends Block implements EntityBlock, PrefabPart {
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new HubBurnerBlockEntity(ModBlockEntities.HUB_BURNER.get(), pos, state);
+    }
+
+    @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.@Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state,
+                                                                                                                 net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        return level.isClientSide() ? null : (l, p, s, be) -> {
+            if (be instanceof HubBurnerBlockEntity burner) burner.serverTick();
+        };
     }
 
     @Override

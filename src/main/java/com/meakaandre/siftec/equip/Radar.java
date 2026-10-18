@@ -61,9 +61,9 @@ public final class Radar {
         // background and their geysers go on the map
         String companyId = company.id;
         com.meakaandre.siftec.geyser.GeyserSearch.search(level, c.getBlockPos(), CELLS * Collectibles.CELL / 16, geysers -> {
-            Company now = CompanyData.get(level.getServer()).byId(companyId);
-            if (now != null && !geysers.isEmpty()) {
-                Companies.tell(level.getServer(), now, Component.translatable("siftec.radar.geysers", geysers.size()).withStyle(ChatFormatting.GOLD));
+            Company owner = CompanyData.get(level.getServer()).byId(companyId);
+            if (owner != null && !geysers.isEmpty()) {
+                Companies.tell(level.getServer(), owner, Component.translatable("siftec.radar.geysers", geysers.size()).withStyle(ChatFormatting.GOLD));
             }
         });
         Set<String> collected = Set.copyOf(company.collected);
