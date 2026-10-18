@@ -166,7 +166,7 @@ public class DronePortBlockEntity extends BlockEntity {
 
     /** The middle of the landing pad over a port's terminal (straight over it, whichever way the port faces). */
     public static net.minecraft.world.phys.Vec3 padOf(BlockPos terminal) {
-        return new net.minecraft.world.phys.Vec3(terminal.getX() + 0.5, terminal.getY() + PAD_DY + 1, terminal.getZ() + 0.5);
+        return new net.minecraft.world.phys.Vec3(terminal.getX() + 0.5, terminal.getY() + PAD_DY, terminal.getZ() + 0.5);
     }
 
     /**
