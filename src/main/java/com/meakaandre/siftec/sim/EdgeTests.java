@@ -335,6 +335,12 @@ public final class EdgeTests {
         return n;
     }
 
+    private static int links(SimData data, String key) {
+        int n = 0;
+        for (SimData.Link l : data.stored.links) if (l.from.equals(key)) n++;
+        return n;
+    }
+
     private static long carried(SimData data, String key) {
         long n = 0;
         for (SimData.Link l : data.stored.links) if (l.from.equals(key) || l.to.equals(key)) n += l.carrying();
@@ -440,9 +446,13 @@ public final class EdgeTests {
             return;
         }
         long start = fill(level, p.a, IRON, 256);
-        Factories.recordNow(level, p.a);
-        Factories.recordNow(level, p.b);
         AABB box = s.box();
+        // read once the belt has started moving (a belt that does not move is no link)
+        later(server, 40, () -> {
+            Factories.recordNow(level, p.a);
+            Factories.recordNow(level, p.b);
+            report("logout: " + links(SimData.get(server), SimData.key(level, p.a.getBlockPos())) + " link(s) from the first container");
+        });
         later(server, 60, () -> {
             CountDownLatch release = new CountDownLatch(1);
             Factories.holdWorker(release, 15_000);
@@ -491,24 +501,35 @@ public final class EdgeTests {
         Factories.recordNow(level, sink);
         Factories.recordNow(level, burner);
         var company = com.meakaandre.siftec.company.CompanyData.get(server).byId(sink.companyId);
+        String owner = sink.companyId;
         later(server, 200, () -> {
-            ItemStack plates = new ItemStack(item("siftec:iron_plate"), 32);
+            ItemStack plates = ItemStack.EMPTY;
+            for (String id : new String[]{"siftec:iron_plate", "siftec:iron_rod", "siftec:screw", "siftec:reinforced_iron_plate", "minecraft:iron_ingot"}) {
+                ItemStack one = new ItemStack(item(id));
+                if (!one.isEmpty() && com.meakaandre.siftec.sink.Sink.accepts(one) && com.meakaandre.siftec.sink.Sink.worthOne(one) > 0) {
+                    plates = one.copyWithCount(32);
+                    break;
+                }
+            }
             long worth = com.meakaandre.siftec.sink.Sink.worth(plates);
             long before = company == null ? 0 : company.pointsEver;
             boolean powered = sink.powered;
-            // in the same tick: the plates arrive and the chunk stops ticking (it stays loaded through F)
+            // the plates arrive just as the chunk stops ticking (it stays loaded through F): the real Sink is kept from
+            // sinking them in its last tick (it sinks nothing without a company), so the simulation starts with them
+            sink.companyId = "";
             sink.input.setItem(0, plates);
             for (int dx = -2; dx <= 3; dx++) for (int dz = 0; dz <= 3; dz++) if (dx != 0 || dz != 0) level.setChunkForced(s.cx + dx, s.cz + dz, false);
             level.setChunkForced(s.cx, s.cz, true);
             later(server, 100, () -> {
                 SimData.Node n = Factories.node(level, sink.getBlockPos());
                 report("sink: powered before " + powered + "; its chunk " + state(level, sink.getBlockPos()) + ", simulated " + (n != null && n.sim)
-                    + ", the simulation sank " + (n == null ? "?" : n.made));
+                    + ", the simulation sank " + (n == null ? "?" : n.made) + "; input " + sink.input.getItem(0));
+                sink.companyId = owner;
                 level.setChunkForced(nx, nz, true);
                 later(server, 60, () -> {
                     long got = company == null ? -1 : company.pointsEver - before;
-                    expect("sink: caught up before its first real tick, the Sink pays for its 32 plates once",
-                        got == worth && sink.input.getItem(0).isEmpty(), got + " points against " + worth + "; input " + sink.input.getItem(0));
+                    expect("sink: caught up before its first real tick, the Sink pays for its 32 items once",
+                        worth > 0 && got == worth && sink.input.getItem(0).isEmpty(), got + " points against " + worth + "; input " + sink.input.getItem(0));
                     none(level, s);
                     closed();
                 });
@@ -550,11 +571,14 @@ public final class EdgeTests {
             return;
         }
         long start = fill(level, p.a, IRON, 128);
-        Factories.recordNow(level, p.a);
-        Factories.recordNow(level, p.b);
-        ring(level, s);
         AABB box = s.box();
-        later(server, 400, () -> {
+        later(server, 40, () -> {
+            Factories.recordNow(level, p.a);
+            Factories.recordNow(level, p.b);
+            report("straddling: " + links(SimData.get(server), SimData.key(level, p.a.getBlockPos())) + " link(s) from the straddling container");
+            ring(level, s);
+        });
+        later(server, 440, () -> {
             Port out = port("storage_container", p.a.anchor == null ? p.a.getBlockPos() : p.a.anchor, Direction.EAST, PortBlock.Kind.ITEM_OUT);
             SimData.Node n = Factories.node(level, p.a.getBlockPos());
             report("straddling: controller " + state(level, p.a.getBlockPos()) + ", output port " + (out == null ? "?" : state(level, out.pos))
@@ -686,11 +710,12 @@ public final class EdgeTests {
             return;
         }
         long start = fill(level, p.a, IRON, 256);
-        Factories.recordNow(level, p.a);
-        Factories.recordNow(level, p.b);
         AABB box = s.box();
         String key = SimData.key(level, p.a.getBlockPos());
-        later(server, 20, () -> {
+        later(server, 40, () -> {
+            Factories.recordNow(level, p.a);
+            Factories.recordNow(level, p.b);
+            report("handover: " + links(SimData.get(server), key) + " link(s) from the first container");
             none(level, s);
             until(server, () -> unloaded(level, s), 600, () -> {
                 // a little simulated time: the belt between them has iron on it
@@ -711,7 +736,7 @@ public final class EdgeTests {
 
     /** A pair along the row after F, A in one column, B in the next one east or west, as the case wants. */
     private static @Nullable Pair rowPair(ServerLevel level, Site s, Direction facing, int aCol, int bCol) {
-        for (int dz = 2; dz < 12; dz++) for (int dx = -16; dx < 32; dx++) {
+        for (int dz = 2; dz < 12; dz++) for (int dx = -32; dx < 64; dx++) {
             BlockPos at = new BlockPos(s.x(0) + dx, Y + 1, s.z(1) + dz);
             List<BlockPos> a = cells("storage_container", at, facing);
             List<BlockPos> all = pairCells(at, facing, 4);
@@ -740,12 +765,14 @@ public final class EdgeTests {
             return;
         }
         long start = fill(level, p.a, IRON, 128);
-        Factories.recordNow(level, p.a);
-        Factories.recordNow(level, p.b);
         AABB box = s.box();
         String key = SimData.key(level, p.a.getBlockPos());
-        ring(level, s);
-        until(server, () -> carried(SimData.get(server), key) > 0, 400, () -> {
+        later(server, 40, () -> {
+            Factories.recordNow(level, p.a);
+            Factories.recordNow(level, p.b);
+            ring(level, s);
+        });
+        until(server, () -> carried(SimData.get(server), key) > 3, 500, () -> {
             long onBelt = carried(SimData.get(server), key);
             SimData.Node b = Factories.node(level, p.b.getBlockPos());
             report("dead link: A " + state(level, p.a.getBlockPos()) + ", B " + state(level, p.b.getBlockPos()) + " simulated " + (b != null && b.sim) + "; " + onBelt + " iron on the simulated belt");
@@ -778,12 +805,14 @@ public final class EdgeTests {
             return;
         }
         long start = fill(level, p.a, IRON, 128);
-        Factories.recordNow(level, p.a);
-        Factories.recordNow(level, p.b);
         AABB box = s.box();
         String key = SimData.key(level, p.a.getBlockPos()), bKey = SimData.key(level, p.b.getBlockPos());
-        ring(level, s);
-        until(server, () -> carried(SimData.get(server), key) > 0, 400, () -> {
+        later(server, 40, () -> {
+            Factories.recordNow(level, p.a);
+            Factories.recordNow(level, p.b);
+            ring(level, s);
+        });
+        until(server, () -> carried(SimData.get(server), key) > 3, 500, () -> {
             // just before the next full check, B looks as a building the simulation never read
             long now = level.getGameTime();
             long wait = Factories.RECORD - 1 - (now % Factories.RECORD);
@@ -948,13 +977,19 @@ public final class EdgeTests {
 
     // ------------------------------------------------------------------------------------------------ chunk loads
 
-    /** Reading a building whose belt runs into a chunk that is not loaded must not load that chunk. */
+    /**
+     * Reading a building whose belt runs through a chunk that is not loaded must not load that chunk. Two chunks six
+     * apart are force-loaded: the chunk three from each is not loaded, those either side of it are; a 20-block belt
+     * starts at a Storage Container two chunks east of the first, crosses the unloaded chunk and ends in the loaded one
+     * beyond (so the belt's controller, at either end, is loaded).
+     */
     private static void tracer(MinecraftServer server, ServerLevel level, Site s) {
-        all(level, s);
-        level.setChunkForced(s.cx + 3, s.cz, true);
-        level.getChunk(s.cx + 3, s.cz);
-        BuildingTests.platform(level, s.x(1), s.z(0), s.x(4) - 1, s.z(1) - 1, Y, 14);
-        // a Storage Container at the east edge of the chunk two from F, its output port facing east, a belt into the next
+        for (int dx = 0; dx <= 6; dx++) {
+            level.setChunkForced(s.cx + dx, s.cz, true);
+            level.getChunk(s.cx + dx, s.cz);
+        }
+        BuildingTests.platform(level, s.x(1), s.z(0), s.x(6) - 1, s.z(1) - 1, Y, 14);
+        int edge = s.x(3);
         ControllerBlockEntity a = null;
         BlockPos beltFrom = null, beltTo = null;
         for (Direction facing : new Direction[]{Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH}) {
@@ -962,39 +997,43 @@ public final class EdgeTests {
                 BlockPos at = new BlockPos(s.x(2) + dx, Y + 1, s.z(0) + 6);
                 Port out = port("storage_container", at, facing, PortBlock.Kind.ITEM_OUT);
                 if (out == null || out.facing != Direction.EAST) break;
-                boolean ok = out.pos.getX() >> 4 == s.cx + 2 && (out.pos.getX() + 1) >> 4 == s.cx + 2 && (out.pos.getX() + 3) >> 4 == s.cx + 3;
+                // the belt: from the block east of the port to 20 blocks on, crossing all of chunk 3 into chunk 4
+                if (out.pos.getX() != edge - 3) continue;
+                boolean ok = true;
                 for (BlockPos c : cells("storage_container", at, facing)) if (c.getX() >> 4 != s.cx + 2 || c.getZ() >> 4 != s.cz) ok = false;
                 if (!ok) continue;
                 a = put(level, "storage_container", at, facing);
                 beltFrom = out.pos.east();
-                beltTo = out.pos.east(10);
+                beltTo = out.pos.east(20);
             }
             if (a != null) break;
         }
         if (a == null || beltFrom == null) {
-            expect("tracer: a Storage Container with a belt into the next chunk goes down", false, "");
+            expect("tracer: a Storage Container with a belt through the next chunk goes down", false, "");
             closed();
             return;
         }
         AlwaysTests.belt(level, beltFrom, beltTo);
         ControllerBlockEntity building = a;
         long far = ChunkPos.pack(s.cx + 3, s.cz);
-        BlockPos from = beltFrom;
-        // F stays: the chunk with the building is two from it (loaded); the belt's far end is three (not loaded)
-        for (int dx = -2; dx <= 3; dx++) for (int dz = 0; dz <= 3; dz++) if (dx != 0 || dz != 0) level.setChunkForced(s.cx + dx, s.cz + dz, false);
-        level.setChunkForced(s.cx, s.cz, true);
-        until(server, () -> !level.hasChunk(s.cx + 3, s.cz), 600, () -> {
-            boolean ready = !level.hasChunk(s.cx + 3, s.cz) && level.isLoaded(building.getBlockPos());
-            watched = far;
-            watchedLoads = 0;
-            boolean beltHere = level.getBlockEntity(from) instanceof BeltBlockEntity b && b.getControllerBE() != null;
-            Factories.recordNow(level, building);
-            int loads = watchedLoads;
-            watched = Long.MIN_VALUE;
-            expect("tracer: reading a building does not load the chunk its belt runs on into", ready && loads == 0,
-                (ready ? "" : "set-up not reached: ") + loads + " loads of the far chunk; the belt's start " + (beltHere ? "is loaded with its controller" : "has no loaded controller"));
-            none(level, s);
-            closed();
+        BlockPos from = beltFrom, to = beltTo;
+        later(server, 40, () -> {
+            // F and the chunk six east stay: the building's chunk and the belt's far end are loaded, the middle is not
+            for (int dx = 1; dx <= 5; dx++) level.setChunkForced(s.cx + dx, s.cz, false);
+            until(server, () -> !level.hasChunk(s.cx + 3, s.cz), 600, () -> {
+                boolean ready = !level.hasChunk(s.cx + 3, s.cz) && level.isLoaded(building.getBlockPos()) && level.isLoaded(to);
+                watched = far;
+                watchedLoads = 0;
+                BlockEntity start = level.getBlockEntity(from);
+                boolean ctrl = start instanceof BeltBlockEntity b && b.getControllerBE() != null;
+                Factories.recordNow(level, building);
+                int loads = watchedLoads;
+                watched = Long.MIN_VALUE;
+                expect("tracer: reading a building does not load a chunk its belt runs through", ready && ctrl && loads == 0,
+                    (ready ? "" : "set-up not reached: ") + loads + " loads of the middle chunk; the belt's controller " + (ctrl ? "loaded" : "NOT loaded"));
+                for (int dx = 0; dx <= 6; dx++) level.setChunkForced(s.cx + dx, s.cz, false);
+                closed();
+            });
         });
     }
 
