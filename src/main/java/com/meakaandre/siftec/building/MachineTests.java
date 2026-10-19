@@ -341,6 +341,18 @@ public final class MachineTests {
         for (int i = 0; i < motors.size() && i < was.size(); i++) motors.get(i).speedBehavior.setValue(was.get(i)[0]);
     }
 
+    /** What a Nuclear Power Plant's acceptors hold and its rods' fuel, its input, output, water and fuse (for the log). */
+    private static String reactorState(ServerLevel level, @Nullable ControllerBlockEntity c) {
+        if (c == null) return "missing";
+        StringBuilder b = new StringBuilder("acceptors");
+        for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:reactor_fuel_acceptor"))) {
+            if (level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.fuelacceptor.ReactorFuelAcceptorBlockEntity a) b.append(' ').append(a.container.getItem(0));
+        }
+        b.append("; rod fuel ").append(Generators.rodFuel(level, c)).append("; input ").append(c.input.getItem(0)).append("; output ").append(c.output.getItem(0))
+            .append("; tripped ").append(c.tripped).append("; problem ").append(c.machineProblem);
+        return b.toString();
+    }
+
     /** Fuel in a Fuel Generator's engine, in droplets. */
     private static long engineFuel(ServerLevel level, @Nullable ControllerBlockEntity c) {
         BlockPos at = cell(c, "createdieselgenerators:diesel_engine");
@@ -837,6 +849,7 @@ public final class MachineTests {
             near(source, "after restart: the Coal Generator gives 75 MW on its machines", offered(level, coal), su(75), 0.04);
             near(source, "after restart: the Fuel Generator gives 250 MW on its engine", offered(level, diesel), su(250), 0.04);
             near(source, "after restart: the Nuclear Power Plant gives 2,500 MW on its reactor", offered(level, nuke), su(2500), 0.04);
+            report(source, "after restart: the Nuclear Power Plant's reactor: " + reactorState(level, nuke));
             expect(source, "after restart: the burners burn again", bio.made > madeBio || coal.made > madeCoal, (bio.made - madeBio) + " biofuel, " + (coal.made - madeCoal) + " coal");
             expect(source, "after restart: the Particle Accelerator and the Converter make again", out[0] > 0 && out[1] > 0, out[0] + " Diamonds, " + out[1] + " Iron Ore");
             report(source, "result: " + passed + " passed, " + failed + " failed");
