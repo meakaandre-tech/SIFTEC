@@ -349,7 +349,15 @@ public final class MachineTests {
             if (level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.fuelacceptor.ReactorFuelAcceptorBlockEntity a) b.append(' ').append(a.container.getItem(0));
         }
         b.append("; rod fuel ").append(Generators.rodFuel(level, c)).append("; input ").append(c.input.getItem(0)).append("; output ").append(c.output.getItem(0))
-            .append("; tripped ").append(c.tripped).append("; problem ").append(c.machineProblem);
+            .append("; tripped ").append(c.tripped).append("; problem ").append(c.machineProblem)
+            .append("; offered ").append(c.offered).append(" lastGenerated ").append(c.lastGenerated).append(" intake ")
+            .append(Generators.intake(c) == null ? "none" : ProductionLogic.mbAt(level, Generators.intake(c), Fluids.WATER));
+        for (var boiler : Generators.boilers(level, c)) {
+            var d = boiler.boiler;
+            b.append("; boiler heat ").append(d.activeHeat).append(" supply ").append(d.waterSupply).append(" engines ").append(d.attachedEngines)
+                .append(" maxForWater ").append(d.maxHeatForWater).append(" maxForSize ").append(d.maxHeatForSize)
+                .append(" perLevel ").append(((BoilerWater) d).siftec$waterPerLevel());
+        }
         return b.toString();
     }
 
