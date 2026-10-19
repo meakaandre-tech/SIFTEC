@@ -212,7 +212,8 @@ public final class Generators {
             ((BoilerWater) b.boiler).siftec$waterPerLevel(perLevel);
         }
         if (!wet) return false;
-        c.waterOwed += full * use;
+        // water comes at least at the floor's rate too, so a boiler with no load yet can start its first level
+        c.waterOwed += full * Math.max(use, MIN_WATER_LOAD);
         long droplets = (long) c.waterOwed;
         if (droplets <= 0) return true;
         Storage<FluidVariant> from = FluidStorage.SIDED.find(level, intake, null);
@@ -233,7 +234,18 @@ public final class Generators {
         c.waterOwed -= moved;
         if (c.waterOwed > full * 20) c.waterOwed = full * 20;
         c.waterUsed += moved;
-        return moved > 0;
+        // boilers with water in them are not dry, even when full enough to take none this tick
+        return moved > 0 || boilersHold(level, boilers);
+    }
+
+    /** True if any of the boilers holds water. */
+    private static boolean boilersHold(ServerLevel level, List<FluidTankBlockEntity> boilers) {
+        for (FluidTankBlockEntity b : boilers) {
+            Storage<FluidVariant> tank = FluidStorage.SIDED.find(level, b.getBlockPos(), null);
+            if (tank == null) continue;
+            for (var view : tank) if (!view.isResourceBlank() && view.getResource().getFluid() == Fluids.WATER && view.getAmount() > 0) return true;
+        }
+        return false;
     }
 
     // ------------------------------------------------------------------------------------------------ Fuel Generator

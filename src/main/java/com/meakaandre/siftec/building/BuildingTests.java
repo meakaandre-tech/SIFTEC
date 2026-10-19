@@ -206,11 +206,18 @@ public final class BuildingTests {
         return null;
     }
 
+    /** What lies loose near a spot, and what a crate there holds (a company's building gives back into a crate). */
     private static List<ItemStack> dropsNear(ServerLevel level, BlockPos at) {
         List<ItemStack> out = new ArrayList<>();
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(at).inflate(4))) {
             out.add(e.getItem().copy());
             e.discard();
+        }
+        for (BlockPos pos : BlockPos.betweenClosed(at.offset(-4, -4, -4), at.offset(4, 4, 4))) {
+            if (!(level.getBlockEntity(pos) instanceof com.meakaandre.siftec.death.DeathCrateBlockEntity crate)) continue;
+            for (com.meakaandre.siftec.death.DeathCrateBlockEntity.Entry e : crate.entries) out.add(e.stack().copy());
+            crate.entries.clear();
+            level.setBlock(pos.immutable(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         }
         return out;
     }
@@ -381,11 +388,11 @@ public final class BuildingTests {
             List<ItemStack> dropsE = dropsNear(level, controllerE);
             expect(source, "breaks with refund from a block of its shell", standing(level, e) == 0 && index.count(level, controllerE) == 0
                     && count(dropsE, "create:iron_sheet") == 2 && count(dropsE, "siftec:iron_rod") == 4,
-                standing(level, e) + " blocks left, dropped " + count(dropsE, "create:iron_sheet") + " sheets and " + count(dropsE, "siftec:iron_rod") + " rods");
+                standing(level, e) + " blocks left, gave back " + count(dropsE, "create:iron_sheet") + " sheets and " + count(dropsE, "siftec:iron_rod") + " rods");
             List<ItemStack> dropsF = dropsNear(level, controllerF);
             expect(source, "losing the controller takes the rest down with refund", standing(level, f) == 0 && index.count(level, controllerF) == 0
                     && count(dropsF, "create:iron_sheet") == 2 && count(dropsF, "siftec:iron_rod") == 4,
-                standing(level, f) + " blocks left, dropped " + count(dropsF, "create:iron_sheet") + " sheets and " + count(dropsF, "siftec:iron_rod") + " rods");
+                standing(level, f) + " blocks left, gave back " + count(dropsF, "create:iron_sheet") + " sheets and " + count(dropsF, "siftec:iron_rod") + " rods");
             // B and C stay up for the restart test
         });
         later(level, BuildingRepair.EVERY + 60, () -> report(source, "result: " + passed + " passed, " + failed + " failed"));
