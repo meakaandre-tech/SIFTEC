@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "review-fixes-6"]
   workflow_dispatch:
 
 permissions:
@@ -290,7 +290,7 @@ jobs:
           name: siftec-26.3
           path: build/libs/*.jar
       - name: Publish the jar as a release
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
