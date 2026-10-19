@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: ["main", "review-fixes-6"]
+    branches: ["main", "review-fixes-6-quick"]
   workflow_dispatch:
 
 permissions:
@@ -278,11 +278,11 @@ jobs:
           ls -l build/libs > /tmp/ci/jars.txt 2>&1 || true
           echo "${GITHUB_SHA}" > /tmp/ci/commit.txt
           cd /tmp/ci
-          git init -q -b ci-logs
+          git init -q -b ci-logs-quick
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git add -A && git commit -q -m "Build log for ${GITHUB_SHA}"
-          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs-quick
       - name: Upload jars
         if: success()
         uses: actions/upload-artifact@v4
