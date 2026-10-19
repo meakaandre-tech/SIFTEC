@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "top": "create:block/gearbox_top",
-    "side": "minecraft:block/emerald_block",
-    "bottom": "minecraft:block/emerald_block"
+    "top": "siftec:block/blueprint_designer_mk2_top",
+    "side": "siftec:block/blueprint_designer_mk2_side",
+    "bottom": "siftec:block/blueprint_designer_mk2_side"
   }
 }

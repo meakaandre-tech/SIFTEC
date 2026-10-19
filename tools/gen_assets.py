@@ -102,7 +102,7 @@ DEPOSIT = {
 # the resource in it); uranium borrows the emerald ore texture until it has its own.
 SIFTEC_ORES = {
     "bauxite_ore": ("Bauxite Ore", "siftec:block/bauxite_node_front"),
-    "uranium_ore": ("Uranium Ore", "minecraft:block/emerald_ore"),
+    "uranium_ore": ("Uranium Ore", "siftec:block/uranium_ore"),
     "sam_ore": ("SAM Ore", "siftec:block/sam_node_front"),
     "sulfur_ore": ("Sulfur Ore", "siftec:block/sulfur_node_front"),
 }
