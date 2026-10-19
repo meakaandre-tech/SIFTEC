@@ -1,9 +1,13 @@
 package com.meakaandre.siftec.sink;
 
+import com.meakaandre.siftec.building.BuildingMenus;
+import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.SpecialBuildings;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.registry.ModItems;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -25,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The AWESOME Sink's screen: the company's points, how far it is to the next FICSIT Coupon, and Print Coupons. Run by
  * the server, like the HUB window.
@@ -33,22 +39,43 @@ public class SinkMenu extends ChestMenu {
     private static final int SIZE = 27, INFO = 11, PRINT = 13, STATUS = 15;
     private final SimpleContainer view;
     private final ServerPlayer player;
-    private final Company company;
+    /** The company whose points it shows (looked up by id on every refresh and click, so a fold is followed). */
+    private final String companyId;
+    /** The Sink's controller, which must stand and stay in reach. */
+    private final BlockPos at;
+    /** The viewer could print when the window opened (a member, or a Sink nobody owns); others only look. */
+    private final boolean operator;
     private final BooleanSupplier powered;
     private int ticks;
 
-    private SinkMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, BooleanSupplier powered) {
+    private SinkMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, String companyId, BlockPos at, boolean operator,
+                     BooleanSupplier powered) {
         super(MenuType.GENERIC_9x3, id, inventory, view, 3);
         this.view = view;
         this.player = player;
-        this.company = company;
+        this.companyId = companyId;
+        this.at = at.immutable();
+        this.operator = operator;
         this.powered = powered;
         refresh();
     }
 
-    public static void open(ServerPlayer player, Company company, BooleanSupplier powered) {
-        player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new SinkMenu(id, inventory, new SimpleContainer(SIZE), player, company, powered),
-            Component.translatable("siftec.sink.title")));
+    /**
+     * Opens the Sink at {@code at} showing {@code company}'s points. Anyone may look; only {@code operator}s (members
+     * of the owning company, {@link com.meakaandre.siftec.building.SpecialBuildings#mayOperate}) may print.
+     */
+    public static void open(ServerPlayer player, Company company, BlockPos at, boolean operator, BooleanSupplier powered) {
+        player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new SinkMenu(id, inventory, new SimpleContainer(SIZE), player, company.id, at,
+            operator, powered), Component.translatable("siftec.sink.title")));
+    }
+
+    private @Nullable Company company() {
+        return BuildingMenus.company(player, companyId);
+    }
+
+    /** True if the viewer may print right now: still allowed to operate the Sink that still stands. */
+    private boolean mayPrint() {
+        return player.level().getBlockEntity(at) instanceof ControllerBlockEntity c && SpecialBuildings.mayOperate(player, c);
     }
 
     static ItemStack button(Item icon, Component name, List<Component> lore) {
@@ -67,6 +94,8 @@ public class SinkMenu extends ChestMenu {
     }
 
     private void refresh() {
+        Company company = company();
+        if (company == null) return;
         long next = Sink.couponCost(company.couponsPrinted + 1);
         view.setItem(INFO, button(Items.PAPER, Component.translatable("siftec.sink.points", company.points), List.of(
             Component.translatable("siftec.sink.status", company.points, company.couponsPrinted + 1, next).withStyle(ChatFormatting.GRAY),
@@ -83,6 +112,11 @@ public class SinkMenu extends ChestMenu {
 
     private void press(int slot) {
         if (slot != PRINT) return;
+        Company company = company();
+        if (company == null || !operator || !mayPrint()) {
+            player.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
+            return;
+        }
         int made = Sink.print(company);
         if (made == 0) {
             player.sendOverlayMessage(Component.translatable("siftec.sink.print_none"));
@@ -116,6 +150,8 @@ public class SinkMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player who) {
-        return true;
+        // a member keeps it open while still a member; anyone else only looks, from within reach
+        return who == player && BuildingMenus.near(player, at, BuildingMenus.logic("sink"))
+            && company() != null && (!operator || mayPrint());
     }
 }

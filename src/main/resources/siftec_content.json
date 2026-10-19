@@ -2963,9 +2963,6 @@
     "create:schematic_and_quill",
     "create:schematic",
     "farmersdelight:wheat_dough",
-    "siftec:drone_port",
-    "siftec:converter",
-    "siftec:particle_accelerator",
     "travelersbackpack:bat",
     "travelersbackpack:bee",
     "travelersbackpack:blaze",
@@ -6808,7 +6805,16 @@
     "siftec:toxic_residue",
     "siftec:uranium_waste",
     "siftec:plutonium_waste",
-    "siftec:ficsit_coupon"
+    "siftec:ficsit_coupon",
+    "siftec:customizer",
+    "siftec:tape_cat",
+    "siftec:tape_blocks",
+    "siftec:tape_chirp",
+    "siftec:tape_far",
+    "siftec:tape_mall",
+    "siftec:tape_stal",
+    "siftec:tape_strad",
+    "siftec:tape_pigstep"
   ],
   "coupons": {
     "first": 3,

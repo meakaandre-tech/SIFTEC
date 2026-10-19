@@ -305,6 +305,14 @@ public final class BuildingPower {
 
     /** True if the waste a fuel rod leaves fits into the plant's output now. */
     static boolean wasteFits(ControllerBlockEntity c, ItemStack rod) {
+        return wasteFits(c, rod, 0);
+    }
+
+    /**
+     * True if the waste a fuel rod leaves fits into the plant's output, after {@code promised} waste still to come from
+     * rods already handed to its fuel acceptors (they leave it as New Age uses them up).
+     */
+    static boolean wasteFits(ControllerBlockEntity c, ItemStack rod, int promised) {
         readFuel();
         String id = BuiltInRegistries.ITEM.getKey(rod.getItem()).toString();
         String waste = WASTE.get(id);
@@ -312,7 +320,17 @@ public final class BuildingPower {
         Item wasteItem = BuiltInRegistries.ITEM.getValue(Identifier.parse(waste));
         int n = WASTE_COUNT.getOrDefault(id, 1);
         ItemStack out = c.output.getItem(0);
-        return out.isEmpty() || out.is(wasteItem) && out.getCount() + n <= out.getMaxStackSize();
+        if (!out.isEmpty() && !out.is(wasteItem)) return false;
+        int max = out.isEmpty() ? wasteItem.getDefaultMaxStackSize() : out.getMaxStackSize();
+        return out.getCount() + promised + n <= max;
+    }
+
+    /** The waste these rods will leave (a stack of rods in a fuel acceptor, not yet used up). */
+    static int pendingWaste(ItemStack rods) {
+        if (rods.isEmpty()) return 0;
+        readFuel();
+        String id = BuiltInRegistries.ITEM.getKey(rods.getItem()).toString();
+        return WASTE.containsKey(id) ? WASTE_COUNT.getOrDefault(id, 1) * rods.getCount() : 0;
     }
 
     /** True if the Geothermal Generator's acid tank has room for a second's acid. */
@@ -357,7 +375,11 @@ public final class BuildingPower {
         /** Its machines have their fuel (and water) but make nothing yet: a boiler heating up, an engine spinning up. */
         @Override
         public boolean starting() {
-            return !c.isRemoved() && !c.tripped && !c.broken && c.offered <= 0 && c.machineProblem.isEmpty();
+            boolean ready = !c.isRemoved() && !c.tripped && !c.broken && c.offered <= 0 && c.machineProblem.isEmpty();
+            // only for a few seconds after it last became ready: a machine stuck "starting" must not hold the fuse for ever
+            long[] w = PowerMember.startWindow(ready, c.startingSince, level.getGameTime());
+            c.startingSince = w[0];
+            return w[1] == 1;
         }
 
         @Override
@@ -786,11 +808,19 @@ public final class BuildingPower {
         BlockPos plant = BuildingIndex.controllerOf(level, acceptor);
         if (plant != null && level.getBlockEntity(plant) instanceof ControllerBlockEntity c) {
             ItemStack slot = c.output.getItem(0);
-            if (slot.isEmpty()) c.output.setItem(0, out.copy());
-            else if (ItemStack.isSameItemSameComponents(slot, out)) slot.grow(out.getCount());
-            else net.minecraft.world.Containers.dropItemStack(level, plant.getX() + 0.5, plant.getY() + 1.1, plant.getZ() + 0.5, out.copy());
-            c.output.setChanged();
             c.wasteMade += out.getCount();
+            if (slot.isEmpty()) {
+                c.output.setItem(0, out.split(Math.min(out.getCount(), out.getMaxStackSize())));
+            } else if (ItemStack.isSameItemSameComponents(slot, out)) {
+                // never past a full stack (the plant takes no rod whose waste would not fit, counting what its acceptors hold)
+                int move = Math.min(out.getCount(), slot.getMaxStackSize() - slot.getCount());
+                if (move > 0) {
+                    slot.grow(move);
+                    out.shrink(move);
+                }
+            }
+            if (!out.isEmpty()) net.minecraft.world.Containers.dropItemStack(level, plant.getX() + 0.5, plant.getY() + 1.1, plant.getZ() + 0.5, out.copy());
+            c.output.setChanged();
             return;
         }
         for (net.minecraft.core.Direction side : net.minecraft.core.Direction.values()) {

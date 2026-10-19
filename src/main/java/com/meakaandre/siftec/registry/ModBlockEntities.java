@@ -4,7 +4,6 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlockEntity;
 import com.meakaandre.siftec.depot.DepotBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
-import com.meakaandre.siftec.machine.ProcessorBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
@@ -50,7 +49,6 @@ public class ModBlockEntities {
     public static final Entry<com.meakaandre.siftec.blueprint.DesignerBlockEntity> DESIGNER = register("blueprint_designer", com.meakaandre.siftec.blueprint.DesignerBlockEntity::new, ModBlocks.BLUEPRINT_DESIGNER.get(), ModBlocks.BLUEPRINT_DESIGNER_MK2.get(), ModBlocks.BLUEPRINT_DESIGNER_MK3.get());
 
 
-    public static final Entry<ProcessorBlockEntity> PROCESSOR = register("processor", ProcessorBlockEntity::new, ModBlocks.CONVERTER.get(), ModBlocks.PARTICLE_ACCELERATOR.get());
     /** Only holds what the Workshop's removed automatic mode had in it, until it is given back. */
 
     public static final Entry<com.meakaandre.siftec.building.ControllerBlockEntity> BUILDING_CONTROLLER = register("building_controller", com.meakaandre.siftec.building.ControllerBlockEntity::new, ModBlocks.BUILDING_CONTROLLER.get());
@@ -78,7 +76,6 @@ public class ModBlockEntities {
         ItemStorage.SIDED.registerForBlockEntity((burner, side) -> ContainerStorage.of(burner.fuel, side), HUB_BURNER.get());
         ItemStorage.SIDED.registerForBlockEntity((box, side) -> ContainerStorage.of(box.items, side), STORAGE_BOX.get());
         ItemStorage.SIDED.registerForBlockEntity((port, side) -> ContainerStorage.of(port.items, side), DRONE_PORT.get());
-        ItemStorage.SIDED.registerForBlockEntity((machine, side) -> ContainerStorage.of(machine.items, side), PROCESSOR.get());
         // a building's ports pass items and fluids to and from the machines inside
         ItemStorage.SIDED.registerForBlockEntity((port, side) -> port.items(side), BUILDING_PORT.get());
         // a building's controller has no storage of its own on any side: only its ports reach it (PortBlockEntity.items)

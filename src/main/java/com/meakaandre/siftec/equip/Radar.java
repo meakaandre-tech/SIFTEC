@@ -58,9 +58,10 @@ public final class Radar {
         if (company == null) return;
         MapServer.radarSweep(level, company, c.getBlockPos(), CELLS * Collectibles.CELL);
         // the geysers in its range, in land nobody has loaded too: the game generates the sulfur cave chunks in the
-        // background and their geysers go on the map
+        // background and their geysers go on the map, within a capped radius (every chunk it generates stays on disk)
         String companyId = company.id;
-        com.meakaandre.siftec.geyser.GeyserSearch.search(level, c.getBlockPos(), CELLS * Collectibles.CELL / 16, geysers -> {
+        int radius = Math.min(com.meakaandre.siftec.geyser.GeyserSearch.MAX_RADIUS, CELLS * Collectibles.CELL / 16);
+        com.meakaandre.siftec.geyser.GeyserSearch.search(level, c.getBlockPos(), radius, geysers -> {
             Company owner = CompanyData.get(level.getServer()).byId(companyId);
             if (owner != null && !geysers.isEmpty()) {
                 Companies.tell(level.getServer(), owner, Component.translatable("siftec.radar.geysers", geysers.size()).withStyle(ChatFormatting.GOLD));

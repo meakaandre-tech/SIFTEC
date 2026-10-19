@@ -50,9 +50,14 @@ public final class CrashSites {
         return v ^ (v >>> 33);
     }
 
+    /**
+     * Blocks from the point the map is measured from. Asked on the node map's worker thread too, so it reads the settled
+     * origin ({@link com.meakaandre.siftec.node.NodeMap#origin}, safe from any thread), never the saved data.
+     */
     private static double fromSpawn(ServerLevel level, BlockPos pos) {
-        NodeSavedData data = NodeSavedData.get(level.getServer());
-        return Math.sqrt(Math.pow(pos.getX() - data.originX(), 2) + Math.pow(pos.getZ() - data.originZ(), 2));
+        int[] origin = com.meakaandre.siftec.node.NodeMap.origin();
+        int ox = origin == null ? 0 : origin[0], oz = origin == null ? 0 : origin[1];
+        return Math.sqrt(Math.pow(pos.getX() - ox, 2) + Math.pow(pos.getZ() - oz, 2));
     }
 
     /** What this pod asks for. Worked out from where it is (x and z), so it never changes. */
@@ -159,7 +164,7 @@ public final class CrashSites {
         if (at == null || data.stored.connectors.contains(key)) return false;
         BlockState state = connector();
         if (state == null) return false;
-        level.setBlock(at, state, Block.UPDATE_ALL);
+        level.setBlock(at, state, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
         data.stored.connectors.add(key);
         data.setDirty();
         return true;
@@ -201,8 +206,8 @@ public final class CrashSites {
             for (int drop = 0; drop < 3 && level.getBlockState(at.below()).canBeReplaced(); drop++) at = at.below();
             if (!level.getBlockState(at).canBeReplaced() || level.getBlockState(at.below()).canBeReplaced()) continue;
             BlockState piece = i % 3 == 0 ? Blocks.COARSE_DIRT.defaultBlockState() : i % 3 == 1 ? casing.defaultBlockState() : Blocks.IRON_BARS.defaultBlockState();
-            if (i % 3 == 0) level.setBlock(at.below(), piece, Block.UPDATE_CLIENTS);
-            else level.setBlock(at, piece, Block.UPDATE_CLIENTS);
+            if (i % 3 == 0) level.setBlock(at.below(), piece, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+            else level.setBlock(at, piece, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
         }
         if (requirement(level, pod).kind() == Requirement.Kind.POWER) placeConnector(level, pod, only);
     }

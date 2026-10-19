@@ -14,12 +14,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.Mixin;
 
-/** Putting a casing on by hand (item application) follows the player's company's unlocks, as the Deployer does. */
+/**
+ * Putting a casing on by hand (item application) follows the player's company's unlocks, as the Deployer does, and never
+ * changes a block of a Build Gun building.
+ */
 @Mixin(value = ManualApplicationHelper.class, remap = false)
 public abstract class ManualApplicationMixin {
     @WrapMethod(method = "manualApplicationRecipesApplyInWorld")
     private static InteractionResult siftec$asPlayer(Level level, Player player, ItemStack held, InteractionHand hand, BlockHitResult hit, BlockPos pos,
                                                      Operation<InteractionResult> original) {
+        // a building's shell changes only with the Build Gun: a casing put on one of its blocks would bring it down
+        if (!level.isClientSide() && com.meakaandre.siftec.building.Buildings.shellChangeRefused(level, player, pos)) return InteractionResult.FAIL;
         ServerPlayer before = Ownership.asking(player instanceof ServerPlayer server ? server : null);
         try {
             return original.call(level, player, held, hand, hit, pos);

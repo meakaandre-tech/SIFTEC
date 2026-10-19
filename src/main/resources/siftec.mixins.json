@@ -28,6 +28,7 @@
     "claim.BuildingDestroyMixin",
     "claim.BuildingDropsMixin",
     "claim.ChuteSealMixin",
+    "claim.ClaimArmMixin",
     "claim.ClaimAssemblyMixin",
     "claim.ClaimBlockItemMixin",
     "claim.ClaimBreakerMixin",
@@ -44,6 +45,7 @@
     "claim.ClaimHopperMixin",
     "claim.ClaimOpenPipeMixin",
     "claim.ClaimPistonMixin",
+    "claim.ClaimPsiMixin",
     "ConnectionAccessor",
     "CrafterMixin",
     "DisplayInvoker",
@@ -90,7 +92,9 @@
     "client.DebugEntriesInvoker",
     "client.ContainerScreenAccessor",
     "client.ScreenInvoker",
-    "client.PlayerEmoteMixin"
+    "client.PlayerEmoteMixin",
+    "client.MixerVisualMixin",
+    "client.VisualBlockEntityAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

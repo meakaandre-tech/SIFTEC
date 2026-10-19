@@ -29,6 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Somersloops also sit in Ancient City portal frames ({@link AncientCities}) and in some crash pods.
  */
 public final class Collectibles {
+    /** How blocks are set while placing: sent to clients, with no neighbour shape updates (they would load the next chunk). */
+    private static final int WORLDGEN = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
+
     public static final int CELL = 96;
     private static final int MARGIN = 8, FAR = 1000;
     private static final float CHANCE = 0.4f;
@@ -238,7 +241,7 @@ public final class Collectibles {
         if (spot.type() == Collectible.SOMERSLOOP) {
             BlockPos at = new BlockPos(spot.x(), deepY(level.getSeed(), spot.x(), spot.z()), spot.z());
             pocket(level, at, only);
-            level.setBlock(at, block, Block.UPDATE_CLIENTS);
+            level.setBlock(at, block, WORLDGEN);
             return true;
         }
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
@@ -254,11 +257,11 @@ public final class Collectibles {
         if (spot.type() == Collectible.MERCER_SPHERE) {
             siftslatePatch(level, ground, only);
             // it floats: one block of air between the patch and the sphere
-            level.setBlock(ground.above(), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-            level.setBlock(ground.above(2), block, Block.UPDATE_CLIENTS);
+            level.setBlock(ground.above(), Blocks.AIR.defaultBlockState(), WORLDGEN);
+            level.setBlock(ground.above(2), block, WORLDGEN);
             return true;
         }
-        level.setBlock(ground.above(), block, Block.UPDATE_CLIENTS);
+        level.setBlock(ground.above(), block, WORLDGEN);
         CrashSites.wreckage(level, ground.above(), only);
         return true;
     }
@@ -287,9 +290,9 @@ public final class Collectibles {
                 for (int i = 0; i < 2 && level.getBlockState(at).canBeReplaced(); i++) at = at.below();
                 BlockState was = level.getBlockState(at);
                 if (was.canBeReplaced() || !was.getFluidState().isEmpty() || was.hasBlockEntity()) continue;
-                level.setBlock(at, slate, Block.UPDATE_CLIENTS);
+                level.setBlock(at, slate, WORLDGEN);
                 if (level.getBlockState(at.above()).canBeReplaced() && level.getBlockState(at.above()).getFluidState().isEmpty()) {
-                    level.setBlock(at.above(), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                    level.setBlock(at.above(), Blocks.AIR.defaultBlockState(), WORLDGEN);
                 }
             }
         }
@@ -304,12 +307,12 @@ public final class Collectibles {
                     if (!inside(only, p)) continue;
                     BlockState was = level.getBlockState(p);
                     if (was.is(Blocks.BEDROCK) || was.hasBlockEntity()) continue;
-                    level.setBlock(p, Blocks.CAVE_AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                    level.setBlock(p, Blocks.CAVE_AIR.defaultBlockState(), WORLDGEN);
                 }
             }
         }
         BlockPos floor = at.below();
-        if (level.getBlockState(floor).canBeReplaced()) level.setBlock(floor, Blocks.DEEPSLATE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        if (level.getBlockState(floor).canBeReplaced()) level.setBlock(floor, Blocks.DEEPSLATE.defaultBlockState(), WORLDGEN);
     }
 
     /**

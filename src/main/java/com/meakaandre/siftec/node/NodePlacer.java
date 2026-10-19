@@ -303,7 +303,8 @@ public final class NodePlacer {
         boolean cave = node.type().where == NodeType.Where.SULFUR_CAVE;
         int maxFill = cave || node.type().where == NodeType.Where.NETHER ? MAX_FILL_UNDERGROUND : MAX_FILL;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        int flags = Block.UPDATE_CLIENTS;
+        // UPDATE_KNOWN_SHAPE: no neighbour shape updates, which would load the next chunk over from a border block
+        int flags = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
         boolean any = false;
         int minY = level.getMinY();
         for (int dx = -REACH; dx <= REACH; dx++) {

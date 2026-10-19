@@ -341,6 +341,26 @@ public final class MachineTests {
         for (int i = 0; i < motors.size() && i < was.size(); i++) motors.get(i).speedBehavior.setValue(was.get(i)[0]);
     }
 
+    /** What a Nuclear Power Plant's acceptors hold and its rods' fuel, its input, output, water and fuse (for the log). */
+    private static String reactorState(ServerLevel level, @Nullable ControllerBlockEntity c) {
+        if (c == null) return "missing";
+        StringBuilder b = new StringBuilder("acceptors");
+        for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:reactor_fuel_acceptor"))) {
+            if (level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.fuelacceptor.ReactorFuelAcceptorBlockEntity a) b.append(' ').append(a.container.getItem(0));
+        }
+        b.append("; rod fuel ").append(Generators.rodFuel(level, c)).append("; input ").append(c.input.getItem(0)).append("; output ").append(c.output.getItem(0))
+            .append("; tripped ").append(c.tripped).append("; problem ").append(c.machineProblem)
+            .append("; offered ").append(c.offered).append(" lastGenerated ").append(c.lastGenerated).append(" intake ")
+            .append(Generators.intake(c) == null ? "none" : ProductionLogic.mbAt(level, Generators.intake(c), Fluids.WATER));
+        for (var boiler : Generators.boilers(level, c)) {
+            var d = boiler.boiler;
+            b.append("; boiler heat ").append(d.activeHeat).append(" supply ").append(d.waterSupply).append(" engines ").append(d.attachedEngines)
+                .append(" maxForWater ").append(d.maxHeatForWater).append(" maxForSize ").append(d.maxHeatForSize)
+                .append(" perLevel ").append(((BoilerWater) d).siftec$waterPerLevel());
+        }
+        return b.toString();
+    }
+
     /** Fuel in a Fuel Generator's engine, in droplets. */
     private static long engineFuel(ServerLevel level, @Nullable ControllerBlockEntity c) {
         BlockPos at = cell(c, "createdieselgenerators:diesel_engine");
@@ -808,6 +828,13 @@ public final class MachineTests {
         // factories) may have burnt what it had and filled its waste output; it is given its rods again and emptied
         nuke.input.setItem(0, new ItemStack(item("siftec:uranium_fuel_rod"), 12));
         empty(nuke, item("siftec:uranium_waste"));
+        // and its waste taken away as it comes, as a belt from its output port would: a full stack's worth of waste (one
+        // rod's 50) stops it taking the rods its other acceptors need
+        long until = level.getGameTime() + 600;
+        EVERY_TICK.add(() -> {
+            empty(nuke, item("siftec:uranium_waste"));
+            return level.getGameTime() >= until;
+        });
         Port coalWater = port(level, coal, PortBlock.Kind.FLUID_IN, 0), nukeWater = port(level, nuke, PortBlock.Kind.FLUID_IN, 0),
             dieselIn = port(level, diesel, PortBlock.Kind.FLUID_IN, 0), paIn = port(level, pa, PortBlock.Kind.ITEM_IN, 0),
             convA = port(level, conv, PortBlock.Kind.ITEM_IN, 0), convB = port(level, conv, PortBlock.Kind.ITEM_IN, 1);
@@ -837,6 +864,7 @@ public final class MachineTests {
             near(source, "after restart: the Coal Generator gives 75 MW on its machines", offered(level, coal), su(75), 0.04);
             near(source, "after restart: the Fuel Generator gives 250 MW on its engine", offered(level, diesel), su(250), 0.04);
             near(source, "after restart: the Nuclear Power Plant gives 2,500 MW on its reactor", offered(level, nuke), su(2500), 0.04);
+            report(source, "after restart: the Nuclear Power Plant's reactor: " + reactorState(level, nuke));
             expect(source, "after restart: the burners burn again", bio.made > madeBio || coal.made > madeCoal, (bio.made - madeBio) + " biofuel, " + (coal.made - madeCoal) + " coal");
             expect(source, "after restart: the Particle Accelerator and the Converter make again", out[0] > 0 && out[1] > 0, out[0] + " Diamonds, " + out[1] + " Iron Ore");
             report(source, "result: " + passed + " passed, " + failed + " failed");

@@ -414,8 +414,8 @@ public final class Buildings {
         BlockPos controllerPos = controller.getBlockPos().immutable();
         com.meakaandre.siftec.sim.Factories.removed(level, controllerPos);
         if (p != null) out.addAll(takeDown(level, p, controllerPos));
-        // the Converter's cell is part of its machine, not something it holds
-        out.removeIf(s -> s.is(Processors.cellItem()));
+        // the Converter's cell is part of its machine, not something it holds: plain, loaded or charged, it stays
+        out.removeIf(Processors::cellBearing);
         if (level.getBlockState(controllerPos).getBlock() instanceof ControllerBlock) level.setBlock(controllerPos, Blocks.AIR.defaultBlockState(), SET);
         Siftec.LOGGER.info("SIFTEC: building {} at {} dismantled; {} stacks given back", controller.buildingId, controllerPos.toShortString(), out.size());
         com.meakaandre.siftec.power.PowerGrids.dirty();
@@ -428,6 +428,11 @@ public final class Buildings {
      * left alone.
      */
     private static List<ItemStack> takeDown(ServerLevel level, Placement p, BlockPos controllerPos) {
+        return takeDown(level, p, controllerPos, Set.of());
+    }
+
+    /** As {@link #takeDown(ServerLevel, Placement, BlockPos)}, leaving alone the positions in {@code keep} (a new building's). */
+    private static List<ItemStack> takeDown(ServerLevel level, Placement p, BlockPos controllerPos, Set<Long> keep) {
         List<ItemStack> out = new ArrayList<>();
         BuildingTemplate t = BuildingTemplate.of(p.def());
         if (t == null) return out;
@@ -437,6 +442,7 @@ public final class Buildings {
         boolean storage = p.def().logic().equals("storage");
         for (BuildingTemplate.Cell cell : t.members) {
             BlockPos pos = p.at(cell);
+            if (keep.contains(pos.asLong())) continue;
             index.remove(level, pos, controllerPos);
             if (pos.equals(controllerPos)) continue;
             BlockState now = level.getBlockState(pos);
@@ -447,7 +453,18 @@ public final class Buildings {
         // machines that drop what they hold as they go (a basin's input, say) are caught too: it all comes back
         AABB box = p.bounds(t).inflate(1);
         Set<java.util.UUID> before = new HashSet<>();
-        for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, box)) before.add(e.getUUID());
+        for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, box)) {
+            // the Particle Accelerator's Cores in flight never despawn and cannot be picked up: they come back with the
+            // building (a Converter cell lying loose is part of its machine and goes with it)
+            if (Processors.isCore(e.getItem())) {
+                out.add(e.getItem().copy());
+                e.discard();
+            } else if (Processors.cellBearing(e.getItem())) {
+                e.discard();
+            } else {
+                before.add(e.getUUID());
+            }
+        }
         for (BlockPos pos : remove) level.setBlock(pos, Blocks.AIR.defaultBlockState(), SET);
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, box)) {
             if (before.contains(e.getUUID()) || e.getItem().isEmpty()) continue;
@@ -590,26 +607,53 @@ public final class Buildings {
 
     /**
      * A block of the building went without the Build Gun: the whole building comes down, and the refund and its
-     * contents drop where the controller stands.
+     * contents go into a crate for its company where the controller stood ({@link #giveBack}).
      */
     public static void collapse(ServerLevel level, ControllerBlockEntity controller, BlockPos missing) {
         BlockPos at = controller.getBlockPos().immutable();
-        Siftec.LOGGER.info("SIFTEC: building {} at {} broke (its block at {} is gone); it comes down and drops its refund",
+        String company = controller.companyId;
+        Siftec.LOGGER.info("SIFTEC: building {} at {} broke (its block at {} is gone); it comes down and gives back its refund",
             controller.buildingId, at.toShortString(), missing.toShortString());
-        drop(level, at, dismantle(level, controller));
+        giveBack(level, at, company, dismantle(level, controller));
     }
 
-    private record Gone(ServerLevel level, Placement placement, BlockPos controller, List<ItemStack> refund) {
+    private record Gone(ServerLevel level, Placement placement, BlockPos controller, String company, List<ItemStack> kept) {
     }
 
     private static final Deque<Gone> GONE = new ArrayDeque<>();
 
-    /** The controller itself was removed without the Build Gun: the rest comes down on the next tick. */
+    /**
+     * The controller itself was removed without the Build Gun: the rest comes down on the next tick. What the
+     * controller held (its refund, input, output and buffer) is kept with it, and the factory simulation forgets it.
+     */
     static void controllerGone(ServerLevel level, ControllerBlockEntity controller) {
         controller.removing = true;
+        BlockPos at = controller.getBlockPos().immutable();
+        com.meakaandre.siftec.sim.Factories.removed(level, at);
         Placement p = controller.placement();
-        if (p == null) return;
-        GONE.add(new Gone(level, p, controller.getBlockPos().immutable(), copy(controller.refund)));
+        List<ItemStack> kept = new ArrayList<>(copy(controller.refund));
+        controller.refund.clear();
+        kept.addAll(controller.takeContents());
+        // the Converter's cell (its carrier) belongs to the machine and goes with it
+        controller.carrier = ItemStack.EMPTY;
+        if (p == null) {
+            giveBack(level, at, controller.companyId, kept);
+            return;
+        }
+        GONE.add(new Gone(level, p, at, controller.companyId, kept));
+    }
+
+    /**
+     * What a building that came down by itself gives back: into a crate only its company's members open, so nobody
+     * else picks it up (death.DeathCrates#stash); dropped where it stood when nobody owns it or no crate fits. A
+     * Converter's cells, of any kind, are part of its machine and never given back.
+     */
+    static void giveBack(ServerLevel level, BlockPos at, String companyId, List<ItemStack> items) {
+        List<ItemStack> out = new ArrayList<>(items);
+        out.removeIf(s -> s.isEmpty() || Processors.cellBearing(s));
+        if (out.isEmpty()) return;
+        if (com.meakaandre.siftec.death.DeathCrates.stash(level, at, companyId, out)) return;
+        drop(level, at, out);
     }
 
     private static void drop(ServerLevel level, BlockPos at, List<ItemStack> items) {
@@ -624,14 +668,23 @@ public final class Buildings {
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             BuildingIndex.serverStopped();
             GONE.clear();
+            CHANGED.clear();
         });
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             while (!GONE.isEmpty()) {
                 Gone g = GONE.poll();
-                Siftec.LOGGER.info("SIFTEC: building {} lost its controller at {}; it comes down and drops its refund", g.placement.def().id(), g.controller.toShortString());
-                List<ItemStack> items = new ArrayList<>(g.refund);
-                items.addAll(takeDown(g.level, g.placement, g.controller));
-                drop(g.level, g.controller, items);
+                Siftec.LOGGER.info("SIFTEC: building {} lost its controller at {}; it comes down and gives back its refund and contents", g.placement.def().id(), g.controller.toShortString());
+                List<ItemStack> items = new ArrayList<>(g.kept);
+                // a new building put down where this one's controller stood (in the same tick: a command, a selftest
+                // laying out its row again) has the same blocks in the same places: they are the new one's, left alone
+                Set<Long> keep = new HashSet<>();
+                if (g.level.getBlockEntity(g.controller) instanceof ControllerBlockEntity now && !now.removing && now.placement() != null) {
+                    BuildingTemplate nt = BuildingTemplate.of(now.placement().def());
+                    if (nt != null) for (BuildingTemplate.Cell cell : nt.members) keep.add(now.placement().at(cell).asLong());
+                    Siftec.LOGGER.info("SIFTEC: building {} at {} was replaced before it came down; the new one's blocks stay", g.placement.def().id(), g.controller.toShortString());
+                }
+                items.addAll(takeDown(g.level, g.placement, g.controller, keep));
+                giveBack(g.level, g.controller, g.company, items);
             }
         });
         // no block of a building can be mined, not even in creative: the Build Gun takes the building down
@@ -643,6 +696,13 @@ public final class Buildings {
                 server.sendOverlayMessage(Component.translatable(hub ? "siftec.prefab.part" : "siftec.build_gun.part", nameAt(level, controller)));
             }
             return false;
+        });
+        // nor scraped, stripped or waxed: that would change the block and bring the building down
+        UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+            if (level.isClientSide() || !changesBlock(player.getItemInHand(hand))) return InteractionResult.PASS;
+            if (!shellChangeRefused(level, player, hit.getBlockPos())) return InteractionResult.PASS;
+            com.meakaandre.siftec.claim.Claims.resync(player, level, hit.getBlockPos(), hit.getDirection());
+            return InteractionResult.FAIL;
         });
         // nor wrenched off or turned; a wrench on a Power Pole or Tower rides its wires instead (the Zipline research)
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
@@ -680,6 +740,64 @@ public final class Buildings {
         // the HUB's Craft Station is listed under the HUB's terminal
         if (level.getBlockState(controller).getBlock() instanceof com.meakaandre.siftec.hub.HubBlock) return Component.translatable("block.siftec.hub");
         return Component.translatable("siftec.build_gun.building");
+    }
+
+    /**
+     * True (and the player told why) if a block of a Build Gun building may not be changed by hand: an axe scraping or
+     * stripping it, wax going on or off, a casing applied to it. Changing one would bring the building down; its shell
+     * changes only with the Build Gun and the Customizer. The controller and the ports are left to their own use.
+     */
+    public static boolean shellChangeRefused(Level level, net.minecraft.world.entity.player.@Nullable Player player, BlockPos pos) {
+        BlockPos controller = BuildingIndex.controllerOf(level, pos);
+        if (controller == null || pos.equals(controller) || level.getBlockState(pos).getBlock() instanceof PortBlock) return false;
+        if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.build_gun.part", nameAt(level, controller)));
+        return true;
+    }
+
+    /** Items whose use on a block changes that block (an axe strips or scrapes, honeycomb waxes, a shovel or hoe turns soil). */
+    static boolean changesBlock(ItemStack stack) {
+        return stack.is(net.minecraft.tags.ItemTags.AXES) || stack.is(net.minecraft.tags.ItemTags.SHOVELS) || stack.is(net.minecraft.tags.ItemTags.HOES)
+            || stack.is(net.minecraft.world.item.Items.HONEYCOMB);
+    }
+
+    /** Controllers one of whose blocks changed since they last looked (for the foundations, which do not look every second). */
+    private static final Map<String, it.unimi.dsi.fastutil.longs.LongOpenHashSet> CHANGED = new java.util.HashMap<>();
+
+    /** A block changed in the world (LevelChunkMixin): if it is a building's, its controller looks over its blocks again. */
+    public static void blockChanged(ServerLevel level, BlockPos pos) {
+        BlockPos controller = BuildingIndex.controllerOf(level, pos);
+        if (controller == null) return;
+        CHANGED.computeIfAbsent(level.dimension().identifier().toString(), k -> new it.unimi.dsi.fastutil.longs.LongOpenHashSet()).add(controller.asLong());
+    }
+
+    /** True (once) if one of the controller's blocks changed since it last asked. */
+    static boolean takeChanged(ServerLevel level, BlockPos controller) {
+        it.unimi.dsi.fastutil.longs.LongOpenHashSet set = CHANGED.get(level.dimension().identifier().toString());
+        return set != null && set.remove(controller.asLong());
+    }
+
+    /** How far {@link #within} looks out from a spot for the building round it. */
+    private static final int WITHIN_REACH = 32;
+
+    /**
+     * True if the spot is a block of a Build Gun building or lies inside one's space: its room, a doorway, the air its
+     * template keeps free (those are no blocks of it, so {@link #protectedAt} does not see them). Looks out along the six
+     * directions for the first block of a building and checks that building's box.
+     */
+    public static boolean within(Level level, BlockPos pos) {
+        if (BuildingIndex.isMember(level, pos)) return true;
+        BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
+        for (Direction d : Direction.values()) {
+            for (int i = 1; i <= WITHIN_REACH; i++) {
+                at.setWithOffset(pos, d.getStepX() * i, d.getStepY() * i, d.getStepZ() * i);
+                BlockPos controller = BuildingIndex.controllerOf(level, at);
+                if (controller == null) continue;
+                if (level.isLoaded(controller) && level.getBlockEntity(controller) instanceof ControllerBlockEntity c
+                    && BuildGun.bounds(c).contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)) return true;
+                break;
+            }
+        }
+        return false;
     }
 
     /** For the protections in mixins: true if the block belongs to a building (always false on the client). */

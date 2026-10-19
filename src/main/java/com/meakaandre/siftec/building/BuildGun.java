@@ -109,7 +109,8 @@ public final class BuildGun {
         if (t == null) return p;
         BlockPos a = p.at(t.minX, 0, 0), b = p.at(t.maxX, 0, t.depth - 1);
         int x = Math.min(a.getX(), b.getX()), z = Math.min(a.getZ(), b.getZ());
-        int dx = Math.round(x / 8f) * 8 - x, dz = Math.round(z / 8f) * 8 - z;
+        // the nearest multiple of 8 in whole numbers (float division loses blocks far from the world's middle)
+        int dx = Math.floorDiv(x + 4, 8) * 8 - x, dz = Math.floorDiv(z + 4, 8) * 8 - z;
         return new Placement(p.def(), p.anchor().offset(dx, 0, dz), p.facing(), p.flip());
     }
 
@@ -255,7 +256,7 @@ public final class BuildGun {
     }
 
     /** The space a placed building takes up, or just its controller's block if its placement is lost. */
-    static AABB bounds(ControllerBlockEntity controller) {
+    public static AABB bounds(ControllerBlockEntity controller) {
         Placement p = controller.placement();
         BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
         return p != null && t != null ? p.bounds(t) : new AABB(controller.getBlockPos());

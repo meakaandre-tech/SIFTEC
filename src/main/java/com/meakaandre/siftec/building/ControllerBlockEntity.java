@@ -115,6 +115,8 @@ public class ControllerBlockEntity extends BlockEntity {
     /** A generator: its load over the last ticks (its boilers' water follows the least of them), water owed and given (droplets). */
     final float[] loadWindow = new float[Generators.WATER_WINDOW];
     public double waterOwed;
+    /** A generator: the game time it last became ready to give power while giving none (PowerMember#startWindow). */
+    public long startingSince = Long.MIN_VALUE;
     public long waterUsed;
     /** What its machines say is wrong ("" if nothing), as a lang key: a generator's fuel, water, geyser. */
     public String machineProblem = "";
@@ -139,6 +141,8 @@ public class ControllerBlockEntity extends BlockEntity {
     boolean removing;
     private int ticks;
     private boolean indexed;
+    /** A foundation has looked over its blocks since it loaded (after that, only when one changes). */
+    private boolean membersChecked;
     private long repairTried;
     private @Nullable Storage<ItemVariant> storage;
 
@@ -213,14 +217,20 @@ public class ControllerBlockEntity extends BlockEntity {
             indexed = BuildingRepair.check(server, this) != BuildingRepair.Result.WAITING;
             if (removing) return;
         }
-        if (!broken) BuildingLogic.tick(server, this);
+        // a Foundations-tab piece (a foundation, wall or roof) runs nothing and makes nothing: it only has to stay whole
+        BuildingDef def = def();
+        boolean foundation = def != null && def.logic().equals("foundation");
+        if (!broken && !foundation) BuildingLogic.tick(server, this);
         // the factory simulation reads it now and then, to run it while its chunk does not tick (work package 17)
-        if (!broken && indexed) com.meakaandre.siftec.sim.Factories.building(server, this);
+        if (!broken && indexed && !foundation) com.meakaandre.siftec.sim.Factories.building(server, this);
         if (++ticks % 20 != 0) return;
         // its machines are looked over every few seconds and anything missing is put back; a missing piece of shell
         // brings the building down
-        if (indexed && ticks % BuildingRepair.EVERY == 0) BuildingRepair.check(server, this);
+        if (indexed && !foundation && ticks % BuildingRepair.EVERY == 0) BuildingRepair.check(server, this);
         if (!indexed || broken || removing) return;
+        // a foundation's blocks are looked over only when one of them changed (and once after it loads), not every second
+        if (foundation && membersChecked && !Buildings.takeChanged(server, getBlockPos())) return;
+        membersChecked = true;
         BlockPos missing = Buildings.missingMember(server, this);
         if (missing != null) Buildings.collapse(server, this, missing);
     }

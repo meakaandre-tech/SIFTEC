@@ -1,26 +1,6 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "minecraft:block/white_concrete",
-    "face": "minecraft:block/white_concrete"
-  },
-  "elements": [
-    {
-      "from": [
-        0,
-        0,
-        0
-      ],
-      "to": [
-        16,
-        16,
-        0.5
-      ],
-      "faces": {
-        "south": {
-          "texture": "#face"
-        }
-      }
-    }
-  ]
+    "particle": "create:block/industrial_iron_block"
+  }
 }

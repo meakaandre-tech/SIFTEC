@@ -90,6 +90,22 @@ public class PortBlockEntity extends SmartBlockEntity {
         Storage<ItemVariant> inner = level.getBlockEntity(target) instanceof ControllerBlockEntity controller ? controller.storage()
             : ItemStorage.SIDED.find(level, target, out());
         if (inner == null) return null;
+        // the Particle Accelerator's and the Converter's input port lets in only what the current recipe takes, so junk
+        // never jams the Basin
+        if (kind() == PortBlock.Kind.ITEM_IN && controller != null && level.getBlockEntity(controller) instanceof ControllerBlockEntity c
+            && c.def() != null && c.def().logic().equals("processor") && level.getBlockEntity(target) instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity) {
+            return new FilteringStorage<>(inner) {
+                @Override
+                protected boolean canInsert(ItemVariant resource) {
+                    return ProductionLogic.processorTakes(c, resource.toStack());
+                }
+
+                @Override
+                protected boolean canExtract(ItemVariant resource) {
+                    return false;
+                }
+            };
+        }
         return kind() == PortBlock.Kind.ITEM_IN ? FilteringStorage.insertOnlyOf(inner) : FilteringStorage.extractOnlyOf(inner);
     }
 

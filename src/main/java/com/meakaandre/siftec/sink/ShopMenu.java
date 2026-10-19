@@ -1,7 +1,9 @@
 package com.meakaandre.siftec.sink;
 
 import com.meakaandre.siftec.building.Paint;
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Companies;
+import net.minecraft.core.BlockPos;
 import com.meakaandre.siftec.cosmetic.Banners;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Milestone;
@@ -38,20 +40,23 @@ public class ShopMenu extends ChestMenu {
     private static final int SIZE = 54, PER_PAGE = 45, PREVIOUS = 45, INFO = 49, NEXT = 53;
     private final SimpleContainer view;
     private final ServerPlayer player;
-    private final Company company;
+    /** The company it sells to, looked up by id on every click; and the Shop's controller, which must stay in reach. */
+    private final String companyId;
+    private final BlockPos at;
     private int page;
 
-    private ShopMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company) {
+    private ShopMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, String companyId, BlockPos at) {
         super(MenuType.GENERIC_9x6, id, inventory, view, 6);
         this.view = view;
         this.player = player;
-        this.company = company;
+        this.companyId = companyId;
+        this.at = at.immutable();
         refresh();
     }
 
-    public static void open(ServerPlayer player, Company company) {
+    public static void open(ServerPlayer player, Company company, BlockPos at) {
         player.openMenu(new SimpleMenuProvider(
-            (id, inventory, p) -> new ShopMenu(id, inventory, new SimpleContainer(SIZE), player, company),
+            (id, inventory, p) -> new ShopMenu(id, inventory, new SimpleContainer(SIZE), player, company.id, at),
             Component.translatable("siftec.shop.title", coupons(player))));
     }
 
@@ -131,8 +136,14 @@ public class ShopMenu extends ChestMenu {
         return Math.max(1, (shown().size() + PER_PAGE - 1) / PER_PAGE);
     }
 
+    private @org.jspecify.annotations.Nullable Company company() {
+        return BuildingMenus.company(player, companyId);
+    }
+
     private void refresh() {
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
+        Company company = company();
+        if (company == null) return;
         List<Shop.Entry> entries = shown();
         int have = coupons(player);
         for (int i = 0; i < PER_PAGE && page * PER_PAGE + i < entries.size(); i++) {
@@ -192,10 +203,12 @@ public class ShopMenu extends ChestMenu {
         List<Shop.Entry> entries = shown();
         if (slot >= PER_PAGE || index >= entries.size()) return;
         Shop.Entry e = entries.get(index);
+        Company company = company();
+        if (company == null || !stillValid(player)) return;
         if (e.owned(company)) {
-            take(e);
+            take(company, e);
         } else {
-            buy(e);
+            buy(company, e);
         }
         Companies.save(player.level().getServer());
         refresh();
@@ -211,7 +224,7 @@ public class ShopMenu extends ChestMenu {
         return out;
     }
 
-    private void buy(Shop.Entry e) {
+    private void buy(Company company, Shop.Entry e) {
         if (!e.inSeason() && !player.hasInfiniteMaterials()) {
             player.sendOverlayMessage(Component.translatable("siftec.shop.out_of_season", months(e.months())));
             return;
@@ -230,7 +243,7 @@ public class ShopMenu extends ChestMenu {
     }
 
     /** One of something the company owns: the Customizer free, a decoration or cup for its parts. */
-    private void take(Shop.Entry e) {
+    private void take(Company company, Shop.Entry e) {
         ItemStack made;
         switch (e.kind()) {
             case "customizer" -> made = new ItemStack(ModItems.CUSTOMIZER.get());
@@ -238,13 +251,24 @@ public class ShopMenu extends ChestMenu {
             case "banner" -> {
                 ItemStack held = player.getMainHandItem();
                 if (held.getItem() instanceof net.minecraft.world.item.BannerItem) {
-                    company.banner = Banners.write(player.level().getServer(), held);
+                    String encoded = Banners.write(player.level().getServer(), held);
+                    if (encoded.isEmpty()) {
+                        // an encode that failed keeps the banner the company had
+                        player.sendOverlayMessage(Component.translatable("siftec.shop.banner_failed"));
+                        return;
+                    }
+                    company.banner = encoded;
                     Companies.tell(player.level().getServer(), company, Component.translatable("siftec.shop.banner_new").withStyle(ChatFormatting.GOLD));
                     return;
                 }
                 ItemStack copy = Banners.read(player.level().getServer(), company);
                 if (copy.isEmpty()) {
                     player.sendOverlayMessage(Component.translatable("siftec.shop.banner_none"));
+                    return;
+                }
+                // a copy is printed onto a blank banner of its colour from the inventory, never made from nothing
+                if (!player.hasInfiniteMaterials() && !takeBlank(copy.getItem())) {
+                    player.sendOverlayMessage(Component.translatable("siftec.shop.banner_blank", copy.getItem().getName(new ItemStack(copy.getItem()))));
                     return;
                 }
                 made = copy;
@@ -277,6 +301,21 @@ public class ShopMenu extends ChestMenu {
         player.getInventory().placeItemBackInInventory(made, Prediction.SERVER_ONLY);
     }
 
+    /** Takes one plain banner of this colour (no patterns) from the inventory; false if there is none. */
+    private boolean takeBlank(Item banner) {
+        Inventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (!stack.is(banner)) continue;
+            net.minecraft.world.level.block.entity.BannerPatternLayers layers = stack.get(DataComponents.BANNER_PATTERNS);
+            if (layers != null && !layers.layers().isEmpty()) continue;
+            stack.shrink(1);
+            inventory.setChanged();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void clicked(int slot, int button, ContainerInput input, Player who) {
         if (slot >= 0 && slot < SIZE) {
@@ -293,6 +332,6 @@ public class ShopMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player who) {
-        return true;
+        return who == player && BuildingMenus.near(player, at, BuildingMenus.logic("shop")) && BuildingMenus.member(player, companyId);
     }
 }

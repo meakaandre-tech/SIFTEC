@@ -600,9 +600,9 @@ public final class EdgeTests {
             BlockPos terminal = new BlockPos(s.x(0) + 8, Y + 1, s.z(2) + dz);
             BuildingDef def = Buildings.def("drone_port");
             BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
-            int[] cell = t == null ? null : com.meakaandre.siftec.building.LegacyConversion.terminalCell(t);
+            int[] cell = t == null ? null : com.meakaandre.siftec.building.SpecialBuildings.terminalCell(t);
             if (cell == null) return null;
-            Placement p = com.meakaandre.siftec.building.LegacyConversion.forTerminal(def, cell, terminal, Direction.NORTH);
+            Placement p = com.meakaandre.siftec.building.SpecialBuildings.forTerminal(def, cell, terminal, Direction.NORTH);
             boolean ok = true;
             for (BuildingTemplate.Cell c : t.members) {
                 BlockPos at = p.at(c);

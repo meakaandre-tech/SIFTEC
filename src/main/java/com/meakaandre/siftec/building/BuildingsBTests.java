@@ -472,6 +472,7 @@ public final class BuildingsBTests {
             }
         Placement we = at("water_extractor", x, Z);
         put(level, source, company, we);
+        BuildingTests.rim(level, x - 5, Z - 9, x + 5, Z + 2, Y);
         ControllerBlockEntity wc = controller(level, we);
         long[] wout = pipeOut(level, we, new int[]{0, 1, 0}, fluid("minecraft:water"));
         power(level, source, we, 1, powered);
@@ -692,9 +693,13 @@ public final class BuildingsBTests {
                 BuildingDef def = Buildings.def(id);
                 if (at == null || def == null) continue;
                 Placement p = new Placement(def, new BlockPos(at, VY, VZ), Direction.NORTH, false);
+                List<BlockPos> pool = new ArrayList<>();
                 if (def.intake() != null) {
                     for (int dx = -4; dx <= 4; dx++)
-                        for (int dz = -1; dz <= 7; dz++) level.setBlock(p.at(dx, 0, dz), Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL);
+                        for (int dz = -1; dz <= 7; dz++) {
+                            level.setBlock(p.at(dx, 0, dz), Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL);
+                            pool.add(p.at(dx, 0, dz));
+                        }
                 }
                 if (def.node()) {
                     int[] c = def.nodeCell();
@@ -702,6 +707,17 @@ public final class BuildingsBTests {
                 }
                 Buildings.Check check = Buildings.place(level, p, null, null, true);
                 report(source, "view: " + id + " " + (check.ok() ? "built" : check.message().getString()) + " at " + p.anchor().toShortString());
+                // the Water Extractor's pool keeps its water (it ran out over the platform)
+                if (!pool.isEmpty()) {
+                    int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, minZ = Integer.MAX_VALUE, maxZ = Integer.MIN_VALUE;
+                    for (BlockPos b : pool) {
+                        minX = Math.min(minX, b.getX());
+                        maxX = Math.max(maxX, b.getX());
+                        minZ = Math.min(minZ, b.getZ());
+                        maxZ = Math.max(maxZ, b.getZ());
+                    }
+                    BuildingTests.rim(level, minX, minZ, maxX, maxZ, pool.getFirst().getY());
+                }
             }
         }
         int mid = (VX + x) / 2;

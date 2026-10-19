@@ -64,7 +64,7 @@ public class MamBlock extends Block implements EntityBlock {
             mam.companyId = company.id;
             mam.setChanged();
         }
-        MamMenu.open(player, company);
+        MamMenu.open(player, company, pos);
         return null;
     }
 

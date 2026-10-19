@@ -137,6 +137,23 @@ public final class BuildingTests {
             }
     }
 
+    /**
+     * A one-block stone rim round a pool (x0..x1, z0..z1 at height y) wherever it is open, so its water stays in instead of
+     * running over the test platform. Laid after the buildings, so it never stands in their way.
+     */
+    public static void rim(ServerLevel level, int x0, int z0, int x1, int z1, int y) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int x = x0 - 1; x <= x1 + 1; x++)
+            for (int z = z0 - 1; z <= z1 + 1; z++) {
+                if (x >= x0 && x <= x1 && z >= z0 && z <= z1) continue;
+                pos.set(x, y, z);
+                BlockState state = level.getBlockState(pos);
+                if ((state.isAir() || !state.getFluidState().isEmpty() && !state.getFluidState().isSource()) && !Buildings.protectedAt(level, pos)) {
+                    level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
+                }
+            }
+    }
+
     private static SimpleContainer wallet(int sheets, int rods) {
         SimpleContainer c = new SimpleContainer(9);
         Item sheet = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse("create:iron_sheet"));
@@ -189,11 +206,18 @@ public final class BuildingTests {
         return null;
     }
 
+    /** What lies loose near a spot, and what a crate there holds (a company's building gives back into a crate). */
     private static List<ItemStack> dropsNear(ServerLevel level, BlockPos at) {
         List<ItemStack> out = new ArrayList<>();
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(at).inflate(4))) {
             out.add(e.getItem().copy());
             e.discard();
+        }
+        for (BlockPos pos : BlockPos.betweenClosed(at.offset(-4, -4, -4), at.offset(4, 4, 4))) {
+            if (!(level.getBlockEntity(pos) instanceof com.meakaandre.siftec.death.DeathCrateBlockEntity crate)) continue;
+            for (com.meakaandre.siftec.death.DeathCrateBlockEntity.Entry e : crate.entries) out.add(e.stack().copy());
+            crate.entries.clear();
+            level.setBlock(pos.immutable(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         }
         return out;
     }
@@ -364,11 +388,11 @@ public final class BuildingTests {
             List<ItemStack> dropsE = dropsNear(level, controllerE);
             expect(source, "breaks with refund from a block of its shell", standing(level, e) == 0 && index.count(level, controllerE) == 0
                     && count(dropsE, "create:iron_sheet") == 2 && count(dropsE, "siftec:iron_rod") == 4,
-                standing(level, e) + " blocks left, dropped " + count(dropsE, "create:iron_sheet") + " sheets and " + count(dropsE, "siftec:iron_rod") + " rods");
+                standing(level, e) + " blocks left, gave back " + count(dropsE, "create:iron_sheet") + " sheets and " + count(dropsE, "siftec:iron_rod") + " rods");
             List<ItemStack> dropsF = dropsNear(level, controllerF);
             expect(source, "losing the controller takes the rest down with refund", standing(level, f) == 0 && index.count(level, controllerF) == 0
                     && count(dropsF, "create:iron_sheet") == 2 && count(dropsF, "siftec:iron_rod") == 4,
-                standing(level, f) + " blocks left, dropped " + count(dropsF, "create:iron_sheet") + " sheets and " + count(dropsF, "siftec:iron_rod") + " rods");
+                standing(level, f) + " blocks left, gave back " + count(dropsF, "create:iron_sheet") + " sheets and " + count(dropsF, "siftec:iron_rod") + " rods");
             // B and C stay up for the restart test
         });
         later(level, BuildingRepair.EVERY + 60, () -> report(source, "result: " + passed + " passed, " + failed + " failed"));

@@ -14,8 +14,6 @@
     "siftec:satellite_portal",
     "siftec:mam",
     "siftec:claim_marker",
-    "siftec:converter",
-    "siftec:particle_accelerator",
     "siftec:hub",
     "siftec:wormhole_gateway",
     "siftec:bauxite_ore",

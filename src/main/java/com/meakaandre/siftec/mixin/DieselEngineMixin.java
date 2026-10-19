@@ -41,13 +41,14 @@ public abstract class DieselEngineMixin implements EngineControl {
 
     @Inject(method = "getCachedFuelSpeed", at = @At("HEAD"), cancellable = true, require = 1)
     private void siftec$speed(CallbackInfoReturnable<Float> cir) {
-        if (siftec$speed > 0) cir.setReturnValue(siftec$speed);
+        // set by the building (0 included: a fuel it does not burn stops the engine), else Diesel Generators' own
+        if (siftec$speed >= 0) cir.setReturnValue(siftec$speed);
     }
 
     @Inject(method = "getCachedFuelCapacity", at = @At("HEAD"), cancellable = true, require = 1)
     private void siftec$capacity(CallbackInfoReturnable<Float> cir) {
-        // Diesel Generators keeps capacity a turn: the SU over the speed
-        if (siftec$speed > 0 && siftec$strength > 0) cir.setReturnValue(siftec$strength / siftec$speed);
+        // Diesel Generators keeps capacity a turn: the SU over the speed; a strength of 0 means none at all
+        if (siftec$strength >= 0) cir.setReturnValue(siftec$speed > 0 ? siftec$strength / siftec$speed : 0f);
     }
 
     @Inject(method = "getCachedBurnRate", at = @At("HEAD"), cancellable = true, require = 1)

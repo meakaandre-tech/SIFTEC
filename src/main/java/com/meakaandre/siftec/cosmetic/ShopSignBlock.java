@@ -42,6 +42,16 @@ public class ShopSignBlock extends WallSignBlock {
         return new ShopSignBlockEntity(ModBlockEntities.SHOP_SIGN.get(), pos, state);
     }
 
+    /**
+     * The sign's ticker, as vanilla signs have: it lets go of a player who stopped editing it (left the editor, logged out,
+     * walked away), so nobody else is locked out. Vanilla's own ticker only knows the vanilla sign's block entity type.
+     */
+    @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.@org.jspecify.annotations.Nullable BlockEntityTicker<T> getTicker(
+        net.minecraft.world.level.Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        return createTickerHelper(type, ModBlockEntities.SHOP_SIGN.get(), net.minecraft.world.level.block.entity.SignBlockEntity::tick);
+    }
+
     /** A thin panel against the wall behind it. */
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
