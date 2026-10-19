@@ -203,12 +203,15 @@ public final class Generators {
         c.loadWindow[(int) (level.getGameTime() % WATER_WINDOW)] = use;
         float least = 1;
         for (float f : c.loadWindow) least = Math.min(least, f);
-        // never a level for nothing: a moment of no load in the window must not let the boiler run every level on a trickle
-        least = Math.max(least, MIN_WATER_LOAD);
+        // a generator that is not giving power yet (just built or just loaded) starts with every level free, as its boilers
+        // take water only once they heat; once it runs, a moment of no load in the window never lets the boiler run every
+        // level on a trickle: its need follows at least the floor
+        boolean startingUp = c.offered <= 0 && c.lastGenerated <= 0;
+        least = startingUp && least <= 0 ? 0 : Math.max(least, MIN_WATER_LOAD);
         BlockPos intake = intake(c);
         boolean wet = intake != null && ProductionLogic.mbAt(level, intake, Fluids.WATER) > 0;
         for (FluidTankBlockEntity b : boilers) {
-            float perLevel = !wet ? Float.POSITIVE_INFINITY : (float) (full / engines * least);
+            float perLevel = !wet ? Float.POSITIVE_INFINITY : least <= 0 ? 0 : (float) (full / engines * least);
             ((BoilerWater) b.boiler).siftec$waterPerLevel(perLevel);
         }
         if (!wet) return false;
