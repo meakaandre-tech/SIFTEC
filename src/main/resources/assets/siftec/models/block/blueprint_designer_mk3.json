@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "siftec:block/blueprint_designer_mk3_top",
-    "side": "siftec:block/blueprint_designer_mk3_side",
-    "bottom": "siftec:block/blueprint_designer_mk3_side"
+    "particle": "siftec:block/blueprint_designer_mk3_side",
+    "north": "siftec:block/blueprint_designer_mk3_front",
+    "south": "siftec:block/blueprint_designer_mk3_side",
+    "east": "siftec:block/blueprint_designer_mk3_side",
+    "west": "siftec:block/blueprint_designer_mk3_side",
+    "up": "siftec:block/blueprint_designer_mk3_top",
+    "down": "siftec:block/blueprint_designer_mk3_side"
   }
 }

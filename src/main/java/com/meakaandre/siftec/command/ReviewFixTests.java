@@ -344,31 +344,54 @@ public final class ReviewFixTests {
         expect(source, "2: a Deployer outside the building may not act on its blocks; one that is part of it may",
             !Buildings.deployerMayAct(level, outside, member) && Buildings.deployerMayAct(level, p.at(t.controller), member)
                 && Buildings.deployerMayAct(level, outside, outside.above()), "");
-        // the Designer's sneak-clear goes round it
+        // the Designer's sneak-clear goes round it: a Blueprint Designer Mk.3 built round the building (its floor under it,
+        // in place of the platform's stone), its terminal sneak-clicked
         AABB box = p.bounds(t);
-        BlockPos designer = new BlockPos((int) Math.floor((box.minX + box.maxX) / 2), Y - 1, (int) Math.floor((box.minZ + box.maxZ) / 2));
-        BlockState under = level.getBlockState(designer);
-        BlockPos loose = null;
-        AABB volume = com.meakaandre.siftec.blueprint.DesignerBlockEntity.volume(designer, 8);
-        for (BlockPos pos : BlockPos.betweenClosed((int) volume.minX, Y, (int) volume.minZ, (int) volume.maxX - 1, Y, (int) volume.maxZ - 1)) {
-            if (level.getBlockState(pos).isAir() && !Buildings.protectedAt(level, pos) && !box.contains(Vec3.atCenterOf(pos))) {
-                loose = pos.immutable();
-                break;
+        BuildingDef mk3 = Buildings.def("blueprint_designer_mk3");
+        BuildingTemplate dt = mk3 == null ? null : BuildingTemplate.of(mk3);
+        if (mk3 == null || dt == null) {
+            expect(source, "2: the Blueprint Designer Mk.3 building exists", false, "");
+        } else {
+            int mx = (int) Math.floor((box.minX + box.maxX) / 2), mz = (int) Math.floor((box.minZ + box.maxZ) / 2);
+            // facing north, its front edge (the terminal's side) is to the south; the volume's middle is 9 blocks in
+            Placement dp = new Placement(mk3, new BlockPos(mx, Y - 1, mz + 9), Direction.NORTH, false);
+            AABB whole = dp.bounds(dt);
+            for (BlockPos pos : BlockPos.betweenClosed((int) whole.minX, Y - 1, (int) whole.minZ, (int) whole.maxX - 1, Y - 1, (int) whole.maxZ - 1)) {
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            }
+            Buildings.Check built = Buildings.place(level, dp, company, null, true);
+            ControllerBlockEntity terminal = BuildGun.controllerAt(level, dp.at(dt.controller));
+            if (!built.ok() || !(terminal instanceof com.meakaandre.siftec.blueprint.DesignerBlockEntity designer)) {
+                expect(source, "2: a Blueprint Designer Mk.3 goes down round the building", false, built.message().getString()
+                    + (built.blocked.isEmpty() ? "" : " first blocked " + built.blocked.getFirst().toShortString()));
+            } else {
+                AABB volume = designer.volume();
+                BlockPos loose = null;
+                for (BlockPos pos : BlockPos.betweenClosed((int) volume.minX, Y, (int) volume.minZ, (int) volume.maxX - 1, Y, (int) volume.maxZ - 1)) {
+                    if (level.getBlockState(pos).isAir() && !Buildings.protectedAt(level, pos) && !box.contains(Vec3.atCenterOf(pos))) {
+                        loose = pos.immutable();
+                        break;
+                    }
+                }
+                if (loose != null) level.setBlock(loose, Blocks.COBBLESTONE.defaultBlockState(), Block.UPDATE_ALL);
+                BlockPos at = terminal.getBlockPos();
+                FakePlayer hand = fake(level, MEMBER, "selftest_fixes");
+                hand.setPos(at.getX() + 0.5, at.getY(), at.getZ() + 1.5);
+                hand.setShiftKeyDown(true);
+                level.getBlockState(at).useWithoutItem(level, hand, new BlockHitResult(Vec3.atCenterOf(at), Direction.SOUTH, at, false));
+                hand.setShiftKeyDown(false);
+                int after = 0;
+                for (BuildingTemplate.Cell cell : t.members) if (level.getBlockState(p.at(cell)).getBlock() == cell.state().getBlock()) after++;
+                boolean cleared = loose == null || level.getBlockState(loose).isAir();
+                expect(source, "2: the Blueprint Designer's sneak-clear leaves a building in its volume alone (and clears the rest)",
+                    after == t.members.size() && cleared && volume.contains(Vec3.atCenterOf(p.at(t.controller))),
+                    after + " of " + t.members.size() + " standing; loose block at " + at(loose) + " cleared " + cleared);
+                Buildings.dismantle(level, terminal);
+            }
+            for (BlockPos pos : BlockPos.betweenClosed((int) whole.minX, Y - 1, (int) whole.minZ, (int) whole.maxX - 1, Y - 1, (int) whole.maxZ - 1)) {
+                if (level.getBlockState(pos).isAir()) level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
             }
         }
-        if (loose != null) level.setBlock(loose, Blocks.COBBLESTONE.defaultBlockState(), Block.UPDATE_ALL);
-        level.setBlock(designer, ModBlocks.BLUEPRINT_DESIGNER_MK3.get().defaultBlockState(), Block.UPDATE_ALL);
-        FakePlayer hand = fake(level, MEMBER, "selftest_fixes");
-        hand.setPos(designer.getX() + 0.5, designer.getY() + 1, designer.getZ() + 0.5);
-        hand.setShiftKeyDown(true);
-        level.getBlockState(designer).useWithoutItem(level, hand, new BlockHitResult(Vec3.atCenterOf(designer), Direction.UP, designer, false));
-        hand.setShiftKeyDown(false);
-        int after = 0;
-        for (BuildingTemplate.Cell cell : t.members) if (level.getBlockState(p.at(cell)).getBlock() == cell.state().getBlock()) after++;
-        boolean cleared = loose == null || level.getBlockState(loose).isAir();
-        expect(source, "2: the Blueprint Designer's sneak-clear leaves a building in its volume alone (and clears the rest)",
-            after == t.members.size() && cleared, after + " of " + t.members.size() + " standing; loose block at " + at(loose) + " cleared " + cleared);
-        level.setBlock(designer, under, Block.UPDATE_ALL);
         // a block lost anyway gives nothing back for itself
         BlockPos lost = member;
         Item own = was.getBlock().asItem();

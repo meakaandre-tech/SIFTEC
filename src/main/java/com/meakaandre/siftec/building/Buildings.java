@@ -61,6 +61,8 @@ public final class Buildings {
     /** How far the Build Gun reaches, as Satisfactory's reaches further than a hand. */
     public static final int RANGE = 32;
     private static final int SET = Block.UPDATE_ALL;
+    /** Sent to clients, but no neighbour is told (nothing next to the block reacts to it going). */
+    private static final int QUIET = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
 
     private static final Map<String, BuildingDef> DEFS = new LinkedHashMap<>();
 
@@ -416,7 +418,9 @@ public final class Buildings {
         if (p != null) out.addAll(takeDown(level, p, controllerPos));
         // the Converter's cell is part of its machine, not something it holds: plain, loaded or charged, it stays
         out.removeIf(Processors::cellBearing);
-        if (level.getBlockState(controllerPos).getBlock() instanceof ControllerBlock) level.setBlock(controllerPos, Blocks.AIR.defaultBlockState(), SET);
+        if (level.getBlockState(controllerPos).getBlock() instanceof ControllerBlock) {
+            level.setBlock(controllerPos, Blocks.AIR.defaultBlockState(), controller instanceof com.meakaandre.siftec.blueprint.DesignerBlockEntity ? QUIET : SET);
+        }
         Siftec.LOGGER.info("SIFTEC: building {} at {} dismantled; {} stacks given back", controller.buildingId, controllerPos.toShortString(), out.size());
         com.meakaandre.siftec.power.PowerGrids.dirty();
         return out;
@@ -450,10 +454,16 @@ public final class Buildings {
             out.addAll(contents(level, pos));
             remove.add(pos);
         }
-        // machines that drop what they hold as they go (a basin's input, say) are caught too: it all comes back
+        // machines that drop what they hold as they go (a basin's input, say) are caught too: it all comes back. Things
+        // lying in a Blueprint Designer's volume are not the building's, and stay where they are
         AABB box = p.bounds(t).inflate(1);
+        AABB open = com.meakaandre.siftec.blueprint.DesignerBlockEntity.openSpace(p);
         Set<java.util.UUID> before = new HashSet<>();
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, box)) {
+            if (open != null && open.contains(e.position())) {
+                before.add(e.getUUID());
+                continue;
+            }
             // the Particle Accelerator's Cores in flight never despawn and cannot be picked up: they come back with the
             // building (a Converter cell lying loose is part of its machine and goes with it)
             if (Processors.isCore(e.getItem())) {
@@ -465,7 +475,10 @@ public final class Buildings {
                 before.add(e.getUUID());
             }
         }
-        for (BlockPos pos : remove) level.setBlock(pos, Blocks.AIR.defaultBlockState(), SET);
+        // a Blueprint Designer's floor and frame go without telling their neighbours, so nothing built in its volume (a
+        // torch or carpet on the floor, a lever on a pillar) pops off as they go
+        int flags = open != null ? QUIET : SET;
+        for (BlockPos pos : remove) level.setBlock(pos, Blocks.AIR.defaultBlockState(), flags);
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, box)) {
             if (before.contains(e.getUUID()) || e.getItem().isEmpty()) continue;
             out.add(e.getItem().copy());
@@ -792,12 +805,19 @@ public final class Buildings {
                 at.setWithOffset(pos, d.getStepX() * i, d.getStepY() * i, d.getStepZ() * i);
                 BlockPos controller = BuildingIndex.controllerOf(level, at);
                 if (controller == null) continue;
+                // a Blueprint Designer's volume is no part of it: whatever is built there is the players' own
                 if (level.isLoaded(controller) && level.getBlockEntity(controller) instanceof ControllerBlockEntity c
-                    && BuildGun.bounds(c).contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)) return true;
+                    && BuildGun.bounds(c).contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) && !inOpenSpace(c, pos)) return true;
                 break;
             }
         }
         return false;
+    }
+
+    /** True if the spot is in the open space of a building that is no part of it (a Blueprint Designer's volume). */
+    static boolean inOpenSpace(ControllerBlockEntity c, BlockPos pos) {
+        AABB open = com.meakaandre.siftec.blueprint.DesignerBlockEntity.openSpace(c);
+        return open != null && open.contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     /** For the protections in mixins: true if the block belongs to a building (always false on the client). */

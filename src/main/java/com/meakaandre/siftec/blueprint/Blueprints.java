@@ -42,9 +42,15 @@ public final class Blueprints {
     private Blueprints() {
     }
 
-    public static ItemStack save(Level level, BlockPos designer, int reach) {
-        AABB box = DesignerBlockEntity.volume(designer, reach);
-        int side = 2 * reach + 1;
+    /** Saves the cube of {@code 2 * reach + 1} blocks each way sitting on top of {@code below}, centred on it. */
+    public static ItemStack save(Level level, BlockPos below, int reach) {
+        return save(level, new AABB(below.getX() - reach, below.getY() + 1, below.getZ() - reach, below.getX() + reach + 1, below.getY() + 2 + 2 * reach, below.getZ() + reach + 1));
+    }
+
+    /** Saves what stands in a cubic box (a Blueprint Designer's volume) as a Blueprint; empty if nothing does. */
+    public static ItemStack save(Level level, AABB box) {
+        int side = (int) Math.round(box.getXsize());
+        BlockPos designer = BlockPos.containing(box.minX, box.minY, box.minZ);
         List<BlockState> palette = new ArrayList<>();
         int[] cells = new int[side * side * side];
         int blocks = 0;

@@ -101,8 +101,13 @@ Create packages between ports, burning fire charges for each trip, unloaded land
 vault's contents to the company's cloud at Satisfactory 1.0's rates (15 items a minute and one stack of each item,
 raised by the MAM's Upload Upgrade and Depot Expansion research to 240 a minute and five stacks), which members take
 out from the Cloud button above their inventory, `/depot`, or any depot; with the Manual Depot Uploader research they
-shift-click their own items in. The Blueprint Designer
-saves what is built in its volume as a Blueprint that places it whole again.
+shift-click their own items in. The Blueprint Designer Mk.1 to Mk.3 (Special tab, unlocked by FICSIT Blueprints, Mk.2
+and Mk.3, at Satisfactory 1.0's costs) is a Build Gun building: a build floor of 9, 13 or 17 blocks square with a hazard
+edge, in a frame of corner pillars and a top frame outlining the cube over it. The cube is no part of the building, so
+anyone can walk, fly and build in it, and dismantling the Designer takes only its floor and frame and gives back its
+cost, leaving what was built inside. Its terminal, set into the front side at floor level, is the building's controller:
+paper saves what stands in the cube as a Blueprint that places it whole again, and a sneak-click clears the cube. A
+bigger Mk is built new, not upgraded in place (`blueprint/`).
 
 ## Vehicles
 

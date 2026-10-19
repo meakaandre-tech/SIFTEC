@@ -258,6 +258,21 @@ BUILDING_GUIDE = {
     "radar_tower": [
         "The Radar Tower clears the company's map over a wide area around it while it has power.",
     ],
+    "blueprint_designer": [
+        "The Blueprint Designer is a build floor in a frame: the 9 by 9 by 9 cube over the floor is yours to build in, and "
+        "anyone inside it can fly.",
+        "Click its terminal with paper to save what stands in the cube as a Blueprint; sneak-click it to clear the cube. "
+        "Dismantling the Designer takes only the floor and frame: what you built inside stays where it is.",
+    ],
+    "blueprint_designer_mk2": [
+        "The Blueprint Designer Mk.2 has a 13 by 13 by 13 cube to design in. It is a new building, not an upgrade: "
+        "dismantle a Mk.1 and build the Mk.2 in its place.",
+        "Its terminal saves the cube with paper and clears it with a sneak-click, as the Mk.1's does.",
+    ],
+    "blueprint_designer_mk3": [
+        "The Blueprint Designer Mk.3 has a 17 by 17 by 17 cube to design in, for the biggest blueprints.",
+        "Its terminal saves the cube with paper and clears it with a sneak-click; dismantling it leaves what you built inside.",
+    ],
     "truck_station": [
         "The Truck Station loads vehicles from its two Item Vaults, or unloads them into the vaults, while they stand at the "
         "dock in front of it.",

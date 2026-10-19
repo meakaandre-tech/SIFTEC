@@ -27,7 +27,8 @@ import java.util.Map;
  * north. Here every cell is turned into the frame the Build Gun uses: x to the right (0 is the middle column), y up
  * from the bottom row, z away from the front edge (0 is the front row).
  * <p>
- * Markers: exactly one {@code siftec:building_controller} (the building's brain), any number of
+ * Markers: exactly one {@code siftec:building_controller} or other {@link ControllerBlock} (the building's brain: a
+ * Blueprint Designer's terminal is one), any number of
  * {@code siftec:building_port} (where belts and pipes attach; its {@code facing} points out of the building, and
  * its block entity data may hold {@code Target: [x, y, z]}, the cell it feeds or drains in file coordinates, by
  * default the cell just inside it). Air cells are inside space that must be free when the building goes down;
@@ -128,7 +129,8 @@ public final class BuildingTemplate {
                 if (t != null && t.length == 3) target = new int[]{t[0] - cx, t[1], sz - 1 - t[2]};
             }
             Cell cell = new Cell(nx - cx, ny, sz - 1 - nz, state, target);
-            if (state.is(ModBlocks.BUILDING_CONTROLLER.get())) {
+            // a Blueprint Designer's terminal is its building's controller
+            if (state.getBlock() instanceof ControllerBlock) {
                 controller = cell;
                 controllers++;
             }

@@ -217,9 +217,10 @@ public class ControllerBlockEntity extends BlockEntity {
             indexed = BuildingRepair.check(server, this) != BuildingRepair.Result.WAITING;
             if (removing) return;
         }
-        // a Foundations-tab piece (a foundation, wall or roof) runs nothing and makes nothing: it only has to stay whole
+        // a Foundations-tab piece (a foundation, wall or roof) or a Blueprint Designer runs nothing and makes nothing: it
+        // only has to stay whole
         BuildingDef def = def();
-        boolean foundation = def != null && def.logic().equals("foundation");
+        boolean foundation = def != null && (def.logic().equals("foundation") || def.logic().equals("designer"));
         if (!broken && !foundation) BuildingLogic.tick(server, this);
         // the factory simulation reads it now and then, to run it while its chunk does not tick (work package 17)
         if (!broken && indexed && !foundation) com.meakaandre.siftec.sim.Factories.building(server, this);

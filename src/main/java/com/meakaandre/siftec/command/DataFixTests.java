@@ -3,7 +3,6 @@ package com.meakaandre.siftec.command;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.Siftec;
-import com.meakaandre.siftec.blueprint.DesignerBlockEntity;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.MachineTimes;
@@ -309,21 +308,17 @@ public final class DataFixTests {
     // ------------------------------------------------------------------------------------------------ 17
 
     private static void designer(CommandSourceStack source, ServerLevel level) {
-        Item mk2 = ModBlocks.BLUEPRINT_DESIGNER_MK2.get().asItem();
-        Milestone lock = Locks.lockOf(mk2);
-        expect(source, "FICSIT Blueprints Mk.2 unlocks the Blueprint Designer Mk.2", lock != null && lock.id().equals("ficsit_blueprints_mk2"),
-            lock == null ? "free" : lock.id());
+        // the Blueprint Designers are Build Gun buildings now (the volumes are checked by /siftec selftest designer)
+        com.meakaandre.siftec.building.BuildingDef mk2 = com.meakaandre.siftec.building.Buildings.def("blueprint_designer_mk2");
+        expect(source, "FICSIT Blueprints Mk.2 unlocks the Blueprint Designer Mk.2 (a Build Gun building on the Special tab)",
+            mk2 != null && mk2.unlock().equals("ficsit_blueprints_mk2") && mk2.category() == com.meakaandre.siftec.building.Category.SPECIAL,
+            mk2 == null ? "no building" : mk2.unlock() + " " + mk2.category());
         boolean built = false;
-        for (Milestones.Build b : Milestones.workshop()) built |= b.item().toString().equals("siftec:blueprint_designer_mk2");
-        expect(source, "the Equipment Workshop builds it", built, "");
+        for (Milestones.Build b : Milestones.workshop()) built |= b.item().toString().startsWith("siftec:blueprint_designer");
+        expect(source, "the Equipment Workshop builds no Blueprint Designer (the Build Gun does)", !built, "");
         int[] reach = new int[3];
         Block[] marks = {ModBlocks.BLUEPRINT_DESIGNER.get(), ModBlocks.BLUEPRINT_DESIGNER_MK2.get(), ModBlocks.BLUEPRINT_DESIGNER_MK3.get()};
-        for (int k = 0; k < 3; k++) {
-            BlockPos at = new BlockPos(X + 2 + 6 * k, Y + 1, Z + 12);
-            level.setBlock(at, marks[k].defaultBlockState(), Block.UPDATE_ALL);
-            reach[k] = level.getBlockEntity(at) instanceof DesignerBlockEntity d ? d.reach() : -1;
-            level.setBlock(at, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-        }
+        for (int k = 0; k < 3; k++) reach[k] = marks[k] instanceof com.meakaandre.siftec.blueprint.DesignerBlock d ? d.reach : -1;
         expect(source, "Mk.2's build volume is between Mk.1's and Mk.3's", reach[1] == 6 && reach[0] < reach[1] && reach[1] < reach[2],
             "reach " + reach[0] + ", " + reach[1] + ", " + reach[2]);
     }
