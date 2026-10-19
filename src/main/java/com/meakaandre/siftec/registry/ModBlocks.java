@@ -161,10 +161,17 @@ public class ModBlocks {
         () -> machine().noLootTable());
     public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> MAIN_PORTAL = block("main_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(true, properties), ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> SATELLITE_PORTAL = block("satellite_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(false, properties), ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER = block("blueprint_designer", properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(4, properties), ModBlocks::machine);
-    /** Mk.2 (FICSIT Blueprints Mk.2): between Mk.1's 9-block cube and Mk.3's 17, as 1.0's 40 m is between 32 and 48. */
-    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER_MK2 = block("blueprint_designer_mk2", properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(6, properties), ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER_MK3 = block("blueprint_designer_mk3", properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(8, properties), ModBlocks::machine);
+    /**
+     * The Blueprint Designers' terminals, each the controller of its Blueprint Designer building (Mk.1 to Mk.3, built with
+     * the Build Gun): only ever part of the building, so they have no item. Mk.2 (FICSIT Blueprints Mk.2) is between
+     * Mk.1's 9-block cube and Mk.3's 17, as 1.0's 40 m is between 32 and 48.
+     */
+    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER = blockOnly("blueprint_designer",
+        properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(4, properties), () -> machine().noLootTable());
+    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER_MK2 = blockOnly("blueprint_designer_mk2",
+        properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(6, properties), () -> machine().noLootTable());
+    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER_MK3 = blockOnly("blueprint_designer_mk3",
+        properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(8, properties), () -> machine().noLootTable());
     public static final Supplier<Block> STEEL_CASING = block("steel_casing", Block::new, () -> BlockBehaviour.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL));
 
     public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);

@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.blueprint;
 
+import com.meakaandre.siftec.building.ControllerBlock;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.registry.ModBlockEntities;
 import com.meakaandre.siftec.registry.ModItems;
@@ -13,23 +14,21 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Blueprint Designer. The framed cube above it is the build volume: anyone inside it can fly. Click the
- * designer with paper (or an old blueprint) to save what is built there as a Blueprint; sneak-click it
- * empty-handed to clear the volume.
+ * The Blueprint Designer's terminal, and the controller of the Blueprint Designer building (Mk.1 to Mk.3, put down and
+ * taken away only with the Build Gun). It is set into the middle of the building's front side at floor level, facing
+ * out; the cube over the building's floor behind it is the build volume, and anyone inside it can fly. Click the
+ * terminal with paper (or an old blueprint) to save what is built there as a Blueprint; sneak-click it empty-handed to
+ * clear the volume. Anything else it does is a building controller's (the Customizer, its status).
  */
-public class DesignerBlock extends Block implements EntityBlock {
-    /** Blocks from the centre column to each side: 4 makes a 9-block cube (Mk.1), 6 a 13-block cube (Mk.2), 8 a 17-block cube (Mk.3). */
+public class DesignerBlock extends ControllerBlock {
+    /** Blocks from the volume's middle column to each side: 4 makes a 9-block cube (Mk.1), 6 a 13-block cube (Mk.2), 8 a 17-block cube (Mk.3). */
     public final int reach;
 
     public DesignerBlock(int reach, Properties properties) {
@@ -42,19 +41,21 @@ public class DesignerBlock extends Block implements EntityBlock {
         return new DesignerBlockEntity(ModBlockEntities.DESIGNER.get(), pos, state);
     }
 
-    @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide() ? null : (l, p, s, be) -> {
-            if (be instanceof DesignerBlockEntity designer) designer.serverTick();
-        };
+    /** The terminal's building, or null (and the player told) if it stands on its own, outside any Blueprint Designer. */
+    private static @Nullable DesignerBlockEntity designer(Level level, BlockPos pos, ServerPlayer player) {
+        if (level.getBlockEntity(pos) instanceof DesignerBlockEntity designer && designer.placement() != null) return designer;
+        player.sendOverlayMessage(Component.translatable("siftec.blueprint.loose"));
+        return null;
     }
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         boolean paper = stack.is(Items.PAPER), old = stack.is(ModItems.BLUEPRINT.get());
-        if (!paper && !old) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!paper && !old) return super.useItemOn(stack, state, level, pos, player, hand, hit);
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
-        ItemStack blueprint = Blueprints.save(level, pos, reach);
+        DesignerBlockEntity designer = designer(level, pos, server);
+        if (designer == null) return InteractionResult.SUCCESS;
+        ItemStack blueprint = Blueprints.save(level, designer.volume());
         if (blueprint.isEmpty()) {
             server.sendOverlayMessage(Component.translatable("siftec.blueprint.empty"));
             return InteractionResult.SUCCESS;
@@ -68,12 +69,14 @@ public class DesignerBlock extends Block implements EntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
+        DesignerBlockEntity designer = designer(level, pos, server);
+        if (designer == null) return InteractionResult.SUCCESS;
         if (!player.isShiftKeyDown()) {
             server.sendOverlayMessage(Component.translatable("siftec.blueprint.how", 2 * reach + 1));
             return InteractionResult.SUCCESS;
         }
         if (!Claims.allowed(player, level, pos)) return InteractionResult.SUCCESS;
-        AABB box = DesignerBlockEntity.volume(pos, reach);
+        AABB box = designer.volume();
         int cleared = 0;
         for (BlockPos at : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
             // a Build Gun building's blocks come down only with the Build Gun, never with the Designer

@@ -183,13 +183,13 @@ for name, tex, tint in (("gypsum", "minecraft:item/bone_meal", None), ("toxic_re
     item_def(name, f"siftec:item/{name}", tint)
 MACHINES = {"blueprint_designer": ("Blueprint Designer Mk.1", "minecraft:block/lapis_block"), "blueprint_designer_mk2": ("Blueprint Designer Mk.2", "minecraft:block/emerald_block"), "blueprint_designer_mk3": ("Blueprint Designer Mk.3", "minecraft:block/diamond_block"), "drone_port": ("Drone Port", "create:block/cardboard_block_side"), "main_portal": ("Main Portal", "minecraft:block/crying_obsidian"), "satellite_portal": ("Satellite Portal", "minecraft:block/obsidian"), "landing_pad": ("Landing Pad", "minecraft:block/hay_block_side"), "claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"),
             "resource_well_extractor": ("Resource Well Extractor", "create:block/railway_casing")}
-BLOCK_ONLY_MACHINES = {"drone_port"}
+# the Drone Port block and the Blueprint Designers are only ever a Build Gun building's terminal: they have no item
+BLOCK_ONLY_MACHINES = {"drone_port", "blueprint_designer", "blueprint_designer_mk2", "blueprint_designer_mk3"}
 for b, (name, casing) in MACHINES.items():
     lang[f"block.siftec.{b}"] = name
     write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
         "top": "create:block/gearbox_top", "side": casing, "bottom": casing}})
-    # the Drone Port block is only ever the Drone Port building's terminal: it has no item
     if b not in BLOCK_ONLY_MACHINES:
         item_def(b, f"siftec:block/{b}")
 
@@ -292,7 +292,8 @@ lang.update({"siftec.place.not_yours": "That belongs to another company", "sifte
 lang["item.siftec.blueprint"] = "Blueprint"
 write(f"{A}/models/item/blueprint.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:item/filled_map"}})
 item_def("blueprint", "siftec:item/blueprint")
-lang.update({"siftec.blueprint.how": "Build inside the frame above (%s blocks each way); you can fly in there. Click with paper to save it, sneak-click to clear it",
+lang.update({"siftec.blueprint.how": "Build inside the frame behind this terminal (%s blocks each way); you can fly in there. Click with paper to save it, sneak-click to clear it",
+             "siftec.blueprint.loose": "This terminal is not part of a Blueprint Designer: build one with the Build Gun (Special tab)",
              "siftec.blueprint.empty": "Nothing is built in the frame yet", "siftec.blueprint.saved": "Blueprint saved: %s blocks",
              "siftec.blueprint.cleared": "Cleared %s blocks from the frame", "siftec.blueprint.blank": "This blueprint is blank",
              "siftec.blueprint.blocked": "Something is in the way at x %s, y %s, z %s", "siftec.blueprint.missing": "The blueprint needs %s more %s",
@@ -972,7 +973,7 @@ lang.update({"siftec.workshop.title": "Equipment Workshop",
 # ---- Build Gun and its buildings (building/BuildGun.java, building/Buildings.java)
 data["buildings"] = []
 LOGICS = {"basin", "smelter", "miner", "portable_miner", "storage", "power", "assembly", "packager", "extractor", "pressurizer",
-          "well_extractor", "processor", "workshop", "sink", "shop", "radar", "truck_station", "drone_port", "foundation"}
+          "well_extractor", "processor", "workshop", "sink", "shop", "radar", "truck_station", "drone_port", "foundation", "designer"}
 POWERS = {"pole", "storage", "augmenter", "biomass", "coal", "fuel", "geothermal", "nuclear"}
 for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     if tab not in content.BUILD_TABS:
@@ -1307,7 +1308,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # machines drop themselves
-for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk2", "blueprint_designer_mk3", "main_portal", "satellite_portal", "landing_pad", "claim_marker", "resource_well_extractor", "dimensional_depot", "speed_governor"):
+for b in ("steel_casing", "main_portal", "satellite_portal", "landing_pad", "claim_marker", "resource_well_extractor", "dimensional_depot", "speed_governor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -1333,7 +1334,8 @@ TEX = os.path.join(A, "textures")
 def has(kind, name):
     return os.path.exists(os.path.join(TEX, kind, name + ".png"))
 
-FRONTED = {"hub", "mam", "resource_well_extractor", "hub_engine", "crash_site_block"}
+# the Blueprint Designers' terminals face out of the building's front side, as its controller does
+FRONTED = {"hub", "mam", "resource_well_extractor", "hub_engine", "crash_site_block", "blueprint_designer", "blueprint_designer_mk2", "blueprint_designer_mk3"}
 # drawn as a post or a tripod on a clear background: shown as two crossed planes, like a flower
 CROSSED = set()
 # art of blocks that are gone (work package 6 made the power blocks Build Gun buildings); the HUB Engine's is kept as

@@ -1254,6 +1254,47 @@ def drone_port():
     return f.done()
 
 
+# ------------------------------------------------------------------------------------------------ the Blueprint Designers
+# Satisfactory's Blueprint Designer: a build floor the size of the build area (9 by 9 for Mk.1, 13 for Mk.2, 17 for Mk.3),
+# light grey with a white grid through its middle and a yellow and black hazard edge, inside a frame outlining the whole
+# cube: dark rails round the floor, a dark pillar at each corner and a top frame in the Mk's colour (orange, copper,
+# light grey) with a lamp on each pillar. The cube over the floor (as tall as it is wide) is left out of the template:
+# it is no part of the building, so it is open to walk, fly and build in, and dismantling never touches what stands
+# there. The terminal (the Blueprint Designer block, which is the building's controller) is set into the middle of the
+# front side at floor level, facing out; it saves, clears and keeps the flight of the cube behind it
+# (blueprint/DesignerBlockEntity.java).
+DESIGNER_TERMINAL = (0, 1, 0)
+
+
+def blueprint_designer(reach, block, trim):
+    side = 2 * reach + 1
+    o, back = reach + 1, side + 1
+    f = Frame(side + 2, side + 2)
+    for x in range(-reach, reach + 1):
+        for z in range(1, side + 1):
+            if abs(x) == reach or z in (1, side):
+                spec = YELLOW if (x + z) % 2 == 0 else BLACK
+            elif x % 4 == 0 or (z - o) % 4 == 0:
+                spec = "minecraft:white_concrete"
+            else:
+                spec = PAD
+            f.set(x, 0, z, spec)
+    # the bottom rails round the floor and the top frame over it, then the corner pillars with their lamps
+    for y, spec in ((0, DARK), (side + 1, trim)):
+        for x in range(-o, o + 1):
+            f.set(x, y, 0, spec)
+            f.set(x, y, back, spec)
+        for z in range(0, back + 1):
+            f.set(-o, y, z, spec)
+            f.set(o, y, z, spec)
+    for x in (-o, o):
+        for z in (0, back):
+            f.box(x, 0, z, x, side, z, DARK)
+            f.set(x, side + 1, z, "siftec:prefab_lamp")
+    f.set(*DESIGNER_TERMINAL, f"siftec:{block}[facing=south]")
+    return f.done()
+
+
 # ------------------------------------------------------------------------------------------------ the Foundations tab
 # 8 by 8 foundations, 8-wide walls and a roof (Satisfactory's sizes in blocks), built of the blocks their materials
 # replace (content.py MATERIALS): a foundation's top light grey concrete and body grey, a wall's panels white, a
@@ -1316,6 +1357,9 @@ BUILT = {"test_building": test_building, "test_miner": test_miner,
          "particle_accelerator": particle_accelerator, "converter": converter,
          "equipment_workshop": equipment_workshop, "awesome_sink": awesome_sink, "awesome_shop": awesome_shop, "radar_tower": radar_tower,
          "truck_station": truck_station, "drone_port": drone_port,
+         "blueprint_designer": lambda: blueprint_designer(4, "blueprint_designer", ORANGE),
+         "blueprint_designer_mk2": lambda: blueprint_designer(6, "blueprint_designer_mk2", "minecraft:waxed_copper_block"),
+         "blueprint_designer_mk3": lambda: blueprint_designer(8, "blueprint_designer_mk3", LIGHT),
          "foundation_1m": lambda: foundation(1), "foundation_2m": lambda: foundation(2), "foundation_4m": lambda: foundation(4),
          "wall_4m": wall, "roof_4m": roof,
          "billboard_small": lambda: billboard(8, 4, (-3, 2)), "billboard_large": lambda: billboard(16, 8, (-6, 5))}

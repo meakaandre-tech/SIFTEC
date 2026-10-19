@@ -41,6 +41,7 @@ siftec worldtest geyser natural 160
 siftec worldtest geyser wet 160
 siftec selftest polish
 siftec selftest exploits
+siftec selftest designer
 #sleep 40
 siftec worldtest automate
 siftec worldtest powerchain setup

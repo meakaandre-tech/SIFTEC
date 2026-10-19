@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "siftec:block/blueprint_designer_mk3"
+    "model": "siftec:item/blueprint"
   }
 }

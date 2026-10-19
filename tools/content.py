@@ -259,7 +259,7 @@ MILESTONES = [
     (3, "enhanced_asset_security", "Enhanced Asset Security", "Xeno-Basher (Pneumatic Hammer) and the melee weapons", ["cgs:hammer"], []),
 
     # Tier 4
-    (4, "ficsit_blueprints", "FICSIT Blueprints", "Blueprint Designer Mk.1", ["siftec:blueprint_designer"], []),
+    (4, "ficsit_blueprints", "FICSIT Blueprints", "Blueprint Designer Mk.1", [], []),
     (4, "logistics_mk3", "Logistics Mk.3", "Belt Mk.3: belts with no shaft run at 270 items/min; Industrial Storage Container", [], ["belt:270"]),
     (4, "advanced_steel_production", "Advanced Steel Production",
      "Miner Mk.2, Crushing Wheels; Encased Industrial Beam, Stator, Motor and Automated Wiring", [C + "crushing_wheel"], []),
@@ -295,7 +295,7 @@ MILESTONES = [
      [C + "track", C + "track_station", C + "controls", C + "schedule", C + "mechanical_roller", C + "railway_casing"], []),
     (6, "railway_signalling", "Railway Signalling", "Train Signal and Train Observer", [C + "track_signal", C + "track_observer"], []),
     (6, "pipeline_engineering_mk2", "Pipeline Engineering Mk.2", "Pipeline and Pump Mk.2: Mechanical Pump flow and range doubled", [], ["pumps:2"]),
-    (6, "ficsit_blueprints_mk2", "FICSIT Blueprints Mk.2", "Blueprint Designer Mk.2", ["siftec:blueprint_designer_mk2"], []),
+    (6, "ficsit_blueprints_mk2", "FICSIT Blueprints Mk.2", "Blueprint Designer Mk.2", [], []),
 
     # Tier 7 (Wormhole Phase 3)
     (7, "bauxite_refinement", "Bauxite Refinement",
@@ -329,7 +329,7 @@ MILESTONES = [
      [], ["scanner:sam"]),
     (9, "quantum_encoding", "Quantum Encoding",
      "Quantum Encoder; Excited Photonic Matter, Dark Matter, Superposition Oscillator, Neural-Quantum Processor and AI Expansion Server", [], []),
-    (9, "ficsit_blueprints_mk3", "FICSIT Blueprints Mk.3", "Blueprint Designer Mk.3", ["siftec:blueprint_designer_mk3"], []),
+    (9, "ficsit_blueprints_mk3", "FICSIT Blueprints Mk.3", "Blueprint Designer Mk.3", [], []),
     (9, "spatial_energy_regulation", "Spatial Energy Regulation", "Main Portal and Satellite Portal; Singularity Cell and Ballistic Warp Drive",
      ["siftec:main_portal", "siftec:satellite_portal"], []),
     (9, "peak_efficiency", "Peak Efficiency", "Belt Mk.6: belts with no shaft run at 1,200 items/min; Ficsonium and the Ficsonium Fuel Rod", [], ["belt:1200"]),
@@ -1347,6 +1347,11 @@ BUILDINGS = [
     ("awesome_sink", "AWESOME Sink", "special", BUILD_COSTS["AWESOME Sink"], "resource_sink_bonus_program", False, {"logic": "sink", "su": round(30 * MW)}),
     ("awesome_shop", "AWESOME Shop", "special", BUILD_COSTS["AWESOME Shop"], "resource_sink_bonus_program", False, {"logic": "shop"}),
     ("radar_tower", "Radar Tower", "special", BUILD_COSTS["Radar Tower"], mam("Quartz", "Radar Technology"), False, {"logic": "radar", "su": round(30 * MW)}),
+    # FICSIT Blueprints, Mk.2 and Mk.3: the Blueprint Designers (tools/structures.py), a build floor in a frame outlining
+    # the cube over it, its terminal the controller. They draw no power; Mk.2 and Mk.3 are built new, not upgraded in place
+    ("blueprint_designer", "Blueprint Designer Mk.1", "special", BUILD_COSTS["Blueprint Designer Mk.1"], "ficsit_blueprints", False, {"logic": "designer"}),
+    ("blueprint_designer_mk2", "Blueprint Designer Mk.2", "special", BUILD_COSTS["Blueprint Designer Mk.2"], "ficsit_blueprints_mk2", False, {"logic": "designer"}),
+    ("blueprint_designer_mk3", "Blueprint Designer Mk.3", "special", BUILD_COSTS["Blueprint Designer Mk.3"], "ficsit_blueprints_mk3", False, {"logic": "designer"}),
     # work package 14: vehicles (vehicle/Vehicles.java). The Tractor, Truck and Explorer are single entities the Build Gun
     # puts down (prefab "vehicle", no template), drawn from Create's own models; they burn the Fuel Generator's fuels. The
     # Truck Station is a building: an Item Vault vehicles load from or unload into (using its terminal switches which),

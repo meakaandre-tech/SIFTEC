@@ -117,6 +117,8 @@ public final class BuildingLogic {
         formTanks(level, c);
         Processors.ensureCell(level, c);
         if (def.logic().equals("drone_port")) SpecialBuildings.dronePortPlaced(level, c);
+        // a Blueprint Designer's volume is flyable from the moment it is built
+        if (c instanceof com.meakaandre.siftec.blueprint.DesignerBlockEntity designer) designer.report();
     }
 
     /**
@@ -521,7 +523,7 @@ public final class BuildingLogic {
         ProductionLogic.status(level, c, def, parts);
         ExtractorLogic.status(level, c, def, parts);
         if (!def.logic().equals("storage") && !def.logic().isEmpty() && !def.logic().equals("power") && !def.logic().contains("extractor")
-            && !def.logic().equals("pressurizer") && !java.util.Set.of("workshop", "shop", "radar", "truck_station", "drone_port", "foundation").contains(def.logic())) {
+            && !def.logic().equals("pressurizer") && !java.util.Set.of("workshop", "shop", "radar", "truck_station", "drone_port", "foundation", "designer").contains(def.logic())) {
             parts.add(Component.translatable("siftec.building.made", c.made));
         }
         BuildingPower.status(level, c, def, parts);
