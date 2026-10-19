@@ -828,6 +828,13 @@ public final class MachineTests {
         // factories) may have burnt what it had and filled its waste output; it is given its rods again and emptied
         nuke.input.setItem(0, new ItemStack(item("siftec:uranium_fuel_rod"), 12));
         empty(nuke, item("siftec:uranium_waste"));
+        // and its waste taken away as it comes, as a belt from its output port would: a full stack's worth of waste (one
+        // rod's 50) stops it taking the rods its other acceptors need
+        long until = level.getGameTime() + 600;
+        EVERY_TICK.add(() -> {
+            empty(nuke, item("siftec:uranium_waste"));
+            return level.getGameTime() >= until;
+        });
         Port coalWater = port(level, coal, PortBlock.Kind.FLUID_IN, 0), nukeWater = port(level, nuke, PortBlock.Kind.FLUID_IN, 0),
             dieselIn = port(level, diesel, PortBlock.Kind.FLUID_IN, 0), paIn = port(level, pa, PortBlock.Kind.ITEM_IN, 0),
             convA = port(level, conv, PortBlock.Kind.ITEM_IN, 0), convB = port(level, conv, PortBlock.Kind.ITEM_IN, 1);
