@@ -1,0 +1,508 @@
+Downloading Minecraft server
+Installing Fabric Loader 0.19.5(26.3) on the server
+Downloading required files
+Downloading library org.ow2.asm:asm:9.10.1
+Downloading library org.ow2.asm:asm-analysis:9.10.1
+Downloading library org.ow2.asm:asm-commons:9.10.1
+Downloading library org.ow2.asm:asm-tree:9.10.1
+Downloading library org.ow2.asm:asm-util:9.10.1
+Downloading library net.fabricmc:sponge-mixin:0.17.4+mixin.0.8.7
+Downloading library net.fabricmc:fabric-loader:0.19.5
+Generating server launch JAR
+Unpacking 26.3/server-26.3.jar (versions:26.3) to versions/26.3/server-26.3.jar
+Unpacking at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar (libraries:at.yawk.lz4:lz4-java:1.10.1) to libraries/at/yawk/lz4/lz4-java/1.10.1/lz4-java-1.10.1.jar
+Unpacking com/azure/azure-json/1.4.0/azure-json-1.4.0.jar (libraries:com.azure:azure-json:1.4.0) to libraries/com/azure/azure-json/1.4.0/azure-json-1.4.0.jar
+Unpacking com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar (libraries:com.github.oshi:oshi-core:6.9.0) to libraries/com/github/oshi/oshi-core/6.9.0/oshi-core-6.9.0.jar
+Unpacking com/google/code/gson/gson/2.14.0/gson-2.14.0.jar (libraries:com.google.code.gson:gson:2.14.0) to libraries/com/google/code/gson/gson/2.14.0/gson-2.14.0.jar
+Unpacking com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar (libraries:com.google.guava:failureaccess:1.0.3) to libraries/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar
+Unpacking com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar (libraries:com.google.guava:guava:33.6.0-jre) to libraries/com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar
+Unpacking com/microsoft/azure/msal4j/1.24.1/msal4j-1.24.1.jar (libraries:com.microsoft.azure:msal4j:1.24.1) to libraries/com/microsoft/azure/msal4j/1.24.1/msal4j-1.24.1.jar
+Unpacking com/mojang/authlib/10.0.77/authlib-10.0.77.jar (libraries:com.mojang:authlib:10.0.77) to libraries/com/mojang/authlib/10.0.77/authlib-10.0.77.jar
+Unpacking com/mojang/brigadier/1.3.11/brigadier-1.3.11.jar (libraries:com.mojang:brigadier:1.3.11) to libraries/com/mojang/brigadier/1.3.11/brigadier-1.3.11.jar
+Unpacking com/mojang/datafixerupper/10.0.21/datafixerupper-10.0.21.jar (libraries:com.mojang:datafixerupper:10.0.21) to libraries/com/mojang/datafixerupper/10.0.21/datafixerupper-10.0.21.jar
+Unpacking com/mojang/jtracy/1.14.38/jtracy-1.14.38.jar (libraries:com.mojang:jtracy:1.14.38) to libraries/com/mojang/jtracy/1.14.38/jtracy-1.14.38.jar
+Unpacking com/mojang/logging/1.7.12/logging-1.7.12.jar (libraries:com.mojang:logging:1.7.12) to libraries/com/mojang/logging/1.7.12/logging-1.7.12.jar
+Unpacking commons-io/commons-io/2.20.0/commons-io-2.20.0.jar (libraries:commons-io:commons-io:2.20.0) to libraries/commons-io/commons-io/2.20.0/commons-io-2.20.0.jar
+Unpacking io/netty/netty-buffer/4.2.16.Final/netty-buffer-4.2.16.Final.jar (libraries:io.netty:netty-buffer:4.2.16.Final) to libraries/io/netty/netty-buffer/4.2.16.Final/netty-buffer-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-base/4.2.16.Final/netty-codec-base-4.2.16.Final.jar (libraries:io.netty:netty-codec-base:4.2.16.Final) to libraries/io/netty/netty-codec-base/4.2.16.Final/netty-codec-base-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-compression/4.2.16.Final/netty-codec-compression-4.2.16.Final.jar (libraries:io.netty:netty-codec-compression:4.2.16.Final) to libraries/io/netty/netty-codec-compression/4.2.16.Final/netty-codec-compression-4.2.16.Final.jar
+Unpacking io/netty/netty-codec-http/4.2.16.Final/netty-codec-http-4.2.16.Final.jar (libraries:io.netty:netty-codec-http:4.2.16.Final) to libraries/io/netty/netty-codec-http/4.2.16.Final/netty-codec-http-4.2.16.Final.jar
+Unpacking io/netty/netty-common/4.2.16.Final/netty-common-4.2.16.Final.jar (libraries:io.netty:netty-common:4.2.16.Final) to libraries/io/netty/netty-common/4.2.16.Final/netty-common-4.2.16.Final.jar
+Unpacking io/netty/netty-handler/4.2.16.Final/netty-handler-4.2.16.Final.jar (libraries:io.netty:netty-handler:4.2.16.Final) to libraries/io/netty/netty-handler/4.2.16.Final/netty-handler-4.2.16.Final.jar
+Unpacking io/netty/netty-resolver/4.2.16.Final/netty-resolver-4.2.16.Final.jar (libraries:io.netty:netty-resolver:4.2.16.Final) to libraries/io/netty/netty-resolver/4.2.16.Final/netty-resolver-4.2.16.Final.jar
+Unpacking io/netty/netty-transport/4.2.16.Final/netty-transport-4.2.16.Final.jar (libraries:io.netty:netty-transport:4.2.16.Final) to libraries/io/netty/netty-transport/4.2.16.Final/netty-transport-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-classes-epoll/4.2.16.Final/netty-transport-classes-epoll-4.2.16.Final.jar (libraries:io.netty:netty-transport-classes-epoll:4.2.16.Final) to libraries/io/netty/netty-transport-classes-epoll/4.2.16.Final/netty-transport-classes-epoll-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-classes-kqueue/4.2.16.Final/netty-transport-classes-kqueue-4.2.16.Final.jar (libraries:io.netty:netty-transport-classes-kqueue:4.2.16.Final) to libraries/io/netty/netty-transport-classes-kqueue/4.2.16.Final/netty-transport-classes-kqueue-4.2.16.Final.jar
+Unpacking io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-x86_64.jar (libraries:io.netty:netty-transport-native-epoll:4.2.16.Final:linux-x86_64) to libraries/io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-x86_64.jar
+Unpacking io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-aarch_64.jar (libraries:io.netty:netty-transport-native-epoll:4.2.16.Final:linux-aarch_64) to libraries/io/netty/netty-transport-native-epoll/4.2.16.Final/netty-transport-native-epoll-4.2.16.Final-linux-aarch_64.jar
+Unpacking io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-x86_64.jar (libraries:io.netty:netty-transport-native-kqueue:4.2.16.Final:osx-x86_64) to libraries/io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-x86_64.jar
+Unpacking io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-aarch_64.jar (libraries:io.netty:netty-transport-native-kqueue:4.2.16.Final:osx-aarch_64) to libraries/io/netty/netty-transport-native-kqueue/4.2.16.Final/netty-transport-native-kqueue-4.2.16.Final-osx-aarch_64.jar
+Unpacking io/netty/netty-transport-native-unix-common/4.2.16.Final/netty-transport-native-unix-common-4.2.16.Final.jar (libraries:io.netty:netty-transport-native-unix-common:4.2.16.Final) to libraries/io/netty/netty-transport-native-unix-common/4.2.16.Final/netty-transport-native-unix-common-4.2.16.Final.jar
+Unpacking it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar (libraries:it.unimi.dsi:fastutil:8.5.18) to libraries/it/unimi/dsi/fastutil/8.5.18/fastutil-8.5.18.jar
+Unpacking net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar (libraries:net.java.dev.jna:jna:5.17.0) to libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar
+Unpacking net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar (libraries:net.java.dev.jna:jna-platform:5.17.0) to libraries/net/java/dev/jna/jna-platform/5.17.0/jna-platform-5.17.0.jar
+Unpacking net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar (libraries:net.sf.jopt-simple:jopt-simple:5.0.4) to libraries/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar
+Unpacking org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar (libraries:org.apache.commons:commons-lang3:3.20.0) to libraries/org/apache/commons/commons-lang3/3.20.0/commons-lang3-3.20.0.jar
+Unpacking org/apache/logging/log4j/log4j-api/2.26.0/log4j-api-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-api:2.26.0) to libraries/org/apache/logging/log4j/log4j-api/2.26.0/log4j-api-2.26.0.jar
+Unpacking org/apache/logging/log4j/log4j-core/2.26.0/log4j-core-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-core:2.26.0) to libraries/org/apache/logging/log4j/log4j-core/2.26.0/log4j-core-2.26.0.jar
+Unpacking org/apache/logging/log4j/log4j-slf4j2-impl/2.26.0/log4j-slf4j2-impl-2.26.0.jar (libraries:org.apache.logging.log4j:log4j-slf4j2-impl:2.26.0) to libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.26.0/log4j-slf4j2-impl-2.26.0.jar
+Unpacking org/joml/joml/1.10.9/joml-1.10.9.jar (libraries:org.joml:joml:1.10.9) to libraries/org/joml/joml/1.10.9/joml-1.10.9.jar
+Unpacking org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar (libraries:org.jspecify:jspecify:1.0.0) to libraries/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar
+Unpacking org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar (libraries:org.slf4j:slf4j-api:2.0.17) to libraries/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar
+Starting net.fabricmc.loader.impl.game.minecraft.BundlerClassPathCapture
+[06:46:25] [main/INFO]: Loading Minecraft 26.3 with Fabric Loader 0.19.5
+[06:46:25] [main/INFO]: Mappings not present!
+[06:46:25] [main/WARN]: Warnings were found!
+ - Mod 'Forge Config API Port' (forgeconfigapiport) 26.3.1 recommends any version of modmenu, which is missing!
+	 - You should install any version of modmenu for the optimal experience.
+ - Mod 'Mielon's The Sift' (the_sift) 1.1.2 recommends version 4.13.0 or later of lambdynlights, which is missing!
+	 - You should install version 4.13.0 or later of lambdynlights for the optimal experience.
+[06:46:25] [main/INFO]: Loading 55 mods:
+	- cgs 1.4.9+26.3
+	- create 6.0.9-1
+	- create_new_age 1.2.1+26.3
+	- createdieselgenerators 1.3.15+26.3
+	- fabric-api 0.161.0+26.3
+	   |-- fabric-advancement-api-v1 1.0.0+38c7a2d55d
+	   |-- fabric-api-base 2.0.6+fcdff87f5d
+	   |-- fabric-api-lookup-api-v1 2.0.24+3434d6d95d
+	   |-- fabric-biome-api-v1 20.0.9+74ed1ea55d
+	   |-- fabric-block-api-v1 3.1.0+0ae6f9115d
+	   |-- fabric-block-getter-api-v2 2.0.9+3434d6d95d
+	   |-- fabric-command-api-v2 3.1.2+fcdff87f5d
+	   |-- fabric-content-registries-v0 15.0.4+74ed1ea55d
+	   |-- fabric-convention-tags-v2 4.10.3+6b5b47fd5d
+	   |-- fabric-crash-report-info-v1 1.0.7+fcdff87f5d
+	   |-- fabric-creative-tab-api-v1 5.0.21+fcdff87f5d
+	   |-- fabric-data-attachment-api-v1 2.2.30+3434d6d95d
+	   |-- fabric-data-generation-api-v1 27.2.4+427eab975d
+	   |-- fabric-debug-api-v1 1.0.4+3434d6d95d
+	   |-- fabric-dimensions-v1 5.1.19+47f74c985d
+	   |-- fabric-entity-events-v1 6.0.4+3434d6d95d
+	   |-- fabric-events-interaction-v0 5.3.6+3434d6d95d
+	   |-- fabric-game-rule-api-v1 4.0.10+3434d6d95d
+	   |-- fabric-item-api-v1 14.7.0+cf6bc2db5d
+	   |-- fabric-lifecycle-events-v1 4.1.9+ffef5f675d
+	   |-- fabric-loot-api-v3 4.0.8+4068fd645d
+	   |-- fabric-menu-api-v1 2.0.27+ed66f0a35d
+	   |-- fabric-message-api-v1 7.0.10+3434d6d95d
+	   |-- fabric-networking-api-v1 6.3.8+fcdff87f5d
+	   |-- fabric-object-builder-api-v1 24.1.9+3434d6d95d
+	   |-- fabric-particles-v1 5.0.24+3434d6d95d
+	   |-- fabric-permission-api-v1 1.0.8+fcdff87f5d
+	   |-- fabric-recipe-api-v1 10.0.8+fcdff87f5d
+	   |-- fabric-registry-sync-v0 8.0.1+fcdff87f5d
+	   |-- fabric-rendering-fluids-v1 6.0.6+3434d6d95d
+	   |-- fabric-resource-conditions-api-v1 6.1.5+3434d6d95d
+	   |-- fabric-resource-loader-v0 3.3.26+4fc5413f5d
+	   |-- fabric-resource-loader-v1 3.0.4+fcdff87f5d
+	   |-- fabric-serialization-api-v1 2.0.7+74ed1ea55d
+	   |-- fabric-tag-api-v1 2.1.10+fcdff87f5d
+	   |-- fabric-transfer-api-v1 8.0.25+fcdff87f5d
+	   \-- fabric-transitive-access-wideners-v1 8.1.16+52268a0e5d
+	- fabricloader 0.19.5
+	   \-- mixinextras 0.5.5
+	- farmersdelight 26.3-3.6.27+refabricated
+	- forgeconfigapiport 26.3.1
+	   |-- com_electronwill_night-config_core 3.8.4
+	   \-- com_electronwill_night-config_toml 3.8.4
+	- geckolib 5.5.7
+	- java 25
+	- minecraft 26.3
+	- ntgl 3.1.8+26.3
+	- siftec 0.1.0+26.3
+	- the_sift 1.1.2
+	- travelersbackpack 11.4.1
+[06:46:25] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/net/fabricmc/sponge-mixin/0.17.4+mixin.0.8.7/sponge-mixin-0.17.4+mixin.0.8.7.jar Service=Knot/Fabric Env=SERVER
+[06:46:25] [main/WARN]: Error loading class: net/minecraft/client/gui/screens/recipebook/GhostSlots (java.lang.ClassNotFoundException: net/minecraft/client/gui/screens/recipebook/GhostSlots)
+[06:46:25] [main/WARN]: @Mixin target net.minecraft.client.gui.screens.recipebook.GhostSlots was not found farmersdelight.mixins.json:refabricated.GhostSlotsInvoker from mod farmersdelight
+[06:46:25] [main/WARN]: Error loading class: net/minecraft/client/gui/GuiGraphicsExtractor (java.lang.ClassNotFoundException: net/minecraft/client/gui/GuiGraphicsExtractor)
+[06:46:25] [main/WARN]: @Mixin target net.minecraft.client.gui.GuiGraphicsExtractor was not found farmersdelight.mixins.json:refabricated.GuiGraphicsExtractorAccessor from mod farmersdelight
+[06:46:25] [main/INFO]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.joml.MemUtil$MemUtilUnsafe (file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/org/joml/joml/1.10.9/joml-1.10.9.jar)
+WARNING: Please consider reporting this to the maintainers of class org.joml.MemUtil$MemUtilUnsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[06:46:31] [main/INFO]: [STDERR]: Failed to read config file: /home/runner/work/SIFTEC/SIFTEC/server/./config/create/server.json
+[06:46:31] [main/INFO]: [STDERR]: java.nio.file.NoSuchFileException: ./config/create/server.json
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:92)
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixFileSystemProvider.newFileChannel(UnixFileSystemProvider.java:213)
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:244)
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newByteChannel(Files.java:357)
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newByteChannel(Files.java:399)
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.spi.FileSystemProvider.newInputStream(FileSystemProvider.java:371)
+[06:46:31] [main/INFO]: [STDERR]: 	at java.base/java.nio.file.Files.newInputStream(Files.java:154)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.FileUtils.lambda$readFileToString$14(FileUtils.java:2768)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.IOUtils.toString(IOUtils.java:3204)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.IOUtils.toString(IOUtils.java:3179)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//org.apache.commons.io.FileUtils.readFileToString(FileUtils.java:2768)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.read(Builder.java:136)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.<init>(Builder.java:36)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.create(Builder.java:49)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.catnip.config.Builder.create(Builder.java:44)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.infrastructure.config.AllConfigs.register(AllConfigs.java:28)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//com.zurrtum.create.Create.onInitialize(Create.java:62)
+[06:46:31] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.FabricLoaderImpl.invokeEntrypoints(FabricLoaderImpl.java:409)
+[06:46:31] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.game.minecraft.Hooks.startServer(Hooks.java:63)
+[06:46:31] [main/INFO]: [STDERR]: 	at knot//net.minecraft.server.Main.main(Main.java:114)
+[06:46:31] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:517)
+[06:46:31] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+[06:46:31] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.knot.KnotServer.main(KnotServer.java:23)
+[06:46:31] [main/INFO]: [STDERR]: 	at net.fabricmc.loader.impl.launch.server.FabricServerLauncher.main(FabricServerLauncher.java:69)
+[06:46:31] [main/INFO]: [STDERR]: 	at net.fabricmc.installer.ServerLauncher.main(ServerLauncher.java:69)
+[06:46:32] [main/INFO]: Loaded config farmersdelight-common.json
+[06:46:32] [main/INFO]: SIFTEC: Traveler's Backpack found; it is every player's inventory, raised by milestones and bound to them
+[06:46:33] [main/INFO]: The Sift initialized.
+[06:46:33] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:water for Water (Fluid Amount Required: 81000) with the ID 0
+[06:46:33] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:lava for Lava (Fluid Amount Required: 81000) with the ID 1
+[06:46:33] [main/INFO]: Registered the FluidEffect with Unique ID of travelersbackpack:potion for block.travelersbackpack.potion_still (Fluid Amount Required: 27000) with the ID 2
+[06:46:33] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:milk for Air (Fluid Amount Required: 81000) with the ID 3
+[06:46:33] [main/INFO]: Environment: Environment[discoveryUrl=https://discovery.minecraftservices.com/minecraft/client, name=PROD]
+[06:46:33] [main/INFO]: Created 13 recipes which will be injected into the game
+[06:46:33] [main/INFO]: Found new data pack create:dynamic_data, loading it automatically
+[06:46:34] [Worker-Main-2/INFO]: No existing world data, creating new world
+[06:46:35] [Worker-Main-1/INFO]: Loaded 3541 advancements
+[06:46:35] [main/INFO]: Applied 258 biome modifications to 61 of 77 new biomes in 6.439 ms
+[06:46:35] [Server thread/INFO]: SIFTEC settings: spawn_free_radius=64, member_cooldown_hours=24
+[06:46:35] [Server thread/INFO]: Starting minecraft server version 26.3
+[06:46:35] [Server thread/INFO]: Loading properties
+[06:46:35] [Server thread/INFO]: Default game type: CREATIVE
+[06:46:35] [Server thread/INFO]: Generating keypair
+[06:46:35] [Server thread/INFO]: Starting Minecraft server on *:25565
+[06:46:35] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[06:46:35] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[06:46:35] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[06:46:35] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[06:46:35] [Server thread/INFO]: Preparing level "world"
+[06:46:35] [Server thread/INFO]: Selecting global world spawn...
+[06:46:38] [Server thread/INFO]: Loading 0 persistent chunks...
+[06:46:38] [Server thread/INFO]: Preparing spawn area: 100%
+[06:46:38] [Server thread/INFO]: Time elapsed: 2302 ms
+[06:46:38] [Server thread/INFO]: Done (2.454s)! For help, type "help"
+[06:46:38] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[06:46:38] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+[06:46:38] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[06:46:38] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTransformRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.RotationPropagator
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.network.config.SynchronizeRegistriesTask
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.chunk.LevelChunkSection$1BlockCounter
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ServerboundSelectKnownPacks
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.BlockItemTagAppender
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistriesDatapackGenerator
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.Swim
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.HashedStack$ActualItem
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ConfigurationProtocols
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerLoginPacketListenerImpl
+[06:46:38] [Server thread/INFO]: Force-loading class org.antarcticgardens.cna.content.electricity.network.NetworkEnergyStorage
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.commands.execution.CommandQueueEntry
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RecipeBookType
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider$1
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.stats.ServerRecipeBook
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.gametest.framework.GameTestServer
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.CompoundContainer
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender$1
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.PacketEncoder
+[06:46:38] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SimpleCookingRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SpecialRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.util.BackpackDeathHelper
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.stats.RecipeBookSettings$TypeSettings
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapedRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.food.FoodData
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.ServerExplosion
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.foundation.recipe.trie.RecipeTrie
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.DeployerHandler
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.PacketDecoder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapelessRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.CustomCraftingRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.item.enchantment.EnchantmentHelper
+[06:46:38] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade$2
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.GiveGiftToHero
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.ManualApplicationHelper
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.BlockLootSubProvider
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltTunnelInteractionHandler
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.game.GameProtocols
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonSittingPhase
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistryPatchGenerator
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.level.ChunkMap$TrackedEntity
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.item.Item$TooltipContext$2
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache$ProviderCache
+[06:46:38] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.inventory.menu.slot.ResultSlotExt
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.StartAttacking
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.PathfindingContext
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTrimRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.common.ServerActions
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SingleItemRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.CollectingNeighborUpdater$MultiNeighborUpdate
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.PlayerAdvancements
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RemoteSlot$Synchronized
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.ExperimentalRedstoneWireEvaluator
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerHandshakePacketListenerImpl
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.projectile.ProjectileUtil
+[06:46:38] [Server thread/INFO]: Force-loading class com.jesz.createdieselgenerators.world.OilChunksSavedData
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.commands.DebugConfigCommand
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.WalkNodeEvaluator
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.TransmuteRecipeBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.entity.PersistentEntitySectionManager$Callback
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.BundlePacket
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.util.ParticleUtils
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.stats.RecipeBookSettings
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.pump.PumpBlockEntity$PumpFluidTransferBehaviour
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagsProvider
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.level.ServerEntity
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.processing.basin.BasinInventory
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.tags.TagBuilder
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltInventory
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.OpenEndedPipe
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeOutput
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.KineticNetwork
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.block.RailState
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.dedicated.ServerWatchdog
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.advancements.packs.VanillaAdventureAdvancements
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.commands.execution.tasks.BuildContexts
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.ai.behavior.WorkAtComposter
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingProvider
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.server.network.PlayerChunkSender
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.FluidPropagator
+[06:46:38] [Server thread/INFO]: Force-loading class com.mojang.brigadier.context.ContextChain
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.PathFinder
+[06:46:38] [Server thread/INFO]: Force-loading class org.antarcticgardens.cna.content.electricity.network.ElectricalNetwork
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.codec.IdDispatchCodec
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.DataProvider
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.EntityLootSubProvider
+[06:46:38] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ClientboundCustomQueryPacket
+[06:46:38] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.tank.BoilerData
+[06:46:38] [Server thread/INFO]: [MixinAudit] audit finished
+[06:46:45] [Server thread/INFO]: SELFTEST owner setup: shaft of selftest_owner at 224, 138, -107
+[06:46:45] [Server thread/INFO]: System chat: SELFTEST owner setup: shaft of selftest_owner at 224, 138, -107
+[06:46:45] [Server thread/INFO]: SELFTEST setup Node[x=224, z=-107, type=IRON, purity=NORMAL, y=-2147483648] core at 224, 121, -107
+[06:46:45] [Server thread/INFO]: System chat: SELFTEST setup Node[x=224, z=-107, type=IRON, purity=NORMAL, y=-2147483648] core at 224, 121, -107
+[06:46:45] [Server thread/INFO]: SELFTEST setup Node[x=66, z=-206, type=COPPER, purity=NORMAL, y=-2147483648] core at 66, 65, -206
+[06:46:45] [Server thread/INFO]: System chat: SELFTEST setup Node[x=66, z=-206, type=COPPER, purity=NORMAL, y=-2147483648] core at 66, 65, -206
+[06:46:52] [Server thread/INFO]: SELFTEST machines test site ready at 9000 200 9000; geysers at [9042, 200, 9070, 9014, 200, 9070, 9000, 200, 9070]; the checks report over the next three minutes
+[06:46:52] [Server thread/INFO]: System chat: SELFTEST machines test site ready at 9000 200 9000; geysers at [9042, 200, 9070, 9014, 200, 9070, 9000, 200, 9070]; the checks report over the next three minutes
+[06:46:52] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 9032ms or 180 ticks behind
+[06:46:52] [Server thread/INFO]: SELFTEST machines PASS an impure, a normal and a pure geyser are found for the Geothermal Generators (3 found)
+[06:46:52] [Server thread/INFO]: System chat: SELFTEST machines PASS an impure, a normal and a pure geyser are found for the Geothermal Generators (3 found)
+[06:46:52] [Server thread/INFO]: SIFTEC: building biomass_burner placed at 9001, 201, 9000 facing north (218 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building coal_generator placed at 9025, 201, 9000 facing north (362 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building fuel_generator placed at 9049, 201, 9000 facing north (199 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building fuel_generator placed at 9073, 201, 9000 facing north (199 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building nuclear_power_plant placed at 9111, 201, 8999 facing north (1722 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building coal_generator placed at 9261, 201, 9000 facing north (362 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 8995, 201, 8990 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9019, 201, 8988 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9043, 201, 8990 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9049, 201, 8990 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9055, 201, 8990 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9067, 201, 8990 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9105, 201, 8985 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9255, 201, 8988 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building geothermal_generator placed at 9043, 201, 9070 facing north (183 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9037, 201, 9061 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building geothermal_generator placed at 9015, 201, 9070 facing north (183 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 9009, 201, 9061 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building geothermal_generator placed at 9001, 201, 9070 facing north (183 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building power_storage placed at 8995, 201, 9061 facing north (46 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building particle_accelerator placed at 9161, 201, 8994 facing north (696 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building converter at 9201, 201, 8999: its Converter Cell was missing; it has one again
+[06:46:52] [Server thread/INFO]: SIFTEC: building converter placed at 9201, 201, 8999 facing north (343 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building converter at 9231, 201, 8999: its Converter Cell was missing; it has one again
+[06:46:52] [Server thread/INFO]: SIFTEC: building converter placed at 9231, 201, 8999 facing north (343 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building alien_power_augmenter placed at 9153, 201, 8973 facing north (118 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building alien_power_augmenter placed at 9165, 201, 8973 facing north (118 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building alien_power_augmenter placed at 9193, 201, 8985 facing north (118 blocks, 0 refund stacks)
+[06:46:52] [Server thread/INFO]: SIFTEC: building alien_power_augmenter placed at 9223, 201, 8985 facing north (118 blocks, 0 refund stacks)
+[06:46:53] [Server thread/INFO]: SIFTEC: the factory simulation read 4976 recipes (166 smelting inputs)
+[06:46:53] [Server thread/INFO]: RecipeTrie of depth 7 with 1220 nodes built with 862 variants, 670 ingredients, and 1170 recipes
+[06:47:02] [Server thread/INFO]: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 4 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 2, made 4
+[06:47:02] [Server thread/INFO]: System chat: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 4 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 2, made 4
+[06:47:02] [Server thread/INFO]: SELFTEST machines inside the converter: Converter: makes Raw Iron, 1 made, draws 51,200 SU, grid: 59,904 of 102,400 SU used, 42,496 SU spare; basin 64 minecraft:stone 63 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running true 24/-1, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:conversion_core_iron_ore_limestone by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for -1; deployer RETRACTING USE timer 488 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 1
+[06:47:02] [Server thread/INFO]: System chat: SELFTEST machines inside the converter: Converter: makes Raw Iron, 1 made, draws 51,200 SU, grid: 59,904 of 102,400 SU used, 42,496 SU spare; basin 64 minecraft:stone 63 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running true 24/-1, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:conversion_core_iron_ore_limestone by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for -1; deployer RETRACTING USE timer 488 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 1
+[06:47:02] [Server thread/INFO]: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 59,904 of 102,400 SU used, 42,496 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running true 24/-1, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:conversion_core_dark_matter_residue by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for -1; deployer RETRACTING USE timer 488 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 0 minecraft:air, launched 0, made 0
+[06:47:02] [Server thread/INFO]: System chat: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 59,904 of 102,400 SU used, 42,496 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running true 24/-1, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:conversion_core_dark_matter_residue by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for -1; deployer RETRACTING USE timer 488 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 0 minecraft:air, launched 0, made 0
+[06:47:02] [Server thread/INFO]: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 139 SUh of 61,440 SUh, fuel in its engine 999 mB
+[06:47:02] [Server thread/INFO]: System chat: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 139 SUh of 61,440 SUh, fuel in its engine 999 mB
+[06:47:21] [Server thread/INFO]: SELFTEST machines warmed up: biomass Biomass Burner: gives 6,144 SU of 6,144 SU, grid: 0 of 6,144 SU used, 6,144 SU spare, storage 49.1 SUh of 20,480 SUh | coal Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 121 SUh of 20,480 SUh | diesel Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 410 SUh of 61,440 SUh | turbofuel Fuel Generator: gives 20,480 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 164 SUh of 20,480 SUh | nuclear Nuclear Power Plant: gives 20,480 SU of 512,000 SU, grid: 0 of 512,000 SU used, 512,000 SU spare, storage 117 SUh of 20,480 SUh | accelerator Particle Accelerator: makes Diamond, 14 made, draws 102,400 SU, grid: 72,960 of 204,800 SU used, 131,840 SU spare | converter Converter: makes Raw Iron, 4 made, draws 51,200 SU, grid: 70,144 of 102,400 SU used, 32,256 SU spare | residue Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 70,144 of 102,400 SU used, 32,256 SU spare
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines warmed up: biomass Biomass Burner: gives 6,144 SU of 6,144 SU, grid: 0 of 6,144 SU used, 6,144 SU spare, storage 49.1 SUh of 20,480 SUh | coal Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 121 SUh of 20,480 SUh | diesel Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 410 SUh of 61,440 SUh | turbofuel Fuel Generator: gives 20,480 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 164 SUh of 20,480 SUh | nuclear Nuclear Power Plant: gives 20,480 SU of 512,000 SU, grid: 0 of 512,000 SU used, 512,000 SU spare, storage 117 SUh of 20,480 SUh | accelerator Particle Accelerator: makes Diamond, 14 made, draws 102,400 SU, grid: 72,960 of 204,800 SU used, 131,840 SU spare | converter Converter: makes Raw Iron, 4 made, draws 51,200 SU, grid: 70,144 of 102,400 SU used, 32,256 SU spare | residue Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 70,144 of 102,400 SU used, 32,256 SU spare
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS biomass_burner: its Blaze Burners are lit with the fuel put in them (Biomass Burner: gives 6,144 SU of 6,144 SU, grid: 0 of 6,144 SU used, 6,144 SU spare, storage 49.1 SUh of 20,480 SUh)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS biomass_burner: its Blaze Burners are lit with the fuel put in them (Biomass Burner: gives 6,144 SU of 6,144 SU, grid: 0 of 6,144 SU used, 6,144 SU spare, storage 49.1 SUh of 20,480 SUh)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS biomass_burner: its boiler drives its Steam Engines (1 boilers, 1 engines)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS biomass_burner: its boiler drives its Steam Engines (1 boilers, 1 engines)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS biomass_burner: the Steam Engines turn its New Age coil at 64 RPM (64.0, wanted 64.0 within 1%)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS biomass_burner: the Steam Engines turn its New Age coil at 64 RPM (64.0, wanted 64.0 within 1%)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS coal_generator: its Blaze Burners are lit with the fuel put in them (Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 121 SUh of 20,480 SUh)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS coal_generator: its Blaze Burners are lit with the fuel put in them (Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 121 SUh of 20,480 SUh)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS coal_generator: its boiler drives its Steam Engines (1 boilers, 2 engines)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS coal_generator: its boiler drives its Steam Engines (1 boilers, 2 engines)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS coal_generator: the Steam Engines turn its New Age coil at 64 RPM (64.0, wanted 64.0 within 1%)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS coal_generator: the Steam Engines turn its New Age coil at 64 RPM (64.0, wanted 64.0 within 1%)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS Fuel Generator: Diesel Generators' engine turns at 256 RPM (256.0, wanted 256.0 within 1%)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS Fuel Generator: Diesel Generators' engine turns at 256 RPM (256.0, wanted 256.0 within 1%)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS and so does its New Age coil (256.0, wanted 256.0 within 1%)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS and so does its New Age coil (256.0, wanted 256.0 within 1%)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS Nuclear Power Plant: two boilers of 18 Steam Engines each (18 engines; 18 engines; )
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS Nuclear Power Plant: two boilers of 18 Steam Engines each (18 engines; 18 engines; )
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS its New Age reactor rods hold the fuel the plant put in (497027 fuel ticks in its rods)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS its New Age reactor rods hold the fuel the plant put in (497027 fuel ticks in its rods)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS its coils turn at 256 RPM (256.0, wanted 256.0 within 1%)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS its coils turn at 256 RPM (256.0, wanted 256.0 within 1%)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS Particle Accelerator: its Encased Fan turns and blows up (256.0 RPM, Block{create:encased_fan}[facing=up])
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS Particle Accelerator: its Encased Fan turns and blows up (256.0 RPM, Block{create:encased_fan}[facing=up])
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS its Crushing Wheels turn against each other and carry upward (Block{create:crushing_wheel_controller}[facing=up,valid=true])
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS its Crushing Wheels turn against each other and carry upward (Block{create:crushing_wheel_controller}[facing=up,valid=true])
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS it launched Cores into the column (7 launched, 14 made)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS it launched Cores into the column (7 launched, 14 made)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS Converter: its fan blows through lit soul fire (64.0 RPM, Block{minecraft:soul_campfire}[facing=south,ichorlogged=false,lit=true,signal_fire=false,waterlogged=false])
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS Converter: its fan blows through lit soul fire (64.0 RPM, Block{minecraft:soul_campfire}[facing=south,ichorlogged=false,lit=true,signal_fire=false,waterlogged=false])
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS Geothermal Generator: its turbine turns at what its geyser gives (Geothermal Generator: gives 20,480 SU of 22,630 SU, on a Impure geyser, grid: 0 of 22,630 SU used, 22,630 SU spare, storage 162 SUh of 20,480 SUh) (22680.0, wanted 22630.4 within 5%)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS Geothermal Generator: its turbine turns at what its geyser gives (Geothermal Generator: gives 20,480 SU of 22,630 SU, on a Impure geyser, grid: 0 of 22,630 SU used, 22,630 SU spare, storage 162 SUh of 20,480 SUh) (22680.0, wanted 22630.4 within 5%)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS Geothermal Generator: its turbine turns at what its geyser gives (Geothermal Generator: gives 20,480 SU of 61,440 SU, on a Normal geyser, grid: 0 of 61,440 SU used, 61,440 SU spare, storage 162 SUh of 20,480 SUh) (61440.0, wanted 61440.0 within 5%)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS Geothermal Generator: its turbine turns at what its geyser gives (Geothermal Generator: gives 20,480 SU of 61,440 SU, on a Normal geyser, grid: 0 of 61,440 SU used, 61,440 SU spare, storage 162 SUh of 20,480 SUh) (61440.0, wanted 61440.0 within 5%)
+[06:47:21] [Server thread/INFO]: SELFTEST machines PASS Geothermal Generator: its turbine turns at what its geyser gives (Geothermal Generator: gives 20,480 SU of 41,131 SU, on a Pure geyser, grid: 0 of 41,131 SU used, 41,131 SU spare, storage 162 SUh of 20,480 SUh) (41160.0, wanted 41130.7 within 5%)
+[06:47:21] [Server thread/INFO]: System chat: SELFTEST machines PASS Geothermal Generator: its turbine turns at what its geyser gives (Geothermal Generator: gives 20,480 SU of 41,131 SU, on a Pure geyser, grid: 0 of 41,131 SU used, 41,131 SU spare, storage 162 SUh of 20,480 SUh) (41160.0, wanted 41130.7 within 5%)
+[06:47:22] [Server thread/INFO]: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 14 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 7, made 14
+[06:47:22] [Server thread/INFO]: System chat: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 14 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 7, made 14
+[06:47:22] [Server thread/INFO]: SELFTEST machines inside the converter: Converter: makes Raw Iron, 4 made, draws 51,200 SU, grid: 80,384 of 102,400 SU used, 22,016 SU spare; basin 64 minecraft:stone 64 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running false 0/-1, next craft in 3, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:incomplete_conversion_iron_ore_limestone by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for 0; deployer WAITING USE timer 384 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 4
+[06:47:22] [Server thread/INFO]: System chat: SELFTEST machines inside the converter: Converter: makes Raw Iron, 4 made, draws 51,200 SU, grid: 80,384 of 102,400 SU used, 22,016 SU spare; basin 64 minecraft:stone 64 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running false 0/-1, next craft in 3, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:incomplete_conversion_iron_ore_limestone by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for 0; deployer WAITING USE timer 384 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 4
+[06:47:22] [Server thread/INFO]: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 80,384 of 102,400 SU used, 22,016 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running false 0/-1, next craft in 3, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:loaded_conversion_dark_matter_residue by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for 9; deployer RETRACTING USE timer 1000 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 0 minecraft:air, launched 0, made 0
+[06:47:22] [Server thread/INFO]: System chat: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 80,384 of 102,400 SU used, 22,016 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running false 0/-1, next craft in 3, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:loaded_conversion_dark_matter_residue by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for 9; deployer RETRACTING USE timer 1000 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 0 minecraft:air, launched 0, made 0
+[06:47:22] [Server thread/INFO]: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 424 SUh of 61,440 SUh, fuel in its engine 1000 mB
+[06:47:22] [Server thread/INFO]: System chat: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 424 SUh of 61,440 SUh, fuel in its engine 1000 mB
+[06:47:22] [Server thread/INFO]: SELFTEST machines measuring from [3, 8, 71113, 32076, 4779, 496747, 382968, 14, 48, 129600, 7, 6, 0, 0, 0, 0]
+[06:47:22] [Server thread/INFO]: System chat: SELFTEST machines measuring from [3, 8, 71113, 32076, 4779, 496747, 382968, 14, 48, 129600, 7, 6, 0, 0, 0, 0]
+[06:47:27] [Server thread/INFO]: SELFTEST machines PASS repair: the Coal Generator runs before (15,360 SU) (15360.0, wanted 15360.0 within 4%)
+[06:47:27] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: the Coal Generator runs before (15,360 SU) (15360.0, wanted 15360.0 within 4%)
+[06:47:32] [Server thread/INFO]: SIFTEC: building coal_generator at 9261, 201, 9000 had 1 blocks of its machines missing or wrong; rebuilt them from its shape: [steam_engine@9261, 205, 8996]
+[06:47:34] [Server thread/INFO]: SELFTEST machines PASS repair: a Steam Engine taken away is put back from the building's shape (Block{create:steam_engine}[face=wall,facing=south,waterlogged=false])
+[06:47:34] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: a Steam Engine taken away is put back from the building's shape (Block{create:steam_engine}[face=wall,facing=south,waterlogged=false])
+[06:47:42] [Server thread/INFO]: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 24 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 12, made 24
+[06:47:42] [Server thread/INFO]: System chat: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 24 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 12, made 24
+[06:47:42] [Server thread/INFO]: SELFTEST machines inside the converter: Converter: makes Raw Iron, 8 made, draws 51,200 SU, grid: 39,424 of 102,400 SU used, 62,976 SU spare; basin 64 minecraft:stone 64 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running true 20/38, next craft in 83, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot empty; deployer WAITING USE timer 896 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 8
+[06:47:42] [Server thread/INFO]: System chat: SELFTEST machines inside the converter: Converter: makes Raw Iron, 8 made, draws 51,200 SU, grid: 39,424 of 102,400 SU used, 62,976 SU spare; basin 64 minecraft:stone 64 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running true 20/38, next craft in 83, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot empty; deployer WAITING USE timer 896 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 8
+[06:47:42] [Server thread/INFO]: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 39,424 of 102,400 SU used, 62,976 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running true 20/38, next craft in 83, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot empty; deployer EXPANDING USE timer 616 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 0
+[06:47:42] [Server thread/INFO]: System chat: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 39,424 of 102,400 SU used, 62,976 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running true 20/38, next craft in 83, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot empty; deployer EXPANDING USE timer 616 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 0
+[06:47:42] [Server thread/INFO]: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 708 SUh of 61,440 SUh, fuel in its engine 999 mB
+[06:47:42] [Server thread/INFO]: System chat: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 708 SUh of 61,440 SUh, fuel in its engine 999 mB
+[06:47:52] [Server thread/INFO]: SELFTEST machines PASS repair: and the generator gives its 75 MW again (Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 231 SUh of 20,480 SUh) (15360.0, wanted 15360.0 within 4%)
+[06:47:52] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: and the generator gives its 75 MW again (Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 231 SUh of 20,480 SUh) (15360.0, wanted 15360.0 within 4%)
+[06:48:02] [Server thread/INFO]: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 34 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 17, made 34
+[06:48:02] [Server thread/INFO]: System chat: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 34 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 17, made 34
+[06:48:02] [Server thread/INFO]: SELFTEST machines inside the converter: Converter: makes Raw Iron, 11 made, draws 51,200 SU, grid: 59,904 of 102,400 SU used, 42,496 SU spare; basin 64 minecraft:stone 63 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running true 24/-1, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:conversion_core_iron_ore_limestone by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for -1; deployer EXPANDING USE timer 872 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 11
+[06:48:02] [Server thread/INFO]: System chat: SELFTEST machines inside the converter: Converter: makes Raw Iron, 11 made, draws 51,200 SU, grid: 59,904 of 102,400 SU used, 42,496 SU spare; basin 64 minecraft:stone 63 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running true 24/-1, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:conversion_core_iron_ore_limestone by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for -1; deployer EXPANDING USE timer 872 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 11
+[06:48:02] [Server thread/INFO]: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 59,904 of 102,400 SU used, 42,496 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running true 24/-1, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:conversion_core_dark_matter_residue by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for -1; deployer WAITING USE timer 244 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 0 minecraft:air, launched 0, made 0
+[06:48:02] [Server thread/INFO]: System chat: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 59,904 of 102,400 SU used, 42,496 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running true 24/-1, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:conversion_core_dark_matter_residue by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for -1; deployer WAITING USE timer 244 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 0 minecraft:air, launched 0, made 0
+[06:48:02] [Server thread/INFO]: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 993 SUh of 61,440 SUh, fuel in its engine 999 mB
+[06:48:02] [Server thread/INFO]: System chat: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 993 SUh of 61,440 SUh, fuel in its engine 999 mB
+[06:48:02] [Server thread/INFO]: SIFTEC: building coal_generator at 9261, 201, 9000 was built to an older shape; rebuilt it to the current one: 1 blocks set, 0 of the old shape taken away, 0 stacks it held given back (first set: [generator_coil@9259, 205, 8998])
+[06:48:02] [Server thread/INFO]: SELFTEST machines PASS repair: a building of an older shape is rebuilt to the current one (REBUILT, shape 735569750)
+[06:48:02] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: a building of an older shape is rebuilt to the current one (REBUILT, shape 735569750)
+[06:48:22] [Server thread/INFO]: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 44 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 22, made 44
+[06:48:22] [Server thread/INFO]: System chat: SELFTEST machines inside the accelerator: Particle Accelerator: makes Diamond, 44 made, draws 102,400 SU, grid: 98,560 of 204,800 SU used, 106,240 SU spare; basin 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal 64 minecraft:coal, filter 1 siftec:particle_charge_diamonds; mixer -64.0 RPM, running true 20/20, next craft in 43, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 9162, 200, 8980 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_machines; carrier 0 minecraft:air, launched 22, made 44
+[06:48:22] [Server thread/INFO]: SELFTEST machines inside the converter: Converter: makes Raw Iron, 14 made, draws 51,200 SU, grid: 80,384 of 102,400 SU used, 22,016 SU spare; basin 64 minecraft:stone 64 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running false 0/-1, next craft in 3, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:incomplete_conversion_iron_ore_limestone by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for 0; deployer WAITING USE timer 384 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 14
+[06:48:22] [Server thread/INFO]: System chat: SELFTEST machines inside the converter: Converter: makes Raw Iron, 14 made, draws 51,200 SU, grid: 80,384 of 102,400 SU used, 22,016 SU spare; basin 64 minecraft:stone 64 siftec:reanimated_sam 64 minecraft:stone 64 minecraft:stone 64 minecraft:stone 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_iron_ore_limestone; mixer -64.0 RPM, running false 0/-1, next craft in 3, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:incomplete_conversion_iron_ore_limestone by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for 0; deployer WAITING USE timer 384 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 1 siftec:converter_cell, launched 0, made 14
+[06:48:22] [Server thread/INFO]: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 80,384 of 102,400 SU used, 22,016 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running false 0/-1, next craft in 3, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:loaded_conversion_dark_matter_residue by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for 1; deployer RETRACTING USE timer -24 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 0 minecraft:air, launched 0, made 0
+[06:48:22] [Server thread/INFO]: System chat: SELFTEST machines inside the residue converter: Converter: makes Dark Matter Residue Bucket, 0 made, draws 51,200 SU, grid: 80,384 of 102,400 SU used, 22,016 SU spare; basin 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam 64 siftec:reanimated_sam, filter 1 siftec:conversion_core_dark_matter_residue; mixer -64.0 RPM, running false 0/-1, next craft in 3, its company selftest_machines (matter_conversion true, quantum_encoding true), basin can go on true; depot 1 siftec:loaded_conversion_dark_matter_residue by com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes$HauntingType@3b07c27d for 1; deployer RETRACTING USE timer -24 holding 0 minecraft:air speed 64.0 owner selftest_machines; carrier 0 minecraft:air, launched 0, made 0
+[06:48:22] [Server thread/INFO]: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 1,277 SUh of 61,440 SUh, fuel in its engine 1000 mB
+[06:48:22] [Server thread/INFO]: System chat: SELFTEST machines inside the fuel generator: Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 1,277 SUh of 61,440 SUh, fuel in its engine 1000 mB
+[06:48:27] [Server thread/INFO]: SELFTEST machines PASS repair: and it runs on its rebuilt machines (15,360 SU) (15360.0, wanted 15360.0 within 4%)
+[06:48:27] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: and it runs on its rebuilt machines (15,360 SU) (15360.0, wanted 15360.0 within 4%)
+[06:48:32] [Server thread/WARN]: SIFTEC: building coal_generator at 9261, 201, 9000 cannot rebuild its machines: 1 blocks are in the way, the first minecraft:cobblestone at 9261, 205, 8996; it makes nothing until they are cleared
+[06:48:32] [Server thread/INFO]: SELFTEST machines PASS repair: a block in the way of a Steam Engine leaves the building broken (BLOCKED, Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 401 SUh of 20,480 SUh, something stands where its machines go: clear it and the building rebuilds them)
+[06:48:32] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: a block in the way of a Steam Engine leaves the building broken (BLOCKED, Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 401 SUh of 20,480 SUh, something stands where its machines go: clear it and the building rebuilds them)
+[06:48:37] [Server thread/INFO]: SIFTEC: building coal_generator at 9261, 201, 9000 had 1 blocks of its machines missing or wrong; rebuilt them from its shape: [powered_shaft@9261, 205, 8998]
+[06:48:37] [Server thread/INFO]: SELFTEST machines PASS repair: and a broken generator gives nothing (no power made in code) (0.0 SU offered, 0.0 given; Coal Generator: gives 0 SU of 0 SU, grid: 0 of 0 SU used, 0 SU spare, storage 401 SUh of 20,480 SUh, something stands where its machines go: clear it and the building rebuilds them)
+[06:48:37] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: and a broken generator gives nothing (no power made in code) (0.0 SU offered, 0.0 given; Coal Generator: gives 0 SU of 0 SU, grid: 0 of 0 SU used, 0 SU spare, storage 401 SUh of 20,480 SUh, something stands where its machines go: clear it and the building rebuilds them)
+[06:48:38] [Server thread/INFO]: SIFTEC: building coal_generator at 9261, 201, 9000 had 1 blocks of its machines missing or wrong; rebuilt them from its shape: [steam_engine@9261, 205, 8996]
+[06:48:38] [Server thread/INFO]: SIFTEC: building coal_generator at 9261, 201, 9000 is whole again and runs
+[06:48:38] [Server thread/INFO]: SELFTEST machines PASS repair: once cleared, the Steam Engine is put back and the building runs (REBUILT, Coal Generator: gives 0 SU of 0 SU, grid: 0 of 0 SU used, 0 SU spare, storage 401 SUh of 20,480 SUh)
+[06:48:38] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: once cleared, the Steam Engine is put back and the building runs (REBUILT, Coal Generator: gives 0 SU of 0 SU, grid: 0 of 0 SU used, 0 SU spare, storage 401 SUh of 20,480 SUh)
+[06:49:02] [Server thread/INFO]: SELFTEST machines PASS repair: it gives its 75 MW again (Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 502 SUh of 20,480 SUh) (15360.0, wanted 15360.0 within 4%)
+[06:49:02] [Server thread/INFO]: System chat: SELFTEST machines PASS repair: it gives its 75 MW again (Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 502 SUh of 20,480 SUh) (15360.0, wanted 15360.0 within 4%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Biomass Burner on a full load gives 30 MW (6,144 SU) (6144.0, wanted 6144.0 within 4%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Biomass Burner on a full load gives 30 MW (6,144 SU) (6144.0, wanted 6144.0 within 4%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Biomass Burner burns 4 Solid Biofuel a minute (4.0, wanted 4.0 within 15%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Biomass Burner burns 4 Solid Biofuel a minute (4.0, wanted 4.0 within 15%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Coal Generator on a full load gives 75 MW (15,360 SU) (15360.0, wanted 15360.0 within 4%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Coal Generator on a full load gives 75 MW (15,360 SU) (15360.0, wanted 15360.0 within 4%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Coal Generator burns 15 Coal a minute (15.0, wanted 15.0 within 8%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Coal Generator burns 15 Coal a minute (15.0, wanted 15.0 within 8%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Coal Generator drinks 45 m3 (1,800 mB) of water a minute (1800.0, wanted 1800.0 within 5%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Coal Generator drinks 45 m3 (1,800 mB) of water a minute (1800.0, wanted 1800.0 within 5%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Fuel Generator on Fuel, full load, gives 250 MW (51,200 SU) (51200.0, wanted 51200.0 within 4%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Fuel Generator on Fuel, full load, gives 250 MW (51,200 SU) (51200.0, wanted 51200.0 within 4%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Fuel Generator burns 20 m3 (800 mB) of Fuel a minute (800.0, wanted 800.0 within 5%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Fuel Generator burns 20 m3 (800 mB) of Fuel a minute (800.0, wanted 800.0 within 5%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Fuel Generator on Turbofuel gives the 100 MW drawn (20,480 SU) (20480.0, wanted 20480.0 within 4%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Fuel Generator on Turbofuel gives the 100 MW drawn (20,480 SU) (20480.0, wanted 20480.0 within 4%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS and burns Turbofuel for those 100 MW only: 3 m3 (120 mB) a minute (120.0, wanted 120.0 within 8%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS and burns Turbofuel for those 100 MW only: 3 m3 (120 mB) a minute (120.0, wanted 120.0 within 8%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Nuclear Power Plant gives 2,500 MW (512,000 SU) on 100 MW of load (512000.0, wanted 512000.0 within 3%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Nuclear Power Plant gives 2,500 MW (512,000 SU) on 100 MW of load (512000.0, wanted 512000.0 within 3%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS its rods burn 0.2 Uranium Fuel Rods a minute (16,800 fuel units) at full, whatever the load (16800.0, wanted 16800.0 within 3%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS its rods burn 0.2 Uranium Fuel Rods a minute (16,800 fuel units) at full, whatever the load (16800.0, wanted 16800.0 within 3%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS it drinks 240 m3 (9,600 mB) of water a minute (9600.0, wanted 9600.0 within 5%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS it drinks 240 m3 (9,600 mB) of water a minute (9600.0, wanted 9600.0 within 5%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS every Uranium Fuel Rod it took left 50 Uranium Waste at its output (6 rods, 300 waste made, 300 taken out)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS every Uranium Fuel Rod it took left 50 Uranium Waste at its output (6 rods, 300 waste made, 300 taken out)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Particle Accelerator: 30 Diamonds a minute, out of its Crushing Wheels (30.0, wanted 30.0 within 7%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Particle Accelerator: 30 Diamonds a minute, out of its Crushing Wheels (30.0, wanted 30.0 within 7%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS every Diamond came from a Core the fan blew up into the wheels, two a Core (30 Cores launched, 60 Diamonds)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS every Diamond came from a Core the fan blew up into the wheels, two a Core (30 Cores launched, 60 Diamonds)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS its least power over a cycle is 250 MW (51,200 SU) (51200.0, wanted 51200.0 within 7%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS its least power over a cycle is 250 MW (51,200 SU) (51200.0, wanted 51200.0 within 7%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS its most power over a cycle is 750 MW (153,600 SU) (152320.0, wanted 153600.0 within 5%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS its most power over a cycle is 750 MW (153,600 SU) (152320.0, wanted 153600.0 within 5%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Converter: 120 Iron Ore (Limestone) a minute (120.0, wanted 120.0 within 10%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Converter: 120 Iron Ore (Limestone) a minute (120.0, wanted 120.0 within 10%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Converter: 40 m3 (4,000 mB) of Dark Matter Residue a minute out of its Item Drain (4000.0, wanted 4000.0 within 10%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Converter: 40 m3 (4,000 mB) of Dark Matter Residue a minute out of its Item Drain (4000.0, wanted 4000.0 within 10%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS the Converter has its one Converter Cell, no more (1 cells)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS the Converter has its one Converter Cell, no more (1 cells)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Geothermal Generator on a impure geyser averages 100 MW (20444.7, wanted 20480.0 within 6%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Geothermal Generator on a impure geyser averages 100 MW (20444.7, wanted 20480.0 within 6%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS and swings down to 50 MW (10171.7, wanted 10240.0 within 10%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS and swings down to 50 MW (10171.7, wanted 10240.0 within 10%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS and up to 150 MW (30720.0, wanted 30720.0 within 6%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS and up to 150 MW (30720.0, wanted 30720.0 within 6%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Geothermal Generator on a normal geyser averages 200 MW (40933.3, wanted 40960.0 within 6%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Geothermal Generator on a normal geyser averages 200 MW (40933.3, wanted 40960.0 within 6%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS and swings down to 100 MW (20480.0, wanted 20480.0 within 10%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS and swings down to 100 MW (20480.0, wanted 20480.0 within 10%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS and up to 300 MW (61440.0, wanted 61440.0 within 6%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS and up to 300 MW (61440.0, wanted 61440.0 within 6%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS Geothermal Generator on a pure geyser averages 400 MW (81896.7, wanted 81920.0 within 6%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS Geothermal Generator on a pure geyser averages 400 MW (81896.7, wanted 81920.0 within 6%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS and swings down to 200 MW (40891.7, wanted 40960.0 within 10%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS and swings down to 200 MW (40891.7, wanted 40960.0 within 10%)
+[06:49:22] [Server thread/INFO]: SELFTEST machines PASS and up to 600 MW (122880.0, wanted 122880.0 within 6%)
+[06:49:22] [Server thread/INFO]: System chat: SELFTEST machines PASS and up to 600 MW (122880.0, wanted 122880.0 within 6%)
+[06:49:47] [Server thread/INFO]: SELFTEST machines PASS with its Crushing Wheels stopped, the Particle Accelerator makes no Diamonds (2 wheel motors stopped, 0 Diamonds in 20 s)
+[06:49:47] [Server thread/INFO]: System chat: SELFTEST machines PASS with its Crushing Wheels stopped, the Particle Accelerator makes no Diamonds (2 wheel motors stopped, 0 Diamonds in 20 s)
+[06:49:47] [Server thread/INFO]: SELFTEST machines PASS with its fan stopped, the Converter makes no Iron Ore (1 fan motors stopped, 0 Iron Ore in 20 s)
+[06:49:47] [Server thread/INFO]: System chat: SELFTEST machines PASS with its fan stopped, the Converter makes no Iron Ore (1 fan motors stopped, 0 Iron Ore in 20 s)
+[06:50:05] [Server thread/INFO]: SELFTEST machines PASS turned again, they make again (22 Diamonds, 96 Iron Ore in 18 s)
+[06:50:05] [Server thread/INFO]: System chat: SELFTEST machines PASS turned again, they make again (22 Diamonds, 96 Iron Ore in 18 s)
+[06:50:05] [Server thread/INFO]: SELFTEST machines result: 60 passed, 0 failed
+[06:50:05] [Server thread/INFO]: System chat: SELFTEST machines result: 60 passed, 0 failed
+[06:53:53] [Server thread/INFO]: System chat: Stopping the server
+[06:53:53] [Server thread/INFO]: Stopping server
+[06:53:53] [Server thread/INFO]: Saving players
+[06:53:53] [Server thread/INFO]: Saving worlds
+[06:53:54] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[06:53:55] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+[06:53:55] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[06:53:55] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+EXIT 0
