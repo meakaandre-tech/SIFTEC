@@ -268,7 +268,7 @@ public class ShopMenu extends ChestMenu {
                 }
                 // a copy is printed onto a blank banner of its colour from the inventory, never made from nothing
                 if (!player.hasInfiniteMaterials() && !takeBlank(copy.getItem())) {
-                    player.sendOverlayMessage(Component.translatable("siftec.shop.banner_blank", copy.getItem().getName()));
+                    player.sendOverlayMessage(Component.translatable("siftec.shop.banner_blank", copy.getItem().getName(new ItemStack(copy.getItem()))));
                     return;
                 }
                 made = copy;

@@ -747,7 +747,7 @@ public final class Buildings {
      * stripping it, wax going on or off, a casing applied to it. Changing one would bring the building down; its shell
      * changes only with the Build Gun and the Customizer. The controller and the ports are left to their own use.
      */
-    public static boolean shellChangeRefused(Level level, @Nullable net.minecraft.world.entity.player.Player player, BlockPos pos) {
+    public static boolean shellChangeRefused(Level level, net.minecraft.world.entity.player.@Nullable Player player, BlockPos pos) {
         BlockPos controller = BuildingIndex.controllerOf(level, pos);
         if (controller == null || pos.equals(controller) || level.getBlockState(pos).getBlock() instanceof PortBlock) return false;
         if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.build_gun.part", nameAt(level, controller)));
@@ -756,8 +756,8 @@ public final class Buildings {
 
     /** Items whose use on a block changes that block (an axe strips or scrapes, honeycomb waxes, a shovel or hoe turns soil). */
     static boolean changesBlock(ItemStack stack) {
-        return stack.getItem() instanceof net.minecraft.world.item.AxeItem || stack.getItem() instanceof net.minecraft.world.item.HoneycombItem
-            || stack.getItem() instanceof net.minecraft.world.item.ShovelItem || stack.getItem() instanceof net.minecraft.world.item.HoeItem;
+        return stack.is(net.minecraft.tags.ItemTags.AXES) || stack.is(net.minecraft.tags.ItemTags.SHOVELS) || stack.is(net.minecraft.tags.ItemTags.HOES)
+            || stack.is(net.minecraft.world.item.Items.HONEYCOMB);
     }
 
     /** Controllers one of whose blocks changed since they last looked (for the foundations, which do not look every second). */

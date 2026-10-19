@@ -326,7 +326,7 @@ public final class BuildingPower {
     }
 
     /** The waste these rods will leave (a stack of rods in a fuel acceptor, not yet used up). */
-    static int wasteOf(ItemStack rods) {
+    static int pendingWaste(ItemStack rods) {
         if (rods.isEmpty()) return 0;
         readFuel();
         String id = BuiltInRegistries.ITEM.getKey(rods.getItem()).toString();
