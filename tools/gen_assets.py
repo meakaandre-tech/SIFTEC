@@ -687,9 +687,8 @@ for sid, name, cost, panel, tex in content.SIGNS:
     item_def(sid, f"siftec:block/{sid}")
     write(f"{D}/loot_table/blocks/{sid}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{sid}"}]}]})
 for bid, w, h, _ in content.BILLBOARD_SIGNS:
-    # flush with the board's white face: only the text shows
-    write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/block", "textures": {"particle": "minecraft:block/white_concrete", "face": "minecraft:block/white_concrete"},
-                                          "elements": [{"from": [0, 0, 0], "to": [16, 16, 0.5], "faces": {"south": {"texture": "#face"}}}]})
+    # it hangs on the rim's bottom row and draws nothing itself: only its text shows, on the board's face
+    write(f"{A}/models/block/{bid}.json", {"parent": "minecraft:block/block", "textures": {"particle": "create:block/industrial_iron_block"}})
     lang[f"block.siftec.{bid}"] = "Billboard"
 for sid in [x[0] for x in content.SIGNS] + [x[0] for x in content.BILLBOARD_SIGNS]:
     write(f"{A}/blockstates/{sid}.json", {"variants": {f"facing={d},waterlogged={wl}": ({"model": f"siftec:block/{sid}", "y": y} if y else {"model": f"siftec:block/{sid}"})
