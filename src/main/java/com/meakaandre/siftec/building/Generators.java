@@ -207,7 +207,7 @@ public final class Generators {
         // take water only once they heat; once it runs, a moment of no load in the window never lets the boiler run every
         // level on a trickle: its need follows at least the floor
         boolean startingUp = c.offered <= 0 && c.lastGenerated <= 0;
-        least = startingUp && least <= 0 ? 0 : Math.max(least, MIN_WATER_LOAD);
+        least = startingUp ? 0 : Math.max(least, MIN_WATER_LOAD);
         BlockPos intake = intake(c);
         boolean wet = intake != null && ProductionLogic.mbAt(level, intake, Fluids.WATER) > 0;
         for (FluidTankBlockEntity b : boilers) {
