@@ -137,6 +137,23 @@ public final class BuildingTests {
             }
     }
 
+    /**
+     * A one-block stone rim round a pool (x0..x1, z0..z1 at height y) wherever it is open, so its water stays in instead of
+     * running over the test platform. Laid after the buildings, so it never stands in their way.
+     */
+    public static void rim(ServerLevel level, int x0, int z0, int x1, int z1, int y) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int x = x0 - 1; x <= x1 + 1; x++)
+            for (int z = z0 - 1; z <= z1 + 1; z++) {
+                if (x >= x0 && x <= x1 && z >= z0 && z <= z1) continue;
+                pos.set(x, y, z);
+                BlockState state = level.getBlockState(pos);
+                if ((state.isAir() || !state.getFluidState().isEmpty() && !state.getFluidState().isSource()) && !Buildings.protectedAt(level, pos)) {
+                    level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
+                }
+            }
+    }
+
     private static SimpleContainer wallet(int sheets, int rods) {
         SimpleContainer c = new SimpleContainer(9);
         Item sheet = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse("create:iron_sheet"));

@@ -7,7 +7,6 @@ import com.meakaandre.siftec.collect.Collectible;
 import com.meakaandre.siftec.collect.CollectibleBlock;
 import com.meakaandre.siftec.depot.DepotBlock;
 import com.meakaandre.siftec.hub.HubBlock;
-import com.meakaandre.siftec.machine.ProcessorBlock;
 import com.meakaandre.siftec.mam.MamBlock;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.node.NodeLook;
@@ -157,7 +156,9 @@ public class ModBlocks {
     public static final Supplier<DepotBlock> DIMENSIONAL_DEPOT = block("dimensional_depot", DepotBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.governor.GovernorBlock> SPEED_GOVERNOR = block("speed_governor", com.meakaandre.siftec.governor.GovernorBlock::new, ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.equip.LandingPadBlock> LANDING_PAD = block("landing_pad", com.meakaandre.siftec.equip.LandingPadBlock::new, ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.drone.DronePortBlock> DRONE_PORT = block("drone_port", com.meakaandre.siftec.drone.DronePortBlock::new, ModBlocks::machine);
+    /** The Drone Port building's terminal: only ever part of the building (built with the Build Gun), so it has no item. */
+    public static final Supplier<com.meakaandre.siftec.drone.DronePortBlock> DRONE_PORT = blockOnly("drone_port", com.meakaandre.siftec.drone.DronePortBlock::new,
+        () -> machine().noLootTable());
     public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> MAIN_PORTAL = block("main_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(true, properties), ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> SATELLITE_PORTAL = block("satellite_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(false, properties), ModBlocks::machine);
     public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER = block("blueprint_designer", properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(4, properties), ModBlocks::machine);
@@ -186,8 +187,6 @@ public class ModBlocks {
     public static final Supplier<com.meakaandre.siftec.building.BrassBasinBlock> BRASS_BASIN = blockOnly("brass_basin",
         com.meakaandre.siftec.building.BrassBasinBlock::new, () -> machine().sound(SoundType.NETHERITE_BLOCK));
 
-    public static final Supplier<ProcessorBlock> CONVERTER = block("converter", properties -> new ProcessorBlock("converter", properties), ModBlocks::machine);
-    public static final Supplier<ProcessorBlock> PARTICLE_ACCELERATOR = block("particle_accelerator", properties -> new ProcessorBlock("particle_accelerator", properties), ModBlocks::machine);
     public static final Supplier<ClaimMarkerBlock> CLAIM_MARKER = block("claim_marker", ClaimMarkerBlock::new, ModBlocks::machine);
     /**
      * A dead player's things, where they died (death/DeathCrates.java): placed only by the game, so it has no item.

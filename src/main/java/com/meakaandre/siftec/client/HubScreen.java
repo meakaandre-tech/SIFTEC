@@ -259,8 +259,25 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
             if (hoverExtra != null) lines.add(hoverExtra.copy().withStyle(ChatFormatting.GRAY));
             g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
         } else if (hoverLines != null) {
-            g.setComponentTooltipForNextFrame(font, hoverLines, mouseX, mouseY);
+            // wrapped to the panel's width, so a long line (a milestone's unlocks) never runs past it to the screen's edges
+            g.setComponentTooltipForNextFrame(font, wrap(hoverLines, W - 16), mouseX, mouseY);
         }
+    }
+
+    /** Each line split into lines no wider than {@code width}, keeping its styles. */
+    private List<Component> wrap(List<Component> lines, int width) {
+        List<Component> out = new ArrayList<>();
+        for (Component line : lines) {
+            for (net.minecraft.network.chat.FormattedText part : font.getSplitter().splitLines(line, width, net.minecraft.network.chat.Style.EMPTY)) {
+                net.minecraft.network.chat.MutableComponent c = Component.empty();
+                part.visit((style, text) -> {
+                    c.append(Component.literal(text).withStyle(style));
+                    return java.util.Optional.empty();
+                }, net.minecraft.network.chat.Style.EMPTY);
+                out.add(c);
+            }
+        }
+        return out;
     }
 
     private void milestone(GuiGraphicsExtractor g, Milestone sel, int x, int y, int mouseX, int mouseY) {

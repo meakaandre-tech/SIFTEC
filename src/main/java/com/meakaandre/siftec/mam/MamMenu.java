@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.mam;
 
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Companies;
+import net.minecraft.core.BlockPos;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Alternates;
 import com.meakaandre.siftec.hub.HubMenu;
@@ -38,15 +40,21 @@ public class MamMenu extends ChestMenu {
     private static final int SIZE = 54, STATUS_SLOT = 17, FIRST_NODE = 27, MAX_NODES = 27, DRIVE_SLOT = 28, OFFER_SLOT = 31;
     private final SimpleContainer view;
     private final ServerPlayer player;
-    private final Company company;
+    /** The company it researches for: kept by id and looked up again on every refresh and click ({@link #relook}). */
+    private final String companyId;
+    private Company company;
+    /** The MAM it was opened at, which must stand and stay in reach. */
+    private final BlockPos at;
     private int tree;
     private int ticks;
 
-    private MamMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company) {
+    private MamMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, BlockPos at) {
         super(MenuType.GENERIC_9x6, id, inventory, view, 6);
         this.view = view;
         this.player = player;
+        this.companyId = company.id;
         this.company = company;
+        this.at = at.immutable();
         // open on the first tree this player can see
         List<Milestones.Tree> trees = Milestones.trees();
         for (int t = 0; t < trees.size(); t++) {
@@ -58,9 +66,9 @@ public class MamMenu extends ChestMenu {
         refresh();
     }
 
-    public static void open(ServerPlayer player, Company company) {
+    public static void open(ServerPlayer player, Company company, BlockPos at) {
         player.openMenu(new SimpleMenuProvider(
-            (id, inventory, p) -> new MamMenu(id, inventory, new SimpleContainer(SIZE), player, company),
+            (id, inventory, p) -> new MamMenu(id, inventory, new SimpleContainer(SIZE), player, company, at),
             Component.translatable("siftec.mam.title", company.name)));
     }
 
@@ -89,7 +97,16 @@ public class MamMenu extends ChestMenu {
         return BuiltInRegistries.ITEM.getOptional(Identifier.parse(id)).orElse(Items.BOOK);
     }
 
+    /** Looks the company up by id again (a fold, a company that is gone); false if it is gone. */
+    private boolean relook() {
+        Company now = BuildingMenus.company(player, companyId);
+        if (now == null) return false;
+        company = now;
+        return true;
+    }
+
     private void refresh() {
+        if (!relook()) return;
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         List<Milestones.Tree> trees = Milestones.trees();
         for (int t = 0; t < trees.size() && t < 9; t++) {
@@ -292,7 +309,8 @@ public class MamMenu extends ChestMenu {
     @Override
     public void clicked(int slot, int button, ContainerInput input, Player who) {
         if (slot >= 0 && slot < SIZE) {
-            if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) press(slot);
+            // an ex-member, or one out of reach, pays nothing into the research
+            if ((input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) && stillValid(who) && relook()) press(slot);
             return;
         }
         if (input == ContainerInput.PICKUP || input == ContainerInput.THROW) super.clicked(slot, button, input, who);
@@ -311,6 +329,8 @@ public class MamMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player who) {
-        return true;
+        if (who != player || !BuildingMenus.near(player, at, be -> be instanceof MamBlockEntity)) return false;
+        if (player.hasInfiniteMaterials()) return true;
+        return BuildingMenus.member(player, companyId) && MamBlock.refusal(player, at) == null;
     }
 }

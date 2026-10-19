@@ -1294,7 +1294,7 @@ def billboard(width, height, post_x):
         f.box(x, 0, 1, x, 1, 1, LIGHT)
     f.box(left, 2, 1, right, height + 1, 1, DARK)
     f.box(left + 1, 3, 1, right - 1, height, 1, W_BODY)
-    f.set(0, 2, 1, W_BODY)
+    # the sign hangs on the rim's bottom row, which stays whole (a white block there left a gap in the frame)
     f.set(0, 2, 0, f"siftec:billboard_{'small' if width == 8 else 'large'}_sign[facing=south,waterlogged=false]")
     f.set(post_x[0], 0, 0, CONTROLLER)
     return f.done()

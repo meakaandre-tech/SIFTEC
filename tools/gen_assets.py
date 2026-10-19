@@ -183,12 +183,15 @@ for name, tex, tint in (("gypsum", "minecraft:item/bone_meal", None), ("toxic_re
     item_def(name, f"siftec:item/{name}", tint)
 MACHINES = {"blueprint_designer": ("Blueprint Designer Mk.1", "minecraft:block/lapis_block"), "blueprint_designer_mk2": ("Blueprint Designer Mk.2", "minecraft:block/emerald_block"), "blueprint_designer_mk3": ("Blueprint Designer Mk.3", "minecraft:block/diamond_block"), "drone_port": ("Drone Port", "create:block/cardboard_block_side"), "main_portal": ("Main Portal", "minecraft:block/crying_obsidian"), "satellite_portal": ("Satellite Portal", "minecraft:block/obsidian"), "landing_pad": ("Landing Pad", "minecraft:block/hay_block_side"), "claim_marker": ("Claim Marker", "minecraft:block/red_concrete"), "dimensional_depot": ("Dimensional Depot", "create:block/brass_casing"),
             "resource_well_extractor": ("Resource Well Extractor", "create:block/railway_casing")}
+BLOCK_ONLY_MACHINES = {"drone_port"}
 for b, (name, casing) in MACHINES.items():
     lang[f"block.siftec.{b}"] = name
     write(f"{A}/blockstates/{b}.json", {"variants": {"": {"model": f"siftec:block/{b}"}}})
     write(f"{A}/models/block/{b}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
         "top": "create:block/gearbox_top", "side": casing, "bottom": casing}})
-    item_def(b, f"siftec:block/{b}")
+    # the Drone Port block is only ever the Drone Port building's terminal: it has no item
+    if b not in BLOCK_ONLY_MACHINES:
+        item_def(b, f"siftec:block/{b}")
 
 # ---- power (power/, building/BuildingPower.java): everything shown in SU, Satisfactory's MW at 1 MW = 204.8 SU
 lang.update({
@@ -569,14 +572,8 @@ for pid, (pname, recipe_list) in content.PROCESSORS.items():
         r["mw"] = list(p["mw"])
         r["name"] = p["name"]
         out.append(r)
+    # the recipes only: the Converter and Particle Accelerator are Build Gun buildings (the old single blocks are gone)
     data["processors"][pid] = out
-    lang[f"block.siftec.{pid}"] = pname
-    casing = "create:block/brass_casing" if pid == "converter" else "create:block/railway_casing"
-    write(f"{A}/blockstates/{pid}.json", {"variants": {"": {"model": f"siftec:block/{pid}"}}})
-    write(f"{A}/models/block/{pid}.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
-        "top": "create:block/gearbox_top", "side": casing, "bottom": casing}})
-    item_def(pid, f"siftec:block/{pid}")
-    write(f"{D}/loot_table/blocks/{pid}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"siftec:{pid}"}]}]})
 lang.update({"siftec.processor.selected": "Making: %s", "siftec.processor.fluid": "%s mB of %s"})
 
 # ---- AWESOME Sink and Shop (sink/, the AWESOME Sink and Shop tab)
@@ -742,7 +739,9 @@ for m, name in enumerate(("January", "February", "March", "April", "May", "June"
 lang.update({
     "siftec.shop.season": "On sale in %s", "siftec.shop.out_of_season": "A holiday set: on sale in %s",
     "siftec.shop.banner_none": "Your company has no banner yet: use this entry holding a banner to make it the company's",
-    "siftec.shop.banner_take": "Click to take a copy of the company banner", "siftec.shop.banner_set": "Holding a banner: click to make it the company's",
+    "siftec.shop.banner_take": "Click to print the company banner onto a plain banner of its colour from your inventory",
+    "siftec.shop.banner_failed": "That banner could not be kept: the company banner is unchanged",
+    "siftec.shop.banner_blank": "Printing the company banner needs a plain %s in your inventory", "siftec.shop.banner_set": "Holding a banner: click to make it the company's",
     "siftec.shop.banner_new": "Your company has a new banner", "siftec.shop.banner_name": "%s banner",
     "siftec.shop.use.material": "Use the Customizer on a foundation, wall or roof", "siftec.shop.use.pattern": "Use the Customizer on a foundation",
     "siftec.shop.use.emote": "Play it with /emote", "siftec.shop.use.helmet": "Use the Customizer in the air", "siftec.shop.use.trim": "Use the Customizer in the air",
@@ -1167,6 +1166,7 @@ lang.update({
     "siftec.building.pressurized": "pressurizing a %s well",
     # work package 14: vehicles (vehicle/Vehicles.java) and the Truck Station (building/TruckStations.java)
     "entity.siftec.tractor": "Tractor", "entity.siftec.truck": "Truck", "entity.siftec.explorer": "Explorer",
+    "entity.siftec.cardboard_drone": "Cardboard Drone",
     "key.category.siftec.vehicles": "SIFTEC Vehicles", "key.siftec.vehicle.record": "Record a self-driving route",
     "siftec.build_gun.fits_vehicle": "Right-click to put the %s down here. R rotate",
     "siftec.build_gun.dismantle_vehicle": "Right-click to take the %s back: its cost and cargo come back",
@@ -1218,6 +1218,8 @@ item_def("building_port", "siftec:block/building_port_item_in")
 lang.update({
     "siftec.backpack.bound": "Your backpack is your inventory: it stays on your back",
     "siftec.backpack.tier": "Your backpack grew to %s: %s slots",
+    "siftec.backpack.lowered": "Your company's backpacks are %s: yours is %s slots again",
+    "siftec.backpack.lowered_crate": "What lay in the backpack slots you no longer have is in a crate at %s %s %s",
     "siftec.backpack.extra": "Only one backpack per player: the extra one was unpacked into your inventory",
     "siftec.backpack.grid": "2x2 Crafting Grid",
     "siftec.backpack.grid.locked": "The backpack's crafting grid stays in it. A Crafting Upgrade makes it 3x3",
@@ -1229,7 +1231,7 @@ lang.update({
     "siftec.crate.placed": "Your things are in a Death Crate where you died (%s, %s, %s). It is on your map",
     "siftec.crate.restored": "Everything is back where it was",
     "siftec.crate.partly": "%s stacks did not fit and stay in the crate",
-    "siftec.crate.not_yours": "This Death Crate belongs to %s",
+    "siftec.crate.building": "A building of your company came down: what it held is in a crate at %s %s %s", "siftec.crate.not_yours": "This Death Crate belongs to %s",
     "siftec.crate.empty": "The Death Crate was empty",
 })
 write(f"{A}/models/block/death_crate.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
@@ -1306,7 +1308,7 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
 # machines drop themselves
-for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk2", "blueprint_designer_mk3", "drone_port", "main_portal", "satellite_portal", "landing_pad", "claim_marker", "resource_well_extractor", "dimensional_depot", "speed_governor"):
+for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk2", "blueprint_designer_mk3", "main_portal", "satellite_portal", "landing_pad", "claim_marker", "resource_well_extractor", "dimensional_depot", "speed_governor"):
     write(f"{D}/loot_table/blocks/{b}.json", {"type": "minecraft:block", "pools": [{"rolls": 1,
           "entries": [{"type": "minecraft:item", "name": f"siftec:{b}"}],
           "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
@@ -1314,7 +1316,7 @@ for b in ("steel_casing", "blueprint_designer", "blueprint_designer_mk2", "bluep
 # a Pumpjack hole only counts an Oil Well as the bottom of its pipe
 write(os.path.join(ROOT, "data", "createdieselgenerators", "tags", "block", "oil_deposit.json"), {"replace": True, "values": ["siftec:oil_well"]})
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json"),
-      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk2", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:converter", "siftec:particle_accelerator", "siftec:hub", "siftec:wormhole_gateway"]
+      {"replace": False, "values": ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing", "siftec:blueprint_designer", "siftec:blueprint_designer_mk2", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal", "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:hub", "siftec:wormhole_gateway"]
       + sorted(f"siftec:{b}" for b in SIFTEC_ORES) + [f"siftec:{d[0]}" for d in content.DECOR]})
 # SIFTEC's ores take a stone pickaxe or better, like iron ore
 write(os.path.join(ROOT, "data", "minecraft", "tags", "block", "needs_stone_tool.json"), {"replace": False, "values": sorted(f"siftec:{b}" for b in SIFTEC_ORES)})
@@ -1332,15 +1334,17 @@ TEX = os.path.join(A, "textures")
 def has(kind, name):
     return os.path.exists(os.path.join(TEX, kind, name + ".png"))
 
-FRONTED = {"hub", "mam", "resource_well_extractor", "converter",
-           "particle_accelerator", "hub_engine", "crash_site_block"}
+FRONTED = {"hub", "mam", "resource_well_extractor", "hub_engine", "crash_site_block"}
 # drawn as a post or a tripod on a clear background: shown as two crossed planes, like a flower
 CROSSED = set()
 # art of blocks that are gone (work package 6 made the power blocks Build Gun buildings); the HUB Engine's is kept as
 # the look of the HUB's Biomass Burners (its model only)
 RETIRED = {"furnace_engine", "geyser_engine", "power_pole", "power_tower", "power_storage",
            # work package 10 made these Build Gun buildings: their art stays for when the buildings use it
-           "awesome_sink", "awesome_shop", "equipment_workshop", "radar_tower"}
+           "awesome_sink", "awesome_shop", "equipment_workshop", "radar_tower",
+           # the old single-block Converter and Particle Accelerator: Build Gun buildings since review fixes 4, the blocks
+           # gone since review fixes 6
+           "converter", "particle_accelerator"}
 # blocks that turn to face whoever placed them; the Crash Site Pod is set down by world generation, so it does not
 TURNS = FRONTED - {"crash_site_block", "hub_engine"}
 # these share a block class with one that turns, so they have the same facing, though nothing on them shows it

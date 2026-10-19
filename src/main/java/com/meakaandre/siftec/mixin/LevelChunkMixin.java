@@ -27,6 +27,7 @@ public abstract class LevelChunkMixin {
                                    org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<net.minecraft.world.level.block.state.BlockState> cir) {
         if (cir.getReturnValue() != null && ((LevelChunk) (Object) this).getLevel() instanceof net.minecraft.server.level.ServerLevel level) {
             com.meakaandre.siftec.map.MapTerrain.blockChanged(level, pos);
+            com.meakaandre.siftec.building.Buildings.blockChanged(level, pos);
         }
     }
 

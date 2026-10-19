@@ -17,7 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * A Deployer acts as its owner (Create gives its fake player the owner's id), so inside a claim it may only
  * punch, use, place or attack when the owner's company holds the claim, or when it works inside that claim itself.
  * It never acts on a Build Gun building's block ({@link Buildings#deployerMayAct}): buildings come down only with the
- * Build Gun. A Deployer that is itself part of that building (the Manufacturer's line) still works on it.
+ * Build Gun. A Deployer that is itself part of that building (the Manufacturer's line) still works on it. It never
+ * punches an ore node's position (node.NodeSites).
  */
 @Mixin(DeployerHandler.class)
 public abstract class ClaimDeployerMixin {
@@ -26,5 +27,8 @@ public abstract class ClaimDeployerMixin {
         ServerPlayer fake = player.cast();
         // vec is the middle of the Deployer's own block (or where it is on a moving contraption)
         if (!Claims.allowed(fake, fake.level(), clickedPos) || !Buildings.deployerMayAct(fake.level(), BlockPos.containing(vec), clickedPos)) ci.cancel();
+        // nor does it mine an ore node: a Deployer with a Fortune pickaxe would give a Miner Mk.2's output with no milestone
+        // (plain Create drills may mine nodes)
+        else if (mode == DeployerBlockEntity.Mode.PUNCH && com.meakaandre.siftec.node.NodeSites.isSite(fake.level(), clickedPos)) ci.cancel();
     }
 }

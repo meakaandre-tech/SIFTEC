@@ -39,12 +39,19 @@ import java.util.function.Consumer;
 public final class GeyserSearch {
     /** Chunks generated at the same time, and chunks of biome sampling a worker piece takes. */
     private static final int AT_ONCE = 4, SAMPLE_BATCH = 64;
+    /** The farthest a Radar Tower's search reaches, in chunks (each chunk with sulfur caves under it is generated for good). */
+    public static final int MAX_RADIUS = 20;
+    /** Times a chunk that failed to generate is asked for again before the search gives up on it (it is not marked read). */
+    private static final int RETRIES = 3;
     /** Heights where sulfur caves are looked for (the survey's): every 8 blocks from -60 to 100. */
     private static final int Y_FROM = -60, Y_TO = 100, Y_STEP = 8;
 
     /** A search under way: the chunks still to generate, what it has found, and who to tell. */
     private static final class Job {
         final LongLinkedOpenHashSet queue = new LongLinkedOpenHashSet();
+        /** Chunks being generated for this search now (their ticket is renewed every tick until they are in). */
+        final LongOpenHashSet inFlight = new LongOpenHashSet();
+        final it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap failed = new it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap();
         final List<BlockPos> found = new ArrayList<>();
         final Consumer<List<BlockPos>> done;
         int running;
@@ -178,20 +185,30 @@ public final class GeyserSearch {
         ServerLevel level = server.overworld();
         Searched searched = Searched.get(server);
         for (Job job : new ArrayList<>(JOBS)) {
+            // a chunk asked for from the server thread holds its loading ticket for one tick only: asking again every tick
+            // keeps it held at the features level until the chunk is in, so it is never dropped half way
+            for (long c : job.inFlight) level.getChunkSource().getChunkFuture(ChunkPos.getX(c), ChunkPos.getZ(c), ChunkStatus.FEATURES, true);
             while (job.running < AT_ONCE && !job.queue.isEmpty()) {
                 long c = job.queue.removeFirstLong();
                 if (searched.has(c) || !RUNNING.add(c)) continue;
                 job.running++;
+                job.inFlight.add(c);
                 int x = ChunkPos.getX(c), z = ChunkPos.getZ(c);
                 level.getChunkSource().getChunkFuture(x, z, ChunkStatus.FEATURES, true).whenCompleteAsync((result, error) -> {
                     RUNNING.remove(c);
+                    job.inFlight.remove(c);
                     job.running--;
                     ChunkAccess chunk = error == null && result != null ? result.orElse(null) : null;
-                    if (chunk != null) {
-                        List<BlockPos> here = read(level, chunk);
-                        job.found.addAll(here);
-                        MapTerrain.addFound(level, x, z, here);
+                    if (chunk == null) {
+                        // not read: asked for again a few times, and never marked as read
+                        int tries = job.failed.addTo(c, 1) + 1;
+                        if (tries <= RETRIES) job.queue.add(c);
+                        else Siftec.LOGGER.warn("SIFTEC geysers: chunk {} {} could not be generated; it is left for a later search", x, z);
+                        return;
                     }
+                    List<BlockPos> here = read(level, chunk);
+                    job.found.addAll(here);
+                    MapTerrain.addFound(level, x, z, here);
                     searched.add(c);
                 }, server);
             }

@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.workshop;
 
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Company;
+import net.minecraft.core.BlockPos;
 import com.meakaandre.siftec.hub.Locks;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
@@ -30,31 +32,39 @@ public class WorkshopMenu extends ChestMenu {
     private static final int SIZE = 54;
     private final SimpleContainer view;
     private final ServerPlayer player;
-    private final Company company;
+    /** The company it builds for, looked up by id on every click; and the Workshop's controller, which must stay in reach. */
+    private final String companyId;
+    private final BlockPos at;
     private final List<Milestones.Build> shown = new ArrayList<>();
 
-    private WorkshopMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company) {
+    private WorkshopMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, String companyId, BlockPos at) {
         super(MenuType.GENERIC_9x6, id, inventory, view, 6);
         this.view = view;
         this.player = player;
-        this.company = company;
+        this.companyId = companyId;
+        this.at = at.immutable();
         refresh();
     }
 
-    public static void open(ServerPlayer player, Company company) {
+    public static void open(ServerPlayer player, Company company, BlockPos at) {
         player.openMenu(new SimpleMenuProvider(
-            (id, inventory, p) -> new WorkshopMenu(id, inventory, new SimpleContainer(SIZE), player, company),
+            (id, inventory, p) -> new WorkshopMenu(id, inventory, new SimpleContainer(SIZE), player, company.id, at),
             Component.translatable("siftec.workshop.title")));
+    }
+
+    private boolean unlocked(Company company, Item result) {
+        Milestone lock = Locks.lockOf(result);
+        return lock == null || company.has(lock.id()) || player.hasInfiniteMaterials();
     }
 
     private void refresh() {
         shown.clear();
+        Company company = BuildingMenus.company(player, companyId);
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         for (Milestones.Build build : Milestones.workshop()) {
             Item result = BuiltInRegistries.ITEM.getOptional(build.item()).orElse(Items.AIR);
             if (result == Items.AIR || shown.size() >= SIZE) continue;
-            Milestone lock = Locks.lockOf(result);
-            if (lock != null && !company.has(lock.id()) && !player.hasInfiniteMaterials()) continue;
+            if (company == null || !unlocked(company, result)) continue;
             ItemStack icon = new ItemStack(result);
             List<Component> lore = new ArrayList<>();
             for (Milestone.Cost cost : build.cost()) {
@@ -74,6 +84,11 @@ public class WorkshopMenu extends ChestMenu {
     private void press(int slot) {
         if (slot >= shown.size()) return;
         Milestones.Build build = shown.get(slot);
+        Company company = BuildingMenus.company(player, companyId);
+        if (company == null || !stillValid(player) || !unlocked(company, BuiltInRegistries.ITEM.getValue(build.item()))) {
+            refresh();
+            return;
+        }
         Inventory inventory = player.getInventory();
         for (Milestone.Cost cost : build.cost()) {
             if (cost.present() && cost.carried(inventory) < cost.count()) {
@@ -106,6 +121,6 @@ public class WorkshopMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player who) {
-        return true;
+        return who == player && BuildingMenus.near(player, at, BuildingMenus.logic("workshop")) && BuildingMenus.member(player, companyId);
     }
 }

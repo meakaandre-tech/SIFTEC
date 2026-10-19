@@ -29,6 +29,11 @@ public class DeathCrateBlockEntity extends BlockEntity {
 
     public UUID owner;
     public String ownerName = "";
+    /**
+     * A building's crate ({@link DeathCrates#stash}): the company whose building came down. Any of its members opens it,
+     * and its stacks go anywhere in their inventory. Empty for a player's Death Crate.
+     */
+    public String companyId = "";
     public String markerId = "";
     public final List<Entry> entries = new ArrayList<>();
 
@@ -51,6 +56,7 @@ public class DeathCrateBlockEntity extends BlockEntity {
         super.saveAdditional(view);
         if (owner != null) view.store("Owner", UUIDUtil.CODEC, owner);
         view.putString("OwnerName", ownerName);
+        if (!companyId.isEmpty()) view.putString("Company", companyId);
         view.putString("Marker", markerId);
         List<Integer> where = new ArrayList<>(), slots = new ArrayList<>();
         List<ItemStack> stacks = new ArrayList<>();
@@ -69,6 +75,7 @@ public class DeathCrateBlockEntity extends BlockEntity {
         super.loadAdditional(view);
         owner = view.read("Owner", UUIDUtil.CODEC).orElse(null);
         ownerName = view.getStringOr("OwnerName", "");
+        companyId = view.getStringOr("Company", "");
         markerId = view.getStringOr("Marker", "");
         List<Integer> where = view.read("Where", Codec.INT.listOf()).orElse(List.of());
         List<Integer> slots = view.read("Slots", Codec.INT.listOf()).orElse(List.of());

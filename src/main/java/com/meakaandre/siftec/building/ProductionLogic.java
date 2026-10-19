@@ -600,6 +600,14 @@ public final class ProductionLogic {
         return out;
     }
 
+    /** True if the Particle Accelerator's or the Converter's current recipe takes this item (its input port lets nothing else in). */
+    static boolean processorTakes(ControllerBlockEntity c, ItemStack stack) {
+        BuildingDef def = c.def();
+        if (def == null || !def.logic().equals("processor") || stack.isEmpty()) return false;
+        for (Milestone.Cost cost : processorInputs(c, def)) if (cost.matches(stack)) return true;
+        return false;
+    }
+
     static boolean processorSlotTakes(ControllerBlockEntity c, int slot, ItemStack stack) {
         BuildingDef def = c.def();
         if (def == null || !def.logic().equals("processor") || stack.isEmpty()) return false;

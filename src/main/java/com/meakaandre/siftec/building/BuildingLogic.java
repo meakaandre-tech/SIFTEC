@@ -161,6 +161,8 @@ public final class BuildingLogic {
         c.filter = stack.isEmpty() ? ItemStack.EMPTY : stack.copyWithCount(1);
         c.setChanged();
         syncFilter(level, c);
+        // the Converter keeps its one cell through a recipe change
+        if (level instanceof ServerLevel server) Processors.ensureCell(server, c);
         return true;
     }
 
@@ -235,7 +237,8 @@ public final class BuildingLogic {
                 yield onLine || ProductionLogic.basinHasInput(level, c, true);
             }
             case "packager" -> !c.input.getItem(0).isEmpty() || ProductionLogic.packagerHolds(level, c);
-            case "processor" -> ProductionLogic.basinHasInput(level, c, true) || Processors.busy(level, c) || Processors.ready(level, c, def);
+            // working only while a step of its recipe can go on, not whenever something lies inside it
+            case "processor" -> Processors.progressing(level, c, def);
             case "extractor" -> !c.problem.equals("siftec.building.full");
             case "sink" -> !c.input.getItem(0).isEmpty();
             default -> true;

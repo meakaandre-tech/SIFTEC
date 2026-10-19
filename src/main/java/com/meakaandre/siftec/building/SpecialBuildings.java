@@ -52,12 +52,12 @@ public final class SpecialBuildings {
     static boolean use(ServerPlayer player, ControllerBlockEntity c, BuildingDef def) {
         Company company = Companies.of(player);
         switch (def.logic()) {
-            case "workshop" -> WorkshopMenu.open(player, company);
-            case "shop" -> ShopMenu.open(player, company);
+            case "workshop" -> WorkshopMenu.open(player, company, c.getBlockPos());
+            case "shop" -> ShopMenu.open(player, company, c.getBlockPos());
             case "sink" -> {
-                // a Sink is its company's: anyone may look, but points and coupons are the owner's
+                // a Sink is its company's: anyone may look, but only its members print the owner's points as coupons
                 Company owner = c.companyId.isEmpty() ? company : com.meakaandre.siftec.company.CompanyData.get(player.level().getServer()).byId(c.companyId);
-                SinkMenu.open(player, owner == null ? company : owner, () -> c.powered);
+                SinkMenu.open(player, owner == null ? company : owner, c.getBlockPos(), mayOperate(player, c), () -> c.powered);
             }
             case "radar" -> Radar.use(player, c);
             case "truck_station" -> TruckStations.use(player, c, def);
@@ -70,6 +70,20 @@ public final class SpecialBuildings {
             }
         }
         return true;
+    }
+
+    /** The Drone Port template's terminal cell (the Drone Port block under its pad), in the Build Gun frame. */
+    public static int @Nullable [] terminalCell(BuildingTemplate t) {
+        for (BuildingTemplate.Cell cell : t.members) if (cell.state().is(com.meakaandre.siftec.registry.ModBlocks.DRONE_PORT.get())) return new int[]{cell.x(), cell.y(), cell.z()};
+        return null;
+    }
+
+    /** The placement that puts a Drone Port's terminal at a spot, facing one way. */
+    public static Placement forTerminal(BuildingDef def, int[] terminal, BlockPos at, net.minecraft.core.Direction facing) {
+        net.minecraft.core.Direction right = facing.getClockWise();
+        BlockPos anchor = at.offset(-right.getStepX() * terminal[0] - facing.getStepX() * terminal[2], -terminal[1],
+            -right.getStepZ() * terminal[0] - facing.getStepZ() * terminal[2]);
+        return new Placement(def, anchor, facing, false);
     }
 
     /** The Drone Port building's loading terminal (the Drone Port block under its pad), or null. */

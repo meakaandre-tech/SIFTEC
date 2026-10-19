@@ -352,7 +352,8 @@ public final class TravelersBackpackCompat {
 
     /**
      * Brings the player in line with the rules: a backpack item found in the inventory or on the cursor is unpacked, a
-     * player without a backpack is given one, a backpack below the company's tier is raised, and a backpack without a
+     * player without a backpack is given one, a backpack below the company's tier is raised (one above it, from a company
+     * left behind, is lowered and its extra slots go into a crate), and a backpack without a
      * crafting grid gets its built-in one.
      */
     public static void sync(ServerPlayer player) {
@@ -385,8 +386,49 @@ public final class TravelersBackpackCompat {
             player.sendSystemMessage(Component.translatable("siftec.backpack.tier", Tiers.of(want).getLocalizedName(), Tiers.of(want).getStorageSlots())
                 .withStyle(ChatFormatting.GOLD));
             Siftec.LOGGER.info("SIFTEC: raised {}'s backpack from tier {} to {}", player.getGameProfile().name(), tier, want);
+        } else if (tier > want) {
+            lower(player, attachment, tier, want);
         }
         ensureGrid(player, attachment);
+    }
+
+    /**
+     * The player's company now has a lower tier than their backpack (they left a company that had more): the backpack
+     * goes down to the company's tier, and what lay in the storage, tool and upgrade slots it no longer has goes into a
+     * crate of theirs (death.DeathCrates#stashFor). The crafting grid stays.
+     */
+    private static void lower(ServerPlayer player, BackpackAttachment attachment, int tier, int want) {
+        ItemStack lowered = attachment.getBackpack().copy();
+        Tiers.Tier to = Tiers.of(want);
+        List<ItemStack> extra = new ArrayList<>();
+        extra.addAll(trim(lowered, ModDataComponents.BACKPACK_CONTAINER, to.getStorageSlots()));
+        extra.addAll(trim(lowered, ModDataComponents.TOOLS_CONTAINER, to.getToolSlots()));
+        extra.addAll(trim(lowered, ModDataComponents.UPGRADES, to.getUpgradeSlots()));
+        extra.removeIf(TravelersBackpackCompat::isGrid);
+        applyTier(lowered, want);
+        equip(player, attachment, lowered);
+        if (!extra.isEmpty()) DeathCrates.stashFor(player, extra, "siftec.backpack.lowered_crate");
+        player.sendSystemMessage(Component.translatable("siftec.backpack.lowered", to.getLocalizedName(), to.getStorageSlots()).withStyle(ChatFormatting.YELLOW));
+        Siftec.LOGGER.info("SIFTEC: lowered {}'s backpack from tier {} to {}; {} stacks went into a crate", player.getGameProfile().name(), tier, want, extra.size());
+    }
+
+    /** Keeps the first {@code keep} slots of one of the backpack's containers and returns what lay in the rest. */
+    static List<ItemStack> trim(ItemStack backpack, DataComponentType<ItemContainerContents> type, int keep) {
+        List<ItemStack> extra = new ArrayList<>();
+        ItemContainerContents contents = backpack.get(type);
+        if (contents == null) return extra;
+        NonNullList<ItemStack> all = NonNullList.withSize(512, ItemStack.EMPTY);
+        contents.copyInto(all);
+        int last = 0;
+        for (int i = 0; i < all.size(); i++) if (!all.get(i).isEmpty()) last = i + 1;
+        if (last <= keep) return extra;
+        NonNullList<ItemStack> kept = NonNullList.withSize(Math.max(0, keep), ItemStack.EMPTY);
+        for (int i = 0; i < all.size(); i++) {
+            if (i < keep) kept.set(i, all.get(i));
+            else if (!all.get(i).isEmpty()) extra.add(all.get(i));
+        }
+        backpack.set(type, ItemContainerContents.fromItems(kept));
+        return extra;
     }
 
     /** A backpack item found off the player's back: worn if they somehow have none on, else emptied into the inventory. */

@@ -178,8 +178,9 @@ public final class Claims {
      */
     public static boolean mayUse(Player player, Level level, BlockPos pos) {
         if (allowed(player, level, pos)) return true;
-        return level.getBlockEntity(pos) instanceof com.meakaandre.siftec.death.DeathCrateBlockEntity crate && crate.owner != null
-            && crate.owner.equals(player.getUUID());
+        if (!(level.getBlockEntity(pos) instanceof com.meakaandre.siftec.death.DeathCrateBlockEntity crate)) return false;
+        if (!crate.companyId.isEmpty()) return player instanceof ServerPlayer server && Companies.owns(Companies.find(server), crate.companyId);
+        return crate.owner != null && crate.owner.equals(player.getUUID());
     }
 
     /**

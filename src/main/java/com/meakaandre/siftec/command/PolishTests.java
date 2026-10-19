@@ -8,7 +8,6 @@ import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.Category;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
-import com.meakaandre.siftec.building.LegacyConversion;
 import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.company.Company;
@@ -22,7 +21,6 @@ import com.meakaandre.siftec.hub.Locks;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.item.ObjectScannerItem;
-import com.meakaandre.siftec.machine.ProcessorBlockEntity;
 import com.meakaandre.siftec.map.MapGrid;
 import com.meakaandre.siftec.map.MapPoi;
 import com.meakaandre.siftec.map.MapTerrain;
@@ -85,7 +83,7 @@ import java.util.List;
  * <li>6: SAM Reanimation says it is a Constructor recipe;</li>
  * <li>7: the Drone Port building: its terminal, ports, pad and drone, a trip pad to pad;</li>
  * <li>8: chutes reach a building's machines only from inside it;</li>
- * <li>9: the old single-block Converter, Particle Accelerator and Drone Port turn into the buildings;</li>
+ * <li>9: (gone: the old single-block machines were removed in review fixes 6);</li>
  * <li>10: the HUB's Biomass Burners run a real boiler, engine and coil.</li>
  * </ul>
  */
@@ -204,7 +202,6 @@ public final class PolishTests {
             run(source, "6 SAM text", () -> samText(source));
             run(source, "7 drone port", () -> dronePort(source, level));
             run(source, "8 chutes", () -> chutes(source, level));
-            run(source, "9 legacy", () -> legacy(source, level));
             run(source, "10 HUB burners", () -> hubBurners(source, level));
             run(source, "2 geysers", () -> geysers(source, level));
             run(source, "1 shop", () -> ShopTests.run(source, level, X + 120, Y, Z + 100));
@@ -338,9 +335,9 @@ public final class PolishTests {
     public static @Nullable DronePortBlockEntity buildDronePort(ServerLevel level, @Nullable Company company, BlockPos terminal) {
         BuildingDef def = Buildings.def("drone_port");
         BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
-        int[] cell = t == null ? null : LegacyConversion.terminalCell(t);
+        int[] cell = t == null ? null : com.meakaandre.siftec.building.SpecialBuildings.terminalCell(t);
         if (cell == null) return null;
-        Placement p = LegacyConversion.forTerminal(def, cell, terminal, Direction.NORTH);
+        Placement p = com.meakaandre.siftec.building.SpecialBuildings.forTerminal(def, cell, terminal, Direction.NORTH);
         Buildings.Check check = Buildings.place(level, p, company, null, true);
         if (!check.ok()) Siftec.LOGGER.info("SIFTEC: selftest Drone Port at {} not placed: {}", terminal.toShortString(), check.message().getString());
         return check.ok() && level.getBlockEntity(terminal) instanceof DronePortBlockEntity d ? d : null;
@@ -460,60 +457,6 @@ public final class PolishTests {
         int n = 0;
         for (int i = 0; i < chest.getContainerSize(); i++) n += chest.getItem(i).getCount();
         return n;
-    }
-
-    // ------------------------------------------------------------------------------------------------ 9: legacy
-
-    private static void legacy(CommandSourceStack source, ServerLevel level) {
-        Company c = company(level, COMPANY);
-        // an old Converter with room round it, holding a stack it had been given
-        BlockPos conv = new BlockPos(X + 30, Y, Z + 80);
-        level.setBlock(conv, ModBlocks.CONVERTER.get().defaultBlockState(), Block.UPDATE_ALL);
-        if (level.getBlockEntity(conv) instanceof ProcessorBlockEntity p) {
-            p.items.setItem(0, new ItemStack(Items.IRON_INGOT, 7));
-            p.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, c.id);
-        }
-        // an old Particle Accelerator at the top of the world: no building fits there
-        BlockPos top = new BlockPos(X + 60, level.getMaxY() - 1, Z + 80);
-        level.setBlock(top, ModBlocks.PARTICLE_ACCELERATOR.get().defaultBlockState(), Block.UPDATE_ALL);
-        // an old Drone Port with a drone, fire charges and a destination
-        BlockPos oldPort = new BlockPos(X + 150, Y + 1, Z + 30);
-        level.setBlock(oldPort, ModBlocks.DRONE_PORT.get().defaultBlockState(), Block.UPDATE_ALL);
-        if (level.getBlockEntity(oldPort) instanceof DronePortBlockEntity d) {
-            d.companyId = c.id;
-            d.hasDrone = true;
-            d.destination = new BlockPos(X + 60, Y + 1, Z + 30);
-            d.items.setItem(PortContainer.FUEL, new ItemStack(Items.FIRE_CHARGE, 5));
-            d.setChanged();
-            Places.add(level, oldPort, Places.DRONE_PORT, c.id, "Selftest old port");
-        }
-        later(level, 60, () -> {
-            BlockPos controller = null;
-            AABB around = new AABB(conv).inflate(30);
-            for (BlockPos pos : BlockPos.betweenClosed((int) around.minX, conv.getY(), (int) around.minZ, (int) around.maxX, conv.getY() + 6, (int) around.maxZ)) {
-                if (level.getBlockEntity(pos) instanceof ControllerBlockEntity ce && "converter".equals(ce.buildingId)) {
-                    controller = pos.immutable();
-                    break;
-                }
-            }
-            ControllerBlockEntity ce = controller == null ? null : (ControllerBlockEntity) level.getBlockEntity(controller);
-            int dropped = 0;
-            for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(conv).inflate(8))) if (e.getItem().is(Items.IRON_INGOT)) dropped += e.getItem().getCount();
-            expect(source, "9: an old Converter turns into the Converter building, its cost as the refund, what it held given back",
-                !level.getBlockState(conv).is(ModBlocks.CONVERTER.get()) && ce != null && !ce.refund.isEmpty() && dropped == 7,
-                "block now " + level.getBlockState(conv) + ", building " + (ce != null) + ", refund " + (ce == null ? 0 : ce.refund.size()) + " stacks, given back " + dropped);
-            int cost = 0;
-            for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(top).inflate(3, 400, 3))) cost += e.getItem().getCount();
-            expect(source, "9: with no room anywhere for the building, an old Particle Accelerator is taken away and its cost given back",
-                level.getBlockState(top).isAir() && cost > 0, "block now " + level.getBlockState(top) + ", items dropped " + cost);
-            DronePortBlockEntity moved = level.getBlockEntity(oldPort) instanceof DronePortBlockEntity d ? d : null;
-            boolean building = BuildingIndex.controllerOf(level, oldPort) != null;
-            expect(source, "9: an old Drone Port becomes the Drone Port building, its terminal where it stood, keeping its drone, charges and destination",
-                moved != null && building && moved.hasDrone && moved.fuel().getCount() == 5 && moved.destination != null && "Selftest old port".equals(Places.nameAt(level, oldPort)),
-                moved == null ? "no terminal" : "building " + building + ", drone " + moved.hasDrone + ", charges " + moved.fuel().getCount() + ", destination " + moved.destination);
-            expect(source, "9: the old blocks can no longer be placed or crafted (switched off)",
-                Locks.lockOf(item("siftec:converter")) == Locks.DISABLED && Locks.lockOf(item("siftec:drone_port")) == Locks.DISABLED, "");
-        });
     }
 
     // ------------------------------------------------------------------------------------------------ 10: HUB burners

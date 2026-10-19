@@ -27,8 +27,7 @@ import java.util.List;
  * far port whose chunk does not tick takes the packages all the same: the factory simulation unloads them into it (work
  * package 17), and while this port's own chunk does not tick the simulation flies its drone (SimData's drone ports).
  * <p>
- * An old single-block port (one that is no building's) is turned into the building when it first ticks
- * ({@link com.meakaandre.siftec.building.LegacyConversion}).
+ * A port is only ever the Drone Port building's terminal: one that is no building's does nothing.
  */
 public class DronePortBlockEntity extends BlockEntity {
     public static final int IDLE = 0, OUTBOUND = 1, HOMEBOUND = 2;
@@ -48,7 +47,6 @@ public class DronePortBlockEntity extends BlockEntity {
     private int ticks, total;
     private final List<ItemStack> cargo = new ArrayList<>();
     private @Nullable DroneEntity shown;
-    private boolean legacyQueued;
 
     public DronePortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -78,25 +76,12 @@ public class DronePortBlockEntity extends BlockEntity {
         if (!(level instanceof ServerLevel server)) return;
         // what the factory simulation did while its chunk did not tick goes in before it runs for real (work package 17)
         com.meakaandre.siftec.sim.Factories.awake(server, this);
-        if (!legacyQueued && com.meakaandre.siftec.building.BuildingIndex.controllerOf(server, worldPosition) == null) {
-            // an old single-block port: it becomes the Drone Port building
-            legacyQueued = true;
-            com.meakaandre.siftec.building.LegacyConversion.queue(server, worldPosition);
-        }
-        if (server.getGameTime() % 20 == 0) {
-            com.meakaandre.siftec.sim.Factories.port(server, this);
-            // the port it flies to may have been an old single-block one, moved into its building since
-            if (destination != null) {
-                BlockPos moved = com.meakaandre.siftec.building.LegacyConversion.moved(server.getServer(), destination);
-                if (!moved.equals(destination)) {
-                    destination = moved;
-                    setChanged();
-                }
-            }
-        }
+        // a port is only ever the Drone Port building's terminal: one standing on its own (put down by a command) does nothing
+        if (com.meakaandre.siftec.building.BuildingIndex.controllerOf(server, worldPosition) == null) return;
+        if (server.getGameTime() % 20 == 0) com.meakaandre.siftec.sim.Factories.port(server, this);
         if (state == IDLE) {
             // a drone at home sits on the pad
-            if (hasDrone && !legacyQueued) park(server);
+            if (hasDrone) park(server);
             else if (shown != null) hide();
             if (!hasDrone || destination == null || level.getGameTime() % 20 != 0 || items.empty(PortContainer.OUT, PortContainer.FUEL)) return;
             int charges = chargesNeeded();

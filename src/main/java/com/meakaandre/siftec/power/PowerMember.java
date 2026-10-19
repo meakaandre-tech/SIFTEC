@@ -72,6 +72,24 @@ public interface PowerMember {
         return false;
     }
 
+    /**
+     * Ticks a generator may count as starting after it last became ready ({@link #startWindow}): one that never gets going
+     * (a Geothermal Generator with no turbine, a HUB burner missing its brushes, an overstressed coil) stops counting, so
+     * its grid's fuse can blow again.
+     */
+    int STARTING_TICKS = 100;
+
+    /**
+     * Helper for {@link #starting}: {@code ready} is whether the machine has what it needs and makes nothing yet;
+     * {@code since} holds when it last became ready (Long.MIN_VALUE while not). Returns the new {@code since} in [0] and
+     * whether it still counts as starting in [1] (1 or 0).
+     */
+    static long[] startWindow(boolean ready, long since, long now) {
+        if (!ready) return new long[]{Long.MIN_VALUE, 0};
+        if (since == Long.MIN_VALUE) since = now;
+        return new long[]{since, now - since <= STARTING_TICKS ? 1 : 0};
+    }
+
     default boolean holdsFuse() {
         return false;
     }

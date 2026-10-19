@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Fire outside a claim neither spreads into it nor burns its blocks away. */
+/** Fire outside a claim neither spreads into it nor burns its blocks away; nor does any fire burn a building's blocks. */
 @Mixin(FireBlock.class)
 public abstract class ClaimFireMixin {
     @Unique
@@ -34,6 +34,8 @@ public abstract class ClaimFireMixin {
     private boolean siftec$spread(ServerLevel level, BlockPos target, BlockState state, int flags) {
         BlockPos fire = SIFTEC_FIRE.get();
         if (fire != null && Claims.crosses(level, fire, target)) return false;
+        // a building's blocks never burn or catch (a plank skin would burn away and bring it down)
+        if (com.meakaandre.siftec.building.Buildings.protectedAt(level, target)) return false;
         return level.setBlock(target, state, flags);
     }
 
@@ -41,5 +43,6 @@ public abstract class ClaimFireMixin {
     private void siftec$burn(Level level, BlockPos pos, int chance, RandomSource random, int age, CallbackInfo ci) {
         BlockPos fire = SIFTEC_FIRE.get();
         if (fire != null && Claims.crosses(level, fire, pos)) ci.cancel();
+        else if (com.meakaandre.siftec.building.Buildings.protectedAt(level, pos)) ci.cancel();
     }
 }

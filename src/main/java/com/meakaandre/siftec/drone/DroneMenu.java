@@ -67,7 +67,7 @@ public class DroneMenu extends ChestMenu {
             if (!place.dimension.equals(port.getLevel().dimension().identifier().toString()) || shown.size() >= LIST) continue;
             boolean chosen = place.pos().equals(port.destination);
             int blocks = (int) Math.round(Math.sqrt(place.pos().distSqr(port.getBlockPos())));
-            view.setItem(shown.size(), button(ModBlocks.DRONE_PORT.get().asItem(), Component.literal(place.name), List.of(
+            view.setItem(shown.size(), button(net.minecraft.world.item.Items.ENDER_EYE, Component.literal(place.name), List.of(
                 Component.translatable("siftec.place.where", place.x, place.y, place.z, blocks).withStyle(ChatFormatting.GRAY),
                 Component.translatable(chosen ? "siftec.drone.chosen" : "siftec.drone.choose").withStyle(chosen ? ChatFormatting.GREEN : ChatFormatting.YELLOW)), chosen));
             shown.add(place);

@@ -24,7 +24,6 @@ public class SiftecClient implements ClientModInitializer {
         // machines with a shaft through them, turning with the network
         BlockEntityRendererProvider<KineticBlockEntity, SingleKineticRenderState> shaft = ShaftRenderer::new;
         BlockEntityRendererRegistry.register(ModBlockEntities.EXTRACTOR.get(), shaft);
-        BlockEntityRendererRegistry.register(ModBlockEntities.PROCESSOR.get(), shaft);
         // a generator building's turbine, turning its generator coils
         BlockEntityRendererRegistry.register(ModBlockEntities.TURBINE.get(), shaft);
         // the Speed Governor's two shaft halves turn at different speeds, like a Gearshift's

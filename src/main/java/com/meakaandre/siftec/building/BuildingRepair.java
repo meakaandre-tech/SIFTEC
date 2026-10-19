@@ -84,10 +84,15 @@ public final class BuildingRepair {
             cells.add(pos.asLong());
             if (pos.equals(at)) continue;
             BlockState now = level.getBlockState(pos);
-            if (paint.fits(cell, now.getBlock(), storage)) continue;
+            boolean ours = at.equals(BuildingIndex.controllerOf(level, pos));
+            if (paint.fits(cell, now.getBlock(), storage)) {
+                // on a reshape, a block that only happens to look like the new shape's (a player's) is not taken in: it
+                // is in the way like any other
+                if (reshape && !ours && !now.isAir()) blocked.add(pos);
+                continue;
+            }
             // a missing piece of shell on a building of the current shape is left to bring it down
             if (!reshape && !machine(cell.state())) continue;
-            boolean ours = at.equals(BuildingIndex.controllerOf(level, pos));
             if (!ours && !now.isAir() && !now.canBeReplaced()) {
                 blocked.add(pos);
                 continue;
@@ -111,14 +116,15 @@ public final class BuildingRepair {
         if (!rebuilt.isEmpty() || removed > 0) {
             Buildings.wire(level, p, t, at, c.companyId);
             BuildingLogic.placed(level, c);
-            for (ItemStack s : spilled) if (!s.isEmpty()) Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, s);
+            // what the replaced blocks held goes to the company (a crate only its members open), never the Converter's cells
+            Buildings.giveBack(level, at.above(), c.companyId, spilled);
             com.meakaandre.siftec.power.PowerGrids.dirty();
             List<String> what = new ArrayList<>();
             for (BlockPos pos : rebuilt.subList(0, Math.min(6, rebuilt.size()))) {
                 what.add(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()).getPath() + "@" + pos.toShortString());
             }
             if (reshape) {
-                Siftec.LOGGER.info("SIFTEC: building {} was built to an older shape; rebuilt it to the current one: {} blocks set, {} of the old shape taken away, {} stacks it held dropped at its controller (first set: {})",
+                Siftec.LOGGER.info("SIFTEC: building {} was built to an older shape; rebuilt it to the current one: {} blocks set, {} of the old shape taken away, {} stacks it held given back (first set: {})",
                     name, rebuilt.size(), removed, spilled.size(), what);
             } else {
                 Siftec.LOGGER.info("SIFTEC: building {} had {} blocks of its machines missing or wrong; rebuilt them from its shape: {}", name, rebuilt.size(), what);

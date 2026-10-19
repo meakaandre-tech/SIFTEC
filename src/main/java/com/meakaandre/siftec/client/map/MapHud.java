@@ -155,18 +155,28 @@ public final class MapHud {
         }
         marks.sort((a, b) -> Boolean.compare(a.pinned, b.pinned));
         int iy = TOP + BAND / 2;
+        // the distance labels under the strip: one too close to another (markers at nearly the same bearing) goes down a
+        // row, so they never run into each other; the bearing under the middle keeps its place
+        List<List<int[]>> labelRows = new ArrayList<>();
+        String bearingText = String.format(Locale.ROOT, "%03d", Math.round(heading) % 360);
+        int bearingHalf = (int) Math.ceil(mc.font.width(bearingText) * 0.75 / 2) + 1;
+        labelRows.add(new ArrayList<>(List.of(new int[]{cx + 1 - bearingHalf, cx + 1 + bearingHalf})));
+        // pins at (nearly) the same bearing are spread apart a little, so each icon stays readable
+        java.util.Map<Mark, Integer> spread = spreadPins(marks, heading, cx, perDeg);
         for (Mark mark : marks) {
             double rel = wrap180(mark.bearing - heading);
             boolean edge = Math.abs(rel) > 88;
             if (edge && !mark.pinned) continue;
             // a pin behind the player waits at the end of the strip it is nearest
-            int x = (int) Math.round(cx + Math.clamp(rel, -88, 88) * perDeg);
+            int x = spread.getOrDefault(mark, (int) Math.round(cx + Math.clamp(rel, -88, 88) * perDeg));
             switch (mark.kind) {
                 case 0 -> {
                     MapClient.Pin pin = (MapClient.Pin) mark.what;
                     MapIcons.centred(g, MapIcons.DISC, x, iy, 0xC0101418);
                     MapIcons.centred(g, pin.icon(), x, iy, pin.argb());
-                    small(g, MapDraw.distance(mark.distance), x, TOP + BAND + 2, 0xFFFFFFFF);
+                    String label = MapDraw.distance(mark.distance);
+                    int row = labelRow(labelRows, x, (int) Math.ceil(mc.font.width(label) * 0.75 / 2) + 2);
+                    small(g, label, x, TOP + BAND + 2 + row * LABEL_ROW, 0xFFFFFFFF);
                 }
                 case 1 -> MapDraw.marker(g, (MapMarker) mark.what, x, iy);
                 case 2 -> MapIcons.centred(g, MapIcons.ARROW, x, iy, MapDraw.MATE);
@@ -179,7 +189,67 @@ public final class MapHud {
         }
         // the middle, and the bearing under it
         g.fill(cx, TOP - 1, cx + 1, TOP + BAND + 1, 0xFFFFA530);
-        small(g, String.format(Locale.ROOT, "%03d", Math.round(heading) % 360), cx + 1, TOP + BAND + 2, 0xFFFFA530);
+        small(g, bearingText, cx + 1, TOP + BAND + 2, 0xFFFFA530);
+    }
+
+    /** The least distance between two pin icons on the strip. */
+    private static final int PIN_GAP = 10;
+
+    /**
+     * Where each pin's icon goes: at its bearing, except that pins closer than {@link #PIN_GAP} to each other are spread
+     * out evenly around where the group stands.
+     */
+    private static java.util.Map<Mark, Integer> spreadPins(List<Mark> marks, double heading, int cx, double perDeg) {
+        List<Mark> pins = new ArrayList<>();
+        for (Mark m : marks) if (m.pinned) pins.add(m);
+        java.util.Map<Mark, Integer> out = new java.util.HashMap<>();
+        if (pins.isEmpty()) return out;
+        List<int[]> xs = new ArrayList<>();
+        for (int i = 0; i < pins.size(); i++) {
+            double rel = wrap180(pins.get(i).bearing - heading);
+            xs.add(new int[]{(int) Math.round(cx + Math.clamp(rel, -88, 88) * perDeg), i});
+        }
+        xs.sort((a, b) -> Integer.compare(a[0], b[0]));
+        int start = 0;
+        while (start < xs.size()) {
+            int end = start;
+            while (end + 1 < xs.size() && xs.get(end + 1)[0] - xs.get(end)[0] < PIN_GAP) end++;
+            int n = end - start + 1;
+            double middle = 0;
+            for (int i = start; i <= end; i++) middle += xs.get(i)[0];
+            middle /= n;
+            for (int i = start; i <= end; i++) {
+                int x = n == 1 ? xs.get(i)[0] : (int) Math.round(middle + (i - start - (n - 1) / 2.0) * PIN_GAP);
+                out.put(pins.get(xs.get(i)[1]), x);
+            }
+            start = end + 1;
+        }
+        return out;
+    }
+
+    /** Height of a row of distance labels under the strip. */
+    private static final int LABEL_ROW = 7;
+    /** Rows of distance labels at most (a crowd past that shares the last row). */
+    private static final int LABEL_ROWS = 4;
+
+    /** The first row where a label of half width {@code half} centred on x overlaps no other; it is taken there. */
+    private static int labelRow(List<List<int[]>> rows, int x, int half) {
+        int from = x - half, to = x + half;
+        for (int r = 0; r < LABEL_ROWS; r++) {
+            if (r == rows.size()) rows.add(new ArrayList<>());
+            boolean free = true;
+            for (int[] span : rows.get(r)) {
+                if (from < span[1] && to > span[0]) {
+                    free = false;
+                    break;
+                }
+            }
+            if (free || r == LABEL_ROWS - 1) {
+                rows.get(r).add(new int[]{from, to});
+                return r;
+            }
+        }
+        return LABEL_ROWS - 1;
     }
 
     private static MapMarker marker(String pinKey) {

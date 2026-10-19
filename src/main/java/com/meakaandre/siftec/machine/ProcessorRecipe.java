@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public record ProcessorRecipe(List<Milestone.Cost> inputs, Identifier fluidIn, int fluidInMb, Identifier outItem, int outCount,
                               Identifier fluidOut, int fluidOutMb, int seconds, String alt, String name, Identifier core, Identifier crush,
-                              Identifier haunt, List<Step> steps, Identifier charged, double mwMin, double mwMax) {
+                              Identifier haunt, List<Step> steps, Identifier charged, double mwMin, double mwMax, int batch) {
     /** A Deployer step: on the item {@code on} it puts one {@code apply}, which makes {@code makes}. */
     public record Step(Identifier on, Milestone.Cost apply, Identifier makes) {
     }
@@ -59,7 +59,8 @@ public record ProcessorRecipe(List<Milestone.Cost> inputs, Identifier fluidIn, i
                     fout == null ? null : Identifier.parse(fout.get("fluid").getAsString()), fout == null ? 0 : fout.get("mb").getAsInt(),
                     o.get("seconds").getAsInt(), o.has("alt") ? o.get("alt").getAsString() : null, o.has("name") ? o.get("name").getAsString() : "",
                     id(o, "core"), id(o, "crush"), id(o, "haunt"), steps(o), id(o, "charged"),
-                    o.has("mw") ? o.getAsJsonArray("mw").get(0).getAsDouble() : 0, o.has("mw") ? o.getAsJsonArray("mw").get(1).getAsDouble() : 0));
+                    o.has("mw") ? o.getAsJsonArray("mw").get(0).getAsDouble() : 0, o.has("mw") ? o.getAsJsonArray("mw").get(1).getAsDouble() : 0,
+                    o.has("batch") ? Math.max(1, o.get("batch").getAsInt()) : 1));
             }
             BY_MACHINE.put(machine, list);
         }
@@ -88,6 +89,19 @@ public record ProcessorRecipe(List<Milestone.Cost> inputs, Identifier fluidIn, i
     /** Drops the table (the content is reloaded). */
     public static void forget() {
         BY_MACHINE.clear();
+    }
+
+    /**
+     * Ticks one cycle really takes: a Core carries {@code batch} crafts (a recipe shorter than the Core's time is packed
+     * two or three to a Core), so its Mixer takes that many recipe times to make it.
+     */
+    public long cycleTicks() {
+        return Math.max(1L, (long) seconds * 20L * Math.max(1, batch));
+    }
+
+    /** What one Core (one cycle) gives of the main result. */
+    public int outPerCycle() {
+        return outCount * Math.max(1, batch);
     }
 
     public Item item() {

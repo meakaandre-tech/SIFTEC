@@ -234,6 +234,15 @@ public final class Blueprints {
     }
 
     /**
+     * True for a spot no blueprint may build into, empty or not: an ore node's position (grown or mined, it grows back
+     * there), a block of a Build Gun building (a doorway or the room inside included) or of the HUB's shell.
+     */
+    public static boolean reserved(ServerLevel level, BlockPos pos) {
+        return com.meakaandre.siftec.node.NodeSites.isSite(level, pos) || com.meakaandre.siftec.building.Buildings.within(level, pos)
+            || com.meakaandre.siftec.prefab.Prefabs.isPart(level.getBlockState(pos));
+    }
+
+    /**
      * Used on a block: the first use puts up a hologram of the blueprint where it would stand and says what is
      * missing; a second use on the same spot builds it, taking every block from the player's inventory and backpack.
      */
@@ -254,7 +263,7 @@ public final class Blueprints {
         }
         Map<Item, Integer> need = new LinkedHashMap<>();
         for (Map.Entry<BlockPos, BlockState> entry : layout.entrySet()) {
-            if (!level.getBlockState(entry.getKey()).canBeReplaced() || !Claims.allowed(player, level, entry.getKey())) {
+            if (!level.getBlockState(entry.getKey()).canBeReplaced() || !Claims.allowed(player, level, entry.getKey()) || reserved(level, entry.getKey())) {
                 player.sendOverlayMessage(Component.translatable("siftec.blueprint.blocked", entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ()));
                 return;
             }

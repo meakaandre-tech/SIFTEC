@@ -58,6 +58,8 @@ public final class Generators {
     static final int BURNER_REFILL = 20;
     /** Fuel ticks a reactor rod has left when the building puts the next rod into its acceptor. */
     static final int ROD_REFILL = 200;
+    /** The least load a boiler's water need follows, so a level always takes some water. */
+    static final float MIN_WATER_LOAD = 0.05f;
     /** Ticks over which a boiler's water use follows its load (the boiler measures its water over 50). */
     static final int WATER_WINDOW = 64;
 
@@ -201,10 +203,12 @@ public final class Generators {
         c.loadWindow[(int) (level.getGameTime() % WATER_WINDOW)] = use;
         float least = 1;
         for (float f : c.loadWindow) least = Math.min(least, f);
+        // never a level for nothing: a moment of no load in the window must not let the boiler run every level on a trickle
+        least = Math.max(least, MIN_WATER_LOAD);
         BlockPos intake = intake(c);
         boolean wet = intake != null && ProductionLogic.mbAt(level, intake, Fluids.WATER) > 0;
         for (FluidTankBlockEntity b : boilers) {
-            float perLevel = !wet ? Float.POSITIVE_INFINITY : least <= 0 ? 0 : (float) (full / engines * least);
+            float perLevel = !wet ? Float.POSITIVE_INFINITY : (float) (full / engines * least);
             ((BoilerWater) b.boiler).siftec$waterPerLevel(perLevel);
         }
         if (!wet) return false;
@@ -225,7 +229,8 @@ public final class Generators {
             if (moved < took) from.insert(FluidVariant.of(Fluids.WATER), took - moved, tx);
             tx.commit();
         }
-        c.waterOwed -= droplets;
+        // only what really went into the boilers is paid off: a shortfall stays owed (up to a second's worth)
+        c.waterOwed -= moved;
         if (c.waterOwed > full * 20) c.waterOwed = full * 20;
         c.waterUsed += moved;
         return moved > 0;
@@ -247,7 +252,7 @@ public final class Generators {
             c.machineProblem = "";
         } else {
             // not a fuel the Fuel Generator burns (or none): the engine gives nothing and burns nothing
-            engine.siftec$set(FUEL_SPEED, 0, 0, 0);
+            engine.siftec$set(0, 0, 0, 0);
             c.machineProblem = fuel.isEmpty() ? "siftec.power.no_fuel" : "siftec.power.wrong_fuel";
         }
     }
@@ -263,23 +268,33 @@ public final class Generators {
 
     private static void nuclear(ServerLevel level, ControllerBlockEntity c, BuildingDef def) {
         boolean fed = false, waiting = false;
+        // its water first: with none (or its fuse blown) no rod goes in, so it never burns rods dry
+        boolean water = water(level, c, def, 1, true);
+        List<ReactorFuelAcceptorBlockEntity> acceptors = new ArrayList<>();
         for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:reactor_fuel_acceptor"))) {
-            if (!(level.getBlockEntity(pos) instanceof ReactorFuelAcceptorBlockEntity acceptor)) continue;
+            if (level.getBlockEntity(pos) instanceof ReactorFuelAcceptorBlockEntity acceptor) acceptors.add(acceptor);
+        }
+        // the waste still to come from rods its acceptors hold, so they cannot all take a rod at once past a full stack
+        int promised = 0;
+        for (ReactorFuelAcceptorBlockEntity acceptor : acceptors) promised += BuildingPower.wasteOf(acceptor.container.getItem(0));
+        for (ReactorFuelAcceptorBlockEntity acceptor : acceptors) {
             List<ReactorRodBlockEntity> rods = rods(acceptor);
             if (rods.isEmpty()) continue;
             int least = Integer.MAX_VALUE;
             for (ReactorRodBlockEntity rod : rods) least = Math.min(least, rod.fuel);
             if (least > 0) fed = true;
             if (least > ROD_REFILL || !acceptor.container.getItem(0).isEmpty()) continue;
+            if (!water || c.tripped) continue;
             ItemStack in = c.input.getItem(0);
             if (BuildingPower.itemMj("nuclear", in) <= 0) {
                 waiting = true;
                 continue;
             }
-            if (!BuildingPower.wasteFits(c, in)) {
+            if (!BuildingPower.wasteFits(c, in, promised)) {
                 c.machineProblem = "siftec.power.waste_full";
                 continue;
             }
+            promised += BuildingPower.wasteOf(in.copyWithCount(1));
             // the next rod into this acceptor; New Age shares its fuel out over the acceptor's rods, and the waste it
             // leaves comes to the plant's output (BuildingPower.reactorWaste)
             acceptor.container.setItem(0, in.split(1));
@@ -288,7 +303,6 @@ public final class Generators {
             c.made++;
             c.setChanged();
         }
-        boolean water = water(level, c, def, 1, true);
         if (!water) c.machineProblem = "siftec.power.no_water";
         else if (!fed && waiting) c.machineProblem = "siftec.power.no_fuel";
         else if (!c.machineProblem.equals("siftec.power.waste_full")) c.machineProblem = "";

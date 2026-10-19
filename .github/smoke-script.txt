@@ -235,9 +235,11 @@ shot
 cmd siftec worldtest look node sulfur 1
 sleep 10
 shot
+cmd effect clear @a minecraft:night_vision
 cmd siftec worldtest look node quartz 1
 sleep 10
 shot
+cmd effect give @a minecraft:night_vision infinite 0 true
 cmd siftec worldtest look clump 1
 sleep 8
 shot

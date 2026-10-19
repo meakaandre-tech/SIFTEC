@@ -375,10 +375,7 @@ MILESTONES = [(t, mid, name, _sat_cost(_by_sat[mid][1]), _mmss(_by_sat[mid][2]),
 # Switched off for good: they can be neither crafted nor placed.
 DISABLED = [C + "water_wheel", C + "large_water_wheel", C + "blaze_cake", C + "blaze_cake_base", C + "creative_blaze_cake",
             "the_sift:sift_portal", "the_sift:sift_rift", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill",
-            C + "schematic", "farmersdelight:wheat_dough",   # Create's dough replaces Farmer's Delight's
-            # the old single-block Drone Port, Converter and Particle Accelerator: Build Gun buildings now (an old world's are
-            # turned into the buildings when they load, building/LegacyConversion.java)
-            "siftec:drone_port", "siftec:converter", "siftec:particle_accelerator"]
+            C + "schematic", "farmersdelight:wheat_dough"]   # Create's dough replaces Farmer's Delight's
 
 # Wormhole phases, delivered at the Wormhole Gateway. Phase n opens the tiers listed.
 PHASES = [
@@ -1044,6 +1041,9 @@ TAPES = [("tape_cat", "Cassette Tape: Cat", "minecraft:cat"), ("tape_blocks", "C
          ("tape_chirp", "Cassette Tape: Chirp", "minecraft:chirp"), ("tape_far", "Cassette Tape: Far", "minecraft:far"),
          ("tape_mall", "Cassette Tape: Mall", "minecraft:mall"), ("tape_stal", "Cassette Tape: Stal", "minecraft:stal"),
          ("tape_strad", "Cassette Tape: Strad", "minecraft:strad"), ("tape_pigstep", "Cassette Tape: Pigstep", "minecraft:pigstep")]
+# the Shop's free things (the Customizer and the tapes, taken without limit once owned) are worth no points: the Sink
+# refuses them, so they cannot be taken and sunk over and over
+SINK_REFUSED += ["siftec:customizer"] + [f"siftec:{t}" for t, _, _ in TAPES]
 
 # player cosmetics held in the hand: (id, name, part cost, what has to be done first ("" for nothing))
 CUPS = [("coffee_cup", "FICSIT Coffee Cup", "2 Iron Sheet", ""),
