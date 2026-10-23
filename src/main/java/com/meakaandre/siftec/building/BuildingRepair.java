@@ -74,7 +74,7 @@ public final class BuildingRepair {
         int want = hash(t);
         boolean reshape = c.shape != want;
         Paint paint = Paint.parse(c.paint);
-        boolean storage = p.def().logic().equals("storage");
+        boolean storage = p.def().logic() == Logic.STORAGE;
         BuildingIndex index = BuildingIndex.get(level);
         BlockPos at = c.getBlockPos().immutable();
         List<BlockPos> rebuilt = new ArrayList<>(), blocked = new ArrayList<>();

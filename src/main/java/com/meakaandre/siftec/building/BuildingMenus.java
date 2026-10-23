@@ -51,12 +51,12 @@ public final class BuildingMenus {
         return now != null && Companies.same(now.id, companyId);
     }
 
-    /** Accepts a building controller whose building runs {@code logic} ("sink", "shop", "workshop"). */
-    public static Predicate<BlockEntity> logic(String logic) {
+    /** Accepts a building controller whose building runs {@code logic} (SINK, SHOP, WORKSHOP). */
+    public static Predicate<BlockEntity> logic(Logic logic) {
         return be -> {
             if (!(be instanceof ControllerBlockEntity c)) return false;
             BuildingDef def = Buildings.def(c.buildingId);
-            return def != null && logic.equals(def.logic());
+            return def != null && def.logic() == logic;
         };
     }
 

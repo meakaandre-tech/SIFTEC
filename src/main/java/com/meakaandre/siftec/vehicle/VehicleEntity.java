@@ -5,6 +5,7 @@ import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.building.BuildingPower;
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.building.TruckStations;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.node.NodeSavedData;
@@ -577,10 +578,10 @@ public class VehicleEntity extends Entity {
     /** A bucket of a fuel the Fuel Generator burns goes into the tank, and the empty bucket comes back. */
     private boolean refuel(ServerPlayer player, InteractionHand hand, ItemStack held) {
         if (held.isEmpty()) return false;
-        for (String id : BuildingPower.fluidFuels("fuel")) {
+        for (String id : BuildingPower.fluidFuels(PowerRole.FUEL)) {
             Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(id));
             if (fluid.getBucket() == Items.AIR || !held.is(fluid.getBucket())) continue;
-            double mj = BuildingPower.fluidMj("fuel", fluid) * 1000;
+            double mj = BuildingPower.fluidMj(PowerRole.FUEL, fluid) * 1000;
             if (fuelMj + mj > kind.tankMj() + 1) {
                 player.sendOverlayMessage(Component.translatable("siftec.vehicle.full", getName()));
                 return true;

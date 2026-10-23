@@ -34,13 +34,13 @@ public final class GuideClientTests {
 
     private static void control(GuideTests.Control control) {
         switch (control.action()) {
-            case "check" -> check();
-            case "open" -> {
+            case CHECK -> check();
+            case OPEN -> {
                 BuildingDef def = Buildings.def(control.arg());
                 if (def == null) report("FAIL open: no building " + control.arg());
                 else Guide.open(def);
             }
-            case "close" -> Minecraft.getInstance().gui.setScreen(null);
+            case CLOSE -> Minecraft.getInstance().gui.setScreen(null);
             default -> {
             }
         }

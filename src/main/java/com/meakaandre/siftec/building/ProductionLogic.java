@@ -595,14 +595,14 @@ public final class ProductionLogic {
     /** True if the Particle Accelerator's or the Converter's current recipe takes this item (its input port lets nothing else in). */
     static boolean processorTakes(ControllerBlockEntity c, ItemStack stack) {
         BuildingDef def = c.def();
-        if (def == null || !def.logic().equals("processor") || stack.isEmpty()) return false;
+        if (def == null || def.logic() != Logic.PROCESSOR || stack.isEmpty()) return false;
         for (Milestone.Cost cost : processorInputs(c, def)) if (cost.matches(stack)) return true;
         return false;
     }
 
     static boolean processorSlotTakes(ControllerBlockEntity c, int slot, ItemStack stack) {
         BuildingDef def = c.def();
-        if (def == null || !def.logic().equals("processor") || stack.isEmpty()) return false;
+        if (def == null || def.logic() != Logic.PROCESSOR || stack.isEmpty()) return false;
         List<Milestone.Cost> inputs = processorInputs(c, def);
         return !inputs.isEmpty() && inputs.get(slot % inputs.size()).matches(stack);
     }
@@ -611,7 +611,7 @@ public final class ProductionLogic {
 
     static void status(Level level, ControllerBlockEntity c, BuildingDef def, List<Component> parts) {
         switch (def.logic()) {
-            case "assembly", "processor" -> parts.add(c.filter.isEmpty() ? Component.translatable("siftec.building.no_filter")
+            case ASSEMBLY, PROCESSOR -> parts.add(c.filter.isEmpty() ? Component.translatable("siftec.building.no_filter")
                 : Component.translatable("siftec.building.filter", c.filter.getHoverName()));
             default -> {
             }

@@ -9,6 +9,7 @@ import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.Category;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.Logic;
 import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -187,7 +188,7 @@ public final class VehicleTests {
         }
         BuildingDef station = Buildings.def("truck_station");
         expect(source, "the Truck Station is a building with a template, unlocked by Vehicular Transport",
-            station != null && !station.vehicle() && station.logic().equals("truck_station") && station.unlock().equals("vehicular_transport")
+            station != null && !station.vehicle() && station.logic() == Logic.TRUCK_STATION && station.unlock().equals("vehicular_transport")
                 && BuildingTemplate.of(station) != null, station == null ? "missing" : BuildingTemplate.problem("truck_station"));
         for (VehicleKind kind : VehicleKind.values()) {
             expect(source, kind.id + " has an entity type", Vehicles.type(kind) != null

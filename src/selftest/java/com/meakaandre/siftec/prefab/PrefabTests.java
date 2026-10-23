@@ -4,6 +4,7 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.Facing;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.building.BuildingPower;
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -366,8 +367,8 @@ public final class PrefabTests {
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
             if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof HubBurnerBlockEntity engine) {
                 b.append(" burner ").append(engine.status().getString()).append(" (fuel ").append(engine.fuel.getItem(0)).append(", banked ")
-                    .append(Math.round(engine.energy)).append(" SU-ticks, biomass ").append(BuildingPower.itemMj("biomass", new ItemStack(biomass())))
-                    .append(" MJ, coal ").append(BuildingPower.itemMj("biomass", new ItemStack(Items.COAL))).append(" MJ, grid ")
+                    .append(Math.round(engine.energy)).append(" SU-ticks, biomass ").append(BuildingPower.itemMj(PowerRole.BIOMASS, new ItemStack(biomass())))
+                    .append(" MJ, coal ").append(BuildingPower.itemMj(PowerRole.BIOMASS, new ItemStack(Items.COAL))).append(" MJ, grid ")
                     .append(engine.grid == null ? "none" : engine.grid.describe()).append(");");
             } else {
                 b.append(" burner missing;");

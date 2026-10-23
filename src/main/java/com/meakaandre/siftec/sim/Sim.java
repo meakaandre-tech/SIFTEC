@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.sim;
 
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.sim.SimData.Link;
 import com.meakaandre.siftec.sim.SimData.Node;
 import com.meakaandre.siftec.sim.SimData.Recipe;
@@ -156,29 +157,26 @@ public final class Sim {
     /** Whether a building has work right now (BuildingLogic.working, as far as the simulation can tell). */
     static boolean working(Node n, long now) {
         return switch (n.mode) {
-            case "craft" -> n.busyUntil > now || startable(n) != null;
-            case "smelt" -> !n.pending.isEmpty() || smeltable(n) != null;
-            case "mine" -> total(n.out) + Math.ceil(n.minePer) <= n.outCap;
-            case "extract" -> total(n.fout) < n.fluidOutCap;
-            case "sink" -> !n.in.isEmpty();
+            case CRAFT -> n.busyUntil > now || startable(n) != null;
+            case SMELT -> !n.pending.isEmpty() || smeltable(n) != null;
+            case MINE -> total(n.out) + Math.ceil(n.minePer) <= n.outCap;
+            case EXTRACT -> total(n.fout) < n.fluidOutCap;
+            case SINK -> !n.in.isEmpty();
             default -> true;
         };
     }
 
     static boolean generator(Node n) {
-        return switch (n.power) {
-            case "biomass", "coal", "fuel", "nuclear", "geothermal", "augmenter" -> true;
-            default -> false;
-        };
+        return n.power.givesPower();
     }
 
     static boolean holdsFuse(Node n) {
-        return generator(n) || n.power.equals("storage");
+        return n.power.holdsFuse();
     }
 
     /** Energy (SU-ticks) a generator could still give: what its machines hold and what its fuel at the input holds. */
     static double fuelEnergy(Node n) {
-        if (n.power.equals("geothermal") || n.power.equals("augmenter")) return Double.MAX_VALUE;
+        if (n.power.unfuelled()) return Double.MAX_VALUE;
         double e = Math.max(0, n.energy);
         for (Map.Entry<String, Long> f : n.in.entrySet()) {
             Double mj = n.fuelMj.get(f.getKey());
@@ -227,7 +225,7 @@ public final class Sim {
     static void burn(Node n, double suTicks) {
         if (suTicks <= 0) return;
         n.given += suTicks;
-        if (n.power.equals("geothermal") || n.power.equals("augmenter")) return;
+        if (n.power.unfuelled()) return;
         n.energy -= suTicks;
         while (n.energy < 0) {
             String fuel = null;
@@ -284,7 +282,7 @@ public final class Sim {
                 fuse = true;
                 tripped |= n.tripped;
             }
-            if (n.power.equals("augmenter")) {
+            if (n.power == PowerRole.AUGMENTER) {
                 if (!n.tripped) {
                     caps[i] = n.fullSu;
                     flat += n.fullSu;
@@ -297,7 +295,7 @@ public final class Sim {
                     if (n.water > 0) caps[i] = Math.min(caps[i], n.fullSu * get(n.fin, WATER) / (n.water * dt));
                     boosted += caps[i];
                 }
-            } else if (n.power.equals("storage")) {
+            } else if (n.power == PowerRole.STORAGE) {
                 stored += n.stored;
                 if (!n.tripped) chargeWant += Math.max(0, Math.min(storageRate(), storageCap() - n.stored) * dt);
             } else {
@@ -316,7 +314,7 @@ public final class Sim {
             double spare = (own - demand) * dt;
             double charge = Math.min(spare, chargeWant);
             if (charge > 0) for (Node n : grid) {
-                if (!n.power.equals("storage") || n.tripped) continue;
+                if (n.power != PowerRole.STORAGE || n.tripped) continue;
                 double w = Math.max(0, Math.min(storageRate(), storageCap() - n.stored) * dt);
                 n.stored = Math.min(storageCap(), n.stored + charge * w / chargeWant);
             }
@@ -325,7 +323,7 @@ public final class Sim {
             double shortBy = (demand - own) * dt;
             if (stored > 0 && stored >= shortBy) {
                 on = true;
-                for (Node n : grid) if (n.power.equals("storage") && n.stored > 0) n.stored = Math.max(0, n.stored - shortBy * n.stored / stored);
+                for (Node n : grid) if (n.power == PowerRole.STORAGE && n.stored > 0) n.stored = Math.max(0, n.stored - shortBy * n.stored / stored);
                 load = 1;
             } else if (fuse) {
                 on = false;
@@ -340,21 +338,21 @@ public final class Sim {
             Node n = grid.get(i);
             if (generator(n)) {
                 // the reactor burns at full whatever the load, as Satisfactory 1.0's does
-                double give = n.power.equals("nuclear") && !n.tripped ? caps[i] : caps[i] * load;
+                double give = n.power == PowerRole.NUCLEAR && !n.tripped ? caps[i] : caps[i] * load;
                 n.capacityNow = caps[i];
-                if (n.power.equals("augmenter")) feedAugmenter(n, dt, on);
+                if (n.power == PowerRole.AUGMENTER) feedAugmenter(n, dt, on);
                 else {
                     burn(n, give * dt);
                     if (n.fullSu > 0) drink(n, give * dt / n.fullSu);
                 }
-                if (n.power.equals("geothermal") && give > 0 && !n.fluidOut.isEmpty()) {
+                if (n.power == PowerRole.GEOTHERMAL && give > 0 && !n.fluidOut.isEmpty()) {
                     n.frac += ACID_PER_TICK * dt;
                     long mb = (long) n.frac;
                     long room = Math.max(0, n.fluidOutCap - total(n.fout));
                     add(n.fout, n.fluidOut, Math.min(mb, room));
                     n.frac -= mb;
                 }
-            } else if (!n.power.equals("storage")) {
+            } else if (n.power != PowerRole.STORAGE) {
                 n.powered = on || n.su <= 0;
             }
         }
@@ -401,10 +399,10 @@ public final class Sim {
         long t0 = n.simTime;
         if (now <= t0) return;
         switch (n.mode) {
-            case "craft" -> craft(n, t0, now);
-            case "smelt" -> smelt(n, t0, now);
-            case "mine" -> mine(n, t0, now);
-            case "extract" -> {
+            case CRAFT -> craft(n, t0, now);
+            case SMELT -> smelt(n, t0, now);
+            case MINE -> mine(n, t0, now);
+            case EXTRACT -> {
                 if (n.su <= 0 || n.powered) {
                     n.frac += n.fluidRate * (now - t0);
                     long mb = (long) n.frac;
@@ -415,7 +413,7 @@ public final class Sim {
                     if (put < mb) n.frac = 0;
                 }
             }
-            case "sink" -> {
+            case SINK -> {
                 if (n.su <= 0 || n.powered) {
                     for (Map.Entry<String, Long> e : n.in.entrySet()) {
                         add(n.sunk, e.getKey(), e.getValue());
@@ -424,7 +422,7 @@ public final class Sim {
                     n.in.clear();
                 }
             }
-            case "port" -> port(n, t0, now, g);
+            case PORT -> port(n, t0, now, g);
             default -> {
             }
         }
@@ -552,10 +550,10 @@ public final class Sim {
     /** How much of a key a node takes in now. */
     static long room(Node n, String key, boolean fluid) {
         switch (n.mode) {
-            case "store" -> {
+            case STORE -> {
                 return fluid ? Math.max(0, n.fluidOutCap - total(n.fout)) : Math.max(0, n.outCap - total(n.out));
             }
-            case "craft" -> {
+            case CRAFT -> {
                 boolean wanted = false;
                 for (Recipe r : n.recipes) if (fluid ? r.fin.containsKey(key) : takes(n, r, key)) {
                     wanted = true;
@@ -564,7 +562,7 @@ public final class Sim {
                 if (!wanted) return 0;
                 return fluid ? Math.max(0, n.fluidInCap - total(n.fin)) : Math.max(0, n.inCap - total(n.in));
             }
-            case "smelt" -> {
+            case SMELT -> {
                 for (Recipe r : n.recipes) if (r.in.containsKey(key)) {
                     // the Smelter's input slot holds one stack, of one ore at a time
                     for (String k : n.in.keySet()) if (!k.equals(key)) return 0;
@@ -572,14 +570,14 @@ public final class Sim {
                 }
                 return 0;
             }
-            case "gen" -> {
+            case GEN -> {
                 if (fluid && key.equals(WATER) && n.water > 0) return Math.max(0, n.fluidInCap - total(n.fin));
                 if (!n.fuelMj.containsKey(key)) return 0;
                 if (fluid) return Math.max(0, n.fluidInCap - total(n.fin));
                 for (String k : n.in.keySet()) if (!k.equals(key)) return 0;
                 return Math.max(0, n.inCap - total(n.in));
             }
-            case "sink" -> {
+            case SINK -> {
                 if (fluid || !n.worth.containsKey(key)) return 0;
                 return Math.max(0, n.inCap - total(n.in));
             }
@@ -590,7 +588,7 @@ public final class Sim {
     }
 
     static void put(Node n, String key, long count, boolean fluid) {
-        Map<String, Long> into = n.mode.equals("store") ? (fluid ? n.fout : n.out) : (fluid ? n.fin : n.in);
+        Map<String, Long> into = n.mode == NodeMode.STORE ? (fluid ? n.fout : n.out) : (fluid ? n.fin : n.in);
         add(into, key, count);
     }
 
@@ -731,7 +729,7 @@ public final class Sim {
             if (next > end) return;
             t = Math.max(t, next);
             Node far = n.destination == null ? null : g.all.get(SimData.key(n.dim, n.destination));
-            if (far == null || !far.kind.equals("drone_port")) {
+            if (far == null || far.kind != NodeKind.DRONE_PORT) {
                 // no port there: nothing to unload into; it comes home with the packages
                 n.state = HOMEBOUND;
                 n.ticks = n.total;

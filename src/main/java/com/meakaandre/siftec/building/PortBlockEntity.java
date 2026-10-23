@@ -96,7 +96,7 @@ public class PortBlockEntity extends SmartBlockEntity {
         // the Particle Accelerator's and the Converter's input port lets in only what the current recipe takes, so junk
         // never jams the Basin
         if (kind() == PortBlock.Kind.ITEM_IN && controller != null && level.getBlockEntity(controller) instanceof ControllerBlockEntity c
-            && c.def() != null && c.def().logic().equals("processor") && level.getBlockEntity(target) instanceof BasinBlockEntity) {
+            && c.def() != null && c.def().logic() == Logic.PROCESSOR && level.getBlockEntity(target) instanceof BasinBlockEntity) {
             return new FilteringStorage<>(inner) {
                 @Override
                 protected boolean canInsert(ItemVariant resource) {

@@ -61,16 +61,16 @@ public final class SpecialBuildings {
     static boolean use(ServerPlayer player, ControllerBlockEntity c, BuildingDef def) {
         Company company = Companies.of(player);
         switch (def.logic()) {
-            case "workshop" -> WorkshopMenu.open(player, company, c.getBlockPos());
-            case "shop" -> ShopMenu.open(player, company, c.getBlockPos());
-            case "sink" -> {
+            case WORKSHOP -> WorkshopMenu.open(player, company, c.getBlockPos());
+            case SHOP -> ShopMenu.open(player, company, c.getBlockPos());
+            case SINK -> {
                 // a Sink is its company's: anyone may look, but only its members print the owner's points as coupons
                 Company owner = c.companyId.isEmpty() ? company : Companies.byId(player.level().getServer(), c.companyId);
                 SinkMenu.open(player, owner == null ? company : owner, c.getBlockPos(), mayOperate(player, c), () -> c.powered);
             }
-            case "radar" -> Radar.use(player, c);
-            case "truck_station" -> TruckStations.use(player, c, def);
-            case "drone_port" -> {
+            case RADAR -> Radar.use(player, c);
+            case TRUCK_STATION -> TruckStations.use(player, c, def);
+            case DRONE_PORT -> {
                 if (!mayOperate(player, c)) player.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
                 else if (droneTerminal(player.level(), c) instanceof DronePortBlockEntity port) DroneMenu.open(player, port, c.getBlockPos());
             }

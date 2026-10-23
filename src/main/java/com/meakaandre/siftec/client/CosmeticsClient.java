@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,15 +32,63 @@ public final class CosmeticsClient {
     private static final Map<Integer, Playing> PLAYING = new HashMap<>();
     private static long ticks;
 
-    private record Playing(String emote, long start) {
+    private record Playing(@Nullable Emote emote, long start) {
     }
+
+    /** Where an emote puts the arms, head and body at a time (KEEP: left as the game posed it). */
+    private record Pose(float rx, float ry, float rz, float lx, float ly, float lz, float head, float body) {
+    }
+
+    /** An emote the client can play (siftec_content.json "emotes"), with the pose it moves through. */
+    private enum Emote {
+        WAVE("wave", t -> new Pose(-2.8f, KEEP, 0.3f + Mth.sin(t * 0.6f) * 0.35f, KEEP, KEEP, KEEP, KEEP, KEEP)),
+        POINT("point", t -> new Pose(-1.55f, -0.15f, KEEP, KEEP, KEEP, KEEP, KEEP, KEEP)),
+        CLAP("clap", t -> {
+            float a = 0.25f + 0.35f * Math.abs(Mth.sin(t * 0.7f));
+            return new Pose(-1.35f, -a, KEEP, -1.35f, a, KEEP, KEEP, KEEP);
+        }),
+        FACEPALM("facepalm", t -> new Pose(-2.2f, 0.55f, KEEP, KEEP, KEEP, KEEP, 0.45f, KEEP)),
+        HEART("heart", t -> new Pose(-2.9f, KEEP, 0.55f, -2.9f, KEEP, -0.55f, KEEP, KEEP)),
+        DANCE("dance", t -> {
+            float s = Mth.sin(t * 0.5f);
+            return new Pose(-1.3f + s * 1.3f, KEEP, KEEP, -1.3f - s * 1.3f, KEEP, KEEP, KEEP, Mth.sin(t * 0.25f) * 0.3f);
+        });
+
+        private final String id;
+        private final Motion pose;
+
+        Emote(String id, Motion pose) {
+            this.id = id;
+            this.pose = pose;
+        }
+
+        /** The emote with this id, or null for one this client cannot play. */
+        static @Nullable Emote find(String id) {
+            for (Emote e : values()) if (e.id.equals(id)) return e;
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return id;
+        }
+    }
+
+    /** An emote's pose at a time (the player's age in ticks). */
+    @FunctionalInterface
+    private interface Motion {
+        Pose at(float t);
+    }
+
+    /** A part of the pose the emote leaves as the game set it. */
+    private static final float KEEP = Float.NaN;
 
     private CosmeticsClient() {
     }
 
     public static void register() {
         ClientPlayNetworking.registerGlobalReceiver(EmotePayload.TYPE, (payload, context) -> Minecraft.getInstance().execute(
-            () -> PLAYING.put(payload.entity(), new Playing(payload.emote(), ticks))));
+            () -> PLAYING.put(payload.entity(), new Playing(Emote.find(payload.emote()), ticks))));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ticks++;
             PLAYING.values().removeIf(p -> ticks - p.start > Emotes.TICKS);
@@ -70,42 +119,9 @@ public final class CosmeticsClient {
         float t = state.ageInTicks;
         // eases in and out over the first and last few ticks
         float age = ticks - playing.start, w = Mth.clamp(Math.min(age, Emotes.TICKS - age) / 6f, 0, 1);
-        float n = Float.NaN, rx = n, ry = n, rz = n, lx = n, ly = n, lz = n, head = n, body = n;
-        switch (playing.emote) {
-            case "wave" -> {
-                rx = -2.8f;
-                rz = 0.3f + Mth.sin(t * 0.6f) * 0.35f;
-            }
-            case "point" -> {
-                rx = -1.55f;
-                ry = -0.15f;
-            }
-            case "clap" -> {
-                float a = 0.25f + 0.35f * Math.abs(Mth.sin(t * 0.7f));
-                rx = lx = -1.35f;
-                ry = -a;
-                ly = a;
-            }
-            case "facepalm" -> {
-                rx = -2.2f;
-                ry = 0.55f;
-                head = 0.45f;
-            }
-            case "heart" -> {
-                rx = lx = -2.9f;
-                rz = 0.55f;
-                lz = -0.55f;
-            }
-            case "dance" -> {
-                float s = Mth.sin(t * 0.5f);
-                rx = -1.3f + s * 1.3f;
-                lx = -1.3f - s * 1.3f;
-                body = Mth.sin(t * 0.25f) * 0.3f;
-            }
-            default -> {
-                return;
-            }
-        }
+        if (playing.emote == null) return;
+        Pose p = playing.emote.pose.at(t);
+        float rx = p.rx(), ry = p.ry(), rz = p.rz(), lx = p.lx(), ly = p.ly(), lz = p.lz(), head = p.head(), body = p.body();
         // only what the emote moves: the rest of the pose stays as the game set it
         model.rightArm.xRot = to(w, model.rightArm.xRot, rx);
         model.rightArm.yRot = to(w, model.rightArm.yRot, ry);

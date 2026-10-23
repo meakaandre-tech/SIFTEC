@@ -58,19 +58,24 @@ public final class MapTests {
     /** A second member for the smoke run's real player, who places a company marker for them. */
     private static final String MATE = "00000000-0000-4000-8000-00000000beef";
 
+    /** What the map's remote control does on the client: the map's screen, a filter, the minimap, a pin, a new marker. */
+    public enum Action {
+        OPEN, CLOSE, HIDE, SHOW, MINIMAP, PIN_MARKER, EDIT
+    }
+
     /**
      * Server to client, from the smoke run's {@code /siftec worldtest map}: opens or closes the map, centred and zoomed,
      * or switches a filter (key presses under the CI's virtual display are not reliable enough).
      */
-    public record Control(String action, String arg, int x, int z, float zoom) implements CustomPacketPayload {
+    public record Control(Action action, String arg, int x, int z, float zoom) implements CustomPacketPayload {
         public static final Type<Control> TYPE = new Type<>(Siftec.id("map_control"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Control> CODEC = StreamCodec.of((buf, p) -> {
-            buf.writeUtf(p.action);
+            buf.writeVarInt(p.action.ordinal());
             buf.writeUtf(p.arg);
             buf.writeVarInt(p.x);
             buf.writeVarInt(p.z);
             buf.writeFloat(p.zoom);
-        }, buf -> new Control(buf.readUtf(32), buf.readUtf(64), buf.readVarInt(), buf.readVarInt(), buf.readFloat()));
+        }, buf -> new Control(Action.values()[buf.readVarInt()], buf.readUtf(64), buf.readVarInt(), buf.readVarInt(), buf.readFloat()));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
@@ -108,13 +113,13 @@ public final class MapTests {
                         return 1;
                     }))
                     .then(Commands.literal("open").then(Commands.argument("zoom", FloatArgumentType.floatArg(0.01f, 4))
-                        .executes(context -> control(context, "open", "", FloatArgumentType.getFloat(context, "zoom")))))
-                    .then(Commands.literal("close").executes(context -> control(context, "close", "", 0)))
-                    .then(Commands.literal("edit").executes(context -> control(context, "edit", "", 0)))
+                        .executes(context -> control(context, Action.OPEN, "", FloatArgumentType.getFloat(context, "zoom")))))
+                    .then(Commands.literal("close").executes(context -> control(context, Action.CLOSE, "", 0)))
+                    .then(Commands.literal("edit").executes(context -> control(context, Action.EDIT, "", 0)))
                     .then(Commands.literal("hide").then(Commands.argument("filter", StringArgumentType.greedyString())
-                        .executes(context -> control(context, "hide", StringArgumentType.getString(context, "filter"), 0))))
+                        .executes(context -> control(context, Action.HIDE, StringArgumentType.getString(context, "filter"), 0))))
                     .then(Commands.literal("show").then(Commands.argument("filter", StringArgumentType.greedyString())
-                        .executes(context -> control(context, "show", StringArgumentType.getString(context, "filter"), 0))))))));
+                        .executes(context -> control(context, Action.SHOW, StringArgumentType.getString(context, "filter"), 0))))))));
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
@@ -322,7 +327,7 @@ public final class MapTests {
         return 1;
     }
 
-    private static int control(CommandContext<CommandSourceStack> context, String action, String arg, float zoom) {
+    private static int control(CommandContext<CommandSourceStack> context, Action action, String arg, float zoom) {
         for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
             BlockPos at = player.blockPosition();
             if (!Companies.isFake(player) && ServerPlayNetworking.canSend(player, Control.TYPE)) {

@@ -372,7 +372,7 @@ public final class BuildingsBTests {
             BuildingDef def = Buildings.def(w[0]);
             BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
             expect(source, w[0] + " is listed with its unlock, logic and SU, and its template reads", def != null && t != null && def.unlock().equals(w[1])
-                    && def.logic().equals(w[2]) && def.su() == Integer.parseInt(w[3]) && !def.dev() && def.category() == Category.PRODUCTION == !w[0].equals("nuclear_power_plant"),
+                    && def.logic().id().equals(w[2]) && def.su() == Integer.parseInt(w[3]) && !def.dev() && def.category() == Category.PRODUCTION == !w[0].equals("nuclear_power_plant"),
                 def == null ? "missing" : def.category() + " " + def.unlock() + " " + def.logic() + " su " + def.su() + (t == null ? " no template: " + BuildingTemplate.problem(w[0]) : ""));
         }
         // the Pure Aluminum Ingot alternate runs in the Foundry's heated Mixer

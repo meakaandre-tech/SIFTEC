@@ -81,7 +81,7 @@ public class ControllerBlock extends Block implements EntityBlock {
             return InteractionResult.SUCCESS;
         }
         // an AWESOME Sink used with something in hand sinks it
-        if (def != null && def.logic().equals("sink")) {
+        if (def != null && def.logic() == Logic.SINK) {
             if (player instanceof ServerPlayer server) SpecialBuildings.sinkHeld(server, controller, stack);
             return InteractionResult.SUCCESS;
         }

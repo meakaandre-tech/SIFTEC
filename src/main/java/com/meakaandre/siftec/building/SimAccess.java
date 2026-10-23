@@ -10,6 +10,7 @@ import com.meakaandre.siftec.node.Purity;
 import com.meakaandre.siftec.power.Power;
 import com.meakaandre.siftec.power.PowerMember;
 import com.meakaandre.siftec.sim.Keys;
+import com.meakaandre.siftec.sim.NodeMode;
 import com.meakaandre.siftec.sim.Recipes;
 import com.meakaandre.siftec.sim.SimData;
 import com.meakaandre.siftec.sink.Sink;
@@ -67,7 +68,7 @@ public final class SimAccess {
 
     /** Whether a building is simulated at all: not the HUB, the Gateway, vehicles or plain poles. */
     public static boolean simulated(@Nullable BuildingDef def) {
-        return def != null && !def.structure() && !def.vehicle() && !def.power().equals("pole");
+        return def != null && !def.structure() && !def.vehicle() && def.power() != PowerRole.POLE;
     }
 
     public static List<Port> ports(ControllerBlockEntity c) {
@@ -138,31 +139,31 @@ public final class SimAccess {
         n.logic = def.logic();
         n.company = c.companyId;
         n.power = def.power();
-        n.su = def.power().isEmpty() ? def.su() : 0;
+        n.su = def.power() == PowerRole.NONE ? def.su() : 0;
         n.unload = c.unload;
         n.recipes.clear();
         n.alts.clear();
         n.connectors.clear();
         for (BlockPos pos : connectors(c)) n.connectors.add(pos.asLong());
-        n.mode = "none";
+        n.mode = NodeMode.NONE;
         switch (def.logic()) {
-            case "miner", "portable_miner" -> mine(level, c, def, n);
-            case "smelter" -> smelter(n);
-            case "basin" -> basin(c, def, n);
-            case "assembly" -> assembly(c, def, n);
-            case "packager" -> packager(n);
-            case "processor" -> processor(c, def, n);
-            case "extractor", "well_extractor" -> extractor(level, c, def, n);
-            case "power" -> generator(level, c, def, n);
-            case "sink" -> {
-                n.mode = "sink";
+            case MINER, PORTABLE_MINER -> mine(level, c, def, n);
+            case SMELTER -> smelter(n);
+            case BASIN -> basin(c, def, n);
+            case ASSEMBLY -> assembly(c, def, n);
+            case PACKAGER -> packager(n);
+            case PROCESSOR -> processor(c, def, n);
+            case EXTRACTOR, WELL_EXTRACTOR -> extractor(level, c, def, n);
+            case POWER -> generator(level, c, def, n);
+            case SINK -> {
+                n.mode = NodeMode.SINK;
                 n.inCap = 64;
             }
-            case "storage", "truck_station" -> {
-                n.mode = "store";
-                for (String fuel : BuildingPower.fluidFuels("fuel")) {
+            case STORAGE, TRUCK_STATION -> {
+                n.mode = NodeMode.STORE;
+                for (String fuel : BuildingPower.fluidFuels(PowerRole.FUEL)) {
                     Fluid f = BuiltInRegistries.FLUID.getValue(Identifier.parse(fuel));
-                    n.fuelMj.put(Keys.fluid(f), BuildingPower.fluidMj("fuel", f));
+                    n.fuelMj.put(Keys.fluid(f), BuildingPower.fluidMj(PowerRole.FUEL, f));
                 }
             }
             default -> {
@@ -171,7 +172,7 @@ public final class SimAccess {
     }
 
     private static void mine(ServerLevel level, ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
-        n.mode = "mine";
+        n.mode = NodeMode.MINE;
         n.outCap = 64;
         var site = c.node == null || !level.isLoaded(c.node) ? null : NodeSites.at(level, c.node);
         if (site == null) {
@@ -202,13 +203,13 @@ public final class SimAccess {
         if (!best.equals(n.mineItem) || n.minePer <= 0) n.minePer = per;
         n.mineItem = best;
         Purity purity = site.purity;
-        boolean powered = def.logic().equals("miner");
+        boolean powered = def.logic() == Logic.MINER;
         n.minePeriod = NodeRegrowth.ticks(purity) + Math.max(1, def.breakTicks()) + (powered ? MINER_LAG : 0);
         if (!powered) n.outCap = 64;
     }
 
     private static void smelter(SimData.Node n) {
-        n.mode = "smelt";
+        n.mode = NodeMode.SMELT;
         n.inCap = 64;
         n.outCap = 64;
         JsonObject raw = Milestones.raw();
@@ -236,7 +237,7 @@ public final class SimAccess {
 
     /** A Constructor, Assembler, Foundry, Refinery or Blender: the Basin recipe its filter picks, at Satisfactory's time. */
     private static void basin(ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
-        n.mode = "craft";
+        n.mode = NodeMode.CRAFT;
         n.inCap = 9 * 64;
         n.outCap = 9 * 64;
         n.fluidInCap = 2000;
@@ -276,7 +277,7 @@ public final class SimAccess {
 
     /** The Manufacturer and the Quantum Encoder: the Core's inputs plus each step's item or fluid, the result at the line's end. */
     private static void assembly(ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
-        n.mode = "craft";
+        n.mode = NodeMode.CRAFT;
         n.inCap = 9 * 64;
         n.outCap = 64;
         n.fluidInCap = 2000;
@@ -302,7 +303,7 @@ public final class SimAccess {
     }
 
     private static void packager(SimData.Node n) {
-        n.mode = "craft";
+        n.mode = NodeMode.CRAFT;
         n.inCap = 64;
         n.outCap = 64;
         n.fluidInCap = 4000;
@@ -319,7 +320,7 @@ public final class SimAccess {
     }
 
     private static void processor(ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
-        n.mode = "craft";
+        n.mode = NodeMode.CRAFT;
         n.inCap = 9 * 64;
         n.outCap = 64;
         n.fluidInCap = 4000;
@@ -335,10 +336,10 @@ public final class SimAccess {
     }
 
     private static void extractor(ServerLevel level, ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
-        n.mode = "extract";
+        n.mode = NodeMode.EXTRACT;
         n.fluidOut = Keys.fluid(ExtractorLogic.fluid(def));
         float rate = 1f;
-        if (def.logic().equals("well_extractor")) {
+        if (def.logic() == Logic.WELL_EXTRACTOR) {
             ExtractorLogic.Draw d = ExtractorLogic.well(level, c);
             rate = d.purity() == null ? 0 : d.purity().multiplier;
         } else if (def.node()) {
@@ -350,54 +351,54 @@ public final class SimAccess {
     }
 
     private static void generator(ServerLevel level, ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
-        String kind = def.power();
+        PowerRole kind = def.power();
         n.fullSu = Power.su(def.mw());
         // the Coal Generator and the Nuclear Power Plant drink water at their intake: none, no power
         n.water = def.water() > 0 ? def.water() * BuildingPower.mbPerM3() / 1200.0 : 0;
         if (n.water > 0) n.fluidInCap = Math.max(n.fluidInCap, 4000);
         switch (kind) {
-            case "biomass", "coal", "nuclear" -> {
-                n.mode = "gen";
+            case BIOMASS, COAL, NUCLEAR -> {
+                n.mode = NodeMode.GEN;
                 n.inCap = 64;
                 // a nuclear plant's waste: its output slot and waste store (BuildingPower.WASTE_ROOM), several rods' worth
-                n.outCap = kind.equals("nuclear") ? BuildingPower.WASTE_ROOM : 64;
+                n.outCap = kind == PowerRole.NUCLEAR ? BuildingPower.WASTE_ROOM : 64;
                 ItemStack in = c.input.getItem(0);
                 if (!in.isEmpty()) fuel(n, kind, in);
             }
-            case "fuel" -> {
-                n.mode = "gen";
+            case FUEL -> {
+                n.mode = NodeMode.GEN;
                 n.fluidInCap = 4000;
-                for (String fuel : BuildingPower.fluidFuels("fuel")) {
+                for (String fuel : BuildingPower.fluidFuels(PowerRole.FUEL)) {
                     Fluid f = BuiltInRegistries.FLUID.getValue(Identifier.parse(fuel));
-                    n.fuelMj.put(Keys.fluid(f), BuildingPower.fluidMj("fuel", f));
+                    n.fuelMj.put(Keys.fluid(f), BuildingPower.fluidMj(PowerRole.FUEL, f));
                 }
             }
-            case "geothermal" -> {
-                n.mode = "gen";
+            case GEOTHERMAL -> {
+                n.mode = NodeMode.GEN;
                 PowerMember m = BuildingPower.member(level, c);
                 n.fullSu = m == null ? 0 : m.steady(n.fullSu);
                 n.fluidOut = "fluid:siftec:sulfuric_acid";
                 n.fluidOutCap = 4000;
             }
-            case "augmenter" -> {
-                n.mode = "gen";
+            case AUGMENTER -> {
+                n.mode = NodeMode.GEN;
                 n.inCap = 64;
                 ItemStack in = c.input.getItem(0);
-                if (!in.isEmpty() && BuildingPower.itemMj("augmenter", in) > 0) n.fuelMj.put(Keys.of(in), 1.0);
+                if (!in.isEmpty() && BuildingPower.itemMj(PowerRole.AUGMENTER, in) > 0) n.fuelMj.put(Keys.of(in), 1.0);
             }
             // Power Storage: charged and drained with its grid, wherever that grid is
-            case "storage" -> n.mode = "battery";
+            case STORAGE -> n.mode = NodeMode.BATTERY;
             default -> {
             }
         }
     }
 
     /** Notes what one item of this fuel is worth to a generator of this kind (and the waste a fuel rod leaves). */
-    public static void fuel(SimData.Node n, String kind, ItemStack stack) {
+    public static void fuel(SimData.Node n, PowerRole kind, ItemStack stack) {
         double mj = BuildingPower.itemMj(kind, stack);
         if (mj <= 0) return;
         String key = Keys.of(stack);
-        n.fuelMj.put(key, kind.equals("augmenter") ? 1.0 : mj);
+        n.fuelMj.put(key, kind == PowerRole.AUGMENTER ? 1.0 : mj);
         String[] waste = BuildingPower.wasteOf(stack);
         if (waste != null) {
             n.waste.put(key, waste[0]);
@@ -409,8 +410,8 @@ public final class SimAccess {
     public static void accepts(SimData.Node n, String itemKey) {
         ItemStack stack = Keys.stack(itemKey, 1);
         if (stack.isEmpty()) return;
-        if (n.mode.equals("gen") && !n.power.isEmpty()) fuel(n, n.power, stack);
-        if (n.mode.equals("sink") && Sink.accepts(stack)) n.worth.put(itemKey, Sink.worthOne(stack));
+        if (n.mode == NodeMode.GEN && n.power != PowerRole.NONE) fuel(n, n.power, stack);
+        if (n.mode == NodeMode.SINK && Sink.accepts(stack)) n.worth.put(itemKey, Sink.worthOne(stack));
     }
 
     // ------------------------------------------------------------------------------------------------ handing back
@@ -453,9 +454,9 @@ public final class SimAccess {
         BuildingDef def = c.def();
         if (def != null) {
             switch (def.power()) {
-                case "storage" -> c.energy = n.stored;
-                case "augmenter" -> c.fedTicks = (int) Math.min(Integer.MAX_VALUE, n.fed);
-                case "biomass", "coal", "fuel", "nuclear" -> {
+                case STORAGE -> c.energy = n.stored;
+                case AUGMENTER -> c.fedTicks = (int) Math.min(Integer.MAX_VALUE, n.fed);
+                case BIOMASS, COAL, FUEL, NUCLEAR -> {
                     double spent = n.energy0 - n.energy;
                     PowerMember m = BuildingPower.member(level, c);
                     if (spent > 0 && m != null) m.spend(spent);

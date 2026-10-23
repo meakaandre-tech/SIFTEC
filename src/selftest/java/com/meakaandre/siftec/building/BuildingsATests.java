@@ -325,7 +325,7 @@ public final class BuildingsATests {
             BuildingDef def = Buildings.def(w[0]);
             BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
             expect(source, w[0] + " is listed with its tab, unlock and logic, and its template reads", def != null && t != null && def.category().name().equals(w[1])
-                    && def.unlock().equals(w[2]) && def.logic().equals(w[3]) && !def.dev(),
+                    && def.unlock().equals(w[2]) && def.logic().id().equals(w[3]) && !def.dev(),
                 def == null ? "missing" : def.category() + " " + def.unlock() + " " + def.logic() + " su " + def.su() + (t == null ? " no template: " + BuildingTemplate.problem(w[0]) : ""));
         }
         expect(source, "SU follow Satisfactory's MW (1 MW = 204.8 SU)", Buildings.def("constructor").su() == 819 && Buildings.def("smelter").su() == 819
@@ -623,7 +623,7 @@ public final class BuildingsATests {
             if (level.getBlockEntity(b1) instanceof HubBurnerBlockEntity burner) {
                 expect(source, "HUB: its Biomass Burners take Biomass and leaves, not coal, and are wired from the top", HubBurnerBlockEntity.accepts(new ItemStack(item("siftec:biomass")))
                     && HubBurnerBlockEntity.accepts(new ItemStack(Items.OAK_LEAVES)) && !HubBurnerBlockEntity.accepts(new ItemStack(Items.COAL))
-                    && BuildingPower.itemMj("biomass", new ItemStack(item("siftec:biomass"))) == 180
+                    && BuildingPower.itemMj(PowerRole.BIOMASS, new ItemStack(item("siftec:biomass"))) == 180
                     && level.getBlockEntity(b1.above()) instanceof AbstractElectricalConnector, String.valueOf(level.getBlockState(b1.above())));
             } else {
                 expect(source, "HUB: its first Biomass Burner stands", false, String.valueOf(level.getBlockState(b1)));

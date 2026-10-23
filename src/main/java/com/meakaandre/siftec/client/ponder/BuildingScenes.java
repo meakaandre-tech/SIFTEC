@@ -8,6 +8,7 @@ import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.PortBlock;
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.power.Power;
@@ -255,8 +256,8 @@ public final class BuildingScenes {
     /** What it does in the power grid: draws, gives or stores power, and where its wires go. */
     private static void power(BuildingDef def, SceneBuilder scene, SceneBuildingUtil util, @Nullable BlockPos controller, @Nullable BlockPos connector) {
         Vec3 at = controller == null ? null : util.vector().centerOf(controller);
-        String kind = def.power();
-        boolean generator = def.mw() > 0 && !kind.isEmpty() && !kind.equals("pole") && !kind.equals("storage");
+        PowerRole kind = def.power();
+        boolean generator = def.mw() > 0 && kind.givesPower();
         if (generator) {
             shared(scene, "power_make", at, fmt(def.mw()), Power.fmt(Power.su(def.mw())));
         } else if (def.su() > 0) {
@@ -266,7 +267,7 @@ public final class BuildingScenes {
             scene.overlay().showOutline(PonderPalette.BLUE, "connector", util.select().position(connector), 90);
             shared(scene, "power_wire", util.vector().topOf(connector));
         }
-        if (generator || kind.equals("storage")) shared(scene, "fuse", at);
+        if (generator || kind == PowerRole.STORAGE) shared(scene, "fuse", at);
     }
 
     private static String fmt(double n) {

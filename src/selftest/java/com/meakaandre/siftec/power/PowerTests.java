@@ -9,6 +9,7 @@ import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.Placement;
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.node.NodeMap;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -423,12 +424,12 @@ public final class PowerTests {
             for (ControllerBlockEntity c : built) {
                 BuildingDef def = c.def();
                 if (def == null) continue;
-                if (def.power().equals("biomass")) c.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 64));
-                if (def.power().equals("coal")) {
+                if (def.power() == PowerRole.BIOMASS) c.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 64));
+                if (def.power() == PowerRole.COAL) {
                     fill(level, tank(c), Fluids.WATER, 8000);
                     c.input.setItem(0, new ItemStack(Items.COAL, 64));
                 }
-                if (def.power().equals("pole")) {
+                if (def.power() == PowerRole.POLE) {
                     if (pole != null) wire(connector(level, pole), connector(level, c));
                     pole = c;
                 }
@@ -436,8 +437,8 @@ public final class PowerTests {
             ControllerBlockEntity first = built.isEmpty() ? null : built.getFirst();
             for (ControllerBlockEntity c : built) {
                 BuildingDef def = c.def();
-                if (def == null || def.power().equals("pole") || first == null) continue;
-                wire(connector(level, c), connector(level, def.power().isEmpty() ? pole : first));
+                if (def == null || def.power() == PowerRole.POLE || first == null) continue;
+                wire(connector(level, c), connector(level, def.power() == PowerRole.NONE ? pole : first));
             }
             report(source, "view: " + built.size() + " power buildings built and wired");
         }

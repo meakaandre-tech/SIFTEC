@@ -2,6 +2,7 @@ package com.meakaandre.siftec.sink;
 
 import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.Logic;
 import com.meakaandre.siftec.building.SpecialBuildings;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -151,7 +152,7 @@ public class SinkMenu extends ChestMenu {
     @Override
     public boolean stillValid(Player who) {
         // a member keeps it open while still a member; anyone else only looks, from within reach
-        return who == player && BuildingMenus.near(player, at, BuildingMenus.logic("sink"))
+        return who == player && BuildingMenus.near(player, at, BuildingMenus.logic(Logic.SINK))
             && company() != null && (!operator || mayPrint());
     }
 }

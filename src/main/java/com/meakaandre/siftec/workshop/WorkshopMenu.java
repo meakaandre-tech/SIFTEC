@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.workshop;
 
 import com.meakaandre.siftec.building.BuildingMenus;
+import com.meakaandre.siftec.building.Logic;
 import com.meakaandre.siftec.company.Company;
 import net.minecraft.core.BlockPos;
 import com.meakaandre.siftec.hub.Locks;
@@ -121,6 +122,6 @@ public class WorkshopMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player who) {
-        return BuildingMenus.stillValid(who, player, at, BuildingMenus.logic("workshop"), companyId);
+        return BuildingMenus.stillValid(who, player, at, BuildingMenus.logic(Logic.WORKSHOP), companyId);
     }
 }

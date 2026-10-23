@@ -40,7 +40,7 @@ public final class BasinPace {
         // the Manufacturer's and the Quantum Encoder's Mixer only makes the Core: the building counts what leaves its line
         BuildingDef def = c.def();
         // and the Particle Accelerator and the Converter count what comes out of their crusher or haunting
-        if (def == null || !def.logic().equals("assembly") && !def.logic().equals("processor")) c.made++;
+        if (def == null || def.logic() != Logic.ASSEMBLY && def.logic() != Logic.PROCESSOR) c.made++;
         c.setChanged();
     }
 }
