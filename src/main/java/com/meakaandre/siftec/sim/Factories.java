@@ -76,7 +76,7 @@ public final class Factories {
     });
     private static @Nullable Future<?> running;
     private static List<Sim.Group> runningGroups = List.of();
-    private static long runningNanos, runningStarted;
+    private static long runningStarted;
     private static boolean stopping;
     private static @Nullable MinecraftServer server;
     /** Nodes in mixed grids (balanced by PowerGrids), by key, with the connector their grid is found by. */
@@ -1150,18 +1150,6 @@ public final class Factories {
                 Thread.currentThread().interrupt();
             }
         });
-    }
-
-    /** Runs a step now on the server thread (selftests). */
-    public static void stepNow(MinecraftServer s) {
-        join();
-        SimData data = SimData.get(s);
-        long now = s.overworld().getGameTime();
-        due(s, data);
-        transitions(s, data, now);
-        boundary(s, data, now);
-        submit(s, data, now);
-        join();
     }
 
     public static BuildingDef def(Node n) {

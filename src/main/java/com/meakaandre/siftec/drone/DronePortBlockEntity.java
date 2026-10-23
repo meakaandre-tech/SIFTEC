@@ -6,16 +6,12 @@ import com.meakaandre.siftec.sim.Factories;
 import com.meakaandre.siftec.sim.Keys;
 import com.meakaandre.siftec.sim.SimData;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -364,39 +360,6 @@ public class DronePortBlockEntity extends BlockEntity {
         }
         setChanged();
         return spill;
-    }
-
-    /** Everything a port keeps, so an old single-block port's can move into the building's terminal. */
-    public record Snapshot(String companyId, boolean hasDrone, @Nullable BlockPos destination, int state, int ticks, int total,
-                           List<ItemStack> slots, List<ItemStack> cargo) {
-    }
-
-    /** Takes everything out of this port (it holds nothing afterwards, so breaking it drops nothing). */
-    public Snapshot takeSnapshot() {
-        List<ItemStack> slots = new ArrayList<>();
-        for (int i = 0; i < PortContainer.SIZE; i++) slots.add(items.removeItemNoUpdate(i));
-        Snapshot snap = new Snapshot(companyId, hasDrone, destination, state, ticks, total, slots, List.copyOf(cargo));
-        cargo.clear();
-        hasDrone = false;
-        state = IDLE;
-        hide();
-        setChanged();
-        return snap;
-    }
-
-    /** Puts a snapshot into this port, the trip under way and all. */
-    public void apply(Snapshot snap) {
-        companyId = snap.companyId();
-        hasDrone = snap.hasDrone();
-        destination = snap.destination();
-        state = snap.state();
-        ticks = snap.ticks();
-        total = snap.total();
-        for (int i = 0; i < PortContainer.SIZE; i++) items.setItem(i, i < snap.slots().size() ? snap.slots().get(i) : ItemStack.EMPTY);
-        cargo.clear();
-        cargo.addAll(snap.cargo());
-        cargo.removeIf(ItemStack::isEmpty);
-        setChanged();
     }
 
     /** Gives back the drone as an item, if it is home. */

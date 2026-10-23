@@ -11,7 +11,6 @@ import com.meakaandre.siftec.item.ObjectScannerItem;
 import com.meakaandre.siftec.map.MapServer;
 import com.meakaandre.siftec.net.CompanyState;
 import com.meakaandre.siftec.place.Places;
-import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.save.JsonSavedData;
 import com.meakaandre.siftec.sim.SimData;
 import com.meakaandre.siftec.sink.Shop;
@@ -31,9 +30,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
-import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;

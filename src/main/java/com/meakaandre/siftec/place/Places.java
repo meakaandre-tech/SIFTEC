@@ -88,7 +88,6 @@ public final class Places {
         return kind.equals(DRONE_PORT) ? ModBlocks.DRONE_PORT.get() : kind.equals(MAIN_PORTAL) ? ModBlocks.MAIN_PORTAL.get() : ModBlocks.SATELLITE_PORTAL.get();
     }
 
-    /** A company's places. One whose block has been broken drops off the list the first time its chunk is seen loaded. */
     /** Hands every port and portal of one company to another. */
     public static void reassign(MinecraftServer server, String from, String to) {
         Data data = Data.get(server);

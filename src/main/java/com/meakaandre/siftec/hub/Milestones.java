@@ -164,12 +164,6 @@ public final class Milestones {
         return false;
     }
 
-    /** The MAM tree a research node belongs to. */
-    public static Tree treeOf(Milestone m) {
-        for (Tree t : TREES) if (t.id().equals(m.tree())) return t;
-        return null;
-    }
-
     /** True if every wormhole phase is delivered: the portal to The Sift is open and the game goes on as free play. */
     public static boolean freePlay(Company company) {
         return !PHASES.isEmpty() && company.has(PHASES.get(PHASES.size() - 1).id());

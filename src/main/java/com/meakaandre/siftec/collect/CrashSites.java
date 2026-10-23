@@ -3,7 +3,6 @@ package com.meakaandre.siftec.collect;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.node.NodeMap;
-import com.meakaandre.siftec.node.NodeSavedData;
 import com.meakaandre.siftec.power.Power;
 import com.meakaandre.siftec.power.PowerGrids;
 import com.meakaandre.siftec.save.JsonSavedData;

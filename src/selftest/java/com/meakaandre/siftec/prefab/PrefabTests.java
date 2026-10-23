@@ -49,7 +49,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 

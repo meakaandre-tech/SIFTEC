@@ -3,7 +3,6 @@ package com.meakaandre.siftec.sim;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
-import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.building.SimAccess;
 import com.zurrtum.create.content.logistics.vault.ItemVaultBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;

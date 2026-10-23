@@ -2,7 +2,6 @@ package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.registry.ModBlockEntities;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Block;
