@@ -87,7 +87,6 @@ public final class MapClient {
         ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Markers.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> markers(p.markers())));
         ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Mates.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> mates = p.mates()));
         ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Movers.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> movers = p.movers()));
-        ClientPlayNetworking.registerGlobalReceiver(MapPayloads.Control.TYPE, (p, c) -> Minecraft.getInstance().execute(() -> control(p)));
         ClientTickEvents.END_CLIENT_TICK.register(MapClient::tick);
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(MapClient::reset));
         loadSettings();
@@ -288,7 +287,7 @@ public final class MapClient {
     private static void tick(Minecraft mc) {
         if (mc.player == null || mc.level == null) return;
         if (mc.gui.screen() == null) {
-            while (OPEN.consumeClick()) open(null);
+            while (OPEN.consumeClick()) open();
             while (MINIMAP.consumeClick()) {
                 minimapOn = !minimapOn;
                 saveSettings();
@@ -320,7 +319,12 @@ public final class MapClient {
     }
 
     /** Opens the fullscreen map, if the company has it and the player is in the Overworld. */
-    public static void open(MapPayloads.@Nullable Control at) {
+    public static void open() {
+        show(new MapScreen());
+    }
+
+    /** Shows this map screen, if the company has the map and the player is in the Overworld. */
+    public static void show(MapScreen screen) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         if (!unlocked()) {
@@ -331,31 +335,7 @@ public final class MapClient {
             mc.player.sendOverlayMessage(Component.translatable("siftec.map.surface_only"));
             return;
         }
-        MapScreen screen = new MapScreen();
-        if (at != null) screen.centre(at.x(), at.z(), at.zoom());
         mc.gui.setScreen(screen);
-    }
-
-    /** The smoke run's remote control: see {@link MapPayloads.Control}. */
-    private static void control(MapPayloads.Control p) {
-        Minecraft mc = Minecraft.getInstance();
-        switch (p.action()) {
-            case "open" -> open(p);
-            case "close" -> {
-                if (mc.gui.screen() instanceof MapScreen) mc.gui.setScreen(null);
-            }
-            case "hide" -> HIDDEN.add(p.arg());
-            case "show" -> HIDDEN.remove(p.arg());
-            case "minimap" -> minimapOn = p.arg().equals("on");
-            case "pin_marker" -> {
-                for (MapMarker m : markers) if (m.name.equals(p.arg())) pin(markerPin(m));
-            }
-            case "edit" -> {
-                if (mc.gui.screen() instanceof MapScreen screen) screen.newMarker(p.x(), p.z());
-            }
-            default -> {
-            }
-        }
     }
 
     /** Everything the map shows of the seed and the world in the regions given. */

@@ -237,24 +237,4 @@ public final class MapPayloads {
             return TYPE;
         }
     }
-
-    /**
-     * Server to client, from the smoke run's {@code /siftec worldtest map}: opens or closes the map, centred and zoomed,
-     * or switches a filter (key presses under the CI's virtual display are not reliable enough).
-     */
-    public record Control(String action, String arg, int x, int z, float zoom) implements CustomPacketPayload {
-        public static final Type<Control> TYPE = typeOf("map_control");
-        public static final StreamCodec<RegistryFriendlyByteBuf, Control> CODEC = StreamCodec.of((buf, p) -> {
-            buf.writeUtf(p.action);
-            buf.writeUtf(p.arg);
-            buf.writeVarInt(p.x);
-            buf.writeVarInt(p.z);
-            buf.writeFloat(p.zoom);
-        }, buf -> new Control(buf.readUtf(32), buf.readUtf(64), buf.readVarInt(), buf.readVarInt(), buf.readFloat()));
-
-        @Override
-        public Type<? extends CustomPacketPayload> type() {
-            return TYPE;
-        }
-    }
 }

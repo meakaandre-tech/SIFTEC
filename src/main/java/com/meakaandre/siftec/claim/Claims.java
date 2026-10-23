@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.claim;
 
+import com.meakaandre.siftec.SelfTestHooks;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.company.Companies;
@@ -250,7 +251,7 @@ public final class Claims {
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) ->
             entity instanceof Player ? InteractionResult.PASS : entityCheck(player, level, entity));
         ServerChunkEvents.CHUNK_LOAD.register(Claims::heal);
-        StateSelfTest.register();
+        SelfTestHooks.run(SelfTestHooks.Stage.CLAIMS);
     }
 
     private static InteractionResult entityCheck(Player player, Level level, Entity entity) {

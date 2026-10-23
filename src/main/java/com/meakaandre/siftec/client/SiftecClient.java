@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.client;
 
+import com.meakaandre.siftec.SelfTestHooks;
 import com.meakaandre.siftec.client.map.MapClient;
 import com.meakaandre.siftec.client.ponder.Guide;
 import com.meakaandre.siftec.equip.JetFuelPayload;
@@ -86,5 +87,6 @@ public class SiftecClient implements ClientModInitializer {
             ClientState.jetFuel = true;
             BuildGunClient.reset();
         });
+        SelfTestHooks.run(SelfTestHooks.Stage.CLIENT);
     }
 }

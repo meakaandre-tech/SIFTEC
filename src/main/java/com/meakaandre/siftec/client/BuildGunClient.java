@@ -73,11 +73,13 @@ public final class BuildGunClient {
     }
     private static final int GREEN = 0x5CD65C, RED = 0xE03C3C, BLUE = 0x4AA8FF;
 
-    private static int category;
-    private static final int[] picked = new int[Category.values().length];
-    private static boolean selected, dismantle, nudge, flip, ctrlHeld, scrolled, wasHolding;
+    static int category;
+    static final int[] picked = new int[Category.values().length];
+    static boolean selected, dismantle, nudge;
+    private static boolean flip, ctrlHeld, scrolled, wasHolding;
     private static int turns;
-    private static @Nullable Placement frozen, shown;
+    static @Nullable Placement frozen;
+    private static @Nullable Placement shown;
     private static BuildGunPayloads.@Nullable Select sent;
     private static BuildGunPayloads.@Nullable View verdict;
     private static int ticks, lastColor, lastRebuild;
@@ -98,7 +100,6 @@ public final class BuildGunClient {
         ClientTickEvents.START_CLIENT_TICK.register(BuildGunClient::keys);
         ClientTickEvents.END_CLIENT_TICK.register(BuildGunClient::hologram);
         ClientPlayNetworking.registerGlobalReceiver(BuildGunPayloads.View.TYPE, (payload, context) -> Minecraft.getInstance().execute(() -> verdict = payload));
-        ClientPlayNetworking.registerGlobalReceiver(BuildGunPayloads.Tab.TYPE, (payload, context) -> Minecraft.getInstance().execute(() -> tab(payload)));
     }
 
     private static boolean holding(Minecraft mc) {
@@ -110,7 +111,7 @@ public final class BuildGunClient {
         return nudge && mc.gui.screen() == null && holding(mc);
     }
 
-    private static List<BuildingDef> list(Minecraft mc) {
+    static List<BuildingDef> list(Minecraft mc) {
         return Buildings.of(Category.values()[category], mc.player != null && mc.player.hasInfiniteMaterials());
     }
 
@@ -203,17 +204,6 @@ public final class BuildGunClient {
             BuildingDef def = current(mc);
             if (def != null && !dismantle) Guide.open(def);
         }
-    }
-
-    /** The smoke run's tab: see {@link BuildGunPayloads.Tab}. */
-    private static void tab(BuildGunPayloads.Tab payload) {
-        Minecraft mc = Minecraft.getInstance();
-        category = Math.floorMod(payload.category(), Category.values().length);
-        selected = !payload.building().isEmpty();
-        List<BuildingDef> defs = list(mc);
-        for (int i = 0; i < defs.size(); i++) if (defs.get(i).id().equals(payload.building())) picked[category] = i;
-        dismantle = nudge = false;
-        frozen = null;
     }
 
     private static void flip() {

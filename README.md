@@ -252,11 +252,13 @@ lights, office furniture and cups (taken from the Shop for a few parts once owne
 
 Create Fly, Create: New Age and Diesel Generators are not on a Maven repository: put their jars at
 `libs/create-fly-26.3.jar`, `libs/create-new-age-26.3.jar` and `libs/createdieselgenerators-26.3.jar` first (the CI
-downloads the latest 26.3 releases of the meakaandre-tech forks). The built jar is in `build/libs/`.
+downloads the latest 26.3 releases of the meakaandre-tech forks). The built jar is in `build/libs/`, next to
+`siftec-selftest-*.jar`: the self-tests (`src/selftest`), a mod of their own that only the CI loads.
 
 The CI (`.github/workflows/build.yml`) builds on every push to `main`, starts a dedicated server with the
-pack's mods, runs the self-tests in `.github/smoke-commands*.txt` (`/siftec selftest ...`), publishes the logs
-to the `ci-logs` branch and the jar as the `latest` release.
+pack's mods and the self-test jar, runs the self-tests in `.github/smoke-commands*.txt` (`/siftec selftest ...`),
+joins it with a client (`./gradlew runSelftestClient`), publishes the logs to the `ci-logs` branch and the jar as the
+`latest` release.
 
 ## Where the data comes from
 

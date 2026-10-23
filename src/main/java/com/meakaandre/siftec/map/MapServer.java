@@ -109,7 +109,6 @@ public final class MapServer {
         PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Markers.TYPE, MapPayloads.Markers.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Mates.TYPE, MapPayloads.Mates.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Movers.TYPE, MapPayloads.Movers.CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(MapPayloads.Control.TYPE, MapPayloads.Control.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(MapPayloads.TileRequest.TYPE, MapPayloads.TileRequest.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(MapPayloads.MarkerEdit.TYPE, MapPayloads.MarkerEdit.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(MapPayloads.TileRequest.TYPE, (payload, context) -> context.server().execute(() -> tiles(context.player(), payload)));
@@ -727,10 +726,5 @@ public final class MapServer {
         SEED.remove(from);
         SEED.remove(into);
         SEED_STAMP.remove(into);
-    }
-
-    /** For the smoke run: tells the player's client to open, move or close its map. */
-    public static void control(ServerPlayer player, MapPayloads.Control control) {
-        send(player, control);
     }
 }

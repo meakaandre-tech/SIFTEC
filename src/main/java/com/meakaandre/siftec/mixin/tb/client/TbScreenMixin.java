@@ -26,7 +26,7 @@ public abstract class TbScreenMixin {
     private void siftec$cloudButton(CallbackInfo ci) {
         AbstractBackpackScreen<?> self = (AbstractBackpackScreen<?>) (Object) this;
         if (self.getWrapper() == null || self.getWrapper().getScreenID() != Reference.WEARABLE_SCREEN_ID) return;
-        CloudButton.reportBackpack(self, CloudButton.addBeside(self, self.getImageWidth(), self.getImageHeight()));
+        CloudButton.addBeside(self, self.getImageWidth(), self.getImageHeight());
     }
 
     @Inject(method = "renderScreen(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIIIF)V", at = @At("TAIL"))

@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.client;
 
-import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.depot.OpenCloudPayload;
 import com.meakaandre.siftec.mixin.client.ContainerScreenAccessor;
 import com.meakaandre.siftec.mixin.client.ScreenInvoker;
@@ -19,8 +18,6 @@ import net.minecraft.network.chat.Component;
  */
 public final class CloudButton {
     private static final int WIDTH = 44, HEIGHT = 18, PANEL_WIDTH = 176;
-    /** Whether the backpack window's button has been reported to the log yet (once a session, for the smoke run). */
-    private static boolean reported;
 
     private CloudButton() {
     }
@@ -52,15 +49,6 @@ public final class CloudButton {
         ContainerScreenAccessor at = (ContainerScreenAccessor) screen;
         if (button.getY() < 0) button.setPosition(at.siftec$leftPos() + panelWidth + 2, at.siftec$topPos() + panelHeight - HEIGHT);
         return button;
-    }
-
-    /** The backpack window got its button: said once a session in the log, where the smoke run looks for it. */
-    public static void reportBackpack(AbstractContainerScreen<?> screen, Button button) {
-        if (reported) return;
-        reported = true;
-        boolean onScreen = button.getX() >= 0 && button.getY() >= 0 && button.getX() + button.getWidth() <= screen.width && button.getY() + button.getHeight() <= screen.height;
-        Siftec.LOGGER.info("SELFTEST tb-client {} the backpack window has the Cloud button, on screen at {},{} ({}x{} of {}x{})", onScreen ? "PASS" : "FAIL",
-            button.getX(), button.getY(), button.getWidth(), button.getHeight(), screen.width, screen.height);
     }
 
     private static void place(AbstractContainerScreen<?> screen, Button button, int panelWidth) {

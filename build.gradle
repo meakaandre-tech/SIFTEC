@@ -38,7 +38,44 @@ dependencies {
 
 }
 
-processResources {
+// The selftests (/siftec selftest and worldtest) are their own mod, siftec_selftest, built into a separate jar that
+// only the CI smoke run loads; the release jar holds none of their code.
+sourceSets {
+    selftest {
+        compileClasspath += main.compileClasspath + main.output
+        runtimeClasspath += main.runtimeClasspath + main.output
+    }
+}
+
+loom {
+    mods {
+        siftec {
+            sourceSet sourceSets.main
+        }
+        siftec_selftest {
+            sourceSet sourceSets.selftest
+        }
+    }
+    runs {
+        // the client the smoke run joins with: the mod and its selftests
+        selftestClient {
+            client()
+            source sourceSets.selftest
+            ideConfigGenerated false
+        }
+    }
+}
+
+def selftestJar = tasks.register("selftestJar", Jar) {
+    archiveBaseName = "${project.archives_base_name}-selftest"
+    from sourceSets.selftest.output
+}
+
+tasks.named("assemble") {
+    dependsOn selftestJar
+}
+
+tasks.withType(ProcessResources).configureEach {
     def version = project.version
     inputs.property "version", version
     filesMatching("fabric.mod.json") {

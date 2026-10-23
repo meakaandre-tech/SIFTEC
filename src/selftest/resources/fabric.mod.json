@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "siftec_selftest",
+  "version": "${version}",
+  "name": "SIFTEC Selftests",
+  "description": "The /siftec selftest and worldtest suites the CI smoke run drives. Not part of a release.",
+  "authors": ["meakaandre"],
+  "license": "All-Rights-Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "siftec:selftest": ["com.meakaandre.siftec.SelfTests"],
+    "siftec:selftest_client": ["com.meakaandre.siftec.client.SelfTestsClient"]
+  },
+  "depends": {
+    "siftec": "*"
+  }
+}
