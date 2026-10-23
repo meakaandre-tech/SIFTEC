@@ -21,6 +21,7 @@ import net.minecraft.world.item.Items;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -198,6 +199,6 @@ public final class MapDraw {
     }
 
     public static String distance(double blocks) {
-        return blocks >= 1000 ? String.format(java.util.Locale.ROOT, "%.1f km", blocks / 1000) : Math.round(blocks) + " m";
+        return blocks >= 1000 ? String.format(Locale.ROOT, "%.1f km", blocks / 1000) : Math.round(blocks) + " m";
     }
 }

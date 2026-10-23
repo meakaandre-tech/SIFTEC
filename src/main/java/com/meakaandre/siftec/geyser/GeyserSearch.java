@@ -6,6 +6,7 @@ import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.Terrain;
 import com.meakaandre.siftec.save.JsonSavedData;
 import com.mojang.serialization.Codec;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -51,7 +52,7 @@ public final class GeyserSearch {
         final LongLinkedOpenHashSet queue = new LongLinkedOpenHashSet();
         /** Chunks being generated for this search now (their ticket is renewed every tick until they are in). */
         final LongOpenHashSet inFlight = new LongOpenHashSet();
-        final it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap failed = new it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap();
+        final Long2IntOpenHashMap failed = new Long2IntOpenHashMap();
         final List<BlockPos> found = new ArrayList<>();
         final Consumer<List<BlockPos>> done;
         int running;

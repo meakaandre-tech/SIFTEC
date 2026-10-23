@@ -26,6 +26,7 @@ import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.GearshiftBlock;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -323,7 +324,7 @@ public final class PowerFixTests {
             BuildGunPayloads.View view = BuildGun.view(gunner);
             BuildGunPayloads.View decoded = null;
             if (view != null) {
-                RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), level.registryAccess());
+                RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
                 BuildGunPayloads.View.STREAM_CODEC.encode(buf, view);
                 decoded = BuildGunPayloads.View.STREAM_CODEC.decode(buf);
             }

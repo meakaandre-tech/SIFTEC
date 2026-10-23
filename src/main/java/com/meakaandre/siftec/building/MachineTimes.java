@@ -3,6 +3,7 @@ package com.meakaandre.siftec.building;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.hub.Milestones;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -56,7 +57,7 @@ public final class MachineTimes {
             smelter = new HashMap<>();
             JsonObject times = section("smelter_ticks");
             for (String id : times.keySet()) {
-                BuiltInRegistries.ITEM.getOptional(net.minecraft.resources.Identifier.parse(id)).ifPresent(item -> smelter.put(item, times.get(id).getAsInt()));
+                BuiltInRegistries.ITEM.getOptional(Identifier.parse(id)).ifPresent(item -> smelter.put(item, times.get(id).getAsInt()));
             }
         }
         return stack.isEmpty() ? 0 : smelter.getOrDefault(stack.getItem(), 0);

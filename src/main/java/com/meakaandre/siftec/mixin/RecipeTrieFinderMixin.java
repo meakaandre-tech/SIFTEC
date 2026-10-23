@@ -6,6 +6,7 @@ import com.meakaandre.siftec.owner.Ownership;
 import com.zurrtum.create.foundation.recipe.trie.RecipeTrie;
 import com.zurrtum.create.foundation.recipe.trie.RecipeTrieFinder;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,7 +24,7 @@ public abstract class RecipeTrieFinderMixin {
     private static RecipeTrie<Recipe<?>> siftec$whole(Object key, ServerLevel level, Predicate<RecipeHolder<? extends Recipe<?>>> conditions,
                                                      Operation<RecipeTrie<Recipe<?>>> original) {
         BlockEntity asking = Ownership.ticking();
-        net.minecraft.server.level.ServerPlayer player = Ownership.asking(null);
+        ServerPlayer player = Ownership.asking(null);
         Ownership.ticking(null);
         try {
             return original.call(key, level, conditions);

@@ -2,23 +2,28 @@ package com.meakaandre.siftec.sim;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingDef;
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.building.SimAccess;
 import com.meakaandre.siftec.drone.DronePortBlockEntity;
+import com.meakaandre.siftec.drone.PortContainer;
 import com.meakaandre.siftec.power.GridStats;
 import com.meakaandre.siftec.power.PowerGrids;
 import com.meakaandre.siftec.power.PowerMemory;
 import com.meakaandre.siftec.power.WireMap;
 import com.meakaandre.siftec.sim.SimData.Link;
 import com.meakaandre.siftec.sim.SimData.Node;
+import com.meakaandre.siftec.sink.Sink;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,11 +36,14 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Always-running factories (work package 17): every Build Gun building, Drone Port and the inventories belts end in
@@ -99,7 +107,7 @@ public final class Factories {
     public record Stats(int nodes, int simulated, int groups, int vehicles, double mainMsPerTick, double workerMsPerStep,
                         double workerMsPerTick, long catchUps, long snapshots) {
         public String line() {
-            return String.format(java.util.Locale.ROOT, "SIFTEC factories: %d/%d simulated in %d groups, %d vehicles; %.3f ms/tick (server %.3f, worker %.3f a step); %d snapshots, %d catch-ups",
+            return String.format(Locale.ROOT, "SIFTEC factories: %d/%d simulated in %d groups, %d vehicles; %.3f ms/tick (server %.3f, worker %.3f a step); %d snapshots, %d catch-ups",
                 simulated, nodes, groups, vehicles, mainMsPerTick + workerMsPerTick, mainMsPerTick, workerMsPerStep, snapshots, catchUps);
         }
     }
@@ -361,7 +369,7 @@ public final class Factories {
         BlockEntity be = reach.be(pos);
         return switch (n.kind) {
             case "drone_port" -> be instanceof DronePortBlockEntity;
-            case "inventory" -> net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, pos, reach.state(pos), be, null) != null;
+            case "inventory" -> ItemStorage.SIDED.find(level, pos, reach.state(pos), be, null) != null;
             default -> be instanceof ControllerBlockEntity c ? n.building.isEmpty() || c.buildingId.equals(n.building)
                 : n.building.isEmpty() && n.mode.equals("none") && be != null;
         };
@@ -757,7 +765,7 @@ public final class Factories {
             int c = (int) Math.min(count, max);
             ItemStack stack = Keys.stack(key, c);
             if (stack.isEmpty()) return;
-            net.minecraft.world.Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, stack);
+            Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, stack);
             count -= c;
         }
     }
@@ -867,7 +875,7 @@ public final class Factories {
             points += (worth == null ? SimAccess.worth(e.getKey()) : worth) * e.getValue();
         }
         n.sunk.clear();
-        if (points > 0 && !n.company.isEmpty()) com.meakaandre.siftec.sink.Sink.paySimulated(s, n.company, points);
+        if (points > 0 && !n.company.isEmpty()) Sink.paySimulated(s, n.company, points);
     }
 
     /** A simulated drone at a ticking port: the packages go into that port's arrivals, and the drone heads home. */
@@ -879,7 +887,7 @@ public final class Factories {
         if (!level.isLoaded(at) || !(level.getBlockEntity(at) instanceof DronePortBlockEntity other)) return;
         List<SimData.Slot> left = new ArrayList<>();
         for (SimData.Slot c : n.cargo) {
-            ItemStack rest = other.items.add(Keys.stack(c.key, c.count), com.meakaandre.siftec.drone.PortContainer.IN, com.meakaandre.siftec.drone.PortContainer.SIZE);
+            ItemStack rest = other.items.add(Keys.stack(c.key, c.count), PortContainer.IN, PortContainer.SIZE);
             if (!rest.isEmpty()) left.add(new SimData.Slot(c.key, rest.getCount()));
         }
         n.cargo = left;
@@ -1132,12 +1140,12 @@ public final class Factories {
      * Keeps the worker busy, as a step that takes long would, until {@code release} counts down or {@code maxMillis} pass
      * (selftests of a lagging server).
      */
-    public static void holdWorker(java.util.concurrent.CountDownLatch release, long maxMillis) {
+    public static void holdWorker(CountDownLatch release, long maxMillis) {
         join();
         runningGroups = List.of();
         running = WORKER.submit(() -> {
             try {
-                release.await(maxMillis, java.util.concurrent.TimeUnit.MILLISECONDS);
+                release.await(maxMillis, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -1157,6 +1165,6 @@ public final class Factories {
     }
 
     public static BuildingDef def(Node n) {
-        return com.meakaandre.siftec.building.Buildings.def(n.building);
+        return Buildings.def(n.building);
     }
 }

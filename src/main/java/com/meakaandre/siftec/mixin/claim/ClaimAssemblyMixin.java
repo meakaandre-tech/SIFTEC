@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.mixin.claim;
 
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.node.NodeSites;
 import com.zurrtum.create.content.contraptions.Contraption;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,8 +21,8 @@ public abstract class ClaimAssemblyMixin {
         Contraption self = (Contraption) (Object) this;
         BlockPos anchor = self.anchor;
         for (BlockPos local : self.getBlocks().keySet()) {
-            if (Claims.crosses(level, anchor, local.offset(anchor)) || com.meakaandre.siftec.building.Buildings.protectedAt(level, local.offset(anchor))
-                || com.meakaandre.siftec.node.NodeSites.isSite(level, local.offset(anchor))) {
+            if (Claims.crosses(level, anchor, local.offset(anchor)) || Buildings.protectedAt(level, local.offset(anchor))
+                || NodeSites.isSite(level, local.offset(anchor))) {
                 cir.setReturnValue(false);
                 return;
             }

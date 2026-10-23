@@ -1,15 +1,20 @@
 package com.meakaandre.siftec.hub;
 
+import com.meakaandre.siftec.backpack.Backpack;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** A HUB milestone (tier 0 to 9), a wormhole phase (tier -1) or a MAM research node (in a tree). */
@@ -51,8 +56,8 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
         /** What to draw for the cost: the item, or for a tag one of its items in turn (a new one every second). */
         public ItemStack icon() {
             if (!isTag()) return new ItemStack(item());
-            List<Item> items = new java.util.ArrayList<>();
-            for (net.minecraft.core.Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag())) items.add(holder.value());
+            List<Item> items = new ArrayList<>();
+            for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag())) items.add(holder.value());
             if (items.isEmpty()) return new ItemStack(Items.BARRIER);
             return new ItemStack(items.get((int) (System.currentTimeMillis() / 1000 % items.size())));
         }
@@ -68,18 +73,18 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
          * for from what the player carries pays from these (milestones, the Workshop, the Build Gun, vehicles,
          * blueprints, jetpack fuel and filters; see {@link com.meakaandre.siftec.backpack.Carried}).
          */
-        public static java.util.List<net.minecraft.world.Container> containers(Inventory inventory) {
-            if (!(inventory.player instanceof net.minecraft.server.level.ServerPlayer server)) return java.util.List.of(inventory);
-            java.util.List<net.minecraft.world.Container> out = new java.util.ArrayList<>();
+        public static List<Container> containers(Inventory inventory) {
+            if (!(inventory.player instanceof ServerPlayer server)) return List.of(inventory);
+            List<Container> out = new ArrayList<>();
             out.add(inventory);
-            out.addAll(com.meakaandre.siftec.backpack.Backpack.containers(server));
+            out.addAll(Backpack.containers(server));
             return out;
         }
 
         /** How many matching items the player is carrying, backpack included. */
         public int carried(Inventory inventory) {
             int n = 0;
-            for (net.minecraft.world.Container container : containers(inventory)) {
+            for (Container container : containers(inventory)) {
                 for (int i = 0; i < container.getContainerSize(); i++) {
                     if (matches(container.getItem(i))) n += container.getItem(i).getCount();
                 }
@@ -90,7 +95,7 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
         /** Takes up to {@code amount} matching items out of the inventory, then the backpack, and says how many it got. */
         public int take(Inventory inventory, int amount) {
             int left = amount;
-            for (net.minecraft.world.Container container : containers(inventory)) {
+            for (Container container : containers(inventory)) {
                 for (int i = 0; i < container.getContainerSize() && left > 0; i++) {
                     ItemStack stack = container.getItem(i);
                     if (!matches(stack)) continue;

@@ -7,12 +7,14 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -45,7 +47,7 @@ public final class ClientTiles {
     }
 
     /** By region, in the order last used (oldest first). */
-    private static final java.util.LinkedHashMap<Long, Slot> TILES = new java.util.LinkedHashMap<>(256, 0.75f, true) {
+    private static final LinkedHashMap<Long, Slot> TILES = new LinkedHashMap<>(256, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<Long, Slot> eldest) {
             if (size() <= KEPT) return false;
@@ -84,7 +86,7 @@ public final class ClientTiles {
             Slot fresh = e;
             fresh.loading = true;
             int gen = generation;
-            net.minecraft.util.Util.ioPool().execute(() -> {
+            Util.ioPool().execute(() -> {
                 MapTile read = null;
                 try {
                     if (Files.exists(file)) read = MapTile.unpack(Files.readAllBytes(file));

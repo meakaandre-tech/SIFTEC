@@ -2,36 +2,58 @@ package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.building.BuildingTests;
+import com.meakaandre.siftec.building.BuildingsATests;
+import com.meakaandre.siftec.building.BuildingsBTests;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.fluid.ModFluids;
+import com.meakaandre.siftec.hub.Alternates;
+import com.meakaandre.siftec.hub.HubMenu;
+import com.meakaandre.siftec.hub.HubView;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
-import com.meakaandre.siftec.node.NodePlacer;
-import com.meakaandre.siftec.registry.ModBlocks;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import com.meakaandre.siftec.map.MapTests;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
+import com.meakaandre.siftec.node.NodePlacer;
+import com.meakaandre.siftec.node.NodeSavedData;
+import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.node.NodeType;
+import com.meakaandre.siftec.owner.Ownership;
+import com.meakaandre.siftec.owner.RecipeLocks;
+import com.meakaandre.siftec.power.PowerTests;
+import com.meakaandre.siftec.prefab.PrefabTests;
+import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.tweak.SelfMovingBelts;
+import com.meakaandre.siftec.vehicle.VehicleTests;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.zurrtum.create.infrastructure.config.AllConfigs;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 /** Operator commands for testing: {@code /siftec node find <type>} and {@code /siftec node tp <type>}. */
 public final class SiftecCommands {
@@ -40,19 +62,19 @@ public final class SiftecCommands {
 
     public static void register() {
         WorldTests.register();
-        com.meakaandre.siftec.prefab.PrefabTests.register();
-        com.meakaandre.siftec.building.BuildingTests.register();
-        com.meakaandre.siftec.building.BuildingsATests.register();
-        com.meakaandre.siftec.building.BuildingsBTests.register();
+        PrefabTests.register();
+        BuildingTests.register();
+        BuildingsATests.register();
+        BuildingsBTests.register();
         AutomateTests.register();
-        com.meakaandre.siftec.power.PowerTests.register();
+        PowerTests.register();
         NodeTests.register();
         LogisticsTests.register();
         ProgressionTests.register();
         ExplorationTests.register();
         FoodTests.register();
-        com.meakaandre.siftec.vehicle.VehicleTests.register();
-        com.meakaandre.siftec.map.MapTests.register();
+        VehicleTests.register();
+        MapTests.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("node")
@@ -67,7 +89,7 @@ public final class SiftecCommands {
         ));
     }
 
-    private static com.mojang.brigadier.builder.RequiredArgumentBuilder<CommandSourceStack, String> type() {
+    private static RequiredArgumentBuilder<CommandSourceStack, String> type() {
         return Commands.argument("type", StringArgumentType.word()).suggests((context, builder) ->
             SharedSuggestionProvider.suggest(Arrays.stream(NodeType.values()).map(NodeType::id), builder));
     }
@@ -93,7 +115,7 @@ public final class SiftecCommands {
             BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(node.x(), level.getMaxY(), node.z());
             while (pos.getY() > level.getMinY()) {
                 BlockState state = level.getBlockState(pos);
-                if (state.getBlock() instanceof NodeBlock || com.meakaandre.siftec.node.NodeSites.isSite(level, pos)) break;
+                if (state.getBlock() instanceof NodeBlock || NodeSites.isSite(level, pos)) break;
                 pos.move(0, -1, 0);
             }
             if (pos.getY() <= level.getMinY()) {
@@ -106,7 +128,7 @@ public final class SiftecCommands {
             if (setup) {
                 report(source, "SELFTEST setup " + node + " core at " + pos.toShortString());
             } else {
-                var site = com.meakaandre.siftec.node.NodeSites.at(level, pos);
+                var site = NodeSites.at(level, pos);
                 report(source, "SELFTEST check " + node + ": core still " + BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock())
                     + (site == null ? ", NOT a node any more" : ", a node (" + site.look.id() + " " + site.purity.getSerializedName() + ")"));
                 // the setup kept this chunk loaded until now; let it go
@@ -120,7 +142,7 @@ public final class SiftecCommands {
     private static int hubTest(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         int count = 0;
-        java.util.Set<String> missing = new java.util.TreeSet<>();
+        Set<String> missing = new TreeSet<>();
         for (Milestone m : Milestones.all()) {
             count++;
             for (Milestone.Cost cost : m.cost()) {
@@ -142,18 +164,18 @@ public final class SiftecCommands {
             company.done.add(m.id());
         }
         // the HUB screen: button ids are bounds-checked, and the view survives the trip to the client
-        boolean buttons = com.meakaandre.siftec.hub.HubMenu.milestone(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.PAY, 0, 0)) == Milestones.tier(0).get(0)
-            && com.meakaandre.siftec.hub.HubMenu.milestone(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.PAY, com.meakaandre.siftec.hub.HubMenu.PHASES, Milestones.phases().size() - 1)) == Milestones.phases().getLast()
-            && com.meakaandre.siftec.hub.HubMenu.milestone(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.PAY, 0, 63)) == null
-            && com.meakaandre.siftec.hub.HubMenu.milestone(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.PAY, 11, 0)) == null
-            && com.meakaandre.siftec.hub.HubMenu.milestone(-7) == null && com.meakaandre.siftec.hub.HubMenu.action(-7) == 0
-            && com.meakaandre.siftec.hub.HubMenu.action(com.meakaandre.siftec.hub.HubMenu.button(com.meakaandre.siftec.hub.HubMenu.SIFT, 0, 0)) == com.meakaandre.siftec.hub.HubMenu.SIFT;
+        boolean buttons = HubMenu.milestone(HubMenu.button(HubMenu.PAY, 0, 0)) == Milestones.tier(0).get(0)
+            && HubMenu.milestone(HubMenu.button(HubMenu.PAY, HubMenu.PHASES, Milestones.phases().size() - 1)) == Milestones.phases().getLast()
+            && HubMenu.milestone(HubMenu.button(HubMenu.PAY, 0, 63)) == null
+            && HubMenu.milestone(HubMenu.button(HubMenu.PAY, 11, 0)) == null
+            && HubMenu.milestone(-7) == null && HubMenu.action(-7) == 0
+            && HubMenu.action(HubMenu.button(HubMenu.SIFT, 0, 0)) == HubMenu.SIFT;
         Milestone base = Milestones.tier(1).get(0);
         company.pay(base, base.cost().get(0), 7);
-        com.meakaandre.siftec.hub.HubView sent = com.meakaandre.siftec.hub.HubView.of(company, false, 40);
-        net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+        HubView sent = HubView.of(company, false, 40);
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         sent.write(buf);
-        com.meakaandre.siftec.hub.HubView got = com.meakaandre.siftec.hub.HubView.read(buf);
+        HubView got = HubView.read(buf);
         buf.release();
         report(source, "SELFTEST hub: screen buttons checked " + buttons + "; view paid " + got.paid(base, 0) + " of " + got.need(base.cost().get(0))
             + " (server " + company.paid(base, base.cost().get(0)) + " of " + company.cost(base.cost().get(0)) + "), done " + got.done.size()
@@ -163,7 +185,7 @@ public final class SiftecCommands {
         report(source, "SELFTEST hub: two members pay x" + company.costMultiplier() + "; tier 1 open " + Milestones.tierOpen(company, 1)
             + "; tier 3 open " + Milestones.tierOpen(company, 3) + "; coal power needs " + Milestones.blocker(company, coal).id()
             + "; scanner copper " + company.hasToken("scanner:copper")
-            + "; self-moving belts " + com.meakaandre.siftec.tweak.SelfMovingBelts.itemsPerMinute(company) + " items/min");
+            + "; self-moving belts " + SelfMovingBelts.itemsPerMinute(company) + " items/min");
         int ours = 0;
         boolean steelGone = true;
         for (var holder : source.getServer().getRecipeManager().getRecipes()) {
@@ -172,10 +194,10 @@ public final class SiftecCommands {
             if (Milestones.removedRecipes().contains(rid)) steelGone = false;
         }
         report(source, "SELFTEST recipes: " + ours + " SIFTEC recipes loaded; removed recipes gone " + steelGone
-            + "; fluids " + com.meakaandre.siftec.fluid.ModFluids.ALL.keySet());
-        report(source, "SELFTEST alternates: " + com.meakaandre.siftec.hub.Alternates.total() + " in the pool; a company that has only done Tier 0 could be offered "
-            + com.meakaandre.siftec.hub.Alternates.eligible(company));
-        report(source, "SELFTEST hub: Create's speed limit now reads " + com.zurrtum.create.infrastructure.config.AllConfigs.server().kinetics.maxRotationSpeed.get());
+            + "; fluids " + ModFluids.ALL.keySet());
+        report(source, "SELFTEST alternates: " + Alternates.total() + " in the pool; a company that has only done Tier 0 could be offered "
+            + Alternates.eligible(company));
+        report(source, "SELFTEST hub: Create's speed limit now reads " + AllConfigs.server().kinetics.maxRotationSpeed.get());
         return 1;
     }
 
@@ -191,9 +213,9 @@ public final class SiftecCommands {
         Node node = found.get();
         level.getChunk(node.x() >> 4, node.z() >> 4);
         NodePlacer.placeChunk(level, node.x() >> 4, node.z() >> 4);
-        int y = com.meakaandre.siftec.node.NodeSavedData.get(source.getServer()).height(node.key());
+        int y = NodeSavedData.get(source.getServer()).height(node.key());
         report(source, "SELFTEST nether: " + node + " height " + y + " block "
-            + (y == com.meakaandre.siftec.node.NodeSavedData.NO_HEIGHT ? "not placed" : level.getBlockState(new BlockPos(node.x(), y, node.z())) + " under "
+            + (y == NodeSavedData.NO_HEIGHT ? "not placed" : level.getBlockState(new BlockPos(node.x(), y, node.z())) + " under "
             + level.getBlockState(new BlockPos(node.x(), y + 1, node.z()))));
         return 1;
     }
@@ -203,7 +225,7 @@ public final class SiftecCommands {
      * company with nothing, allowed once the milestone is done).
      */
     private static void ownerTest(CommandSourceStack source, ServerLevel level, BlockPos at, boolean setup) {
-        var data = com.meakaandre.siftec.company.CompanyData.get(source.getServer());
+        var data = CompanyData.get(source.getServer());
         if (setup) {
             Company owner = new Company();
             owner.id = "selftest_owner";
@@ -212,7 +234,7 @@ public final class SiftecCommands {
             if (shaft.hasProperty(BlockStateProperties.AXIS)) shaft = shaft.setValue(BlockStateProperties.AXIS, Direction.Axis.Y);
             level.setBlockAndUpdate(at, shaft);
             BlockEntity placed = level.getBlockEntity(at);
-            if (placed != null) placed.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, owner.id);
+            if (placed != null) placed.setAttached(Ownership.OWNER, owner.id);
             report(source, "SELFTEST owner setup: shaft of " + owner.id + " at " + at.toShortString());
             return;
         }
@@ -220,13 +242,13 @@ public final class SiftecCommands {
         BlockEntity machine = level.getBlockEntity(at);
         Company fast = data.byId("selftest_owner");
         for (var holder : source.getServer().getRecipeManager().getRecipes()) {
-            String lock = com.meakaandre.siftec.owner.RecipeLocks.lockOf(source.getServer(), holder.value());
+            String lock = RecipeLocks.lockOf(source.getServer(), holder.value());
             if (lock == null || machine == null || fast == null) continue;
-            boolean before = com.meakaandre.siftec.owner.RecipeLocks.blocked(machine, holder.value());
+            boolean before = RecipeLocks.blocked(machine, holder.value());
             fast.done.add(lock);
-            boolean after = com.meakaandre.siftec.owner.RecipeLocks.blocked(machine, holder.value());
+            boolean after = RecipeLocks.blocked(machine, holder.value());
             fast.done.remove(lock);
-            report(source, "SELFTEST owner recipes: " + com.meakaandre.siftec.owner.RecipeLocks.count(source.getServer()) + " locked; "
+            report(source, "SELFTEST owner recipes: " + RecipeLocks.count(source.getServer()) + " locked; "
                 + holder.id().identifier() + " needs " + lock + "; blocked before " + before + ", after unlocking " + after);
             break;
         }

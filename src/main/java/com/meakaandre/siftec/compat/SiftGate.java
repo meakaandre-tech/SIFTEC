@@ -1,12 +1,17 @@
 package com.meakaandre.siftec.compat;
 
+import com.meakaandre.siftec.company.Companies;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.Set;
@@ -25,25 +30,25 @@ public final class SiftGate {
     public static boolean refuses(ServerPlayer player, ServerLevel to) {
         if (to == null || to.dimension() != SIFT || player.level().dimension() == SIFT) return false;
         if (player.hasInfiniteMaterials() || player.isSpectator()) return false;
-        if (com.meakaandre.siftec.company.Companies.of(player).has("phase_5")) return false;
+        if (Companies.of(player).has("phase_5")) return false;
         player.sendOverlayMessage(Component.translatable("siftec.sift.closed"));
         return true;
     }
 
-    private static net.minecraft.world.level.block.Block portalBlock;
+    private static Block portalBlock;
     private static boolean portalLooked;
 
     /** True for The Sift's own portal block, which the pack does not let form outside The Sift. */
-    public static boolean isPortal(net.minecraft.world.level.block.state.BlockState state) {
+    public static boolean isPortal(BlockState state) {
         if (!portalLooked) {
-            portalBlock = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(Identifier.fromNamespaceAndPath("the_sift", "sift_portal")).orElse(null);
+            portalBlock = BuiltInRegistries.BLOCK.getOptional(Identifier.fromNamespaceAndPath("the_sift", "sift_portal")).orElse(null);
             portalLooked = true;
         }
         return portalBlock != null && state.getBlock() == portalBlock;
     }
 
-    public static boolean isRift(net.minecraft.world.entity.Entity entity) {
-        Identifier id = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+    public static boolean isRift(Entity entity) {
+        Identifier id = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
         return id.getNamespace().equals("the_sift") && (id.getPath().equals("rift") || id.getPath().equals("mini_rift"));
     }
 

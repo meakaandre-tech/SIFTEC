@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.client;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.drone.DroneEntity;
 import com.meakaandre.siftec.vehicle.VehicleEntity;
 import com.meakaandre.siftec.vehicle.VehicleInputPayload;
 import com.meakaandre.siftec.vehicle.VehicleRecordPayload;
@@ -29,7 +30,7 @@ public final class VehicleClient {
 
     public static void register() {
         for (var type : Vehicles.types().values()) EntityRendererRegistry.register(type, VehicleRenderer::new);
-        EntityRendererRegistry.register(com.meakaandre.siftec.drone.DroneEntity.TYPE, DroneRenderer::new);
+        EntityRendererRegistry.register(DroneEntity.TYPE, DroneRenderer::new);
         KeyMappingHelper.registerKeyMapping(RECORD);
         ClientTickEvents.END_CLIENT_TICK.register(VehicleClient::tick);
     }

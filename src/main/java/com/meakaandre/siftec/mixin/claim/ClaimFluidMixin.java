@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.mixin.claim;
 
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.node.NodeSites;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +20,6 @@ public abstract class ClaimFluidMixin {
     @Inject(method = "spreadTo", at = @At("HEAD"), cancellable = true)
     private void siftec$claimBorder(LevelAccessor level, BlockPos pos, BlockState state, Direction direction, FluidState fluid, CallbackInfo ci) {
         if (level instanceof ServerLevel server && (Claims.crosses(server, pos.relative(direction.getOpposite()), pos)
-            || com.meakaandre.siftec.node.NodeSites.isSite(server, pos))) ci.cancel();
+            || NodeSites.isSite(server, pos))) ci.cancel();
     }
 }

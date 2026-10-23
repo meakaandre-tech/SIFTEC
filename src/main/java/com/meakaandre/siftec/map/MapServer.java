@@ -6,11 +6,15 @@ import com.meakaandre.siftec.collect.Collectibles;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.death.DeathCrates;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodeType;
+import com.meakaandre.siftec.sim.SimVehicles;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -21,6 +25,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -81,7 +86,7 @@ public final class MapServer {
     private static final Set<UUID> NO_MATES = new HashSet<>();
     /** Packed tiles, kept while their version is current. */
     private static final Long2ObjectOpenHashMap<byte[]> PACKED = new Long2ObjectOpenHashMap<>();
-    private static final it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap PACKED_AT = new it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap();
+    private static final Long2LongOpenHashMap PACKED_AT = new Long2LongOpenHashMap();
 
     private MapServer() {
     }
@@ -140,7 +145,7 @@ public final class MapServer {
         });
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
             // a death that left a Death Crate already has its marker, on the crate
-            if (entity instanceof ServerPlayer player && !Companies.isFake(player) && !com.meakaandre.siftec.death.DeathCrates.placedJustNow(player)) deathMarker(player);
+            if (entity instanceof ServerPlayer player && !Companies.isFake(player) && !DeathCrates.placedJustNow(player)) deathMarker(player);
         });
         ServerTickEvents.END_SERVER_TICK.register(MapServer::tick);
     }
@@ -227,7 +232,7 @@ public final class MapServer {
 
     /** Each player's company's vehicles and drones in their dimension, where they are or (driven by time) would be. */
     private static void movers(MinecraftServer server) {
-        List<com.meakaandre.siftec.sim.SimVehicles.Shown> all = com.meakaandre.siftec.sim.SimVehicles.positions(server);
+        List<SimVehicles.Shown> all = SimVehicles.positions(server);
         CompanyData data = CompanyData.get(server);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (Companies.isFake(player)) continue;
@@ -244,7 +249,7 @@ public final class MapServer {
         }
     }
 
-    private static final java.util.Set<UUID> NO_MOVERS = new java.util.HashSet<>();
+    private static final Set<UUID> NO_MOVERS = new HashSet<>();
 
     // ------------------------------------------------------------------------------------------------ sending
 
@@ -346,7 +351,7 @@ public final class MapServer {
      * Chunks the company just explored: the regions they are in are sent again if a POI stands in one of them (POIs are
      * only sent for explored chunks). Regions whose POIs are not worked out yet are left to the pending work.
      */
-    private static void uncovered(MinecraftServer server, Company company, it.unimi.dsi.fastutil.longs.LongList chunks) {
+    private static void uncovered(MinecraftServer server, Company company, LongList chunks) {
         Long2ObjectOpenHashMap<List<MapPoi>> seed = SEED.get(company.id);
         if (seed == null) return;
         LongOpenHashSet fresh = new LongOpenHashSet(chunks);
@@ -596,13 +601,13 @@ public final class MapServer {
 
     /** True if the player may change or remove the marker: their own, or a company marker of their company. */
     public static boolean mayEdit(MapMarker m, String player, String companyId) {
-        return m.owner.equals(player) || (m.company && !m.death && com.meakaandre.siftec.company.Companies.same(m.companyId, companyId));
+        return m.owner.equals(player) || (m.company && !m.death && Companies.same(m.companyId, companyId));
     }
 
     private static void edit(ServerPlayer player, MapPayloads.MarkerEdit payload) {
         Company company = Companies.find(player);
         String result = apply(player.level().getServer(), player.getUUID().toString(), company == null ? "" : company.id, payload.op(), payload.marker());
-        if (result != null) player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable(result));
+        if (result != null) player.sendOverlayMessage(Component.translatable(result));
     }
 
     /**
@@ -668,7 +673,7 @@ public final class MapServer {
      * A death marker at a player's Death Crate: kept, whatever the number of deaths since, until the crate is emptied
      * or taken away ({@link #removeMarker}). Returns its id.
      */
-    public static String crateMarker(ServerPlayer player, net.minecraft.server.level.ServerLevel level, BlockPos at) {
+    public static String crateMarker(ServerPlayer player, ServerLevel level, BlockPos at) {
         return deathMarker(player, level, at, true);
     }
 
@@ -683,7 +688,7 @@ public final class MapServer {
         markersChanged(server, m);
     }
 
-    private static String deathMarker(ServerPlayer player, net.minecraft.server.level.ServerLevel level, BlockPos at, boolean crate) {
+    private static String deathMarker(ServerPlayer player, ServerLevel level, BlockPos at, boolean crate) {
         MinecraftServer server = level.getServer();
         MapMarkers markers = MapMarkers.get(server);
         String id = player.getUUID().toString();

@@ -9,6 +9,7 @@ import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.owner.RecipeLocks;
 import com.mojang.brigadier.context.CommandContext;
+import com.zurrtum.create.foundation.utility.FuelUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,7 +36,7 @@ final class ContentSelfTest {
         StringBuilder fuels = new StringBuilder();
         for (String id : new String[]{"minecraft:coal", "siftec:biomass", "siftec:solid_biofuel", "siftec:compacted_coal", "siftec:petroleum_coke"}) {
             ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(id)));
-            fuels.append(' ').append(id).append('=').append(com.zurrtum.create.foundation.utility.FuelUtil.burnDuration(level, stack));
+            fuels.append(' ').append(id).append('=').append(FuelUtil.burnDuration(level, stack));
         }
         report(source, "SELFTEST content fuels:" + fuels);
         StringBuilder locks = new StringBuilder();

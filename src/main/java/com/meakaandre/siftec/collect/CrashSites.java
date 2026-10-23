@@ -1,20 +1,30 @@
 package com.meakaandre.siftec.collect;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodeSavedData;
 import com.meakaandre.siftec.power.Power;
 import com.meakaandre.siftec.power.PowerGrids;
+import com.meakaandre.siftec.save.JsonSavedData;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
 import org.jspecify.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Crash sites: what a cargo pod wants before it opens, and the wreckage lying round it. As in Satisfactory, some open
@@ -52,10 +62,10 @@ public final class CrashSites {
 
     /**
      * Blocks from the point the map is measured from. Asked on the node map's worker thread too, so it reads the settled
-     * origin ({@link com.meakaandre.siftec.node.NodeMap#origin}, safe from any thread), never the saved data.
+     * origin ({@link NodeMap#origin}, safe from any thread), never the saved data.
      */
     private static double fromSpawn(ServerLevel level, BlockPos pos) {
-        int[] origin = com.meakaandre.siftec.node.NodeMap.origin();
+        int[] origin = NodeMap.origin();
         int ox = origin == null ? 0 : origin[0], oz = origin == null ? 0 : origin[1];
         return Math.sqrt(Math.pow(pos.getX() - ox, 2) + Math.pow(pos.getZ() - oz, 2));
     }
@@ -85,7 +95,7 @@ public final class CrashSites {
     }
 
     /** As above, looking only inside {@code only} when given (world generation never reads a neighbouring chunk). */
-    private static @Nullable BlockPos connectorSpot(ServerLevel level, BlockPos pod, net.minecraft.world.level.@Nullable ChunkPos only) {
+    private static @Nullable BlockPos connectorSpot(ServerLevel level, BlockPos pod, @Nullable ChunkPos only) {
         for (Direction side : Direction.Plane.HORIZONTAL) {
             BlockPos at = pod.relative(side);
             if (Collectibles.inside(only, at) && isConnector(level.getBlockState(at))) return at;
@@ -111,20 +121,20 @@ public final class CrashSites {
     }
 
     /** Which pods have had their wire connector put down, kept with the world ("dimension|x,y,z" of the pod). */
-    public static class Data extends com.meakaandre.siftec.save.JsonSavedData<Data.Stored> {
+    public static class Data extends JsonSavedData<Data.Stored> {
         public static class Stored {
-            java.util.Set<String> connectors = new java.util.HashSet<>();
+            Set<String> connectors = new HashSet<>();
         }
 
-        static final com.mojang.serialization.Codec<Data> CODEC = com.meakaandre.siftec.save.JsonSavedData.codec(Data::new);
-        static final net.minecraft.world.level.saveddata.SavedDataType<Data> TYPE =
-            new net.minecraft.world.level.saveddata.SavedDataType<>(com.meakaandre.siftec.Siftec.id("crash_sites"), Data::new, CODEC, null);
+        static final Codec<Data> CODEC = JsonSavedData.codec(Data::new);
+        static final SavedDataType<Data> TYPE =
+            new SavedDataType<>(Siftec.id("crash_sites"), Data::new, CODEC, null);
 
         public Data() {
             super("crash_sites", Stored.class, Stored::new);
         }
 
-        static Data get(net.minecraft.server.MinecraftServer server) {
+        static Data get(MinecraftServer server) {
             return server.getDataStorage().computeIfAbsent(TYPE);
         }
     }
@@ -153,7 +163,7 @@ public final class CrashSites {
     }
 
     /** As above; with {@code only}, the connector goes on a side inside that chunk or (for now) nowhere. */
-    private static boolean placeConnector(ServerLevel level, BlockPos pod, net.minecraft.world.level.@Nullable ChunkPos only) {
+    private static boolean placeConnector(ServerLevel level, BlockPos pod, @Nullable ChunkPos only) {
         BlockPos at = connectorSpot(level, pod, only);
         Data data = Data.get(level.getServer());
         String key = podKey(level, pod);
@@ -193,7 +203,7 @@ public final class CrashSites {
      * As above; with {@code only} (world generation), nothing outside that chunk is read or changed. A pod at the chunk's
      * edge may then get its connector later, when someone first tries to open it.
      */
-    public static void wreckage(ServerLevel level, BlockPos pod, net.minecraft.world.level.@Nullable ChunkPos only) {
+    public static void wreckage(ServerLevel level, BlockPos pod, @Nullable ChunkPos only) {
         Block casing = BuiltInRegistries.BLOCK.getOptional(Identifier.parse("create:andesite_casing")).orElse(Blocks.IRON_BLOCK);
         long h = hash(pod);
         for (int i = 0; i < 6; i++) {

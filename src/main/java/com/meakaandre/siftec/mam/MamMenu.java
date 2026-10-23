@@ -2,16 +2,17 @@ package com.meakaandre.siftec.mam;
 
 import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Companies;
-import net.minecraft.core.BlockPos;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Alternates;
 import com.meakaandre.siftec.hub.HubMenu;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -151,7 +152,7 @@ public class MamMenu extends ChestMenu {
 
     /** The items that start a tree, by name: "rotten flesh, bone, spider eye or gunpowder". */
     private static Component triggers(Milestones.Tree t) {
-        net.minecraft.network.chat.MutableComponent out = Component.empty();
+        MutableComponent out = Component.empty();
         List<String> seen = new ArrayList<>();
         for (String trigger : t.triggers()) if (!seen.contains(trigger)) seen.add(trigger);
         for (int i = 0; i < seen.size(); i++) {
@@ -239,7 +240,7 @@ public class MamMenu extends ChestMenu {
         if (blocker != null) {
             for (String need : m.needs()) {
                 if (Milestones.needMet(company, need)) continue;
-                net.minecraft.network.chat.MutableComponent names = Component.empty();
+                MutableComponent names = Component.empty();
                 String[] alts = need.split("\\|");
                 for (int i = 0; i < alts.length; i++) {
                     Milestone other = Milestones.get(alts[i]);

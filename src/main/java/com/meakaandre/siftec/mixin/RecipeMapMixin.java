@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.meakaandre.siftec.hub.Milestones;
+import com.meakaandre.siftec.owner.RecipeLocks;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -18,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 /** Takes out the recipes from other mods that the pack replaces (listed in siftec_content.json). */
 @Mixin(RecipeMap.class)
@@ -43,8 +45,8 @@ public abstract class RecipeMapMixin {
 
     /** A machine is only offered the recipes its company has unlocked. */
     @Inject(method = "getRecipesFor", at = @At("RETURN"), cancellable = true)
-    private void siftec$locked(CallbackInfoReturnable<java.util.stream.Stream<RecipeHolder<?>>> cir) {
-        if (!com.meakaandre.siftec.owner.RecipeLocks.active()) return;
-        cir.setReturnValue(cir.getReturnValue().filter(holder -> !com.meakaandre.siftec.owner.RecipeLocks.blocked(holder)));
+    private void siftec$locked(CallbackInfoReturnable<Stream<RecipeHolder<?>>> cir) {
+        if (!RecipeLocks.active()) return;
+        cir.setReturnValue(cir.getReturnValue().filter(holder -> !RecipeLocks.blocked(holder)));
     }
 }

@@ -2,6 +2,8 @@ package com.meakaandre.siftec.block;
 
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
+import com.meakaandre.siftec.node.NodeSites;
+import com.meakaandre.siftec.node.NodeType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -22,8 +24,8 @@ public final class Mining {
     public static Optional<Node> nodeUnder(Level level, BlockPos pos) {
         if (!(level instanceof ServerLevel server)) return Optional.empty();
         BlockState below = level.getBlockState(pos.below());
-        com.meakaandre.siftec.node.NodeType type;
-        var site = com.meakaandre.siftec.node.NodeSites.at(level, pos.below());
+        NodeType type;
+        var site = NodeSites.at(level, pos.below());
         if (below.getBlock() instanceof NodeBlock node) type = node.type;
         else if (site != null) type = site.type();
         else return Optional.empty();

@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
@@ -39,7 +40,7 @@ public final class Outfits {
             helmet.set(DataComponents.EQUIPPABLE, own);
             return true;
         }
-        Optional<ResourceKey<net.minecraft.world.item.equipment.EquipmentAsset>> look = Optional.of(ResourceKey.create(EquipmentAssets.ROOT_ID, Identifier.parse(asset)));
+        Optional<ResourceKey<EquipmentAsset>> look = Optional.of(ResourceKey.create(EquipmentAssets.ROOT_ID, Identifier.parse(asset)));
         helmet.set(DataComponents.EQUIPPABLE, new Equippable(own.slot(), own.equipSound(), look, own.cameraOverlay(), own.allowedEntities(), own.dispensable(),
             own.swappable(), own.damageOnHurt(), own.equipOnInteract(), own.canBeSheared(), own.shearingSound()));
         return true;

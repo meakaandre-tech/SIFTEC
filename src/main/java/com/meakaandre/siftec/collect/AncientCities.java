@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.collect;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.node.Terrain;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -11,23 +12,29 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Somersloops in Ancient City portal frames. When the chunk an Ancient City starts in loads, the city is noted; once
@@ -45,7 +52,7 @@ public final class AncientCities {
      * The nearest cities found from each 256-block square, nearest first, so the search runs once per square. A
      * city whose Somersloop the company has collected is passed over for the next one in the list.
      */
-    private static final Map<Long, List<BlockPos>> LOCATED = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<Long, List<BlockPos>> LOCATED = new ConcurrentHashMap<>();
     /** Squares remembered at most; the cache is emptied when it grows past this. */
     private static final int LOCATED_MAX = 512;
     /** How many cities each square remembers, and how far out (in placement regions) the search looks. */
@@ -220,13 +227,13 @@ public final class AncientCities {
         try {
             Holder<Structure> city = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(BuiltinStructures.ANCIENT_CITY);
             var state = level.getChunkSource().getGeneratorState();
-            List<BlockPos> out = new java.util.ArrayList<>();
+            List<BlockPos> out = new ArrayList<>();
             for (var placement : state.getPlacementsForStructure(city)) {
-                if (placement instanceof net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement spread) {
+                if (placement instanceof RandomSpreadStructurePlacement spread) {
                     out.addAll(spreadCities(level, state, spread, city.value(), from));
                 }
             }
-            out.sort(java.util.Comparator.comparingDouble(p -> p.distSqr(new BlockPos(from.getX(), p.getY(), from.getZ()))));
+            out.sort(Comparator.comparingDouble(p -> p.distSqr(new BlockPos(from.getX(), p.getY(), from.getZ()))));
             return List.copyOf(out.subList(0, Math.min(CITIES_KEPT, out.size())));
         } catch (RuntimeException e) {
             Siftec.LOGGER.warn("Could not look for Ancient Cities", e);
@@ -238,14 +245,14 @@ public final class AncientCities {
      * The chunks a random-spread placement offers round a spot, ring by ring, that pass its own frequency and exclusion
      * tests and lie in a biome the city may start in (sampled at the city's depth). Stops a ring after it has enough.
      */
-    private static List<BlockPos> spreadCities(ServerLevel level, net.minecraft.world.level.chunk.ChunkGeneratorStructureState state,
-                                               net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement spread,
+    private static List<BlockPos> spreadCities(ServerLevel level, ChunkGeneratorStructureState state,
+                                               RandomSpreadStructurePlacement spread,
                                                Structure city, BlockPos from) {
-        List<BlockPos> out = new java.util.ArrayList<>();
+        List<BlockPos> out = new ArrayList<>();
         int spacing = spread.spacing();
         int rx = Math.floorDiv(from.getX() >> 4, spacing), rz = Math.floorDiv(from.getZ() >> 4, spacing);
         long seed = state.getLevelSeed();
-        HolderSet<net.minecraft.world.level.biome.Biome> biomes = city.biomes();
+        HolderSet<Biome> biomes = city.biomes();
         int y = Math.max(level.getMinY() + 8, -27);
         int extra = -1;
         for (int ring = 0; ring <= SEARCH_REGIONS; ring++) {
@@ -255,7 +262,7 @@ public final class AncientCities {
                     var chunk = spread.getPotentialStructureChunk(seed, rx + dx, rz + dz);
                     if (!spread.isStructureChunk(state, chunk.x(), chunk.z())) continue;
                     int x = (chunk.x() << 4) + 8, z = (chunk.z() << 4) + 8;
-                    if (!biomes.contains(com.meakaandre.siftec.node.Terrain.biome(level, x, y, z))) continue;
+                    if (!biomes.contains(Terrain.biome(level, x, y, z))) continue;
                     out.add(new BlockPos(x, y, z));
                 }
             }

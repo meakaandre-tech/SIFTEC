@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -99,14 +100,14 @@ public final class Recipes {
     public static List<Parsed> making(String type, String itemId) {
         List<Parsed> out = new ArrayList<>();
         for (Parsed p : ALL.values()) if (p.type.equals(type) && p.results.containsKey(itemId)) out.add(p);
-        out.sort(java.util.Comparator.comparing(Parsed::id));
+        out.sort(Comparator.comparing(Parsed::id));
         return out;
     }
 
     public static List<Parsed> ofType(String type) {
         List<Parsed> out = new ArrayList<>();
         for (Parsed p : ALL.values()) if (p.type.equals(type)) out.add(p);
-        out.sort(java.util.Comparator.comparing(Parsed::id));
+        out.sort(Comparator.comparing(Parsed::id));
         return out;
     }
 

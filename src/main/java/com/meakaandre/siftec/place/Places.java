@@ -1,8 +1,9 @@
 package com.meakaandre.siftec.place;
 
 import com.meakaandre.siftec.Siftec;
-import com.meakaandre.siftec.save.JsonSavedData;
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.save.JsonSavedData;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -13,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,7 +107,7 @@ public final class Places {
                 data.setDirty();
                 continue;
             }
-            if (com.meakaandre.siftec.company.Companies.same(place.company, company)) out.add(place);
+            if (Companies.same(place.company, company)) out.add(place);
         }
         out.sort((a, b) -> a.name.compareToIgnoreCase(b.name));
         return out;
@@ -116,7 +118,7 @@ public final class Places {
     }
 
     /** The name of the place at a spot, or null if there is none there. */
-    public static @org.jspecify.annotations.Nullable String nameAt(ServerLevel level, BlockPos pos) {
+    public static @Nullable String nameAt(ServerLevel level, BlockPos pos) {
         for (Place place : Data.get(level.getServer()).stored.places.values()) if (same(place, level, pos)) return place.name;
         return null;
     }
@@ -124,7 +126,7 @@ public final class Places {
     /** For the self-test: how many places a company has, without dropping any. */
     public static int count(MinecraftServer server, String company) {
         int n = 0;
-        for (Place place : Data.get(server).stored.places.values()) if (com.meakaandre.siftec.company.Companies.same(place.company, company)) n++;
+        for (Place place : Data.get(server).stored.places.values()) if (Companies.same(place.company, company)) n++;
         return n;
     }
 

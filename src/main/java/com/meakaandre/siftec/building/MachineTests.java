@@ -8,12 +8,19 @@ import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.geyser.GeyserPurity;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.node.Purity;
+import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.power.Power;
 import com.meakaandre.siftec.power.PowerTests;
+import com.meakaandre.siftec.registry.ModBlocks;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlock;
+import com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity;
+import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
+import com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
+import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
+import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -34,6 +41,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -43,10 +52,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
 import org.antarcticgardens.cna.content.motor.MotorBlockEntity;
+import org.antarcticgardens.cna.content.nuclear.reactor.fuelacceptor.ReactorFuelAcceptorBlockEntity;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.BooleanSupplier;
@@ -293,7 +305,7 @@ public final class MachineTests {
         if (c == null) return 0;
         // its output slot, and a nuclear plant's waste store after it (its output port takes from both)
         long n = 0;
-        for (net.minecraft.world.SimpleContainer box : new net.minecraft.world.SimpleContainer[]{c.output, c.waste}) {
+        for (SimpleContainer box : new SimpleContainer[]{c.output, c.waste}) {
             for (int i = 0; i < box.getContainerSize(); i++) {
                 ItemStack s = box.getItem(i);
                 if (s.isEmpty()) continue;
@@ -352,7 +364,7 @@ public final class MachineTests {
         if (c == null) return "missing";
         StringBuilder b = new StringBuilder("acceptors");
         for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:reactor_fuel_acceptor"))) {
-            if (level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.fuelacceptor.ReactorFuelAcceptorBlockEntity a) b.append(' ').append(a.container.getItem(0));
+            if (level.getBlockEntity(pos) instanceof ReactorFuelAcceptorBlockEntity a) b.append(' ').append(a.container.getItem(0));
         }
         b.append("; rod fuel ").append(Generators.rodFuel(level, c)).append("; input ").append(c.input.getItem(0)).append("; output ").append(c.output.getItem(0))
             .append("; tripped ").append(c.tripped).append("; problem ").append(c.machineProblem)
@@ -556,7 +568,7 @@ public final class MachineTests {
             start[9] = fed[2];
             start[10] = pa == null ? 0 : pa.launched;
             start[11] = nuke == null ? 0 : nuke.made;
-            report(source, "measuring from " + java.util.Arrays.toString(start));
+            report(source, "measuring from " + Arrays.toString(start));
         });
         double[] given = new double[5];
         int[] givenN = {0};
@@ -670,7 +682,7 @@ public final class MachineTests {
         }
         for (ControllerBlockEntity g : geos) {
             near(source, "Geothermal Generator: its turbine turns at what its geyser gives (" + status(level, g) + ")",
-                Math.abs(speed(level, BuildingLogic.cell(g, com.meakaandre.siftec.registry.ModBlocks.TURBINE.get()))) * Generators.GEO_STRESS, offered(level, g), 0.05);
+                Math.abs(speed(level, BuildingLogic.cell(g, ModBlocks.TURBINE.get()))) * Generators.GEO_STRESS, offered(level, g), 0.05);
         }
     }
 
@@ -678,7 +690,7 @@ public final class MachineTests {
     static String inside(ServerLevel level, @Nullable ControllerBlockEntity c) {
         if (c == null) return "missing";
         StringBuilder b = new StringBuilder(status(level, c));
-        com.zurrtum.create.content.processing.basin.BasinBlockEntity basin = ProductionLogic.basin(level, c);
+        BasinBlockEntity basin = ProductionLogic.basin(level, c);
         if (basin != null) {
             b.append("; basin");
             for (int i = 0; i < basin.itemCapability.getContainerSize(); i++) {
@@ -690,10 +702,10 @@ public final class MachineTests {
             if (tanks != null) for (StorageView<FluidVariant> v : tanks) if (!v.isResourceBlank() && v.getAmount() > 0) b.append(", ").append(mb(v.getAmount())).append(" mB ").append(BuiltInRegistries.FLUID.getKey(v.getResource().getFluid()));
         }
         BlockPos mixer = cell(c, "create:mechanical_mixer");
-        if (mixer != null && level.getBlockEntity(mixer) instanceof com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity m) {
+        if (mixer != null && level.getBlockEntity(mixer) instanceof MechanicalMixerBlockEntity m) {
             b.append("; mixer ").append(m.getSpeed()).append(" RPM, running ").append(m.running).append(' ').append(m.runningTicks).append('/').append(m.processingTicks)
                 .append(", next craft in ").append(c.nextCraft - level.getGameTime());
-            com.meakaandre.siftec.company.Company co = com.meakaandre.siftec.owner.Ownership.of(m);
+            Company co = Ownership.of(m);
             b.append(", its company ").append(co == null ? "none" : co.id + " (matter_conversion " + co.has("matter_conversion") + ", quantum_encoding " + co.has("quantum_encoding") + ")");
             if (basin != null) b.append(", basin can go on ").append(basin.canContinueProcessing());
         }
@@ -702,23 +714,23 @@ public final class MachineTests {
             if (fp != null) b.append("; fluid port ").append(fp.pos().toShortString()).append(" reaches ").append(FluidStorage.SIDED.find(level, fp.pos(), fp.side()) != null);
         }
         BlockPos gap = Processors.gap(c), fan = cell(c, "create:encased_fan");
-        if (gap != null && level.getBlockEntity(gap) instanceof com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity crusher) {
+        if (gap != null && level.getBlockEntity(gap) instanceof CrushingWheelControllerBlockEntity crusher) {
             b.append("; crusher speed ").append(crusher.crushingspeed).append(", holding ").append(crusher.processingEntity)
-                .append(", inventory ").append(crusher.inventory.getItem(0)).append(", owner ").append(crusher.getAttached(com.meakaandre.siftec.owner.Ownership.OWNER));
+                .append(", inventory ").append(crusher.inventory.getItem(0)).append(", owner ").append(crusher.getAttached(Ownership.OWNER));
         }
         if (fan != null) {
-            for (net.minecraft.world.entity.item.ItemEntity e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(fan).inflate(2, 8, 2))) {
+            for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(fan).inflate(2, 8, 2))) {
                 b.append(level.isPositionEntityTicking(e.blockPosition()) ? "; item " : "; (not ticking) item ").append(e.getItem()).append(String.format(Locale.ROOT, " at %.2f %.2f %.2f moving %.3f", e.getX(), e.getY(), e.getZ(), e.getDeltaMovement().y));
             }
         }
         BlockPos depot = cell(c, "create:depot"), deployer = cell(c, "create:deployer");
-        if (depot != null && level.getBlockEntity(depot) instanceof com.zurrtum.create.content.logistics.depot.DepotBlockEntity d) {
+        if (depot != null && level.getBlockEntity(depot) instanceof DepotBlockEntity d) {
             var held = d.getHeldItem();
             b.append("; depot ").append(held == null ? "empty" : held.stack + " by " + held.processedBy + " for " + held.processingTime);
         }
-        if (deployer != null && level.getBlockEntity(deployer) instanceof com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity d) {
+        if (deployer != null && level.getBlockEntity(deployer) instanceof DeployerBlockEntity d) {
             b.append("; deployer ").append(d.state).append(' ').append(d.mode).append(" timer ").append(d.timer).append(" holding ").append(d.heldItem)
-                .append(" speed ").append(d.getSpeed()).append(" owner ").append(d.getAttached(com.meakaandre.siftec.owner.Ownership.OWNER));
+                .append(" speed ").append(d.getSpeed()).append(" owner ").append(d.getAttached(Ownership.OWNER));
         }
         b.append("; carrier ").append(c.carrier).append(", launched ").append(c.launched).append(", made ").append(c.made);
         return b.toString();
@@ -735,7 +747,7 @@ public final class MachineTests {
             if (held.is(Processors.cellItem()) || path.startsWith("loaded_conversion_") || Processors.chargedCell(held)) n++;
         }
         BlockPos deployer = cell(c, "create:deployer");
-        if (deployer != null && level.getBlockEntity(deployer) instanceof com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity d && d.heldItem.is(Processors.cellItem())) n++;
+        if (deployer != null && level.getBlockEntity(deployer) instanceof DeployerBlockEntity d && d.heldItem.is(Processors.cellItem())) n++;
         return n;
     }
 
@@ -822,7 +834,7 @@ public final class MachineTests {
         ControllerBlockEntity bio = controller(level, "biomass_burner", BIOMASS), coal = controller(level, "coal_generator", COAL),
             diesel = controller(level, "fuel_generator", DIESEL), nuke = controller(level, "nuclear_power_plant", NUCLEAR),
             pa = controller(level, "particle_accelerator", ACCELERATOR), conv = controller(level, "converter", CONVERTER);
-        List<ControllerBlockEntity> all = new ArrayList<>(java.util.Arrays.asList(bio, coal, diesel, nuke, pa, conv));
+        List<ControllerBlockEntity> all = new ArrayList<>(Arrays.asList(bio, coal, diesel, nuke, pa, conv));
         expect(source, "after restart: the buildings are there", !all.contains(null), all.stream().map(c -> c == null ? "missing" : c.buildingId).toList().toString());
         if (all.contains(null)) {
             report(source, "result: " + passed + " passed, " + failed + " failed");

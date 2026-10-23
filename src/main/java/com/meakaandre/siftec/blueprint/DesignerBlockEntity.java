@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.blueprint;
 
 import com.meakaandre.siftec.block.Facing;
+import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.Placement;
 import net.minecraft.core.BlockPos;
@@ -75,7 +76,7 @@ public class DesignerBlockEntity extends ControllerBlockEntity {
 
     /** As {@link #openSpace(ControllerBlockEntity)}, for a building placed so (its controller may be gone already). */
     public static @Nullable AABB openSpace(Placement p) {
-        com.meakaandre.siftec.building.BuildingTemplate t = com.meakaandre.siftec.building.BuildingTemplate.of(p.def());
+        BuildingTemplate t = BuildingTemplate.of(p.def());
         return t != null && t.controller.state().getBlock() instanceof DesignerBlock designer ? volume(p, designer.reach) : null;
     }
 

@@ -3,6 +3,7 @@ package com.meakaandre.siftec.command;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingDef;
+import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
@@ -358,7 +359,7 @@ public final class OwnershipFixTests {
         Placement rp = new Placement(radarDef, new BlockPos(X + 90, Y, Z + 30), Direction.NORTH, false);
         Buildings.Check radarPlaced = Buildings.place(level, rp, a, null, true);
         ControllerBlockEntity radar = null;
-        com.meakaandre.siftec.building.BuildingTemplate rt = com.meakaandre.siftec.building.BuildingTemplate.of(radarDef);
+        BuildingTemplate rt = BuildingTemplate.of(radarDef);
         if (rt != null) radar = BuildGun.controllerAt(level, rp.at(rt.controller));
         if (!radarPlaced.ok() || radar == null) {
             expect(source, "7: a Radar Tower goes down", false, radarPlaced.message().getString());

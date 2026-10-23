@@ -7,12 +7,16 @@ import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.machine.ProcessorRecipe;
 import com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor;
+import com.meakaandre.siftec.owner.Ownership;
+import com.meakaandre.siftec.registry.ModBlocks;
 import com.zurrtum.create.content.fluids.drain.ItemDrainBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
+import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
+import com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -23,7 +27,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -34,6 +37,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.jspecify.annotations.Nullable;
@@ -70,7 +74,7 @@ public final class ProductionLogic {
     }
 
     static @Nullable Company company(ControllerBlockEntity c) {
-        return com.meakaandre.siftec.owner.Ownership.of(c);
+        return Ownership.of(c);
     }
 
     /** True if the building's company may run a recipe with this lock ("" for none). */
@@ -99,7 +103,7 @@ public final class ProductionLogic {
      */
     static boolean basinHasInput(Level level, ControllerBlockEntity c, boolean outputs) {
         List<BlockPos> basins = BuildingLogic.cells(c, create("basin"));
-        basins.addAll(BuildingLogic.cells(c, com.meakaandre.siftec.registry.ModBlocks.BRASS_BASIN.get()));
+        basins.addAll(BuildingLogic.cells(c, ModBlocks.BRASS_BASIN.get()));
         for (BlockPos pos : basins) {
             if (!(level.getBlockEntity(pos) instanceof BasinBlockEntity basin)) continue;
             Container inv = basin.itemCapability;
@@ -214,7 +218,7 @@ public final class ProductionLogic {
     }
 
     static @Nullable BasinBlockEntity basin(Level level, ControllerBlockEntity c) {
-        BlockPos pos = BuildingLogic.cell(c, com.meakaandre.siftec.registry.ModBlocks.BRASS_BASIN.get());
+        BlockPos pos = BuildingLogic.cell(c, ModBlocks.BRASS_BASIN.get());
         if (pos == null) pos = BuildingLogic.cell(c, create("basin"));
         return pos != null && level.getBlockEntity(pos) instanceof BasinBlockEntity b ? b : null;
     }
@@ -440,8 +444,8 @@ public final class ProductionLogic {
     }
 
     /** The fill recipe that packages this fluid, or null when the Packager has none. */
-    private static @org.jspecify.annotations.Nullable Pack fillFor(Fluid fluid) {
-        for (Pack p : packs()) if (p.fill && p.fluid == fluid && p.mb > 0 && p.out != net.minecraft.world.item.Items.AIR) return p;
+    private static @Nullable Pack fillFor(Fluid fluid) {
+        for (Pack p : packs()) if (p.fill && p.fluid == fluid && p.mb > 0 && p.out != Items.AIR) return p;
         return null;
     }
 
@@ -530,10 +534,10 @@ public final class ProductionLogic {
         Storage<FluidVariant> s = FluidStorage.SIDED.find(level, pos, side);
         if (s != null) return s;
         BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider<?> provider) {
+        if (state.getBlock() instanceof FluidInventoryProvider<?> provider) {
             var inv = provider.getFluidInventory(state, level, pos, level.getBlockEntity(pos), side);
-            if (inv != null) return side == null ? com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage.of(inv)
-                : com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage.of(inv, side);
+            if (inv != null) return side == null ? FluidInventoryStorage.of(inv)
+                : FluidInventoryStorage.of(inv, side);
         }
         return null;
     }

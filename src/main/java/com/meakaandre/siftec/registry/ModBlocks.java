@@ -1,16 +1,40 @@
 package com.meakaandre.siftec.registry;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.ExtractorBlock;
+import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.block.NodePadBlock;
+import com.meakaandre.siftec.blueprint.DesignerBlock;
+import com.meakaandre.siftec.building.BrassBasinBlock;
+import com.meakaandre.siftec.building.ControllerBlock;
+import com.meakaandre.siftec.building.PortBlock;
+import com.meakaandre.siftec.building.TurbineBlock;
 import com.meakaandre.siftec.claim.ClaimMarkerBlock;
 import com.meakaandre.siftec.collect.Collectible;
 import com.meakaandre.siftec.collect.CollectibleBlock;
+import com.meakaandre.siftec.cosmetic.BoomBoxBlock;
+import com.meakaandre.siftec.cosmetic.ShopSignBlock;
+import com.meakaandre.siftec.death.DeathCrateBlock;
 import com.meakaandre.siftec.depot.DepotBlock;
+import com.meakaandre.siftec.drone.DronePortBlock;
+import com.meakaandre.siftec.equip.LandingPadBlock;
+import com.meakaandre.siftec.governor.GovernorBlock;
 import com.meakaandre.siftec.hub.HubBlock;
+import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.mam.MamBlock;
-import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.NodeType;
+import com.meakaandre.siftec.portal.PortalBlock;
+import com.meakaandre.siftec.prefab.HubBedBlock;
+import com.meakaandre.siftec.prefab.HubBurnerBlock;
+import com.meakaandre.siftec.prefab.PrefabBlock;
+import com.meakaandre.siftec.prefab.PrefabItem;
+import com.meakaandre.siftec.prefab.Prefabs;
+import com.meakaandre.siftec.prefab.StorageBoxBlock;
+import com.meakaandre.siftec.sink.DecorBlock;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -19,12 +43,15 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -53,16 +80,16 @@ public class ModBlocks {
      * Each patch stone's patch: flat unbreakable ground of that stone under a node (see node.NodeLook). Immovable, no
      * item and no loot; Create's drills skip it (in create:non_movable, hardness -1).
      */
-    public static final Map<String, Supplier<com.meakaandre.siftec.block.NodePadBlock>> PATCHES = new java.util.LinkedHashMap<>();
+    public static final Map<String, Supplier<NodePadBlock>> PATCHES = new LinkedHashMap<>();
     /**
      * The fluid nodes' blocks ({@code nitrogen_node}, and oil's Oil Well). Ore nodes have no block of their own: they
      * are the real ore block (node.NodeLook, node.NodeSites).
      */
-    public static final Map<String, Supplier<NodeBlock>> NODES = new java.util.LinkedHashMap<>();
+    public static final Map<String, Supplier<NodeBlock>> NODES = new LinkedHashMap<>();
 
     static {
         for (String patch : NodeLook.patches()) {
-            PATCHES.put(patch, blockOnly(patch + "_patch", com.meakaandre.siftec.block.NodePadBlock::new, ModBlocks::node));
+            PATCHES.put(patch, blockOnly(patch + "_patch", NodePadBlock::new, ModBlocks::node));
         }
         for (NodeLook look : NodeLook.all()) {
             if (!look.fluid() || look.type() == NodeType.OIL) continue;
@@ -92,32 +119,32 @@ public class ModBlocks {
     /** The HUB Terminal and the Wormhole Gateway's terminal; their items place the whole structure (see prefab.Prefabs). */
     /** The HUB's terminal. The HUB has no item: every player builds it with the Build Gun (it is listed in content BUILDINGS). */
     public static final Supplier<HubBlock> HUB = blockOnly("hub", properties -> new HubBlock(false, properties), ModBlocks::machine);
-    public static final Supplier<HubBlock> WORMHOLE_GATEWAY = prefab("wormhole_gateway", com.meakaandre.siftec.prefab.Prefabs.Kind.GATEWAY, properties -> new HubBlock(true, properties));
+    public static final Supplier<HubBlock> WORMHOLE_GATEWAY = prefab("wormhole_gateway", Prefabs.Kind.GATEWAY, properties -> new HubBlock(true, properties));
 
     /**
      * The shell blocks of the HUB and Wormhole Gateway structures, by style: Create and vanilla textures (see
      * tools/gen_assets.py, PREFAB). Unbreakable, immovable, no item and no loot, like node pads.
      */
-    public static final Map<String, Supplier<com.meakaandre.siftec.prefab.PrefabBlock>> PREFAB = new java.util.LinkedHashMap<>();
+    public static final Map<String, Supplier<PrefabBlock>> PREFAB = new LinkedHashMap<>();
 
     static {
         // style, the vanilla block whose sound, light and see-through-ness it copies, light level
-        Object[][] styles = {{"white", net.minecraft.world.level.block.Blocks.CONCRETE.white(), 0}, {"orange", net.minecraft.world.level.block.Blocks.CONCRETE.orange(), 0},
-            {"metal", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"floor", net.minecraft.world.level.block.Blocks.CONCRETE.lightGray(), 0},
-            {"glass", net.minecraft.world.level.block.Blocks.GLASS, 0}, {"lamp", net.minecraft.world.level.block.Blocks.REDSTONE_LAMP, 15},
-            {"step", net.minecraft.world.level.block.Blocks.CONCRETE.lightGray(), 0}, {"locker", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
-            {"railway", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0}, {"coil", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0},
-            {"coil_lit", net.minecraft.world.level.block.Blocks.AMETHYST_BLOCK, 15}, {"rift", net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN, 15},
-            {"foundation", net.minecraft.world.level.block.Blocks.CONCRETE.gray(), 0},
+        Object[][] styles = {{"white", Blocks.CONCRETE.white(), 0}, {"orange", Blocks.CONCRETE.orange(), 0},
+            {"metal", Blocks.IRON_BLOCK, 0}, {"floor", Blocks.CONCRETE.lightGray(), 0},
+            {"glass", Blocks.GLASS, 0}, {"lamp", Blocks.REDSTONE_LAMP, 15},
+            {"step", Blocks.CONCRETE.lightGray(), 0}, {"locker", Blocks.IRON_BLOCK, 0},
+            {"railway", Blocks.IRON_BLOCK, 0}, {"coil", Blocks.IRON_BLOCK, 0},
+            {"coil_lit", Blocks.AMETHYST_BLOCK, 15}, {"rift", Blocks.CRYING_OBSIDIAN, 15},
+            {"foundation", Blocks.CONCRETE.gray(), 0},
             // Polartt's yellow and black hazard stripes, on the HUB's platform edges
-            {"hazard_yellow", net.minecraft.world.level.block.Blocks.CONCRETE.yellow(), 0}, {"hazard_black", net.minecraft.world.level.block.Blocks.CONCRETE.black(), 0},
+            {"hazard_yellow", Blocks.CONCRETE.yellow(), 0}, {"hazard_black", Blocks.CONCRETE.black(), 0},
             // the Wormhole Gateway's energy conduits, and its portal: no collision, see-through, glowing (it swirls like a Nether portal)
-            {"conduit", net.minecraft.world.level.block.Blocks.IRON_BLOCK, 4}, {"portal", net.minecraft.world.level.block.Blocks.NETHER_PORTAL, 15}};
+            {"conduit", Blocks.IRON_BLOCK, 4}, {"portal", Blocks.NETHER_PORTAL, 15}};
         for (Object[] style : styles) {
             String name = (String) style[0];
             Block like = (Block) style[1];
             int light = (Integer) style[2];
-            PREFAB.put(name, blockOnly("prefab_" + name, properties -> new com.meakaandre.siftec.prefab.PrefabBlock(name.equals("step"), properties),
+            PREFAB.put(name, blockOnly("prefab_" + name, properties -> new PrefabBlock(name.equals("step"), properties),
                 () -> prefabProperties(like, light, name.equals("step") || name.equals("portal"))));
         }
     }
@@ -132,11 +159,11 @@ public class ModBlocks {
         return open ? p.noOcclusion() : p;
     }
 
-    public static final Supplier<com.meakaandre.siftec.prefab.HubBedBlock> HUB_BED = blockOnly("hub_bed", com.meakaandre.siftec.prefab.HubBedBlock::new,
-        () -> prefabProperties(net.minecraft.world.level.block.Blocks.BED.orange(), 0, true));
-    public static final Supplier<com.meakaandre.siftec.prefab.StorageBoxBlock> PERSONAL_STORAGE = blockOnly("personal_storage", com.meakaandre.siftec.prefab.StorageBoxBlock::new,
-        () -> prefabProperties(net.minecraft.world.level.block.Blocks.BARREL, 0));
-    public static final Supplier<com.meakaandre.siftec.prefab.HubBurnerBlock> HUB_BURNER = blockOnly("hub_burner", com.meakaandre.siftec.prefab.HubBurnerBlock::new,
+    public static final Supplier<HubBedBlock> HUB_BED = blockOnly("hub_bed", HubBedBlock::new,
+        () -> prefabProperties(Blocks.BED.orange(), 0, true));
+    public static final Supplier<StorageBoxBlock> PERSONAL_STORAGE = blockOnly("personal_storage", StorageBoxBlock::new,
+        () -> prefabProperties(Blocks.BARREL, 0));
+    public static final Supplier<HubBurnerBlock> HUB_BURNER = blockOnly("hub_burner", HubBurnerBlock::new,
         () -> BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.METAL).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
 
     /**
@@ -144,34 +171,34 @@ public class ModBlocks {
      * unbreakable and immovable; their items exist (not in the tab) only so buildings can be built and saved with a
      * Structure Block.
      */
-    public static final Supplier<com.meakaandre.siftec.building.ControllerBlock> BUILDING_CONTROLLER = hidden("building_controller",
-        com.meakaandre.siftec.building.ControllerBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0));
-    public static final Supplier<com.meakaandre.siftec.building.PortBlock> BUILDING_PORT = hidden("building_port",
-        com.meakaandre.siftec.building.PortBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0));
+    public static final Supplier<ControllerBlock> BUILDING_CONTROLLER = hidden("building_controller",
+        ControllerBlock::new, () -> prefabProperties(Blocks.IRON_BLOCK, 0));
+    public static final Supplier<PortBlock> BUILDING_PORT = hidden("building_port",
+        PortBlock::new, () -> prefabProperties(Blocks.IRON_BLOCK, 0));
     /** The turbine inside a generator building, turning its generator coils while it runs (see building.TurbineBlock). */
-    public static final Supplier<com.meakaandre.siftec.building.TurbineBlock> TURBINE = hidden("turbine",
-        com.meakaandre.siftec.building.TurbineBlock::new, () -> prefabProperties(net.minecraft.world.level.block.Blocks.IRON_BLOCK, 0).noOcclusion());
+    public static final Supplier<TurbineBlock> TURBINE = hidden("turbine",
+        TurbineBlock::new, () -> prefabProperties(Blocks.IRON_BLOCK, 0).noOcclusion());
 
 
     public static final Supplier<DepotBlock> DIMENSIONAL_DEPOT = block("dimensional_depot", DepotBlock::new, ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.governor.GovernorBlock> SPEED_GOVERNOR = block("speed_governor", com.meakaandre.siftec.governor.GovernorBlock::new, ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.equip.LandingPadBlock> LANDING_PAD = block("landing_pad", com.meakaandre.siftec.equip.LandingPadBlock::new, ModBlocks::machine);
+    public static final Supplier<GovernorBlock> SPEED_GOVERNOR = block("speed_governor", GovernorBlock::new, ModBlocks::machine);
+    public static final Supplier<LandingPadBlock> LANDING_PAD = block("landing_pad", LandingPadBlock::new, ModBlocks::machine);
     /** The Drone Port building's terminal: only ever part of the building (built with the Build Gun), so it has no item. */
-    public static final Supplier<com.meakaandre.siftec.drone.DronePortBlock> DRONE_PORT = blockOnly("drone_port", com.meakaandre.siftec.drone.DronePortBlock::new,
+    public static final Supplier<DronePortBlock> DRONE_PORT = blockOnly("drone_port", DronePortBlock::new,
         () -> machine().noLootTable());
-    public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> MAIN_PORTAL = block("main_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(true, properties), ModBlocks::machine);
-    public static final Supplier<com.meakaandre.siftec.portal.PortalBlock> SATELLITE_PORTAL = block("satellite_portal", properties -> new com.meakaandre.siftec.portal.PortalBlock(false, properties), ModBlocks::machine);
+    public static final Supplier<PortalBlock> MAIN_PORTAL = block("main_portal", properties -> new PortalBlock(true, properties), ModBlocks::machine);
+    public static final Supplier<PortalBlock> SATELLITE_PORTAL = block("satellite_portal", properties -> new PortalBlock(false, properties), ModBlocks::machine);
     /**
      * The Blueprint Designers' terminals, each the controller of its Blueprint Designer building (Mk.1 to Mk.3, built with
      * the Build Gun): only ever part of the building, so they have no item. Mk.2 (FICSIT Blueprints Mk.2) is between
      * Mk.1's 9-block cube and Mk.3's 17, as 1.0's 40 m is between 32 and 48.
      */
-    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER = blockOnly("blueprint_designer",
-        properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(4, properties), () -> machine().noLootTable());
-    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER_MK2 = blockOnly("blueprint_designer_mk2",
-        properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(6, properties), () -> machine().noLootTable());
-    public static final Supplier<com.meakaandre.siftec.blueprint.DesignerBlock> BLUEPRINT_DESIGNER_MK3 = blockOnly("blueprint_designer_mk3",
-        properties -> new com.meakaandre.siftec.blueprint.DesignerBlock(8, properties), () -> machine().noLootTable());
+    public static final Supplier<DesignerBlock> BLUEPRINT_DESIGNER = blockOnly("blueprint_designer",
+        properties -> new DesignerBlock(4, properties), () -> machine().noLootTable());
+    public static final Supplier<DesignerBlock> BLUEPRINT_DESIGNER_MK2 = blockOnly("blueprint_designer_mk2",
+        properties -> new DesignerBlock(6, properties), () -> machine().noLootTable());
+    public static final Supplier<DesignerBlock> BLUEPRINT_DESIGNER_MK3 = blockOnly("blueprint_designer_mk3",
+        properties -> new DesignerBlock(8, properties), () -> machine().noLootTable());
     public static final Supplier<Block> STEEL_CASING = block("steel_casing", Block::new, () -> BlockBehaviour.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL));
 
     public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);
@@ -191,46 +218,46 @@ public class ModBlocks {
     }
 
     /** The Manufacturer's and the Blender's Brass Basin: only ever part of a building, so it has no item. */
-    public static final Supplier<com.meakaandre.siftec.building.BrassBasinBlock> BRASS_BASIN = blockOnly("brass_basin",
-        com.meakaandre.siftec.building.BrassBasinBlock::new, () -> machine().sound(SoundType.NETHERITE_BLOCK));
+    public static final Supplier<BrassBasinBlock> BRASS_BASIN = blockOnly("brass_basin",
+        BrassBasinBlock::new, () -> machine().sound(SoundType.NETHERITE_BLOCK));
 
     public static final Supplier<ClaimMarkerBlock> CLAIM_MARKER = block("claim_marker", ClaimMarkerBlock::new, ModBlocks::machine);
     /**
      * A dead player's things, where they died (death/DeathCrates.java): placed only by the game, so it has no item.
      * Nothing breaks, blows up or pushes it, and it drops nothing; its owner empties it by clicking it.
      */
-    public static final Supplier<com.meakaandre.siftec.death.DeathCrateBlock> DEATH_CRATE = blockOnly("death_crate", com.meakaandre.siftec.death.DeathCrateBlock::new,
+    public static final Supplier<DeathCrateBlock> DEATH_CRATE = blockOnly("death_crate", DeathCrateBlock::new,
         () -> BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.WOOD)
-            .pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE));
+            .pushReaction(PushReaction.IMMOVEABLE));
 
     /** The AWESOME Shop's decorations (sink/DecorBlock.java), by id, from siftec_content.json (tools/content.py, DECOR). */
-    public static final Map<String, Block> DECOR = new java.util.LinkedHashMap<>();
+    public static final Map<String, Block> DECOR = new LinkedHashMap<>();
 
     static {
-        for (com.google.gson.JsonElement e : com.meakaandre.siftec.hub.Milestones.raw().getAsJsonArray("decor")) {
-            com.google.gson.JsonObject o = e.getAsJsonObject();
+        for (JsonElement e : Milestones.raw().getAsJsonArray("decor")) {
+            JsonObject o = e.getAsJsonObject();
             String id = o.get("id").getAsString();
             int light = o.get("light").getAsInt();
-            com.google.gson.JsonArray b = o.getAsJsonArray("shape");
-            net.minecraft.world.phys.shapes.VoxelShape shape = Block.box(b.get(0).getAsDouble(), b.get(1).getAsDouble(), b.get(2).getAsDouble(),
+            JsonArray b = o.getAsJsonArray("shape");
+            VoxelShape shape = Block.box(b.get(0).getAsDouble(), b.get(1).getAsDouble(), b.get(2).getAsDouble(),
                 b.get(3).getAsDouble(), b.get(4).getAsDouble(), b.get(5).getAsDouble());
-            Supplier<com.meakaandre.siftec.sink.DecorBlock> block = block(id, properties -> new com.meakaandre.siftec.sink.DecorBlock(shape, properties),
+            Supplier<DecorBlock> block = block(id, properties -> new DecorBlock(shape, properties),
                 () -> BlockBehaviour.Properties.of().strength(1.5F, 6.0F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> light));
             DECOR.put(id, block.get());
         }
     }
 
     /** The AWESOME Shop's signs (cosmetic/ShopSignBlock.java): a Label Sign and a Display Sign, and a billboard's own sign. */
-    public static final Supplier<com.meakaandre.siftec.cosmetic.ShopSignBlock> LABEL_SIGN = block("label_sign",
-        properties -> new com.meakaandre.siftec.cosmetic.ShopSignBlock(1, 0.5f, 0, 0, 4, 12, properties), ModBlocks::signProperties);
-    public static final Supplier<com.meakaandre.siftec.cosmetic.ShopSignBlock> DISPLAY_SIGN = block("display_sign",
-        properties -> new com.meakaandre.siftec.cosmetic.ShopSignBlock(1, 1, 0, 0, 0, 16, properties), ModBlocks::signProperties);
-    public static final Supplier<com.meakaandre.siftec.cosmetic.ShopSignBlock> BILLBOARD_SMALL_SIGN = blockOnly("billboard_small_sign",
-        properties -> new com.meakaandre.siftec.cosmetic.ShopSignBlock(6, 2, -0.5f, 1.5f, 0, 16, properties), ModBlocks::signProperties);
-    public static final Supplier<com.meakaandre.siftec.cosmetic.ShopSignBlock> BILLBOARD_LARGE_SIGN = blockOnly("billboard_large_sign",
-        properties -> new com.meakaandre.siftec.cosmetic.ShopSignBlock(14, 6, -0.5f, 3.5f, 0, 16, properties), ModBlocks::signProperties);
+    public static final Supplier<ShopSignBlock> LABEL_SIGN = block("label_sign",
+        properties -> new ShopSignBlock(1, 0.5f, 0, 0, 4, 12, properties), ModBlocks::signProperties);
+    public static final Supplier<ShopSignBlock> DISPLAY_SIGN = block("display_sign",
+        properties -> new ShopSignBlock(1, 1, 0, 0, 0, 16, properties), ModBlocks::signProperties);
+    public static final Supplier<ShopSignBlock> BILLBOARD_SMALL_SIGN = blockOnly("billboard_small_sign",
+        properties -> new ShopSignBlock(6, 2, -0.5f, 1.5f, 0, 16, properties), ModBlocks::signProperties);
+    public static final Supplier<ShopSignBlock> BILLBOARD_LARGE_SIGN = blockOnly("billboard_large_sign",
+        properties -> new ShopSignBlock(14, 6, -0.5f, 3.5f, 0, 16, properties), ModBlocks::signProperties);
     /** The Boom Box (cosmetic/BoomBoxBlock.java): a jukebox that plays the Shop's cassette tapes. */
-    public static final Supplier<com.meakaandre.siftec.cosmetic.BoomBoxBlock> BOOM_BOX = block("boom_box", com.meakaandre.siftec.cosmetic.BoomBoxBlock::new,
+    public static final Supplier<BoomBoxBlock> BOOM_BOX = block("boom_box", BoomBoxBlock::new,
         () -> BlockBehaviour.Properties.of().strength(1.5F, 6.0F).sound(SoundType.METAL).noOcclusion());
 
     private static BlockBehaviour.Properties signProperties() {
@@ -254,13 +281,13 @@ public class ModBlocks {
         return () -> block;
     }
 
-    /** The Wormhole Gateway: the item is a {@link com.meakaandre.siftec.prefab.PrefabItem}, which places the whole structure. */
-    private static Supplier<HubBlock> prefab(String name, com.meakaandre.siftec.prefab.Prefabs.Kind kind, Function<BlockBehaviour.Properties, HubBlock> factory) {
+    /** The Wormhole Gateway: the item is a {@link PrefabItem}, which places the whole structure. */
+    private static Supplier<HubBlock> prefab(String name, Prefabs.Kind kind, Function<BlockBehaviour.Properties, HubBlock> factory) {
         Identifier id = Siftec.id(name);
         ResourceKey<Block> blockKey = ResourceKey.create(Registries.BLOCK, id);
         HubBlock block = Registry.register(BuiltInRegistries.BLOCK, blockKey, factory.apply(machine().setId(blockKey)));
         ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, id);
-        BlockItem item = new com.meakaandre.siftec.prefab.PrefabItem(kind, block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix());
+        BlockItem item = new PrefabItem(kind, block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix());
         item.registerBlocks(Item.BY_BLOCK, item);
         Registry.register(BuiltInRegistries.ITEM, itemKey, item);
         TAB_ITEMS.add(item);

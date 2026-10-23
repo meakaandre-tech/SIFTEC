@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.mixin.claim;
 
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.node.NodeSites;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -28,14 +30,14 @@ public abstract class ClaimPistonMixin {
         if (!resolver.resolve()) return;
         Direction push = resolver.getPushDirection();
         for (BlockPos moved : resolver.getToPush()) {
-            if (com.meakaandre.siftec.building.Buildings.protectedAt(level, moved) || Claims.crosses(level, pos, moved) || Claims.crosses(level, pos, moved.relative(push))
-                || com.meakaandre.siftec.node.NodeSites.isSite(level, moved) || com.meakaandre.siftec.node.NodeSites.isSite(level, moved.relative(push))) {
+            if (Buildings.protectedAt(level, moved) || Claims.crosses(level, pos, moved) || Claims.crosses(level, pos, moved.relative(push))
+                || NodeSites.isSite(level, moved) || NodeSites.isSite(level, moved.relative(push))) {
                 cir.setReturnValue(false);
                 return;
             }
         }
         for (BlockPos broken : resolver.getToDestroy()) {
-            if (com.meakaandre.siftec.building.Buildings.protectedAt(level, broken) || Claims.crosses(level, pos, broken) || com.meakaandre.siftec.node.NodeSites.isSite(level, broken)) {
+            if (Buildings.protectedAt(level, broken) || Claims.crosses(level, pos, broken) || NodeSites.isSite(level, broken)) {
                 cir.setReturnValue(false);
                 return;
             }

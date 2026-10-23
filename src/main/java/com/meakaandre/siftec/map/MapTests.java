@@ -14,6 +14,7 @@ import com.meakaandre.siftec.node.NodeType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -154,7 +155,7 @@ public final class MapTests {
         // ---- fog is per company, and shared inside it
         Company a = company(source, A, MEMBER_1, MEMBER_2);
         Company b = company(source, B);
-        it.unimi.dsi.fastutil.longs.LongOpenHashSet fresh1 = new it.unimi.dsi.fastutil.longs.LongOpenHashSet();
+        LongOpenHashSet fresh1 = new LongOpenHashSet();
         var cleared = MapFog.reveal(A, X >> 4, Z >> 4, MapServer.VISIT_RADIUS, fresh1);
         expect(source, "a member's visit clears a disc of chunks for their company",
             !cleared.isEmpty() && MapFog.explored(A, X >> 4, Z >> 4) && MapFog.explored(A, (X >> 4) + 5, Z >> 4) && !MapFog.explored(A, (X >> 4) + 8, (Z >> 4) + 8),

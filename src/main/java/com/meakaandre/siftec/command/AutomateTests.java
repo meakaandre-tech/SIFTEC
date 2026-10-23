@@ -1,19 +1,21 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
+import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.mojang.brigadier.context.CommandContext;
+import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCraftingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationInput;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
-import com.mojang.brigadier.context.CommandContext;
-import com.zurrtum.create.AllRecipeTypes;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.commands.CommandSourceStack;
@@ -38,6 +40,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.antarcticgardens.cna.content.electricity.network.ElectricalNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -183,7 +186,7 @@ public final class AutomateTests {
                         break;
                     }
                     ItemApplicationInput input = new ItemApplicationInput(stack, first(application.ingredient()));
-                    var found = level.recipeAccess().getRecipeFor(com.zurrtum.create.AllRecipeTypes.DEPLOYING, input, level);
+                    var found = level.recipeAccess().getRecipeFor(AllRecipeTypes.DEPLOYING, input, level);
                     if (found.isEmpty()) {
                         outcome = "refused at step " + step + " of " + line.sequence().size();
                         break;
@@ -210,17 +213,17 @@ public final class AutomateTests {
     private static void poles(CommandSourceStack source, ServerLevel level, BlockPos at) {
         BlockPos a = at, b = at.east(10), far = at.east(50);
         for (BlockPos p : List.of(a, b, far)) level.getChunk(p.getX() >> 4, p.getZ() >> 4);
-        var pa = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", a, Direction.SOUTH);
-        var pb = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", b, Direction.SOUTH);
-        var pf = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", far, Direction.SOUTH);
-        var ca = com.meakaandre.siftec.power.PowerTests.connector(level, pa);
-        var cb = com.meakaandre.siftec.power.PowerTests.connector(level, pb);
-        var cf = com.meakaandre.siftec.power.PowerTests.connector(level, pf);
+        var pa = PowerTests.build(level, source, "power_pole_mk1", a, Direction.SOUTH);
+        var pb = PowerTests.build(level, source, "power_pole_mk1", b, Direction.SOUTH);
+        var pf = PowerTests.build(level, source, "power_pole_mk1", far, Direction.SOUTH);
+        var ca = PowerTests.connector(level, pa);
+        var cb = PowerTests.connector(level, pb);
+        var cf = PowerTests.connector(level, pf);
         if (ca == null || cb == null || cf == null) {
             report(source, "poles: could not put the poles down");
             return;
         }
-        for (var c : List.of(ca, cb, cf)) if (c.getNetwork() == null) c.setNetwork(new org.antarcticgardens.cna.content.electricity.network.ElectricalNetwork(c));
+        for (var c : List.of(ca, cb, cf)) if (c.getNetwork() == null) c.setNetwork(new ElectricalNetwork(c));
         FakePlayer fake = FakePlayer.get(level);
         fake.setPos(a.getX() + 0.5, a.getY() + 1, a.getZ() + 0.5);
         ItemStack wires = new ItemStack(item("create_new_age:copper_wire"), 4);
@@ -233,7 +236,7 @@ public final class AutomateTests {
         report(source, "poles: uses " + results + "; wire left in hand " + wires.getCount() + "; first pole joined to the second " + ca.isConnected(cb.getBlockPos())
             + ", the second to the far one (50 blocks) " + cb.isConnected(cf.getBlockPos()) + " (fake player counts as a machine: " + Companies.isFake(fake) + ")");
         fake.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-        for (var c : List.of(pa, pb, pf)) if (c != null) com.meakaandre.siftec.building.Buildings.dismantle(level, c);
+        for (var c : List.of(pa, pb, pf)) if (c != null) Buildings.dismantle(level, c);
         // the wire itself: one Cable pressed (1.0's Power Line is 1 Cable), only for a company that has it unlocked
         boolean pressed = false;
         for (RecipeHolder<?> holder : source.getServer().getRecipeManager().getRecipes()) {

@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.compat;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.death.DeathCrateBlockEntity;
@@ -10,6 +11,7 @@ import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.map.MapMarker;
 import com.meakaandre.siftec.map.MapMarkers;
+import com.meakaandre.siftec.registry.ModBlocks;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.tiviacz.travelersbackpack.attachment.AttachmentUtils;
 import com.tiviacz.travelersbackpack.attachment.BackpackAttachment;
@@ -21,6 +23,7 @@ import com.tiviacz.travelersbackpack.inventory.BackpackWrapper;
 import com.tiviacz.travelersbackpack.inventory.handler.ItemStackHandler;
 import com.tiviacz.travelersbackpack.inventory.menu.BackpackBaseMenu;
 import com.tiviacz.travelersbackpack.inventory.menu.BackpackItemMenu;
+import com.tiviacz.travelersbackpack.inventory.menu.slot.ResultSlotExt;
 import com.tiviacz.travelersbackpack.inventory.menu.slot.UpgradeLockableSlotItemHandler;
 import com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade;
 import com.tiviacz.travelersbackpack.util.ContainerContentsHelper;
@@ -29,14 +32,20 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -142,7 +151,7 @@ public final class TravelersBackpackSelfTest {
             if (part != null) for (int i = 0; i < part.getSlots(); i++) part.setStackInSlot(i, ItemStack.EMPTY);
         }
         // what an earlier crafting check left on the grid (the death crate takes that too)
-        net.minecraft.world.Container grid = TravelersBackpackCompat.grid(player);
+        Container grid = TravelersBackpackCompat.grid(player);
         if (grid != null) for (int i = 0; i < grid.getContainerSize(); i++) grid.setItem(i, ItemStack.EMPTY);
     }
 
@@ -235,9 +244,9 @@ public final class TravelersBackpackSelfTest {
             }
             storage.setStackInSlot(0, new ItemStack(Items.GOLD_INGOT, 5));
             boolean unequip = ServerActions.unequipBackpack(player);
-            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, TravelersBackpackCompat.newBackpack(0));
+            player.setItemInHand(InteractionHand.MAIN_HAND, TravelersBackpackCompat.newBackpack(0));
             boolean swap = ServerActions.swapBackpack(player);
-            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             expect(source, "the backpack cannot be taken off or swapped", !unequip && !swap && TravelersBackpackCompat.wearing(player)
                 && TravelersBackpackCompat.storage(player).getStackInSlot(0).is(Items.GOLD_INGOT), "unequip " + unequip + ", swap " + swap);
             // the built-in grid stays in its slot
@@ -272,7 +281,7 @@ public final class TravelersBackpackSelfTest {
             Milestone.Cost rods = Milestones.get("hub_upgrade_1").cost().get(0);
             storage = TravelersBackpackCompat.storage(player);
             storage.setStackInSlot(0, ItemStack.EMPTY);
-            storage.setStackInSlot(5, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse(rods.key())), 10));
+            storage.setStackInSlot(5, new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(rods.key())), 10));
             int carried = rods.carried(player.getInventory());
             int took = rods.take(player.getInventory(), 4);
             int leftIn = storage.getStackInSlot(5).getCount();
@@ -402,7 +411,7 @@ public final class TravelersBackpackSelfTest {
         return 1;
     }
 
-    private static void put(net.minecraft.world.Container container, int where, int slot, ItemStack stack) {
+    private static void put(Container container, int where, int slot, ItemStack stack) {
         container.setItem(slot, stack.copy());
         PUT.put(key(where, slot), stack.copy());
     }
@@ -458,7 +467,7 @@ public final class TravelersBackpackSelfTest {
             BackpackWrapper wrapper = TravelersBackpackCompat.wrapper(player);
             for (var e : PUT.entrySet()) {
                 int where = (int) (e.getKey() >> 32), slot = (int) (long) e.getKey();
-                net.minecraft.world.Container c = where == 0 ? player.getInventory() : where == 1 ? wrapper.getStorage() : wrapper.getTools();
+                Container c = where == 0 ? player.getInventory() : where == 1 ? wrapper.getStorage() : wrapper.getTools();
                 if (ItemStack.matches(c.getItem(slot), e.getValue())) right++;
                 else wrong.add(where + "/" + slot + ": " + c.getItem(slot));
             }
@@ -508,11 +517,11 @@ public final class TravelersBackpackSelfTest {
             wrapper.getStorage().getSlots())) {
             if (stack.is(Items.CARVED_PUMPKIN)) saved += stack.getCount();
         }
-        boolean on = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(Items.CARVED_PUMPKIN);
+        boolean on = player.getItemBySlot(EquipmentSlot.HEAD).is(Items.CARVED_PUMPKIN);
         expect(source, "fix 3: shift-clicking armour out of a backpack slot that keeps part of the stack saves the part left in the backpack",
             index >= 0 && on && saved == 1, "slot " + index + ", pumpkin on " + on + ", the backpack's saved contents hold " + saved + " (1 wanted)");
         clearAll(player);
-        player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, ItemStack.EMPTY);
+        player.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
     }
 
     /** Fix 4: a Build Gun in the backpack is left out of the crate; the crafting grid's stacks go in and come back to the grid. */
@@ -520,7 +529,7 @@ public final class TravelersBackpackSelfTest {
         player.closeContainer();
         clearAll(player);
         BackpackWrapper wrapper = TravelersBackpackCompat.wrapper(player);
-        net.minecraft.world.Container grid = TravelersBackpackCompat.grid(player);
+        Container grid = TravelersBackpackCompat.grid(player);
         if (wrapper == null || grid == null) {
             expect(source, "fix 4: the backpack and its crafting grid are there", false, state(player));
             return;
@@ -531,7 +540,7 @@ public final class TravelersBackpackSelfTest {
         List<DeathCrateBlockEntity.Entry> looked = DeathCrates.carried(player, false);
         boolean gun = false, planks = false;
         for (DeathCrateBlockEntity.Entry e : looked) {
-            gun |= e.stack().getItem() instanceof com.meakaandre.siftec.building.BuildGunItem;
+            gun |= e.stack().getItem() instanceof BuildGunItem;
             planks |= e.where() == 3 && e.slot() == 0 && e.stack().is(Items.OAK_PLANKS) && e.stack().getCount() == 3;
         }
         expect(source, "fix 4: the crate leaves out a Build Gun kept in the backpack", !gun, looked.size() + " stacks");
@@ -545,7 +554,7 @@ public final class TravelersBackpackSelfTest {
             expect(source, "fix 4: room for a crate", false, "");
             return;
         }
-        level.setBlockAndUpdate(at, com.meakaandre.siftec.registry.ModBlocks.DEATH_CRATE.get().defaultBlockState());
+        level.setBlockAndUpdate(at, ModBlocks.DEATH_CRATE.get().defaultBlockState());
         if (!(level.getBlockEntity(at) instanceof DeathCrateBlockEntity crate)) {
             expect(source, "fix 4: a crate goes down", false, at.toShortString());
             return;
@@ -576,7 +585,7 @@ public final class TravelersBackpackSelfTest {
     }
 
     /** How many of the item the player carries, inventory and backpack. */
-    private static int carried(ServerPlayer player, net.minecraft.world.item.Item item) {
+    private static int carried(ServerPlayer player, Item item) {
         int n = player.getInventory().countItem(item);
         ItemStackHandler storage = TravelersBackpackCompat.storage(player);
         if (storage != null) for (int i = 0; i < storage.getSlots(); i++) if (storage.getStackInSlot(i).is(item)) n += storage.getStackInSlot(i).getCount();
@@ -599,18 +608,18 @@ public final class TravelersBackpackSelfTest {
         BackpackBaseMenu menu = openWithGrid(player);
         CraftingUpgrade upgrade = menu == null ? null : menu.getWrapper().getUpgradeManager().getUpgrade(CraftingUpgrade.class).orElse(null);
         Slot result = null;
-        if (menu != null) for (Slot slot : menu.slots) if (slot instanceof com.tiviacz.travelersbackpack.inventory.menu.slot.ResultSlotExt) result = slot;
+        if (menu != null) for (Slot slot : menu.slots) if (slot instanceof ResultSlotExt) result = slot;
         if (menu == null || upgrade == null || result == null || TravelersBackpackCompat.gridSize(player) < 3) {
             expect(source, "fixes2: the backpack has its 3x3 crafting grid open", false, state(player));
             restoreLock(source, company, hadLock);
             return;
         }
-        net.minecraft.world.item.Item flywheel = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse("create:flywheel"));
-        net.minecraft.world.item.Item rod = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse("siftec:iron_rod"));
-        net.minecraft.world.item.Item sheet = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse("create:iron_sheet"));
-        net.minecraft.world.item.Item shaft = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(Identifier.parse("create:shaft"));
+        Item flywheel = BuiltInRegistries.ITEM.getValue(Identifier.parse("create:flywheel"));
+        Item rod = BuiltInRegistries.ITEM.getValue(Identifier.parse("siftec:iron_rod"));
+        Item sheet = BuiltInRegistries.ITEM.getValue(Identifier.parse("create:iron_sheet"));
+        Item shaft = BuiltInRegistries.ITEM.getValue(Identifier.parse("create:shaft"));
         // RSR / SAS / RSR, two of everything so one craft leaves a second one on the grid
-        net.minecraft.world.item.Item[] pattern = {rod, sheet, rod, sheet, shaft, sheet, rod, sheet, rod};
+        Item[] pattern = {rod, sheet, rod, sheet, shaft, sheet, rod, sheet, rod};
         for (int i = 0; i < 9; i++) upgrade.craftSlots.setItem(i, new ItemStack(pattern[i], 2));
         menu.slotChangedCraftingGrid(upgrade, player.level(), player);
         menu.broadcastChanges();
@@ -619,7 +628,7 @@ public final class TravelersBackpackSelfTest {
         expect(source, "fixes2: a locked recipe's result shows on the backpack's grid", shown.is(flywheel), shown + (survival ? "" : " (creative: locks do not apply)"));
         boolean mayPickup = result.mayPickup(player);
         int index = menu.slots.indexOf(result);
-        menu.clicked(index, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        menu.clicked(index, 0, ContainerInput.PICKUP, player);
         boolean clickTook = menu.getCarried().is(flywheel);
         menu.setCarried(ItemStack.EMPTY);
         menu.quickMoveStack(player, index);

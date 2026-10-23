@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.mixin.claim;
 
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.node.NodeSites;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ServerExplosion;
@@ -26,8 +28,8 @@ public abstract class ClaimExplosionMixin {
         List<BlockPos> positions = cir.getReturnValue();
         if (positions == null || positions.isEmpty()) return;
         List<BlockPos> kept = new ArrayList<>(positions.size());
-        for (BlockPos pos : positions) if (Claims.at(level, pos) == null && !com.meakaandre.siftec.building.Buildings.protectedAt(level, pos)
-            && !com.meakaandre.siftec.node.NodeSites.isSite(level, pos)) kept.add(pos);
+        for (BlockPos pos : positions) if (Claims.at(level, pos) == null && !Buildings.protectedAt(level, pos)
+            && !NodeSites.isSite(level, pos)) kept.add(pos);
         if (kept.size() != positions.size()) cir.setReturnValue(kept);
     }
 }

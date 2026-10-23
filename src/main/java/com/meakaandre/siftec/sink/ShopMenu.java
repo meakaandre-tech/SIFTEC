@@ -1,19 +1,20 @@
 package com.meakaandre.siftec.sink;
 
-import com.meakaandre.siftec.building.Paint;
 import com.meakaandre.siftec.building.BuildingMenus;
+import com.meakaandre.siftec.building.Paint;
 import com.meakaandre.siftec.company.Companies;
-import net.minecraft.core.BlockPos;
-import com.meakaandre.siftec.cosmetic.Banners;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.cosmetic.Banners;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.registry.ModItems;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Prediction;
@@ -24,12 +25,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The AWESOME Shop window: every cosmetic, its price in FICSIT Coupons, and whether the company owns it. Clicking one
@@ -116,7 +121,7 @@ public class ShopMenu extends ChestMenu {
     }
 
     /** What taking one of an owned entry costs in parts, if anything. */
-    static Shop.@org.jspecify.annotations.Nullable Goods goods(Shop.Entry e) {
+    static Shop.@Nullable Goods goods(Shop.Entry e) {
         return switch (e.kind()) {
             case "decor", "cup", "sign" -> Shop.goods(e.arg());
             case "boom_box" -> Shop.goods("boom_box");
@@ -136,7 +141,7 @@ public class ShopMenu extends ChestMenu {
         return Math.max(1, (shown().size() + PER_PAGE - 1) / PER_PAGE);
     }
 
-    private @org.jspecify.annotations.Nullable Company company() {
+    private @Nullable Company company() {
         return BuildingMenus.company(player, companyId);
     }
 
@@ -150,7 +155,7 @@ public class ShopMenu extends ChestMenu {
             Shop.Entry e = entries.get(page * PER_PAGE + i);
             boolean owned = e.owned(company);
             List<Component> lore = new ArrayList<>();
-            lore.add(Component.translatable("siftec.shop.category." + e.category().toLowerCase(java.util.Locale.ROOT).replace(' ', '_')).withStyle(ChatFormatting.DARK_GRAY));
+            lore.add(Component.translatable("siftec.shop.category." + e.category().toLowerCase(Locale.ROOT).replace(' ', '_')).withStyle(ChatFormatting.DARK_GRAY));
             if (e.kind().equals("swatch")) lore.add(Component.translatable("siftec.shop.swatches", company.swatches.size(), Shop.MAX_SWATCHES).withStyle(ChatFormatting.GRAY));
             if (owned) {
                 lore.add(Component.translatable(e.kind().equals("swatch") ? "siftec.shop.full" : "siftec.shop.owned").withStyle(ChatFormatting.GREEN));
@@ -216,7 +221,7 @@ public class ShopMenu extends ChestMenu {
 
     /** "December", "October": a holiday set's months. */
     static Component months(List<Integer> months) {
-        net.minecraft.network.chat.MutableComponent out = Component.empty();
+        MutableComponent out = Component.empty();
         for (int i = 0; i < months.size(); i++) {
             if (i > 0) out.append(", ");
             out.append(Component.translatable("siftec.month." + months.get(i)));
@@ -250,7 +255,7 @@ public class ShopMenu extends ChestMenu {
             case "tape" -> made = new ItemStack(icon(e));
             case "banner" -> {
                 ItemStack held = player.getMainHandItem();
-                if (held.getItem() instanceof net.minecraft.world.item.BannerItem) {
+                if (held.getItem() instanceof BannerItem) {
                     String encoded = Banners.write(player.level().getServer(), held);
                     if (encoded.isEmpty()) {
                         // an encode that failed keeps the banner the company had
@@ -307,7 +312,7 @@ public class ShopMenu extends ChestMenu {
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             ItemStack stack = inventory.getItem(i);
             if (!stack.is(banner)) continue;
-            net.minecraft.world.level.block.entity.BannerPatternLayers layers = stack.get(DataComponents.BANNER_PATTERNS);
+            BannerPatternLayers layers = stack.get(DataComponents.BANNER_PATTERNS);
             if (layers != null && !layers.layers().isEmpty()) continue;
             stack.shrink(1);
             inventory.setChanged();

@@ -12,16 +12,20 @@ import com.meakaandre.siftec.power.PowerMember;
 import com.meakaandre.siftec.sim.Keys;
 import com.meakaandre.siftec.sim.Recipes;
 import com.meakaandre.siftec.sim.SimData;
+import com.meakaandre.siftec.sink.Sink;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -30,8 +34,10 @@ import net.minecraft.world.level.material.Fluid;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -82,11 +88,11 @@ public final class SimAccess {
 
     /** Every chunk the building stands in, as packed chunk positions, its controller's first. */
     public static List<Long> chunks(ControllerBlockEntity c) {
-        java.util.LinkedHashSet<Long> out = new java.util.LinkedHashSet<>();
-        out.add(net.minecraft.world.level.ChunkPos.pack(c.getBlockPos()));
+        LinkedHashSet<Long> out = new LinkedHashSet<>();
+        out.add(ChunkPos.pack(c.getBlockPos()));
         Placement p = c.placement();
         BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
-        if (t != null) for (BuildingTemplate.Cell cell : t.members) out.add(net.minecraft.world.level.ChunkPos.pack(p.at(cell)));
+        if (t != null) for (BuildingTemplate.Cell cell : t.members) out.add(ChunkPos.pack(p.at(cell)));
         return new ArrayList<>(out);
     }
 
@@ -177,8 +183,8 @@ public final class SimAccess {
         int samples = 48;
         ItemStack tool = new ItemStack(Items.NETHERITE_PICKAXE);
         if (def.fortune() > 0) {
-            var holder = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.FORTUNE);
+            var holder = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
+                .getOrThrow(Enchantments.FORTUNE);
             tool.enchant(holder, def.fortune());
         }
         for (int i = 0; i < samples; i++) {
@@ -244,7 +250,7 @@ public final class SimAccess {
         }
         candidates.removeIf(p -> !ticks.containsKey(p.id()) || !unlocked(c, p.id()));
         String own = "/" + def.id() + "/";
-        candidates.sort(java.util.Comparator.comparing((Recipes.Parsed p) -> !p.id().contains(own)));
+        candidates.sort(Comparator.comparing((Recipes.Parsed p) -> !p.id().contains(own)));
         if (c.filter.isEmpty()) candidates.removeIf(p -> !p.id().contains(own));
         for (Recipes.Parsed p : candidates) {
             int t = ticks.get(p.id());
@@ -403,7 +409,7 @@ public final class SimAccess {
         ItemStack stack = Keys.stack(itemKey, 1);
         if (stack.isEmpty()) return;
         if (n.mode.equals("gen") && !n.power.isEmpty()) fuel(n, n.power, stack);
-        if (n.mode.equals("sink") && com.meakaandre.siftec.sink.Sink.accepts(stack)) n.worth.put(itemKey, com.meakaandre.siftec.sink.Sink.worthOne(stack));
+        if (n.mode.equals("sink") && Sink.accepts(stack)) n.worth.put(itemKey, Sink.worthOne(stack));
     }
 
     // ------------------------------------------------------------------------------------------------ handing back
@@ -431,7 +437,7 @@ public final class SimAccess {
             r = g.reserve(at);
         } else {
             // a cell of it is not loaded: its machines cannot be read now (NaN: keep what was read before)
-            for (long chunk : chunks(c)) if (!level.hasChunk(net.minecraft.world.level.ChunkPos.getX(chunk), net.minecraft.world.level.ChunkPos.getZ(chunk))) return Double.NaN;
+            for (long chunk : chunks(c)) if (!level.hasChunk(ChunkPos.getX(chunk), ChunkPos.getZ(chunk))) return Double.NaN;
             r = m.reserve();
         }
         if (!Double.isFinite(r)) return 0;
@@ -496,7 +502,7 @@ public final class SimAccess {
     /** Points for what a Sink took. */
     public static long worth(String itemKey) {
         ItemStack stack = Keys.stack(itemKey, 1);
-        return stack.isEmpty() ? 0 : com.meakaandre.siftec.sink.Sink.worthOne(stack);
+        return stack.isEmpty() ? 0 : Sink.worthOne(stack);
     }
 
     static Map<String, Long> copy(Map<String, Long> m) {

@@ -1,8 +1,15 @@
 package com.meakaandre.siftec.death;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.BuildGunItem;
+import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.map.MapServer;
+import com.meakaandre.siftec.node.NodeSites;
+import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.registry.ModBlocks;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
@@ -10,12 +17,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -115,7 +124,7 @@ public final class DeathCrates {
         List<DeathCrateBlockEntity.Entry> entries = carried(player, true);
         if (entries.isEmpty()) return null;
         ServerLevel level = player.level();
-        com.meakaandre.siftec.company.Company company = Companies.find(player);
+        Company company = Companies.find(player);
         BlockPos pos = spot(level, player.blockPosition(), company == null ? "" : company.id);
         if (pos != null) level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
         if (pos == null || !(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) {
@@ -139,7 +148,7 @@ public final class DeathCrates {
      * Where the crate goes: where the player died, or the nearest free spot above it (below, when there is none). Null
      * when the whole column is taken: the crate never goes over a block, so the things are dropped instead.
      */
-    public static @org.jspecify.annotations.Nullable BlockPos spot(ServerLevel level, BlockPos at) {
+    public static @Nullable BlockPos spot(ServerLevel level, BlockPos at) {
         return column(level, at, null);
     }
 
@@ -148,7 +157,7 @@ public final class DeathCrates {
      * another company's claim, otherwise the nearest column outside foreign claims (within {@link #SEARCH} blocks). Never
      * in a building or its doorway, nor on an ore node. Null when there is no such spot.
      */
-    public static @org.jspecify.annotations.Nullable BlockPos spot(ServerLevel level, BlockPos at, @org.jspecify.annotations.Nullable String company) {
+    public static @Nullable BlockPos spot(ServerLevel level, BlockPos at, @Nullable String company) {
         if (company == null) return spot(level, at);
         if (!foreignClaim(level, at, company)) {
             BlockPos here = column(level, at, company);
@@ -180,11 +189,11 @@ public final class DeathCrates {
     public static final int SEARCH = 48;
 
     private static boolean foreignClaim(ServerLevel level, BlockPos pos, String company) {
-        com.meakaandre.siftec.claim.Claims.Claim claim = com.meakaandre.siftec.claim.Claims.at(level, pos);
+        Claims.Claim claim = Claims.at(level, pos);
         return claim != null && !Companies.same(claim.company, company);
     }
 
-    private static @org.jspecify.annotations.Nullable BlockPos column(ServerLevel level, BlockPos at, @org.jspecify.annotations.Nullable String company) {
+    private static @Nullable BlockPos column(ServerLevel level, BlockPos at, @Nullable String company) {
         int minY = level.getMinY(), maxY = level.getMaxY();
         if (at.getY() <= minY) {
             // fell out of the world: the ground of that column, if it has any
@@ -206,10 +215,10 @@ public final class DeathCrates {
      * of a building, the HUB or a doorway of one (a crate there would be a block nobody could take away).
      */
     public static boolean free(ServerLevel level, BlockPos pos) {
-        if (com.meakaandre.siftec.node.NodeSites.isSite(level, pos)) return false;
-        if (com.meakaandre.siftec.building.Buildings.within(level, pos)) return false;
+        if (NodeSites.isSite(level, pos)) return false;
+        if (Buildings.within(level, pos)) return false;
         BlockState state = level.getBlockState(pos);
-        if (com.meakaandre.siftec.prefab.Prefabs.isPart(state)) return false;
+        if (Prefabs.isPart(state)) return false;
         return state.isAir() || (state.canBeReplaced() && !state.hasBlockEntity());
     }
 
@@ -227,7 +236,7 @@ public final class DeathCrates {
         if (pos == null) return false;
         level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
         if (!(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) return false;
-        com.meakaandre.siftec.company.Company company = com.meakaandre.siftec.company.CompanyData.get(level.getServer()).byId(companyId);
+        Company company = CompanyData.get(level.getServer()).byId(companyId);
         crate.companyId = companyId;
         crate.ownerName = company == null ? companyId : company.name;
         crate.entries.addAll(entries);
@@ -249,11 +258,11 @@ public final class DeathCrates {
         for (ItemStack stack : items) if (!stack.isEmpty()) entries.add(new DeathCrateBlockEntity.Entry(DeathCrateBlockEntity.INVENTORY, -1, stack.copy()));
         if (entries.isEmpty()) return;
         ServerLevel level = player.level();
-        com.meakaandre.siftec.company.Company company = Companies.find(player);
+        Company company = Companies.find(player);
         BlockPos pos = spot(level, player.blockPosition(), company == null ? "" : company.id);
         if (pos != null) level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
         if (pos == null || !(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) {
-            for (DeathCrateBlockEntity.Entry e : entries) player.getInventory().placeItemBackInInventory(e.stack(), net.minecraft.util.Prediction.SERVER_ONLY);
+            for (DeathCrateBlockEntity.Entry e : entries) player.getInventory().placeItemBackInInventory(e.stack(), Prediction.SERVER_ONLY);
             return;
         }
         crate.owner = player.getUUID();
@@ -345,7 +354,7 @@ public final class DeathCrates {
     }
 
     private static boolean isBuildGun(ItemStack stack) {
-        return stack.getItem() instanceof com.meakaandre.siftec.building.BuildGunItem;
+        return stack.getItem() instanceof BuildGunItem;
     }
 
     /** Merges the stack into the container's matching stacks, then its empty slots, as far as it goes. */

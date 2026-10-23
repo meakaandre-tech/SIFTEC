@@ -1,37 +1,53 @@
 package com.meakaandre.siftec.prefab;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.block.Facing;
+import com.meakaandre.siftec.building.BuildGunItem;
+import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.HubBlockEntity;
+import com.meakaandre.siftec.hub.HubMenu;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
+import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.registry.ModItems;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlock;
+import com.zurrtum.create.content.kinetics.press.MechanicalPressBlock;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,14 +69,14 @@ public final class PrefabTests {
     }
 
     public static void register() {
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
             if (pending != null && server.overworld().getGameTime() >= pendingAt) {
                 Runnable run = pending;
                 pending = null;
                 run.run();
             }
         });
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> pending = null);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> pending = null);
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("prefab").executes(PrefabTests::run)
@@ -127,8 +143,8 @@ public final class PrefabTests {
     private static String parts(ServerLevel level, Prefabs.Spot spot) {
         StringBuilder b = new StringBuilder();
         b.append(is(level, spot, Templates.HUB_TERMINAL, ModBlocks.HUB.get()) ? "T" : ".");
-        b.append(level.getBlockState(spot.at(Templates.PRESS[0], Templates.PRESS[1], Templates.PRESS[2])).getBlock() instanceof com.zurrtum.create.content.kinetics.press.MechanicalPressBlock
-            && level.getBlockState(spot.at(Templates.MIXER[0], Templates.MIXER[1], Templates.MIXER[2])).getBlock() instanceof com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlock ? "C" : ".");
+        b.append(level.getBlockState(spot.at(Templates.PRESS[0], Templates.PRESS[1], Templates.PRESS[2])).getBlock() instanceof MechanicalPressBlock
+            && level.getBlockState(spot.at(Templates.MIXER[0], Templates.MIXER[1], Templates.MIXER[2])).getBlock() instanceof MechanicalMixerBlock ? "C" : ".");
         b.append(is(level, spot, Templates.STORAGE, ModBlocks.PERSONAL_STORAGE.get()) ? "S" : ".");
         b.append(is(level, spot, Templates.BURNER_1, ModBlocks.HUB_BURNER.get()) ? "1" : ".");
         b.append(is(level, spot, Templates.BED, ModBlocks.HUB_BED.get()) ? "B" : ".");
@@ -155,7 +171,7 @@ public final class PrefabTests {
     }
 
     private static Item biomass() {
-        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse("siftec:biomass"));
+        return BuiltInRegistries.ITEM.getValue(Identifier.parse("siftec:biomass"));
     }
 
     private static int count(List<ItemStack> stacks, Item item) {
@@ -245,7 +261,7 @@ public final class PrefabTests {
         // ---- Personal Storage keeps what is put in
         StorageBoxBlockEntity box = level.getBlockEntity(spotA.at(Templates.STORAGE[0], Templates.STORAGE[1], Templates.STORAGE[2])) instanceof StorageBoxBlockEntity s ? s : null;
         if (box != null) {
-            box.items.setItem(0, new ItemStack(com.meakaandre.siftec.registry.ModItems.PARTS.get("iron_rod"), 10));
+            box.items.setItem(0, new ItemStack(ModItems.PARTS.get("iron_rod"), 10));
             box.items.setItem(5, new ItemStack(Items.DIAMOND, 3));
         }
         // ---- the terminal takes a milestone by belt; the freighter then leaves and comes back after the milestone's time
@@ -273,7 +289,7 @@ public final class PrefabTests {
         AABB boundsA = Prefabs.bounds(spotA);
         List<ItemStack> back1 = Prefabs.dismantle(level, hub);
         boolean released = Claims.at(level, spotA.terminal()) == null;
-        report(source, "picked up: HUB items (none any more) " + back1.stream().filter(st -> st.getItem().builtInRegistryHolder().key().identifier().getPath().equals("hub")).count() + ", iron rods " + count(back1, com.meakaandre.siftec.registry.ModItems.PARTS.get("iron_rod"))
+        report(source, "picked up: HUB items (none any more) " + back1.stream().filter(st -> st.getItem().builtInRegistryHolder().key().identifier().getPath().equals("hub")).count() + ", iron rods " + count(back1, ModItems.PARTS.get("iron_rod"))
             + " of 10, diamonds " + count(back1, Items.DIAMOND) + " of 3, biomass " + count(back1, biomass()) + " of " + coalIn
             + "; parts left standing " + partsIn(level, boundsA) + "; land released " + released + "; progress kept " + a.has("hub_upgrade_6"));
 
@@ -284,7 +300,7 @@ public final class PrefabTests {
         boolean reclaimed = Claims.at(level, spotA2.terminal()) != null && Claims.at(level, spotA2.terminal()).company.equals(A);
         BlockState term = level.getBlockState(spotA2.terminal());
         report(source, "placed again facing east " + again.ok() + ": parts " + parts(level, spotA2) + ", claims again " + reclaimed
-            + ", terminal faces " + term.getValue(com.meakaandre.siftec.block.Facing.FACING) + ", level " + (hub2 == null ? -1 : hub2.builtLevel));
+            + ", terminal faces " + term.getValue(Facing.FACING) + ", level " + (hub2 == null ? -1 : hub2.builtLevel));
 
         // ---- a second company's HUB, all upgrades, with fuel: its burners are checked later
         for (int i = 1; i <= 6; i++) b.done.add("hub_upgrade_" + i);
@@ -294,9 +310,9 @@ public final class PrefabTests {
             if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof HubBurnerBlockEntity engine) engine.addFuel(new ItemStack(biomass(), 16));
         }
         // the two burners wired to each other, so they are a grid (they give power only to what the grid uses)
-        com.meakaandre.siftec.power.PowerTests.wire(
-            level.getBlockEntity(spotB.at(Templates.BURNER_1[0], Templates.BURNER_1[1] + 1, Templates.BURNER_1[2])) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector ca ? ca : null,
-            level.getBlockEntity(spotB.at(Templates.BURNER_2[0], Templates.BURNER_2[1] + 1, Templates.BURNER_2[2])) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector cb ? cb : null);
+        PowerTests.wire(
+            level.getBlockEntity(spotB.at(Templates.BURNER_1[0], Templates.BURNER_1[1] + 1, Templates.BURNER_1[2])) instanceof AbstractElectricalConnector ca ? ca : null,
+            level.getBlockEntity(spotB.at(Templates.BURNER_2[0], Templates.BURNER_2[1] + 1, Templates.BURNER_2[2])) instanceof AbstractElectricalConnector cb ? cb : null);
         report(source, "second company's HUB " + placedB.ok() + " (" + placedB.message().getString() + "), parts " + parts(level, spotB));
 
         // ---- the Wormhole Gateway: placed whole, a phase paid lights its ring, one per company, picked up and put back with its progress
@@ -351,8 +367,8 @@ public final class PrefabTests {
         for (int[] at : new int[][]{Templates.BURNER_1, Templates.BURNER_2}) {
             if (level.getBlockEntity(spotB.at(at[0], at[1], at[2])) instanceof HubBurnerBlockEntity engine) {
                 b.append(" burner ").append(engine.status().getString()).append(" (fuel ").append(engine.fuel.getItem(0)).append(", banked ")
-                    .append(Math.round(engine.energy)).append(" SU-ticks, biomass ").append(com.meakaandre.siftec.building.BuildingPower.itemMj("biomass", new ItemStack(biomass())))
-                    .append(" MJ, coal ").append(com.meakaandre.siftec.building.BuildingPower.itemMj("biomass", new ItemStack(Items.COAL))).append(" MJ, grid ")
+                    .append(Math.round(engine.energy)).append(" SU-ticks, biomass ").append(BuildingPower.itemMj("biomass", new ItemStack(biomass())))
+                    .append(" MJ, coal ").append(BuildingPower.itemMj("biomass", new ItemStack(Items.COAL))).append(" MJ, grid ")
                     .append(engine.grid == null ? "none" : engine.grid.describe()).append(");");
             } else {
                 b.append(" burner missing;");
@@ -364,7 +380,7 @@ public final class PrefabTests {
         b.append(" first company's terminal ticked ").append(hubA == null ? -1 : hubA.ticked).append(";");
         report(source, "check: the second company's HUB burners:" + b + " terminal ticked " + (hub == null ? -1 : hub.ticked) + ", blocks tick here "
             + level.shouldTickBlocksAt(term) + ", entity ticking " + level.isPositionEntityTicking(term) + ", chunk forced "
-            + level.getForceLoadedChunks().contains(net.minecraft.world.level.ChunkPos.pack(term.getX() >> 4, term.getZ() >> 4)));
+            + level.getForceLoadedChunks().contains(ChunkPos.pack(term.getX() >> 4, term.getZ() >> 4)));
         return 1;
     }
 
@@ -435,7 +451,7 @@ public final class PrefabTests {
             case "inside" -> player.teleportTo(level, VX + 2.5, Y + 1, VZ - 0.5, Set.of(), 155f, 8f, true);
             case "terminal" -> {
                 player.teleportTo(level, VX + 0.5, Y + 1, VZ - 2.5, Set.of(), 180f, 20f, true);
-                if (level.getBlockEntity(spot.terminal()) instanceof HubBlockEntity hub) com.meakaandre.siftec.hub.HubMenu.open(player, company, spot.terminal(), false);
+                if (level.getBlockEntity(spot.terminal()) instanceof HubBlockEntity hub) HubMenu.open(player, company, spot.terminal(), false);
             }
             case "gateway" -> {
                 // the company's Wormhole Gateway at n phases, north of the HUB, seen from far off with a mannequin at its terminal
@@ -464,12 +480,12 @@ public final class PrefabTests {
 
     private static void mannequin(ServerLevel level, BlockPos at) {
         AABB near = new AABB(at).inflate(2);
-        if (!level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, near, e -> !(e instanceof ServerPlayer)).isEmpty()) return;
-        var registry = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE;
-        EntityType<?> type = registry.getOptional(net.minecraft.resources.Identifier.withDefaultNamespace("mannequin"))
-            .or(() -> registry.getOptional(net.minecraft.resources.Identifier.withDefaultNamespace("armor_stand"))).orElse(null);
+        if (!level.getEntitiesOfClass(LivingEntity.class, near, e -> !(e instanceof ServerPlayer)).isEmpty()) return;
+        var registry = BuiltInRegistries.ENTITY_TYPE;
+        EntityType<?> type = registry.getOptional(Identifier.withDefaultNamespace("mannequin"))
+            .or(() -> registry.getOptional(Identifier.withDefaultNamespace("armor_stand"))).orElse(null);
         if (type == null) return;
-        var entity = type.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var entity = type.create(level, EntitySpawnReason.COMMAND);
         if (entity == null) return;
         entity.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 180f, 0f);
         level.addFreshEntity(entity);
@@ -506,7 +522,7 @@ public final class PrefabTests {
         boolean hubItem = false;
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             ItemStack st = player.getInventory().getItem(i);
-            if (st.getItem() instanceof com.meakaandre.siftec.building.BuildGunItem) guns += st.getCount();
+            if (st.getItem() instanceof BuildGunItem) guns += st.getCount();
             if (!st.isEmpty() && st.getItem().builtInRegistryHolder().key().identifier().toString().equals("siftec:hub")) hubItem = true;
         }
         report(source, "joined: the player has " + guns + " Build Gun, a HUB item " + hubItem + "; HUB block has an item " + (ModBlocks.HUB.get().asItem() != Items.AIR)

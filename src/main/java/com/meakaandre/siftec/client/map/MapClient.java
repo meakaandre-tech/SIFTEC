@@ -24,6 +24,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
@@ -323,11 +324,11 @@ public final class MapClient {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         if (!unlocked()) {
-            mc.player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.map.locked"));
+            mc.player.sendOverlayMessage(Component.translatable("siftec.map.locked"));
             return;
         }
         if (!mappedHere()) {
-            mc.player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.map.surface_only"));
+            mc.player.sendOverlayMessage(Component.translatable("siftec.map.surface_only"));
             return;
         }
         MapScreen screen = new MapScreen();

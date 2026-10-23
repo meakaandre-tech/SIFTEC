@@ -1,8 +1,10 @@
 package com.meakaandre.siftec.depot;
 
+import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.zurrtum.create.AllBlocks;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -11,6 +13,10 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -48,14 +54,14 @@ public class DepotBlockEntity extends BlockEntity {
     }
 
     /** Takes up to a stack of one item out of a company's cloud. Empty if there is none. */
-    public static net.minecraft.world.item.ItemStack withdraw(Company company, String id) {
-        net.minecraft.world.item.Item item = BuiltInRegistries.ITEM.getOptional(net.minecraft.resources.Identifier.tryParse(id)).orElse(net.minecraft.world.item.Items.AIR);
+    public static ItemStack withdraw(Company company, String id) {
+        Item item = BuiltInRegistries.ITEM.getOptional(Identifier.tryParse(id)).orElse(Items.AIR);
         int have = company.cloud.getOrDefault(id, 0);
-        int take = Math.min(have, new net.minecraft.world.item.ItemStack(item).getMaxStackSize());
-        if (item == net.minecraft.world.item.Items.AIR || take <= 0) return net.minecraft.world.item.ItemStack.EMPTY;
+        int take = Math.min(have, new ItemStack(item).getMaxStackSize());
+        if (item == Items.AIR || take <= 0) return ItemStack.EMPTY;
         if (have - take <= 0) company.cloud.remove(id);
         else company.cloud.put(id, have - take);
-        return new net.minecraft.world.item.ItemStack(item, take);
+        return new ItemStack(item, take);
     }
 
     /** Items a minute each of a company's depots uploads: raised by the Upload Upgrade research. */
@@ -69,8 +75,8 @@ public class DepotBlockEntity extends BlockEntity {
     }
 
     /** The most of one item a company's cloud holds: its stacks of that item. */
-    public static int cloudLimit(Company company, net.minecraft.world.item.Item item) {
-        return cloudStacks(company) * new net.minecraft.world.item.ItemStack(item).getMaxStackSize();
+    public static int cloudLimit(Company company, Item item) {
+        return cloudStacks(company) * new ItemStack(item).getMaxStackSize();
     }
 
     /** True once the company has the Manual Depot Uploader research: its members upload from their inventory. */
@@ -82,7 +88,7 @@ public class DepotBlockEntity extends BlockEntity {
      * Puts as much of a stack into the company's cloud as it has room for, and says how many went. Only plain items go
      * to the cloud: nothing named, enchanted, damaged or filled.
      */
-    public static int upload(Company company, net.minecraft.world.item.ItemStack stack) {
+    public static int upload(Company company, ItemStack stack) {
         if (stack.isEmpty() || !stack.getComponentsPatch().isEmpty()) return 0;
         String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
         int room = cloudLimit(company, stack.getItem()) - company.cloud.getOrDefault(id, 0);
@@ -107,9 +113,9 @@ public class DepotBlockEntity extends BlockEntity {
         for (Direction side : Direction.values()) {
             BlockPos next = worldPosition.relative(side);
             // a depot uploads from the Item Vault it sits on, nothing else
-            if (!level.getBlockState(next).is(com.zurrtum.create.AllBlocks.ITEM_VAULT)) continue;
+            if (!level.getBlockState(next).is(AllBlocks.ITEM_VAULT)) continue;
             // only from containers the depot's company may reach: unclaimed land or its own claim
-            com.meakaandre.siftec.claim.Claims.Claim claim = com.meakaandre.siftec.claim.Claims.at(level, next);
+            Claims.Claim claim = Claims.at(level, next);
             if (claim != null && !Companies.owns(company, claim.company)) continue;
             Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, next, side.getOpposite());
             if (storage == null || !storage.supportsExtraction()) continue;

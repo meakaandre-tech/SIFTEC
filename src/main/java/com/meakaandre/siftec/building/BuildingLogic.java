@@ -1,10 +1,22 @@
 package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.blueprint.DesignerBlockEntity;
+import com.meakaandre.siftec.drone.DronePortBlockEntity;
+import com.meakaandre.siftec.equip.Radar;
+import com.meakaandre.siftec.mixin.building.BreakerAccessor;
 import com.meakaandre.siftec.node.NodeLook;
+import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.node.Purity;
+import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.sink.Sink;
+import com.zurrtum.create.api.connectivity.ConnectivityHandler;
+import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
+import com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
+import com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
+import com.zurrtum.create.content.kinetics.crusher.CrushingWheelBlock;
 import com.zurrtum.create.content.kinetics.fan.EncasedFanBlock;
 import com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes;
 import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
@@ -16,21 +28,31 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.antarcticgardens.cna.content.motor.MotorBlockEntity;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * How each kind of building works, run by its controller every tick ({@link BuildingDef#logic()}):
@@ -79,7 +101,7 @@ public final class BuildingLogic {
     }
 
     private static Block create(String id) {
-        return BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath("create", id));
+        return BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", id));
     }
 
     // ------------------------------------------------------------------------------------------------ placing
@@ -95,10 +117,10 @@ public final class BuildingLogic {
         Placement p = c.placement();
         BuildingTemplate t = p == null ? null : BuildingTemplate.of(def);
         for (BlockPos pos : BuildingPower.motors(c)) {
-            if (!(level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.motor.MotorBlockEntity motor)) continue;
+            if (!(level.getBlockEntity(pos) instanceof MotorBlockEntity motor)) continue;
             int rpm = (int) MOTOR_RPM;
             // a fan turned the wrong way would suck instead of blow: the motor turns so it blows away from it
-            Direction toward = motor.getBlockState().getValue(com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING);
+            Direction toward = motor.getBlockState().getValue(DirectionalKineticBlock.FACING);
             BlockState next = level.getBlockState(pos.relative(toward));
             if (next.getBlock() instanceof EncasedFanBlock) {
                 // a fan that lifts things up a column into Crushing Wheels (the Particle Accelerator's) runs at full
@@ -107,7 +129,7 @@ public final class BuildingLogic {
                 rpm *= next.getValue(EncasedFanBlock.FACING).getAxisDirection().getStep();
             }
             // two Crushing Wheels crush only turning against each other: the right one's motor runs the other way
-            if (next.getBlock() instanceof com.zurrtum.create.content.kinetics.crusher.CrushingWheelBlock && t != null) {
+            if (next.getBlock() instanceof CrushingWheelBlock && t != null) {
                 for (BuildingTemplate.Cell cell : t.members) if (p.at(cell).equals(pos) && cell.x() > 0) rpm = -rpm;
             }
             if (motor.speedBehavior != null) motor.speedBehavior.setValue(rpm);
@@ -118,7 +140,7 @@ public final class BuildingLogic {
         Processors.ensureCell(level, c);
         if (def.logic().equals("drone_port")) SpecialBuildings.dronePortPlaced(level, c);
         // a Blueprint Designer's volume is flyable from the moment it is built
-        if (c instanceof com.meakaandre.siftec.blueprint.DesignerBlockEntity designer) designer.report();
+        if (c instanceof DesignerBlockEntity designer) designer.report();
     }
 
     /**
@@ -127,15 +149,15 @@ public final class BuildingLogic {
      */
     static void formTanks(ServerLevel level, ControllerBlockEntity c) {
         List<BlockPos> tanks = cells(c, create("fluid_tank"));
-        tanks.sort(java.util.Comparator.<BlockPos>comparingInt(BlockPos::getY).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ));
+        tanks.sort(Comparator.<BlockPos>comparingInt(BlockPos::getY).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ));
         for (BlockPos pos : tanks) {
-            if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity tank && tank.isController()
+            if (level.getBlockEntity(pos) instanceof FluidTankBlockEntity tank && tank.isController()
                 && tank.getWidth() == 1 && tank.getHeight() == 1) {
-                com.zurrtum.create.api.connectivity.ConnectivityHandler.formMulti(tank);
+                ConnectivityHandler.formMulti(tank);
             }
         }
         for (BlockPos pos : tanks) {
-            if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity tank && tank.isController()) {
+            if (level.getBlockEntity(pos) instanceof FluidTankBlockEntity tank && tank.isController()) {
                 tank.updateBoilerState();
                 tank.updateBoilerTemperature();
             }
@@ -148,7 +170,7 @@ public final class BuildingLogic {
         // the Manufacturer's and the Quantum Encoder's Basin makes the Core; the line sets its filter (ProductionLogic)
         if (def == null || !def.logic().equals("basin")) return;
         List<BlockPos> basins = cells(c, create("basin"));
-        basins.addAll(cells(c, com.meakaandre.siftec.registry.ModBlocks.BRASS_BASIN.get()));
+        basins.addAll(cells(c, ModBlocks.BRASS_BASIN.get()));
         for (BlockPos pos : basins) {
             if (level.getBlockEntity(pos) instanceof BasinBlockEntity basin && !ItemStack.matches(basin.getFilter().getFilter(), c.filter)) {
                 basin.getFilter().setFilter(c.filter.copy());
@@ -191,7 +213,7 @@ public final class BuildingLogic {
             case "pressurizer" -> ExtractorLogic.pressurize(level, c, def);
             case "well_extractor" -> ExtractorLogic.wellExtract(level, c, def);
             case "sink" -> SpecialBuildings.sink(level, c);
-            case "radar" -> com.meakaandre.siftec.equip.Radar.tick(level, c);
+            case "radar" -> Radar.tick(level, c);
             case "truck_station" -> TruckStations.tick(level, c);
             default -> {
             }
@@ -253,7 +275,7 @@ public final class BuildingLogic {
         if (def == null) return false;
         if (def.logic().equals("smelter")) return MachineTimes.smelterTicks(stack) > 0;
         if (def.logic().equals("packager")) return ProductionLogic.packagerTakes(stack);
-        if (def.logic().equals("sink")) return com.meakaandre.siftec.sink.Sink.accepts(stack);
+        if (def.logic().equals("sink")) return Sink.accepts(stack);
         return BuildingPower.acceptsFuel(def, stack);
     }
 
@@ -267,7 +289,7 @@ public final class BuildingLogic {
 
     private static @Nullable NodeAt nodeAt(Level level, @Nullable BlockPos pos) {
         if (pos == null || !level.isLoaded(pos)) return null;
-        var site = com.meakaandre.siftec.node.NodeSites.at(level, pos);
+        var site = NodeSites.at(level, pos);
         return site == null ? null : new NodeAt(site.look, site.purity);
     }
 
@@ -302,8 +324,8 @@ public final class BuildingLogic {
         boolean regrown = node.look().isNodeBlock(state);
         if (powered) {
             // the Drill only looks for a block to break every half second after its last one: a regrown node is started at once
-            if (regrown && drillPos != null && level.getBlockEntity(drillPos) instanceof com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity drill
-                && ((com.meakaandre.siftec.mixin.building.BreakerAccessor) drill).siftec$ticksUntilNextProgress() == -1) {
+            if (regrown && drillPos != null && level.getBlockEntity(drillPos) instanceof BlockBreakingKineticBlockEntity drill
+                && ((BreakerAccessor) drill).siftec$ticksUntilNextProgress() == -1) {
                 drill.destroyNextTick();
             }
             return;
@@ -378,10 +400,10 @@ public final class BuildingLogic {
         BlockPos pos = c.node;
         BuildingDef def = c.def();
         if (pos == null || def == null) return;
-        List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(state, level, pos, null, null, tool(level, def.fortune()));
-        level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+        List<ItemStack> drops = Block.getDrops(state, level, pos, null, null, tool(level, def.fortune()));
+        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         level.destroyBlockProgress(breakerId(c), pos, -1);
-        level.levelEvent(net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, pos, net.minecraft.world.level.block.Block.getId(state));
+        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
         int n = 0;
         for (ItemStack drop : drops) {
             if (drop.isEmpty()) continue;
@@ -390,7 +412,7 @@ public final class BuildingLogic {
                 BlockPos at = dropSpot(c);
                 if (at == null) continue;
                 ItemEntity entity = new ItemEntity(level, at.getX() + 0.5, at.getY() + 0.1, at.getZ() + 0.5, drop);
-                entity.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                entity.setDeltaMovement(Vec3.ZERO);
                 level.addFreshEntity(entity);
             } else {
                 ItemStack out = c.output.getItem(0);
@@ -405,7 +427,7 @@ public final class BuildingLogic {
                 // nothing is lost: what does not fit (another drop of a node with two) goes out of the output port's front
                 if (!drop.isEmpty()) {
                     BlockPos at = c.placement() == null ? c.getBlockPos() : c.placement().at(0, 0, -1);
-                    net.minecraft.world.Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, drop);
+                    Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, drop);
                 }
                 c.output.setChanged();
             }
@@ -419,8 +441,8 @@ public final class BuildingLogic {
     private static ItemStack tool(ServerLevel level, int fortune) {
         ItemStack pick = new ItemStack(Items.NETHERITE_PICKAXE);
         if (fortune > 0) {
-            var holder = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
-                .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.FORTUNE);
+            var holder = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
+                .getOrThrow(Enchantments.FORTUNE);
             pick.enchant(holder, fortune);
         }
         return pick;
@@ -513,7 +535,7 @@ public final class BuildingLogic {
             }
             case "truck_station" -> TruckStations.status(level, c, parts);
             case "drone_port" -> {
-                if (SpecialBuildings.droneTerminal(level, c) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port) {
+                if (SpecialBuildings.droneTerminal(level, c) instanceof DronePortBlockEntity port) {
                     parts.add(Component.translatable(port.statusKey(), port.chargesNeeded()));
                 }
             }
@@ -523,7 +545,7 @@ public final class BuildingLogic {
         ProductionLogic.status(level, c, def, parts);
         ExtractorLogic.status(level, c, def, parts);
         if (!def.logic().equals("storage") && !def.logic().isEmpty() && !def.logic().equals("power") && !def.logic().contains("extractor")
-            && !def.logic().equals("pressurizer") && !java.util.Set.of("workshop", "shop", "radar", "truck_station", "drone_port", "foundation", "designer").contains(def.logic())) {
+            && !def.logic().equals("pressurizer") && !Set.of("workshop", "shop", "radar", "truck_station", "drone_port", "foundation", "designer").contains(def.logic())) {
             parts.add(Component.translatable("siftec.building.made", c.made));
         }
         BuildingPower.status(level, c, def, parts);

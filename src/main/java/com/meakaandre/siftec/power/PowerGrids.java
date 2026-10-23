@@ -1,8 +1,11 @@
 package com.meakaandre.siftec.power;
 
 import com.meakaandre.siftec.Siftec;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,7 +73,7 @@ public final class PowerGrids {
         final List<Grid> grids = new ArrayList<>();
         final Map<AbstractElectricalConnector, Grid> byConnector = new IdentityHashMap<>();
         /** Every connector position a grid reaches (loaded or not), and its grid. */
-        final it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<Grid> at = new it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<>();
+        final Long2ObjectOpenHashMap<Grid> at = new Long2ObjectOpenHashMap<>();
     }
 
     public static void register() {
@@ -138,7 +142,7 @@ public final class PowerGrids {
         WireMap map = WireMap.get(level);
         PowerMemory memory = PowerMemory.get(level);
         var remembered = memory.byConnector(level);
-        Set<BlockPos> done = new java.util.HashSet<>();
+        Set<BlockPos> done = new HashSet<>();
         for (AbstractElectricalConnector first : List.copyOf(at.values())) {
             if (done.contains(first.getBlockPos())) continue;
             Grid grid = new Grid();
@@ -223,7 +227,7 @@ public final class PowerGrids {
                 break;
             }
         }
-        Set<BlockPos> live = new java.util.HashSet<>();
+        Set<BlockPos> live = new HashSet<>();
         for (Grid grid : b.grids) {
             try {
                 solve(grid);
@@ -407,7 +411,7 @@ public final class PowerGrids {
      * FE a New Age source pushes into a connector (its {@code NetworkEnergyStorage}): taken up to what the grid could
      * use, and given out with the rest of the grid's power next tick.
      */
-    public static long pushed(AbstractElectricalConnector connector, long fe, net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext txn) {
+    public static long pushed(AbstractElectricalConnector connector, long fe, TransactionContext txn) {
         Grid grid = of(connector);
         if (grid == null || grid.stats.tripped || fe <= 0) return 0;
         long room = (long) Math.floor(Power.feOfSu(grid.room) - grid.inbox.fe);
@@ -417,10 +421,10 @@ public final class PowerGrids {
     }
 
     /** What pushed energy a grid holds for next tick, undone with the transaction that put it there. */
-    static final class Inbox extends net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant<Long> {
+    static final class Inbox extends SnapshotParticipant<Long> {
         long fe;
 
-        void add(long amount, net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext txn) {
+        void add(long amount, TransactionContext txn) {
             updateSnapshots(txn);
             fe += amount;
         }

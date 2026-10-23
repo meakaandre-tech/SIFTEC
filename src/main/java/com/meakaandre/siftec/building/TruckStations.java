@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.building;
 
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.vehicle.VehicleEntity;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
@@ -78,7 +79,7 @@ public final class TruckStations {
      */
     public static boolean serves(ControllerBlockEntity c, VehicleEntity vehicle) {
         if (c.companyId.isEmpty() || vehicle.companyId.isEmpty()) return c.companyId.isEmpty() && vehicle.companyId.isEmpty();
-        return com.meakaandre.siftec.company.Companies.same(c.companyId, vehicle.companyId);
+        return Companies.same(c.companyId, vehicle.companyId);
     }
 
     /** The station of the vehicle's company whose dock is within {@link #DOCK_RANGE} of a spot, nearest first; null if none. */

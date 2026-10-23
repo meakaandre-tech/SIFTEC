@@ -9,6 +9,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.Locale;
+
 /**
  * Server to client, once a second: the factory simulation's figures for the debug overlay (F3): how many buildings it
  * knows and how many it runs, in how many groups, the vehicles it drives, and the time it takes a tick on the server
@@ -41,7 +43,7 @@ public record SimStatsPayload(int nodes, int simulated, int groups, int vehicles
 
     /** The line the debug overlay shows. */
     public String line() {
-        return String.format(java.util.Locale.ROOT, "SIFTEC factories: %d/%d simulated, %d groups, %d vehicles | %.3f ms/tick (server %.3f, worker %.3f; %.2f a step)",
+        return String.format(Locale.ROOT, "SIFTEC factories: %d/%d simulated, %d groups, %d vehicles | %.3f ms/tick (server %.3f, worker %.3f; %.2f a step)",
             simulated, nodes, groups, vehicles, mainMs + workerMs, mainMs, workerMs, workerStepMs);
     }
 

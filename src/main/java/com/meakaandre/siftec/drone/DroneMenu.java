@@ -1,9 +1,13 @@
 package com.meakaandre.siftec.drone;
 
+import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.depot.DepotMenu;
 import com.meakaandre.siftec.place.Places;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.registry.ModItems;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,11 +34,11 @@ public class DroneMenu extends ChestMenu {
     private final ServerPlayer player;
     private final DronePortBlockEntity port;
     /** Where it was opened (the terminal, or the building's controller): the player must stay within reach of it. */
-    private final net.minecraft.core.BlockPos at;
+    private final BlockPos at;
     private final List<Places.Place> shown = new ArrayList<>();
     private int ticks;
 
-    private DroneMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, DronePortBlockEntity port, net.minecraft.core.BlockPos at) {
+    private DroneMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, DronePortBlockEntity port, BlockPos at) {
         super(MenuType.GENERIC_9x6, id, inventory, view, 6);
         this.view = view;
         this.player = player;
@@ -44,7 +48,7 @@ public class DroneMenu extends ChestMenu {
     }
 
     /** Opens a port's window; {@code at} is the block it was opened at, which the player must stay within reach of. */
-    public static void open(ServerPlayer player, DronePortBlockEntity port, net.minecraft.core.BlockPos at) {
+    public static void open(ServerPlayer player, DronePortBlockEntity port, BlockPos at) {
         player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new DroneMenu(id, inventory, new SimpleContainer(SIZE), player, port, at),
             Component.translatable("block.siftec.drone_port")));
     }
@@ -62,12 +66,12 @@ public class DroneMenu extends ChestMenu {
     private void refresh() {
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         shown.clear();
-        for (Places.Place place : Places.of(player.level().getServer(), com.meakaandre.siftec.company.Companies.of(player).id)) {
+        for (Places.Place place : Places.of(player.level().getServer(), Companies.of(player).id)) {
             if (!place.kind.equals(Places.DRONE_PORT) || Places.same(place, port.getLevel(), port.getBlockPos())) continue;
             if (!place.dimension.equals(port.getLevel().dimension().identifier().toString()) || shown.size() >= LIST) continue;
             boolean chosen = place.pos().equals(port.destination);
             int blocks = (int) Math.round(Math.sqrt(place.pos().distSqr(port.getBlockPos())));
-            view.setItem(shown.size(), button(net.minecraft.world.item.Items.ENDER_EYE, Component.literal(place.name), List.of(
+            view.setItem(shown.size(), button(Items.ENDER_EYE, Component.literal(place.name), List.of(
                 Component.translatable("siftec.place.where", place.x, place.y, place.z, blocks).withStyle(ChatFormatting.GRAY),
                 Component.translatable(chosen ? "siftec.drone.chosen" : "siftec.drone.choose").withStyle(chosen ? ChatFormatting.GREEN : ChatFormatting.YELLOW)), chosen));
             shown.add(place);
@@ -135,8 +139,8 @@ public class DroneMenu extends ChestMenu {
     public boolean stillValid(Player who) {
         if (who != player || port.isRemoved() || player.isRemoved() || !player.isAlive()) return false;
         if (player.level() != port.getLevel()) return false;
-        com.meakaandre.siftec.company.Company now = com.meakaandre.siftec.company.Companies.find(player);
-        if (!player.hasInfiniteMaterials() && !port.companyId.isEmpty() && (now == null || !com.meakaandre.siftec.company.Companies.owns(now, port.companyId))) return false;
-        return player.distanceToSqr(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5) <= com.meakaandre.siftec.depot.DepotMenu.REACH * com.meakaandre.siftec.depot.DepotMenu.REACH;
+        Company now = Companies.find(player);
+        if (!player.hasInfiniteMaterials() && !port.companyId.isEmpty() && (now == null || !Companies.owns(now, port.companyId))) return false;
+        return player.distanceToSqr(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5) <= DepotMenu.REACH * DepotMenu.REACH;
     }
 }

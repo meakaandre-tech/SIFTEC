@@ -2,6 +2,7 @@ package com.meakaandre.siftec.claim;
 
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.config.SiftecConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
@@ -22,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 public class ClaimMarkerBlock extends Block {
     public ClaimMarkerBlock(Properties properties) {
         // a marker holds land: it cannot be blown up or pushed, or its claim would be left behind
-        super(properties.explosionResistance(3600000.0F).pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE));
+        super(properties.explosionResistance(3600000.0F).pushReaction(PushReaction.IMMOVEABLE));
     }
 
     @Override
@@ -36,7 +38,7 @@ public class ClaimMarkerBlock extends Block {
         if (company.id.isEmpty()) problem = Component.translatable("siftec.claim.nothing");
         else if (used >= budget || room <= 0) problem = Component.translatable("siftec.claim.budget", budget);
         else if (Claims.inSpawnZone(server, pos)) problem = Component.translatableWithFallback("siftec.claim.spawn",
-            "Nothing can be claimed within %s blocks of spawn", com.meakaandre.siftec.config.SiftecConfig.spawnFreeRadius);
+            "Nothing can be claimed within %s blocks of spawn", SiftecConfig.spawnFreeRadius);
         else if (Claims.nearForeignHub(server, company, pos)) problem = Component.translatable("siftec.claim.too_close", Claims.HUB_SPACING);
         else if (Claims.claim(server, company, pos, Claims.MARKER_RADIUS, true, room) == 0) problem = Component.translatable("siftec.claim.nothing");
         if (problem != null) {

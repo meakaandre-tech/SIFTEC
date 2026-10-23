@@ -1,9 +1,13 @@
 package com.meakaandre.siftec.company;
 
+import com.meakaandre.siftec.config.SiftecConfig;
 import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.hub.Milestones;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -47,9 +51,9 @@ public class Company {
      * The company's colour swatches, each "primary/secondary" dye names ("industrial" for the dark grey panels as
      * built). The first is the default every company has; the AWESOME Shop sells more slots.
      */
-    public java.util.List<String> swatches = new java.util.ArrayList<>(java.util.List.of("orange/industrial"));
+    public List<String> swatches = new ArrayList<>(List.of("orange/industrial"));
     /** The alternates a finished Hard Drive is offering; empty when there is nothing to choose. */
-    public java.util.List<String> offer = new java.util.ArrayList<>();
+    public List<String> offer = new ArrayList<>();
     /** The MAM node being researched, and the game time it finishes. Empty when nothing is running. */
     public String research = "";
     public long researchEnd;
@@ -72,7 +76,7 @@ public class Company {
 
     /** Players who left recently and are not back. */
     public int recentLeavers() {
-        long now = System.currentTimeMillis(), cooldown = com.meakaandre.siftec.config.SiftecConfig.memberCooldownMillis();
+        long now = System.currentTimeMillis(), cooldown = SiftecConfig.memberCooldownMillis();
         leftAt.values().removeIf(at -> now - at >= cooldown);
         int n = 0;
         for (String id : leftAt.keySet()) if (!members.contains(id)) n++;
@@ -82,7 +86,7 @@ public class Company {
     /** True if the player left this company too recently to join it again. */
     public boolean coolingDown(String playerId) {
         Long at = leftAt.get(playerId);
-        return at != null && System.currentTimeMillis() - at < com.meakaandre.siftec.config.SiftecConfig.memberCooldownMillis();
+        return at != null && System.currentTimeMillis() - at < SiftecConfig.memberCooldownMillis();
     }
 
     /** Scales parts already delivered when the multiplier has changed, so a partial payment keeps its share. */
@@ -96,7 +100,7 @@ public class Company {
         float ratio = now / paidAt;
         paid.forEach((id, parts) -> {
             // a MAM node costs the same whatever the company's size: its parts are never scaled
-            Milestone m = com.meakaandre.siftec.hub.Milestones.get(id);
+            Milestone m = Milestones.get(id);
             if (m == null || !m.isResearch()) parts.replaceAll((item, count) -> Math.round(count * ratio));
         });
         paidAt = now;
@@ -162,7 +166,7 @@ public class Company {
     private int countNow(String token) {
         int n = 0;
         for (String id : done) {
-            Milestone m = com.meakaandre.siftec.hub.Milestones.get(id);
+            Milestone m = Milestones.get(id);
             if (m != null && m.tokens().contains(token)) n++;
         }
         return n;
@@ -177,7 +181,7 @@ public class Company {
     public int best(String prefix, int fallback) {
         int best = fallback;
         for (String id : done) {
-            Milestone m = com.meakaandre.siftec.hub.Milestones.get(id);
+            Milestone m = Milestones.get(id);
             if (m == null) continue;
             for (String token : m.tokens()) {
                 if (token.startsWith(prefix)) best = Math.max(best, Integer.parseInt(token.substring(prefix.length())));

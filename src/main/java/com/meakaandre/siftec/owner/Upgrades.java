@@ -1,7 +1,11 @@
 package com.meakaandre.siftec.owner;
 
 import com.meakaandre.siftec.company.Company;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /** Upgrades a company has earned that change how its machines behave. */
 public final class Upgrades {
@@ -11,7 +15,7 @@ public final class Upgrades {
     /** Pipeline Engineering Mk.2: the company's Mechanical Pumps reach twice as far and push twice as hard. */
     public static int pumps(BlockEntity pump) {
         // asked by every pump every tick: the company is looked up again at most every five seconds
-        if (!(pump.getLevel() instanceof net.minecraft.server.level.ServerLevel level)) return 1;
+        if (!(pump.getLevel() instanceof ServerLevel level)) return 1;
         long now = level.getGameTime();
         long[] known = PUMPS.get(pump);
         if (known != null && now - known[0] < 100 && now >= known[0]) return (int) known[1];
@@ -22,5 +26,5 @@ public final class Upgrades {
     }
 
     /** Pump -> {when looked up, factor}. Server thread only; forgets pumps that are gone. */
-    private static final java.util.Map<BlockEntity, long[]> PUMPS = new java.util.WeakHashMap<>();
+    private static final Map<BlockEntity, long[]> PUMPS = new WeakHashMap<>();
 }

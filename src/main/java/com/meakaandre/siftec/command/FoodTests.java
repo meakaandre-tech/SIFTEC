@@ -10,6 +10,9 @@ import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.RecipeLocks;
 import com.meakaandre.siftec.tweak.NetherWater;
 import com.mojang.brigadier.context.CommandContext;
+import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
+import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
+import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
 import com.zurrtum.create.content.processing.basin.BasinRecipe;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -102,9 +105,9 @@ public final class FoodTests {
         int n = 0;
         // Create's machine recipes keep their results to themselves (their display shows none)
         List<ItemStack> made = new ArrayList<>();
-        if (r instanceof com.zurrtum.create.content.kinetics.mixer.MixingRecipe m) m.results().forEach(o -> made.add(o.create()));
-        if (r instanceof com.zurrtum.create.content.kinetics.mixer.CompactingRecipe c) c.results().forEach(o -> made.add(o.create()));
-        if (r instanceof com.zurrtum.create.content.fluids.transfer.FillingRecipe f) made.add(f.result().create());
+        if (r instanceof MixingRecipe m) m.results().forEach(o -> made.add(o.create()));
+        if (r instanceof CompactingRecipe c) c.results().forEach(o -> made.add(o.create()));
+        if (r instanceof FillingRecipe f) made.add(f.result().create());
         for (ItemStack stack : made) if (stack.is(what)) n = Math.max(n, stack.getCount());
         for (RecipeDisplay display : r.display()) {
             for (ItemStack stack : display.result().resolveForStacks(SlotDisplayContext.fromLevel(level))) {

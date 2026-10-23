@@ -5,6 +5,11 @@ import com.meakaandre.siftec.collect.Collectible;
 import com.meakaandre.siftec.collect.Collectibles;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.geyser.GeyserSearch;
+import com.meakaandre.siftec.map.MapTerrain;
+import com.meakaandre.siftec.node.NodeMap;
+import com.meakaandre.siftec.node.NodeSites;
+import com.meakaandre.siftec.node.Terrain;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -24,7 +29,10 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
@@ -55,7 +63,7 @@ public class ObjectScannerItem extends Item {
         }
 
         public Component label() {
-            return Component.translatable("siftec.scanner.target." + name().toLowerCase(java.util.Locale.ROOT));
+            return Component.translatable("siftec.scanner.target." + name().toLowerCase(Locale.ROOT));
         }
 
         public boolean open(Company company, boolean creative) {
@@ -97,9 +105,9 @@ public class ObjectScannerItem extends Item {
         Target target = SELECTED.getOrDefault(player.getUUID(), Target.HARD_DRIVE);
         if (!open.contains(target)) target = open.getFirst();
         // aimed at a resource node (its ore, or the empty spot growing back): what node it is, and its regrowth
-        BlockPos node = player.isShiftKeyDown() ? null : com.meakaandre.siftec.node.NodeSites.lookedAt(player, player.blockInteractionRange());
+        BlockPos node = player.isShiftKeyDown() ? null : NodeSites.lookedAt(player, player.blockInteractionRange());
         if (node != null) {
-            player.sendOverlayMessage(com.meakaandre.siftec.node.NodeSites.describe(server, node));
+            player.sendOverlayMessage(NodeSites.describe(server, node));
             return InteractionResult.SUCCESS;
         }
         if (player.isShiftKeyDown()) {
@@ -124,9 +132,9 @@ public class ObjectScannerItem extends Item {
             // background where nobody has been), then the nearest geyser on record is the answer
             player.sendOverlayMessage(Component.translatable("siftec.scanner.searching", name));
             int px = player.getBlockX(), pz = player.getBlockZ();
-            com.meakaandre.siftec.geyser.GeyserSearch.search(server, player.blockPosition(), GEYSER_CHUNKS, found -> {
+            GeyserSearch.search(server, player.blockPosition(), GEYSER_CHUNKS, found -> {
                 if (player.isRemoved()) return;
-                List<BlockPos> near = com.meakaandre.siftec.map.MapTerrain.geysersNear(px, pz, GEYSER_CHUNKS * 16 + 16);
+                List<BlockPos> near = MapTerrain.geysersNear(px, pz, GEYSER_CHUNKS * 16 + 16);
                 if (near.isEmpty()) tellNone(player, name);
                 else tellFound(player, name, near.getFirst().getX(), near.getFirst().getZ());
             });
@@ -144,16 +152,16 @@ public class ObjectScannerItem extends Item {
             tellNone(player, name);
             return InteractionResult.SUCCESS;
         }
-        java.util.Set<String> collected = java.util.Set.copyOf(company.collected);
-        com.meakaandre.siftec.node.Terrain.Border border = com.meakaandre.siftec.node.Terrain.Border.of(server);
+        Set<String> collected = Set.copyOf(company.collected);
+        Terrain.Border border = Terrain.Border.of(server);
         double px = player.getX(), pz = player.getZ();
         BlockPos at = player.blockPosition();
         // searched on the node map's worker thread (it samples the world generator), answered when done; Ancient City
         // Somersloops are found there too, from the seed, so nothing runs on the server thread or generates a chunk
-        record Found(java.util.Optional<Collectibles.Spot> spot, List<BlockPos> cities) {
+        record Found(Optional<Collectibles.Spot> spot, List<BlockPos> cities) {
         }
-        com.meakaandre.siftec.node.NodeMap.async(server.getServer(), () -> new Found(
-            Collectibles.nearest(server, px, pz, looking, collected, 48, border, com.meakaandre.siftec.node.NodeMap.SEARCH_NANOS),
+        NodeMap.async(server.getServer(), () -> new Found(
+            Collectibles.nearest(server, px, pz, looking, collected, 48, border, NodeMap.SEARCH_NANOS),
             looking == Collectible.SOMERSLOOP ? AncientCities.candidates(server, at) : List.of()), found -> {
                 if (player.isRemoved()) return;
                 int[] best = null;

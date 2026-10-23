@@ -7,6 +7,7 @@ import com.meakaandre.siftec.cosmetic.GoldenCart;
 import com.mojang.math.Quadrant;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlock;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
@@ -39,7 +40,7 @@ public final class CosmeticsClient {
     public static void register() {
         ClientPlayNetworking.registerGlobalReceiver(EmotePayload.TYPE, (payload, context) -> Minecraft.getInstance().execute(
             () -> PLAYING.put(payload.entity(), new Playing(payload.emote(), ticks))));
-        net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ticks++;
             PLAYING.values().removeIf(p -> ticks - p.start > Emotes.TICKS);
         });

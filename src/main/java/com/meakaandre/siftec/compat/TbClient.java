@@ -1,5 +1,7 @@
 package com.meakaandre.siftec.compat;
 
+import com.tiviacz.travelersbackpack.attachment.AttachmentUtils;
+import com.tiviacz.travelersbackpack.network.ServerboundActionTagPacket;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -35,8 +37,8 @@ public final class TbClient {
     /** Only loaded once Traveler's Backpack is known to be there. */
     private static final class Tb {
         static boolean open(LocalPlayer player) {
-            if (!com.tiviacz.travelersbackpack.attachment.AttachmentUtils.isWearingBackpack(player)) return false;
-            com.tiviacz.travelersbackpack.network.ServerboundActionTagPacket.create(com.tiviacz.travelersbackpack.network.ServerboundActionTagPacket.OPEN_SCREEN);
+            if (!AttachmentUtils.isWearingBackpack(player)) return false;
+            ServerboundActionTagPacket.create(ServerboundActionTagPacket.OPEN_SCREEN);
             return true;
         }
     }

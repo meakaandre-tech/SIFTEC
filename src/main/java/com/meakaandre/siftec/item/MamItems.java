@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.item;
 
+import com.meakaandre.siftec.hub.Locks;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.content.equipment.armor.BacktankBlockEntity;
 import com.zurrtum.create.content.equipment.armor.BacktankUtil;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Items the MAM's research unlocks (MAM Research tab): the four inhalers, and the Elytra Backpack. Food is the only
@@ -41,7 +43,7 @@ public final class MamItems {
         NUTRITIONAL;
 
         public String key() {
-            return "siftec.inhaler." + name().toLowerCase(java.util.Locale.ROOT);
+            return "siftec.inhaler." + name().toLowerCase(Locale.ROOT);
         }
 
         void apply(Player player) {
@@ -77,8 +79,8 @@ public final class MamItems {
         public InteractionResult use(Level level, Player player, InteractionHand hand) {
             ItemStack stack = player.getItemInHand(hand);
             if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
-            if (!com.meakaandre.siftec.hub.Locks.allowed(player, stack)) {
-                server.sendOverlayMessage(Component.translatable("siftec.lock.item", com.meakaandre.siftec.hub.Locks.lockOf(stack.getItem()).name()));
+            if (!Locks.allowed(player, stack)) {
+                server.sendOverlayMessage(Component.translatable("siftec.lock.item", Locks.lockOf(stack.getItem()).name()));
                 return InteractionResult.FAIL;
             }
             kind.apply(player);

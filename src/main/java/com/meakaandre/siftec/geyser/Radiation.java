@@ -1,9 +1,12 @@
 package com.meakaandre.siftec.geyser;
 
+import com.meakaandre.siftec.backpack.Backpack;
+import com.meakaandre.siftec.equip.Equipment;
 import com.meakaandre.siftec.registry.ModItems;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +29,7 @@ public final class Radiation {
                 if (player.hasInfiniteMaterials() || player.isSpectator()) continue;
                 boolean exposed = player.getInventory().contains(stack -> stack.is(residue));
                 if (!exposed) {
-                    for (net.minecraft.world.Container worn : com.meakaandre.siftec.backpack.Backpack.containers(player)) {
+                    for (Container worn : Backpack.containers(player)) {
                         if (worn.hasAnyMatching(stack -> stack.is(residue))) exposed = true;
                     }
                 }
@@ -34,7 +37,7 @@ public final class Radiation {
                 if (!exposed) {
                     exposed = !level.getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(RANGE), e -> e.getItem().is(residue)).isEmpty();
                 }
-                if (exposed && !com.meakaandre.siftec.equip.Equipment.shieldsRadiation(player)) player.hurtServer(level, level.damageSources().magic(), 1.0f);
+                if (exposed && !Equipment.shieldsRadiation(player)) player.hurtServer(level, level.damageSources().magic(), 1.0f);
             }
         });
     }

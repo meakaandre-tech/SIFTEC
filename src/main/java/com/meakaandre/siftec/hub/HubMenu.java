@@ -4,6 +4,7 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.compat.SiftGate;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -23,6 +24,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
@@ -164,7 +166,7 @@ public class HubMenu extends AbstractContainerMenu {
             case SIFT -> {
                 if (!gateway || !company.has("phase_5")) return false;
                 player.closeContainer();
-                com.meakaandre.siftec.compat.SiftGate.enter(player);
+                SiftGate.enter(player);
                 return true;
             }
             default -> {
@@ -222,11 +224,11 @@ public class HubMenu extends AbstractContainerMenu {
     public boolean stillValid(Player who) {
         if (player == null) return true;
         if (who != player || company == null || pos == null || player.isRemoved()) return false;
-        if (player.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(pos)) > REACH * REACH) return false;
+        if (player.distanceToSqr(Vec3.atCenterOf(pos)) > REACH * REACH) return false;
         HubBlockEntity hub = hub();
         if (hub == null || !(hub.getBlockState().getBlock() instanceof HubBlock block) || block.gateway != gateway) return false;
         // the block must still be this company's, and the player still in it
-        if (!com.meakaandre.siftec.company.Companies.owns(company, hub.companyId) || !company.members.contains(player.getUUID().toString())) return false;
+        if (!Companies.owns(company, hub.companyId) || !company.members.contains(player.getUUID().toString())) return false;
         return CompanyData.get(player.level().getServer()).byId(company.id) == company;
     }
 }

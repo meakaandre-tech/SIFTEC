@@ -24,7 +24,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.DyeColor;
@@ -39,6 +41,7 @@ import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.entity.SignTextSlot;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +60,7 @@ final class ShopTests {
     }
 
     private static Block block(String id) {
-        return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse(id));
+        return BuiltInRegistries.BLOCK.getValue(Identifier.parse(id));
     }
 
     private static Company fresh(ServerLevel level, String id) {
@@ -86,7 +89,7 @@ final class ShopTests {
 
         // holiday sets: on sale in their month only; once bought, kept
         Shop.Entry tree = Shop.entry("decor_ficsmas_tree");
-        int month = java.time.LocalDate.now().getMonthValue();
+        int month = LocalDate.now().getMonthValue();
         expect(source, "a holiday set (the FICSMAS Tree) is on sale in December only",
             tree != null && tree.months().equals(List.of(12)) && tree.inSeason() == (month == 12) && tree.owned(rich), tree == null ? "missing" : tree.months().toString());
 
@@ -174,7 +177,7 @@ final class ShopTests {
         fake.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
 
         // the company banner: kept by the company, copies named for it
-        ItemStack banner = new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse("minecraft:orange_banner")));
+        ItemStack banner = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse("minecraft:orange_banner")));
         rich.banner = Banners.write(level.getServer(), banner);
         ItemStack copy = Banners.read(level.getServer(), rich);
         expect(source, "the banner designer keeps a banner as the company's and hands out copies named for it",

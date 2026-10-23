@@ -2,6 +2,7 @@ package com.meakaandre.siftec.mixin.building;
 
 import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock;
 import com.zurrtum.create.content.kinetics.drill.DrillBlockEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,7 +22,7 @@ public abstract class MinerDrillBrokenMixin {
         DrillBlockEntity self = (DrillBlockEntity) (Object) this;
         if (!(self.getLevel() instanceof ServerLevel level)) return;
         // the block it broke is the one in front of it, which for a miner's Drill is its node
-        var front = self.getBlockPos().relative(self.getBlockState().getValue(com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING));
+        var front = self.getBlockPos().relative(self.getBlockState().getValue(DirectionalKineticBlock.FACING));
         ControllerBlockEntity miner = BuildingLogic.minerOf(level, self.getBlockPos(), front);
         if (miner == null) return;
         BuildingLogic.mined(level, miner, state);

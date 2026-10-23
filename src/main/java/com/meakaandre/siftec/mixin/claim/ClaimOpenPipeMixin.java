@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.mixin.claim;
 
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.node.NodeSites;
 import com.zurrtum.create.content.fluids.OpenEndedPipe;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.core.BlockPos;
@@ -37,7 +38,7 @@ public abstract class ClaimOpenPipeMixin {
 
     @Inject(method = "provideFluidToSpace", at = @At("HEAD"), cancellable = true)
     private void siftec$noPour(FluidStack fluid, boolean simulate, CallbackInfoReturnable<Boolean> cir) {
-        if (siftec$blocked() || (world != null && com.meakaandre.siftec.node.NodeSites.isSite(world, outputPos))) cir.setReturnValue(false);
+        if (siftec$blocked() || (world != null && NodeSites.isSite(world, outputPos))) cir.setReturnValue(false);
     }
 
     @Inject(method = "removeFluidFromSpace", at = @At("HEAD"), cancellable = true)

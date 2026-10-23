@@ -2,6 +2,7 @@ package com.meakaandre.siftec.mixin.claim;
 
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.node.NodeSites;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.kinetics.deployer.DeployerHandler;
 import com.zurrtum.create.content.kinetics.deployer.DeployerPlayer;
@@ -29,6 +30,6 @@ public abstract class ClaimDeployerMixin {
         if (!Claims.allowed(fake, fake.level(), clickedPos) || !Buildings.deployerMayAct(fake.level(), BlockPos.containing(vec), clickedPos)) ci.cancel();
         // nor does it mine an ore node: a Deployer with a Fortune pickaxe would give a Miner Mk.2's output with no milestone
         // (plain Create drills may mine nodes)
-        else if (mode == DeployerBlockEntity.Mode.PUNCH && com.meakaandre.siftec.node.NodeSites.isSite(fake.level(), clickedPos)) ci.cancel();
+        else if (mode == DeployerBlockEntity.Mode.PUNCH && NodeSites.isSite(fake.level(), clickedPos)) ci.cancel();
     }
 }

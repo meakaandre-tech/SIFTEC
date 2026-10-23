@@ -1,6 +1,9 @@
 package com.meakaandre.siftec.mixin.claim;
 
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.node.NodeSites;
+import com.meakaandre.siftec.prefab.Prefabs;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.StructureTransform;
@@ -35,9 +38,9 @@ public abstract class ClaimDisassemblyMixin {
         for (Iterator<Map.Entry<BlockPos, StructureTemplate.StructureBlockInfo>> it = self.getBlocks().entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<BlockPos, StructureTemplate.StructureBlockInfo> e = it.next();
             BlockPos target = transform.apply(e.getValue().pos());
-            if (!Claims.crosses(level, anchor, target) && !com.meakaandre.siftec.building.Buildings.protectedAt(level, target)
-                && !com.meakaandre.siftec.node.NodeSites.isSite(level, target)
-                && !com.meakaandre.siftec.prefab.Prefabs.isPart(level.getBlockState(target))) continue;
+            if (!Claims.crosses(level, anchor, target) && !Buildings.protectedAt(level, target)
+                && !NodeSites.isSite(level, target)
+                && !Prefabs.isPart(level.getBlockState(target))) continue;
             BlockState state = e.getValue().state();
             if (!state.isAir()) {
                 ItemStack item = new ItemStack(state.getBlock().asItem());

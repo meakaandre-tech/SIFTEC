@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.node;
 
+import com.meakaandre.siftec.block.NodeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -96,7 +97,7 @@ public final class NodeSites {
     public static Component describe(Level level, BlockPos pos) {
         NodeSavedData.Site site = at(level, pos);
         if (site == null) return Component.empty();
-        Component label = com.meakaandre.siftec.block.NodeBlock.label(site.type(), site.purity);
+        Component label = NodeBlock.label(site.type(), site.purity);
         if (site.look.isNodeBlock(level.getBlockState(pos))) return label;
         long left = Math.max(0, site.grown() ? 0 : site.regrowAt() - NodeRegrowth.now(level));
         return Component.translatable("siftec.node.regrowing", label, String.format(Locale.ROOT, "%.1f", left / 20.0));

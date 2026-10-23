@@ -1,5 +1,8 @@
 package com.meakaandre.siftec.building;
 
+import com.meakaandre.siftec.power.GridStats;
+import com.meakaandre.siftec.power.PowerMember;
+import com.meakaandre.siftec.sim.Factories;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -103,7 +106,7 @@ public class ControllerBlockEntity extends BlockEntity {
     public boolean powered;
     /**
      * The factory simulation runs this building (its chunks stopped ticking) and has not handed it back yet: its ports
-     * pass nothing, and it does not tick, until it is caught up ({@link com.meakaandre.siftec.sim.Factories#awake}).
+     * pass nothing, and it does not tick, until it is caught up ({@link Factories#awake}).
      */
     public boolean simulated;
     /** The game time it last ran for real (a gap means it was not ticking, and may have to be caught up first). */
@@ -140,8 +143,8 @@ public class ControllerBlockEntity extends BlockEntity {
     /** Its machines are not all there and cannot be rebuilt yet (something stands where they go): it does nothing. */
     public boolean broken;
     /** Its grid as last balanced, and its part in it. */
-    public com.meakaandre.siftec.power.@Nullable GridStats grid;
-    com.meakaandre.siftec.power.@Nullable PowerMember member;
+    public @Nullable GridStats grid;
+    @Nullable PowerMember member;
     @Nullable BuildingDef memberFor;
     /** Set while the building is taken down on purpose, so the controller's own removal does not count as breaking. */
     boolean removing;
@@ -220,7 +223,7 @@ public class ControllerBlockEntity extends BlockEntity {
     public void serverTick() {
         if (!(level instanceof ServerLevel server) || removing) return;
         // what the factory simulation did while its chunks did not tick goes in before it runs for real (work package 17)
-        if (!com.meakaandre.siftec.sim.Factories.awake(server, this)) return;
+        if (!Factories.awake(server, this)) return;
         if (!indexed && (repairTried == 0 || server.getGameTime() - repairTried >= 20)) {
             // its blocks are checked against its shape (and rebuilt where they differ) before they are listed again
             repairTried = server.getGameTime();
@@ -233,7 +236,7 @@ public class ControllerBlockEntity extends BlockEntity {
         boolean foundation = def != null && (def.logic().equals("foundation") || def.logic().equals("designer"));
         if (!broken && !foundation) BuildingLogic.tick(server, this);
         // the factory simulation reads it now and then, to run it while its chunk does not tick (work package 17)
-        if (!broken && indexed && !foundation) com.meakaandre.siftec.sim.Factories.building(server, this);
+        if (!broken && indexed && !foundation) Factories.building(server, this);
         if (++ticks % 20 != 0) return;
         // its machines are looked over every few seconds and anything missing is put back; a missing piece of shell
         // brings the building down

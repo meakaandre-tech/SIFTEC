@@ -1,8 +1,11 @@
 package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.power.PowerGrids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Containers;
@@ -36,8 +39,8 @@ public final class BuildingRepair {
 
     /** Ticks between looks once it has loaded. */
     static final int EVERY = 100;
-    private static final TagKey<Block> MAGNETS = TagKey.create(net.minecraft.core.registries.Registries.BLOCK,
-        net.minecraft.resources.Identifier.fromNamespaceAndPath("create_new_age", "magnet"));
+    private static final TagKey<Block> MAGNETS = TagKey.create(Registries.BLOCK,
+        Identifier.fromNamespaceAndPath("create_new_age", "magnet"));
 
     private BuildingRepair() {
     }
@@ -118,7 +121,7 @@ public final class BuildingRepair {
             BuildingLogic.placed(level, c);
             // what the replaced blocks held goes to the company (a crate only its members open), never the Converter's cells
             Buildings.giveBack(level, at.above(), c.companyId, spilled);
-            com.meakaandre.siftec.power.PowerGrids.dirty();
+            PowerGrids.dirty();
             List<String> what = new ArrayList<>();
             for (BlockPos pos : rebuilt.subList(0, Math.min(6, rebuilt.size()))) {
                 what.add(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()).getPath() + "@" + pos.toShortString());

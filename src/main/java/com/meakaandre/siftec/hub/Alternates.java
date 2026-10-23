@@ -2,6 +2,8 @@ package com.meakaandre.siftec.hub;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.meakaandre.siftec.building.BuildingDef;
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.net.CompanyState;
@@ -72,8 +74,8 @@ public final class Alternates {
 
     /** True once the company may build the building this alternate runs in. */
     public static boolean buildingUnlocked(Company company, String id) {
-        com.meakaandre.siftec.building.BuildingDef def = com.meakaandre.siftec.building.Buildings.def(building(id));
-        return def == null || !com.meakaandre.siftec.building.Buildings.locked(def, company);
+        BuildingDef def = Buildings.def(building(id));
+        return def == null || !Buildings.locked(def, company);
     }
 
     /** The alternates this company could be offered right now. */

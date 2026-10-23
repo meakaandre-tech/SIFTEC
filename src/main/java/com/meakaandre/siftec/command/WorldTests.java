@@ -2,12 +2,21 @@ package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.building.BuildingLogic;
+import com.meakaandre.siftec.building.BuildingPower;
+import com.meakaandre.siftec.collect.Collectibles;
+import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.geyser.Vents;
+import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodePlacer;
 import com.meakaandre.siftec.node.NodeSavedData;
+import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.node.NodeType;
 import com.meakaandre.siftec.node.Terrain;
+import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -24,9 +33,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -36,12 +47,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.PotentSulfurState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.material.Fluids;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Selftests for how the mod fits the world: nodes, scanners, sulfur caves, geysers, Power Storage, Furnace Engines,
@@ -103,20 +121,20 @@ public final class WorldTests {
         }
         BlockPos hubPos = new BlockPos(x, y, z);
         level.setBlockAndUpdate(hubPos, ModBlocks.HUB.get().defaultBlockState());
-        for (net.minecraft.server.level.ServerPlayer player : source.getServer().getPlayerList().getPlayers()) {
-            com.meakaandre.siftec.company.Company company = com.meakaandre.siftec.company.Companies.of(player);
+        for (ServerPlayer player : source.getServer().getPlayerList().getPlayers()) {
+            Company company = Companies.of(player);
             company.done.clear();
             company.paid.clear();
             company.active = "";
             company.lockUntil = 0;
-            com.meakaandre.siftec.company.Companies.save(source.getServer());
-            if (level.getBlockEntity(hubPos) instanceof com.meakaandre.siftec.hub.HubBlockEntity hub) {
+            Companies.save(source.getServer());
+            if (level.getBlockEntity(hubPos) instanceof HubBlockEntity hub) {
                 hub.companyId = company.id;
                 hub.setChanged();
                 report(source, "hubui terminal for " + company.name);
             }
             // three blocks south of the HUB, looking north and down at it
-            player.teleportTo(level, x + 0.5, y, z + 3.5, java.util.Set.of(), 180f, 22f, true);
+            player.teleportTo(level, x + 0.5, y, z + 3.5, Set.of(), 180f, 22f, true);
         }
         return 1;
     }
@@ -138,7 +156,7 @@ public final class WorldTests {
         return SITES.computeIfAbsent(dx + "," + dz, k -> findSite(level, dx, dz));
     }
 
-    private static final Map<String, BlockPos> SITES = new java.util.HashMap<>();
+    private static final Map<String, BlockPos> SITES = new HashMap<>();
 
     private static BlockPos findSite(ServerLevel level, int dx, int dz) {
         BlockPos o = origin(level);
@@ -208,8 +226,8 @@ public final class WorldTests {
         int spots = 0, spotsOnLand = 0;
         for (int dx = -10; dx <= 10; dx++) {
             for (int dz = -10; dz <= 10; dz++) {
-                var spot = com.meakaandre.siftec.collect.Collectibles.inCell(level, Math.floorDiv(o.getX(), com.meakaandre.siftec.collect.Collectibles.CELL) + dx,
-                    Math.floorDiv(o.getZ(), com.meakaandre.siftec.collect.Collectibles.CELL) + dz);
+                var spot = Collectibles.inCell(level, Math.floorDiv(o.getX(), Collectibles.CELL) + dx,
+                    Math.floorDiv(o.getZ(), Collectibles.CELL) + dz);
                 if (spot.isEmpty()) continue;
                 spots++;
                 Terrain.Column column = Terrain.column(level, spot.get().x(), spot.get().z());
@@ -272,7 +290,7 @@ public final class WorldTests {
                                 if (state.is(Blocks.SULFUR)) sulfurBlocks++;
                                 if (!state.is(Blocks.POTENT_SULFUR)) continue;
                                 potent++;
-                                if (!chunk.getFluidState(pos.above()).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) {
+                                if (!chunk.getFluidState(pos.above()).isSourceOfType(Fluids.WATER)) {
                                     if (dry == null) dry = pos.immutable();
                                     continue;
                                 }
@@ -303,7 +321,7 @@ public final class WorldTests {
         ServerLevel level = source.getLevel();
         NodeType type = NodeType.byId(StringArgumentType.getString(context, "type"));
         if (type == null) return 0;
-        BlockPos o = level.dimension() == net.minecraft.world.level.Level.NETHER ? new BlockPos(150, 0, 150) : origin(level);
+        BlockPos o = level.dimension() == Level.NETHER ? new BlockPos(150, 0, 150) : origin(level);
         Optional<Node> found = NodeMap.nearest(level, o.getX(), o.getZ(), type, type == NodeType.SULFUR ? 24 : 32);
         if (found.isEmpty()) {
             report(source, "place " + type.id() + ": no node");
@@ -320,7 +338,7 @@ public final class WorldTests {
         if (saved != NodeSavedData.NO_HEIGHT && saved != NodePlacer.NO_PLACE) pos.setY(saved + 1);
         while (pos.getY() > level.getMinY()) {
             BlockState state = level.getBlockState(pos);
-            if (state.getBlock() instanceof NodeBlock || com.meakaandre.siftec.node.NodeSites.isSite(level, pos)) break;
+            if (state.getBlock() instanceof NodeBlock || NodeSites.isSite(level, pos)) break;
             pos.move(0, -1, 0);
         }
         String result;
@@ -387,7 +405,7 @@ public final class WorldTests {
             return 0;
         }
         int depth = 0;
-        while (depth < 6 && level.getFluidState(vent.above(depth + 1)).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) depth++;
+        while (depth < 6 && level.getFluidState(vent.above(depth + 1)).isSourceOfType(Fluids.WATER)) depth++;
         BlockPos onWater = vent.above(depth + 1);
         // the generator's vent cell (the middle of its bottom row, two in from the front) is the air over the water
         BlockPos anchor = onWater.south(2);
@@ -399,13 +417,13 @@ public final class WorldTests {
                 }
             }
         }
-        var gen = com.meakaandre.siftec.power.PowerTests.build(level, source, "geothermal_generator", anchor, Direction.NORTH);
-        var store = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_storage", anchor.east(6), Direction.NORTH);
-        var pole = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk1", anchor.west(5), Direction.NORTH);
+        var gen = PowerTests.build(level, source, "geothermal_generator", anchor, Direction.NORTH);
+        var store = PowerTests.build(level, source, "power_storage", anchor.east(6), Direction.NORTH);
+        var pole = PowerTests.build(level, source, "power_pole_mk1", anchor.west(5), Direction.NORTH);
         BlockPos finalVent = vent;
         report(source, "geyser " + vent.toShortString() + ": state " + ventState.getValue(PotentSulfurBlock.STATE).getSerializedName() + ", water " + depth
-            + " deep; generator placed " + (gen != null) + ", it finds the vent " + (gen != null && finalVent.equals(com.meakaandre.siftec.building.BuildingPower.vent(level, gen)))
-            + ", gas escapes " + com.meakaandre.siftec.geyser.Vents.gasEscapes(level, finalVent) + "; watching " + seconds + " s");
+            + " deep; generator placed " + (gen != null) + ", it finds the vent " + (gen != null && finalVent.equals(BuildingPower.vent(level, gen)))
+            + ", gas escapes " + Vents.gasEscapes(level, finalVent) + "; watching " + seconds + " s");
         MONITORS.add(new Monitor() {
             int ticks;
             long lastStart = -1;
@@ -420,9 +438,9 @@ public final class WorldTests {
             public boolean tick() {
                 if (!wired) {
                     wired = true;
-                    var p = com.meakaandre.siftec.power.PowerTests.connector(level, pole);
-                    com.meakaandre.siftec.power.PowerTests.wire(com.meakaandre.siftec.power.PowerTests.connector(level, gen), p);
-                    com.meakaandre.siftec.power.PowerTests.wire(com.meakaandre.siftec.power.PowerTests.connector(level, store), p);
+                    var p = PowerTests.connector(level, pole);
+                    PowerTests.wire(PowerTests.connector(level, gen), p);
+                    PowerTests.wire(PowerTests.connector(level, store), p);
                 }
                 // the watch starts once the geyser's chunk really ticks (up to a minute after the chunk is forced)
                 if (ticks == 0 && !level.shouldTickBlocksAt(finalVent) && ++waited < 1200) return false;
@@ -451,8 +469,8 @@ public final class WorldTests {
                 report(source, "geyser " + finalVent.toShortString() + " after " + seconds + " s (chunk ticking after " + waited / 20 + " s): " + eruptions + " eruptions, gaps " + gaps
                     + " s (min " + min + ", max " + max + ", all within 20-70: " + gaps.stream().allMatch(g -> g >= 20 && g <= 70) + "); generator gave power " + givingInside
                     + " ticks during eruptions and " + givingOutside + " outside; SU-seconds per eruption " + bursts + "; generator now " + (gen == null ? "missing"
-                    : com.meakaandre.siftec.building.BuildingLogic.status(level, gen).getString()) + "; storage " + (store == null ? "missing"
-                    : com.meakaandre.siftec.building.BuildingLogic.status(level, store).getString()));
+                    : BuildingLogic.status(level, gen).getString()) + "; storage " + (store == null ? "missing"
+                    : BuildingLogic.status(level, store).getString()));
                 for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) level.setChunkForced((forcedAt.getX() >> 4) + dx, (forcedAt.getZ() >> 4) + dz, false);
                 return true;
             }
@@ -504,7 +522,7 @@ public final class WorldTests {
         int x0 = o.getX() + IntegerArgumentType.getInteger(context, "dx") - half, z0 = o.getZ() + IntegerArgumentType.getInteger(context, "dz") - half;
         int x1 = x0 + 2 * half, z1 = z0 + 2 * half;
         long start = System.nanoTime();
-        java.util.Set<Long> cave = new java.util.HashSet<>(), scan = new java.util.LinkedHashSet<>();
+        Set<Long> cave = new HashSet<>(), scan = new LinkedHashSet<>();
         int chunks = 0;
         for (int cx = x0 >> 4; cx <= x1 >> 4; cx++) {
             for (int cz = z0 >> 4; cz <= z1 >> 4; cz++) {
@@ -525,7 +543,7 @@ public final class WorldTests {
             for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) scan.add(ChunkPos.pack(p.x() + dx, p.z() + dz));
         }
         long sampled = System.nanoTime();
-        Map<String, Integer> byKind = new java.util.TreeMap<>();
+        Map<String, Integer> byKind = new TreeMap<>();
         List<String> listed = new ArrayList<>();
         List<BlockPos> periodic = new ArrayList<>();
         int found = 0, inArea = 0;
@@ -547,7 +565,7 @@ public final class WorldTests {
                     if (inside) inArea++;
                     BlockState below = level.getBlockState(pos.below());
                     int water = 0;
-                    while (water < 8 && level.getFluidState(pos.above(water + 1)).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) water++;
+                    while (water < 8 && level.getFluidState(pos.above(water + 1)).isSourceOfType(Fluids.WATER)) water++;
                     String stateName = state.getValue(PotentSulfurBlock.STATE).getSerializedName();
                     String under = BuiltInRegistries.BLOCK.getKey(below.getBlock()).getPath();
                     int surface = level.getHeight(Heightmap.Types.WORLD_SURFACE, pos.getX(), pos.getZ());
@@ -562,10 +580,10 @@ public final class WorldTests {
                 }
             }
         }
-        periodic.sort(java.util.Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
+        periodic.sort(Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
         for (BlockPos b : periodic) if (!NATURAL.contains(b)) NATURAL.add(b);
-        NATURAL.sort(java.util.Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
-        WET.sort(java.util.Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
+        NATURAL.sort(Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
+        WET.sort(Comparator.comparingDouble(b -> Math.pow(b.getX() - o.getX(), 2) + Math.pow(b.getZ() - o.getZ(), 2)));
         double km2 = (2.0 * half) * (2.0 * half) / 1_000_000.0;
         report(source, String.format("geysers survey x %d..%d z %d..%d (%.2f km2): %d chunks, %d with sulfur caves below (biome sampled in %d ms), %d chunks generated and searched in %d ms; "
                 + "potent sulfur %d (%d inside the area, %.1f per 1000x1000), periodic geysers (magma under, water over) %d; kinds %s; nearest periodic to spawn %s; first: %s",

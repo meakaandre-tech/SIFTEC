@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.block;
 
+import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.NodeType;
 import com.meakaandre.siftec.node.Purity;
@@ -13,6 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.Optional;
 
 /**
  * A fluid node (the Oil Well and the nitrogen node): unbreakable, never mined, pushed, moved by a contraption or blown
@@ -42,7 +45,7 @@ public class NodeBlock extends Block {
         return Component.translatable("siftec.node.label", Component.translatable(type.key()), Component.translatable(purity.key()));
     }
 
-    public static Component label(NodeType type, java.util.Optional<com.meakaandre.siftec.node.Node> node) {
+    public static Component label(NodeType type, Optional<Node> node) {
         Component name = Component.translatable(type.key());
         return node.isEmpty() ? name : label(type, node.get().purity());
     }

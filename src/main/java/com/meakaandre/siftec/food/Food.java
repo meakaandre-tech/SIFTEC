@@ -1,14 +1,21 @@
 package com.meakaandre.siftec.food;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.company.Companies;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.context.ContextMap;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -19,6 +26,8 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -30,6 +39,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -100,7 +110,7 @@ public final class Food {
     }
 
     /** Pickles, jams and mead: each keeps the effect of what it was made from, at the Preserved level. */
-    public static final Map<String, Intrinsic> PRESERVES = new java.util.LinkedHashMap<>();
+    public static final Map<String, Intrinsic> PRESERVES = new LinkedHashMap<>();
 
     static {
         PRESERVES.put("pickled_tomato", Intrinsic.TOMATO);
@@ -122,7 +132,7 @@ public final class Food {
     private static final Map<String, String> SEASONINGS = Map.of("minecraft:glowstone_dust", "long", "minecraft:blaze_powder", "strong", "minecraft:nether_wart", "bonus");
 
     private static String seasonOf(ItemStack stack) {
-        net.minecraft.world.item.component.CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
         return data == null ? "" : data.copyTag().getStringOr(SEASON, "");
     }
 
@@ -131,26 +141,26 @@ public final class Food {
      * and use. One of the ingredient goes on each item of food. Glowstone makes its effects last twice as
      * long, blaze powder makes them one level stronger, nether wart adds one more effect at random.
      */
-    private static net.minecraft.world.InteractionResult season(Player player, Level level, net.minecraft.world.InteractionHand hand) {
-        if (hand != net.minecraft.world.InteractionHand.MAIN_HAND) return net.minecraft.world.InteractionResult.PASS;
+    private static InteractionResult season(Player player, Level level, InteractionHand hand) {
+        if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
         ItemStack spice = player.getMainHandItem(), food = player.getOffhandItem();
         String kind = SEASONINGS.get(BuiltInRegistries.ITEM.getKey(spice.getItem()).toString());
-        if (kind == null || food.isEmpty() || !food.has(DataComponents.FOOD)) return net.minecraft.world.InteractionResult.PASS;
-        if (!(player instanceof ServerPlayer server)) return net.minecraft.world.InteractionResult.SUCCESS;
-        if (!server.hasInfiniteMaterials() && !com.meakaandre.siftec.company.Companies.of(server).hasToken("food:seasoning")) {
-            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.season.locked"));
+        if (kind == null || food.isEmpty() || !food.has(DataComponents.FOOD)) return InteractionResult.PASS;
+        if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
+        if (!server.hasInfiniteMaterials() && !Companies.of(server).hasToken("food:seasoning")) {
+            server.sendOverlayMessage(Component.translatable("siftec.season.locked"));
         } else if (!seasonOf(food).isEmpty()) {
-            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.season.already"));
+            server.sendOverlayMessage(Component.translatable("siftec.season.already"));
         } else if (spice.getCount() < food.getCount()) {
-            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.season.short", food.getCount()));
+            server.sendOverlayMessage(Component.translatable("siftec.season.short", food.getCount()));
         } else {
             if (!server.hasInfiniteMaterials()) spice.shrink(food.getCount());
-            net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, food, tag -> tag.putString(SEASON, kind));
-            food.set(DataComponents.LORE, new net.minecraft.world.item.component.ItemLore(List.of(
-                net.minecraft.network.chat.Component.translatable("siftec.season." + kind).withStyle(style -> style.withItalic(false).withColor(net.minecraft.ChatFormatting.GOLD)))));
-            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.season." + kind));
+            CustomData.update(DataComponents.CUSTOM_DATA, food, tag -> tag.putString(SEASON, kind));
+            food.set(DataComponents.LORE, new ItemLore(List.of(
+                Component.translatable("siftec.season." + kind).withStyle(style -> style.withItalic(false).withColor(ChatFormatting.GOLD)))));
+            server.sendOverlayMessage(Component.translatable("siftec.season." + kind));
         }
-        return net.minecraft.world.InteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     private static RecipeManager cachedFor;
@@ -161,7 +171,7 @@ public final class Food {
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(Food::holdFoodLevel);
-        net.fabricmc.fabric.api.event.player.UseItemCallback.EVENT.register(Food::season);
+        UseItemCallback.EVENT.register(Food::season);
     }
 
     private static void holdFoodLevel(MinecraftServer server) {
@@ -177,7 +187,7 @@ public final class Food {
 
     /** Called when anything finishes eating a food item. */
     public static void onEat(LivingEntity eater, ItemStack stack, FoodProperties food) {
-        if (!(eater instanceof Player player) || player.level().isClientSide() || !(player.level() instanceof net.minecraft.server.level.ServerLevel level)) return;
+        if (!(eater instanceof Player player) || player.level().isClientSide() || !(player.level() instanceof ServerLevel level)) return;
         Profile profile = of(level, stack);
         player.heal(food.nutrition() * profile.prep().healMultiplier);
         String season = seasonOf(stack);
@@ -198,7 +208,7 @@ public final class Food {
         }
     }
 
-    public static Profile of(net.minecraft.server.level.ServerLevel level, ItemStack stack) {
+    public static Profile of(ServerLevel level, ItemStack stack) {
         if (stack.isEmpty()) return Profile.NONE;
         RecipeManager recipes = level.getServer().getRecipeManager();
         synchronized (Food.class) {
@@ -298,7 +308,7 @@ public final class Food {
     }
 
     /** For the automated test. */
-    public static String describe(net.minecraft.server.level.ServerLevel level, Item item) {
+    public static String describe(ServerLevel level, Item item) {
         Profile p = of(level, new ItemStack(item));
         return BuiltInRegistries.ITEM.getKey(item) + " " + p.prep() + " " + p.intrinsics();
     }

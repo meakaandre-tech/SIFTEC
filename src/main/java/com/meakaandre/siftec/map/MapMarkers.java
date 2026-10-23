@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.map;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.save.JsonSavedData;
 import com.mojang.serialization.Codec;
 import net.minecraft.server.MinecraftServer;
@@ -37,7 +38,7 @@ public class MapMarkers extends JsonSavedData<MapMarkers.Stored> {
 
     /** True if a member of this company (or this player) sees the marker. */
     public static boolean visible(MapMarker m, String player, String companyId) {
-        return m.owner.equals(player) || (m.company && com.meakaandre.siftec.company.Companies.same(m.companyId, companyId));
+        return m.owner.equals(player) || (m.company && Companies.same(m.companyId, companyId));
     }
 
     public List<MapMarker> visibleTo(String player, String companyId) {

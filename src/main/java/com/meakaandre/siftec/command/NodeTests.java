@@ -20,10 +20,17 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
+import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
+import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
+import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -33,20 +40,28 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.piston.PistonBaseBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -55,6 +70,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Selftests and camera spots for node sites, run by the automated test on an ordinary world. Every line of output
@@ -179,7 +196,7 @@ public final class NodeTests {
     }
 
     /** The nodes nearest spawn, cell ring by cell ring, that pass the filter. */
-    private static List<Node> nearest(ServerLevel level, int count, java.util.function.Predicate<Node> filter) {
+    private static List<Node> nearest(ServerLevel level, int count, Predicate<Node> filter) {
         BlockPos o = origin();
         int cx0 = Math.floorDiv(o.getX(), NodeMap.CELL), cz0 = Math.floorDiv(o.getZ(), NodeMap.CELL);
         List<Node> found = new ArrayList<>();
@@ -351,7 +368,7 @@ public final class NodeTests {
         // a piston against the node's side, with room for it to push: it must not move the ore
         BlockPos piston = core.east(), power = core.east(2), beyond = core.west();
         for (BlockPos c : new BlockPos[]{piston, power, beyond, beyond.above(), piston.above()}) level.setBlock(c, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-        level.setBlock(piston, Blocks.PISTON.defaultBlockState().setValue(net.minecraft.world.level.block.piston.PistonBaseBlock.FACING, Direction.WEST), Block.UPDATE_ALL);
+        level.setBlock(piston, Blocks.PISTON.defaultBlockState().setValue(PistonBaseBlock.FACING, Direction.WEST), Block.UPDATE_ALL);
         level.setBlock(power, Blocks.REDSTONE_BLOCK.defaultBlockState(), Block.UPDATE_ALL);
         long start = level.getGameTime();
         MONITORS.add(new Monitor() {
@@ -395,10 +412,10 @@ public final class NodeTests {
                     // nothing goes into the empty node: a player placing stone on the patch top there, and a water bucket
                     FakePlayer hand = miner(level, core);
                     hand.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STONE));
-                    var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(core.below()).add(0, 0.5, 0), Direction.UP, core.below(), false);
+                    var hit = new BlockHitResult(Vec3.atCenterOf(core.below()).add(0, 0.5, 0), Direction.UP, core.below(), false);
                     InteractionResult placed = hand.gameMode.useItemOn(hand, level, hand.getMainHandItem(), InteractionHand.MAIN_HAND, hit);
                     placeRefused = level.getBlockState(core).isAir();
-                    boolean poured = ((net.minecraft.world.item.BucketItem) Items.WATER_BUCKET).emptyContents(hand, level, core, hit);
+                    boolean poured = ((BucketItem) Items.WATER_BUCKET).emptyContents(hand, level, core, hit);
                     pourRefused = !poured && level.getFluidState(core).isEmpty() && level.getBlockState(core).isAir();
                     check(source, tally, placeRefused && pourRefused, "the empty node takes nothing: a player placing stone into it (" + placed + ") leaves "
                         + key(level.getBlockState(core).getBlock()) + ", a water bucket poured " + poured + ", fluid there now " + !level.getFluidState(core).isEmpty());
@@ -564,7 +581,7 @@ public final class NodeTests {
 
     // ---- drops: an ore node's block is the real block, so it drops what that block always drops
 
-    private static ItemStack tool(ServerLevel level, net.minecraft.resources.ResourceKey<net.minecraft.world.item.enchantment.Enchantment> enchantment, int lvl) {
+    private static ItemStack tool(ServerLevel level, ResourceKey<Enchantment> enchantment, int lvl) {
         ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE);
         if (enchantment != null) pick.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(enchantment), lvl);
         return pick;
@@ -604,14 +621,14 @@ public final class NodeTests {
             int fortuneMost = 0;
             boolean fortuneOnly = true;
             for (int i = 0; i < 20; i++) {
-                Map<String, Integer> f = tally(Block.getDrops(state, level, at, null, player, tool(level, net.minecraft.world.item.enchantment.Enchantments.FORTUNE, 3)));
-                fortuneOnly &= f.keySet().equals(java.util.Set.of(want));
+                Map<String, Integer> f = tally(Block.getDrops(state, level, at, null, player, tool(level, Enchantments.FORTUNE, 3)));
+                fortuneOnly &= f.keySet().equals(Set.of(want));
                 fortuneMost = Math.max(fortuneMost, f.getOrDefault(want, 0));
             }
-            Map<String, Integer> silk = tally(Block.getDrops(state, level, at, null, player, tool(level, net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, 1)));
+            Map<String, Integer> silk = tally(Block.getDrops(state, level, at, null, player, tool(level, Enchantments.SILK_TOUCH, 1)));
             String self = BuiltInRegistries.ITEM.getKey(block.asItem()).toString();
             // a stone node's block drops itself anyway
-            boolean ok = right && p.keySet().equals(java.util.Set.of(want)) && fortuneOnly && silk.equals(Map.of(self, 1))
+            boolean ok = right && p.keySet().equals(Set.of(want)) && fortuneOnly && silk.equals(Map.of(self, 1))
                 && (want.equals(self) || look.type() == NodeType.COPPER || fortuneMost > p.getOrDefault(want, 0));
             check(source, tally, ok, "drops " + look.id() + " (" + key(block) + "): right tool " + right + ", pickaxe " + p + ", Fortune III up to " + fortuneMost
                 + " " + want + " (only that " + fortuneOnly + "), Silk Touch " + silk);
@@ -672,8 +689,8 @@ public final class NodeTests {
             @Override
             public boolean tick() {
                 if (++t < 200) return false;
-                float speed = level.getBlockEntity(onNode) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k ? k.getSpeed() : 0;
-                float speed2 = level.getBlockEntity(onControl) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k ? k.getSpeed() : 0;
+                float speed = level.getBlockEntity(onNode) instanceof KineticBlockEntity k ? k.getSpeed() : 0;
+                float speed2 = level.getBlockEntity(onControl) instanceof KineticBlockEntity k ? k.getSpeed() : 0;
                 boolean controlMined = !level.getBlockState(control).is(ore);
                 check(source, tally, speed != 0 && speed2 != 0 && controlMined,
                     "deployer: a Deployer turned by a Creative Motor (" + speed2 + " RPM) with a diamond pickaxe mines " + key(ore) + " off any node: now "
@@ -702,18 +719,18 @@ public final class NodeTests {
         BlockPos at = target.above(2), motorAt = at.east();
         level.setBlock(target.above(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         // facing down, its shaft runs east-west (along the first coordinate), so the motor turns it from the east
-        level.setBlock(at, deployer.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, Direction.DOWN)
-            .setValue(com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE, true), Block.UPDATE_ALL);
-        level.setBlock(motorAt, motor.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, Direction.WEST), Block.UPDATE_ALL);
-        if (!(level.getBlockEntity(at) instanceof com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity d)
-            || !(level.getBlockEntity(motorAt) instanceof com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity m)) return null;
+        level.setBlock(at, deployer.defaultBlockState().setValue(BlockStateProperties.FACING, Direction.DOWN)
+            .setValue(DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE, true), Block.UPDATE_ALL);
+        level.setBlock(motorAt, motor.defaultBlockState().setValue(BlockStateProperties.FACING, Direction.WEST), Block.UPDATE_ALL);
+        if (!(level.getBlockEntity(at) instanceof DeployerBlockEntity d)
+            || !(level.getBlockEntity(motorAt) instanceof CreativeMotorBlockEntity m)) return null;
         m.generatedSpeed.setValue(64);
-        d.mode = com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode.PUNCH;
+        d.mode = DeployerBlockEntity.Mode.PUNCH;
         // the pickaxe goes into its hand the way a funnel or a hand gives it one
-        var hand = net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, at, null);
+        var hand = ItemStorage.SIDED.find(level, at, null);
         if (hand == null) return null;
-        try (var tx = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
-            if (hand.insert(net.fabricmc.fabric.api.transfer.v1.item.ItemVariant.of(new ItemStack(Items.DIAMOND_PICKAXE)), 1, tx) != 1) return null;
+        try (var tx = Transaction.openOuter()) {
+            if (hand.insert(ItemVariant.of(new ItemStack(Items.DIAMOND_PICKAXE)), 1, tx) != 1) return null;
             tx.commit();
         }
         d.setChanged();

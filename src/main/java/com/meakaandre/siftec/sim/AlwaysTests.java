@@ -1,15 +1,26 @@
 package com.meakaandre.siftec.sim;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingLogic;
+import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.building.TruckStations;
+import com.meakaandre.siftec.command.LogisticsTests;
+import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.node.NodeLook;
 import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.node.NodeType;
 import com.meakaandre.siftec.node.Purity;
+import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.power.PowerTests;
+import com.meakaandre.siftec.tweak.SelfMovingBelts;
 import com.meakaandre.siftec.vehicle.VehicleEntity;
 import com.meakaandre.siftec.vehicle.VehicleKind;
 import com.meakaandre.siftec.vehicle.Vehicles;
@@ -38,8 +49,10 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
@@ -47,8 +60,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -95,7 +110,7 @@ public final class AlwaysTests {
             watchB = false;
         });
         ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
-            if (!watchB || level.dimension() != net.minecraft.world.level.Level.OVERWORLD) return;
+            if (!watchB || level.dimension() != Level.OVERWORLD) return;
             if (inB(chunk.getPos().getMinBlockX(), chunk.getPos().getMinBlockZ())) bLoads++;
         });
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
@@ -135,33 +150,33 @@ public final class AlwaysTests {
     }
 
     /** The twins' company: every milestone done, so its machines run every standard recipe. */
-    static com.meakaandre.siftec.company.Company company(MinecraftServer server) {
-        var data = com.meakaandre.siftec.company.CompanyData.get(server);
-        com.meakaandre.siftec.company.Company c = data.companies().get(COMPANY);
+    static Company company(MinecraftServer server) {
+        var data = CompanyData.get(server);
+        Company c = data.companies().get(COMPANY);
         if (c == null) {
-            c = new com.meakaandre.siftec.company.Company();
+            c = new Company();
             c.id = COMPANY;
             c.name = "Selftest Always Running";
             data.companies().put(COMPANY, c);
         }
-        for (var m : com.meakaandre.siftec.hub.Milestones.all()) c.done.add(m.id());
-        for (var m : com.meakaandre.siftec.hub.Milestones.phases()) c.done.add(m.id());
-        com.meakaandre.siftec.company.Companies.save(server);
+        for (var m : Milestones.all()) c.done.add(m.id());
+        for (var m : Milestones.phases()) c.done.add(m.id());
+        Companies.save(server);
         return c;
     }
 
     /** A building put down for the company as in creative (no cost), or null (said why). */
     static @Nullable ControllerBlockEntity put(ServerLevel level, CommandSourceStack source, String id, BlockPos anchor, Direction facing) {
-        var def = com.meakaandre.siftec.building.Buildings.def(id);
+        var def = Buildings.def(id);
         if (def == null) return null;
-        var p = new com.meakaandre.siftec.building.Placement(def, anchor, facing, false);
-        var check = com.meakaandre.siftec.building.Buildings.place(level, p, company(level.getServer()), null, true);
+        var p = new Placement(def, anchor, facing, false);
+        var check = Buildings.place(level, p, company(level.getServer()), null, true);
         if (!check.ok()) {
             report(source, "could not place " + id + " at " + anchor.toShortString() + ": " + check.message().getString()
                 + (check.blocked.isEmpty() ? "" : " (first blocked " + check.blocked.getFirst().toShortString() + " " + level.getBlockState(check.blocked.getFirst()) + ")"));
             return null;
         }
-        var t = com.meakaandre.siftec.building.BuildingTemplate.of(def);
+        var t = BuildingTemplate.of(def);
         return t != null && level.getBlockEntity(p.at(t.controller)) instanceof ControllerBlockEntity c ? c : null;
     }
 
@@ -334,7 +349,7 @@ public final class AlwaysTests {
         List<BlockPos> stations = new ArrayList<>(truck.stopStation);
         List<Integer> idx = new ArrayList<>();
         for (int i = 0; i < order.size(); i++) idx.add(i);
-        idx.sort(java.util.Comparator.comparingInt(order::get));
+        idx.sort(Comparator.comparingInt(order::get));
         truck.stopAt.clear();
         truck.stopStation.clear();
         for (int i : idx) {
@@ -352,17 +367,17 @@ public final class AlwaysTests {
         level.setBlock(from, shaftState, Block.UPDATE_ALL);
         level.setBlock(to, shaftState, Block.UPDATE_ALL);
         BeltConnectorItem.createBelts(level, from, to);
-        String company = com.meakaandre.siftec.command.LogisticsTests.beltCompany(level, (int) Math.ceil(32 * com.meakaandre.siftec.tweak.SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM));
+        String company = LogisticsTests.beltCompany(level, (int) Math.ceil(32 * SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM));
         int length = Math.abs(dx) + Math.abs(dz);
         for (int i = 0; i <= length; i++) {
-            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(from.relative(along, i));
-            if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company);
-            if (be instanceof BeltBlockEntity b) com.meakaandre.siftec.tweak.SelfMovingBelts.recheck(b);
+            BlockEntity be = level.getBlockEntity(from.relative(along, i));
+            if (be != null) be.setAttached(Ownership.OWNER, company);
+            if (be instanceof BeltBlockEntity b) SelfMovingBelts.recheck(b);
         }
     }
 
     private static @Nullable ControllerBlockEntity controller(ServerLevel level, BlockPos anchor, String id) {
-        return com.meakaandre.siftec.building.BuildGun.controllerAt(level, anchor) instanceof ControllerBlockEntity c ? c : find(level, anchor, id);
+        return BuildGun.controllerAt(level, anchor) instanceof ControllerBlockEntity c ? c : find(level, anchor, id);
     }
 
     private static @Nullable ControllerBlockEntity find(ServerLevel level, BlockPos anchor, String id) {
@@ -659,6 +674,6 @@ public final class AlwaysTests {
             if (n != null) rods += Sim.get(n.out, "minecraft:iron_ingot") + Sim.get(n.out, "minecraft:raw_iron");
         }
         expect(source, "200 simulated buildings cost less than 1 ms a tick (" + steps + " steps of " + Factories.STEP + " ticks, the checks of every tick, the groups and the step, all on the server thread here)",
-            perTick < 1.0, String.format(java.util.Locale.ROOT, "%.4f ms a tick, %.3f ms a step; %d things made; live: %s", perTick, perTick * Factories.STEP, rods, before.line()));
+            perTick < 1.0, String.format(Locale.ROOT, "%.4f ms a tick, %.3f ms a step; %d things made; live: %s", perTick, perTick * Factories.STEP, rods, before.line()));
     }
 }

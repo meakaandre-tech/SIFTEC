@@ -1,7 +1,9 @@
 package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.block.Facing;
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.registry.ModBlockEntities;
+import com.meakaandre.siftec.sink.CustomizerItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -74,8 +76,8 @@ public class ControllerBlock extends Block implements EntityBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof ControllerBlockEntity controller)) return InteractionResult.TRY_WITH_EMPTY_HAND;
         BuildingDef def = Buildings.def(controller.buildingId);
-        if (stack.getItem() instanceof com.meakaandre.siftec.sink.CustomizerItem) {
-            if (player instanceof ServerPlayer server) com.meakaandre.siftec.sink.CustomizerItem.open(server, controller);
+        if (stack.getItem() instanceof CustomizerItem) {
+            if (player instanceof ServerPlayer server) CustomizerItem.open(server, controller);
             return InteractionResult.SUCCESS;
         }
         // an AWESOME Sink used with something in hand sinks it
@@ -99,7 +101,7 @@ public class ControllerBlock extends Block implements EntityBlock {
     /** A building's settings are its company's to change (anyone may look). */
     private static boolean mayUse(ServerPlayer player, ControllerBlockEntity controller) {
         return player.hasInfiniteMaterials() || controller.companyId.isEmpty()
-            || com.meakaandre.siftec.company.Companies.owns(com.meakaandre.siftec.company.Companies.of(player), controller.companyId);
+            || Companies.owns(Companies.of(player), controller.companyId);
     }
 
     @Override

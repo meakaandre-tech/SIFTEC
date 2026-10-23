@@ -2,16 +2,26 @@ package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.command.LogisticsTests;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.node.NodeLook;
+import com.meakaandre.siftec.node.NodeRegrowth;
+import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.node.NodeType;
 import com.meakaandre.siftec.node.Purity;
+import com.meakaandre.siftec.owner.Ownership;
+import com.meakaandre.siftec.power.PowerTests;
+import com.meakaandre.siftec.prefab.HubBurnerBlockEntity;
 import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.prefab.Templates;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.registry.ModItems;
+import com.meakaandre.siftec.tweak.SelfMovingBelts;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
@@ -21,6 +31,7 @@ import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlockEntity;
 import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
+import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -39,20 +50,28 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
+import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
+import org.antarcticgardens.cna.content.motor.MotorBlockEntity;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * Selftests for work package 5's buildings, run by the smoke test on a test world: {@code /siftec selftest buildings_a}
@@ -98,8 +117,8 @@ public final class BuildingsATests {
                 .then(Commands.literal("selftest").then(Commands.literal("buildings_a").executes(BuildingsATests::run)
                     .then(Commands.literal("restart").executes(BuildingsATests::restart))))
                 .then(Commands.literal("worldtest").then(Commands.literal("buildings_a").then(Commands.literal("view")
-                    .then(Commands.argument("n", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 3))
-                        .executes(c -> view(c, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n")))))))));
+                    .then(Commands.argument("n", IntegerArgumentType.integer(0, 3))
+                        .executes(c -> view(c, IntegerArgumentType.getInteger(c, "n")))))))));
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
@@ -169,7 +188,7 @@ public final class BuildingsATests {
     private static long count(ServerLevel level, @Nullable BlockPos pos, Item item) {
         if (pos == null) return 0;
         // a Basin's item storage only shows its output; its inventory holds both
-        if (level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity basin) {
+        if (level.getBlockEntity(pos) instanceof BasinBlockEntity basin) {
             long n = 0;
             for (int i = 0; i < basin.itemCapability.getContainerSize(); i++) if (basin.itemCapability.getItem(i).is(item)) n += basin.itemCapability.getItem(i).getCount();
             return n;
@@ -206,12 +225,12 @@ public final class BuildingsATests {
         level.setBlock(to, shaftState, Block.UPDATE_ALL);
         BeltConnectorItem.createBelts(level, from, to);
         // belts move by themselves at their company's speed (no shaft drives one): owned by a company fast enough
-        String company = com.meakaandre.siftec.command.LogisticsTests.beltCompany(level, (int) Math.ceil(32 * com.meakaandre.siftec.tweak.SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM));
+        String company = LogisticsTests.beltCompany(level, (int) Math.ceil(32 * SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM));
         int length = Math.abs(dx) + Math.abs(dz);
         for (int i = 0; i <= length; i++) {
-            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(from.relative(along, i));
-            if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company);
-            if (be instanceof BeltBlockEntity b) com.meakaandre.siftec.tweak.SelfMovingBelts.recheck(b);
+            BlockEntity be = level.getBlockEntity(from.relative(along, i));
+            if (be != null) be.setAttached(Ownership.OWNER, company);
+            if (be instanceof BeltBlockEntity b) SelfMovingBelts.recheck(b);
         }
     }
 
@@ -289,7 +308,7 @@ public final class BuildingsATests {
         BlockPos at = new BlockPos(x, y, z);
         level.setBlock(at.below(), look.patchStone(), Block.UPDATE_ALL);
         if (look.fluid()) level.setBlock(at, ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(NodeBlock.PURITY, purity), Block.UPDATE_ALL);
-        else com.meakaandre.siftec.node.NodeSites.put(level, at, look, purity);
+        else NodeSites.put(level, at, look, purity);
         return at;
     }
 
@@ -329,7 +348,7 @@ public final class BuildingsATests {
         level.setBlock(con.at(0, 0, -7), block("create:basin").defaultBlockState(), Block.UPDATE_ALL);
         feeder(level, conIn, Direction.SOUTH, new ItemStack(Items.IRON_INGOT), 6, 120);
         BlockPos basin = BuildingLogic.cell(cc, block("create:basin"));
-        expect(source, "the Constructor's Basin takes its filter", basin != null && level.getBlockEntity(basin) instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity b
+        expect(source, "the Constructor's Basin takes its filter", basin != null && level.getBlockEntity(basin) instanceof BasinBlockEntity b
             && b.getFilter().getFilter().is(item("create:iron_sheet")), "");
 
         // ---- Smelter making Iron Ingot (1 Raw Iron -> 1 Iron Ingot, 2 s)
@@ -380,7 +399,7 @@ public final class BuildingsATests {
         boolean[] counting = {false};
         EVERY_TICK.add(() -> {
             for (int i = 0; i < watched.size(); i++) {
-                var site = com.meakaandre.siftec.node.NodeSites.at(level, watched.get(i));
+                var site = NodeSites.at(level, watched.get(i));
                 BlockState now = level.getBlockState(watched.get(i));
                 boolean grown = site != null && site.look.isNodeBlock(now);
                 if (counting[0] && wasGrown[i] && !grown && now.isAir()) depletions[i]++;
@@ -402,16 +421,16 @@ public final class BuildingsATests {
 
         // ---- power (work package 6): the powered buildings stand still until they are on a grid with power. An Alien Power
         // Augmenter (500 MW, no fuel) on a Power Pole Mk.3 gives it to them all.
-        ControllerBlockEntity aug = com.meakaandre.siftec.power.PowerTests.build(level, source, "alien_power_augmenter", new BlockPos(X + 60, Y, Z + 30), Direction.NORTH);
-        ControllerBlockEntity pole = com.meakaandre.siftec.power.PowerTests.build(level, source, "power_pole_mk3", new BlockPos(X + 60, Y, Z + 22), Direction.NORTH);
-        var poleConnector = com.meakaandre.siftec.power.PowerTests.connector(level, pole);
+        ControllerBlockEntity aug = PowerTests.build(level, source, "alien_power_augmenter", new BlockPos(X + 60, Y, Z + 30), Direction.NORTH);
+        ControllerBlockEntity pole = PowerTests.build(level, source, "power_pole_mk3", new BlockPos(X + 60, Y, Z + 22), Direction.NORTH);
+        var poleConnector = PowerTests.connector(level, pole);
         List<ControllerBlockEntity> powered = new ArrayList<>();
         if (aug != null) powered.add(aug);
         powered.add(cc);
         powered.add(controller(level, sm));
         for (Placement p : minerSpots) powered.add(controller(level, p));
         int wired = 0;
-        for (ControllerBlockEntity c : powered) if (c != null && com.meakaandre.siftec.power.PowerTests.wire(com.meakaandre.siftec.power.PowerTests.connector(level, c), poleConnector)) wired++;
+        for (ControllerBlockEntity c : powered) if (c != null && PowerTests.wire(PowerTests.connector(level, c), poleConnector)) wired++;
         expect(source, "power: the Augmenter, Constructor, Smelter and miners are wired to a Power Pole Mk.3", wired == powered.size(), wired + " of " + powered.size());
         // (an idle Constructor draws next to nothing and its motor stands, as Satisfactory's idle machines do: it is
         // checked once its belt has brought it ingots)
@@ -442,7 +461,7 @@ public final class BuildingsATests {
             for (int i = 0; i < 3; i++) startItems[i] = mined(level, minerSpots.get(i));
             startItems[3] = mined(level, pm);
             counting[0] = true;
-            report(source, "measuring from " + java.util.Arrays.toString(start));
+            report(source, "measuring from " + Arrays.toString(start));
             report(source, "belts: constructor in " + beltState(level, conIn, Items.IRON_INGOT) + ", out " + beltState(level, conOut, item("create:iron_sheet"))
                 + "; basin " + count(level, basin, Items.IRON_INGOT) + " ingots " + count(level, basin, item("create:iron_sheet")) + " plates; smelter in "
                 + beltState(level, smIn, Items.RAW_IRON) + ", out " + beltState(level, smOut, Items.IRON_INGOT) + ", controller in "
@@ -465,7 +484,7 @@ public final class BuildingsATests {
                 long breaks = made(level, p) - start[2 + i], items = mined(level, p) - startItems[i];
                 BuildingDef d = p.def();
                 // a break needs the node grown back first: purity caps the breaks, the Mk's break time slows them a little
-                int regrow = com.meakaandre.siftec.node.NodeRegrowth.ticks(purity);
+                int regrow = NodeRegrowth.ticks(purity);
                 long most = 1200 / regrow + 1, least = (long) (1200f / (regrow + d.breakTicks() + 4) * 0.85f);
                 expect(source, miners[i][0] + " on a " + purity + " node really breaks it, " + least + " to " + most + " times a minute (purity regrows it every "
                     + regrow + " ticks, the Mk breaks it in " + d.breakTicks() + ")", breaks >= least && breaks <= most && Math.abs(breaks - depletions[i]) <= 1,
@@ -473,12 +492,12 @@ public final class BuildingsATests {
                 float per = breaks == 0 ? 0 : items / (float) breaks;
                 float lo = (Float) miners[i][3], hi = (Float) miners[i][4];
                 expect(source, miners[i][0] + ": its Fortune " + d.fortune() + " gives " + lo + " to " + hi + " items a break, and nothing without a break",
-                    breaks > 0 && per >= lo && per <= hi, items + " items from " + breaks + " breaks (" + String.format(java.util.Locale.ROOT, "%.2f", per) + " a break)");
+                    breaks > 0 && per >= lo && per <= hi, items + " items from " + breaks + " breaks (" + String.format(Locale.ROOT, "%.2f", per) + " a break)");
                 ControllerBlockEntity mc = controller(level, p);
                 BlockState nodeNow = mc == null || mc.node == null ? null : level.getBlockState(mc.node);
                 Block oreBlock = ((NodeType) miners[i][1]) == NodeType.IRON ? Blocks.IRON_ORE : Blocks.COPPER_ORE;
                 expect(source, miners[i][0] + ": the node is still there (its ore block " + BuiltInRegistries.BLOCK.getKey(oreBlock) + ", or air growing back) and its ore reaches the chest",
-                    nodeNow != null && (nodeNow.is(oreBlock) || nodeNow.isAir()) && com.meakaandre.siftec.node.NodeSites.isSite(level, mc.node)
+                    nodeNow != null && (nodeNow.is(oreBlock) || nodeNow.isAir()) && NodeSites.isSite(level, mc.node)
                         && count(level, p.at(0, 0, -1), ((NodeType) miners[i][1]) == NodeType.IRON ? Items.RAW_IRON : Items.RAW_COPPER) > 0,
                     mc == null ? "no controller" : String.valueOf(nodeNow));
             }
@@ -510,7 +529,7 @@ public final class BuildingsATests {
     /** True if a building's first New Age motor turns at its 64 RPM. */
     private static boolean motorTurns(ServerLevel level, ControllerBlockEntity c) {
         List<BlockPos> motors = BuildingPower.motors(c);
-        return !motors.isEmpty() && level.getBlockEntity(motors.getFirst()) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k
+        return !motors.isEmpty() && level.getBlockEntity(motors.getFirst()) instanceof KineticBlockEntity k
             && Math.abs(k.getSpeed()) == BuildingLogic.MOTOR_RPM;
     }
 
@@ -531,9 +550,9 @@ public final class BuildingsATests {
         BuildingTests.platform(level, X + 20, Z - 60, X + 60, Z - 20, Y, 30);
         FakePlayer fake = FakePlayer.get(level);
         // the smoke server's default is creative, which would skip the cost
-        fake.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        fake.setGameMode(GameType.SURVIVAL);
         fake.getInventory().clearContent();
-        fake.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.meakaandre.siftec.registry.ModItems.BUILD_GUN.get()));
+        fake.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.BUILD_GUN.get()));
         fake.getInventory().setItem(1, new ItemStack(Items.RAW_IRON, 19));
         // the HUB is a Build Gun building like any other: listed in the Special tab, put down with the gun
         BuildingDef hubDef = Buildings.def("hub");
@@ -565,7 +584,7 @@ public final class BuildingsATests {
         BlockPos wall = null;
         for (long key : Templates.hub().keys()) {
             BlockState part = Templates.hub().at(key, hub.builtLevel);
-            if (part == null || part.isAir() || !Prefabs.isPart(part) || part.getBlock() instanceof com.meakaandre.siftec.hub.HubBlock) continue;
+            if (part == null || part.isAir() || !Prefabs.isPart(part) || part.getBlock() instanceof HubBlock) continue;
             BlockPos local = BlockPos.of(key);
             wall = spot.at(local.getX(), local.getY(), local.getZ());
             break;
@@ -602,11 +621,11 @@ public final class BuildingsATests {
             expect(source, "HUB: the hand-cranked Mixer makes Reinforced Iron Plate", rip == 1, rip + " Reinforced Iron Plate");
             // the Biomass Burners burn Biomass, not coal, at Satisfactory's 180 MJ, and have a wire connector on top
             BlockPos b1 = spot.at(Templates.BURNER_1[0], Templates.BURNER_1[1], Templates.BURNER_1[2]);
-            if (level.getBlockEntity(b1) instanceof com.meakaandre.siftec.prefab.HubBurnerBlockEntity burner) {
-                expect(source, "HUB: its Biomass Burners take Biomass and leaves, not coal, and are wired from the top", com.meakaandre.siftec.prefab.HubBurnerBlockEntity.accepts(new ItemStack(item("siftec:biomass")))
-                    && com.meakaandre.siftec.prefab.HubBurnerBlockEntity.accepts(new ItemStack(Items.OAK_LEAVES)) && !com.meakaandre.siftec.prefab.HubBurnerBlockEntity.accepts(new ItemStack(Items.COAL))
+            if (level.getBlockEntity(b1) instanceof HubBurnerBlockEntity burner) {
+                expect(source, "HUB: its Biomass Burners take Biomass and leaves, not coal, and are wired from the top", HubBurnerBlockEntity.accepts(new ItemStack(item("siftec:biomass")))
+                    && HubBurnerBlockEntity.accepts(new ItemStack(Items.OAK_LEAVES)) && !HubBurnerBlockEntity.accepts(new ItemStack(Items.COAL))
                     && BuildingPower.itemMj("biomass", new ItemStack(item("siftec:biomass"))) == 180
-                    && level.getBlockEntity(b1.above()) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector, String.valueOf(level.getBlockState(b1.above())));
+                    && level.getBlockEntity(b1.above()) instanceof AbstractElectricalConnector, String.valueOf(level.getBlockState(b1.above())));
             } else {
                 expect(source, "HUB: its first Biomass Burner stands", false, String.valueOf(level.getBlockState(b1)));
             }
@@ -668,10 +687,10 @@ public final class BuildingsATests {
             }
         }
         switch (n) {
-            case 0 -> player.teleportTo(level, VX + 12.5, VY + 4, VZ + 12.5, java.util.Set.of(), 180f, 14f, true);
-            case 1 -> player.teleportTo(level, VX + 36.5, VY + 4, VZ + 12.5, java.util.Set.of(), 180f, 14f, true);
-            case 2 -> player.teleportTo(level, VX + 36.5, VY + 5, VZ - 17.5, java.util.Set.of(), 0f, 16f, true);
-            default -> player.teleportTo(level, VX + 31.5, VY + 3, VZ + 8.5, java.util.Set.of(), 180f, 10f, true);
+            case 0 -> player.teleportTo(level, VX + 12.5, VY + 4, VZ + 12.5, Set.of(), 180f, 14f, true);
+            case 1 -> player.teleportTo(level, VX + 36.5, VY + 4, VZ + 12.5, Set.of(), 180f, 14f, true);
+            case 2 -> player.teleportTo(level, VX + 36.5, VY + 5, VZ - 17.5, Set.of(), 0f, 16f, true);
+            default -> player.teleportTo(level, VX + 31.5, VY + 3, VZ + 8.5, Set.of(), 180f, 10f, true);
         }
         report(source, "view " + n + " ready");
         return 1;
@@ -689,7 +708,7 @@ public final class BuildingsATests {
         expect(source, "restart: the Constructor kept its recipe filter and count", cc != null && cc.filter.is(item("create:iron_sheet")) && cc.made > 0,
             cc == null ? "no controller" : cc.filter + ", " + cc.made + " made");
         List<BlockPos> motors = cc == null ? List.of() : BuildingPower.motors(cc);
-        expect(source, "restart: its New Age motor kept its speed", !motors.isEmpty() && level.getBlockEntity(motors.getFirst()) instanceof org.antarcticgardens.cna.content.motor.MotorBlockEntity m
+        expect(source, "restart: its New Age motor kept its speed", !motors.isEmpty() && level.getBlockEntity(motors.getFirst()) instanceof MotorBlockEntity m
             && m.speedBehavior != null && m.speedBehavior.getValue() == (int) BuildingLogic.MOTOR_RPM, motors.isEmpty() ? "no motor" : String.valueOf(level.getBlockEntity(motors.getFirst())));
         later(level, 60, () -> {
             ControllerBlockEntity c2 = controller(level, con);

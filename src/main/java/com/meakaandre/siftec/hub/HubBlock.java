@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.hub;
 
+import com.meakaandre.siftec.block.Facing;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -9,13 +10,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
@@ -30,7 +36,7 @@ public class HubBlock extends Block implements EntityBlock {
 
     public HubBlock(boolean gateway, Properties properties) {
         // a HUB holds land: it cannot be broken, blown up or pushed, or its claim would be left behind
-        super(properties.strength(-1.0F, 3600000.0F).noLootTable().pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE));
+        super(properties.strength(-1.0F, 3600000.0F).noLootTable().pushReaction(PushReaction.IMMOVEABLE));
         this.gateway = gateway;
     }
 
@@ -75,23 +81,23 @@ public class HubBlock extends Block implements EntityBlock {
 
     // the front looks at whoever placed it
     @Override
-    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.state.BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(com.meakaandre.siftec.block.Facing.FACING);
+        builder.add(Facing.FACING);
     }
 
     @Override
-    public net.minecraft.world.level.block.state.BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
-        return com.meakaandre.siftec.block.Facing.place(super.getStateForPlacement(context), context);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return Facing.place(super.getStateForPlacement(context), context);
     }
 
     @Override
-    protected net.minecraft.world.level.block.state.BlockState rotate(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.Rotation rotation) {
-        return com.meakaandre.siftec.block.Facing.rotate(state, rotation);
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return Facing.rotate(state, rotation);
     }
 
     @Override
-    protected net.minecraft.world.level.block.state.BlockState mirror(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.Mirror mirror) {
-        return com.meakaandre.siftec.block.Facing.mirror(state, mirror);
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return Facing.mirror(state, mirror);
     }
 }

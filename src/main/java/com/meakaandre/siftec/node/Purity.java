@@ -1,7 +1,11 @@
 package com.meakaandre.siftec.node;
 
+import net.minecraft.util.StringRepresentable;
+
+import java.util.Locale;
+
 /** Node purity, as in Satisfactory: it multiplies a miner's output. */
-public enum Purity implements net.minecraft.util.StringRepresentable {
+public enum Purity implements StringRepresentable {
     IMPURE(0.5f), NORMAL(1f), PURE(2f);
 
     public final float multiplier;
@@ -12,7 +16,7 @@ public enum Purity implements net.minecraft.util.StringRepresentable {
 
     @Override
     public String getSerializedName() {
-        return name().toLowerCase(java.util.Locale.ROOT);
+        return name().toLowerCase(Locale.ROOT);
     }
 
     public static Purity byName(String name) {
@@ -21,6 +25,6 @@ public enum Purity implements net.minecraft.util.StringRepresentable {
     }
 
     public String key() {
-        return "siftec.purity." + name().toLowerCase(java.util.Locale.ROOT);
+        return "siftec.purity." + name().toLowerCase(Locale.ROOT);
     }
 }

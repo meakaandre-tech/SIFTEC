@@ -1,5 +1,7 @@
 package com.meakaandre.siftec.command;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingIndex;
@@ -10,6 +12,7 @@ import com.meakaandre.siftec.building.Category;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.building.PortBlock;
+import com.meakaandre.siftec.building.SpecialBuildings;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.drone.DroneEntity;
@@ -24,13 +27,16 @@ import com.meakaandre.siftec.item.ObjectScannerItem;
 import com.meakaandre.siftec.map.MapGrid;
 import com.meakaandre.siftec.map.MapPoi;
 import com.meakaandre.siftec.map.MapTerrain;
+import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.place.Places;
+import com.meakaandre.siftec.power.Power;
 import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.prefab.HubBurnerBlockEntity;
 import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.prefab.Templates;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.registry.ModItems;
+import com.meakaandre.siftec.tweak.TankSizes;
 import com.meakaandre.siftec.vehicle.VehicleEntity;
 import com.meakaandre.siftec.vehicle.VehicleInputPayload;
 import com.meakaandre.siftec.vehicle.VehicleKind;
@@ -39,6 +45,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
+import com.zurrtum.create.content.logistics.chute.ChuteBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
@@ -56,7 +63,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -67,10 +76,15 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * {@code /siftec selftest polish}: the polish pass, on a test site of its own (X 14000, Z 14000). Every check prints
@@ -232,7 +246,7 @@ public final class PolishTests {
                 for (int dz = 0; dz < 2; dz++) {
                     BlockPos pos = at[k].offset(dx, 0, dz);
                     level.setBlock(pos, tank, Block.UPDATE_ALL);
-                    if (level.getBlockEntity(pos) != null) level.getBlockEntity(pos).setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, owners[k]);
+                    if (level.getBlockEntity(pos) != null) level.getBlockEntity(pos).setAttached(Ownership.OWNER, owners[k]);
                 }
             }
         }
@@ -244,7 +258,7 @@ public final class PolishTests {
             expect(source, "3: before Petroleum Power a company's Fluid Tanks stay one block wide; after it they join up to Create's size",
                 width[0] == 1 && width[1] == 2, "without " + width[0] + ", with " + width[1]);
             expect(source, "3: Petroleum Power carries the larger tanks", Milestones.get("petroleum_power") != null
-                && Milestones.get("petroleum_power").tokens().contains(com.meakaandre.siftec.tweak.TankSizes.TOKEN), "");
+                && Milestones.get("petroleum_power").tokens().contains(TankSizes.TOKEN), "");
         });
     }
 
@@ -311,19 +325,19 @@ public final class PolishTests {
     }
 
     /** Whether a pick straight down through a spot (as the game picks entities) finds the vehicle. */
-    private static boolean pick(net.minecraft.world.entity.Entity eye, VehicleEntity v, Vec3 spot) {
+    private static boolean pick(Entity eye, VehicleEntity v, Vec3 spot) {
         Vec3 from = spot.add(0, 3, 0), to = spot.add(0, -3, 0);
-        var hit = net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(eye, from, to, new AABB(from, to).inflate(1), e -> e == v, 64);
+        var hit = ProjectileUtil.getEntityHitResult(eye, from, to, new AABB(from, to).inflate(1), e -> e == v, 64);
         return hit != null && hit.getEntity() == v;
     }
 
     // ------------------------------------------------------------------------------------------------ 6: SAM
 
     private static void samText(CommandSourceStack source) {
-        com.google.gson.JsonObject lang = null;
+        JsonObject lang = null;
         try (var in = Siftec.class.getResourceAsStream("/assets/siftec/lang/en_us.json")) {
-            if (in != null) lang = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
-        } catch (java.io.IOException ignored) {
+            if (in != null) lang = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+        } catch (IOException ignored) {
         }
         String text = lang == null || !lang.has("siftec.milestone.mam_alien_sam_reanimation.unlocks") ? "" : lang.get("siftec.milestone.mam_alien_sam_reanimation.unlocks").getAsString();
         expect(source, "6: SAM Reanimation's unlock is a Constructor recipe, not fan haunting", text.contains("Constructor") && !text.contains("haunting"), text);
@@ -335,9 +349,9 @@ public final class PolishTests {
     public static @Nullable DronePortBlockEntity buildDronePort(ServerLevel level, @Nullable Company company, BlockPos terminal) {
         BuildingDef def = Buildings.def("drone_port");
         BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
-        int[] cell = t == null ? null : com.meakaandre.siftec.building.SpecialBuildings.terminalCell(t);
+        int[] cell = t == null ? null : SpecialBuildings.terminalCell(t);
         if (cell == null) return null;
-        Placement p = com.meakaandre.siftec.building.SpecialBuildings.forTerminal(def, cell, terminal, Direction.NORTH);
+        Placement p = SpecialBuildings.forTerminal(def, cell, terminal, Direction.NORTH);
         Buildings.Check check = Buildings.place(level, p, company, null, true);
         if (!check.ok()) Siftec.LOGGER.info("SIFTEC: selftest Drone Port at {} not placed: {}", terminal.toShortString(), check.message().getString());
         return check.ok() && level.getBlockEntity(terminal) instanceof DronePortBlockEntity d ? d : null;
@@ -430,7 +444,7 @@ public final class PolishTests {
         BlockPos sealedChest = new BlockPos(X + 110, Y, Z), openChest = new BlockPos(X + 114, Y, Z);
         BlockPos sealedFrom = new BlockPos(X + 110, Y + 3, Z), openFrom = new BlockPos(X + 114, Y + 3, Z);
         for (BlockPos chest : List.of(sealedChest, openChest)) level.setBlock(chest, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH), Block.UPDATE_ALL);
-        java.util.Objects.requireNonNull(BuildingIndex.get(level)).put(level, sealedChest, owner.getBlockPos());
+        Objects.requireNonNull(BuildingIndex.get(level)).put(level, sealedChest, owner.getBlockPos());
         // a chute into each from above, and a chute under each taking out of it
         BlockState chute = block("create:chute").defaultBlockState();
         for (BlockPos top : List.of(sealedFrom, openFrom)) {
@@ -439,8 +453,8 @@ public final class PolishTests {
             level.setBlock(top.below(2), chute, Block.UPDATE_ALL);
         }
         later(level, 5, () -> {
-            if (level.getBlockEntity(sealedFrom) instanceof com.zurrtum.create.content.logistics.chute.ChuteBlockEntity a) a.setItem(new ItemStack(Items.COBBLESTONE, 8));
-            if (level.getBlockEntity(openFrom) instanceof com.zurrtum.create.content.logistics.chute.ChuteBlockEntity b) b.setItem(new ItemStack(Items.COBBLESTONE, 8));
+            if (level.getBlockEntity(sealedFrom) instanceof ChuteBlockEntity a) a.setItem(new ItemStack(Items.COBBLESTONE, 8));
+            if (level.getBlockEntity(openFrom) instanceof ChuteBlockEntity b) b.setItem(new ItemStack(Items.COBBLESTONE, 8));
         });
         later(level, 80, () -> {
             int sealedIn = level.getBlockEntity(sealedChest) instanceof ChestBlockEntity c ? countIn(c) : -1;
@@ -449,7 +463,7 @@ public final class PolishTests {
                 sealedIn == 0 && openIn == 8, "building's " + sealedIn + ", other " + openIn);
             expect(source, "8: chutes and smart chutes (a Chute underneath) stop at the building: only its ports take and give",
                 Buildings.sealed(level, sealedFrom.below(2), sealedChest) && !Buildings.sealed(level, openFrom.below(2), openChest), "");
-            java.util.Objects.requireNonNull(BuildingIndex.get(level)).remove(level, sealedChest, owner.getBlockPos());
+            Objects.requireNonNull(BuildingIndex.get(level)).remove(level, sealedChest, owner.getBlockPos());
         });
     }
 
@@ -484,12 +498,12 @@ public final class PolishTests {
         ControllerBlockEntity storage = PowerTests.build(level, source, "power_storage", new BlockPos(X + 215, Y, Z + 100), Direction.NORTH);
         BlockPos connectorAt = spot.at(Templates.BURNER_1[0], Templates.BURNER_1[1] + 1, Templates.BURNER_1[2]);
         boolean wired = PowerTests.wire(
-            level.getBlockEntity(connectorAt) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector ca ? ca : null,
+            level.getBlockEntity(connectorAt) instanceof AbstractElectricalConnector ca ? ca : null,
             PowerTests.connector(level, storage));
         later(level, 300, () -> {
             boolean lit = level.getBlockEntity(blaze) instanceof BlazeBurnerBlockEntity b && b.getActiveFuel() != BlazeBurnerBlockEntity.FuelType.NONE;
             float speed = level.getBlockEntity(coil) instanceof KineticBlockEntity k ? k.getSpeed() : 0;
-            double gave = burner.lastGenerated, full = com.meakaandre.siftec.power.Power.su(HubBurnerBlockEntity.MW);
+            double gave = burner.lastGenerated, full = Power.su(HubBurnerBlockEntity.MW);
             expect(source, "10: fed Biomass, its Blaze Burner burns, the boiler turns the coil, and the grid gets the burner's 30 MW from the brushes",
                 wired && lit && speed != 0 && Math.abs(gave - full) <= full * 0.1,
                 "wired " + wired + ", lit " + lit + ", coil " + speed + " RPM, gave " + Math.round(gave) + " of " + Math.round(full) + " SU; " + burner.status().getString());

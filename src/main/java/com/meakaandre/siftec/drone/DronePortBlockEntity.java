@@ -1,9 +1,16 @@
 package com.meakaandre.siftec.drone;
 
+import com.meakaandre.siftec.building.BuildingIndex;
+import com.meakaandre.siftec.registry.ModItems;
+import com.meakaandre.siftec.sim.Factories;
+import com.meakaandre.siftec.sim.Keys;
+import com.meakaandre.siftec.sim.SimData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -14,10 +21,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A Drone Port's loading terminal, under the landing pad of the Drone Port building, with one Cardboard Drone. When
@@ -75,10 +85,10 @@ public class DronePortBlockEntity extends BlockEntity {
     public void serverTick() {
         if (!(level instanceof ServerLevel server)) return;
         // what the factory simulation did while its chunk did not tick goes in before it runs for real (work package 17)
-        com.meakaandre.siftec.sim.Factories.awake(server, this);
+        Factories.awake(server, this);
         // a port is only ever the Drone Port building's terminal: one standing on its own (put down by a command) does nothing
-        if (com.meakaandre.siftec.building.BuildingIndex.controllerOf(server, worldPosition) == null) return;
-        if (server.getGameTime() % 20 == 0) com.meakaandre.siftec.sim.Factories.port(server, this);
+        if (BuildingIndex.controllerOf(server, worldPosition) == null) return;
+        if (server.getGameTime() % 20 == 0) Factories.port(server, this);
         if (state == IDLE) {
             // a drone at home sits on the pad
             if (hasDrone) park(server);
@@ -113,7 +123,7 @@ public class DronePortBlockEntity extends BlockEntity {
         boolean ticking = level.isLoaded(destination) && server.shouldTickBlocksAt(destination);
         if (!ticking) {
             // its chunk does not tick: the simulation's record of that port takes the packages
-            int known = com.meakaandre.siftec.sim.Factories.deliverToPort(server, destination, cargo);
+            int known = Factories.deliverToPort(server, destination, cargo);
             if (known >= 0) {
                 setChanged();
                 if (!cargo.isEmpty()) return;
@@ -146,31 +156,31 @@ public class DronePortBlockEntity extends BlockEntity {
     }
 
     /** The middle of this port's landing pad, where its drone sits and takes off from. */
-    public net.minecraft.world.phys.Vec3 pad() {
+    public Vec3 pad() {
         return padOf(worldPosition);
     }
 
     /** The middle of the landing pad over a port's terminal (straight over it, whichever way the port faces). */
-    public static net.minecraft.world.phys.Vec3 padOf(BlockPos terminal) {
-        return new net.minecraft.world.phys.Vec3(terminal.getX() + 0.5, terminal.getY() + PAD_DY, terminal.getZ() + 0.5);
+    public static Vec3 padOf(BlockPos terminal) {
+        return new Vec3(terminal.getX() + 0.5, terminal.getY() + PAD_DY, terminal.getZ() + 0.5);
     }
 
     /**
      * Where the drone is this many ticks into a trip from one pad to another taking {@code total} ticks: it climbs
      * straight up off the first pad, flies over at cruising height, and comes straight down onto the other.
      */
-    public static net.minecraft.world.phys.Vec3 along(net.minecraft.world.phys.Vec3 from, net.minecraft.world.phys.Vec3 to, int elapsed, int total) {
+    public static Vec3 along(Vec3 from, Vec3 to, int elapsed, int total) {
         int cruise = Math.max(1, total - 2 * CLIMB_TICKS);
         if (elapsed <= CLIMB_TICKS) {
             double up = ease(elapsed / (double) CLIMB_TICKS);
-            return new net.minecraft.world.phys.Vec3(from.x, from.y + CRUISE * up, from.z);
+            return new Vec3(from.x, from.y + CRUISE * up, from.z);
         }
         if (elapsed >= total - CLIMB_TICKS) {
             double up = ease(Math.max(0, total - elapsed) / (double) CLIMB_TICKS);
-            return new net.minecraft.world.phys.Vec3(to.x, to.y + CRUISE * up, to.z);
+            return new Vec3(to.x, to.y + CRUISE * up, to.z);
         }
         double t = Math.min(1, (elapsed - CLIMB_TICKS) / (double) cruise);
-        return new net.minecraft.world.phys.Vec3(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t + CRUISE, from.z + (to.z - from.z) * t);
+        return new Vec3(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t + CRUISE, from.z + (to.z - from.z) * t);
     }
 
     private static double ease(double t) {
@@ -181,12 +191,12 @@ public class DronePortBlockEntity extends BlockEntity {
     /** Where the drone is on its way, for drawing it. */
     private void show(ServerLevel server) {
         if (destination == null) return;
-        net.minecraft.world.phys.Vec3 home = pad(), away = padOf(destination);
+        Vec3 home = pad(), away = padOf(destination);
         boolean out = state == OUTBOUND;
-        net.minecraft.world.phys.Vec3 from = out ? home : away, to = out ? away : home;
+        Vec3 from = out ? home : away, to = out ? away : home;
         int elapsed = total - ticks;
-        net.minecraft.world.phys.Vec3 at = ticks <= 0 && out ? away : along(from, to, elapsed, total);
-        float yaw = (float) (Math.atan2(-(to.x - from.x), to.z - from.z) * net.minecraft.util.Mth.RAD_TO_DEG);
+        Vec3 at = ticks <= 0 && out ? away : along(from, to, elapsed, total);
+        float yaw = (float) (Math.atan2(-(to.x - from.x), to.z - from.z) * Mth.RAD_TO_DEG);
         place(server, at, yaw, ticks > 0, !cargo.isEmpty());
     }
 
@@ -195,7 +205,7 @@ public class DronePortBlockEntity extends BlockEntity {
         place(server, pad(), shown != null ? shown.getYRot() : 0, false, false);
     }
 
-    private void place(ServerLevel server, net.minecraft.world.phys.Vec3 at, float yaw, boolean flying, boolean loaded) {
+    private void place(ServerLevel server, Vec3 at, float yaw, boolean flying, boolean loaded) {
         if (!server.isLoaded(BlockPos.containing(at))) {
             hide();
             return;
@@ -228,9 +238,9 @@ public class DronePortBlockEntity extends BlockEntity {
         super.preRemoveSideEffects(pos, state);
         if (level == null) return;
         // broken (whether its chunk ticks or not): the factory simulation forgets it, so it is never run on with what it held
-        if (level instanceof ServerLevel server) com.meakaandre.siftec.sim.Factories.removed(server, pos);
-        for (ItemStack stack : contents()) net.minecraft.world.Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-        if (hasDrone) net.minecraft.world.Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(com.meakaandre.siftec.registry.ModItems.CARDBOARD_DRONE.get()));
+        if (level instanceof ServerLevel server) Factories.removed(server, pos);
+        for (ItemStack stack : contents()) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
+        if (hasDrone) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.CARDBOARD_DRONE.get()));
         items.clearContent();
         cargo.clear();
         hasDrone = false;
@@ -277,20 +287,20 @@ public class DronePortBlockEntity extends BlockEntity {
     // ------------------------------------------------------------------------------------------------ the simulation
 
     /** Its slots, cargo and flight, into the simulation's record (its chunk stops ticking). */
-    public void toSim(com.meakaandre.siftec.sim.SimData.Node n) {
+    public void toSim(SimData.Node n) {
         n.slots.clear();
         for (int i = 0; i < PortContainer.SIZE; i++) {
             ItemStack s = items.getItem(i);
-            n.slots.add(s.isEmpty() ? new com.meakaandre.siftec.sim.SimData.Slot()
-                : new com.meakaandre.siftec.sim.SimData.Slot(com.meakaandre.siftec.sim.Keys.of(s), s.getCount()));
+            n.slots.add(s.isEmpty() ? new SimData.Slot()
+                : new SimData.Slot(Keys.of(s), s.getCount()));
         }
         n.cargo.clear();
-        for (ItemStack s : cargo) if (!s.isEmpty()) n.cargo.add(new com.meakaandre.siftec.sim.SimData.Slot(com.meakaandre.siftec.sim.Keys.of(s), s.getCount()));
+        for (ItemStack s : cargo) if (!s.isEmpty()) n.cargo.add(new SimData.Slot(Keys.of(s), s.getCount()));
         flight(n);
     }
 
     /** Its flight and settings (all the map needs), kept up to date while it ticks. */
-    public void flight(com.meakaandre.siftec.sim.SimData.Node n) {
+    public void flight(SimData.Node n) {
         n.company = companyId;
         n.hasDrone = hasDrone;
         n.destination = destination == null ? null : destination.asLong();
@@ -306,15 +316,15 @@ public class DronePortBlockEntity extends BlockEntity {
      * simulation since it took the port over (so what a player took out meanwhile, or a drone brought, stays as it is);
      * the drone's cargo and flight as the simulation has them.
      */
-    public void fromSim(com.meakaandre.siftec.sim.SimData.Node n) {
+    public void fromSim(SimData.Node n) {
         List<ItemStack> spill = new ArrayList<>();
         spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.OUT, PortContainer.FUEL));
         spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.FUEL, PortContainer.FUEL + 1));
         spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.IN, PortContainer.SIZE));
-        if (level != null) for (ItemStack stack : spill) net.minecraft.world.Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.1, worldPosition.getZ() + 0.5, stack);
+        if (level != null) for (ItemStack stack : spill) Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.1, worldPosition.getZ() + 0.5, stack);
         cargo.clear();
         for (var s : n.cargo) {
-            ItemStack stack = com.meakaandre.siftec.sim.Keys.stack(s.key, s.count);
+            ItemStack stack = Keys.stack(s.key, s.count);
             if (!stack.isEmpty()) cargo.add(stack);
         }
         state = n.state;
@@ -324,8 +334,8 @@ public class DronePortBlockEntity extends BlockEntity {
     }
 
     /** Slots from..to change by what the simulation's slots hold against what they held when it took over; returns what did not fit. */
-    private List<ItemStack> applyDelta(List<com.meakaandre.siftec.sim.SimData.Slot> now, List<com.meakaandre.siftec.sim.SimData.Slot> base, int from, int to) {
-        java.util.Map<String, Long> d = new java.util.LinkedHashMap<>();
+    private List<ItemStack> applyDelta(List<SimData.Slot> now, List<SimData.Slot> base, int from, int to) {
+        Map<String, Long> d = new LinkedHashMap<>();
         for (int i = from; i < to; i++) {
             if (i < now.size() && !now.get(i).empty()) d.merge(now.get(i).key, now.get(i).count, Long::sum);
             if (i < base.size() && !base.get(i).empty()) d.merge(base.get(i).key, -base.get(i).count, Long::sum);
@@ -335,7 +345,7 @@ public class DronePortBlockEntity extends BlockEntity {
             long take = -e.getValue();
             for (int i = from; i < to && take > 0; i++) {
                 ItemStack stack = items.getItem(i);
-                if (stack.isEmpty() || !com.meakaandre.siftec.sim.Keys.of(stack).equals(e.getKey())) continue;
+                if (stack.isEmpty() || !Keys.of(stack).equals(e.getKey())) continue;
                 int n = (int) Math.min(take, stack.getCount());
                 items.removeItem(i, n);
                 take -= n;
@@ -344,7 +354,7 @@ public class DronePortBlockEntity extends BlockEntity {
         for (var e : d.entrySet()) {
             long give = e.getValue();
             while (give > 0) {
-                ItemStack one = com.meakaandre.siftec.sim.Keys.stack(e.getKey(), 1);
+                ItemStack one = Keys.stack(e.getKey(), 1);
                 if (one.isEmpty()) break;
                 int n = (int) Math.min(give, one.getMaxStackSize());
                 ItemStack rest = items.add(one.copyWithCount(n), from, to);
@@ -394,7 +404,7 @@ public class DronePortBlockEntity extends BlockEntity {
         if (!hasDrone || state != IDLE) return ItemStack.EMPTY;
         hasDrone = false;
         setChanged();
-        return new ItemStack(com.meakaandre.siftec.registry.ModItems.CARDBOARD_DRONE.get());
+        return new ItemStack(ModItems.CARDBOARD_DRONE.get());
     }
 
     public ItemStack fuel() {

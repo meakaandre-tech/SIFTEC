@@ -3,6 +3,7 @@ package com.meakaandre.siftec.building;
 import com.meakaandre.siftec.geyser.GeyserPurity;
 import com.meakaandre.siftec.geyser.Vents;
 import com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor;
+import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.Purity;
 import com.meakaandre.siftec.power.Power;
 import com.meakaandre.siftec.registry.ModBlocks;
@@ -21,8 +22,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import org.antarcticgardens.cna.content.electricity.generation.brushes.CarbonBrushesBlockEntity;
+import org.antarcticgardens.cna.content.electricity.generation.coil.GeneratorCoilBlockEntity;
 import org.antarcticgardens.cna.content.nuclear.reactor.fuelacceptor.ReactorFuelAcceptorBlockEntity;
 import org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity;
 import org.jspecify.annotations.Nullable;
@@ -31,6 +34,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * The machines inside the generator buildings, which make the power ({@link BuildingPower} only hands it to the grid):
@@ -101,7 +105,7 @@ public final class Generators {
     public static double coilSu(ServerLevel level, ControllerBlockEntity c) {
         double su = 0;
         for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:generator_coil"))) {
-            if (level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.electricity.generation.coil.GeneratorCoilBlockEntity coil) {
+            if (level.getBlockEntity(pos) instanceof GeneratorCoilBlockEntity coil) {
                 su += Math.max(0, coil.calculateStressApplied() - 24) * Math.abs(coil.getSpeed());
             }
         }
@@ -329,7 +333,7 @@ public final class Generators {
     }
 
     /** The same, reading the rods through {@code at}. */
-    static long rodFuel(ControllerBlockEntity c, java.util.function.Function<BlockPos, net.minecraft.world.level.block.entity.BlockEntity> at) {
+    static long rodFuel(ControllerBlockEntity c, Function<BlockPos, BlockEntity> at) {
         long n = 0;
         for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:reactor_rod"))) {
             if (at.apply(pos) instanceof ReactorRodBlockEntity rod) n += rod.fuel;
@@ -348,7 +352,7 @@ public final class Generators {
         };
         double mid = (range[0] + range[1]) / 2, half = (range[1] - range[0]) / 2;
         // each geyser at its own point in the swing
-        double phase = (com.meakaandre.siftec.node.NodeMap.mix(vent.asLong()) >>> 40) / (double) (1L << 24);
+        double phase = (NodeMap.mix(vent.asLong()) >>> 40) / (double) (1L << 24);
         return mid + half * Math.sin(2 * Math.PI * (time / GEO_SWING_TICKS + phase));
     }
 

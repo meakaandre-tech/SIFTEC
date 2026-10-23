@@ -8,9 +8,13 @@ import com.meakaandre.siftec.hub.Milestones;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
@@ -21,6 +25,7 @@ import net.minecraft.world.item.Items;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * The HUB screen, laid out like the old Tweaker HUB screen: tier tabs along the top, the tier's milestones down
@@ -147,7 +152,7 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
             }).bounds(left + 6, y, 112, 18).build();
             b.active = !m.id().equals(selected);
             // its Satisfactory-style text, in full
-            b.setTooltip(net.minecraft.client.gui.components.Tooltip.create(m.name().copy().withStyle(ChatFormatting.GOLD)
+            b.setTooltip(Tooltip.create(m.name().copy().withStyle(ChatFormatting.GOLD)
                 .append("\n").append(m.desc().copy().withStyle(ChatFormatting.GRAY))));
             addRenderableWidget(b);
             y += 20;
@@ -268,12 +273,12 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
     private List<Component> wrap(List<Component> lines, int width) {
         List<Component> out = new ArrayList<>();
         for (Component line : lines) {
-            for (net.minecraft.network.chat.FormattedText part : font.getSplitter().splitLines(line, width, net.minecraft.network.chat.Style.EMPTY)) {
-                net.minecraft.network.chat.MutableComponent c = Component.empty();
+            for (FormattedText part : font.getSplitter().splitLines(line, width, Style.EMPTY)) {
+                MutableComponent c = Component.empty();
                 part.visit((style, text) -> {
                     c.append(Component.literal(text).withStyle(style));
-                    return java.util.Optional.empty();
-                }, net.minecraft.network.chat.Style.EMPTY);
+                    return Optional.empty();
+                }, Style.EMPTY);
                 out.add(c);
             }
         }

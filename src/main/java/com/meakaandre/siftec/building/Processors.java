@@ -3,6 +3,7 @@ package com.meakaandre.siftec.building;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.machine.ProcessorRecipe;
+import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.power.Power;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
@@ -10,6 +11,7 @@ import com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlock;
 import com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlockEntity;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.kinetics.fan.processing.AllFanProcessingTypes;
+import com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
 import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -22,10 +24,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.antarcticgardens.cna.content.motor.MotorBlockEntity;
@@ -55,7 +60,7 @@ public final class Processors {
     private Processors() {
     }
 
-    static net.minecraft.world.level.block.Block create(String id) {
+    static Block create(String id) {
         return BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", id));
     }
 
@@ -103,7 +108,7 @@ public final class Processors {
         // inputs stopped coming while it waited out the last recipe) looks again once a second
         BlockPos mixer = BuildingLogic.cell(c, create("mechanical_mixer"));
         if (mixer != null && level.getGameTime() % 20 == 0 && level.getGameTime() >= c.nextCraft
-            && level.getBlockEntity(mixer) instanceof com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity m && !m.running) {
+            && level.getBlockEntity(mixer) instanceof MechanicalMixerBlockEntity m && !m.running) {
             m.basinChecker.scheduleUpdate();
         }
         if (def.id().equals("particle_accelerator")) accelerate(level, c, r, basin);
@@ -166,10 +171,10 @@ public final class Processors {
         BasinBlockEntity basin = ProductionLogic.basin(level, c);
         if (r == null || basin == null || c.problem.equals("siftec.building.full")) return false;
         BlockPos mixer = BuildingLogic.cell(c, create("mechanical_mixer"));
-        if (mixer != null && level.getBlockEntity(mixer) instanceof com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity m && m.running) return true;
+        if (mixer != null && level.getBlockEntity(mixer) instanceof MechanicalMixerBlockEntity m && m.running) return true;
         if (hasInputs(basin, r)) return true;
         Item core = ProcessorRecipe.item(r.core());
-        boolean coreWaiting = core != net.minecraft.world.item.Items.AIR && basinHolds(basin, core, true);
+        boolean coreWaiting = core != Items.AIR && basinHolds(basin, core, true);
         if (def.id().equals("particle_accelerator")) {
             BlockPos fan = BuildingLogic.cell(c, create("encased_fan")), gap = gap(c);
             if (fan == null || gap == null) return false;
@@ -256,8 +261,8 @@ public final class Processors {
         }
         if (level.getBlockEntity(gap) instanceof CrushingWheelControllerBlockEntity crusher) {
             // the crusher's own block belongs to the company too, so it runs the recipes the company has
-            if (!c.companyId.isEmpty() && !c.companyId.equals(crusher.getAttached(com.meakaandre.siftec.owner.Ownership.OWNER))) {
-                crusher.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, c.companyId);
+            if (!c.companyId.isEmpty() && !c.companyId.equals(crusher.getAttached(Ownership.OWNER))) {
+                crusher.setAttached(Ownership.OWNER, c.companyId);
             }
             upward(level, c, gap);
         }
@@ -299,7 +304,7 @@ public final class Processors {
         // there (an item in a chunk not ticking its entities would hang in the air, or be lost while it loads)
         if (!level.isPositionEntityTicking(fan.above())) return;
         Item core = ProcessorRecipe.item(r.core());
-        if (core == net.minecraft.world.item.Items.AIR) return;
+        if (core == Items.AIR) return;
         boolean flying = false;
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, column(fan, gap))) {
             if (!e.getItem().is(core)) continue;
@@ -398,7 +403,7 @@ public final class Processors {
                 // a cell left on the Depot (the recipe changed): it goes back
                 ProductionLogic.lift(level, depot);
                 if (c.carrier.isEmpty()) c.carrier = new ItemStack(cell);
-            } else if (charged != net.minecraft.world.item.Items.AIR && on.is(charged) || chargedCell(on)) {
+            } else if (charged != Items.AIR && on.is(charged) || chargedCell(on)) {
                 // a charged cell into the Item Drain, which empties it
                 if (ProductionLogic.held(level, drain).isEmpty()) {
                     ItemStack moved = ProductionLogic.lift(level, depot);
@@ -460,7 +465,7 @@ public final class Processors {
     /** True if one cycle's results fit into the output slot now. */
     static boolean resultFits(ControllerBlockEntity c, ProcessorRecipe r) {
         Item out = ProcessorRecipe.item(r.outItem());
-        if (out == net.minecraft.world.item.Items.AIR) return true;
+        if (out == Items.AIR) return true;
         ItemStack slot = c.output.getItem(0);
         int need = r.outPerCycle();
         if (slot.isEmpty()) return need <= out.getDefaultMaxStackSize();
@@ -581,7 +586,7 @@ public final class Processors {
             Container inv = basin.itemCapability;
             for (int i = 0; i < inv.getContainerSize(); i++) if (cellBearing(inv.getItem(i))) n += inv.getItem(i).getCount();
         }
-        for (net.minecraft.world.SimpleContainer slots : new net.minecraft.world.SimpleContainer[]{c.input, c.output, c.buffer}) {
+        for (SimpleContainer slots : new SimpleContainer[]{c.input, c.output, c.buffer}) {
             for (int i = 0; i < slots.getContainerSize(); i++) if (cellBearing(slots.getItem(i))) n += slots.getItem(i).getCount();
         }
         Placement p = c.placement();
