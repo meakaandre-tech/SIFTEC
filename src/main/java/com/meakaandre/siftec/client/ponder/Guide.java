@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The guide on the client (work package 13): SIFTEC's Ponder plugin, opening a building's scene (the Build Gun's H
+ * The guide on the client: SIFTEC's Ponder plugin, opening a building's scene (the Build Gun's H
  * key), and the guide items' and the Build Gun's tooltip lines.
  */
 public final class Guide {

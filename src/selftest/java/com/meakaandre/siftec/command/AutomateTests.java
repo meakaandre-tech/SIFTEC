@@ -44,10 +44,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Selftests for automation: the grid's copper wire pressed from Cable (and the old
- * Workshop crafter route refused); the Manufacturer's second step for a part and for equipment, run step by step
- * through a sequenced assembly (as the Deployer asks for each step), for an unlocked and a locked company; and a machine's fake player and
- * stringing New Age wire between two Power Poles. Every line of output starts with "SELFTEST automate".
+ * Selftests for automation: the grid's copper wire pressed from Cable (and the Workshop crafter route refused); the
+ * Manufacturer's second step for a part and for equipment, run step by step through a sequenced assembly (as the
+ * Deployer asks for each step), for an unlocked and a locked company; and a machine's fake player stringing New Age
+ * wire between two Power Poles. Every line of output starts with "SELFTEST automate".
  */
 public final class AutomateTests {
     private static final String YES = "selftest_auto_yes", NO = "selftest_auto_no";
@@ -106,7 +106,7 @@ public final class AutomateTests {
         return 1;
     }
 
-    /** A Mechanical Press asking for its recipe as it does while it ticks, and a Mechanical Crafter that no recipe of the pack's uses any more. */
+    /** A Mechanical Press asking for its recipe as it does while it ticks, and a Mechanical Crafter that no recipe of the pack's uses. */
     private static void machines(CommandSourceStack source, ServerLevel level, BlockPos at) {
         level.setBlockAndUpdate(at, BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:mechanical_press")).defaultBlockState());
         level.setBlockAndUpdate(at.east(), BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:mechanical_crafter")).defaultBlockState());
@@ -116,7 +116,7 @@ public final class AutomateTests {
             return;
         }
         SingleRecipeInput cable = new SingleRecipeInput(new ItemStack(item("siftec:cable")));
-        // what the old Workshop route crafted a Portable Miner from (1 Mechanical Drill, 2 Iron Sheet, 4 Iron Rod): refused now
+        // the Workshop crafter route to a Portable Miner (1 Mechanical Drill, 2 Iron Sheet, 4 Iron Rod) is refused
         ItemStack drill = new ItemStack(item("create:mechanical_drill")), sheet = new ItemStack(item("create:iron_sheet")), rod = new ItemStack(item("siftec:iron_rod"));
         CraftingInput grid = CraftingInput.of(3, 3, List.of(drill, sheet, sheet, rod, rod, rod, rod, ItemStack.EMPTY, ItemStack.EMPTY));
         StringBuilder said = new StringBuilder();

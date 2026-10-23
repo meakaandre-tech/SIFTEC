@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/** Registers the pack's blocks and their block items: nodes, ores, machines, building parts and decor. */
 public class ModBlocks {
     /** Items shown in the creative tab, in registration order. */
     public static final List<Item> TAB_ITEMS = new ArrayList<>();

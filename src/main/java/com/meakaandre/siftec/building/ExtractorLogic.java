@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The extractors of work package 9, run by their controllers ({@link BuildingLogic#tick}). Each fills the fluid tank
+ * The extractors, run by their controllers ({@link BuildingLogic#tick}). Each fills the fluid tank
  * inside it at Satisfactory 1.0's rate while it has power, and its fluid output port drains that tank:
  * <ul>
  * <li>extractor: the Water Extractor (standing in water over its intake, 120 m3 a minute) and the Oil Extractor (over

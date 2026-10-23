@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/** Registers the pack's items: equipment, parts, foods and the guide's building stand-ins. */
 public class ModItems {
     public static final Supplier<NodeScannerItem> NODE_SCANNER = item("node_scanner", properties -> new NodeScannerItem(properties.stacksTo(1)));
     public static final Supplier<ObjectScannerItem> OBJECT_SCANNER = item("object_scanner", properties -> new ObjectScannerItem(properties.stacksTo(1)));
@@ -46,9 +47,8 @@ public class ModItems {
     public static final Supplier<Item> CARDBOARD_DRONE = item("cardboard_drone", properties -> new Item(properties.stacksTo(1)));
     public static final Supplier<BlueprintItem> BLUEPRINT = item("blueprint", properties -> new BlueprintItem(properties.stacksTo(1)));
     /**
-     * The HUB Planner of the old HUB building rule. The rule is gone (the HUB is now a structure placed whole), but the
-     * id stays registered as a plain item that does nothing, so planners in old inventories still load; it has no
-     * recipe and is not in the creative tab.
+     * The HUB Planner: a plain item that does nothing (the HUB is a structure placed whole), kept registered so
+     * planners in old inventories still load; it has no recipe and is not in the creative tab.
      */
     public static final Supplier<Item> HUB_PLANNER = hiddenItem("hub_planner", properties -> new Item(properties.stacksTo(1)));
     /** The Build Gun: places and dismantles every building (see building.BuildGun). Given by the HUB, never crafted. */
@@ -56,7 +56,7 @@ public class ModItems {
     public static final Supplier<Item> TOXIC_SHOT = item("toxic_shot", Item::new);
     public static final Supplier<Item> RAW_BAUXITE = item("raw_bauxite", Item::new);
     public static final Supplier<Item> SAM = item("sam", Item::new);
-    /** From uranium nodes; work package 4 wires it into the nuclear chain. */
+    /** From uranium nodes; feeds the nuclear chain. */
     public static final Supplier<Item> URANIUM = item("uranium", Item::new);
     /** The MAM's inhalers (item/MamItems.java): Protein (Alien Megafauna), Vitamin and Therapeutic (Mycelia), Nutritional (Nutrients). */
     public static final Supplier<Item> PROTEIN_INHALER = item("protein_inhaler",
@@ -117,7 +117,7 @@ public class ModItems {
     public static final Map<String, Item> PARTS = new LinkedHashMap<>();
 
     /**
-     * The guide's stand-ins for the Build Gun's buildings and vehicles (work package 13), by building id: an item
+     * The guide's stand-ins for the Build Gun's buildings and vehicles, by building id: an item
      * {@code siftec:building_<id>} for each, that its Ponder scene, JEI and the Ponder index show. It has no recipe, does
      * nothing and is not in the creative tab; the Build Gun is still the only way to put a building down.
      */

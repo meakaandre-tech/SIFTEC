@@ -62,7 +62,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * {@code /siftec selftest ownership}: the checks for the companies and ownership fixes, on a test site of their own.
+ * {@code /siftec selftest ownership}: company and ownership checks, on a test site of their own.
  * Every line prints "SELFTEST ownership"; failures say FAIL; the last line counts them.
  * <ul>
  * <li>3: the MAM is its owner company's alone, and only after Field Research; the member multiplier never touches a
@@ -382,7 +382,7 @@ public final class OwnershipFixTests {
             expect(source, "7: a Wormhole Gateway goes down", false, placed.message().getString());
             return;
         }
-        // sneak-using its terminal twice (the old pick-up) leaves it standing
+        // sneak-using its terminal twice leaves it standing
         FakePlayer owner = fake(level, MEMBER_A, "selftest_own_a");
         owner.setShiftKeyDown(true);
         use(level, owner, terminal);

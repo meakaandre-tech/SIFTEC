@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Work package 14's vehicles: the Tractor, the Truck and the Explorer. Each is one entity ({@link VehicleEntity}) that
+ * SIFTEC's vehicles: the Tractor, the Truck and the Explorer. Each is one entity ({@link VehicleEntity}) that
  * looks built from Create's blocks, put down by the Build Gun for Satisfactory's cost (the building list's "vehicle"
  * entries) and taken back by its dismantle mode with a full refund and its cargo.
  * <p>

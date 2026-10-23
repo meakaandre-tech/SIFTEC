@@ -66,8 +66,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * {@code /siftec selftest fixes}: one check (or a few) for each fix from the full review, on a test site of its own far
- * from the other selftests. The checks that need a real player (fixes 3 and 4's backpack parts) are
+ * {@code /siftec selftest fixes}: checks of node cells, building protection, death crates, windows, lost vehicles,
+ * crash sites and tank fluids, on a test site of its own far from the other selftests. The checks that need a real
+ * player (the backpack parts of 3 and 4) are
  * {@code /siftec selftest tb fixes}. Every check prints "SELFTEST fixes"; failures say FAIL; the last line counts them.
  * <ol>
  * <li>node cells: a building never covers a node position, a miner takes only the node in its own node cell, a Death

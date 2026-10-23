@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The guide's checks (work package 13). {@code /siftec selftest guide} checks, on the server, that every building
+ * The guide's checks. {@code /siftec selftest guide} checks, on the server, that every building
  * and vehicle has its stand-in item and its Ponder lines, and every milestone and phase its text.
  * {@code /siftec worldtest guide check} has every player's client build every SIFTEC Ponder scene and look up every
  * line it shows (client/ponder/Guide.java logs the results as "SELFTEST guide-client ..."), and

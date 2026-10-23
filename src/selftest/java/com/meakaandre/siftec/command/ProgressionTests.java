@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * /siftec selftest progression (work package 8): the HUB's tiers and milestones, the Wormhole phases that open them and
+ * /siftec selftest progression: the HUB's tiers and milestones, the Wormhole phases that open them and
  * free play after Phase 5, and the MAM's trees, their starting items, cross-tree and either-or needs. Works on throwaway
  * companies only. Every check prints "SELFTEST progression"; failures say FAIL.
  */

@@ -28,7 +28,7 @@ import java.util.List;
  * of a structure template ("hub": the HUB), "vehicle" for a vehicle (an entity, {@link com.meakaandre.siftec.vehicle.Vehicles}),
  * or is "" for an ordinary building.
  * <p>
- * Work package 9's extractors: {@code fluid} is the fluid an extractor gives and {@code rate} its mB a minute on a normal
+ * Extractors: {@code fluid} is the fluid an extractor gives and {@code rate} its mB a minute on a normal
  * node (purity scales it); {@code fluidNode} is the fluid node type ("oil", "nitrogen") a node building stands on instead
  * of an ore node; {@code intake} is the cell a Water Extractor stands over, which has to be a water source.
  */
@@ -49,7 +49,7 @@ public record BuildingDef(String id, Category category, List<Milestone.Cost> cos
         return prefab.equals("hub") || prefab.equals("gateway");
     }
 
-    /** A vehicle (work package 14): the Build Gun puts down a {@link com.meakaandre.siftec.vehicle.VehicleEntity}, not blocks. */
+    /** A vehicle: the Build Gun puts down a {@link com.meakaandre.siftec.vehicle.VehicleEntity}, not blocks. */
     public boolean vehicle() {
         return prefab.equals("vehicle");
     }

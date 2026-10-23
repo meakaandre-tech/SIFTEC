@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * /siftec selftest food (work package 11): the Food and Brass tab after the recipe rewrite. Food: no hunger, eating
+ * /siftec selftest food: the Food and Brass tab. Food: no hunger, eating
  * is the only heal and heals more the more prepared the food, the twelve ingredient effects carry into what is made
  * from them, preserves are stronger and throwable, meals stack every effect, honey cleanses, and the secret
  * ingredients; the Nutrients research locks. Brass: Create's recipe gone, brass blend from a flux with no heat, at the

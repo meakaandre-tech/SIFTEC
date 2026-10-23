@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Work package 16's checks ({@code /siftec selftest tb ...}), on every player online; the smoke run's client drives
+ * The Traveler's Backpack checks ({@code /siftec selftest tb ...}), on every player online; the smoke run's client drives
  * them between its screenshots. Every check prints "SELFTEST tb PASS ..." or "SELFTEST tb FAIL ...".
  * <ul>
  * <li>{@code setup}: back to a new player of a new company: worn from the start, Leather, the built-in 2x2 grid;</li>
@@ -69,9 +69,9 @@ import java.util.Map;
  * <li>{@code crate setup} / {@code crate check}: things in known slots before dying; after respawning, a Death Crate
  * marked on the map holds them and one click puts every one back in its slot;</li>
  * <li>{@code crate keep} / {@code crate kept} / {@code crate persisted}: a crate left alone stays, through a restart;</li>
- * <li>{@code fixes}: the review's fixes that need a real player: a shift-click leaving part of a stack in a backpack slot
- * saves what is left (fix 3); a Build Gun in the backpack stays out of the crate and the crafting grid's stacks go into
- * it and back (fix 4).</li>
+ * <li>{@code fixes}: the checks that need a real player, logged by number: 3, a shift-click leaving part of a stack
+ * in a backpack slot saves what is left; 4, a Build Gun in the backpack stays out of the crate and the crafting grid's
+ * stacks go into it and back.</li>
  * <li>{@code fixes2}: the crafting grid keeps to the locks: a locked result cannot be taken out by a click nor made by
  * shift-crafting, and can once its milestone is done. (The backpack window's Cloud button is the client's to check: it
  * logs "SELFTEST tb-client" the first time the window opens, see client/CloudButton.java; the server side of what the
@@ -478,7 +478,7 @@ public final class TravelersBackpackSelfTest {
         return 1;
     }
 
-    // ------------------------------------------------------------------------------------------------ the review's fixes
+    // ------------------------------------------------------------------------------------------------ fixes
 
     private static int fixes(CommandSourceStack source) {
         for (ServerPlayer player : players(source)) {
@@ -488,7 +488,7 @@ public final class TravelersBackpackSelfTest {
         return 1;
     }
 
-    /** Fix 3: armour shift-clicked out of a backpack slot that keeps part of its stack: the part left is saved in the backpack. */
+    /** 3: armour shift-clicked out of a backpack slot that keeps part of its stack: the part left is saved in the backpack. */
     private static void leftoverSaved(CommandSourceStack source, ServerPlayer player) {
         player.closeContainer();
         clearAll(player);
@@ -524,7 +524,7 @@ public final class TravelersBackpackSelfTest {
         player.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
     }
 
-    /** Fix 4: a Build Gun in the backpack is left out of the crate; the crafting grid's stacks go in and come back to the grid. */
+    /** 4: a Build Gun in the backpack is left out of the crate; the crafting grid's stacks go in and come back to the grid. */
     private static void crateBuildGunAndGrid(CommandSourceStack source, ServerPlayer player) {
         player.closeContainer();
         clearAll(player);

@@ -58,10 +58,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Selftests for work package 7, logistics, run by the smoke test: {@code /siftec selftest logistics}. Self-moving
+ * Selftests for logistics, run by the smoke test: {@code /siftec selftest logistics}. Self-moving
  * belts at every belt tier (and none before Logistics), belts that no shaft or motor drives or is driven by (a running
- * motor on a belt's shaft, a belt an older world saved in a network), a Speed Governor well past the old
- * company speed limit, the Andesite Tunnel splitting evenly and merging, Drone Ports carrying a package, and the
+ * motor on a belt's shaft, a belt an older world saved in a network), a Speed Governor with no company speed
+ * limit, the Andesite Tunnel splitting evenly and merging, Drone Ports carrying a package, and the
  * Dimensional Depot uploading from an Item Vault. Every check prints "SELFTEST logistics"; failures say FAIL.
  */
 public final class LogisticsTests {
@@ -353,7 +353,7 @@ public final class LogisticsTests {
         });
     }
 
-    /** A Speed Governor set to 200 RPM gives 200 RPM: there is no company cap any more. */
+    /** A Speed Governor set to 200 RPM gives 200 RPM: there is no company cap. */
     private static void governor(CommandSourceStack source, ServerLevel level) {
         Company none = company(level, source, "selftest_governor");
         BlockPos at = new BlockPos(X + 30, Y + 1, Z);
@@ -472,7 +472,7 @@ public final class LogisticsTests {
                 a != null && a.state == DronePortBlockEntity.IDLE && a.fuel().getCount() == 2 && a.items.getItem(PortContainer.OUT).isEmpty() && inside == 5,
                 (a == null ? "home port missing" : "home state " + a.state + ", fire charges " + a.fuel().getCount()) + "; arrived " + arrived + " holding " + inside);
         });
-        // a far port whose chunk does not tick (work package 17): the drone unloads there all the same, into the
+        // a far port whose chunk does not tick: the drone unloads there all the same, into the
         // simulation's record of that port, and comes home; loaded again, the port holds the package
         BlockPos lonely = home.south(40), nowhere = home.offset(5_000, 0, 0);
         BuildingTests.platform(level, nowhere.getX() - 16, nowhere.getZ() - 16, nowhere.getX() + 16, nowhere.getZ() + 16, Y, 16);

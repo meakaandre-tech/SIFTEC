@@ -54,9 +54,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Selftests for work package 14, vehicles, run by the smoke test: {@code /siftec selftest vehicles}. The building list
+ * Selftests for vehicles, run by the smoke test: {@code /siftec selftest vehicles}. The building list
  * has the Tractor, Truck, Explorer and Truck Station; the Build Gun puts a vehicle down for its cost (refusing it locked,
- * unpaid or with no room) and takes it back with a full refund. Then the done-when: two Truck Stations, one loading and
+ * unpaid or with no room) and takes it back with a full refund. Then the main check: two Truck Stations, one loading and
  * one unloading; a Truck records a loop through both docks with a pretend driver, and then drives it by itself,
  * carrying the first station's load to the second and filling its tank at the first. {@code restart} checks the Truck
  * and its route came back after a restart and that it is still driving. Every check prints "SELFTEST vehicles".
@@ -235,7 +235,7 @@ public final class VehicleTests {
     }
 
     /**
-     * The done-when: a Truck records a loop through two stations' docks and then drives it unattended, unloading the
+     * The main check: a Truck records a loop through two stations' docks and then drives it unattended, unloading the
      * first station's iron at the second and filling up with the first station's fuel.
      */
     private static void route(CommandSourceStack source, ServerLevel level) {

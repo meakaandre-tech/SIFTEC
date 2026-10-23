@@ -75,7 +75,7 @@ import java.util.function.Function;
  * Generators and storage hold the grid's fuse; using one while sneaking resets it.
  */
 public final class BuildingPower {
-    /** Sulfuric acid a second of running leaves in the Geothermal Generator's tank (the old Geyser Engine's rate). */
+    /** Sulfuric acid a second of running leaves in the Geothermal Generator's tank. */
     public static final int ACID_PER_SECOND = 50;
     /** Ticks an Alien Power Matrix keeps an Augmenter fed (Satisfactory feeds it five a minute). */
     public static final int MATRIX_TICKS = 240;

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Geysers no longer keep a steady beat. Vanilla's countdown ticker (the server ticker, run once a second, so the
+ * Geysers do not keep vanilla's steady beat. Vanilla's countdown ticker (the server ticker, run once a second, so the
  * countdown is in seconds) sets a resting time from a random fixed per position: 15 to 30 seconds (10 more per
  * extra block of water), the same every time. Here each rest is rolled again: 18 to 66 seconds, most near the
  * middle, so with the eruption itself (1 to 3 seconds) one eruption follows another every 20 to 70 seconds, about

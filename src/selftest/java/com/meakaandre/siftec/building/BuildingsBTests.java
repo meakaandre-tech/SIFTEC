@@ -66,7 +66,7 @@ import java.util.Set;
 import java.util.function.LongSupplier;
 
 /**
- * Selftests for work package 9's buildings, run by the smoke test on a test world: {@code /siftec selftest buildings_b}
+ * Selftests for the advanced production buildings, run by the smoke test on a test world: {@code /siftec selftest buildings_b}
  * puts each one down (paid from an inventory, as the Build Gun does) on its own Alien Power Augmenter, feeds it by Create
  * belts at its item ports and by pipe at its fluid ports, and checks after a while that it made its recipe at
  * Satisfactory's rate: the Assembler (Reinforced Iron Plate), Foundry (Steel Ingot), Refinery (Plastic), Blender (Battery),
@@ -359,7 +359,7 @@ public final class BuildingsBTests {
         List<ControllerBlockEntity> powered = new ArrayList<>();
         List<Measure> measures = new ArrayList<>();
 
-        // ---- the list: every work package 9 building, with its tab, unlock, logic and SU, and a template that reads
+        // ---- the list: every building of this set, with its tab, unlock, logic and SU, and a template that reads
         String[][] want = {{"assembler", "part_assembly", "basin", "3072"}, {"foundry", "basic_steel_production", "basin", "3277"},
             {"refinery", "oil_processing", "basin", "6144"}, {"blender", "control_system_development", "basin", "15360"},
             {"manufacturer", "industrial_manufacturing", "assembly", "11264"}, {"quantum_encoder", "quantum_encoding", "assembly", "204800"},
@@ -674,8 +674,8 @@ public final class BuildingsBTests {
     private static final int VX = 1500, VY = 181, VZ = 1000;
 
     /**
-     * For the client screenshots: 0 puts every work package 9 building down in a row (with the work package 5 and 6 ones
-     * beside them, all in their new look) and looks along it; 1 to 5 look at stretches of the row up close.
+     * For the client screenshots: 0 puts every building of this set down in a row (with the basic production and power
+     * buildings beside them) and looks along it; 1 to 5 look at stretches of the row up close.
      */
     private static int view(CommandContext<CommandSourceStack> context, int n) {
         CommandSourceStack source = context.getSource();

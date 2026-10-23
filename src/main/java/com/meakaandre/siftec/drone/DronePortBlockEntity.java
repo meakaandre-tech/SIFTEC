@@ -80,7 +80,7 @@ public class DronePortBlockEntity extends BlockEntity {
 
     public void serverTick() {
         if (!(level instanceof ServerLevel server)) return;
-        // what the factory simulation did while its chunk did not tick goes in before it runs for real (work package 17)
+        // what the factory simulation did while its chunk did not tick goes in before it runs for real
         Factories.awake(server, this);
         // a port is only ever the Drone Port building's terminal: one standing on its own (put down by a command) does nothing
         if (BuildingIndex.controllerOf(server, worldPosition) == null) return;

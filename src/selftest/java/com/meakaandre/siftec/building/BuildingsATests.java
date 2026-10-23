@@ -73,7 +73,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Selftests for work package 5's buildings, run by the smoke test on a test world: {@code /siftec selftest buildings_a}
+ * Selftests for the basic production buildings, run by the smoke test on a test world: {@code /siftec selftest buildings_a}
  * puts each one down (paid from an inventory, as the Build Gun does), feeds it by Create belts at its ports, and checks
  * after a minute of game time that it made its recipe at Satisfactory's rate (Constructor: Iron Plate, Smelter: Iron
  * Ingot, Miner Mk.1 to Mk.3 on normal, impure and pure nodes, the Portable Miner dropping its ore), plus the Storage
@@ -316,7 +316,7 @@ public final class BuildingsATests {
         passed = failed = 0;
         Company company = company(level);
 
-        // ---- the list: every work package 5 building, with its tab, unlock, SU and a template that reads
+        // ---- the list: every building of this set, with its tab, unlock, SU and a template that reads
         String[][] want = {{"portable_miner", "PRODUCTION", "hub_upgrade_1", "portable_miner"}, {"miner_mk1", "PRODUCTION", "hub_upgrade_5", "miner"},
             {"miner_mk2", "PRODUCTION", "advanced_steel_production", "miner"}, {"miner_mk3", "PRODUCTION", "leading_edge_production", "miner"},
             {"smelter", "PRODUCTION", "hub_upgrade_2", "smelter"}, {"constructor", "PRODUCTION", "hub_upgrade_3", "basin"},
@@ -418,7 +418,7 @@ public final class BuildingsATests {
         put(level, source, company, ist);
         ControllerBlockEntity istc = controller(level, ist);
 
-        // ---- power (work package 6): the powered buildings stand still until they are on a grid with power. An Alien Power
+        // ---- power: the powered buildings stand still until they are on a grid with power. An Alien Power
         // Augmenter (500 MW, no fuel) on a Power Pole Mk.3 gives it to them all.
         ControllerBlockEntity aug = PowerTests.build(level, source, "alien_power_augmenter", new BlockPos(X + 60, Y, Z + 30), Direction.NORTH);
         ControllerBlockEntity pole = PowerTests.build(level, source, "power_pole_mk3", new BlockPos(X + 60, Y, Z + 22), Direction.NORTH);
@@ -652,7 +652,7 @@ public final class BuildingsATests {
     private static final int VX = 1200, VY = 181, VZ = 1000;
 
     /**
-     * For the client screenshots: 0 puts every building of work package 5 down in a row (the miners on nodes) and looks
+     * For the client screenshots: 0 puts every building of this set down in a row (the miners on nodes) and looks
      * at the miners from the front; 1 looks at the Constructor, Smelter and Storage Containers; 2 at their backs, where
      * the inputs are; 3 close up at the Constructor and the Smelter through their glass.
      */

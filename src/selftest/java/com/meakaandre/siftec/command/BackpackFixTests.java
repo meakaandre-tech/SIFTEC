@@ -47,7 +47,7 @@ import java.util.function.Function;
 
 /**
  * {@code /siftec selftest backpackfix}: whatever is paid for from what a player carries pays from the worn backpack as
- * well as the inventory (milestones and the Workshop already did): the Build Gun's buildings, vehicles and the HUB,
+ * well as the inventory, as milestones and the Workshop do: the Build Gun's buildings, vehicles and the HUB,
  * blueprints, jetpack fuel and filters. A fake player carries the cost only in its backpack: a stand-in container put
  * where {@link Backpack#worn} looks, which is what the Traveler's Backpack compat fills in for real players. The
  * crafting grid's locks and the backpack window's Cloud button need a real player: {@code /siftec selftest tb fixes2}.

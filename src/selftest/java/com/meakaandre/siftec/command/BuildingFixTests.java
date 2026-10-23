@@ -58,7 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code /siftec selftest buildingfix}: the building-mechanics fixes, on a test site of their own. Every check prints
+ * {@code /siftec selftest buildingfix}: building-mechanics checks, on a test site of their own. Every check prints
  * "SELFTEST buildingfix"; failures say FAIL; the last line counts them.
  * <ul>
  * <li>8: a building's controller has no item storage on any side (a hopper beside it gives it nothing); its ports still

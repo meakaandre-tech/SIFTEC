@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Everything the always-running factories need while their chunks do not tick (work package 17), kept with the world:
+ * Everything the always-running factories need while their chunks do not tick, kept with the world:
  * <ul>
  * <li>{@link Node}: each Build Gun building, Drone Port and plain inventory a belt ends in, as the background
  * simulation knows it: what it makes and at what rate, what its buffers hold, its power;</li>

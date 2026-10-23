@@ -84,7 +84,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * {@code /siftec selftest polish}: the polish pass, on a test site of its own (X 14000, Z 14000). Every check prints
+ * {@code /siftec selftest polish}: assorted gameplay and presentation checks, on a test site of its own (X 14000, Z 14000). Every check prints
  * "SELFTEST polish"; failures say FAIL; the last line counts them.
  * <ul>
  * <li>2: geysers on the Object Scanner (Geothermal Power) and found in land nobody has loaded (the Radar Tower's search);</li>
@@ -94,7 +94,6 @@ import java.util.Objects;
  * <li>6: SAM Reanimation says it is a Constructor recipe;</li>
  * <li>7: the Drone Port building: its terminal, ports, pad and drone, a trip pad to pad;</li>
  * <li>8: chutes reach a building's machines only from inside it;</li>
- * <li>9: (gone: the old single-block machines were removed in review fixes 6);</li>
  * <li>10: the HUB's Biomass Burners run a real boiler, engine and coil.</li>
  * </ul>
  */
@@ -293,7 +292,7 @@ public final class PolishTests {
         AABB box = truck.getBoundingBox();
         expect(source, "5: a Truck facing north takes its whole length (5) along z and its width (3) along x",
             Math.abs(box.getZsize() - 5.0) < 0.01 && Math.abs(box.getXsize() - 3.0) < 0.01, box.getXsize() + " by " + box.getZsize());
-        // picked as a player picks: its front end, past where the old square box ended, is the Truck
+        // picked as a player picks: its front end, past where a square box round its middle would end, is the Truck
         FakePlayer eye = FakePlayer.get(level);
         Vec3 nose = truck.local(0, 1.5, 2.2);
         boolean front = pick(eye, truck, nose) && truck.bodyHit(nose.add(0, 3, 0), nose.add(0, -3, 0), 0).isPresent();

@@ -3,7 +3,7 @@ package com.meakaandre.siftec.vehicle;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The three vehicles of work package 14 and how each drives. Speeds are blocks a tick; {@code mw} is what it burns
+ * The three vehicles and how each drives. Speeds are blocks a tick; {@code mw} is what it burns
  * while driving (Satisfactory's figure), drawn from the fuel's megajoules ({@link VehicleEntity#fuelMj}).
  * {@code rows} is its storage in rows of nine; {@code seat} where the driver sits, in blocks from the middle of its
  * footprint (x right, y up, z forward). {@code width}, {@code length} and {@code height} are the space it needs to be
