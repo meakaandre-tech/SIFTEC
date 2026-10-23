@@ -291,11 +291,17 @@ public final class MachineTests {
     /** Takes the building's output, as a belt from its output port would; how many of the item it held. */
     private static long empty(@Nullable ControllerBlockEntity c, Item item) {
         if (c == null) return 0;
-        ItemStack s = c.output.getItem(0);
-        if (s.isEmpty()) return 0;
-        long n = s.is(item) ? s.getCount() : 0;
-        c.output.setItem(0, ItemStack.EMPTY);
-        c.output.setChanged();
+        // its output slot, and a nuclear plant's waste store after it (its output port takes from both)
+        long n = 0;
+        for (net.minecraft.world.SimpleContainer box : new net.minecraft.world.SimpleContainer[]{c.output, c.waste}) {
+            for (int i = 0; i < box.getContainerSize(); i++) {
+                ItemStack s = box.getItem(i);
+                if (s.isEmpty()) continue;
+                if (s.is(item)) n += s.getCount();
+                box.setItem(i, ItemStack.EMPTY);
+            }
+            box.setChanged();
+        }
         return n;
     }
 
