@@ -3,6 +3,7 @@ package com.meakaandre.siftec.config;
 import com.meakaandre.siftec.Siftec;
 import net.fabricmc.loader.api.FabricLoader;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -45,7 +46,7 @@ public final class SiftecConfig {
                 props.store(writer, "SIFTEC server settings. spawn_free_radius: blocks around the world spawn where nothing can be claimed (0 = off). "
                     + "member_cooldown_hours: how long a player who left a company still counts toward its costs and cannot rejoin it.");
             }
-        } catch (Exception e) {
+        } catch (IOException | IllegalArgumentException e) {
             Siftec.LOGGER.warn("SIFTEC: could not read or write {}; using defaults", file, e);
         }
         Siftec.LOGGER.info("SIFTEC settings: spawn_free_radius={}, member_cooldown_hours={}", spawnFreeRadius, memberCooldownHours);

@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.company;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.config.SiftecConfig;
 import com.meakaandre.siftec.depot.DepotMenu;
@@ -187,6 +188,7 @@ public final class Companies {
             if (online != null) return online.getGameProfile().name();
             return server.services().nameToIdCache().get(uuid).map(NameAndId::name).orElse(member.substring(0, Math.min(8, member.length())));
         } catch (IllegalArgumentException e) {
+            Siftec.LOGGER.debug("SIFTEC: member {} is not a UUID; shown as it is", member, e);
             return member;
         }
     }

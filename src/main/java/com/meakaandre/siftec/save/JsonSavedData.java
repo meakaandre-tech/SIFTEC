@@ -147,7 +147,7 @@ public abstract class JsonSavedData<S> extends SavedData {
             if (read == null) throw new IllegalStateException("no data in the file");
             stored = read;
             loaded();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             broken = true;
             Siftec.LOGGER.error("SIFTEC: COULD NOT READ data/siftec/{}.dat. The data is kept on disk and will not be overwritten; "
                 + "the game runs without it until the file is fixed.", file, e);
@@ -165,7 +165,7 @@ public abstract class JsonSavedData<S> extends SavedData {
                 Files.copy(path, copy, StandardCopyOption.REPLACE_EXISTING);
                 Siftec.LOGGER.error("SIFTEC: a copy of the unreadable file was kept as {}", copy);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             Siftec.LOGGER.error("SIFTEC: could not copy the unreadable {}.dat", file, e);
         }
     }

@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.power;
 
+import com.meakaandre.siftec.Siftec;
 import org.antarcticgardens.cna.config.CNAConfig;
 
 import java.util.Locale;
@@ -27,6 +28,7 @@ public final class Power {
         try {
             return CNAConfig.getServer().suToEnergy.get();
         } catch (RuntimeException e) {
+            Siftec.LOGGER.debug("SIFTEC: Create: New Age's suToEnergy could not be read; using the default", e);
             return 0.029296875;
         }
     }

@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.node.NodeSites;
@@ -51,6 +52,7 @@ public abstract class ClaimDisassemblyMixin {
                 if (storage != null) Containers.dropContents(level, anchor, storage);
             } catch (IllegalStateException uninitialized) {
                 // storage never set up (nothing mounted): nothing held to give back
+                Siftec.LOGGER.debug("SIFTEC: contraption storage at {} not set up; nothing to give back", e.getKey(), uninitialized);
             }
             it.remove();
         }

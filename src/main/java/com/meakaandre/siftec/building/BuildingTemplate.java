@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,7 +85,7 @@ public final class BuildingTemplate {
             } else {
                 t = read(NbtIo.readCompressed(in, NbtAccounter.unlimitedHeap()), def.id());
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             PROBLEMS.put(def.id(), e.toString());
         }
         if (t == null) Siftec.LOGGER.error("SIFTEC: building {} has no usable template: {}", def.id(), PROBLEMS.get(def.id()));

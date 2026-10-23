@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.owner;
 
 import com.google.gson.JsonObject;
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Locks;
@@ -73,6 +74,7 @@ public final class RecipeLocks {
                 }
             } catch (RuntimeException ignored) {
                 // a recipe that cannot say what it makes this way is left unlocked
+                Siftec.LOGGER.debug("SIFTEC: recipe {} cannot say what it makes; left unlocked", holder.id(), ignored);
             }
         }
         // every step of another mod's sequenced assembly is locked exactly as the whole assembly (its final result)

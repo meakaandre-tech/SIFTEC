@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.power;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingIndex;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
@@ -75,6 +76,7 @@ public final class Wires {
         try {
             return CNAConfig.getServer().maxWireLength.get();
         } catch (RuntimeException e) {
+            Siftec.LOGGER.debug("SIFTEC: Create: New Age's maxWireLength could not be read; using 16", e);
             return 16;
         }
     }

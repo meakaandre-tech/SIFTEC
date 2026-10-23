@@ -31,6 +31,7 @@ public final class ToxicShot {
             Method method = getType();
             return method == null ? null : method.invoke(null, ID);
         } catch (ReflectiveOperationException | LinkageError e) {
+            Siftec.LOGGER.debug("SIFTEC: the gun library could not give the toxic shot's ammo type", e);
             return null;
         }
     }
@@ -44,6 +45,7 @@ public final class ToxicShot {
             try {
                 known = Optional.of(Class.forName("com.nukateam.ntgl.common.data.holders.AmmoHolder").getMethod("getType", Identifier.class));
             } catch (ReflectiveOperationException | LinkageError e) {
+                Siftec.LOGGER.debug("SIFTEC: gun library AmmoHolder.getType not found; the toxic shot is off", e);
                 known = Optional.empty();
             }
             getType = known;
@@ -62,6 +64,7 @@ public final class ToxicShot {
             Object holder = field.get().get(projectile);
             return holder == null ? "" : holder.toString();
         } catch (ReflectiveOperationException | RuntimeException e) {
+            Siftec.LOGGER.debug("SIFTEC: could not read the ammunition of {}", projectile, e);
             return "";
         }
     }
@@ -75,6 +78,7 @@ public final class ToxicShot {
                 return Optional.of(field);
             } catch (ReflectiveOperationException | RuntimeException e) {
                 // not the class that holds it; try its parent
+                Siftec.LOGGER.debug("SIFTEC: no readable ammoHolder field in {}", type, e);
             }
         }
         return Optional.empty();

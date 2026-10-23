@@ -317,6 +317,7 @@ public final class Prefabs {
         try {
             pos = BlockPos.of(Long.parseLong(parts[1]));
         } catch (NumberFormatException e) {
+            Siftec.LOGGER.debug("SIFTEC: company {} has an unreadable gateway record {}", company.id, company.gateway, e);
             return null;
         }
         for (ServerLevel level : server.getAllLevels()) {

@@ -15,6 +15,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -81,7 +82,7 @@ public final class Recipes {
                         if (before == null || p.type.equals("minecraft:blasting") && !before.type.equals("minecraft:blasting")) SMELT.put(item, p);
                     }
                 }
-            } catch (Exception ex) {
+            } catch (IOException | RuntimeException ex) {
                 Siftec.LOGGER.debug("SIFTEC: could not read recipe {} for the simulation", id, ex);
             }
         }

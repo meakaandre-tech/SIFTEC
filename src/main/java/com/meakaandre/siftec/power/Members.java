@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.power;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingIndex;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
@@ -65,6 +66,7 @@ final class Members {
         try {
             side = connector.getFacing();
         } catch (RuntimeException e) {
+            Siftec.LOGGER.debug("SIFTEC: connector at {} could not say its facing", connector.getBlockPos(), e);
             side = null;
         }
         EnergyStorage storage = EnergyStorage.findForBlock(level, support, side);

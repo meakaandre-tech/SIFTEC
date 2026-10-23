@@ -2,6 +2,7 @@ package com.meakaandre.siftec.cosmetic;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.company.Company;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.component.DataComponents;
@@ -33,6 +34,7 @@ public final class Banners {
             if (!banner.isEmpty()) banner.set(DataComponents.CUSTOM_NAME, Component.translatable("siftec.shop.banner_name", company.name));
             return banner;
         } catch (RuntimeException e) {
+            Siftec.LOGGER.warn("SIFTEC: company {} has an unreadable banner", company.id, e);
             return ItemStack.EMPTY;
         }
     }
