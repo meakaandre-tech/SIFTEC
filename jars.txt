@@ -1,0 +1,3 @@
+total 2688
+-rw-r--r-- 1 runner runner 2123420 Oct 23 07:49 siftec-0.1.0+26.3.jar
+-rw-r--r-- 1 runner runner  626529 Oct 23 07:49 siftec-selftest-0.1.0+26.3.jar

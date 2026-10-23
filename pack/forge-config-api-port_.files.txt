@@ -1,0 +1,6 @@
+fabric.mod.json
+forgeconfigapiport.common.mixins.json
+forgeconfigapiport.fabric.mixins.json
+META-INF/jars/
+META-INF/jars/core-3.8.4.jar
+META-INF/jars/toml-3.8.4.jar
