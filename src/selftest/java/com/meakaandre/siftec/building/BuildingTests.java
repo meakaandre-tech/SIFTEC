@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -24,7 +25,10 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -67,7 +71,28 @@ public final class BuildingTests {
     private BuildingTests() {
     }
 
+    /**
+     * Server to client, from {@code /siftec worldtest guntab}: puts the gun on a tab, with a building
+     * picked or with nothing picked (an empty building). Key presses under the CI's virtual display are not reliable
+     * enough to count Tabs.
+     */
+    public record Tab(int category, String building) implements CustomPacketPayload {
+        public static final Type<Tab> TYPE = new Type<>(Siftec.id("build_gun_tab"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, Tab> STREAM_CODEC = StreamCodec.of(
+            (buf, p) -> {
+                buf.writeVarInt(p.category);
+                buf.writeUtf(p.building);
+            },
+            buf -> new Tab(buf.readVarInt(), buf.readUtf(64)));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     public static void register() {
+        PayloadTypeRegistry.clientboundPlay().register(Tab.TYPE, Tab.STREAM_CODEC);
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             long now = server.overworld().getGameTime();
             for (Later l : new ArrayList<>(LATER)) {
@@ -91,7 +116,7 @@ public final class BuildingTests {
     private static int gunTab(CommandContext<CommandSourceStack> ctx, String building) {
         Category tab = Category.of(StringArgumentType.getString(ctx, "tab"));
         for (ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) {
-            ServerPlayNetworking.send(player, new BuildGunPayloads.Tab(tab.ordinal(), building));
+            ServerPlayNetworking.send(player, new Tab(tab.ordinal(), building));
         }
         report(ctx.getSource(), "gun tab " + tab + " " + building);
         return 1;

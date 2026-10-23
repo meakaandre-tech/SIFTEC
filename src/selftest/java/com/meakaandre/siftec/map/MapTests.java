@@ -19,10 +19,15 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
@@ -42,7 +47,7 @@ import java.util.Optional;
  * show for the scanner's resources; markers are private or shared, and a second member of the company sees, changes
  * and removes a shared one; death markers keep the last three.
  * <p>
- * {@code /siftec worldtest map ...} drives the smoke run's client for its screenshots (see {@link MapPayloads.Control}).
+ * {@code /siftec worldtest map ...} drives the smoke run's client for its screenshots (see {@link Control}).
  * Every check prints "SELFTEST map"; failures say FAIL.
  */
 public final class MapTests {
@@ -52,6 +57,26 @@ public final class MapTests {
     private static final int X = -9000, Z = 7000;
     /** A second member for the smoke run's real player, who places a company marker for them. */
     private static final String MATE = "00000000-0000-4000-8000-00000000beef";
+
+    /**
+     * Server to client, from the smoke run's {@code /siftec worldtest map}: opens or closes the map, centred and zoomed,
+     * or switches a filter (key presses under the CI's virtual display are not reliable enough).
+     */
+    public record Control(String action, String arg, int x, int z, float zoom) implements CustomPacketPayload {
+        public static final Type<Control> TYPE = new Type<>(Siftec.id("map_control"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, Control> CODEC = StreamCodec.of((buf, p) -> {
+            buf.writeUtf(p.action);
+            buf.writeUtf(p.arg);
+            buf.writeVarInt(p.x);
+            buf.writeVarInt(p.z);
+            buf.writeFloat(p.zoom);
+        }, buf -> new Control(buf.readUtf(32), buf.readUtf(64), buf.readVarInt(), buf.readVarInt(), buf.readFloat()));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
 
     private record Later(long at, Runnable run) {
     }
@@ -63,6 +88,7 @@ public final class MapTests {
     }
 
     public static void register() {
+        PayloadTypeRegistry.clientboundPlay().register(Control.TYPE, Control.CODEC);
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             long now = server.overworld().getGameTime();
             for (Later l : new ArrayList<>(LATER)) {
@@ -299,7 +325,9 @@ public final class MapTests {
     private static int control(CommandContext<CommandSourceStack> context, String action, String arg, float zoom) {
         for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
             BlockPos at = player.blockPosition();
-            MapServer.control(player, new MapPayloads.Control(action, arg, at.getX(), at.getZ(), zoom));
+            if (!Companies.isFake(player) && ServerPlayNetworking.canSend(player, Control.TYPE)) {
+                ServerPlayNetworking.send(player, new Control(action, arg, at.getX(), at.getZ(), zoom));
+            }
         }
         return 1;
     }

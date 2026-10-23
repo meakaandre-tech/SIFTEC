@@ -361,7 +361,6 @@ public final class BuildGun {
     public static void register() {
         PayloadTypeRegistry.serverboundPlay().register(BuildGunPayloads.Select.TYPE, BuildGunPayloads.Select.STREAM_CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BuildGunPayloads.View.TYPE, BuildGunPayloads.View.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(BuildGunPayloads.Tab.TYPE, BuildGunPayloads.Tab.STREAM_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(BuildGunPayloads.Select.TYPE, (payload, context) -> selected(context.player(), payload));
         // the gun works on whatever it points at, so using it on a block never opens or uses that block
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {

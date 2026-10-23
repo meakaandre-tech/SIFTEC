@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.compat;
 
+import com.meakaandre.siftec.SelfTestHooks;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.backpack.Backpack;
 import com.meakaandre.siftec.company.Companies;
@@ -108,7 +109,7 @@ public final class TravelersBackpackCompat {
             if (player instanceof ServerPlayer server) installCraftingUpgrade(server, stack);
             return InteractionResult.SUCCESS;
         });
-        TravelersBackpackSelfTest.register();
+        SelfTestHooks.run(SelfTestHooks.Stage.BACKPACK);
         Siftec.LOGGER.info("SIFTEC: Traveler's Backpack found; it is every player's inventory, raised by milestones and bound to them");
     }
 

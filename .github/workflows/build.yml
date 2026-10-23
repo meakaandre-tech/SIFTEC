@@ -65,6 +65,9 @@ jobs:
           }
           GRADLE
           ./gradlew build --no-daemon --continue -Dorg.gradle.console=plain -I /tmp/maxerrs.gradle 2>&1 | tee build.log
+          # the release jar holds no selftest code: that is all in the selftest jar
+          jar=$(ls build/libs/siftec-[0-9]*.jar | grep -v sources | head -1)
+          if unzip -Z1 "$jar" | grep -E '(Tests|SelfTest)(\$[^/]*)?\.class$'; then echo "selftest classes in $jar"; exit 1; fi
       - name: Dump game signatures, bytecode and data on request
         if: always()
         shell: bash
@@ -168,8 +171,10 @@ jobs:
               rm -rf /tmp/rx && mkdir -p /tmp/rx && unzip -o -q "$j" 'data/*/recipe/*' 'data/*/tags/item/*' -d /tmp/rx 2>/dev/null || true
               (cd /tmp/rx && find . -name '*.json' | sort | python3 -c "import json,sys; print(json.dumps({p.strip()[2:]: json.load(open(p.strip())) for p in sys.stdin}))" > "/tmp/ci/pack/$b.recipes.json") 2>/dev/null || true
             done
-            jar=$(ls ../build/libs/*.jar | grep -v -e sources -e server | head -1)
+            jar=$(ls ../build/libs/siftec-[0-9]*.jar | grep -v -e sources -e server | head -1)
             cp "$jar" mods/
+            # the selftests, a mod of their own that only this run loads
+            cp ../build/libs/siftec-selftest-*.jar mods/
             ls -l mods
             echo "eula=true" > eula.txt
             printf 'level-seed=12345\nwhite-list=false\nenforce-whitelist=false\nonline-mode=false\nmax-tick-time=-1\nview-distance=6\ngamemode=creative\ndifficulty=peaceful\nspawn-protection=0\npause-when-empty-seconds=-1\n' > server.properties
@@ -204,7 +209,7 @@ jobs:
                 export DISPLAY=:99
                 sleep 2
                 (glxinfo -B; eglinfo -B 2>/dev/null | head -40; vulkaninfo --summary 2>/dev/null | head -40) > /tmp/ci/gfx.txt 2>&1
-                (env -u CI JAVA_TOOL_OPTIONS=-Dcreate.mixin.audit=true timeout 1500 ./gradlew runClient --no-daemon -Dorg.gradle.console=plain --args="--quickPlayMultiplayer localhost --width 1280 --height 720" > client-gradle.log 2>&1; echo "EXIT $?" >> client-gradle.log) &
+                (env -u CI JAVA_TOOL_OPTIONS=-Dcreate.mixin.audit=true timeout 1500 ./gradlew runSelftestClient --no-daemon -Dorg.gradle.console=plain --args="--quickPlayMultiplayer localhost --width 1280 --height 720" > client-gradle.log 2>&1; echo "EXIT $?" >> client-gradle.log) &
                 for i in $(seq 1 130); do
                   if grep -q 'joined the game' server/server.log || grep -q '^EXIT' client-gradle.log || grep -q -e 'Failed to create backend Vulkan' -e 'Caught error loading resourcepacks' run/logs/latest.log 2>/dev/null; then break; fi
                   sleep 5
@@ -288,7 +293,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: siftec-26.3
-          path: build/libs/*.jar
+          path: |
+            build/libs/*.jar
+            !build/libs/siftec-selftest-*.jar
       - name: Publish the jar as a release
         if: success()
         env:
@@ -297,6 +304,6 @@ jobs:
         run: |
           gh release delete latest -y --cleanup-tag -R "${{ github.repository }}" || true
           sleep 3
-          jar=$(ls build/libs/*.jar | grep -v sources | head -1)
+          jar=$(ls build/libs/siftec-[0-9]*.jar | grep -v sources | head -1)
           cp "$jar" siftec-26.3.jar
           gh release create latest siftec-26.3.jar -R "${{ github.repository }}" --target "${GITHUB_SHA}" --title "SIFTEC (latest build)" --notes "Built from main at ${GITHUB_SHA}. Needs Create Fly, Create: New Age (meakaandre-tech/Create-New-Age, fabric-26.3) and Fabric API; the pack adds Traveler's Backpack (with Forge Config API Port) as every player's inventory."
