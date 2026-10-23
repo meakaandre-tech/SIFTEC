@@ -2,7 +2,6 @@ package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.drone.DroneMenu;
 import com.meakaandre.siftec.drone.DronePortBlockEntity;
 import com.meakaandre.siftec.equip.Radar;
@@ -12,6 +11,7 @@ import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.sink.ShopMenu;
 import com.meakaandre.siftec.sink.Sink;
 import com.meakaandre.siftec.sink.SinkMenu;
+import com.meakaandre.siftec.util.Chunks;
 import com.meakaandre.siftec.workshop.WorkshopMenu;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -40,7 +40,7 @@ public final class SpecialBuildings {
     public static boolean craftStation(Level level, BlockPos pos) {
         BlockPos terminal = BuildingIndex.controllerOf(level, pos);
         // never loads a chunk: this is asked while rotation propagates
-        return terminal != null && level.isLoaded(terminal) && level.getBlockEntity(terminal) instanceof HubBlockEntity hub
+        return terminal != null && Chunks.blockEntity(level, terminal) instanceof HubBlockEntity hub
             && hub.prefab && !hub.gateway();
     }
 
@@ -65,7 +65,7 @@ public final class SpecialBuildings {
             case "shop" -> ShopMenu.open(player, company, c.getBlockPos());
             case "sink" -> {
                 // a Sink is its company's: anyone may look, but only its members print the owner's points as coupons
-                Company owner = c.companyId.isEmpty() ? company : CompanyData.get(player.level().getServer()).byId(c.companyId);
+                Company owner = c.companyId.isEmpty() ? company : Companies.byId(player.level().getServer(), c.companyId);
                 SinkMenu.open(player, owner == null ? company : owner, c.getBlockPos(), mayOperate(player, c), () -> c.powered);
             }
             case "radar" -> Radar.use(player, c);

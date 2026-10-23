@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.mixin;
 
+import com.meakaandre.siftec.util.Chunks;
 import com.zurrtum.create.content.kinetics.KineticNetwork;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -20,6 +21,6 @@ public abstract class NetworkNoLoadMixin {
     @Redirect(method = {"calculateCapacity", "calculateStress"},
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
     private BlockEntity siftec$noLoad(Level level, BlockPos pos) {
-        return level.isLoaded(pos) ? level.getBlockEntity(pos) : null;
+        return Chunks.blockEntity(level, pos);
     }
 }

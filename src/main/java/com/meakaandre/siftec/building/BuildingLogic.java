@@ -10,6 +10,7 @@ import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.node.Purity;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.sink.Sink;
+import com.meakaandre.siftec.util.Drops;
 import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
@@ -32,7 +33,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -426,7 +426,7 @@ public final class BuildingLogic {
                 // nothing is lost: what does not fit (another drop of a node with two) goes out of the output port's front
                 if (!drop.isEmpty()) {
                     BlockPos at = c.placement() == null ? c.getBlockPos() : c.placement().at(0, 0, -1);
-                    Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, drop);
+                    Drops.at(level, at, 0.5, drop);
                 }
                 c.output.setChanged();
             }

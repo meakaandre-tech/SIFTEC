@@ -3,7 +3,6 @@ package com.meakaandre.siftec.depot;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.zurrtum.create.AllBlocks;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -103,7 +102,7 @@ public class DepotBlockEntity extends BlockEntity {
     public void serverTick() {
         if (++cooldown < 20 || level == null) return;
         cooldown = 0;
-        Company company = CompanyData.get(level.getServer()).byId(companyId);
+        Company company = Companies.byId(level.getServer(), companyId);
         if (company == null) return;
         moved = false;
         // this second's share of the rate, kept in sixtieths so slow rates add up to whole items

@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.node;
 
+import com.meakaandre.siftec.util.Chunks;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
@@ -98,7 +99,7 @@ public final class NodeRegrowth {
                 for (long at : inChunk.toLongArray()) {
                     pos.set(at);
                     // a chunk that is loaded but not ticking is left alone: reading it would keep it loaded
-                    if (!level.isLoaded(pos) || !level.shouldTickBlocksAt(pos)) continue;
+                    if (!Chunks.ticking(level, pos)) continue;
                     NodeSavedData.Site site = sites.get(at);
                     if (site == null) continue;
                     BlockState state = level.getBlockState(pos);

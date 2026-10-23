@@ -10,7 +10,6 @@ import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.compat.SiftGate;
 import com.meakaandre.siftec.config.SiftecConfig;
 import com.meakaandre.siftec.hub.HubBlock;
@@ -20,6 +19,7 @@ import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.registry.ModItems;
+import com.meakaandre.siftec.util.Drops;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -33,7 +33,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Prediction;
-import net.minecraft.world.Containers;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -291,7 +290,7 @@ public final class Prefabs {
             }
             Claims.Claim claim = Claims.at(level, cx, cz);
             if (claim != null && !Companies.same(claim.company, company.id) && !creative) {
-                Company owner = CompanyData.get(level.getServer()).byId(claim.company);
+                Company owner = Companies.byId(level.getServer(), claim.company);
                 check.fail("siftec.prefab.claimed", owner == null ? "?" : owner.name);
                 return;
             }
@@ -450,7 +449,7 @@ public final class Prefabs {
         if (!hub.prefab || hub.anchor == null || hub.facing == null || !(hub.getLevel() instanceof ServerLevel level)) return;
         if (!(hub.getBlockState().getBlock() instanceof HubBlock block)) return;
         Kind kind = Kind.of(block);
-        Company company = CompanyData.get(level.getServer()).byId(hub.companyId);
+        Company company = Companies.byId(level.getServer(), hub.companyId);
         int target = levelOf(kind, company, level.getServer());
         if (target == hub.builtLevel) return;
         Spot spot = new Spot(kind, hub.anchor, hub.facing);
@@ -595,7 +594,7 @@ public final class Prefabs {
         // both are built with the Build Gun: what was paid for the structure comes back
         for (ItemStack paid : hub.refund) out.add(paid.copy());
         hub.refund.clear();
-        Company company = CompanyData.get(level.getServer()).byId(hub.companyId);
+        Company company = Companies.byId(level.getServer(), hub.companyId);
         if (hub.prefab && hub.anchor != null && hub.facing != null) {
             Spot spot = new Spot(kind, hub.anchor, hub.facing);
             Template t = kind.template();
@@ -662,7 +661,7 @@ public final class Prefabs {
             if (player != null) {
                 player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
             } else {
-                Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1, at.getZ() + 0.5, stack);
+                Drops.at(level, at, 1, stack);
             }
         }
     }

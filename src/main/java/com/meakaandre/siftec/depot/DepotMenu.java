@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.depot;
 
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import net.minecraft.ChatFormatting;
@@ -71,12 +72,11 @@ public class DepotMenu extends ChestMenu {
      * shows, and, when it was opened at a depot, that depot still stands and is within reach.
      */
     public static boolean valid(ServerPlayer player, Company company, @Nullable BlockPos at) {
-        if (player.isRemoved() || !player.isAlive()) return false;
-        Company now = Companies.find(player);
-        if (now == null || !Companies.same(now.id, company.id)) return false;
+        if (!BuildingMenus.alive(player)) return false;
+        if (!BuildingMenus.member(player, company.id)) return false;
         if (at == null) return true;
         if (!(player.level().getBlockEntity(at) instanceof DepotBlockEntity)) return false;
-        return player.distanceToSqr(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5) <= REACH * REACH;
+        return BuildingMenus.withinReach(player, at, REACH);
     }
 
     private void refresh() {

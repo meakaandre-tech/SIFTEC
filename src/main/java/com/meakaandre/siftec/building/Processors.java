@@ -5,6 +5,7 @@ import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.machine.ProcessorRecipe;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.power.Power;
+import com.meakaandre.siftec.util.Transfers;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.kinetics.crusher.CrushingWheelControllerBlock;
@@ -17,7 +18,6 @@ import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -122,11 +122,7 @@ public final class Processors {
             if (s.isEmpty()) continue;
             Storage<ItemVariant> into = ItemStorage.SIDED.find(basin.getLevel(), basin.getBlockPos(), Direction.UP);
             if (into == null) return;
-            try (Transaction tx = Transaction.openOuter()) {
-                long put = into.insert(ItemVariant.of(s), s.getCount(), tx);
-                tx.commit();
-                s.shrink((int) put);
-            }
+            s.shrink((int) Transfers.insert(into, ItemVariant.of(s), s.getCount()));
             c.buffer.setChanged();
         }
     }
@@ -531,10 +527,7 @@ public final class Processors {
             Storage<ItemVariant> hand = ItemStorage.SIDED.find(level, deployerPos, null);
             long put = 0;
             if (hand != null) {
-                try (Transaction tx = Transaction.openOuter()) {
-                    put = hand.insert(ItemVariant.of(one), 1, tx);
-                    if (put == 1) tx.commit();
-                }
+                put = Transfers.insertAll(hand, ItemVariant.of(one), 1);
             }
             if (put == 1 && fromCell) c.carrier = ItemStack.EMPTY;
             else if (put != 1 && !fromCell) ProductionLogic.giveBack(basin, one);

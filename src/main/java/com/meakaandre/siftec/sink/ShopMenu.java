@@ -337,6 +337,6 @@ public class ShopMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player who) {
-        return who == player && BuildingMenus.near(player, at, BuildingMenus.logic("shop")) && BuildingMenus.member(player, companyId);
+        return BuildingMenus.stillValid(who, player, at, BuildingMenus.logic("shop"), companyId);
     }
 }

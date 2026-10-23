@@ -3,6 +3,7 @@ package com.meakaandre.siftec.vehicle;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildGunItem;
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.TruckStations;
 import com.meakaandre.siftec.claim.Claims;
@@ -501,7 +502,7 @@ public class VehicleEntity extends Entity {
      * close by, and (unless in creative) still in the company the vehicle belongs to.
      */
     public boolean mayKeepCargoOpen(Player who) {
-        if (isRemoved() || who.isRemoved() || !who.isAlive() || who.level() != level()) return false;
+        if (isRemoved() || !BuildingMenus.alive(who) || who.level() != level()) return false;
         if (who.distanceToSqr(this) > CARGO_REACH * CARGO_REACH) return false;
         return !(who instanceof ServerPlayer server) || !Vehicles.foreign(this, companyId, server);
     }

@@ -4,6 +4,9 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.SimAccess;
+import com.meakaandre.siftec.util.Chunks;
+import com.meakaandre.siftec.util.Drops;
+import com.meakaandre.siftec.util.Transfers;
 import com.zurrtum.create.content.logistics.vault.ItemVaultBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinInventory;
@@ -14,12 +17,10 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -86,7 +87,7 @@ final class Buffers {
 
             @Override
             public @Nullable BlockEntity be(BlockPos pos) {
-                return level.isLoaded(pos) ? level.getBlockEntity(pos) : null;
+                return Chunks.blockEntity(level, pos);
             }
 
             @Override
@@ -112,7 +113,7 @@ final class Buffers {
             @Override
             public @Nullable BlockEntity be(BlockPos pos) {
                 if (mine(pos)) return chunk.getBlockEntity(pos);
-                return level.isLoaded(pos) ? level.getBlockEntity(pos) : null;
+                return Chunks.blockEntity(level, pos);
             }
 
             @Override
@@ -308,7 +309,7 @@ final class Buffers {
                 entity.setDeltaMovement(Vec3.ZERO);
                 level.addFreshEntity(entity);
             } else {
-                Containers.dropItemStack(level, drop.getX() + 0.5, drop.getY() + 1.1, drop.getZ() + 0.5, s);
+                Drops.at(level, drop, 1.1, s);
             }
         }
         if (ground == null && !spill.isEmpty()) Siftec.LOGGER.info("SIFTEC: {} at {}: {} stacks the catch-up had no room for were dropped", n.building, at.toShortString(), spill.size());
@@ -358,10 +359,7 @@ final class Buffers {
         for (Items s : items) {
             if (count <= 0) return;
             if (!matches(role, s.role)) continue;
-            try (Transaction tx = Transaction.openOuter()) {
-                count -= s.s.extract(v, count, tx);
-                tx.commit();
-            }
+            count -= Transfers.extract(s.s, v, count);
         }
     }
 
@@ -371,10 +369,7 @@ final class Buffers {
         for (Items s : items) {
             if (count <= 0) break;
             if (!matches(role, s.role)) continue;
-            try (Transaction tx = Transaction.openOuter()) {
-                count -= s.s.insert(v, count, tx);
-                tx.commit();
-            }
+            count -= Transfers.insert(s.s, v, count);
         }
         int max = Math.max(1, Keys.max(key));
         for (Slots s : slots) {
@@ -413,10 +408,7 @@ final class Buffers {
         for (Fluids s : fluids) {
             if (mb <= 0) return;
             if (!matches(role, s.role)) continue;
-            try (Transaction tx = Transaction.openOuter()) {
-                mb -= s.s.extract(FluidVariant.of(fluid), mb * MB, tx) / MB;
-                tx.commit();
-            }
+            mb -= Transfers.extract(s.s, FluidVariant.of(fluid), mb * MB) / MB;
         }
     }
 
@@ -426,10 +418,7 @@ final class Buffers {
         for (Fluids s : fluids) {
             if (mb <= 0) return 0;
             if (!matches(role, s.role)) continue;
-            try (Transaction tx = Transaction.openOuter()) {
-                mb -= s.s.insert(FluidVariant.of(fluid), mb * MB, tx) / MB;
-                tx.commit();
-            }
+            mb -= Transfers.insert(s.s, FluidVariant.of(fluid), mb * MB) / MB;
         }
         return Math.max(0, mb);
     }
@@ -464,7 +453,7 @@ final class Buffers {
             return count;
         }
         BlockPos at = n.blockPos();
-        for (ItemStack s : b.add(key, count, role)) Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, s);
+        Drops.all(level, at, 1.1, b.add(key, count, role));
         for (Slots s : b.slots) s.c.setChanged();
         return count;
     }
@@ -482,12 +471,9 @@ final class Buffers {
                 for (StorageView<FluidVariant> v : s.s) if (!v.isResourceBlank() && v.getAmount() >= MB && !have.contains(v.getResource())) have.add(v.getResource());
                 for (FluidVariant fv : have) {
                     if (most <= 0) break;
-                    try (Transaction tx = Transaction.openOuter()) {
-                        long took = s.s.extract(fv, most * MB, tx) / MB;
-                        tx.commit();
-                        most -= took;
-                        Sim.add(got, Keys.fluid(fv), took);
-                    }
+                    long took = Transfers.extract(s.s, fv, most * MB) / MB;
+                    most -= took;
+                    Sim.add(got, Keys.fluid(fv), took);
                 }
             }
             return got;
@@ -511,12 +497,9 @@ final class Buffers {
             for (StorageView<ItemVariant> v : s.s) if (!v.isResourceBlank() && v.getAmount() > 0 && !have.contains(v.getResource())) have.add(v.getResource());
             for (ItemVariant iv : have) {
                 if (most <= 0) break;
-                try (Transaction tx = Transaction.openOuter()) {
-                    long took = s.s.extract(iv, most, tx);
-                    tx.commit();
-                    most -= took;
-                    Sim.add(got, Keys.of(iv), took);
-                }
+                long took = Transfers.extract(s.s, iv, most);
+                most -= took;
+                Sim.add(got, Keys.of(iv), took);
             }
         }
         return got;

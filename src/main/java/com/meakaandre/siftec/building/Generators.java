@@ -7,6 +7,7 @@ import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.Purity;
 import com.meakaandre.siftec.power.Power;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.util.Chunks;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -317,7 +318,7 @@ public final class Generators {
 
     /** Fuel ticks left in all the plant's rods. */
     static long rodFuel(ServerLevel level, ControllerBlockEntity c) {
-        return rodFuel(c, pos -> level.isLoaded(pos) ? level.getBlockEntity(pos) : null);
+        return rodFuel(c, pos -> Chunks.blockEntity(level, pos));
     }
 
     /** The same, reading the rods through {@code at}. */

@@ -8,6 +8,7 @@ import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.util.Transfers;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -209,10 +210,7 @@ public final class Vehicles {
         List<ItemStack> out = new ArrayList<>();
         for (ItemStack stack : v.refund) out.add(stack.copy());
         v.refund.clear();
-        for (int i = 0; i < v.cargo.getContainerSize(); i++) {
-            ItemStack stack = v.cargo.removeItemNoUpdate(i);
-            if (!stack.isEmpty()) out.add(stack);
-        }
+        Transfers.takeAll(v.cargo, v.cargo.getContainerSize(), out);
         v.ejectPassengers();
         v.discard();
         Siftec.LOGGER.info("SIFTEC: vehicle {} taken back; {} stacks given back", v.kind.id, out.size());

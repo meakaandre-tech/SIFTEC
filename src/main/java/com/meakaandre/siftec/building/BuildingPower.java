@@ -14,6 +14,9 @@ import com.meakaandre.siftec.power.PowerGrids;
 import com.meakaandre.siftec.power.PowerMember;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.sim.Keys;
+import com.meakaandre.siftec.util.Chunks;
+import com.meakaandre.siftec.util.Drops;
+import com.meakaandre.siftec.util.Transfers;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -32,7 +35,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.Containers;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -455,7 +457,7 @@ public final class BuildingPower {
         /** SU-ticks of fuel it holds: in its machines (burner fuel, the engine's tank, the rods) and at its input. */
         @Override
         public double reserve() {
-            return reserve(pos -> level.isLoaded(pos) ? level.getBlockEntity(pos) : null);
+            return reserve(pos -> Chunks.blockEntity(level, pos));
         }
 
         /**
@@ -523,7 +525,7 @@ public final class BuildingPower {
                     double per = full / Math.max(1, burners.size());
                     for (BlockPos pos : burners) {
                         if (left <= 0) break;
-                        if (!level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof BlazeBurnerBlockEntity b)) continue;
+                        if (!(Chunks.blockEntity(level, pos) instanceof BlazeBurnerBlockEntity b)) continue;
                         int ticks = (int) Math.min(b.getRemainingBurnTime(), Math.ceil(left / per));
                         ((BlazeBurnerAccessor) b).siftec$setRemainingBurnTime(b.getRemainingBurnTime() - ticks);
                         left -= ticks * per;
@@ -531,7 +533,7 @@ public final class BuildingPower {
                 }
                 case "fuel" -> {
                     BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
-                    if (at != null && level.isLoaded(at) && level.getBlockEntity(at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
+                    if (at != null && Chunks.blockEntity(level, at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
                         double perMb = fluidMj(kind, e.siftec$fuel().getFluid());
                         if (perMb > 0) {
                             long mb = (long) Math.ceil(left / Power.suTicksOfMj(perMb));
@@ -544,7 +546,7 @@ public final class BuildingPower {
                     // the rods burn a tick of fuel each for every tick at full power
                     long ticks = (long) Math.ceil(left / full);
                     for (BlockPos pos : BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod"))) {
-                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof ReactorRodBlockEntity rod) {
+                        if (Chunks.blockEntity(level, pos) instanceof ReactorRodBlockEntity rod) {
                             rod.fuel = (int) Math.max(0, rod.fuel - ticks);
                             rod.setChanged();
                         }
@@ -582,7 +584,7 @@ public final class BuildingPower {
                 if (per <= 0 || burners.isEmpty()) return;
                 int each = (int) Math.min(Integer.MAX_VALUE / 2, Math.floor(suTicks / per / burners.size()));
                 for (BlockPos pos : burners) {
-                    if (each <= 0 || !level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof BlazeBurnerBlockEntity b)) continue;
+                    if (each <= 0 || !(Chunks.blockEntity(level, pos) instanceof BlazeBurnerBlockEntity b)) continue;
                     var access = (BlazeBurnerAccessor) b;
                     if (b.getRemainingBurnTime() <= 0) access.siftec$setActiveFuel(BlazeBurnerBlockEntity.FuelType.NORMAL);
                     access.siftec$setRemainingBurnTime(b.getRemainingBurnTime() + each);
@@ -591,24 +593,21 @@ public final class BuildingPower {
             }
             case "fuel" -> {
                 BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
-                if (at == null || !level.isLoaded(at) || !(level.getBlockEntity(at) instanceof EngineControl e)) return;
+                if (at == null || !(Chunks.blockEntity(level, at) instanceof EngineControl e)) return;
                 Fluid fluid = e.siftec$fuel().isEmpty() ? Keys.fluidOf(lastFuel) : e.siftec$fuel().getFluid();
                 double perMb = fluidMj("fuel", fluid);
                 Storage<FluidVariant> tank = ProductionLogic.fluids(level, at, null);
                 if (perMb <= 0 || tank == null) return;
                 long mb = (long) Math.floor(suTicks / Power.suTicksOfMj(perMb));
                 if (mb <= 0) return;
-                try (Transaction tx = Transaction.openOuter()) {
-                    tank.insert(FluidVariant.of(fluid), mb * (FluidConstants.BUCKET / 1000), tx);
-                    tx.commit();
-                }
+                Transfers.insert(tank, FluidVariant.of(fluid), mb * (FluidConstants.BUCKET / 1000));
             }
             case "nuclear" -> {
                 if (full <= 0) return;
                 int ticks = (int) Math.min(Integer.MAX_VALUE / 2, Math.floor(suTicks / full));
                 if (ticks <= 0) return;
                 for (BlockPos pos : BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod"))) {
-                    if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof ReactorRodBlockEntity rod) {
+                    if (Chunks.blockEntity(level, pos) instanceof ReactorRodBlockEntity rod) {
                         rod.fuel = (int) Math.min(ReactorRodBlockEntity.MAX_FUEL, (long) rod.fuel + ticks);
                         rod.setChanged();
                     }
@@ -763,10 +762,7 @@ public final class BuildingPower {
         FluidEntry entry = ModFluids.ALL.get(fluidId);
         Storage<FluidVariant> tank = tankStorage(level, pos);
         if (entry == null || tank == null) return;
-        try (Transaction tx = Transaction.openOuter()) {
-            tank.insert(FluidVariant.of(entry.still), mb * (FluidConstants.BUCKET / 1000), tx);
-            tx.commit();
-        }
+        Transfers.insert(tank, FluidVariant.of(entry.still), mb * (FluidConstants.BUCKET / 1000));
     }
 
     private static boolean tankFull(Level level, @Nullable BlockPos pos) {
@@ -859,7 +855,7 @@ public final class BuildingPower {
             }
             // the rest into the waste store (room for WASTE_ROOM in all, which wasteFits keeps to)
             if (!out.isEmpty()) out = c.waste.addItem(out);
-            if (!out.isEmpty()) Containers.dropItemStack(level, plant.getX() + 0.5, plant.getY() + 1.1, plant.getZ() + 0.5, out.copy());
+            if (!out.isEmpty()) Drops.at(level, plant, 1.1, out.copy());
             c.output.setChanged();
             return;
         }
@@ -867,12 +863,8 @@ public final class BuildingPower {
             if (out.isEmpty()) break;
             var into = ItemStorage.SIDED.find(level, acceptor.relative(side), side.getOpposite());
             if (into == null) continue;
-            try (Transaction tx = Transaction.openOuter()) {
-                long put = into.insert(ItemVariant.of(out), out.getCount(), tx);
-                tx.commit();
-                out.shrink((int) put);
-            }
+            out.shrink((int) Transfers.insert(into, ItemVariant.of(out), out.getCount()));
         }
-        if (!out.isEmpty()) Containers.dropItemStack(level, acceptor.getX() + 0.5, acceptor.getY() + 1.1, acceptor.getZ() + 0.5, out);
+        if (!out.isEmpty()) Drops.at(level, acceptor, 1.1, out);
     }
 }
