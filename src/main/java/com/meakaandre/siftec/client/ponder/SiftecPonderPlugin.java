@@ -25,7 +25,7 @@ import java.util.Set;
  * starts and on every resource reload.
  */
 public final class SiftecPonderPlugin implements PonderPlugin {
-    /** The shared lines' keys (siftec.ponder.shared.<key> in the lang file, written from tools/guide.py). */
+    /** The shared lines' keys (siftec.ponder.shared.<key> in the lang file, written from tools/tables/guide.py). */
     static final List<String> SHARED = List.of("item_in", "item_out", "fluid_in", "fluid_out", "power_use", "power_make", "power_wire", "fuse",
         "node", "panel", "panel_filter", "cost", "unlock", "dismantle", "vehicle_cost");
 

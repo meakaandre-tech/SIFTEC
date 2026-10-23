@@ -51,7 +51,7 @@ import java.util.List;
  * is installed.
  * <ul>
  * <li>Always worn: every player wears one from spawn, Leather. Nobody can craft one (every backpack, design, tier
- * upgrade and sleeping bag is switched off, see tools/content.py).</li>
+ * upgrade and sleeping bag is switched off, see tools/tables/content.py).</li>
  * <li>Grows with the company: its tier is the highest "backpack:&lt;tier&gt;" token among the company's finished
  * milestones (Iron at Field Research, Gold at Vehicular Transport, Diamond at Jetpack, Netherite at Hover Pack, the
  * milestones where Satisfactory gives inventory slots). Members who were offline get theirs when they next join.</li>

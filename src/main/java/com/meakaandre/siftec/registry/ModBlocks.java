@@ -127,7 +127,7 @@ public class ModBlocks {
 
     /**
      * The shell blocks of the HUB and Wormhole Gateway structures, by style: Create and vanilla textures (see
-     * tools/gen_assets.py, PREFAB). Unbreakable, immovable, no item and no loot, like node pads.
+     * tools/tables/assets.py, PREFAB). Unbreakable, immovable, no item and no loot, like node pads.
      */
     public static final Map<String, Supplier<PrefabBlock>> PREFAB = new LinkedHashMap<>();
 
@@ -235,7 +235,7 @@ public class ModBlocks {
         () -> BlockBehaviour.Properties.of().strength(UNBREAKABLE_HARDNESS, UNBREAKABLE_RESISTANCE).noLootTable()
             .sound(SoundType.WOOD).pushReaction(PushReaction.IMMOVEABLE));
 
-    /** The AWESOME Shop's decorations (sink/DecorBlock.java), by id, from siftec_content.json (tools/content.py, DECOR). */
+    /** The AWESOME Shop's decorations (sink/DecorBlock.java), by id, from siftec_content.json (tools/tables/shop.py, DECOR). */
     public static final Map<String, Block> DECOR = new LinkedHashMap<>();
 
     static {

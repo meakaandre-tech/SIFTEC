@@ -262,28 +262,33 @@ joins it with a client (`./gradlew runSelftestClient`), publishes the logs to th
 
 ## Where the data comes from
 
-Most of `src/main/resources` is generated. Edit the generators, not the JSON:
+Most of `src/main/resources` is generated. Edit the tables and generators, not the JSON. The pack's data lives in
+`tools/tables/` (plain tables, no file writing); the scripts in `tools/` turn it into files:
 
-- `tools/content.py`: parts, fluids, milestones, wormhole phases, MAM research, which item each milestone
+- `tools/tables/content.py`: parts, fluids, milestones, wormhole phases, MAM research, which item each milestone
   unlocks (including every item of the other mods: `MORE_LOCKS` and `FREE`), switched-off items, furnace
-  fuels, the Converter and Particle Accelerator, the AWESOME Sink's values and the Shop's cosmetics and decorations.
-- `tools/satisfactory.py`: Satisfactory 1.0's recipes, build costs, milestones, MAM costs and sink points, written by
-  `tools/import_satisfactory.py` from the game export SatisfactoryTools publishes. Never edited by hand.
+  fuels, the Converter and Particle Accelerator, and the Build Gun's buildings (`BUILDINGS`).
+- `tools/tables/shop.py`: the AWESOME Sink's values and the Shop's cosmetics and decorations.
+- `tools/tables/satisfactory.py`: Satisfactory 1.0's recipes, build costs, milestones, MAM costs and sink points,
+  written by `tools/import_satisfactory.py` from the game export SatisfactoryTools publishes. Never edited by hand.
+- `tools/tables/recipe_tables.py`: the recipes the pack removes from other mods (`REMOVED`), the Equipment
+  Workshop's build costs and the backpack upgrades.
+- `tools/tables/assets.py`: the stand-in looks of the mod's blocks and items, resource node looks, and tag lists.
+- `tools/tables/lang.py` and `tools/tables/guide.py`: the lang file's fixed strings, and the milestone and Ponder text.
 - `tools/recipes.py`: every recipe the mod adds (1.0's at Satisfactory amounts, on the Create machines of each
-  building, and the pack's own), the Hard Drive alternates, the recipes it removes from other mods (`REMOVED`) and the
-  Equipment Workshop's build costs.
+  building, and the pack's own) and the Hard Drive alternates.
 - `tools/check_recipes.py`: the checkers (reachability, automatability, conflicts). `gen_assets.py` runs them and
   stops on an error; the CI runs the generator and fails if the committed files differ from what it writes.
 - `tools/gen_assets.py`: turns those into `siftec_content.json`, the recipes, models, blockstates, loot
   tables and the lang file. It stops on an unknown item id (checked against `tools/known_ids.txt`, the item
   ids of the game and the pack's mods), on an item of another mod that nothing unlocks or frees, and it deletes
-  generated files that a run no longer writes.
+  generated files that a run no longer writes. `tools/models.py` and `tools/common.py` hold the file helpers.
 - `tools/import_art.py`: cuts the textures out of the sprite sheets in `tools/art`.
 - `tools/structures.py`: writes the structure templates of the Build Gun's buildings that are drawn in code
   (`data/siftec/structure/building/<id>.nbt`). A building can also be built in game and saved with a Structure
   Block: author it facing north (the player stands on its south side), with one `siftec:building_controller` and a
   `siftec:building_port` (facing out, `kind` item_in, item_out, fluid_in or fluid_out) wherever belts and pipes
-  attach. The building's tab, cost and unlock are listed in `tools/content.py` (`BUILDINGS`).
+  attach. The building's tab, cost and unlock are listed in `tools/tables/content.py` (`BUILDINGS`).
 
 Run them from outside the repository, so nothing in the working directory shadows a module:
 

@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * player is told once, when it opens while they play.
  */
 public final class MapLock {
-    /** The token Field Research gives (tools/content.py). */
+    /** The token Field Research gives (tools/tables/content.py). */
     public static final String TOKEN = MapServer.TOKEN;
     /** What each player online was last told: true for the Map on. */
     private static final Map<UUID, Boolean> TOLD = new ConcurrentHashMap<>();

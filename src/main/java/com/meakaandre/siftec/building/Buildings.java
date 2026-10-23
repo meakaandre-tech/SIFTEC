@@ -67,7 +67,7 @@ public final class Buildings {
 
     // ------------------------------------------------------------------------------------------------ the list
 
-    /** Reads the buildings from siftec_content.json (tools/content.py, BUILDINGS). */
+    /** Reads the buildings from siftec_content.json (tools/tables/content.py, BUILDINGS). */
     public static void load() {
         DEFS.clear();
         JsonObject raw = Milestones.raw();

@@ -52,7 +52,7 @@ import java.util.Map;
  * <p>
  * A scene builds its building from the same template the Build Gun places (or, for the HUB and the Wormhole Gateway,
  * from {@link Templates}, growing level by level), so a scene can never show a building other than the real one.
- * It shows the building's own lines first (tools/guide.py, BUILDING_GUIDE, read from siftec_content.json), then the
+ * It shows the building's own lines first (tools/tables/guide.py, BUILDING_GUIDE, read from siftec_content.json), then the
  * lines every building shares where they apply: its ports, power, resource node, control panel, cost and unlock, and
  * how it comes down again. The lines are in the lang file: {@code siftec.ponder.<id>.text_<n>} and
  * {@code siftec.ponder.shared.<key>}.
@@ -114,7 +114,7 @@ public final class BuildingScenes {
 
     // ------------------------------------------------------------------------------------------------ the text
 
-    /** The building's own lines (tools/guide.py), in order. */
+    /** The building's own lines (tools/tables/guide.py), in order. */
     public static List<String> lines(BuildingDef def) {
         List<String> out = new ArrayList<>();
         JsonObject raw = Milestones.raw();
