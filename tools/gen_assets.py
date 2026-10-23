@@ -19,9 +19,9 @@ from models import (NORTH_FIRST, SOUTH_FIRST, block_model, blockstate, cube_all,
                     single_blockstate, turned, write_tag)
 from tables import content, guide, shop
 from tables.assets import (BLOCK_ONLY_MACHINES, BOOM_BOX_ELEMENTS, BOOM_BOX_TEXTURES, CART_ASSEMBLER_RAILS, CHECKED_MODS, COLLECT,
-                           COLLECT_ELEMENTS, CROSSED, DEPOSIT, DROPS_ITSELF, EQUIPMENT, FLAT_ITEMS, FLUID_NODE_IDS, FRONTED, HANDHELD,
-                           LOCKED_MODS, MACHINES, MAM_ITEMS, MYCELIA_TAG, NODE_IDS, NODE_TYPES, OPTIONAL_MODS, ORE_DROPS, PICKAXE, PORT_FACES,
-                           PREFAB, PRESERVE_ICONS, PRESERVES_TAG, RETIRED, SHOP_ITEMS, SIFTEC_ORES, SPIDER_REMAINS_TAG, STONE, STONES_TAG, TURNS)
+                           COLLECT_ELEMENTS, DEPOSIT, DROPS_ITSELF, EQUIPMENT, FLAT_ITEMS, FLUID_NODE_IDS, FRONTED, HANDHELD,
+                           LOCKED_MODS, MACHINES, MAM_ITEMS, MYCELIA_TAG, NODE_TYPES, OPTIONAL_MODS, ORE_DROPS, PICKAXE, PORT_FACES,
+                           PREFAB, PRESERVE_ICONS, PRESERVES_TAG, SHOP_ITEMS, SIFTEC_ORES, SPIDER_REMAINS_TAG, STONE, STONES_TAG, TURNS)
 from tables.lang import DIRECTIONS, LANG, MONTHS
 from tables.recipe_tables import MACHINE_OF, REMOVED, SOURCES, WORKSHOP
 
@@ -846,15 +846,10 @@ TEX = os.path.join(A, "textures")
 # the Gateway shares a block class with blocks that turn, so it has the same facing, though nothing on it shows it
 blockstate("wormhole_gateway", {f"facing={d}": {"model": "siftec:block/wormhole_gateway"} for d in ("north", "east", "south", "west")})
 for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "block")) if f.endswith("_side.png")} if os.path.isdir(os.path.join(TEX, "block")) else []):
-    if bid in SHAPED_COLLECT or bid in RETIRED:
-        continue  # the Mercer Sphere and Somersloop have their own shapes (above); retired blocks have none
-    if bid == "speed_governor" or bid.endswith("_node") or bid in NODE_IDS or bid == "node_rock" or bid.startswith("miner_mk") or bid == "portable_miner":
-        continue  # the governor keeps Create's gearshift model; nodes look like ore blocks; old node and miner art is unused
+    if bid in SHAPED_COLLECT:
+        continue  # the Mercer Sphere and Somersloop have their own shapes (above)
     t = lambda face: f"siftec:block/{bid}_{face}"
-    if bid in CROSSED:
-        block_model(bid, {"parent": "minecraft:block/cross", "textures": {"cross": t("side"), "particle": t("side")}})
-        flat_item(bid, t("side"))
-    elif bid == "claim_marker":
+    if bid == "claim_marker":
         # a post six pixels wide; the faces take the middle of the drawn textures
         block_model(bid, {"parent": "minecraft:block/block", "textures": {"particle": t("side"), "side": t("side"), "top": t("top")},
                           "elements": [{"from": [5, 0, 5], "to": [11, 16, 11], "faces": {
@@ -869,8 +864,8 @@ for bid in sorted({f[:-len("_side.png")] for f in os.listdir(os.path.join(TEX, "
         block_model(bid, cube_bottom_top(t("top"), t("side"), t("side")))
 for f in sorted(os.listdir(os.path.join(TEX, "item"))) if os.path.isdir(os.path.join(TEX, "item")) else []:
     iid = f[:-4]
-    if iid in ("fluid_in_bucket", "power_line"):
-        continue  # the Power Line item is gone: the grid's wires are Create: New Age's
+    if iid == "fluid_in_bucket":
+        continue
     flat_item(iid, f"siftec:item/{iid}")
 
 # Create's dough replaces Farmer's Delight's (whose recipes are removed and whose dough is switched off). A tag can

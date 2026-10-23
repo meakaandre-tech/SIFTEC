@@ -8,20 +8,21 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import ASSETS, TOOLS
+from tables.assets import FRONTED
 
 OUT = os.path.join(ASSETS, "textures")
 
 BLOCK_SHEETS = {
-    "blocks_base.png": "hub wormhole_gateway mam awesome_sink awesome_shop equipment_workshop claim_marker dimensional_depot steel_casing "
+    "blocks_base.png": "hub wormhole_gateway mam - - - claim_marker dimensional_depot steel_casing "
                        "drone_port landing_pad main_portal satellite_portal blueprint_designer blueprint_designer_mk3",
-    "blocks_machines.png": "portable_miner miner_mk1 miner_mk2 miner_mk3 resource_well_extractor converter particle_accelerator furnace_engine "
-                           "hub_engine geyser_engine power_pole power_tower power_storage speed_governor radar_tower",
-    "blocks_nodes.png": "iron_node copper_node zinc_node coal_node limestone_node sulfur_node bauxite_node quartz_node sam_node oil_node "
-                        "oil_well nitrogen_node node_rock blue_power_slug_block yellow_power_slug_block purple_power_slug_block "
+    "blocks_machines.png": "- - - - resource_well_extractor - - - "
+                           "hub_engine - - - - - -",
+    "blocks_nodes.png": "- - - - - sulfur_node bauxite_node - sam_node - "
+                        "oil_well - - - - - "
                         "mercer_sphere_block somersloop_block crash_site_block",
 }
 ITEM_SHEETS = {
-    "items_materials.png": "raw_bauxite crushed_bauxite aluminum_scrap aluminum_ingot ficsite_ingot brass_blend copper_powder silica gypsum "
+    "items_materials.png": "raw_bauxite - aluminum_scrap aluminum_ingot ficsite_ingot brass_blend copper_powder silica gypsum "
         "quartz_crystal compacted_coal petroleum_coke biomass solid_biofuel rubber plastic fabric toxic_residue iron_rod screw wire cable "
         "quickwire reinforced_iron_plate steel_beam steel_pipe encased_industrial_beam alclad_aluminum_sheet aluminum_casing modular_frame "
         "heavy_modular_frame fused_modular_frame rotor stator motor turbo_motor heat_sink cooling_system empty_fluid_tank "
@@ -29,20 +30,22 @@ ITEM_SHEETS = {
     "items_tech.png": "circuit_board ai_limiter high_speed_connector computer supercomputer crystal_oscillator radio_control_unit "
         "electromagnetic_control_rod smart_plating versatile_framework automated_wiring modular_engine adaptive_control_unit "
         "assembly_director_system magnetic_field_generator thermal_propulsion_rocket nuclear_pasta biochemical_sculptor "
-        "ballistic_warp_drive ai_expansion_server incomplete_ai_expansion_server blue_power_slug yellow_power_slug purple_power_slug "
-        "power_shard somersloop mercer_sphere hard_drive alien_dna_capsule sam reanimated_sam sam_fluctuator ficsite_trigon time_crystal "
+        "ballistic_warp_drive ai_expansion_server incomplete_ai_expansion_server - - - "
+        "- somersloop mercer_sphere hard_drive alien_dna_capsule sam reanimated_sam sam_fluctuator ficsite_trigon time_crystal "
         "dark_matter_crystal excited_photonic_matter singularity_cell superposition_oscillator incomplete_superposition_oscillator "
         "neural_quantum_processor incomplete_neural_quantum_processor",
     "items_gear.png": "jetpack hover_pack parachute hazmat_suit gas_mask blade_runners gas_filter iodine_infused_filter node_scanner "
-        "object_scanner hub_planner blueprint cardboard_drone power_line toxic_shot apple_jam sweet_berry_jam glow_berry_jam melon_jam "
+        "object_scanner hub_planner blueprint cardboard_drone - toxic_shot apple_jam sweet_berry_jam glow_berry_jam melon_jam "
         "pickled_beetroot pickled_cabbage pickled_carrot pickled_kelp pickled_onion pickled_pumpkin pickled_tomato",
     # the sheet's last ten are buckets; the mod draws those from the game's own bucket instead (see bucket_overlay)
 }
 SCALE = 4
-# sprites still on the sheets for things the pack no longer has (the power slugs and Power Shards went with
-# overclocking): they keep their places on the sheet, so the rest line up, but nothing is cut from them
-GONE = {"blue_power_slug_block", "yellow_power_slug_block", "purple_power_slug_block", "blue_power_slug", "yellow_power_slug",
-        "purple_power_slug", "power_shard"}
+# "-" is a sprite still on its sheet for something nothing draws any more (the power slugs and Power Shards, the old
+# single-block machines, miners and power blocks, the old node art): it keeps its place, so the rest line up, but
+# nothing is cut from it.
+# The faces a block's models use (gen_assets.py): a block that faces a way (tables/assets.py, FRONTED) all three, the
+# ores drawn from node art only the front, the Oil Well only its top, and every other block its top and side.
+FACES = {"bauxite_node": ("front",), "sam_node": ("front",), "sulfur_node": ("front",), "oil_well": ("top",)}
 uneven = []
 
 
@@ -84,17 +87,19 @@ def main():
     for file, ids in BLOCK_SHEETS.items():
         sheet = Image.open(os.path.join(TOOLS, "art", file)).convert("RGBA")
         for i, bid in enumerate(ids.split()):
-            if bid in GONE:
+            if bid == "-":
                 continue
+            faces = FACES.get(bid) or (("top", "front", "side") if bid in FRONTED else ("top", "side"))
             # each card: inventory picture, then top, front and side at 4x
             x, y = (i % 2) * 336, (i // 2) * 104
             for face, dx in (("top", 116), ("front", 192), ("side", 268)):
-                save(shrink(sheet, x + dx, y + 20, bid), "block", f"{bid}_{face}")
+                if face in faces:
+                    save(shrink(sheet, x + dx, y + 20, bid), "block", f"{bid}_{face}")
             blocks.append(bid)
     for file, ids in ITEM_SHEETS.items():
         sheet = Image.open(os.path.join(TOOLS, "art", file)).convert("RGBA")
         for i, iid in enumerate(ids.split()):
-            if iid in GONE:
+            if iid == "-":
                 continue
             save(shrink(sheet, (i % 10) * 64, (i // 10) * 64, iid), "item", iid)
             items.append(iid)

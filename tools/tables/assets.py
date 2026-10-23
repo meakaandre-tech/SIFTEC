@@ -58,10 +58,9 @@ SIFTEC_ORES = {
     "sam_ore": ("SAM Ore", "siftec:block/sam_node_front"),
     "sulfur_ore": ("Sulfur Ore", "siftec:block/sulfur_node_front"),
 }
-# the fluid nodes' own blocks (unbreakable, never mined) and the SIFTEC ores
+# the fluid nodes' own blocks (unbreakable, never mined), and what the SIFTEC ores drop
 FLUID_NODE_IDS = sorted(DEPOSIT[k][2].split(":")[1] for k in DEPOSIT if not DEPOSIT[k][3])
 ORE_DROPS = {DEPOSIT[k][2].split(":")[1]: DEPOSIT[k][3] for k in DEPOSIT if DEPOSIT[k][2].startswith("siftec:") and DEPOSIT[k][3]}
-NODE_IDS = set(FLUID_NODE_IDS) | set(SIFTEC_ORES)
 
 # ---- item tags
 # Recipes that take "Stone" (where Satisfactory takes Concrete) take any of these
@@ -149,16 +148,6 @@ PORT_FACES = {"item_in": "minecraft:block/lime_glazed_terracotta", "item_out": "
 # ---- the art (tools/import_art.py): which blocks take it how
 # the Blueprint Designers' terminals face out of the building's front side, as its controller does
 FRONTED = {"hub", "mam", "resource_well_extractor", "hub_engine", "crash_site_block", "blueprint_designer", "blueprint_designer_mk2", "blueprint_designer_mk3"}
-# drawn as a post or a tripod on a clear background: shown as two crossed planes, like a flower
-CROSSED = set()
-# art of blocks that are gone (work package 6 made the power blocks Build Gun buildings); the HUB Engine's is kept as
-# the look of the HUB's Biomass Burners (its model only)
-RETIRED = {"furnace_engine", "geyser_engine", "power_pole", "power_tower", "power_storage",
-           # work package 10 made these Build Gun buildings: their art stays for when the buildings use it
-           "awesome_sink", "awesome_shop", "equipment_workshop", "radar_tower",
-           # the old single-block Converter and Particle Accelerator: Build Gun buildings since review fixes 4, the blocks
-           # gone since review fixes 6
-           "converter", "particle_accelerator"}
 # blocks that turn to face whoever placed them; the Crash Site Pod is set down by world generation, so it does not
 TURNS = FRONTED - {"crash_site_block", "hub_engine"}
 

@@ -55,10 +55,10 @@ SAT_FLUIDS = {"Water": "water", "Crude Oil": "crude oil", "Fuel": "diesel", "Liq
 # any 1.0 recipe is 25 m3 (Nitrogen Gas for the Fused Modular Frame and Cooling System, Excited Photonic Matter), so 40.
 MB_PER_M3 = 40
 # Satisfactory items the pack leaves out, and with them every recipe that makes or takes them: the Nobelisks and rifle
-# rounds (Gunsmithing's guns, TNT and grenades take their place), Explosive Rebar, the power slugs (Power Shards are
-# gone) and the Portable Miner (a Build Gun building, not an item).
+# rounds (Gunsmithing's guns, TNT and grenades take their place), Explosive Rebar and the Portable Miner (a Build Gun
+# building, not an item). The power slugs only go into the Power Shard recipes, which SAT_NOT_MADE drops.
 SAT_LEFT_OUT = {"Nobelisk", "Gas Nobelisk", "Pulse Nobelisk", "Cluster Nobelisk", "Nuke Nobelisk", "Rifle Ammo", "Homing Rifle Ammo",
-                "Turbo Rifle Ammo", "Explosive Rebar", "Blue Power Slug", "Yellow Power Slug", "Purple Power Slug", "Portable Miner"}
+                "Turbo Rifle Ammo", "Explosive Rebar", "Portable Miner"}
 # made in a recipe, these are left out too: Concrete is gone, and the Power Shard recipes with it
 SAT_NOT_MADE = {"Concrete", "Power Shard"}
 
