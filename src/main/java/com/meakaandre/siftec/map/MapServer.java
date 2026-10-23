@@ -53,7 +53,7 @@ import java.util.UUID;
  * explored, and terrain only once Field Research has given the company the Map.
  */
 public final class MapServer {
-    /** The token Field Research gives (tools/content.py): the minimap and the fullscreen map. */
+    /** The token Field Research gives (tools/tables/content.py): the minimap and the fullscreen map. */
     public static final String TOKEN = "map";
     /** Chunks round a company member that count as visited. */
     public static final int VISIT_RADIUS = 6;

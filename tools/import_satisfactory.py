@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Writes tools/satisfactory.py, the Satisfactory 1.0 numbers the pack's data is built from, out of the game export
+"""Writes tools/tables/satisfactory.py, the Satisfactory 1.0 numbers the pack's data is built from, out of the game export
 that SatisfactoryTools publishes (github.com/greeny/SatisfactoryTools, data/data1.0.json: every recipe, building cost,
 milestone and MAM node of Satisfactory 1.0, as the game itself lists them).
 
@@ -117,7 +117,7 @@ for cls, it in I.items():
     if it["name"] in used:
         items[it["name"]] = {"fluid": bool(it.get("liquid")), "sink": it.get("sinkPoints", 0)}
 
-out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "satisfactory.py")
+out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tables", "satisfactory.py")
 with open(out, "w") as f:
     f.write('"""Satisfactory 1.0, as the game export lists it. Written by tools/import_satisfactory.py from SatisfactoryTools\n')
     f.write(f'data/data1.0.json ({rev}); do not edit by hand. Fluid amounts are m3, times seconds."""\n\n')

@@ -24,7 +24,7 @@ import java.util.Map;
  * block itself on the patch (minecraft:iron_ore, create:zinc_ore, the stone block of a stone node; a SIFTEC ore block
  * only where neither the game nor Create has one), made a node by its position ({@link NodeSites}): mined, it drops
  * what that block always drops and leaves air that grows back into the same block. Every node type has one look,
- * except stone nodes, which have one per stone. tools/gen_assets.py (STONE and DEPOSIT) draws the same table; keep
+ * except stone nodes, which have one per stone. tools/tables/assets.py (STONE and DEPOSIT) draws the same table; keep
  * the two in step.
  *
  * @param id     the look's name

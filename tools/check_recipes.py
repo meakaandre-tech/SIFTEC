@@ -14,8 +14,11 @@ recipes clash only when they take the same kinds of input and make the same thin
 input is enough. A clash with a Hard Drive alternate is listed, not refused: the company chose the alternate."""
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import content
+from tables import content
 import recipes
+from common import CONTENT_JSON
+from tables.assets import PRESERVES_TAG
+from tables.recipe_tables import WORKSHOP
 
 C = "create:"
 BASIN = {"create:mixing", "create:compacting"}
@@ -27,8 +30,7 @@ RAW = {"minecraft:raw_iron", "minecraft:raw_copper", "create:raw_zinc", "minecra
        # the Converter's cell is part of its machine: the building has one, and its Item Drain gives it back every time
        "siftec:converter_cell"}
 # pack tags the MAM takes, of things the pack itself makes
-TAGS = {"#siftec:preserves": ["siftec:pickled_" + w for w in ("tomato", "onion", "cabbage", "pumpkin", "carrot", "beetroot", "kelp")]
-        + ["siftec:" + w + "_jam" for w in ("sweet_berry", "glow_berry", "apple", "melon")]}
+TAGS = {"#siftec:preserves": PRESERVES_TAG}
 # what a building gives that is not a recipe: the Nuclear Power Plant's waste (its fuel rods go in, work package 6)
 GENERATED = [({"siftec:uranium_fuel_rod"}, {"siftec:uranium_waste"}, "nuclear_power"),
              ({"siftec:plutonium_fuel_rod"}, {"siftec:plutonium_waste"}, "nuclear_power")]
@@ -220,7 +222,7 @@ def check(data=None):
                     errors.append(f"MAM {tree} / {name} needs {a}, which is no MAM node")
     for i in sorted(checked - known):
         errors.append(f"reachability: nothing reachable makes {i}")
-    for name, cost in list(content.BUILD_COSTS.items()) + [(i, c) for i, c in recipes.WORKSHOP]:
+    for name, cost in list(content.BUILD_COSTS.items()) + [(i, c) for i, c in WORKSHOP]:
         if cost and not payable(cost):
             errors.append(f"reachability: {name} costs something nothing makes ({cost})")
     reach = len(checked & known)
@@ -334,8 +336,11 @@ def check(data=None):
 
 if __name__ == "__main__":
     import json
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "siftec_content.json")
-    errors, notes, summary = check(json.load(open(path)) if os.path.exists(path) else None)
+    data = None
+    if os.path.exists(CONTENT_JSON):
+        with open(CONTENT_JSON) as f:
+            data = json.load(f)
+    errors, notes, summary = check(data)
     for n in notes:
         print("note:", n)
     for e in errors:
