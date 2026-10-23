@@ -94,7 +94,7 @@ public final class MapTerrain {
         try {
             Files.createDirectories(root.resolve("terrain"));
         } catch (IOException e) {
-            Siftec.LOGGER.error("SIFTEC map: could not make {}", root, e);
+            Siftec.LOGGER.error("SIFTEC: could not make the map folder {}", root, e);
         }
     }
 
@@ -136,7 +136,7 @@ public final class MapTerrain {
             try {
                 tile = MapTile.unpack(Files.readAllBytes(file));
             } catch (IOException e) {
-                Siftec.LOGGER.warn("SIFTEC map: unreadable tile {}, starting it again", file, e);
+                Siftec.LOGGER.warn("SIFTEC: unreadable map tile {}, starting it again", file, e);
             }
         }
         if (tile == null) tile = new MapTile();
@@ -172,7 +172,7 @@ public final class MapTerrain {
             Files.write(tmp, data);
             Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            Siftec.LOGGER.error("SIFTEC map: could not write {}", file, e);
+            Siftec.LOGGER.error("SIFTEC: could not write the map file {}", file, e);
         }
     }
 
@@ -369,7 +369,7 @@ public final class MapTerrain {
                     byChunk.put(key, list);
                 }
             } catch (IOException e) {
-                Siftec.LOGGER.warn("SIFTEC map: unreadable {}", file, e);
+                Siftec.LOGGER.warn("SIFTEC: unreadable map file {}", file, e);
             }
         }
         return byChunk;
@@ -395,7 +395,7 @@ public final class MapTerrain {
             out.flush();
             write(file, bytes.toByteArray());
         } catch (IOException e) {
-            Siftec.LOGGER.error("SIFTEC map: could not write {}", file, e);
+            Siftec.LOGGER.error("SIFTEC: could not write the map file {}", file, e);
         }
     }
 

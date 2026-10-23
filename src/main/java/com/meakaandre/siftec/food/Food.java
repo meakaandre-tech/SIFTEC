@@ -220,7 +220,7 @@ public final class Food {
                 try {
                     cache = compute(recipes, level);
                 } catch (RuntimeException e) {
-                    Siftec.LOGGER.warn("SIFTEC could not read the recipes to work out food effects", e);
+                    Siftec.LOGGER.warn("SIFTEC: could not read the recipes to work out food effects", e);
                     cache = Map.of();
                 }
                 cachedFor = recipes;

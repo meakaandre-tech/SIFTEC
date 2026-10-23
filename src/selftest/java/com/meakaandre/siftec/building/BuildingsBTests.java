@@ -2,6 +2,8 @@ package com.meakaandre.siftec.building;
 
 import com.google.gson.JsonElement;
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.command.LogisticsTests;
 import com.meakaandre.siftec.company.Companies;
@@ -41,7 +43,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -83,12 +84,9 @@ public final class BuildingsBTests {
     private static final int WARMUP = 600, MINUTE = 1200;
     private static final long MB = FluidConstants.BUCKET / 1000;
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
+    private static final TestQueue LATER = new TestQueue();
     private static final List<Runnable> EVERY_TICK = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST buildings_b ");
 
     private BuildingsBTests() {
     }
@@ -96,12 +94,7 @@ public final class BuildingsBTests {
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (Runnable r : new ArrayList<>(EVERY_TICK)) r.run();
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
+            LATER.runDue(server.overworld().getGameTime());
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             LATER.clear();
@@ -117,19 +110,15 @@ public final class BuildingsBTests {
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        LATER.add(new Later(level.getGameTime() + ticks, run));
+        LATER.add(level.getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST buildings_b " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Item item(String id) {
@@ -354,7 +343,7 @@ public final class BuildingsBTests {
 
     private static void runSettled(CommandSourceStack source) {
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         Company company = company(level);
         List<ControllerBlockEntity> powered = new ArrayList<>();
         List<Measure> measures = new ArrayList<>();
@@ -624,7 +613,7 @@ public final class BuildingsBTests {
                 int rip = 0;
                 for (ItemStack s : back) if (s.is(item("siftec:reinforced_iron_plate"))) rip += s.getCount();
                 expect(source, "the Assembler dismantles with its cost (8 Reinforced Iron Plate, 4 Rotor, 10 Cable) and contents", rip >= 8, back.size() + " stacks back, " + rip + " plates");
-                report(source, "result: " + passed + " passed, " + failed + " failed");
+                report(source, "result: " + REPORT.totals());
             });
         });
     }
@@ -638,7 +627,7 @@ public final class BuildingsBTests {
     private static int restart(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         Placement ma = at("manufacturer", X + 4 * STEP, Z), pa = at("particle_accelerator", X + 10 * STEP, Z);
         level.getChunk(ma.anchor());
         level.getChunk(pa.anchor());
@@ -664,7 +653,7 @@ public final class BuildingsBTests {
             ControllerBlockEntity p2 = controller(level, pa);
             expect(source, "restart: the Particle Accelerator is back on its grid and goes on making", p2 != null && p2.powered && p2.made > before,
                 p2 == null ? "no controller" : before + " -> " + p2.made + ", " + MachineTests.inside(level, p2));
-            report(source, "restart result: " + passed + " passed, " + failed + " failed");
+            report(source, "restart result: " + REPORT.totals());
         });
         return 1;
     }

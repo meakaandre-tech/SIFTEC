@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.blueprint;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.backpack.Carried;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingDef;
@@ -21,14 +23,11 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
@@ -68,25 +67,14 @@ public final class DesignerTests {
     private static final String[] UNLOCKS = {"ficsit_blueprints", "ficsit_blueprints_mk2", "ficsit_blueprints_mk3"};
     private static final int[] SIDES = {9, 13, 17};
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST designer ");
 
     private DesignerTests() {
     }
 
     public static void register() {
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("designer").executes(DesignerTests::run)))
@@ -96,24 +84,20 @@ public final class DesignerTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST designer " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         BuildingTemplate.forget();
         BuildingTests.platform(level, X - 16, Z - 40, X + 150, Z + 40, Y, 26);
-        LATER.add(new Later(level.getServer().overworld().getGameTime() + 10, () -> {
+        LATER.add(level.getServer().overworld().getGameTime() + 10, () -> {
             for (int k = 0; k < TIERS.length; k++) {
                 int tier = k;
                 try {
@@ -123,8 +107,8 @@ public final class DesignerTests {
                     expect(source, TIERS[tier] + " runs to the end", false, e.toString());
                 }
             }
-            report(source, "done: " + passed + " passed, " + failed + " failed");
-        }));
+            report(source, "done: " + REPORT.totals());
+        });
         report(source, "test site ready; the checks report in a moment");
         return 1;
     }

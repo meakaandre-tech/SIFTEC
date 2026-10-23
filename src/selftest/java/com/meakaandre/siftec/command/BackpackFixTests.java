@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.backpack.Backpack;
 import com.meakaandre.siftec.blueprint.Blueprints;
 import com.meakaandre.siftec.building.BuildGun;
@@ -21,13 +23,10 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -40,7 +39,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -57,25 +55,14 @@ public final class BackpackFixTests {
     private static final int X = 8400, Y = 200, Z = -8400;
     private static final String COMPANY = "selftest_backpackfix";
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST backpackfix ");
 
     private BackpackFixTests() {
     }
 
     public static void register() {
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("backpackfix").executes(BackpackFixTests::run)))));
@@ -84,15 +71,11 @@ public final class BackpackFixTests {
     // ------------------------------------------------------------------------------------------------ helpers
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST backpackfix " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Company company(ServerLevel level, String... done) {
@@ -136,11 +119,11 @@ public final class BackpackFixTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         BuildingTests.platform(level, X - 8, Z - 8, X + 48, Z + 48, Y, 16);
         for (VehicleEntity v : level.getEntitiesOfClass(VehicleEntity.class, new AABB(X - 8, Y - 40, Z - 8, X + 48, Y + 40, Z + 48))) v.discard();
         // long enough for the forced chunks' entities to load, so the Tractor can be found once it is put down
-        LATER.add(new Later(level.getGameTime() + 100, () -> checks(source, level)));
+        LATER.add(level.getGameTime() + 100, () -> checks(source, level));
         report(source, "test site ready; the checks report in a moment");
         return 1;
     }
@@ -168,7 +151,7 @@ public final class BackpackFixTests {
             CompanyData.get(level.getServer()).companies().remove(COMPANY);
             CompanyData.get(level.getServer()).setDirty();
         }
-        report(source, "done: " + passed + " passed, " + failed + " failed");
+        report(source, "done: " + REPORT.totals());
     }
 
     private static void run(CommandSourceStack source, String part, Runnable checks) {

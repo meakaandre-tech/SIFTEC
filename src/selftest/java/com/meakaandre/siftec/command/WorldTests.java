@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.command;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.BuildingPower;
@@ -29,7 +29,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
@@ -60,6 +59,8 @@ import java.util.TreeMap;
  * output starts with "SELFTEST world".
  */
 public final class WorldTests {
+    private static final TestReport REPORT = new TestReport("SELFTEST world ");
+
     private WorldTests() {
     }
 
@@ -133,9 +134,7 @@ public final class WorldTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST world " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static BlockPos origin(ServerLevel level) {

@@ -176,7 +176,7 @@ public final class GeyserSearch {
             // the chunks with no caves that were sampled are read too: there is nothing in them
             for (long c : chunks) if (!job.queue.contains(c)) searched.add(c);
             job.queue.removeIf(searched::has);
-            Siftec.LOGGER.info("SIFTEC geysers: search round {} r{}: {} chunks sampled, {} with sulfur caves, {} to generate",
+            Siftec.LOGGER.info("SIFTEC: geyser search round {} r{}: {} chunks sampled, {} with sulfur caves, {} to generate",
                 centre.toShortString(), radius, chunks.size(), caves.size(), job.queue.size());
             if (job.queue.isEmpty()) done.accept(List.of());
             else JOBS.add(job);
@@ -206,7 +206,7 @@ public final class GeyserSearch {
                         // not read: asked for again a few times, and never marked as read
                         int tries = job.failed.addTo(c, 1) + 1;
                         if (tries <= RETRIES) job.queue.add(c);
-                        else Siftec.LOGGER.warn("SIFTEC geysers: chunk {} {} could not be generated; it is left for a later search", x, z);
+                        else Siftec.LOGGER.warn("SIFTEC: geyser search: chunk {} {} could not be generated; it is left for a later search", x, z);
                         return;
                     }
                     List<BlockPos> here = read(level, chunk);
@@ -217,7 +217,7 @@ public final class GeyserSearch {
             }
             if (job.queue.isEmpty() && job.running == 0) {
                 JOBS.remove(job);
-                Siftec.LOGGER.info("SIFTEC geysers: search done, {} geysers found", job.found.size());
+                Siftec.LOGGER.info("SIFTEC: geyser search done, {} geysers found", job.found.size());
                 job.done.accept(List.copyOf(job.found));
             }
         }

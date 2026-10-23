@@ -240,7 +240,7 @@ public final class AncientCities {
             out.sort(Comparator.comparingDouble(p -> p.distSqr(new BlockPos(from.getX(), p.getY(), from.getZ()))));
             return List.copyOf(out.subList(0, Math.min(CITIES_KEPT, out.size())));
         } catch (RuntimeException e) {
-            Siftec.LOGGER.warn("Could not look for Ancient Cities", e);
+            Siftec.LOGGER.warn("SIFTEC: could not look for Ancient Cities", e);
             return List.of();
         }
     }

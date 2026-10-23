@@ -3,6 +3,7 @@ package com.meakaandre.siftec.guide;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.hub.Milestone;
@@ -17,7 +18,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,7 +55,7 @@ public final class GuideTests {
         }
     }
 
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST guide ");
 
     private GuideTests() {
     }
@@ -80,21 +80,16 @@ public final class GuideTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST guide " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        passed = 0;
-        failed = 0;
+        REPORT.reset();
 
         // every building and vehicle the Build Gun puts down has its stand-in item and its own lines
         List<String> noItem = new ArrayList<>(), noLines = new ArrayList<>();
@@ -141,7 +136,7 @@ public final class GuideTests {
         expect(source, "every milestone and Wormhole phase has its text", noText.isEmpty() && milestones > 0,
             milestones + " milestones and phases" + (noText.isEmpty() ? "" : "; missing " + noText));
 
-        report(source, "done: " + passed + " passed, " + failed + " failed");
-        return failed == 0 ? 1 : 0;
+        report(source, "done: " + REPORT.totals());
+        return REPORT.failed == 0 ? 1 : 0;
     }
 }

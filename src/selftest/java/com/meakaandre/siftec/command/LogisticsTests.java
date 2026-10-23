@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.command;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -39,7 +40,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -68,12 +68,9 @@ public final class LogisticsTests {
     private static final int X = 4200, Y = 230, Z = 2800;
     private static final int BELT_LENGTH = 20, MEASURE_TICKS = 10;
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
+    private static final TestQueue LATER = new TestQueue();
     private static final List<Runnable> EVERY_TICK = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST logistics ");
 
     private LogisticsTests() {
     }
@@ -81,12 +78,7 @@ public final class LogisticsTests {
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (Runnable r : new ArrayList<>(EVERY_TICK)) r.run();
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
+            LATER.runDue(server.overworld().getGameTime());
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             LATER.clear();
@@ -100,19 +92,15 @@ public final class LogisticsTests {
     // ------------------------------------------------------------------------------------------------ helpers
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        LATER.add(new Later(level.getGameTime() + ticks, run));
+        LATER.add(level.getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST logistics " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     /** A test company that has done every milestone carrying any of these tokens (none: a company that has done nothing). */
@@ -234,7 +222,7 @@ public final class LogisticsTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         BuildingTests.platform(level, X - 10, Z - 10, X + 110, Z + 90, Y, 10);
         // clear what an earlier run left lying about
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(X - 10, Y - 1, Z - 10, X + 110, Y + 10, Z + 90))) e.discard();
@@ -245,7 +233,7 @@ public final class LogisticsTests {
             drones(source, level);
             depot(source, level);
         });
-        later(level, 1500, () -> report(source, "done: " + passed + " passed, " + failed + " failed"));
+        later(level, 1500, () -> report(source, "done: " + REPORT.totals()));
         report(source, "test site ready; the test runs in a second and reports in about a minute");
         return 1;
     }

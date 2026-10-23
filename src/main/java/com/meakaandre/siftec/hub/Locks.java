@@ -49,7 +49,7 @@ public final class Locks {
             ItemStack stack = player.getItemInHand(hand);
             if (!(stack.getItem() instanceof BlockItem) || allowed(player, stack)) return InteractionResult.PASS;
             if (player instanceof ServerPlayer server) {
-                server.sendOverlayMessage(Component.translatable("siftec.lock.item", lockOf(stack.getItem()).name()));
+                tellLocked(server, lockOf(stack.getItem()));
                 // the client has already drawn the block; put its inventory and view right again
                 server.containerMenu.broadcastFullState();
             }
@@ -67,12 +67,17 @@ public final class Locks {
         return BY_ITEM.get(BuiltInRegistries.ITEM.getKey(item));
     }
 
+    /** Tells the player, over the hotbar, that this milestone or research node has to be done first. */
+    public static void tellLocked(ServerPlayer player, Milestone lock) {
+        player.sendOverlayMessage(Component.translatable("siftec.lock.item", lock.name()));
+    }
+
     /** False, with the reason shown to the player, if the player's company may not take this item out of a result slot. */
     public static boolean mayTake(Player player, ItemStack stack) {
         if (allowed(player, stack)) return true;
         Milestone lock = lockOf(stack.getItem());
         if (player instanceof ServerPlayer server && lock != null) {
-            server.sendOverlayMessage(Component.translatable("siftec.lock.item", lock.name()));
+            tellLocked(server, lock);
         }
         return false;
     }

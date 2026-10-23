@@ -2,6 +2,8 @@ package com.meakaandre.siftec.building;
 
 import com.google.gson.JsonElement;
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -38,7 +40,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
@@ -93,31 +94,25 @@ public final class MachineTests {
     private static final String COMPANY = "selftest_machines";
     private static final int WARMUP = 600, MINUTES = 2, MINUTE = 1200;
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
+    private static final TestQueue LATER = new TestQueue();
     /** Things done every tick while the test runs (feeding, emptying, sampling); each says when it is done. */
     private static final List<BooleanSupplier> EVERY_TICK = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST machines ");
 
     private MachineTests() {
     }
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
+            LATER.runDue(server.overworld().getGameTime(), run -> {
                 try {
-                    l.run.run();
+                    run.run();
                 } catch (RuntimeException e) {
                     Siftec.LOGGER.error("SIFTEC: selftest machines check threw", e);
-                    failed++;
+                    REPORT.failed++;
                     Siftec.LOGGER.info("SELFTEST machines FAIL a delayed check threw: {}", e.toString());
                 }
-            }
+            });
             for (BooleanSupplier s : new ArrayList<>(EVERY_TICK)) {
                 try {
                     if (s.getAsBoolean()) EVERY_TICK.remove(s);
@@ -140,19 +135,15 @@ public final class MachineTests {
     // ------------------------------------------------------------------------------------------------ reporting
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        LATER.add(new Later(level.getServer().overworld().getGameTime() + ticks, run));
+        LATER.add(level.getServer().overworld().getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST machines " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static void near(CommandSourceStack source, String what, double got, double want, double share) {
@@ -422,7 +413,7 @@ public final class MachineTests {
     private static int run(CommandContext<CommandSourceStack> context, boolean restart) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         if (restart) {
             afterRestart(source, level);
             return 1;
@@ -774,7 +765,7 @@ public final class MachineTests {
         });
         later(level, 860, () -> {
             expect(source, "turned again, they make again", out[0] > at[0] && out[1] > at[1], (out[0] - at[0]) + " Diamonds, " + (out[1] - at[1]) + " Iron Ore in 18 s");
-            report(source, "result: " + passed + " passed, " + failed + " failed");
+            report(source, "result: " + REPORT.totals());
         });
     }
 
@@ -830,14 +821,14 @@ public final class MachineTests {
 
     private static void afterRestart(CommandSourceStack source, ServerLevel level) {
         // the state selftest clears the test companies after a restart: the machines run their company's recipes only
-        LATER.add(new Later(level.getGameTime() + 100, () -> company(level)));
+        LATER.add(level.getGameTime() + 100, () -> company(level));
         ControllerBlockEntity bio = controller(level, "biomass_burner", BIOMASS), coal = controller(level, "coal_generator", COAL),
             diesel = controller(level, "fuel_generator", DIESEL), nuke = controller(level, "nuclear_power_plant", NUCLEAR),
             pa = controller(level, "particle_accelerator", ACCELERATOR), conv = controller(level, "converter", CONVERTER);
         List<ControllerBlockEntity> all = new ArrayList<>(Arrays.asList(bio, coal, diesel, nuke, pa, conv));
         expect(source, "after restart: the buildings are there", !all.contains(null), all.stream().map(c -> c == null ? "missing" : c.buildingId).toList().toString());
         if (all.contains(null)) {
-            report(source, "result: " + passed + " passed, " + failed + " failed");
+            report(source, "result: " + REPORT.totals());
             return;
         }
         bio.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 64));
@@ -885,7 +876,7 @@ public final class MachineTests {
             report(source, "after restart: the Nuclear Power Plant's reactor: " + reactorState(level, nuke));
             expect(source, "after restart: the burners burn again", bio.made > madeBio || coal.made > madeCoal, (bio.made - madeBio) + " biofuel, " + (coal.made - madeCoal) + " coal");
             expect(source, "after restart: the Particle Accelerator and the Converter make again", out[0] > 0 && out[1] > 0, out[0] + " Diamonds, " + out[1] + " Iron Ore");
-            report(source, "result: " + passed + " passed, " + failed + " failed");
+            report(source, "result: " + REPORT.totals());
         });
     }
 }

@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.command;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -29,7 +29,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -46,6 +45,8 @@ import java.util.TreeSet;
  * through Tier 0), {@code content} ({@link ContentSelfTest}) and {@code nether} (the nearest quartz node).
  */
 public final class CoreTests {
+    private static final TestReport REPORT = new TestReport("");
+
     private CoreTests() {
     }
 
@@ -222,7 +223,6 @@ public final class CoreTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        Siftec.LOGGER.info(text);
-        source.sendSuccess(() -> Component.literal(text), false);
+        REPORT.report(source, text);
     }
 }

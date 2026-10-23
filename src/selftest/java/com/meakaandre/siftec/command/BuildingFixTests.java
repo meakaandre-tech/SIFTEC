@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.building.BasinPace;
 import com.meakaandre.siftec.building.BuildingDef;
@@ -30,8 +32,6 @@ import com.zurrtum.create.content.kinetics.crank.HandCrankBlockEntity;
 import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -76,25 +76,15 @@ public final class BuildingFixTests {
     private static final int X = 12000, Y = 200, Z = -12000;
     private static final String COMPANY = "selftest_buildingfix";
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed, pending;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST buildingfix ");
+    private static int pending;
 
     private BuildingFixTests() {
     }
 
     public static void register() {
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("buildingfix").executes(BuildingFixTests::run)))));
@@ -104,28 +94,24 @@ public final class BuildingFixTests {
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
         pending++;
-        LATER.add(new Later(level.getServer().overworld().getGameTime() + ticks, () -> {
+        LATER.add(level.getServer().overworld().getGameTime() + ticks, () -> {
             try {
                 run.run();
             } catch (RuntimeException e) {
                 Siftec.LOGGER.error("SIFTEC: selftest buildingfix check threw", e);
-                failed++;
+                REPORT.failed++;
                 Siftec.LOGGER.info("SELFTEST buildingfix FAIL a delayed check threw: {}", e.toString());
             }
             pending--;
-        }));
+        });
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST buildingfix " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     /** The test company, with the milestones its buildings and recipes need. */
@@ -182,7 +168,8 @@ public final class BuildingFixTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = pending = 0;
+        REPORT.reset();
+        pending = 0;
         BuildingTemplate.forget();
         BuildingTests.platform(level, X - 8, Z - 50, X + 140, Z + 56, Y, 32);
         later(level, 10, () -> {
@@ -209,10 +196,10 @@ public final class BuildingFixTests {
 
     private static void finish(CommandSourceStack source, ServerLevel level) {
         if (pending > 0) {
-            LATER.add(new Later(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level)));
+            LATER.add(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level));
             return;
         }
-        report(source, "done: " + passed + " passed, " + failed + " failed");
+        report(source, "done: " + REPORT.totals());
     }
 
     // ------------------------------------------------------------------------------------------------ 8: ports only

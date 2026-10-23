@@ -62,7 +62,7 @@ public final class MapFog {
                     fog.put(region, bits);
                 }
             } catch (IOException e) {
-                Siftec.LOGGER.warn("SIFTEC map: unreadable fog {}", file, e);
+                Siftec.LOGGER.warn("SIFTEC: unreadable map fog {}", file, e);
             }
         }
         return fog;
@@ -128,7 +128,7 @@ public final class MapFog {
                 Files.write(tmp, bytes.toByteArray());
                 Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             } catch (IOException e) {
-                Siftec.LOGGER.error("SIFTEC map: could not write fog {}", file, e);
+                Siftec.LOGGER.error("SIFTEC: could not write the map fog {}", file, e);
             }
         }
         DIRTY.clear();
