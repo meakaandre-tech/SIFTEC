@@ -105,10 +105,10 @@ public final class Generators {
 
     static void tick(ServerLevel level, ControllerBlockEntity c, BuildingDef def) {
         switch (def.power()) {
-            case "biomass", "coal" -> steam(level, c, def);
-            case "fuel" -> diesel(level, c, def);
-            case "nuclear" -> nuclear(level, c, def);
-            case "geothermal" -> geothermal(level, c, def);
+            case BIOMASS, COAL -> steam(level, c, def);
+            case FUEL -> diesel(level, c, def);
+            case NUCLEAR -> nuclear(level, c, def);
+            case GEOTHERMAL -> geothermal(level, c, def);
             default -> {
             }
         }
@@ -253,7 +253,7 @@ public final class Generators {
             return;
         }
         FluidStack fuel = engine.siftec$fuel();
-        double mjPerMb = fuel.isEmpty() ? 0 : BuildingPower.fluidMj("fuel", fuel.getFluid());
+        double mjPerMb = fuel.isEmpty() ? 0 : BuildingPower.fluidMj(PowerRole.FUEL, fuel.getFluid());
         if (mjPerMb > 0) {
             // Satisfactory's MW out of this fuel's megajoules: mB a tick at full load
             engine.siftec$set(FUEL_SPEED, FUEL_STRENGTH, (float) (def.mw() / 20 / mjPerMb), load(level, c));
@@ -294,7 +294,7 @@ public final class Generators {
             if (least > ROD_REFILL || !acceptor.container.getItem(0).isEmpty()) continue;
             if (!water || c.tripped) continue;
             ItemStack in = c.input.getItem(0);
-            if (BuildingPower.itemMj("nuclear", in) <= 0) {
+            if (BuildingPower.itemMj(PowerRole.NUCLEAR, in) <= 0) {
                 waiting = true;
                 continue;
             }

@@ -5,6 +5,7 @@ import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.PortBlock;
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.building.SimAccess;
 import com.meakaandre.siftec.drone.DronePortBlockEntity;
 import com.meakaandre.siftec.drone.PortContainer;
@@ -229,7 +230,7 @@ public final class Factories {
 
     /** Whether the simulation runs a node at all (one with nothing to simulate is left alone while its chunk does not tick). */
     private static boolean simulates(Node n) {
-        return !n.mode.equals("none") || n.su > 0 || n.kind.equals("drone_port");
+        return n.mode != NodeMode.NONE || n.su > 0 || n.kind == NodeKind.DRONE_PORT;
     }
 
     /**
@@ -373,10 +374,10 @@ public final class Factories {
         if (!reach.has(pos)) return false;
         BlockEntity be = reach.be(pos);
         return switch (n.kind) {
-            case "drone_port" -> be instanceof DronePortBlockEntity;
-            case "inventory" -> ItemStorage.SIDED.find(level, pos, reach.state(pos), be, null) != null;
+            case DRONE_PORT -> be instanceof DronePortBlockEntity;
+            case INVENTORY -> ItemStorage.SIDED.find(level, pos, reach.state(pos), be, null) != null;
             default -> be instanceof ControllerBlockEntity c ? n.building.isEmpty() || c.buildingId.equals(n.building)
-                : n.building.isEmpty() && n.mode.equals("none") && be != null;
+                : n.building.isEmpty() && n.mode == NodeMode.NONE && be != null;
         };
     }
 
@@ -436,7 +437,7 @@ public final class Factories {
         }
         BlockEntity be = level.getBlockEntity(n.blockPos());
         switch (n.kind) {
-            case "drone_port" -> {
+            case DRONE_PORT -> {
                 if (be instanceof DronePortBlockEntity port) port.fromSim(n);
             }
             default -> {
@@ -543,7 +544,7 @@ public final class Factories {
 
     /** Reads a building's model, its buffers and its belts and pipes. */
     static void record(ServerLevel level, SimData data, ControllerBlockEntity c) {
-        Node n = data.nodeOrNew(level, c.getBlockPos(), "building");
+        Node n = data.nodeOrNew(level, c.getBlockPos(), NodeKind.BUILDING);
         if (n.sim) return;
         SimAccess.model(level, c, n);
         List<Long> chunks = SimAccess.chunks(c);
@@ -573,7 +574,7 @@ public final class Factories {
     private static boolean refresh(ServerLevel level, Buffers.Reach reach, Node n) {
         if (!reach.has(n.blockPos())) return false;
         BlockEntity be = reach.be(n.blockPos());
-        if (n.kind.equals("drone_port")) {
+        if (n.kind == NodeKind.DRONE_PORT) {
             if (!(be instanceof DronePortBlockEntity port)) return false;
             port.toSim(n);
             return true;
@@ -601,12 +602,12 @@ public final class Factories {
             for (Tracer.End e : ends) {
                 Node to;
                 if (e.inventory()) {
-                    to = data.nodeOrNew(level, e.at(), "inventory");
-                    to.mode = "store";
+                    to = data.nodeOrNew(level, e.at(), NodeKind.INVENTORY);
+                    to.mode = NodeMode.STORE;
                     if (!to.sim) refresh(level, to);
                 } else {
                     if (e.node().equals(c.getBlockPos())) continue;
-                    to = data.nodeOrNew(level, e.node(), "building");
+                    to = data.nodeOrNew(level, e.node(), NodeKind.BUILDING);
                     // a building it has not read yet (or never will, as the HUB): known by its id until it is
                     if (to.building.isEmpty() && Chunks.blockEntity(level, e.node()) instanceof ControllerBlockEntity tc) to.building = tc.buildingId;
                 }
@@ -667,9 +668,9 @@ public final class Factories {
     }
 
     private static void read(ServerLevel level, SimData data, DronePortBlockEntity port) {
-        Node n = data.nodeOrNew(level, port.getBlockPos(), "drone_port");
+        Node n = data.nodeOrNew(level, port.getBlockPos(), NodeKind.DRONE_PORT);
         if (n.sim) return;
-        n.mode = "port";
+        n.mode = NodeMode.PORT;
         n.parkedAt = Long.MIN_VALUE;
         port.toSim(n);
         n.recordedAt = level.getGameTime();
@@ -683,7 +684,7 @@ public final class Factories {
     public static int deliverToPort(ServerLevel level, BlockPos at, List<ItemStack> cargo) {
         SimData data = SimData.get(level.getServer());
         Node far = data.node(level, at);
-        if (far == null || !far.kind.equals("drone_port")) return -1;
+        if (far == null || far.kind != NodeKind.DRONE_PORT) return -1;
         if (!far.sim && level.isLoaded(at)) return -1;
         // not simulated yet (its chunk just stopped ticking), or the worker is on a step: the drone waits a second
         if (!far.sim || busy()) return cargo.size();
@@ -835,7 +836,7 @@ public final class Factories {
             if (n == null || level == null || !n.sim) continue;
             // a generator or Power Storage in such a grid is its remembered self (PowerGrids burns and charges it; the
             // simulation burns what it gave from the fuel it has, before each step); a consumer asks for what it needs
-            if (Sim.generator(n) || n.power.equals("storage")) continue;
+            if (Sim.generator(n) || n.power == PowerRole.STORAGE) continue;
             PowerMemory.Remembered r = PowerMemory.get(level).at(level, n.blockPos());
             if (r != null) r.simulateDemand(Sim.demand(n, now));
         }
@@ -854,10 +855,7 @@ public final class Factories {
         ServerLevel level = level(s, n.dim);
         PowerMemory.Remembered r = level == null ? null : PowerMemory.get(level).at(level, n.blockPos());
         if (r == null) return;
-        boolean fuel = switch (n.power) {
-            case "biomass", "coal", "fuel", "nuclear" -> true;
-            default -> false;
-        };
+        boolean fuel = n.power.burnsFuel();
         double spent = r.takeSpent();
         if (spent > 0 && fuel) {
             Sim.burn(n, spent);
@@ -866,7 +864,7 @@ public final class Factories {
         double cap = fuel ? Sim.capacity(n) : -1, reserve = fuel ? Sim.fuelEnergy(n) : -1;
         if (mixed) {
             if (fuel) r.simFuel(cap, reserve);
-            if (n.power.equals("storage")) n.stored = r.stored();
+            if (n.power == PowerRole.STORAGE) n.stored = r.stored();
             n.tripped = r.tripped();
         } else {
             r.fromSim(cap, reserve, n.stored, n.tripped);
@@ -1019,7 +1017,7 @@ public final class Factories {
                 if (from != null && to != null && from.sim && to.sim) u.union(l.from, l.to);
             }
             for (Node n : sim) {
-                if (n.kind.equals("drone_port") && n.destination != null) {
+                if (n.kind == NodeKind.DRONE_PORT && n.destination != null) {
                     Node far = all.get(SimData.key(n.dim, n.destination));
                     if (far != null && far.sim) u.union(n.key(), far.key());
                 }

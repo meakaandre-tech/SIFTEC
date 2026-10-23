@@ -231,7 +231,7 @@ public class ControllerBlockEntity extends BlockEntity {
         // a Foundations-tab piece (a foundation, wall or roof) or a Blueprint Designer runs nothing and makes nothing: it
         // only has to stay whole
         BuildingDef def = def();
-        boolean foundation = def != null && (def.logic().equals("foundation") || def.logic().equals("designer"));
+        boolean foundation = def != null && def.logic().isFoundation();
         if (!broken && !foundation) BuildingLogic.tick(server, this);
         // the factory simulation reads it now and then, to run it while its chunk does not tick
         if (!broken && indexed && !foundation) Factories.building(server, this);

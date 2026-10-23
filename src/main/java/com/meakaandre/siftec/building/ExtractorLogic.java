@@ -230,15 +230,15 @@ public final class ExtractorLogic {
 
     static void status(Level level, ControllerBlockEntity c, BuildingDef def, List<Component> parts) {
         switch (def.logic()) {
-            case "extractor", "well_extractor" -> {
-                Purity purity = def.logic().equals("well_extractor") ? (level instanceof ServerLevel s ? well(s, c).purity() : null)
+            case EXTRACTOR, WELL_EXTRACTOR -> {
+                Purity purity = def.logic() == Logic.WELL_EXTRACTOR ? (level instanceof ServerLevel s ? well(s, c).purity() : null)
                     : def.node() ? nodePurity(level, c, def) : Purity.NORMAL;
                 float perMinute = purity == null ? 0 : def.rate() * purity.multiplier;
                 parts.add(Component.translatable("siftec.building.extracting", Math.round(perMinute / ExtractorLogic.mbPerM3()),
                     fluid(def).defaultFluidState().createLegacyBlock().getBlock().getName()));
                 parts.add(Component.translatable("siftec.building.extracted", c.mined));
             }
-            case "pressurizer" -> {
+            case PRESSURIZER -> {
                 Purity purity = nodePurity(level, c, def);
                 if (purity != null) parts.add(Component.translatable("siftec.building.pressurized", Component.translatable("siftec.purity." + purity.name().toLowerCase(Locale.ROOT))));
             }

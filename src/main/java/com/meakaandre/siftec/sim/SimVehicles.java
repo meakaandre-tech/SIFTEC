@@ -150,7 +150,7 @@ public final class SimVehicles {
         SimData data = SimData.get(server);
         for (SimData.Vehicle v : data.stored.vehicles) out.add(new Shown(v.dim, v.x, v.z, v.yaw, v.type, v.company, true));
         for (SimData.Node n : data.stored.nodes.values()) {
-            if (!n.kind.equals("drone_port") || n.state == Sim.IDLE || n.destination == null || n.total <= 0) continue;
+            if (n.kind != NodeKind.DRONE_PORT || n.state == Sim.IDLE || n.destination == null || n.total <= 0) continue;
             BlockPos home = n.blockPos(), far = BlockPos.of(n.destination);
             double done = 1 - n.ticks / (double) n.total;
             double t = n.state == Sim.OUTBOUND ? done : 1 - done;

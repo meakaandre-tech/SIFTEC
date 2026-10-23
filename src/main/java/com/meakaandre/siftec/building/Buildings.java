@@ -119,8 +119,8 @@ public final class Buildings {
             }
             BuildingDef def = new BuildingDef(o.get("id").getAsString(), Category.of(o.get("category").getAsString()), List.copyOf(cost),
                 o.has("unlock") ? o.get("unlock").getAsString() : "", o.has("dev") && o.get("dev").getAsBoolean(), node, nodeCell,
-                o.has("logic") ? o.get("logic").getAsString() : "", o.has("su") ? o.get("su").getAsInt() : 0, o.has("break") ? o.get("break").getAsInt() : 0, o.has("fortune") ? o.get("fortune").getAsInt() : 0,
-                o.has("power") ? o.get("power").getAsString() : "", o.has("mw") ? o.get("mw").getAsDouble() : 0, o.has("water") ? o.get("water").getAsDouble() : 0,
+                Logic.of(o.has("logic") ? o.get("logic").getAsString() : ""), o.has("su") ? o.get("su").getAsInt() : 0, o.has("break") ? o.get("break").getAsInt() : 0, o.has("fortune") ? o.get("fortune").getAsInt() : 0,
+                PowerRole.of(o.has("power") ? o.get("power").getAsString() : ""), o.has("mw") ? o.get("mw").getAsDouble() : 0, o.has("water") ? o.get("water").getAsDouble() : 0,
                 o.has("lines") ? o.get("lines").getAsInt() : 0, cell(o, "vent"), o.has("prefab") ? o.get("prefab").getAsString() : "",
                 o.has("fluid") ? o.get("fluid").getAsString() : "", o.has("rate") ? o.get("rate").getAsInt() : 0,
                 o.has("fluid_node") ? o.get("fluid_node").getAsString() : "", cell(o, "intake"));
@@ -469,7 +469,7 @@ public final class Buildings {
         BuildingIndex index = BuildingIndex.get(level);
         List<BlockPos> remove = new ArrayList<>();
         Paint paint = level.getBlockEntity(controllerPos) instanceof ControllerBlockEntity c ? Paint.parse(c.paint) : Paint.NONE;
-        boolean storage = p.def().logic().equals("storage");
+        boolean storage = p.def().logic() == Logic.STORAGE;
         for (BuildingTemplate.Cell cell : t.members) {
             BlockPos pos = p.at(cell);
             if (keep.contains(pos.asLong())) continue;
@@ -599,7 +599,7 @@ public final class Buildings {
         BuildingTemplate t = BuildingTemplate.of(p.def());
         if (t == null) return null;
         Paint paint = Paint.parse(controller.paint);
-        boolean storage = p.def().logic().equals("storage");
+        boolean storage = p.def().logic() == Logic.STORAGE;
         BlockPos missing = null;
         for (BuildingTemplate.Cell cell : t.members) {
             BlockPos pos = p.at(cell);
@@ -619,7 +619,7 @@ public final class Buildings {
         if (p == null) return;
         BuildingTemplate t = BuildingTemplate.of(p.def());
         if (t == null) return;
-        boolean storage = p.def().logic().equals("storage");
+        boolean storage = p.def().logic() == Logic.STORAGE;
         controller.paint = paint.write();
         controller.setChanged();
         for (BuildingTemplate.Cell cell : t.members) {
@@ -742,7 +742,7 @@ public final class Buildings {
             BlockPos controller = BuildingIndex.controllerOf(level, hit.getBlockPos());
             if (controller == null) return InteractionResult.PASS;
             if (player instanceof ServerPlayer rider && level.getBlockEntity(controller) instanceof ControllerBlockEntity c && c.def() != null
-                && c.def().power().equals("pole")) {
+                && c.def().power() == PowerRole.POLE) {
                 BlockPos connector = connectorOf(level, c);
                 if (!player.hasInfiniteMaterials() && !Companies.of(rider).hasToken("zipline")) {
                     rider.sendOverlayMessage(Component.translatable("siftec.zipline.locked"));

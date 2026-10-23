@@ -95,10 +95,10 @@ public final class BuildingPower {
         if (def == null) return null;
         if (c.member != null && c.memberFor == def) return c.member;
         PowerMember m = switch (def.power()) {
-            case "biomass", "coal", "fuel", "nuclear", "geothermal" -> new Generator(level, c, def);
-            case "augmenter" -> new Augmenter(level, c, def);
-            case "storage" -> new Store(c);
-            case "pole" -> null;
+            case BIOMASS, COAL, FUEL, NUCLEAR, GEOTHERMAL -> new Generator(level, c, def);
+            case AUGMENTER -> new Augmenter(level, c, def);
+            case STORAGE -> new Store(c);
+            case POLE -> null;
             default -> def.su() > 0 ? new Consumer(level, c, def) : null;
         };
         c.member = m;
@@ -133,7 +133,7 @@ public final class BuildingPower {
                 return STANDBY_SU;
             }
             // the Particle Accelerator and the Converter draw Satisfactory's power for where they are in their recipe's cycle
-            c.demandSu = def.logic().equals("processor") ? Processors.demand(level, c, def) : def.su();
+            c.demandSu = def.logic() == Logic.PROCESSOR ? Processors.demand(level, c, def) : def.su();
             return c.demandSu;
         }
 
@@ -258,17 +258,17 @@ public final class BuildingPower {
         }
     }
 
-    /** The fluids a generator of this kind burns ("fuel": the Fuel Generator's), by id. */
-    public static Set<String> fluidFuels(String kind) {
+    /** The fluids a generator of this kind burns (FUEL: the Fuel Generator's), by id. */
+    public static Set<String> fluidFuels(PowerRole kind) {
         readFuel();
-        return Set.copyOf(FUEL.getOrDefault(kind, Map.of()).keySet());
+        return Set.copyOf(FUEL.getOrDefault(kind.id(), Map.of()).keySet());
     }
 
     /** Megajoules of one item of this fuel in a generator of this kind, or 0 if it does not burn it. */
-    public static double itemMj(String kind, ItemStack stack) {
+    public static double itemMj(PowerRole kind, ItemStack stack) {
         readFuel();
         if (stack.isEmpty()) return 0;
-        Map<String, Double> table = FUEL.getOrDefault(kind, Map.of());
+        Map<String, Double> table = FUEL.getOrDefault(kind.id(), Map.of());
         String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
         Double mj = table.get(id);
         if (mj != null) return mj;
@@ -281,9 +281,9 @@ public final class BuildingPower {
     }
 
     /** Megajoules of one mB of this fluid in a generator of this kind, or 0. */
-    public static double fluidMj(String kind, Fluid fluid) {
+    public static double fluidMj(PowerRole kind, Fluid fluid) {
         readFuel();
-        Map<String, Double> table = FUEL.getOrDefault(kind, Map.of());
+        Map<String, Double> table = FUEL.getOrDefault(kind.id(), Map.of());
         Fluid still = fluid instanceof FlowingFluid flowing ? flowing.getSource() : fluid;
         Double mj = table.get(BuiltInRegistries.FLUID.getKey(still).toString());
         return mj == null ? 0 : mj / mbPerM3;
@@ -292,8 +292,8 @@ public final class BuildingPower {
     /** What a building's input port may give its controller: the fuel its generator burns. */
     static boolean acceptsFuel(BuildingDef def, ItemStack stack) {
         return switch (def.power()) {
-            case "biomass", "coal", "nuclear" -> itemMj(def.power(), stack) > 0;
-            case "augmenter" -> itemMj("augmenter", stack) > 0;
+            case BIOMASS, COAL, NUCLEAR -> itemMj(def.power(), stack) > 0;
+            case AUGMENTER -> itemMj(PowerRole.AUGMENTER, stack) > 0;
             default -> false;
         };
     }
@@ -314,10 +314,7 @@ public final class BuildingPower {
 
     /** True for the buildings that hold their grid's fuse: generators, the Augmenter and Power Storage. */
     public static boolean holdsFuse(BuildingDef def) {
-        return switch (def.power()) {
-            case "biomass", "coal", "fuel", "nuclear", "geothermal", "augmenter", "storage" -> true;
-            default -> false;
-        };
+        return def.power().holdsFuse();
     }
 
     /**
@@ -438,7 +435,7 @@ public final class BuildingPower {
             if (su <= 0) return;
             Generators.take(level, c, su);
             c.energyGiven += su;
-            if (def.power().equals("geothermal")) {
+            if (def.power() == PowerRole.GEOTHERMAL) {
                 c.fluidOwed += ACID_PER_SECOND / 20.0;
                 long mb = (long) c.fluidOwed;
                 if (mb > 0) {
@@ -465,11 +462,11 @@ public final class BuildingPower {
          * from itself, not through the level).
          */
         double reserve(Function<BlockPos, BlockEntity> at) {
-            String kind = def.power();
-            if (kind.equals("geothermal")) return Double.POSITIVE_INFINITY;
+            PowerRole kind = def.power();
+            if (kind == PowerRole.GEOTHERMAL) return Double.POSITIVE_INFINITY;
             double r = 0;
             switch (kind) {
-                case "biomass", "coal" -> {
+                case BIOMASS, COAL -> {
                     List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
                     for (BlockPos pos : burners) {
                         if (at.apply(pos) instanceof BlazeBurnerBlockEntity b) {
@@ -477,13 +474,13 @@ public final class BuildingPower {
                         }
                     }
                 }
-                case "fuel" -> {
+                case FUEL -> {
                     BlockPos engine = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
                     if (engine != null && at.apply(engine) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
                         r += Power.suTicksOfMj(fluidMj(kind, e.siftec$fuel().getFluid()) * e.siftec$fuel().getAmount() / (FluidConstants.BUCKET / 1000.0));
                     }
                 }
-                case "nuclear" -> {
+                case NUCLEAR -> {
                     int rods = Math.max(1, BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod")).size());
                     r += full * Generators.rodFuel(c, at) / (double) rods;
                 }
@@ -498,7 +495,7 @@ public final class BuildingPower {
         /** Away, a Geothermal Generator gives its geyser's average, not whatever part of its swing it was at. */
         @Override
         public double steady(double capacity) {
-            if (!def.power().equals("geothermal")) return capacity;
+            if (def.power() != PowerRole.GEOTHERMAL) return capacity;
             BlockPos vent = vent(level, c);
             if (vent == null || c.problem.equals("siftec.power.acid_full")) return 0;
             return Power.su(switch (GeyserPurity.of(level, vent)) {
@@ -516,11 +513,11 @@ public final class BuildingPower {
         /** Burns what it gave while it was away: out of its machines' fuel first, then its input. */
         @Override
         public void spend(double suTicks) {
-            String kind = def.power();
-            if (suTicks <= 0 || kind.equals("geothermal")) return;
+            PowerRole kind = def.power();
+            if (suTicks <= 0 || kind == PowerRole.GEOTHERMAL) return;
             double left = suTicks;
             switch (kind) {
-                case "biomass", "coal" -> {
+                case BIOMASS, COAL -> {
                     List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
                     double per = full / Math.max(1, burners.size());
                     for (BlockPos pos : burners) {
@@ -531,7 +528,7 @@ public final class BuildingPower {
                         left -= ticks * per;
                     }
                 }
-                case "fuel" -> {
+                case FUEL -> {
                     BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
                     if (at != null && Chunks.blockEntity(level, at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
                         double perMb = fluidMj(kind, e.siftec$fuel().getFluid());
@@ -542,7 +539,7 @@ public final class BuildingPower {
                         }
                     }
                 }
-                case "nuclear" -> {
+                case NUCLEAR -> {
                     // the rods burn a tick of fuel each for every tick at full power
                     long ticks = (long) Math.ceil(left / full);
                     for (BlockPos pos : BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod"))) {
@@ -578,7 +575,7 @@ public final class BuildingPower {
         if (suTicks <= 0) return;
         double full = Power.su(def.mw());
         switch (def.power()) {
-            case "biomass", "coal" -> {
+            case BIOMASS, COAL -> {
                 List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
                 double per = full / Math.max(1, burners.size());
                 if (per <= 0 || burners.isEmpty()) return;
@@ -591,18 +588,18 @@ public final class BuildingPower {
                     b.setChanged();
                 }
             }
-            case "fuel" -> {
+            case FUEL -> {
                 BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
                 if (at == null || !(Chunks.blockEntity(level, at) instanceof EngineControl e)) return;
                 Fluid fluid = e.siftec$fuel().isEmpty() ? Keys.fluidOf(lastFuel) : e.siftec$fuel().getFluid();
-                double perMb = fluidMj("fuel", fluid);
+                double perMb = fluidMj(PowerRole.FUEL, fluid);
                 Storage<FluidVariant> tank = ProductionLogic.fluids(level, at, null);
                 if (perMb <= 0 || tank == null) return;
                 long mb = (long) Math.floor(suTicks / Power.suTicksOfMj(perMb));
                 if (mb <= 0) return;
                 Transfers.insert(tank, FluidVariant.of(fluid), mb * (FluidConstants.BUCKET / 1000));
             }
-            case "nuclear" -> {
+            case NUCLEAR -> {
                 if (full <= 0) return;
                 int ticks = (int) Math.min(Integer.MAX_VALUE / 2, Math.floor(suTicks / full));
                 if (ticks <= 0) return;
@@ -657,7 +654,7 @@ public final class BuildingPower {
             if (c.isRemoved() || c.tripped) return 0;
             if (c.fedTicks <= 0) {
                 ItemStack in = c.input.getItem(0);
-                if (itemMj("augmenter", in) > 0) {
+                if (itemMj(PowerRole.AUGMENTER, in) > 0) {
                     in.shrink(1);
                     c.input.setChanged();
                     c.fedTicks = MATRIX_TICKS;
@@ -670,7 +667,7 @@ public final class BuildingPower {
         @Override
         public int boostTicks() {
             ItemStack in = c.input.getItem(0);
-            return Math.max(0, c.fedTicks) + (itemMj("augmenter", in) > 0 ? in.getCount() * MATRIX_TICKS : 0);
+            return Math.max(0, c.fedTicks) + (itemMj(PowerRole.AUGMENTER, in) > 0 ? in.getCount() * MATRIX_TICKS : 0);
         }
 
         @Override
@@ -679,7 +676,7 @@ public final class BuildingPower {
             while (left > 0) {
                 if (c.fedTicks <= 0) {
                     ItemStack in = c.input.getItem(0);
-                    if (itemMj("augmenter", in) <= 0) break;
+                    if (itemMj(PowerRole.AUGMENTER, in) <= 0) break;
                     in.shrink(1);
                     c.input.setChanged();
                     c.fedTicks = MATRIX_TICKS;
@@ -800,14 +797,14 @@ public final class BuildingPower {
     /** The power part of a controller's status line: what it draws or gives, in SU, and its grid. */
     static void status(Level level, ControllerBlockEntity c, BuildingDef def, List<Component> parts) {
         switch (def.power()) {
-            case "pole" -> {
+            case POLE -> {
             }
-            case "storage" -> parts.add(Component.translatable("siftec.power.stored", Power.suHours(c.energy),
+            case STORAGE -> parts.add(Component.translatable("siftec.power.stored", Power.suHours(c.energy),
                 Power.suHours(Power.su(STORAGE_MWH) * Power.TICKS_PER_HOUR)));
-            case "augmenter" -> parts.add(Component.translatable("siftec.power.augmenter", Power.su((float) Power.su(def.mw())), c.fedTicks > 0 ? 30 : 10));
-            case "biomass", "coal", "fuel", "nuclear", "geothermal" -> {
+            case AUGMENTER -> parts.add(Component.translatable("siftec.power.augmenter", Power.su((float) Power.su(def.mw())), c.fedTicks > 0 ? 30 : 10));
+            case BIOMASS, COAL, FUEL, NUCLEAR, GEOTHERMAL -> {
                 parts.add(Component.translatable("siftec.power.gives", Power.su((float) c.lastGenerated), Power.su((float) c.offered)));
-                if (def.power().equals("geothermal") && level instanceof ServerLevel server) {
+                if (def.power() == PowerRole.GEOTHERMAL && level instanceof ServerLevel server) {
                     BlockPos vent = vent(level, c);
                     if (vent != null) parts.add(Component.translatable("siftec.power.geyser", Component.translatable(GeyserPurity.of(server, vent).key())));
                 }
@@ -817,7 +814,7 @@ public final class BuildingPower {
             }
         }
         if (c.tripped) parts.add(Component.translatable("siftec.power.fuse_blown"));
-        else if (c.grid != null && !def.power().equals("pole")) parts.add(c.grid.line());
+        else if (c.grid != null && def.power() != PowerRole.POLE) parts.add(c.grid.line());
     }
 
     /** Sneak-using a generator or Power Storage resets its grid's fuse. True if there was one to reset. */

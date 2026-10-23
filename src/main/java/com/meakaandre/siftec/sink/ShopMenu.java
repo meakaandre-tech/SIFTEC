@@ -1,7 +1,9 @@
 package com.meakaandre.siftec.sink;
 
 import com.meakaandre.siftec.building.BuildingMenus;
+import com.meakaandre.siftec.building.Logic;
 import com.meakaandre.siftec.building.Paint;
+import com.meakaandre.siftec.building.Patterns;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.cosmetic.Banners;
@@ -72,24 +74,24 @@ public class ShopMenu extends ChestMenu {
     /** The picture for an entry: the thing itself where it is an item, a stand-in otherwise. */
     public static Item icon(Shop.Entry e) {
         return switch (e.kind()) {
-            case "customizer" -> ModItems.CUSTOMIZER.get();
-            case "swatch" -> item("minecraft:orange_dye");
-            case "finish" -> switch (e.arg()) {
+            case CUSTOMIZER -> ModItems.CUSTOMIZER.get();
+            case SWATCH -> item("minecraft:orange_dye");
+            case FINISH -> switch (e.arg()) {
                 case "copper" -> item("minecraft:copper_block");
                 case "chrome" -> Items.IRON_BLOCK;
                 case "carbon_steel" -> Items.NETHERITE_BLOCK;
                 case "caterium" -> Items.GOLD_BLOCK;
                 default -> item("minecraft:gray_concrete");
             };
-            case "skin" -> {
+            case SKIN -> {
                 String block = Shop.skins().getOrDefault(e.arg(), Shop.storageSkins().getOrDefault(e.arg(), "minecraft:barrier"));
                 yield BuiltInRegistries.ITEM.getOptional(Identifier.parse(block)).orElse(Items.BARRIER);
             }
-            case "decor" -> ModBlocks.DECOR.containsKey(e.arg()) ? ModBlocks.DECOR.get(e.arg()).asItem() : Items.BARRIER;
-            case "cup" -> ModItems.CUPS.containsKey(e.arg()) ? ModItems.CUPS.get(e.arg()) : Items.BARRIER;
-            case "sign" -> e.arg().equals("label_sign") ? ModBlocks.LABEL_SIGN.get().asItem() : ModBlocks.DISPLAY_SIGN.get().asItem();
-            case "unlock" -> Items.PAINTING;
-            case "material" -> {
+            case DECOR -> ModBlocks.DECOR.containsKey(e.arg()) ? ModBlocks.DECOR.get(e.arg()).asItem() : Items.BARRIER;
+            case CUP -> ModItems.CUPS.containsKey(e.arg()) ? ModItems.CUPS.get(e.arg()) : Items.BARRIER;
+            case SIGN -> e.arg().equals("label_sign") ? ModBlocks.LABEL_SIGN.get().asItem() : ModBlocks.DISPLAY_SIGN.get().asItem();
+            case UNLOCK -> Items.PAINTING;
+            case MATERIAL -> {
                 String kind = Shop.materials().getOrDefault(e.arg(), "");
                 String built = switch (kind) {
                     case "wall" -> "minecraft:white_concrete";
@@ -99,32 +101,31 @@ public class ShopMenu extends ChestMenu {
                 String block = Shop.materialBlock(e.arg(), built);
                 yield item(block == null ? "minecraft:barrier" : block);
             }
-            case "pattern" -> e.arg().equals("factory_zone") ? item("minecraft:black_concrete") : item("minecraft:yellow_concrete");
-            case "emote" -> Items.ARMOR_STAND;
-            case "helmet" -> switch (e.arg()) {
+            case PATTERN -> Patterns.Pattern.find(e.arg()) == Patterns.Pattern.FACTORY_ZONE ? item("minecraft:black_concrete") : item("minecraft:yellow_concrete");
+            case EMOTE -> Items.ARMOR_STAND;
+            case HELMET -> switch (e.arg()) {
                 case "gold" -> Items.GOLDEN_HELMET;
                 case "copper" -> item("minecraft:copper_helmet");
                 case "diamond" -> Items.DIAMOND_HELMET;
                 case "turtle" -> Items.TURTLE_HELMET;
                 default -> Items.NETHERITE_HELMET;
             };
-            case "trim" -> {
+            case TRIM -> {
                 String[] trim = Shop.trims().get(e.arg());
                 yield trim == null ? Items.BARRIER : item(trim[0] + "_armor_trim_smithing_template");
             }
-            case "banner" -> item("minecraft:white_banner");
-            case "golden_cart" -> item("create:cart_assembler");
-            case "boom_box" -> ModBlocks.BOOM_BOX.get().asItem();
-            case "tape" -> ModItems.TAPES.containsKey(e.arg()) ? ModItems.TAPES.get(e.arg()) : Items.BARRIER;
-            default -> Items.BARRIER;
+            case BANNER -> item("minecraft:white_banner");
+            case GOLDEN_CART -> item("create:cart_assembler");
+            case BOOM_BOX -> ModBlocks.BOOM_BOX.get().asItem();
+            case TAPE -> ModItems.TAPES.containsKey(e.arg()) ? ModItems.TAPES.get(e.arg()) : Items.BARRIER;
         };
     }
 
     /** What taking one of an owned entry costs in parts, if anything. */
     static Shop.@Nullable Goods goods(Shop.Entry e) {
         return switch (e.kind()) {
-            case "decor", "cup", "sign" -> Shop.goods(e.arg());
-            case "boom_box" -> Shop.goods("boom_box");
+            case DECOR, CUP, SIGN -> Shop.goods(e.arg());
+            case BOOM_BOX -> Shop.goods("boom_box");
             default -> null;
         };
     }
@@ -156,9 +157,9 @@ public class ShopMenu extends ChestMenu {
             boolean owned = e.owned(company);
             List<Component> lore = new ArrayList<>();
             lore.add(Component.translatable("siftec.shop.category." + e.category().toLowerCase(Locale.ROOT).replace(' ', '_')).withStyle(ChatFormatting.DARK_GRAY));
-            if (e.kind().equals("swatch")) lore.add(Component.translatable("siftec.shop.swatches", company.swatches.size(), Shop.MAX_SWATCHES).withStyle(ChatFormatting.GRAY));
+            if (e.kind() == ShopKind.SWATCH) lore.add(Component.translatable("siftec.shop.swatches", company.swatches.size(), Shop.MAX_SWATCHES).withStyle(ChatFormatting.GRAY));
             if (owned) {
-                lore.add(Component.translatable(e.kind().equals("swatch") ? "siftec.shop.full" : "siftec.shop.owned").withStyle(ChatFormatting.GREEN));
+                lore.add(Component.translatable(e.kind() == ShopKind.SWATCH ? "siftec.shop.full" : "siftec.shop.owned").withStyle(ChatFormatting.GREEN));
                 Shop.Goods goods = goods(e);
                 if (goods != null) {
                     for (Milestone.Cost cost : goods.cost()) {
@@ -171,13 +172,13 @@ public class ShopMenu extends ChestMenu {
                     } else {
                         lore.add(Component.translatable("siftec.shop.take_free").withStyle(ChatFormatting.YELLOW));
                     }
-                } else if (e.kind().equals("customizer") || e.kind().equals("tape")) {
+                } else if (e.kind() == ShopKind.CUSTOMIZER || e.kind() == ShopKind.TAPE) {
                     lore.add(Component.translatable("siftec.shop.take_free").withStyle(ChatFormatting.YELLOW));
-                } else if (e.kind().equals("banner")) {
+                } else if (e.kind() == ShopKind.BANNER) {
                     lore.add(Component.translatable(company.banner.isEmpty() ? "siftec.shop.banner_none" : "siftec.shop.banner_take").withStyle(ChatFormatting.YELLOW));
                     lore.add(Component.translatable("siftec.shop.banner_set").withStyle(ChatFormatting.GRAY));
                 } else {
-                    lore.add(Component.translatable("siftec.shop.use." + e.kind()).withStyle(ChatFormatting.GRAY));
+                    lore.add(Component.translatable("siftec.shop.use." + e.kind().id()).withStyle(ChatFormatting.GRAY));
                 }
             } else {
                 lore.add(Component.translatable("siftec.shop.price", e.coupons()).withStyle(have >= e.coupons() ? ChatFormatting.GREEN : ChatFormatting.RED));
@@ -251,9 +252,9 @@ public class ShopMenu extends ChestMenu {
     private void take(Company company, Shop.Entry e) {
         ItemStack made;
         switch (e.kind()) {
-            case "customizer" -> made = new ItemStack(ModItems.CUSTOMIZER.get());
-            case "tape" -> made = new ItemStack(icon(e));
-            case "banner" -> {
+            case CUSTOMIZER -> made = new ItemStack(ModItems.CUSTOMIZER.get());
+            case TAPE -> made = new ItemStack(icon(e));
+            case BANNER -> {
                 ItemStack held = player.getMainHandItem();
                 if (held.getItem() instanceof BannerItem) {
                     String encoded = Banners.write(player.level().getServer(), held);
@@ -278,7 +279,7 @@ public class ShopMenu extends ChestMenu {
                 }
                 made = copy;
             }
-            case "decor", "cup", "sign", "boom_box" -> {
+            case DECOR, CUP, SIGN, BOOM_BOX -> {
                 Shop.Goods goods = goods(e);
                 if (goods == null) return;
                 if (!goods.needs().isEmpty() && !company.has(goods.needs()) && !player.hasInfiniteMaterials()) {
@@ -298,7 +299,7 @@ public class ShopMenu extends ChestMenu {
                 made = new ItemStack(icon(e));
             }
             default -> {
-                player.sendOverlayMessage(Component.translatable("siftec.shop.use." + e.kind()));
+                player.sendOverlayMessage(Component.translatable("siftec.shop.use." + e.kind().id()));
                 return;
             }
         }
@@ -337,6 +338,6 @@ public class ShopMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player who) {
-        return BuildingMenus.stillValid(who, player, at, BuildingMenus.logic("shop"), companyId);
+        return BuildingMenus.stillValid(who, player, at, BuildingMenus.logic(Logic.SHOP), companyId);
     }
 }

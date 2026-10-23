@@ -4,6 +4,7 @@ import com.meakaandre.siftec.block.Facing;
 import com.meakaandre.siftec.building.BoilerWater;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.BurnerLoad;
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor;
 import com.meakaandre.siftec.power.GridStats;
 import com.meakaandre.siftec.power.Power;
@@ -84,7 +85,7 @@ public class HubBurnerBlockEntity extends BlockEntity implements PowerMember {
     }
 
     public static boolean accepts(ItemStack stack) {
-        return BuildingPower.itemMj("biomass", stack) > 0;
+        return BuildingPower.itemMj(PowerRole.BIOMASS, stack) > 0;
     }
 
     public void addFuel(ItemStack held) {
@@ -141,7 +142,7 @@ public class HubBurnerBlockEntity extends BlockEntity implements PowerMember {
         boolean out = burner.getActiveFuel() == BlazeBurnerBlockEntity.FuelType.NONE;
         if (!tripped && (out || burner.getRemainingBurnTime() <= REFILL)) {
             ItemStack in = fuel.getItem(0);
-            double mj = BuildingPower.itemMj("biomass", in);
+            double mj = BuildingPower.itemMj(PowerRole.BIOMASS, in);
             if (mj > 0) {
                 // the next fuel: its Satisfactory megajoules, at 30 MW
                 int ticks = (int) Math.max(1, Math.round(mj / MW * 20));
@@ -213,7 +214,7 @@ public class HubBurnerBlockEntity extends BlockEntity implements PowerMember {
         ItemStack in = fuel.getItem(0);
         BlazeBurnerBlockEntity burner = blaze();
         double burning = burner == null ? 0 : Power.su(MW) * burner.getRemainingBurnTime();
-        return burning + Power.suTicksOfMj(BuildingPower.itemMj("biomass", in) * in.getCount());
+        return burning + Power.suTicksOfMj(BuildingPower.itemMj(PowerRole.BIOMASS, in) * in.getCount());
     }
 
     /** Burns what it gave while away: out of its Blaze Burner first, then the inlet. */
@@ -228,7 +229,7 @@ public class HubBurnerBlockEntity extends BlockEntity implements PowerMember {
             left -= ticks * per;
         }
         ItemStack in = fuel.getItem(0);
-        double mj = BuildingPower.itemMj("biomass", in);
+        double mj = BuildingPower.itemMj(PowerRole.BIOMASS, in);
         while (left > 0 && mj > 0 && !in.isEmpty()) {
             in.shrink(1);
             left -= Power.suTicksOfMj(mj);

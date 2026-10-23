@@ -26,9 +26,15 @@ public final class Shop {
     /**
      * One thing the Shop sells. {@code gives} is "customizer", "swatch", "finish:<id>", "skin:<id>", "decor:<id>",
      * "cup:<id>", "sign:<id>", "unlock:<id>", "material:<id>", "pattern:<id>", "emote:<id>", "helmet:<id>", "trim:<id>",
-     * "banner", "golden_cart", "boom_box" or "tape:<id>". A holiday set's entry can be bought only in its months.
+     * "banner", "golden_cart", "boom_box" or "tape:<id>" (the part before the colon is its {@link ShopKind}). A holiday set's
+     * entry can be bought only in its months.
      */
     public record Entry(String id, String category, int coupons, String gives, List<Integer> months) {
+        /** An unknown kind is an error in the data, found as it is read. */
+        public Entry {
+            kindOf(gives);
+        }
+
         public Entry(String id, String category, int coupons, String gives) {
             this(id, category, coupons, gives, List.of());
         }
@@ -38,9 +44,13 @@ public final class Shop {
             return months.isEmpty() || months.contains(LocalDate.now().getMonthValue());
         }
 
-        public String kind() {
+        public ShopKind kind() {
+            return kindOf(gives);
+        }
+
+        private static ShopKind kindOf(String gives) {
             int colon = gives.indexOf(':');
-            return colon < 0 ? gives : gives.substring(0, colon);
+            return ShopKind.of(colon < 0 ? gives : gives.substring(0, colon));
         }
 
         public String arg() {
@@ -51,7 +61,7 @@ public final class Shop {
         /** True if the company has it (a swatch slot is never "had": more can be bought until the company has them all). */
         public boolean owned(Company company) {
             if (coupons == 0) return true;
-            if (kind().equals("swatch")) return company.swatches.size() >= MAX_SWATCHES;
+            if (kind() == ShopKind.SWATCH) return company.swatches.size() >= MAX_SWATCHES;
             return company.shop.contains(id);
         }
     }
@@ -222,7 +232,7 @@ public final class Shop {
 
     /** What happens when the company buys an entry (the coupons are already paid): it is remembered, or a swatch added. */
     public static void unlock(Company company, Entry entry) {
-        if (entry.kind().equals("swatch")) {
+        if (entry.kind() == ShopKind.SWATCH) {
             if (company.swatches.size() < MAX_SWATCHES) company.swatches.add(company.swatches.getFirst());
         } else {
             company.shop.add(entry.id());

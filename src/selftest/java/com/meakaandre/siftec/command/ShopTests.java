@@ -82,7 +82,7 @@ final class ShopTests {
         expect(source, "every Shop entry gives something the pack has (nothing shows as a barrier)", barriers.isEmpty(), barriers.toString());
         String[] kinds = {"sign", "unlock", "material", "pattern", "emote", "helmet", "trim", "banner", "golden_cart", "boom_box", "tape"};
         List<String> missing = new ArrayList<>();
-        for (String k : kinds) if (Shop.entries().stream().noneMatch(e -> e.kind().equals(k))) missing.add(k);
+        for (String k : kinds) if (Shop.entries().stream().noneMatch(e -> e.kind().id().equals(k))) missing.add(k);
         boolean holidays = Shop.entries().stream().anyMatch(e -> e.category().equals("Holiday sets"));
         expect(source, "the tab sells signs and billboards, materials, floor patterns, holiday sets, emotes, helmet skins, suit trims, the banner designer, the Golden Cart Assembler and the Boom Box with tapes",
             missing.isEmpty() && holidays, "missing " + missing);

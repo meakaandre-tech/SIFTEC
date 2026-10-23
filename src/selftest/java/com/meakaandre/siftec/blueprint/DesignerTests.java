@@ -9,6 +9,7 @@ import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.Category;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.Logic;
 import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -241,7 +242,7 @@ public final class DesignerTests {
             return;
         }
         expect(source, id + ": on the Special tab, unlocked by " + UNLOCKS[k] + ", at Satisfactory 1.0's cost",
-            def.category() == Category.SPECIAL && def.unlock().equals(UNLOCKS[k]) && def.cost().size() == 4 && def.logic().equals("designer"),
+            def.category() == Category.SPECIAL && def.unlock().equals(UNLOCKS[k]) && def.cost().size() == 4 && def.logic() == Logic.DESIGNER,
             def.category() + " " + def.unlock() + " " + def.cost().size() + " costs");
         expect(source, id + ": its terminal is the building's controller", t.controller.state().getBlock() instanceof DesignerBlock d && d.reach == reach,
             t.controller.state().toString());

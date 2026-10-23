@@ -51,21 +51,65 @@ public final class Patterns {
     private Patterns() {
     }
 
+    /** A floor pattern the AWESOME Shop sells, by its id ("pattern:<id>"), with what it paints at each cell of the top. */
+    public enum Pattern {
+        // a walkway: yellow edges down both sides
+        PATHWAY("pathway", (x, z) -> x == 0 || x == 7 ? YELLOW : null),
+        // hazard stripes all over
+        FACTORY_ZONE("factory_zone", (x, z) -> Math.floorMod(x + z, 4) < 2 ? YELLOW : BLACK),
+        DOTTED_LINE("dotted_line", (x, z) -> (x == 3 || x == 4) && z % 4 < 2 ? YELLOW : null),
+        SOLID_LINE("solid_line", (x, z) -> x == 3 || x == 4 ? YELLOW : null),
+        ARROW("arrow", (x, z) -> picture(Patterns.ARROW, x, z, YELLOW)),
+        FACTORY_ICON("factory_icon", (x, z) -> picture(FACTORY, x, z, YELLOW)),
+        TRANSPORTATION_ICON("transportation_icon", (x, z) -> picture(TRUCK, x, z, WHITE)),
+        NUMBER("number", (x, z) -> picture(Patterns.NUMBER, x, z, WHITE));
+
+        private final String id;
+        private final Ink ink;
+
+        Pattern(String id, Ink ink) {
+            this.id = id;
+            this.ink = ink;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public static Pattern of(String id) {
+            Pattern p = find(id);
+            if (p == null) throw new IllegalArgumentException("unknown floor pattern \"" + id + "\"");
+            return p;
+        }
+
+        /** The pattern with this id, or null if there is none (a paint may name one this version does not know). */
+        public static @Nullable Pattern find(String id) {
+            for (Pattern p : values()) if (p.id.equals(id)) return p;
+            return null;
+        }
+
+        /** What a cell of the top (0 to 7 each way) becomes, or null where the floor stays as it is. */
+        public @Nullable String at(int x, int z) {
+            if (x < 0 || x > 7 || z < 0 || z > 7) return null;
+            return ink.at(x, z);
+        }
+
+        @Override
+        public String toString() {
+            return id;
+        }
+    }
+
+    /** What one pattern paints at a cell inside the top. */
+    @FunctionalInterface
+    private interface Ink {
+        @Nullable String at(int x, int z);
+    }
+
+    /** What a cell of the top becomes under the pattern with this id (null for none, or an id this version does not know). */
     public static @Nullable String at(String pattern, int x, int z) {
-        if (x < 0 || x > 7 || z < 0 || z > 7) return null;
-        return switch (pattern) {
-            // a walkway: yellow edges down both sides
-            case "pathway" -> x == 0 || x == 7 ? YELLOW : null;
-            // hazard stripes all over
-            case "factory_zone" -> Math.floorMod(x + z, 4) < 2 ? YELLOW : BLACK;
-            case "dotted_line" -> (x == 3 || x == 4) && z % 4 < 2 ? YELLOW : null;
-            case "solid_line" -> x == 3 || x == 4 ? YELLOW : null;
-            case "arrow" -> picture(ARROW, x, z, YELLOW);
-            case "factory_icon" -> picture(FACTORY, x, z, YELLOW);
-            case "transportation_icon" -> picture(TRUCK, x, z, WHITE);
-            case "number" -> picture(NUMBER, x, z, WHITE);
-            default -> null;
-        };
+        Pattern p = Pattern.find(pattern);
+        return p == null ? null : p.at(x, z);
     }
 
     private static @Nullable String picture(String[] rows, int x, int z, String ink) {

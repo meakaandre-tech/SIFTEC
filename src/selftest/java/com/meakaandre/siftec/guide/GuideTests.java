@@ -36,13 +36,18 @@ import java.util.Set;
  * run's screenshots.
  */
 public final class GuideTests {
-    /** What the server tells a client to do: "check", "open" a building's scene, or "close" it. */
-    public record Control(String action, String arg) implements CustomPacketPayload {
+    /** What the server tells a client to do: check every scene, open a building's scene, or close it. */
+    public enum Action {
+        CHECK, OPEN, CLOSE
+    }
+
+    /** A remote-control command: the action, sent by its ordinal, and its argument (the building to open). */
+    public record Control(Action action, String arg) implements CustomPacketPayload {
         public static final Type<Control> TYPE = new Type<>(Siftec.id("guide_control"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Control> CODEC = StreamCodec.of((buf, p) -> {
-            buf.writeUtf(p.action);
+            buf.writeVarInt(p.action.ordinal());
             buf.writeUtf(p.arg);
-        }, buf -> new Control(buf.readUtf(32), buf.readUtf(64)));
+        }, buf -> new Control(Action.values()[buf.readVarInt()], buf.readUtf(64)));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
@@ -61,13 +66,13 @@ public final class GuideTests {
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("guide").executes(GuideTests::run)))
                 .then(Commands.literal("worldtest").then(Commands.literal("guide")
-                    .then(Commands.literal("check").executes(context -> control(context, "check", "")))
-                    .then(Commands.literal("close").executes(context -> control(context, "close", "")))
+                    .then(Commands.literal("check").executes(context -> control(context, Action.CHECK, "")))
+                    .then(Commands.literal("close").executes(context -> control(context, Action.CLOSE, "")))
                     .then(Commands.literal("open").then(Commands.argument("building", StringArgumentType.word())
-                        .executes(context -> control(context, "open", StringArgumentType.getString(context, "building")))))))));
+                        .executes(context -> control(context, Action.OPEN, StringArgumentType.getString(context, "building")))))))));
     }
 
-    private static int control(CommandContext<CommandSourceStack> context, String action, String arg) {
+    private static int control(CommandContext<CommandSourceStack> context, Action action, String arg) {
         for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
             if (ServerPlayNetworking.canSend(player, Control.TYPE)) ServerPlayNetworking.send(player, new Control(action, arg));
         }

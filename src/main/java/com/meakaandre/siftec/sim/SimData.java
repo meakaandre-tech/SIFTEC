@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.sim;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.Logic;
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.save.JsonSavedData;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -41,10 +43,10 @@ public class SimData extends JsonSavedData<SimData.Stored> {
     public static class Node {
         public String dim = "";
         public long pos;
-        /** "building", "inventory" (a chest or vault a belt ends in) or "drone_port". */
-        public String kind = "building";
+        /** A building, an inventory (a chest or vault a belt ends in) or a Drone Port. */
+        public NodeKind kind = NodeKind.BUILDING;
         public String building = "";
-        public String logic = "";
+        public Logic logic = Logic.NONE;
         public String company = "";
         /** True while its chunk does not tick and the simulation runs it. */
         public boolean sim;
@@ -61,15 +63,15 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         public long parkedAt = Long.MIN_VALUE;
 
         // ---- the model, read while it is loaded (SimRecorder)
-        /** "craft", "smelt", "mine", "extract", "gen", "sink", "store", "port", or "none" (nothing to simulate). */
-        public String mode = "none";
+        /** Craft, smelt, mine, extract, gen, battery, sink, store, port, or none (nothing to simulate). */
+        public NodeMode mode = NodeMode.NONE;
         public List<Recipe> recipes = new ArrayList<>();
         /** The items of each tag its recipes name ("#tag" to item keys). */
         public Map<String, List<String>> alts = new HashMap<>();
         /** SU it draws while it works (0: needs no power). */
         public double su;
-        /** Its power role (BuildingDef.power): "", "biomass", "coal", "fuel", "nuclear", "geothermal", "augmenter", "storage". */
-        public String power = "";
+        /** Its power role (BuildingDef.power). */
+        public PowerRole power = PowerRole.NONE;
         /** A generator's or augmenter's SU at full. */
         public double fullSu;
         /** What its buffers hold at most, in items (and mB). */
@@ -365,6 +367,11 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         if (n.baseSlots == null) n.baseSlots = new ArrayList<>();
         if (n.chunks == null) n.chunks = new ArrayList<>();
         if (n.lastFuel == null) n.lastFuel = "";
+        // an id this version does not know comes back from Gson as null
+        if (n.kind == null) n.kind = NodeKind.BUILDING;
+        if (n.logic == null) n.logic = Logic.NONE;
+        if (n.mode == null) n.mode = NodeMode.NONE;
+        if (n.power == null) n.power = PowerRole.NONE;
         for (Recipe r : n.recipes) {
             if (r.in == null) r.in = new LinkedHashMap<>();
             if (r.out == null) r.out = new LinkedHashMap<>();
@@ -392,7 +399,7 @@ public class SimData extends JsonSavedData<SimData.Stored> {
     }
 
     /** The node at a spot, made (empty, not simulated) if there is none. */
-    public Node nodeOrNew(Level level, BlockPos pos, String kind) {
+    public Node nodeOrNew(Level level, BlockPos pos, NodeKind kind) {
         String k = key(level, pos);
         Node n = stored.nodes.get(k);
         if (n == null) {

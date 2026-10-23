@@ -3,6 +3,8 @@ package com.meakaandre.siftec.sim;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.Logic;
+import com.meakaandre.siftec.building.PowerRole;
 import com.meakaandre.siftec.building.SimAccess;
 import com.meakaandre.siftec.util.Chunks;
 import com.meakaandre.siftec.util.Drops;
@@ -134,14 +136,14 @@ final class Buffers {
         Buffers b = new Buffers();
         Map<Object, Boolean> seen = new IdentityHashMap<>();
         BlockEntity be = reach.be(pos);
-        if (n.kind.equals("inventory")) {
+        if (n.kind == NodeKind.INVENTORY) {
             Storage<ItemVariant> s = items(level, reach, pos, null);
             if (s == null) return null;
             b.items.add(new Items(s, Role.BOTH));
             return b;
         }
         if (!(be instanceof ControllerBlockEntity c)) return null;
-        boolean store = n.mode.equals("store");
+        boolean store = n.mode == NodeMode.STORE;
         List<SimAccess.Port> ports = SimAccess.ports(c);
         List<BlockPos> vaults = store ? SimAccess.cells(c, "create:item_vault") : List.of();
         List<BlockPos> tanks = store ? SimAccess.cells(c, "create:fluid_tank") : List.of();
@@ -149,7 +151,7 @@ final class Buffers {
         for (SimAccess.Port p : ports) if (!reach.has(p.target())) return null;
         for (BlockPos cell : vaults) if (!reach.has(cell)) return null;
         for (BlockPos cell : tanks) if (!reach.has(cell)) return null;
-        if (n.logic.equals("portable_miner")) b.ground = SimAccess.dropSpot(c);
+        if (n.logic == Logic.PORTABLE_MINER) b.ground = SimAccess.dropSpot(c);
         for (SimAccess.Port p : ports) {
             Role role = store ? Role.BOTH : p.kind().input() ? Role.IN : Role.OUT;
             if (p.kind().fluid()) {
@@ -162,10 +164,10 @@ final class Buffers {
                 if (role == Role.IN) {
                     b.addSlots(seen, tc.input, 0, 1, Role.IN);
                     // only the Particle Accelerator and the Converter take their ingredients into the nine buffer slots
-                    if (n.logic.equals("processor")) b.addSlots(seen, tc.buffer, 0, tc.buffer.getContainerSize(), Role.IN);
+                    if (n.logic == Logic.PROCESSOR) b.addSlots(seen, tc.buffer, 0, tc.buffer.getContainerSize(), Role.IN);
                 } else {
                     b.addSlots(seen, tc.output, 0, 1, Role.OUT);
-                    if (n.power.equals("nuclear")) b.addSlots(seen, tc.waste, 0, tc.waste.getContainerSize(), Role.OUT);
+                    if (n.power == PowerRole.NUCLEAR) b.addSlots(seen, tc.waste, 0, tc.waste.getContainerSize(), Role.OUT);
                 }
             } else if (target instanceof BasinBlockEntity basin && !store) {
                 Container inv = basin.itemCapability;
@@ -181,11 +183,11 @@ final class Buffers {
             }
         }
         // a generator's controller holds its fuel (and a nuclear plant's waste) even without a port reaching it
-        if (n.mode.equals("gen") || n.logic.equals("miner")) {
+        if (n.mode == NodeMode.GEN || n.logic == Logic.MINER) {
             b.addSlots(seen, c.input, 0, 1, Role.IN);
             b.addSlots(seen, c.output, 0, 1, Role.OUT);
             // a nuclear plant's waste store, after its output slot (BuildingPower.WASTE_ROOM in all)
-            if (n.power.equals("nuclear")) b.addSlots(seen, c.waste, 0, c.waste.getContainerSize(), Role.OUT);
+            if (n.power == PowerRole.NUCLEAR) b.addSlots(seen, c.waste, 0, c.waste.getContainerSize(), Role.OUT);
         }
         for (BlockPos vault : vaults) {
             if (reach.be(vault) instanceof ItemVaultBlockEntity v) {
@@ -260,17 +262,17 @@ final class Buffers {
         }
         if (ground != null) outCap = 64;
         // a nuclear plant's output holds its waste up to the room the real plant gives it, not all its slots could
-        if (n.power.equals("nuclear")) outCap = Math.min(outCap, BuildingPower.WASTE_ROOM);
+        if (n.power == PowerRole.NUCLEAR) outCap = Math.min(outCap, BuildingPower.WASTE_ROOM);
         // the model's own figures stand where the buffers say less (a storage's capacity is what it is)
         if (!slots.isEmpty() || !items.isEmpty()) {
-            if (n.mode.equals("store")) n.outCap = outCap;
+            if (n.mode == NodeMode.STORE) n.outCap = outCap;
             else {
                 if (inCap > 0) n.inCap = inCap;
                 if (outCap > 0) n.outCap = outCap;
             }
         }
         if (!fluids.isEmpty()) {
-            if (n.mode.equals("store")) n.fluidOutCap = fOutCap;
+            if (n.mode == NodeMode.STORE) n.fluidOutCap = fOutCap;
             else {
                 if (fInCap > 0) n.fluidInCap = fInCap;
                 if (fOutCap > 0) n.fluidOutCap = fOutCap;
@@ -284,7 +286,7 @@ final class Buffers {
     void write(ServerLevel level, SimData.Node n, BlockPos at) {
         Map<String, Long> dIn = delta(n.in, n.baseIn), dOut = delta(n.out, n.baseOut);
         Map<String, Long> dFin = delta(n.fin, n.baseFin), dFout = delta(n.fout, n.baseFout);
-        boolean store = n.mode.equals("store");
+        boolean store = n.mode == NodeMode.STORE;
         for (Map.Entry<String, Long> e : dIn.entrySet()) if (e.getValue() < 0) remove(e.getKey(), -e.getValue(), store ? Role.BOTH : Role.IN);
         for (Map.Entry<String, Long> e : dOut.entrySet()) if (e.getValue() < 0) remove(e.getKey(), -e.getValue(), store ? Role.BOTH : Role.OUT);
         for (Map.Entry<String, Long> e : dFin.entrySet()) if (e.getValue() < 0) removeFluid(e.getKey(), -e.getValue(), store ? Role.BOTH : Role.IN);
@@ -427,7 +429,7 @@ final class Buffers {
     static long insert(ServerLevel level, SimData.Node n, String key, long count, boolean fluid) {
         Buffers b = of(level, n);
         if (b == null) return 0;
-        Role role = n.mode.equals("store") ? Role.BOTH : Role.IN;
+        Role role = n.mode == NodeMode.STORE ? Role.BOTH : Role.IN;
         if (fluid) {
             long left = b.addFluid(key, count, role);
             return count - left;
@@ -446,7 +448,7 @@ final class Buffers {
     static long putBack(ServerLevel level, SimData.Node n, String key, long count, boolean fluid) {
         Buffers b = of(level, n);
         if (b == null) return 0;
-        Role role = n.mode.equals("store") ? Role.BOTH : Role.OUT;
+        Role role = n.mode == NodeMode.STORE ? Role.BOTH : Role.OUT;
         if (fluid) {
             long lost = b.addFluid(key, count, role);
             if (lost > 0) Siftec.LOGGER.info("SIFTEC: {} at {}: {} mB had no room to go back to", n.building, n.blockPos().toShortString(), lost);
@@ -463,7 +465,7 @@ final class Buffers {
         Map<String, Long> got = new HashMap<>();
         Buffers b = of(level, n);
         if (b == null || most <= 0) return got;
-        Role role = n.mode.equals("store") ? Role.BOTH : Role.OUT;
+        Role role = n.mode == NodeMode.STORE ? Role.BOTH : Role.OUT;
         if (fluid) {
             for (Fluids s : b.fluids) {
                 if (most <= 0 || !matches(role, s.role)) continue;

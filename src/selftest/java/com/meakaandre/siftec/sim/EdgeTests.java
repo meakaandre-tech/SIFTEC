@@ -828,7 +828,7 @@ public final class EdgeTests {
                 SimData.Node b = SimData.get(server).node(bKey);
                 if (b != null) {
                     b.building = "";
-                    b.mode = "none";
+                    b.mode = NodeMode.NONE;
                 }
                 later(server, 3, () -> {
                     SimData data = SimData.get(server);
@@ -852,8 +852,8 @@ public final class EdgeTests {
     /** A belt's allowance over a long step is the step's own length, not a fixed two seconds. */
     private static void allowance(MinecraftServer server, ServerLevel level) {
         SimData data = new SimData();
-        SimData.Node from = data.nodeOrNew(level, new BlockPos(30_000, 100, -30_000), "building");
-        from.mode = "store";
+        SimData.Node from = data.nodeOrNew(level, new BlockPos(30_000, 100, -30_000), NodeKind.BUILDING);
+        from.mode = NodeMode.STORE;
         from.outCap = 100_000;
         from.out.put(Keys.of(IRON), 10_000L);
         from.sim = true;

@@ -3,6 +3,7 @@ package com.meakaandre.siftec.sink;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.Logic;
 import com.meakaandre.siftec.building.Paint;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -66,14 +67,14 @@ public class CustomizerMenu extends ChestMenu {
     private boolean storage() {
         ControllerBlockEntity c = building();
         BuildingDef def = c == null ? null : c.def();
-        return def != null && def.logic().equals("storage");
+        return def != null && def.logic() == Logic.STORAGE;
     }
 
     /** "foundation", "wall" or "roof" for a Foundations-tab building that takes materials; null for any other. */
     private @Nullable String materialKind() {
         ControllerBlockEntity c = building();
         BuildingDef def = c == null ? null : c.def();
-        if (def == null || !def.logic().equals("foundation")) return null;
+        if (def == null || def.logic() != Logic.FOUNDATION) return null;
         String id = def.id();
         return id.startsWith("foundation_") ? "foundation" : id.startsWith("wall_") ? "wall" : id.startsWith("roof_") ? "roof" : null;
     }

@@ -106,7 +106,7 @@ public final class BuildGun {
         for (int i = turns & 3; i > 0; i--) facing = facing.getClockWise();
         Placement p = new Placement(def, anchor.immutable(), facing, flip);
         // foundations, walls and roofs snap to an 8-block grid, so they line up with each other
-        if (def.logic().equals("foundation") && !def.id().startsWith("billboard_")) p = snapToGrid(p);
+        if (def.logic() == Logic.FOUNDATION && !def.id().startsWith("billboard_")) p = snapToGrid(p);
         // a miner snaps onto the node it is aimed near, so its drill stands right over it
         return Buildings.snapToNode(player.level(), p);
     }

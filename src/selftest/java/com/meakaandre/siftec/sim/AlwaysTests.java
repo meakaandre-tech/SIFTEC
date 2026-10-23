@@ -7,6 +7,7 @@ import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.Logic;
 import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.building.TruckStations;
 import com.meakaandre.siftec.command.LogisticsTests;
@@ -471,7 +472,7 @@ public final class AlwaysTests {
         List<SimData.Node> out = new ArrayList<>();
         for (SimData.Node n : SimData.get(server).stored.nodes.values()) {
             BlockPos p = n.blockPos();
-            if (n.dim.equals("minecraft:overworld") && n.kind.equals("building") && t.holds(p.getX(), p.getZ()) && Math.abs(p.getY() - Y) <= 3) out.add(n);
+            if (n.dim.equals("minecraft:overworld") && n.kind == NodeKind.BUILDING && t.holds(p.getX(), p.getZ()) && Math.abs(p.getY() - Y) <= 3) out.add(n);
         }
         return out;
     }
@@ -624,10 +625,10 @@ public final class AlwaysTests {
         long now = server.overworld().getGameTime();
         for (int i = 0; i < 100; i++) {
             BlockPos mp = new BlockPos(-30_000 + i * 64, 100, 30_000), cp = mp.east(16);
-            SimData.Node m = data.nodeOrNew(server.overworld(), mp, "building");
+            SimData.Node m = data.nodeOrNew(server.overworld(), mp, NodeKind.BUILDING);
             m.building = "miner_mk1";
-            m.logic = "miner";
-            m.mode = "mine";
+            m.logic = Logic.MINER;
+            m.mode = NodeMode.MINE;
             m.mineItem = "minecraft:raw_iron";
             m.minePeriod = 32;
             m.minePer = 1;
@@ -635,10 +636,10 @@ public final class AlwaysTests {
             m.sim = true;
             m.simTime = now;
             m.recordedAt = now;
-            SimData.Node c = data.nodeOrNew(server.overworld(), cp, "building");
+            SimData.Node c = data.nodeOrNew(server.overworld(), cp, NodeKind.BUILDING);
             c.building = "constructor";
-            c.logic = "basin";
-            c.mode = "craft";
+            c.logic = Logic.BASIN;
+            c.mode = NodeMode.CRAFT;
             c.inCap = 576;
             c.outCap = 576;
             SimData.Recipe r = new SimData.Recipe();

@@ -51,7 +51,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * How each kind of building works, run by its controller every tick ({@link BuildingDef#logic()}):
@@ -137,7 +136,7 @@ public final class BuildingLogic {
         syncFilter(level, c);
         formTanks(level, c);
         Processors.ensureCell(level, c);
-        if (def.logic().equals("drone_port")) SpecialBuildings.dronePortPlaced(level, c);
+        if (def.logic() == Logic.DRONE_PORT) SpecialBuildings.dronePortPlaced(level, c);
         // a Blueprint Designer's volume is flyable from the moment it is built
         if (c instanceof DesignerBlockEntity designer) designer.report();
     }
@@ -167,7 +166,7 @@ public final class BuildingLogic {
     static void syncFilter(Level level, ControllerBlockEntity c) {
         BuildingDef def = c.def();
         // the Manufacturer's and the Quantum Encoder's Basin makes the Core; the line sets its filter (ProductionLogic)
-        if (def == null || !def.logic().equals("basin")) return;
+        if (def == null || def.logic() != Logic.BASIN) return;
         List<BlockPos> basins = cells(c, create("basin"));
         basins.addAll(cells(c, ModBlocks.BRASS_BASIN.get()));
         for (BlockPos pos : basins) {
@@ -191,7 +190,7 @@ public final class BuildingLogic {
 
     /** The buildings whose controller takes a recipe filter: what their Basin, line or recipe makes. */
     public static boolean hasFilter(BuildingDef def) {
-        return def.logic().equals("basin") || def.logic().equals("assembly") || def.logic().equals("processor");
+        return def.logic().hasFilter();
     }
 
     // ------------------------------------------------------------------------------------------------ running
@@ -200,20 +199,20 @@ public final class BuildingLogic {
         BuildingDef def = c.def();
         if (def == null) return;
         switch (def.logic()) {
-            case "miner" -> mine(level, c, def, true);
-            case "portable_miner" -> mine(level, c, def, false);
-            case "smelter" -> smelt(level, c);
-            case "basin" -> ProductionLogic.heat(level, c);
-            case "assembly" -> ProductionLogic.assemble(level, c, def);
-            case "packager" -> ProductionLogic.pack(level, c);
-            case "processor" -> Processors.tick(level, c, def);
-            case "power" -> Generators.tick(level, c, def);
-            case "extractor" -> ExtractorLogic.extract(level, c, def);
-            case "pressurizer" -> ExtractorLogic.pressurize(level, c, def);
-            case "well_extractor" -> ExtractorLogic.wellExtract(level, c, def);
-            case "sink" -> SpecialBuildings.sink(level, c);
-            case "radar" -> Radar.tick(level, c);
-            case "truck_station" -> TruckStations.tick(level, c);
+            case MINER -> mine(level, c, def, true);
+            case PORTABLE_MINER -> mine(level, c, def, false);
+            case SMELTER -> smelt(level, c);
+            case BASIN -> ProductionLogic.heat(level, c);
+            case ASSEMBLY -> ProductionLogic.assemble(level, c, def);
+            case PACKAGER -> ProductionLogic.pack(level, c);
+            case PROCESSOR -> Processors.tick(level, c, def);
+            case POWER -> Generators.tick(level, c, def);
+            case EXTRACTOR -> ExtractorLogic.extract(level, c, def);
+            case PRESSURIZER -> ExtractorLogic.pressurize(level, c, def);
+            case WELL_EXTRACTOR -> ExtractorLogic.wellExtract(level, c, def);
+            case SINK -> SpecialBuildings.sink(level, c);
+            case RADAR -> Radar.tick(level, c);
+            case TRUCK_STATION -> TruckStations.tick(level, c);
             default -> {
             }
         }
@@ -247,23 +246,23 @@ public final class BuildingLogic {
      */
     static boolean working(ServerLevel level, ControllerBlockEntity c, BuildingDef def) {
         return switch (def.logic()) {
-            case "miner" -> nodeAt(level, c.node) != null && room(level, c);
-            case "smelter" -> {
+            case MINER -> nodeAt(level, c.node) != null && room(level, c);
+            case SMELTER -> {
                 BlockPos depot = cell(c, create("depot"));
                 yield !c.input.getItem(0).isEmpty() || depot != null && level.getBlockEntity(depot) instanceof DepotBlockEntity d
                     && d.getHeldItem() != null && !d.getHeldItem().stack.isEmpty();
             }
-            case "basin" -> ProductionLogic.basinHasInput(level, c, false);
-            case "assembly" -> {
+            case BASIN -> ProductionLogic.basinHasInput(level, c, false);
+            case ASSEMBLY -> {
                 boolean onLine = false;
                 for (ItemStack s : c.line) onLine |= !s.isEmpty();
                 yield onLine || ProductionLogic.basinHasInput(level, c, true);
             }
-            case "packager" -> !c.input.getItem(0).isEmpty() || ProductionLogic.packagerHolds(level, c);
+            case PACKAGER -> !c.input.getItem(0).isEmpty() || ProductionLogic.packagerHolds(level, c);
             // working only while a step of its recipe can go on, not whenever something lies inside it
-            case "processor" -> Processors.progressing(level, c, def);
-            case "extractor" -> !c.problem.equals("siftec.building.full");
-            case "sink" -> !c.input.getItem(0).isEmpty();
+            case PROCESSOR -> Processors.progressing(level, c, def);
+            case EXTRACTOR -> !c.problem.equals("siftec.building.full");
+            case SINK -> !c.input.getItem(0).isEmpty();
             default -> true;
         };
     }
@@ -272,9 +271,9 @@ public final class BuildingLogic {
     static boolean accepts(ControllerBlockEntity c, ItemStack stack) {
         BuildingDef def = c.def();
         if (def == null) return false;
-        if (def.logic().equals("smelter")) return MachineTimes.smelterTicks(stack) > 0;
-        if (def.logic().equals("packager")) return ProductionLogic.packagerTakes(stack);
-        if (def.logic().equals("sink")) return Sink.accepts(stack);
+        if (def.logic() == Logic.SMELTER) return MachineTimes.smelterTicks(stack) > 0;
+        if (def.logic() == Logic.PACKAGER) return ProductionLogic.packagerTakes(stack);
+        if (def.logic() == Logic.SINK) return Sink.accepts(stack);
         return BuildingPower.acceptsFuel(def, stack);
     }
 
@@ -349,7 +348,7 @@ public final class BuildingLogic {
         BuildingDef def = c.def();
         if (node == null || def == null) return false;
         Item item = node.look().output();
-        if (def.logic().equals("portable_miner")) return item == Items.AIR || !groundFull(level, c, item);
+        if (def.logic() == Logic.PORTABLE_MINER) return item == Items.AIR || !groundFull(level, c, item);
         ItemStack out = c.output.getItem(0);
         // a break gives at most Fortune + 1 times the block's own most (copper ore drops up to 5 raw copper, the rest one)
         int most = (def.fortune() + 1) * (item == Items.RAW_COPPER ? 5 : 1);
@@ -365,7 +364,7 @@ public final class BuildingLogic {
         BlockPos controller = BuildingIndex.controllerOf(level, drill);
         if (controller == null || !(level.getBlockEntity(controller) instanceof ControllerBlockEntity c)) return null;
         BuildingDef def = c.def();
-        if (def == null || !def.logic().equals("miner") || c.node == null || breaking != null && !breaking.equals(c.node)) return null;
+        if (def == null || def.logic() != Logic.MINER || c.node == null || breaking != null && !breaking.equals(c.node)) return null;
         return c;
     }
 
@@ -407,7 +406,7 @@ public final class BuildingLogic {
         for (ItemStack drop : drops) {
             if (drop.isEmpty()) continue;
             n += drop.getCount();
-            if (def.logic().equals("portable_miner")) {
+            if (def.logic() == Logic.PORTABLE_MINER) {
                 BlockPos at = dropSpot(c);
                 if (at == null) continue;
                 ItemEntity entity = new ItemEntity(level, at.getX() + 0.5, at.getY() + 0.1, at.getZ() + 0.5, drop);
@@ -507,16 +506,16 @@ public final class BuildingLogic {
         if (def == null) return Component.translatable("siftec.building.unknown", c.buildingId);
         List<Component> parts = new ArrayList<>();
         switch (def.logic()) {
-            case "basin" -> parts.add(c.filter.isEmpty() ? Component.translatable("siftec.building.no_filter")
+            case BASIN -> parts.add(c.filter.isEmpty() ? Component.translatable("siftec.building.no_filter")
                 : Component.translatable("siftec.building.filter", c.filter.getHoverName()));
-            case "miner", "portable_miner" -> {
+            case MINER, PORTABLE_MINER -> {
                 NodeAt node = nodeAt(level, c.node);
                 parts.add(node == null ? Component.translatable("siftec.building.no_node")
                     : Component.translatable("siftec.building.node", NodeBlock.label(node.look().type(), node.purity()), formatRate(def.breakTicks() / 20f)));
                 if (def.fortune() > 0) parts.add(Component.translatable("siftec.building.fortune", def.fortune()));
                 if (node != null) parts.add(Component.translatable("siftec.building.mined", c.mined));
             }
-            case "storage" -> {
+            case STORAGE -> {
                 int used = 0, total = 0;
                 BlockPos vault = cell(c, create("item_vault"));
                 Storage<ItemVariant> s = vault == null ? null : ItemStorage.SIDED.find(level, vault, null);
@@ -528,8 +527,8 @@ public final class BuildingLogic {
                 }
                 parts.add(Component.translatable("siftec.building.storage", used, total));
             }
-            case "truck_station" -> TruckStations.status(level, c, parts);
-            case "drone_port" -> {
+            case TRUCK_STATION -> TruckStations.status(level, c, parts);
+            case DRONE_PORT -> {
                 if (SpecialBuildings.droneTerminal(level, c) instanceof DronePortBlockEntity port) {
                     parts.add(Component.translatable(port.statusKey(), port.chargesNeeded()));
                 }
@@ -539,8 +538,7 @@ public final class BuildingLogic {
         }
         ProductionLogic.status(level, c, def, parts);
         ExtractorLogic.status(level, c, def, parts);
-        if (!def.logic().equals("storage") && !def.logic().isEmpty() && !def.logic().equals("power") && !def.logic().contains("extractor")
-            && !def.logic().equals("pressurizer") && !Set.of("workshop", "shop", "radar", "truck_station", "drone_port", "foundation", "designer").contains(def.logic())) {
+        if (def.logic().countsMade()) {
             parts.add(Component.translatable("siftec.building.made", c.made));
         }
         BuildingPower.status(level, c, def, parts);

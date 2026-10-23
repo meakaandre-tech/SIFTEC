@@ -63,7 +63,7 @@ public final class TruckStations {
     public static @Nullable ControllerBlockEntity at(Level level, BlockPos pos) {
         if (!(Chunks.blockEntity(level, pos) instanceof ControllerBlockEntity c)) return null;
         BuildingDef def = c.def();
-        return def != null && def.logic().equals("truck_station") ? c : null;
+        return def != null && def.logic() == Logic.TRUCK_STATION ? c : null;
     }
 
     /** Where a vehicle stops at the station: three blocks in front of the middle of its front edge, on the ground. */
@@ -147,7 +147,7 @@ public final class TruckStations {
         BlockPos tank = BuildingLogic.cell(c, create("fluid_tank"));
         if (tank == null) return;
         Fluid fluid = ProductionLogic.fluidAt(level, tank);
-        double perMb = BuildingPower.fluidMj("fuel", fluid);
+        double perMb = BuildingPower.fluidMj(PowerRole.FUEL, fluid);
         if (perMb <= 0) return;
         long room = (long) Math.floor((vehicle.kind.tankMj() - vehicle.fuelMj) / perMb);
         if (room <= 0) return;
