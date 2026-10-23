@@ -221,7 +221,7 @@ public final class MapClient {
                     o.get("z").getAsInt(), o.get("icon").getAsInt(), o.get("argb").getAsInt());
                 PINS.put(pin.key(), pin);
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             Siftec.LOGGER.warn("SIFTEC map: unreadable {}", file, e);
         }
     }
@@ -262,7 +262,7 @@ public final class MapClient {
             JsonObject o = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
             if (o.has("minimap")) minimapOn = o.get("minimap").getAsBoolean();
             if (o.has("hidden")) for (JsonElement e : o.getAsJsonArray("hidden")) HIDDEN.add(e.getAsString());
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             Siftec.LOGGER.warn("SIFTEC map: unreadable {}", file, e);
         }
     }

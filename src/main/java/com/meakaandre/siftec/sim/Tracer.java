@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.sim;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingIndex;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.building.PortBlockEntity;
@@ -167,6 +168,7 @@ final class Tracer {
             try {
                 pipe = FluidPropagator.getPipe(level, pos);
             } catch (RuntimeException e) {
+                Siftec.LOGGER.debug("SIFTEC: could not read the pipe at {}", pos, e);
                 pipe = null;
             }
             if (pipe == null) continue;
@@ -174,6 +176,7 @@ final class Tracer {
             try {
                 connections = FluidPropagator.getPipeConnections(state, pipe);
             } catch (RuntimeException e) {
+                Siftec.LOGGER.debug("SIFTEC: could not read the pipe connections at {}; trying every side", pos, e);
                 connections = List.of(Direction.values());
             }
             for (Direction c : connections) {

@@ -264,6 +264,7 @@ public final class MapServer {
                 if (player != null) send(player, payload);
             } catch (IllegalArgumentException ignored) {
                 // a test company's made-up member
+                Siftec.LOGGER.debug("SIFTEC map: member {} is not a UUID; not sent to", member, ignored);
             }
         }
     }
@@ -594,6 +595,7 @@ public final class MapServer {
                 if (player != null) sendMarkers(player);
             } catch (IllegalArgumentException ignored) {
                 // a test company's made-up member
+                Siftec.LOGGER.debug("SIFTEC map: member {} is not a UUID; not sent to", id, ignored);
             }
         }
     }

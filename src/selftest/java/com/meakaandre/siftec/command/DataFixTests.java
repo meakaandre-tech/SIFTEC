@@ -2,6 +2,7 @@ package com.meakaandre.siftec.command;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.blueprint.DesignerBlock;
 import com.meakaandre.siftec.building.BuildingDef;
@@ -43,6 +44,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -142,7 +144,7 @@ public final class DataFixTests {
     private static @Nullable JsonObject resource(String path) {
         try (var in = Siftec.class.getResourceAsStream(path)) {
             return in == null ? null : new Gson().fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), JsonObject.class);
-        } catch (Exception e) {
+        } catch (IOException | JsonParseException e) {
             return null;
         }
     }
@@ -157,7 +159,7 @@ public final class DataFixTests {
                     if (o != null && o.has("id") && o.get("id").getAsString().equals("siftec")) return o;
                 }
             }
-        } catch (Exception ignored) {
+        } catch (IOException | RuntimeException ignored) {
             // reported as missing below
         }
         return null;

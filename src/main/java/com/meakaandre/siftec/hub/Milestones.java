@@ -8,6 +8,7 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.company.Company;
 import net.minecraft.resources.Identifier;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public final class Milestones {
                 if (o.has("triggers")) for (JsonElement t : o.getAsJsonArray("triggers")) triggers.add(t.getAsString());
                 TREES.add(new Tree(o.get("id").getAsString(), Identifier.parse(o.get("icon").getAsString()), byTree.getOrDefault(o.get("id").getAsString(), List.of()), triggers));
             }
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             throw new IllegalStateException("SIFTEC could not read siftec_content.json", e);
         }
     }

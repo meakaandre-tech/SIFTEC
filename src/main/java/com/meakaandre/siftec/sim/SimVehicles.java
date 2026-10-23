@@ -120,6 +120,7 @@ public final class SimVehicles {
         try {
             e.setUUID(UUID.fromString(v.uuid));
         } catch (IllegalArgumentException ignored) {
+            Siftec.LOGGER.warn("SIFTEC: simulated vehicle has an unreadable UUID {}; it gets a new one", v.uuid, ignored);
         }
         double[] p = returnAt(v);
         // from the last point it passed it drives the rest of that leg again

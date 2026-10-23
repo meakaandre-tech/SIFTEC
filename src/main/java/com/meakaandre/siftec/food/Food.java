@@ -270,6 +270,7 @@ public final class Food {
                 parsed.add(new Parsed(results, slots, type != null && type.toString().equals("farmersdelight:cooking")));
             } catch (RuntimeException ignored) {
                 // a recipe of a kind that cannot be read this way simply passes nothing on
+                Siftec.LOGGER.debug("SIFTEC: recipe {} could not be read for food effects", holder.id(), ignored);
             }
         }
         for (int pass = 0; pass < 6; pass++) {

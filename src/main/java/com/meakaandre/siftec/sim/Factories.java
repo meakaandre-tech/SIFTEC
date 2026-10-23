@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -169,8 +170,11 @@ public final class Factories {
         if (f == null) return;
         try {
             f.get();
-        } catch (Exception e) {
-            Siftec.LOGGER.error("SIFTEC: a factory simulation step failed", e);
+        } catch (ExecutionException e) {
+            Siftec.LOGGER.error("SIFTEC: a factory simulation step failed", e.getCause());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Siftec.LOGGER.error("SIFTEC: interrupted while waiting for a factory simulation step", e);
         }
         if (running == f) {
             running = null;
