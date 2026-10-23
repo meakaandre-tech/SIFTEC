@@ -788,7 +788,7 @@ public final class MachineTests {
         }
         BlockPos engine = engines.getFirst(), coil = cell(c, "create_new_age:generator_coil");
         BlockState engineState = level.getBlockState(engine);
-        // 1. a Steam Engine taken away is put back within its next look
+        // a Steam Engine taken away is put back within its next look
         later(level, 700, () -> {
             near(source, "repair: the Coal Generator runs before (15,360 SU)", offered(level, c), su(75), 0.04);
             level.setBlock(engine, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
@@ -796,7 +796,7 @@ public final class MachineTests {
         later(level, 700 + BuildingRepair.EVERY + 40, () -> expect(source, "repair: a Steam Engine taken away is put back from the building's shape",
             level.getBlockState(engine).is(engineState.getBlock()), String.valueOf(level.getBlockState(engine))));
         later(level, 700 + BuildingRepair.EVERY + 400, () -> near(source, "repair: and the generator gives its 75 MW again (" + status(level, c) + ")", offered(level, c), su(75), 0.04));
-        // 2. a building from before its shape changed (shape 0): rebuilt whole, its missing coil too
+        // a building from before its shape changed (shape 0): rebuilt whole, its missing coil too
         later(level, 1400, () -> {
             if (coil != null) level.setBlock(coil, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             c.shape = 0;
@@ -806,7 +806,7 @@ public final class MachineTests {
                 && coil != null && level.getBlockState(coil).is(block("create_new_age:generator_coil")), r + ", shape " + c.shape);
         });
         later(level, 1900, () -> near(source, "repair: and it runs on its rebuilt machines (15,360 SU)", offered(level, c), su(75), 0.04));
-        // 3. something not the building's where a Steam Engine goes: nothing is rebuilt there and it makes nothing until it is cleared
+        // something not the building's where a Steam Engine goes: nothing is rebuilt there and it makes nothing until it is cleared
         later(level, 2000, () -> {
             BuildingIndex index = BuildingIndex.get(level);
             if (index != null) index.remove(level, engine, c.getBlockPos());

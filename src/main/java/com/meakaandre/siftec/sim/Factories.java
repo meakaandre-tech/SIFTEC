@@ -46,7 +46,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Always-running factories (work package 17): every Build Gun building, Drone Port and the inventories belts end in
+ * Always-running factories: every Build Gun building, Drone Port and the inventories belts end in
  * keeps working while its chunks do not tick, without any chunk being loaded for it.
  * <ul>
  * <li>While any chunk a building stands in ticks, it runs for real, and is recorded ({@link #record}): what it makes and

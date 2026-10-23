@@ -58,7 +58,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Selftests for the power grid (work package 6). Every line of output starts with "SELFTEST power".
+ * Selftests for the power grid. Every line of output starts with "SELFTEST power".
  * <ul>
  * <li>{@code /siftec selftest power}: a Coal Generator on a Power Pole Mk.1 runs a Constructor, then two New Age motors
  * a player wired up; the second is more than the generator makes, so the fuse trips, stays tripped after a reset while

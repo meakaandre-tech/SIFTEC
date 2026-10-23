@@ -68,7 +68,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Work package 17's done-when: the same small factory built twice (a Miner Mk.1 on a normal iron node, a Smelter, a
+ * The always-running simulation's main check: the same small factory built twice (a Miner Mk.1 on a normal iron node, a Smelter, a
  * Constructor making Iron Rods, its rods carried by a Truck from one Truck Station to another, into a Storage Container;
  * a Biomass Burner powering it), one left loaded and the other let go so its chunks unload. After ten in-game minutes the
  * two must hold the same rods (within one craft), with no chunk of the second loaded meanwhile, and they must still match

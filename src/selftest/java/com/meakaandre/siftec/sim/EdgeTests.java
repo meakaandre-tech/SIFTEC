@@ -59,9 +59,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.BooleanSupplier;
 
 /**
- * The always-running simulation's edges (review fixes 5), {@code /siftec selftest always edges}: what happens to a building,
- * its belts and its power as it moves between running for real and being simulated. Each case first sets up the moment
- * the review found something doubled or lost, then counts. Every line says "SELFTEST always edges"; failures say FAIL.
+ * The always-running simulation's edges, {@code /siftec selftest always edges}: what happens to a building, its belts
+ * and its power as it moves between running for real and being simulated. Each case first sets up the moment something
+ * could be doubled or lost, then counts. Every line says "SELFTEST always edges"; failures say FAIL.
  * <p>
  * Each case has a site of its own far from everything, a column of chunks one force-loaded chunk F heads: the row south
  * of F ticks (it is next to F), the row after that is loaded but does not tick (two from F), and anything further is
@@ -948,7 +948,7 @@ public final class EdgeTests {
         int room = BuildingPower.WASTE_ROOM;
         expect("nuclear: the recorded plant's output holds several rods' worth of waste, as the real one", model.outCap == room,
             model.outCap + " (" + room + " wanted)");
-        // with water and room for the waste: it runs (both before and after the fixes)
+        // with water and room for the waste: it runs
         SimData.Node ok = copy(model);
         ok.sim = true;
         ok.simTime = now;

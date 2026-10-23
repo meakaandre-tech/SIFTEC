@@ -91,7 +91,7 @@ public class VehicleEntity extends Entity {
     private double lastDist = Double.MAX_VALUE;
     /**
      * Ticks each leg of the route took the last time it drove it for real (index: the point the leg ends at), so the
-     * factory simulation drives it by the same times while its land does not tick (work package 17).
+     * factory simulation drives it by the same times while its land does not tick.
      */
     public final List<Integer> legTicks = new ArrayList<>();
     /** The tick it set off on the leg it is driving. */

@@ -43,7 +43,7 @@ import java.util.List;
 public class HubMenu extends AbstractContainerMenu {
     public static MenuType<HubMenu> TYPE;
 
-    /** Button actions (3 was the old building rescan). */
+    /** Button actions (3 is unused). */
     public static final int SELECT = 1, PAY = 2, SIFT = 4;
     /** The "tier" that stands for the wormhole phases in a button id. */
     public static final int PHASES = Milestones.TIERS;

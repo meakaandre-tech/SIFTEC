@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
+/** A Dimensional Depot: uploads the Item Vault it sits on into its company's cloud at the researched rate. */
 public class DepotBlockEntity extends BlockEntity {
     /**
      * Satisfactory 1.0's Dimensional Depot before research: 15 items a minute, and one stack of each item in the cloud.

@@ -4,8 +4,8 @@ import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Where the selftest mod (siftec_selftest, built only for CI) plugs in. The mod's initializers call {@link #run} at
- * fixed points so the selftests' commands and tick listeners register in the same order among the mod's own as they
- * always have; without the selftest mod installed nothing happens.
+ * fixed points so the selftests' commands and tick listeners register in a fixed order among the mod's own;
+ * without the selftest mod installed nothing happens.
  */
 public final class SelfTestHooks {
     /** The points in initialization the selftests register at, in the order they come. */

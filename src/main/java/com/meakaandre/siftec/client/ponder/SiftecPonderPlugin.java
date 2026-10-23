@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * SIFTEC's part of Ponder (work package 13): a scene for every building and vehicle ({@link BuildingScenes}), a
+ * SIFTEC's part of Ponder: a scene for every building and vehicle ({@link BuildingScenes}), a
  * Ponder tag for each Build Gun tab that has any, and the lines the scenes share. Ponder reads them when the game
  * starts and on every resource reload.
  */

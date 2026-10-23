@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
 
-/** Water boils away out of Create's tanks and fluid machines in the Nether. Carried over from the old Tweaker mod. */
+/** Water boils away out of Create's tanks and fluid machines in the Nether. */
 public final class NetherWater {
     /** mB lost per tick: a full eight-bucket tank is gone in about four seconds. */
     private static final int PER_TICK = 100, DROPLETS = 81;

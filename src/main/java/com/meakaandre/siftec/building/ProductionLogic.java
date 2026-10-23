@@ -47,7 +47,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Work package 9's production buildings, run by their controllers ({@link BuildingLogic#tick}):
+ * The production buildings, run by their controllers ({@link BuildingLogic#tick}):
  * <ul>
  * <li>heat: the Foundry's, Refinery's and Blender's Blaze Burner is kept lit while the building has power (Satisfactory's
  * machines are electric), so the Mixer over it runs its heated recipes;</li>
@@ -595,7 +595,7 @@ public final class ProductionLogic {
         return out;
     }
 
-    /** The inputs the recipes take, each once, in order: slot i of the nine takes input i mod n (as the old machine did). */
+    /** The inputs the recipes take, each once, in order: slot i of the nine takes input i mod n. */
     static List<Milestone.Cost> processorInputs(ControllerBlockEntity c, BuildingDef def) {
         List<Milestone.Cost> out = new ArrayList<>();
         for (ProcessorRecipe r : processorRecipes(c, def)) {

@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The Truck Station (work package 14): a building with two Item Vaults and a fuel tank. Its dock is the ground just in
+ * The Truck Station: a building with two Item Vaults and a fuel tank. Its dock is the ground just in
  * front of it ({@link #dock}); a vehicle driving a recorded route stops there, and while it stands there the station
  * either loads it from its vaults or unloads it into them (using the terminal switches which) and fills its tank
  * from the station's fuel. Stations say they exist every tick their controller runs, so vehicles can find the ones

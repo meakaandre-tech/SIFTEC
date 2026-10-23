@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * A company owns all progression: milestones, wormhole phases and (later) research. Plain fields, because
+ * A company owns all progression: milestones, wormhole phases and research. Plain fields, because
  * the whole thing is saved as JSON.
  */
 public class Company {

@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Work package 10's buildings: the Equipment Workshop, the AWESOME Sink and Shop, and the Radar Tower. Using one opens
+ * The special buildings: the Equipment Workshop, the AWESOME Sink and Shop, and the Radar Tower. Using one opens
  * its window; the Sink destroys what its input port brings while it has power, for its company's points. Also the
  * HUB's Craft Station's rule: it turns by hand only ({@link #cutsRotation}).
  */

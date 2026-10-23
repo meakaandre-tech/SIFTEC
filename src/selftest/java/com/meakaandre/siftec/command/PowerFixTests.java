@@ -54,7 +54,7 @@ import java.util.UUID;
 import java.util.function.BooleanSupplier;
 
 /**
- * {@code /siftec selftest powerfix}: the power, belt and miner fixes, on a test site of their own. Every check prints
+ * {@code /siftec selftest powerfix}: power, belt and miner checks, on a test site of their own. Every check prints
  * "SELFTEST powerfix"; failures say FAIL; the last line counts them.
  * <ol>
  * <li>14, power over unloaded chunks: a fuelled Biomass Burner 640 blocks east is wired to a Power Pole by a Constructor
@@ -270,8 +270,7 @@ public final class PowerFixTests {
     }
 
     /**
-     * Belts never connect to shafts (this replaces the clutch rule this fix first had): a motor through a clutch, engaged
-     * or not, turns no belt, and every belt runs at its company's self-moving speed.
+     * Belts never connect to shafts: a motor through a clutch, engaged or not, turns no belt, and every belt runs at its company's self-moving speed.
      */
     private static void belts(CommandSourceStack source, ServerLevel level) {
         Company c = company(level, COMPANY, "hub_upgrade_4");

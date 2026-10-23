@@ -64,7 +64,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * /siftec selftest exploration (work package 10): the slugs, Power Shards and overclocking are gone; Mercer Spheres,
+ * /siftec selftest exploration: the slugs, Power Shards and overclocking are gone; Mercer Spheres,
  * Somersloops and crash sites come from the seed, are placed in the world, are found by the Object Scanner and start
  * their MAM tree when collected; crash sites ask for nothing, parts or power by distance; the Nutrients start nodes put
  * wild food on the scanner; Field Research's Map; the Sink's values and coupon curve; the Shop and the Customizer's

@@ -33,6 +33,7 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
+/** The client entry point: registers SIFTEC's renderers, screens, keys, tooltips and client-side packet handlers. */
 public class SiftecClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
@@ -80,7 +81,7 @@ public class SiftecClient implements ClientModInitializer {
         VehicleClient.register();
         CloudButton.register();
         MapClient.register();
-        // the guide: Ponder scenes for every building and vehicle (work package 13)
+        // the guide: Ponder scenes for every building and vehicle
         Guide.register();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;

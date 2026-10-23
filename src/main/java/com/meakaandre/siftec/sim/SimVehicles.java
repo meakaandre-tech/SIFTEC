@@ -20,8 +20,8 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 
 /**
- * Trucks, Tractors and Explorers on a recorded route keep driving while the land they are on does not tick (work package
- * 17). As soon as one driving its route by itself is in a chunk that stops ticking entities, it leaves the world into the
+ * Trucks, Tractors and Explorers on a recorded route keep driving while the land they are on does not tick. As soon
+ * as one driving its route by itself is in a chunk that stops ticking entities, it leaves the world into the
  * simulation's record ({@link SimData.Vehicle}): there it drives each leg in the time it last took for real (or its length
  * at the autopilot's speed), burns its fuel, and stands at each Truck Station to load or unload, as {@link Sim#drive}
  * does. When where it would be is ticking land again, it comes back into the world there, with its cargo and fuel.

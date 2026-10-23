@@ -239,7 +239,7 @@ public class PowerMemory extends SavedData {
         }
 
         /**
-         * The factory simulation runs this member while its chunk does not tick (work package 17): what it can give, asks
+         * The factory simulation runs this member while its chunk does not tick: what it can give, asks
          * for, holds and has in fuel is what the simulation says.
          */
         public void simulate(double capacity, double demand, double stored, double reserve) {

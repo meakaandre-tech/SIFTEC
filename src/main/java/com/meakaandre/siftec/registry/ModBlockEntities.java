@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/** Registers the pack's block entity types and the item and fluid storage they expose. */
 public class ModBlockEntities {
     @FunctionalInterface
     private interface Factory<T extends BlockEntity> {

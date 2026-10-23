@@ -46,7 +46,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The Ponder scenes of the guide (work package 13): one for every building and vehicle the Build Gun puts down,
+ * The Ponder scenes of the guide: one for every building and vehicle the Build Gun puts down,
  * keyed to its stand-in item ({@code siftec:building_<id>}, {@link ModItems#BUILDINGS}).
  * <p>
  * A scene builds its building from the same template the Build Gun places (or, for the HUB and the Wormhole Gateway,

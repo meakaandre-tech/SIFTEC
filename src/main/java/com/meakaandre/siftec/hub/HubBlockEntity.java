@@ -77,7 +77,7 @@ public class HubBlockEntity extends BlockEntity {
     protected void loadAdditional(ValueInput view) {
         super.loadAdditional(view);
         companyId = view.getStringOr("Company", "");
-        // an old HUB's building box ("BoxMin", "BoxMax") is simply no longer read
+        // an old HUB's building box ("BoxMin", "BoxMax") is ignored
         prefab = view.getBooleanOr("Prefab", false);
         anchor = view.read("Anchor", BlockPos.CODEC).orElse(null);
         facing = Direction.from2DDataValue(view.getIntOr("Facing", 2));

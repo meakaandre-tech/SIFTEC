@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+/** Registers SIFTEC's creative tab, which lists {@link ModBlocks#TAB_ITEMS}. */
 public class ModTab {
     public static void register() {
         Registry.register(

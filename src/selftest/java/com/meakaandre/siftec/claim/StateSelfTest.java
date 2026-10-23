@@ -31,9 +31,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Used by the automated test ({@code /siftec selftest state setup|check|verify}): saves far bigger than the old
- * 64 KB limit, claims given up when their block goes, explosions, the HUB budget, the spawn area, claims loading no chunks,
- * kicking, and Build Gun buildings on claimed land with the per-company unlocks ({@link ClaimGunTests}). {@code verify} runs after the restart and removes everything the test made.
+ * Used by the automated test ({@code /siftec selftest state setup|check|verify}): saves far bigger than 64 KB, claims
+ * given up when their block goes, explosions, the HUB budget, the spawn area, claims loading no chunks, kicking, and
+ * Build Gun buildings on claimed land with the per-company unlocks ({@link ClaimGunTests}). {@code verify} runs after
+ * the restart and removes everything the test made.
  */
 public final class StateSelfTest {
     private static final String BIG = "selftest_big", OTHER = "selftest_other", BUDGET = "selftest_budget", LOAD = "selftest_load", KICK = "selftest_kick";
@@ -85,7 +86,7 @@ public final class StateSelfTest {
         ServerLevel level = server.overworld();
         codecTests(source, level);
 
-        // 1. big saves: written at shutdown, read back by "verify" after the restart
+        // big saves: written at shutdown, read back by "verify" after the restart
         CompanyData data = CompanyData.get(server);
         Company big = company(data, BIG, fake(0));
         for (int i = 0; i < BIG_COLLECTED; i++) big.collected.add((1_000_000 + i) + "," + (2_000_000 + i));
@@ -107,7 +108,7 @@ public final class StateSelfTest {
         int claimChars = JsonSavedData.GSON.toJson(claims.stored).length();
         report(source, "SELFTEST state save: companies " + companyChars + " chars, claims " + claimChars + " chars as JSON (the old one-string limit was 65535)");
 
-        // 2. claims follow their block: replaced (as /setblock does) and blown up
+        // claims follow their block: replaced (as /setblock does) and blown up
         Company other = company(data, OTHER, fake(1));
         markerA = ground(level, AREA, AREA);
         level.setBlockAndUpdate(markerA, ModBlocks.CLAIM_MARKER.get().defaultBlockState());
@@ -121,7 +122,7 @@ public final class StateSelfTest {
         level.explode(null, markerB.getX() + 0.5, markerB.getY() + 1.0, markerB.getZ() + 0.5, 4f, Level.ExplosionInteraction.TNT);
         report(source, "SELFTEST state claims setup: marker A claimed " + a + ", marker B claimed " + b);
 
-        // 3. the HUB budget: one claiming HUB per company, HUB chunks count against the company's chunks
+        // the HUB budget: one claiming HUB per company, HUB chunks count against the company's chunks
         Company budget = company(data, BUDGET, fake(5));
         hub = ground(level, AREA + 400, AREA);
         level.setBlockAndUpdate(hub, ModBlocks.HUB.get().defaultBlockState());
@@ -139,13 +140,13 @@ public final class StateSelfTest {
             + "; then " + markers + " markers until the budget of " + Claims.chunkBudget(budget) + " chunks was used (" + Claims.chunksUsed(server, budget)
             + "); HUB next to another company's land refused " + nearOther);
 
-        // 4. the spawn area
+        // the spawn area
         BlockPos spawn = level.getRespawnData().pos();
         int atSpawn = Claims.claim(level, other, spawn, Claims.MARKER_RADIUS, true, 9);
         report(source, "SELFTEST state spawn: radius " + SiftecConfig.spawnFreeRadius + ", spawn in zone " + Claims.inSpawnZone(level, spawn)
             + ", 300 blocks out in zone " + Claims.inSpawnZone(level, spawn.offset(300, 0, 300)) + ", a marker at spawn claimed " + atSpawn);
 
-        // 5. claims keep no chunk loaded (work package 17: their factories run simulated instead), members online or not
+        // claims keep no chunk loaded (their factories run simulated instead), members online or not
         Company load = company(data, LOAD, fake(2));
         for (int i = 0; i < 4; i++) {
             Claims.Claim claim = new Claims.Claim();
@@ -158,7 +159,7 @@ public final class StateSelfTest {
         for (int i = 0; i < 4; i++) anyLoaded |= level.hasChunk(((AREA + 1200) >> 4) + i, AREA >> 4);
         report(source, "SELFTEST state loading: claimed chunks keep no ticket (claimed chunks loaded: " + anyLoaded + ", members " + load.members.size() + ")");
 
-        // 6. kicking, the multiplier memory and scaled payments
+        // kicking, the multiplier memory and scaled payments
         Company kick = company(data, KICK, fake(3), fake(4));
         boolean byMember = Companies.kick(server, kick, fake(4), fake(3));
         boolean byFounder = Companies.kick(server, kick, fake(3), fake(4));
@@ -172,7 +173,7 @@ public final class StateSelfTest {
             + "; multiplier right after " + multiplier + "; may rejoin " + !cooling + "; 15 parts paid at x2.0 become " + kick.paid.get("selftest").get("minecraft:iron_ingot")
             + " at x" + kick.costMultiplier());
 
-        // 7. Build Gun buildings and claims, and the per-company unlocks of buildings and belt speed
+        // Build Gun buildings and claims, and the per-company unlocks of buildings and belt speed
         ClaimGunTests.run(source, level, StateSelfTest::fake);
         return 1;
     }

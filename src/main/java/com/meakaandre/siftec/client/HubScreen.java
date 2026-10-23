@@ -310,7 +310,7 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
         List<FormattedCharSequence> lines = font.split(unlocks, width);
         int room = (bottom - y - 4 - costs.size() * row - (lockLine ? 10 : 0)) / 10;
         int shown = Math.max(1, Math.min(lines.size(), Math.min(3, room)));
-        // the milestone's text (work package 13) under its name, in what room the unlocks and costs leave; all of it on hover
+        // the milestone's text under its name, in what room the unlocks and costs leave; all of it on hover
         List<FormattedCharSequence> about = font.split(sel.desc().copy().withStyle(ChatFormatting.ITALIC), width);
         int aboutShown = Math.max(0, Math.min(about.size(), Math.min(4, room - shown - 1)));
         for (int i = 0; i < aboutShown; i++) {

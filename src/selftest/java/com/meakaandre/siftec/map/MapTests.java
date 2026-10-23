@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * /siftec selftest map (work package 15): Field Research gives the Map; the locator bar is off; fog is kept per
+ * /siftec selftest map: Field Research gives the Map; the locator bar is off; fog is kept per
  * company; chunks are recorded into low-resolution tiles that pack and unpack whole; a Radar Tower's sweep clears
  * the fog over its range and fills unloaded land from the generator; geysers are found in recorded chunks; nodes
  * show for the scanner's resources; markers are private or shared, and a second member of the company sees, changes

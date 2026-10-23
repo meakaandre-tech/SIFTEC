@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code /siftec selftest datafix}: the review's recipe and data fixes, on a test site of its own (X 10800, Z -10800).
+ * {@code /siftec selftest datafix}: recipe and data checks, on a test site of its own (X 10800, Z -10800).
  * Every check prints "SELFTEST datafix"; failures say FAIL; the last line counts them. Most read the loaded recipes,
  * locks and tables; tools/check_recipes.py checks the same data before it is written.
  * <ul>
@@ -312,7 +312,7 @@ public final class DataFixTests {
     // ------------------------------------------------------------------------------------------------ 17
 
     private static void designer(CommandSourceStack source, ServerLevel level) {
-        // the Blueprint Designers are Build Gun buildings now (the volumes are checked by /siftec selftest designer)
+        // the Blueprint Designers are Build Gun buildings (the volumes are checked by /siftec selftest designer)
         BuildingDef mk2 = Buildings.def("blueprint_designer_mk2");
         expect(source, "FICSIT Blueprints Mk.2 unlocks the Blueprint Designer Mk.2 (a Build Gun building on the Special tab)",
             mk2 != null && mk2.unlock().equals("ficsit_blueprints_mk2") && mk2.category() == Category.SPECIAL,
