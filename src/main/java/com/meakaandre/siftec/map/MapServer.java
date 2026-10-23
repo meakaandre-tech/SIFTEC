@@ -576,9 +576,9 @@ public final class MapServer {
     // ------------------------------------------------------------------------------------------------ markers
 
     private static void sendMarkers(ServerPlayer player) {
-        Company company = Companies.find(player);
+        String companyId = Companies.idOf(player);
         MapMarkers markers = MapMarkers.get(player.level().getServer());
-        send(player, new MapPayloads.Markers(markers.visibleTo(player.getUUID().toString(), company == null ? "" : company.id)));
+        send(player, new MapPayloads.Markers(markers.visibleTo(player.getUUID().toString(), companyId)));
     }
 
     /** Sends the markers again to everyone who sees this one. */
@@ -586,7 +586,7 @@ public final class MapServer {
         Set<String> who = new HashSet<>();
         who.add(m.owner);
         if (m.company) {
-            Company company = CompanyData.get(server).byId(m.companyId);
+            Company company = Companies.byId(server, m.companyId);
             if (company != null) who.addAll(company.members);
         }
         for (String id : who) {
@@ -606,8 +606,7 @@ public final class MapServer {
     }
 
     private static void edit(ServerPlayer player, MapPayloads.MarkerEdit payload) {
-        Company company = Companies.find(player);
-        String result = apply(player.level().getServer(), player.getUUID().toString(), company == null ? "" : company.id, payload.op(), payload.marker());
+        String result = apply(player.level().getServer(), player.getUUID().toString(), Companies.idOf(player), payload.op(), payload.marker());
         if (result != null) player.sendOverlayMessage(Component.translatable(result));
     }
 
@@ -708,8 +707,7 @@ public final class MapServer {
         m.death = true;
         m.crate = crate;
         m.owner = id;
-        Company company = Companies.find(player);
-        m.companyId = company == null ? "" : company.id;
+        m.companyId = Companies.idOf(player);
         m.at = System.currentTimeMillis();
         markers.all().add(m);
         markers.setDirty();

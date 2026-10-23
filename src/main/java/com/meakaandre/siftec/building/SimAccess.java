@@ -13,6 +13,7 @@ import com.meakaandre.siftec.sim.Keys;
 import com.meakaandre.siftec.sim.Recipes;
 import com.meakaandre.siftec.sim.SimData;
 import com.meakaandre.siftec.sink.Sink;
+import com.meakaandre.siftec.util.Chunks;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
@@ -437,7 +438,7 @@ public final class SimAccess {
             r = g.reserve(at);
         } else {
             // a cell of it is not loaded: its machines cannot be read now (NaN: keep what was read before)
-            for (long chunk : chunks(c)) if (!level.hasChunk(ChunkPos.getX(chunk), ChunkPos.getZ(chunk))) return Double.NaN;
+            for (long chunk : chunks(c)) if (!Chunks.loaded(level, chunk)) return Double.NaN;
             r = m.reserve();
         }
         if (!Double.isFinite(r)) return 0;

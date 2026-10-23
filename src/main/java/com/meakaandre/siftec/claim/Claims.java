@@ -5,7 +5,6 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.config.SiftecConfig;
 import com.meakaandre.siftec.death.DeathCrateBlockEntity;
 import com.meakaandre.siftec.hub.HubBlock;
@@ -204,7 +203,7 @@ public final class Claims {
     /** The name of the company holding a claim, for messages. */
     public static String holder(Level level, Claim claim) {
         if (!(level instanceof ServerLevel server)) return "?";
-        Company owner = CompanyData.get(server.getServer()).byId(claim.company);
+        Company owner = Companies.byId(server.getServer(), claim.company);
         return owner == null ? "?" : owner.name;
     }
 
@@ -263,7 +262,7 @@ public final class Claims {
     public static void deny(Player player, Level level, BlockPos pos) {
         if (!(player instanceof ServerPlayer server) || Companies.isFake(server)) return;
         Claim claim = at(level, pos);
-        Company owner = claim == null ? null : CompanyData.get(server.level().getServer()).byId(claim.company);
+        Company owner = claim == null ? null : Companies.byId(server.level().getServer(), claim.company);
         server.sendOverlayMessage(Component.translatable("siftec.claim.denied", owner == null ? "?" : owner.name));
     }
 

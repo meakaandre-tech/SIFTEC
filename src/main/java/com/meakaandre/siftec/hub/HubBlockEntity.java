@@ -2,7 +2,6 @@ package com.meakaandre.siftec.hub;
 
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.util.IntakeStorage;
 import net.minecraft.core.BlockPos;
@@ -90,7 +89,7 @@ public class HubBlockEntity extends BlockEntity {
 
     private @Nullable Company company() {
         if (level == null || level.getServer() == null) return null;
-        return CompanyData.get(level.getServer()).byId(companyId);
+        return Companies.byId(level.getServer(), companyId);
     }
 
     /** The milestone deliveries go to, if it can take anything right now. */

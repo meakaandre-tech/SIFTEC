@@ -15,6 +15,8 @@ import com.meakaandre.siftec.power.WireMap;
 import com.meakaandre.siftec.sim.SimData.Link;
 import com.meakaandre.siftec.sim.SimData.Node;
 import com.meakaandre.siftec.sink.Sink;
+import com.meakaandre.siftec.util.Chunks;
+import com.meakaandre.siftec.util.Drops;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -23,7 +25,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -198,14 +199,14 @@ public final class Factories {
     static boolean ticking(ServerLevel level, Node n, long except) {
         for (long c : chunks(n)) {
             if (c == except) continue;
-            if (level.hasChunk(ChunkPos.getX(c), ChunkPos.getZ(c)) && level.shouldTickBlocksAt(c)) return true;
+            if (Chunks.loaded(level, c) && level.shouldTickBlocksAt(c)) return true;
         }
         return false;
     }
 
     /** True if every chunk the node stands in is loaded: only then can the catch-up write into it. */
     static boolean loaded(ServerLevel level, Node n) {
-        for (long c : chunks(n)) if (!level.hasChunk(ChunkPos.getX(c), ChunkPos.getZ(c))) return false;
+        for (long c : chunks(n)) if (!Chunks.loaded(level, c)) return false;
         return true;
     }
 
@@ -305,7 +306,7 @@ public final class Factories {
         List<Due> all = new ArrayList<>(DUE.values());
         DUE.clear();
         for (Due d : all) {
-            if (d.level.getServer() != s || !d.level.isLoaded(d.pos) || !d.level.shouldTickBlocksAt(d.pos)) continue;
+            if (d.level.getServer() != s || !Chunks.ticking(d.level, d.pos)) continue;
             BlockEntity be = d.level.getBlockEntity(d.pos);
             if (d.port && be instanceof DronePortBlockEntity port) read(d.level, data, port);
             else if (!d.port && be instanceof ControllerBlockEntity c) read(d.level, data, c, false);
@@ -420,7 +421,7 @@ public final class Factories {
         n.handOver = false;
         n.mixed = false;
         n.sim = true;
-        if (level.isLoaded(n.blockPos()) && level.getBlockEntity(n.blockPos()) instanceof ControllerBlockEntity c) c.simulated = true;
+        if (Chunks.blockEntity(level, n.blockPos()) instanceof ControllerBlockEntity c) c.simulated = true;
         snapshots++;
     }
 
@@ -607,7 +608,7 @@ public final class Factories {
                     if (e.node().equals(c.getBlockPos())) continue;
                     to = data.nodeOrNew(level, e.node(), "building");
                     // a building it has not read yet (or never will, as the HUB): known by its id until it is
-                    if (to.building.isEmpty() && level.isLoaded(e.node()) && level.getBlockEntity(e.node()) instanceof ControllerBlockEntity tc) to.building = tc.buildingId;
+                    if (to.building.isEmpty() && Chunks.blockEntity(level, e.node()) instanceof ControllerBlockEntity tc) to.building = tc.buildingId;
                 }
                 String id = p.pos().asLong() + ">" + to.key() + ">" + e.at().asLong();
                 Link l = old.remove(id);
@@ -769,7 +770,7 @@ public final class Factories {
             int c = (int) Math.min(count, max);
             ItemStack stack = Keys.stack(key, c);
             if (stack.isEmpty()) return;
-            Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, stack);
+            Drops.at(level, at, 1.1, stack);
             count -= c;
         }
     }
@@ -888,7 +889,7 @@ public final class Factories {
         ServerLevel level = level(s, n.dim);
         if (level == null || n.destination == null) return;
         BlockPos at = BlockPos.of(n.destination);
-        if (!level.isLoaded(at) || !(level.getBlockEntity(at) instanceof DronePortBlockEntity other)) return;
+        if (!(Chunks.blockEntity(level, at) instanceof DronePortBlockEntity other)) return;
         List<SimData.Slot> left = new ArrayList<>();
         for (SimData.Slot c : n.cargo) {
             ItemStack rest = other.items.add(Keys.stack(c.key, c.count), PortContainer.IN, PortContainer.SIZE);

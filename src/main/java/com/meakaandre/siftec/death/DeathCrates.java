@@ -6,11 +6,11 @@ import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.map.MapServer;
 import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.util.Drops;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -124,20 +124,15 @@ public final class DeathCrates {
         List<DeathCrateBlockEntity.Entry> entries = carried(player, true);
         if (entries.isEmpty()) return null;
         ServerLevel level = player.level();
-        Company company = Companies.find(player);
-        BlockPos pos = spot(level, player.blockPosition(), company == null ? "" : company.id);
-        if (pos != null) level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
-        if (pos == null || !(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) {
+        BlockPos pos = spot(level, player.blockPosition(), Companies.idOf(player));
+        DeathCrateBlockEntity crate = putDown(level, pos);
+        if (crate == null) {
             // the crate could not be put down (nothing should stop it): drop everything as vanilla would
             for (DeathCrateBlockEntity.Entry e : entries) Containers.dropItemStack(level, player.getX(), player.getY(), player.getZ(), e.stack());
             Siftec.LOGGER.warn("SIFTEC: could not put {}'s Death Crate down at {}; dropped their things", player.getGameProfile().name(), pos);
             return null;
         }
-        crate.owner = player.getUUID();
-        crate.ownerName = player.getGameProfile().name();
-        crate.entries.addAll(entries);
-        crate.markerId = MapServer.crateMarker(player, level, pos);
-        crate.setChanged();
+        fillFor(player, crate, entries);
         JUST_PLACED.add(player.getUUID());
         player.sendSystemMessage(Component.translatable("siftec.crate.placed", pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.GOLD));
         Siftec.LOGGER.info("SIFTEC: {} died; {} stacks went into a Death Crate at {} {}", crate.ownerName, entries.size(), level.dimension().identifier(), pos);
@@ -229,14 +224,12 @@ public final class DeathCrates {
      */
     public static boolean stash(ServerLevel level, BlockPos at, String companyId, List<ItemStack> items) {
         if (companyId == null || companyId.isEmpty()) return false;
-        List<DeathCrateBlockEntity.Entry> entries = new ArrayList<>();
-        for (ItemStack stack : items) if (!stack.isEmpty()) entries.add(new DeathCrateBlockEntity.Entry(DeathCrateBlockEntity.INVENTORY, -1, stack.copy()));
+        List<DeathCrateBlockEntity.Entry> entries = entries(items);
         if (entries.isEmpty()) return true;
         BlockPos pos = spot(level, at, companyId);
-        if (pos == null) return false;
-        level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
-        if (!(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) return false;
-        Company company = CompanyData.get(level.getServer()).byId(companyId);
+        DeathCrateBlockEntity crate = putDown(level, pos);
+        if (crate == null) return false;
+        Company company = Companies.byId(level.getServer(), companyId);
         crate.companyId = companyId;
         crate.ownerName = company == null ? companyId : company.name;
         crate.entries.addAll(entries);
@@ -254,24 +247,41 @@ public final class DeathCrates {
      * drops at their feet.
      */
     public static void stashFor(ServerPlayer player, List<ItemStack> items, String message) {
-        List<DeathCrateBlockEntity.Entry> entries = new ArrayList<>();
-        for (ItemStack stack : items) if (!stack.isEmpty()) entries.add(new DeathCrateBlockEntity.Entry(DeathCrateBlockEntity.INVENTORY, -1, stack.copy()));
+        List<DeathCrateBlockEntity.Entry> entries = entries(items);
         if (entries.isEmpty()) return;
         ServerLevel level = player.level();
-        Company company = Companies.find(player);
-        BlockPos pos = spot(level, player.blockPosition(), company == null ? "" : company.id);
-        if (pos != null) level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
-        if (pos == null || !(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) {
+        BlockPos pos = spot(level, player.blockPosition(), Companies.idOf(player));
+        DeathCrateBlockEntity crate = putDown(level, pos);
+        if (crate == null) {
             for (DeathCrateBlockEntity.Entry e : entries) player.getInventory().placeItemBackInInventory(e.stack(), Prediction.SERVER_ONLY);
             return;
         }
+        fillFor(player, crate, entries);
+        player.sendSystemMessage(Component.translatable(message, pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.GOLD));
+        Siftec.LOGGER.info("SIFTEC: {} stacks of {} went into a crate at {} {}", entries.size(), crate.ownerName, level.dimension().identifier(), pos);
+    }
+
+    /** A copy of each stack that is not empty, as crate entries for the inventory with no slot of their own. */
+    private static List<DeathCrateBlockEntity.Entry> entries(List<ItemStack> items) {
+        List<DeathCrateBlockEntity.Entry> entries = new ArrayList<>();
+        for (ItemStack stack : items) if (!stack.isEmpty()) entries.add(new DeathCrateBlockEntity.Entry(DeathCrateBlockEntity.INVENTORY, -1, stack.copy()));
+        return entries;
+    }
+
+    /** Puts a crate down at {@code pos}; returns it, or null when {@code pos} is null or no crate stands there after. */
+    private static @Nullable DeathCrateBlockEntity putDown(ServerLevel level, @Nullable BlockPos pos) {
+        if (pos == null) return null;
+        level.setBlockAndUpdate(pos, ModBlocks.DEATH_CRATE.get().defaultBlockState());
+        return level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate ? crate : null;
+    }
+
+    /** Makes the crate the player's own, holding {@code entries}, and marks it on their map. */
+    private static void fillFor(ServerPlayer player, DeathCrateBlockEntity crate, List<DeathCrateBlockEntity.Entry> entries) {
         crate.owner = player.getUUID();
         crate.ownerName = player.getGameProfile().name();
         crate.entries.addAll(entries);
-        crate.markerId = MapServer.crateMarker(player, level, pos);
+        crate.markerId = MapServer.crateMarker(player, player.level(), crate.getBlockPos());
         crate.setChanged();
-        player.sendSystemMessage(Component.translatable(message, pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.GOLD));
-        Siftec.LOGGER.info("SIFTEC: {} stacks of {} went into a crate at {} {}", entries.size(), crate.ownerName, level.dimension().identifier(), pos);
     }
 
     /** The owner clicked their crate: everything goes back. Anyone else is told whose it is. */
@@ -380,7 +390,7 @@ public final class DeathCrates {
     /** A crate taken away other than by its owner emptying it: what is in it drops, and its marker goes. */
     static void removed(ServerLevel level, DeathCrateBlockEntity crate) {
         BlockPos pos = crate.getBlockPos();
-        for (DeathCrateBlockEntity.Entry e : crate.entries) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, e.stack());
+        for (DeathCrateBlockEntity.Entry e : crate.entries) Drops.at(level, pos, 0.5, e.stack());
         crate.entries.clear();
         MapServer.removeMarker(level.getServer(), crate.markerId);
         crate.markerId = "";

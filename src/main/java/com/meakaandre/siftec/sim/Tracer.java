@@ -5,6 +5,7 @@ import com.meakaandre.siftec.building.BuildingIndex;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.building.PortBlockEntity;
 import com.meakaandre.siftec.tweak.SelfMovingBelts;
+import com.meakaandre.siftec.util.Chunks;
 import com.zurrtum.create.content.fluids.FluidPropagator;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
@@ -111,7 +112,7 @@ final class Tracer {
                 List<Direction> sides = new ArrayList<>();
                 for (Direction side : new Direction[]{moving.getClockWise(), moving.getCounterClockWise()}) {
                     BlockPos next = seg.relative(side);
-                    BlockEntity sb = level.isLoaded(next) ? level.getBlockEntity(next) : null;
+                    BlockEntity sb = Chunks.blockEntity(level, next);
                     if (sb instanceof BeltBlockEntity sideBelt && sideBelt.getMovementFacing() == side) sides.add(side);
                     else if (sb instanceof PortBlockEntity && level.getBlockState(next).hasProperty(PortBlock.FACING)
                         && level.getBlockState(next).getValue(PortBlock.FACING) == side.getOpposite()) sides.add(side);

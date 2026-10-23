@@ -20,6 +20,9 @@ import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.power.PowerGrids;
 import com.meakaandre.siftec.sim.Factories;
 import com.meakaandre.siftec.sink.Shop;
+import com.meakaandre.siftec.util.Chunks;
+import com.meakaandre.siftec.util.Drops;
+import com.meakaandre.siftec.util.Transfers;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -43,7 +46,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -524,10 +526,7 @@ public final class Buildings {
         Container container = be instanceof Container c ? c
             : be instanceof BasinBlockEntity basin ? basin.itemCapability : null;
         if (container != null) {
-            for (int i = 0; i < container.getContainerSize(); i++) {
-                ItemStack stack = container.removeItemNoUpdate(i);
-                if (!stack.isEmpty()) out.add(stack);
-            }
+            Transfers.takeAll(container, container.getContainerSize(), out);
             container.setChanged();
             return out;
         }
@@ -690,11 +689,7 @@ public final class Buildings {
         out.removeIf(s -> s.isEmpty() || Processors.cellBearing(s));
         if (out.isEmpty()) return;
         if (DeathCrates.stash(level, at, companyId, out)) return;
-        drop(level, at, out);
-    }
-
-    private static void drop(ServerLevel level, BlockPos at, List<ItemStack> items) {
-        for (ItemStack stack : items) Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5, stack);
+        Drops.all(level, at, 0.5, out);
     }
 
     // ------------------------------------------------------------------------------------------------ events
@@ -830,7 +825,7 @@ public final class Buildings {
                 BlockPos controller = BuildingIndex.controllerOf(level, at);
                 if (controller == null) continue;
                 // a Blueprint Designer's volume is no part of it: whatever is built there is the players' own
-                if (level.isLoaded(controller) && level.getBlockEntity(controller) instanceof ControllerBlockEntity c
+                if (Chunks.blockEntity(level, controller) instanceof ControllerBlockEntity c
                     && BuildGun.bounds(c).contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) && !inOpenSpace(c, pos)) return true;
                 break;
             }

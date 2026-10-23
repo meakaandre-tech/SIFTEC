@@ -5,6 +5,7 @@ import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.prefab.Prefabs;
+import com.meakaandre.siftec.util.Drops;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.StructureTransform;
@@ -45,7 +46,7 @@ public abstract class ClaimDisassemblyMixin {
             BlockState state = e.getValue().state();
             if (!state.isAir()) {
                 ItemStack item = new ItemStack(state.getBlock().asItem());
-                if (!item.isEmpty()) Containers.dropItemStack(level, anchor.getX() + 0.5, anchor.getY() + 0.5, anchor.getZ() + 0.5, item);
+                if (!item.isEmpty()) Drops.at(level, anchor, 0.5, item);
             }
             try {
                 MountedItemStorage storage = self.getStorage().getAllItemStorages().get(e.getKey());

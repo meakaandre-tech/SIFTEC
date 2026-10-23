@@ -167,6 +167,17 @@ public final class Companies {
         return CompanyData.get(player.level().getServer()).ofMember(player.getUUID().toString());
     }
 
+    /** The id of the player's company, or "" when they have none; never makes one. */
+    public static String idOf(ServerPlayer player) {
+        Company company = find(player);
+        return company == null ? "" : company.id;
+    }
+
+    /** The company with this id today (following folds), or null when there is none. */
+    public static @Nullable Company byId(MinecraftServer server, String id) {
+        return CompanyData.get(server).byId(id);
+    }
+
     /** True for players that machines use (Create's Deployer, or any Fabric fake player). */
     public static boolean isFake(Player player) {
         return player instanceof FakePlayer || FakePlayerHandler.has(player);

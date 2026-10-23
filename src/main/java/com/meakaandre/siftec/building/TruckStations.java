@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.util.Chunks;
 import com.meakaandre.siftec.vehicle.VehicleEntity;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
@@ -60,7 +61,7 @@ public final class TruckStations {
 
     /** The station whose controller stands here, or null if there is none (any more). */
     public static @Nullable ControllerBlockEntity at(Level level, BlockPos pos) {
-        if (!level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof ControllerBlockEntity c)) return null;
+        if (!(Chunks.blockEntity(level, pos) instanceof ControllerBlockEntity c)) return null;
         BuildingDef def = c.def();
         return def != null && def.logic().equals("truck_station") ? c : null;
     }

@@ -5,10 +5,11 @@ import com.meakaandre.siftec.registry.ModItems;
 import com.meakaandre.siftec.sim.Factories;
 import com.meakaandre.siftec.sim.Keys;
 import com.meakaandre.siftec.sim.SimData;
+import com.meakaandre.siftec.util.Chunks;
+import com.meakaandre.siftec.util.Drops;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -116,7 +117,7 @@ public class DronePortBlockEntity extends BlockEntity {
         }
         // at the far port: unload what fits, once a second; wait for room
         if (level.getGameTime() % 20 != 0 || destination == null) return;
-        boolean ticking = level.isLoaded(destination) && server.shouldTickBlocksAt(destination);
+        boolean ticking = Chunks.ticking(server, destination);
         if (!ticking) {
             // its chunk does not tick: the simulation's record of that port takes the packages
             int known = Factories.deliverToPort(server, destination, cargo);
@@ -235,8 +236,8 @@ public class DronePortBlockEntity extends BlockEntity {
         if (level == null) return;
         // broken (whether its chunk ticks or not): the factory simulation forgets it, so it is never run on with what it held
         if (level instanceof ServerLevel server) Factories.removed(server, pos);
-        for (ItemStack stack : contents()) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-        if (hasDrone) Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(ModItems.CARDBOARD_DRONE.get()));
+        Drops.all(level, pos, 0.5, contents());
+        if (hasDrone) Drops.at(level, pos, 0.5, new ItemStack(ModItems.CARDBOARD_DRONE.get()));
         items.clearContent();
         cargo.clear();
         hasDrone = false;
@@ -317,7 +318,7 @@ public class DronePortBlockEntity extends BlockEntity {
         spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.OUT, PortContainer.FUEL));
         spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.FUEL, PortContainer.FUEL + 1));
         spill.addAll(applyDelta(n.slots, n.baseSlots, PortContainer.IN, PortContainer.SIZE));
-        if (level != null) for (ItemStack stack : spill) Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.1, worldPosition.getZ() + 0.5, stack);
+        if (level != null) Drops.all(level, worldPosition, 1.1, spill);
         cargo.clear();
         for (var s : n.cargo) {
             ItemStack stack = Keys.stack(s.key, s.count);

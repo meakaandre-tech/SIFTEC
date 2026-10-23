@@ -1,10 +1,11 @@
 package com.meakaandre.siftec.hub;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.compat.SiftGate;
+import com.meakaandre.siftec.util.Chunks;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -24,7 +25,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
@@ -109,8 +109,8 @@ public class HubMenu extends AbstractContainerMenu {
     // ---- server side
 
     private @Nullable HubBlockEntity hub() {
-        if (player == null || pos == null || !(player.level() instanceof ServerLevel level) || !level.isLoaded(pos)) return null;
-        return level.getBlockEntity(pos) instanceof HubBlockEntity hub ? hub : null;
+        if (player == null || pos == null || !(player.level() instanceof ServerLevel level)) return null;
+        return Chunks.blockEntity(level, pos) instanceof HubBlockEntity hub ? hub : null;
     }
 
     private long lockTicks() {
@@ -224,11 +224,11 @@ public class HubMenu extends AbstractContainerMenu {
     public boolean stillValid(Player who) {
         if (player == null) return true;
         if (who != player || company == null || pos == null || player.isRemoved()) return false;
-        if (player.distanceToSqr(Vec3.atCenterOf(pos)) > REACH * REACH) return false;
+        if (!BuildingMenus.withinReach(player, pos, REACH)) return false;
         HubBlockEntity hub = hub();
         if (hub == null || !(hub.getBlockState().getBlock() instanceof HubBlock block) || block.gateway != gateway) return false;
         // the block must still be this company's, and the player still in it
         if (!Companies.owns(company, hub.companyId) || !company.members.contains(player.getUUID().toString())) return false;
-        return CompanyData.get(player.level().getServer()).byId(company.id) == company;
+        return Companies.byId(player.level().getServer(), company.id) == company;
     }
 }

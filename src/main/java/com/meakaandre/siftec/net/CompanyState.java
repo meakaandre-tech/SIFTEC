@@ -1,7 +1,7 @@
 package com.meakaandre.siftec.net;
 
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.MapLock;
 import com.meakaandre.siftec.map.MapServer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -22,7 +22,7 @@ public final class CompanyState {
 
     /** Sends a player their company's unlocks. */
     public static void send(ServerPlayer player) {
-        Company company = CompanyData.get(player.level().getServer()).ofMember(player.getUUID().toString());
+        Company company = Companies.find(player);
         ServerPlayNetworking.send(player, new StatePayload(company == null ? new ArrayList<>() : new ArrayList<>(company.done)));
         MapLock.update(player, company);
         MapServer.companyChanged(player, company);

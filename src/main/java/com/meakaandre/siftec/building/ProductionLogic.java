@@ -9,6 +9,7 @@ import com.meakaandre.siftec.machine.ProcessorRecipe;
 import com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.util.Transfers;
 import com.zurrtum.create.content.fluids.drain.ItemDrainBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
@@ -24,7 +25,6 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -328,11 +328,7 @@ public final class ProductionLogic {
             if (hand == null) continue;
             ItemStack one = takeFromBasin(basin, step.item, false);
             if (one.isEmpty()) continue;
-            long put;
-            try (Transaction tx = Transaction.openOuter()) {
-                put = hand.insert(ItemVariant.of(one), 1, tx);
-                if (put == 1) tx.commit();
-            }
+            long put = Transfers.insertAll(hand, ItemVariant.of(one), 1);
             if (put != 1) giveBack(basin, one);
         }
 
@@ -561,21 +557,13 @@ public final class ProductionLogic {
     static long fill(Level level, @Nullable BlockPos pos, Fluid fluid, long mb, boolean simulate) {
         Storage<FluidVariant> s = fluids(level, pos);
         if (s == null || fluid == Fluids.EMPTY) return 0;
-        try (Transaction tx = Transaction.openOuter()) {
-            long put = s.insert(FluidVariant.of(fluid), mb * MB, tx);
-            if (!simulate) tx.commit();
-            return put / MB;
-        }
+        return Transfers.insert(s, FluidVariant.of(fluid), mb * MB, simulate) / MB;
     }
 
     static long drain(Level level, @Nullable BlockPos pos, Fluid fluid, long mb) {
         Storage<FluidVariant> s = fluids(level, pos);
         if (s == null) return 0;
-        try (Transaction tx = Transaction.openOuter()) {
-            long took = s.extract(FluidVariant.of(fluid), mb * MB, tx);
-            tx.commit();
-            return took / MB;
-        }
+        return Transfers.extract(s, FluidVariant.of(fluid), mb * MB) / MB;
     }
 
     // ------------------------------------------------------------------------------------------------ processor

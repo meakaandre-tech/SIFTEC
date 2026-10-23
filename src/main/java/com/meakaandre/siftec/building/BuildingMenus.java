@@ -2,9 +2,10 @@ package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.util.Chunks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
@@ -25,11 +26,20 @@ public final class BuildingMenus {
     private BuildingMenus() {
     }
 
+    /** True if the player is still in the world and alive. */
+    public static boolean alive(Player player) {
+        return !player.isRemoved() && player.isAlive();
+    }
+
+    /** True if the player is within {@code reach} blocks of the middle of the block at {@code at}. */
+    public static boolean withinReach(Player player, BlockPos at, double reach) {
+        return player.distanceToSqr(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5) <= reach * reach;
+    }
+
     /** True if the player is alive and within {@link #REACH} of the block entity at {@code at}, which {@code present} accepts. */
     public static boolean near(ServerPlayer player, BlockPos at, Predicate<BlockEntity> present) {
-        if (player.isRemoved() || !player.isAlive()) return false;
-        if (!player.level().isLoaded(at)) return false;
-        BlockEntity be = player.level().getBlockEntity(at);
+        if (!alive(player)) return false;
+        BlockEntity be = Chunks.blockEntity(player.level(), at);
         if (be == null || !present.test(be)) return false;
         AABB box = be instanceof ControllerBlockEntity c ? BuildGun.bounds(c) : new AABB(at);
         return box.distanceToSqr(player.position()) <= REACH * REACH;
@@ -50,6 +60,12 @@ public final class BuildingMenus {
         };
     }
 
+    /** A building's window stays open: {@code who} is the {@code player} it was opened for, {@link #near} and a {@link #member}. */
+    public static boolean stillValid(Player who, ServerPlayer player, BlockPos at, Predicate<BlockEntity> present,
+                                     String companyId) {
+        return who == player && near(player, at, present) && member(player, companyId);
+    }
+
     /** The building at {@code at} still stands as {@code buildingId}, within reach, and the player is still in {@code companyId}. */
     public static boolean valid(ServerPlayer player, BlockPos at, String buildingId, String companyId) {
         return near(player, at, be -> be instanceof ControllerBlockEntity c && c.buildingId.equals(buildingId)) && member(player, companyId);
@@ -57,6 +73,6 @@ public final class BuildingMenus {
 
     /** The company with this id today (following folds), or null once it is gone. */
     public static @Nullable Company company(ServerPlayer player, String companyId) {
-        return companyId.isEmpty() ? null : CompanyData.get(player.level().getServer()).byId(companyId);
+        return companyId.isEmpty() ? null : Companies.byId(player.level().getServer(), companyId);
     }
 }

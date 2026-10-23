@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.prefab;
 
+import com.meakaandre.siftec.util.Transfers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -38,10 +39,7 @@ public class StorageBoxBlockEntity extends BlockEntity {
     /** Takes everything out (for picking the HUB up): the box is left empty, so nothing can drop twice. */
     public List<ItemStack> takeAll() {
         List<ItemStack> out = new ArrayList<>();
-        for (int i = 0; i < SIZE; i++) {
-            ItemStack stack = items.removeItemNoUpdate(i);
-            if (!stack.isEmpty()) out.add(stack);
-        }
+        Transfers.takeAll(items, SIZE, out);
         setChanged();
         return out;
     }

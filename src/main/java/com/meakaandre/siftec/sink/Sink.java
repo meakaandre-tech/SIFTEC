@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Milestones;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -123,7 +122,7 @@ public final class Sink {
     }
 
     private static boolean credit(MinecraftServer server, String companyId, long amount) {
-        Company company = CompanyData.get(server).byId(companyId);
+        Company company = Companies.byId(server, companyId);
         if (company == null || amount <= 0) return false;
         company.points += amount;
         company.pointsEver += amount;

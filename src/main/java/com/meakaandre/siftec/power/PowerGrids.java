@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.power;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.util.Chunks;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -132,7 +133,7 @@ public final class PowerGrids {
             AbstractElectricalConnector c = it.next();
             // a connector whose chunk stopped ticking leaves: a grid with no ticking connector is balanced by the factory
             // simulation; it joins again when it ticks
-            if (c.isRemoved() || c.getLevel() != level || !level.isLoaded(c.getBlockPos()) || !level.shouldTickBlocksAt(c.getBlockPos())
+            if (c.isRemoved() || c.getLevel() != level || !Chunks.ticking(level, c.getBlockPos())
                 || level.getBlockEntity(c.getBlockPos()) != c) {
                 it.remove();
                 continue;
@@ -199,7 +200,7 @@ public final class PowerGrids {
     private static @Nullable AbstractElectricalConnector live(ServerLevel level, Map<BlockPos, AbstractElectricalConnector> at, BlockPos pos) {
         AbstractElectricalConnector c = at.get(pos);
         if (c != null) return c;
-        if (!level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof AbstractElectricalConnector found) || found.isRemoved()) return null;
+        if (!(Chunks.blockEntity(level, pos) instanceof AbstractElectricalConnector found) || found.isRemoved()) return null;
         at.put(pos.immutable(), found);
         return found;
     }

@@ -3,6 +3,7 @@ package com.meakaandre.siftec.building;
 import com.meakaandre.siftec.power.GridStats;
 import com.meakaandre.siftec.power.PowerMember;
 import com.meakaandre.siftec.sim.Factories;
+import com.meakaandre.siftec.util.Transfers;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -211,10 +212,7 @@ public class ControllerBlockEntity extends BlockEntity {
     public List<ItemStack> takeContents() {
         List<ItemStack> out = new ArrayList<>();
         for (SimpleContainer c : new SimpleContainer[]{input, output, waste, buffer}) {
-            for (int i = 0; i < c.getContainerSize(); i++) {
-                ItemStack stack = c.removeItemNoUpdate(i);
-                if (!stack.isEmpty()) out.add(stack);
-            }
+            Transfers.takeAll(c, c.getContainerSize(), out);
         }
         setChanged();
         return out;

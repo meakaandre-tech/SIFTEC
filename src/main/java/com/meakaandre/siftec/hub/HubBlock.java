@@ -3,7 +3,6 @@ package com.meakaandre.siftec.hub;
 import com.meakaandre.siftec.block.Facing;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -57,7 +56,7 @@ public class HubBlock extends Block implements EntityBlock {
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
         if (!(level.getBlockEntity(pos) instanceof HubBlockEntity hub)) return InteractionResult.SUCCESS;
         Company mine = Companies.of(server);
-        Company owner = CompanyData.get(server.level().getServer()).byId(hub.companyId);
+        Company owner = Companies.byId(server.level().getServer(), hub.companyId);
         if (owner == null) {
             // placed by a machine or left behind by a company that no longer exists: whoever uses it takes it over
             hub.companyId = mine.id;

@@ -1,7 +1,7 @@
 package com.meakaandre.siftec.drone;
 
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Companies;
-import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.depot.DepotMenu;
 import com.meakaandre.siftec.place.Places;
 import com.meakaandre.siftec.registry.ModItems;
@@ -136,10 +136,9 @@ public class DroneMenu extends ChestMenu {
      */
     @Override
     public boolean stillValid(Player who) {
-        if (who != player || port.isRemoved() || player.isRemoved() || !player.isAlive()) return false;
+        if (who != player || port.isRemoved() || !BuildingMenus.alive(player)) return false;
         if (player.level() != port.getLevel()) return false;
-        Company now = Companies.find(player);
-        if (!player.hasInfiniteMaterials() && !port.companyId.isEmpty() && (now == null || !Companies.owns(now, port.companyId))) return false;
-        return player.distanceToSqr(at.getX() + 0.5, at.getY() + 0.5, at.getZ() + 0.5) <= DepotMenu.REACH * DepotMenu.REACH;
+        if (!player.hasInfiniteMaterials() && !port.companyId.isEmpty() && !BuildingMenus.member(player, port.companyId)) return false;
+        return BuildingMenus.withinReach(player, at, DepotMenu.REACH);
     }
 }

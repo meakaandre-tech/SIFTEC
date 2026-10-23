@@ -1,5 +1,7 @@
 package com.meakaandre.siftec.building;
 
+import com.meakaandre.siftec.util.Chunks;
+import com.meakaandre.siftec.util.Transfers;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
@@ -65,7 +67,7 @@ public class PortBlockEntity extends SmartBlockEntity {
      */
     private boolean live() {
         if (level == null || controller == null || level.isClientSide()) return true;
-        if (!level.isLoaded(controller) || !level.shouldTickBlocksAt(controller)) return false;
+        if (!Chunks.ticking(level, controller)) return false;
         return !(level.getBlockEntity(controller) instanceof ControllerBlockEntity c) || !c.simulated;
     }
 
@@ -133,11 +135,7 @@ public class PortBlockEntity extends SmartBlockEntity {
         ItemStack stack = transported.stack;
         Storage<ItemVariant> into = beltCanInsert(side) ? items(out()) : null;
         if (into == null || stack.isEmpty()) return stack;
-        long took;
-        try (Transaction tx = Transaction.openOuter()) {
-            took = into.insert(ItemVariant.of(stack), stack.getCount(), tx);
-            if (!simulate) tx.commit();
-        }
+        long took = Transfers.insert(into, ItemVariant.of(stack), stack.getCount(), simulate);
         if (took <= 0) return stack;
         return took >= stack.getCount() ? ItemStack.EMPTY : stack.copyWithCount(stack.getCount() - (int) took);
     }

@@ -3,7 +3,6 @@ package com.meakaandre.siftec.mam;
 import com.meakaandre.siftec.block.Facing;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.registry.ModBlockEntities;
@@ -84,7 +83,7 @@ public class MamBlock extends Block implements EntityBlock {
         Company mine = Companies.of(player);
         String owner = player.level().getBlockEntity(pos) instanceof MamBlockEntity mam ? mam.companyId : "";
         if (!owner.isEmpty() && !Companies.owns(mine, owner)) {
-            Company holder = CompanyData.get(player.level().getServer()).byId(owner);
+            Company holder = Companies.byId(player.level().getServer(), owner);
             return Component.translatable("siftec.hub.not_yours", holder == null ? "?" : holder.name);
         }
         if (!mine.has(FIELD_RESEARCH)) {
