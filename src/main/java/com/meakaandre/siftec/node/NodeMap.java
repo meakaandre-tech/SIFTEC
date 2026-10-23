@@ -1,29 +1,17 @@
 package com.meakaandre.siftec.node;
 
-import com.meakaandre.siftec.Siftec;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.BiomeTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.Heightmap;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -46,64 +34,29 @@ import java.util.function.Supplier;
 public final class NodeMap {
     public static final int CELL = 128;
     /** Nodes keep this far from the cell edge, so a whole mound always fits inside the cell. */
-    private static final int MARGIN = 16;
-    private static final float NODE_CHANCE = 0.6f;
-    /** Within this many blocks of world spawn, most nodes are impure. */
-    private static final int NEAR = 1500;
-    private static final int FAR = 5000;
+    static final int MARGIN = 16;
     /** The starter iron, copper and stone nodes are within this many blocks of spawn (the design asks for 256). */
     public static final int STARTER = 240;
     /** A search for one resource gives up after this long, keeping the best it found. */
     public static final long SEARCH_NANOS = 4_000_000_000L;
 
-    private static final ResourceKey<Biome> SULFUR_CAVES = ResourceKey.create(Registries.BIOME, Identifier.withDefaultNamespace("sulfur_caves"));
-    private static final TagKey<Biome> COLD = biomeTag("is_cold"), DESERT = biomeTag("is_desert"), SWAMP = biomeTag("is_swamp");
-    /** Where sulfur caves are looked for: these heights below the cell's ground, and these absolute heights (an ordinary world's caves). */
-    private static final int CAVE_DEPTH = 136, CAVE_STEP = 16;
-    private static final int[] CAVE_HEIGHTS = {-40, -24, -8, 8, 24, 40};
-    /** The first height looked at below the ground, the least a height stays under it, and how far apart two are. */
-    private static final int CAVE_BELOW_GROUND = 8, CAVE_UNDER_GROUND = 4, CAVE_GAP = 8;
-    /** Cave heights stay this far above the bottom of the world (its bedrock). */
-    private static final int CAVE_ABOVE_BOTTOM = 4;
-    /** How far round a pocket's first hits its middle is looked for, and the step of that finer grid. */
-    private static final int POCKET_REACH = 40, POCKET_STEP = 8;
-    /** A sulfur search looks at most this many cells out. */
-    private static final int SULFUR_MAX_CELLS = 24;
-    /** Random spots tried for a starter node before the cell's nearest point. */
-    private static final int STARTER_ATTEMPTS = 48;
-    /** Land grid points tried at most for a dry spot, and how far (each way) a spot may be nudged off its point. */
-    private static final int LAND_PROBES = 8, NUDGE = 6;
-    /** Chance of an impure and of a pure node near spawn, and how much each changes by far out. */
-    private static final float IMPURE_NEAR = 0.5f, IMPURE_DROP = 0.3f, PURE_NEAR = 0.1f, PURE_RISE = 0.3f;
-
     private static final Map<ResourceKey<Level>, Map<Long, List<Node>>> CACHE = new ConcurrentHashMap<>();
     private static final Map<Long, Optional<Node>> SULFUR = new ConcurrentHashMap<>();
     /** Which of a cell's 5 x 5 sample points are over land (by biome); bit 25 marks "worked out". */
-    private static final Map<Long, Integer> LAND = new ConcurrentHashMap<>();
+    static final Map<Long, Integer> LAND = new ConcurrentHashMap<>();
     /** Ground height of surface nodes as the generator gives it, for waypoints and teleports. */
-    private static final Map<Long, Integer> GROUND = new ConcurrentHashMap<>();
+    static final Map<Long, Integer> GROUND = new ConcurrentHashMap<>();
     /** Height of the pad of surface nodes (see {@link #padHeight}). */
-    private static final Map<Long, Integer> PAD = new ConcurrentHashMap<>();
+    static final Map<Long, Integer> PAD = new ConcurrentHashMap<>();
     private static volatile long cacheSeed = Long.MIN_VALUE;
     /** The point the map is measured from (world spawn when the world was new); null until settled. */
-    private static volatile int @Nullable [] origin;
+    static volatile int @Nullable [] origin;
     /** Nodes left out for having nowhere to stand (NodeSavedData's live set): never offered by a search or the map. */
     private static volatile Set<Long> unplaceable = Set.of();
     /** Biome samples taken, for the selftest. */
     public static final AtomicLong SAMPLES = new AtomicLong();
 
-    private static final ExecutorService WORKER = Executors.newSingleThreadExecutor(r -> {
-        Thread thread = new Thread(r, "SIFTEC node map");
-        thread.setDaemon(true);
-        thread.setPriority(Thread.NORM_PRIORITY - 1);
-        return thread;
-    });
-
     private NodeMap() {
-    }
-
-    private static TagKey<Biome> biomeTag(String path) {
-        return TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("c", path));
     }
 
     public static boolean hasNodes(Level level) {
@@ -158,7 +111,7 @@ public final class NodeMap {
     }
 
     private static void clearCaches() {
-        starters = null;
+        NodeStarters.starters = null;
         CACHE.clear();
         SULFUR.clear();
         LAND.clear();
@@ -187,7 +140,7 @@ public final class NodeMap {
         }
     }
 
-    private static long cellKey(int cellX, int cellZ) {
+    static long cellKey(int cellX, int cellZ) {
         return ((long) cellX << 32) ^ (cellZ & 0xffffffffL);
     }
 
@@ -201,24 +154,11 @@ public final class NodeMap {
 
     /** Works the cell out on the worker thread, so a later {@link #inCell} finds it cached. */
     public static void prefetch(ServerLevel level, int cellX, int cellZ) {
-        // every chunk of a cell asks, again and again until it is done: queue each cell once
-        long pending = cellKey(cellX, cellZ) * 31 + level.dimension().identifier().hashCode();
-        if (!PENDING.add(pending)) return;
-        WORKER.execute(() -> {
-            try {
-                inCell(level, cellX, cellZ);
-            } catch (RuntimeException e) {
-                Siftec.LOGGER.warn("Could not work out node cell {} {}", cellX, cellZ, e);
-            } finally {
-                PENDING.remove(pending);
-            }
-        });
+        NodeWorker.prefetch(level, cellX, cellZ);
     }
 
-    private static final Set<Long> PENDING = ConcurrentHashMap.newKeySet();
-
     /** The surface (or Nether) node of a cell, if any. */
-    private static List<Node> surface(ServerLevel level, int cellX, int cellZ) {
+    static List<Node> surface(ServerLevel level, int cellX, int cellZ) {
         checkSeed(level);
         int[] from = origin;
         if (from == null) return List.of();
@@ -228,13 +168,13 @@ public final class NodeMap {
         if (cached == null) {
             trimCaches();
             cells = CACHE.computeIfAbsent(level.dimension(), k -> new ConcurrentHashMap<>());
-            cached = level.dimension() == Level.NETHER ? nether(level, cellX, cellZ, from) : overworld(level, cellX, cellZ, from);
+            cached = level.dimension() == Level.NETHER ? NodeCells.nether(level, cellX, cellZ, from) : NodeCells.overworld(level, cellX, cellZ, from);
             cells.put(key, cached);
         }
         return cached;
     }
 
-    private static Optional<Node> sulfurIn(ServerLevel level, int cellX, int cellZ) {
+    static Optional<Node> sulfurIn(ServerLevel level, int cellX, int cellZ) {
         if (level.dimension() != Level.OVERWORLD) return Optional.empty();
         checkSeed(level);
         int[] from = origin;
@@ -243,7 +183,7 @@ public final class NodeMap {
         Optional<Node> cached = SULFUR.get(key);
         if (cached == null) {
             trimCaches();
-            cached = Optional.ofNullable(sulfur(level, cellX, cellZ, from));
+            cached = Optional.ofNullable(NodeCaves.sulfur(level, cellX, cellZ, from));
             SULFUR.put(key, cached);
         }
         return cached;
@@ -283,93 +223,18 @@ public final class NodeMap {
     public static int padHeight(ServerLevel level, Node node) {
         Integer known = PAD.get(node.key());
         if (known != null) return known;
-        int y = padHeight(level, node.x(), node.z());
+        int y = NodeCells.padHeight(level, node.x(), node.z());
         PAD.put(node.key(), y);
         return y;
     }
 
-    /** Points round a pad's middle that must be dry: a pad with two or more of them in water is not placed. */
-    private static final int[][] SHORE_POINTS = {{3, 0}, {-3, 0}, {0, 3}, {0, -3}};
-
-    private static boolean padWet(ServerLevel level, int x, int z) {
-        int wet = 0;
-        for (int[] d : SHORE_POINTS) {
-            if (Terrain.wet(level, x + d[0], z + d[1]) && ++wet >= 2) return true;
-        }
-        return false;
-    }
-
-    private static final int[][] PAD_POINTS = {{0, 0}, {2, 0}, {-2, 0}, {0, 2}, {0, -2}, {2, 2}, {2, -2}, {-2, 2}, {-2, -2}, {3, 0}, {-3, 0}, {0, 3}, {0, -3}};
-
-    private static int padHeight(ServerLevel level, int x, int z) {
-        var generator = level.getChunkSource().getGenerator();
-        var random = level.getChunkSource().randomState();
-        int[] ys = new int[PAD_POINTS.length];
-        for (int i = 0; i < ys.length; i++) {
-            ys[i] = generator.getBaseHeight(x + PAD_POINTS[i][0], z + PAD_POINTS[i][1], Heightmap.Types.OCEAN_FLOOR_WG, level, random) - 1;
-        }
-        Arrays.sort(ys);
-        return Math.max(ys[ys.length / 2], level.getMinY() + 1);
-    }
-
     /** The nearest node of a type in this dimension, searched ring by ring. Runs where it is called. */
     public static Optional<Node> nearest(ServerLevel level, double x, double z, NodeType type, int maxCells) {
-        return nearest(level, x, z, type, maxCells, Terrain.Border.NONE, Long.MAX_VALUE);
+        return NodeSearch.nearest(level, x, z, type, maxCells);
     }
 
     public static Optional<Node> nearest(ServerLevel level, double x, double z, NodeType type, int maxCells, Terrain.Border border, long nanos) {
-        if (!hasNodes(level) || origin == null || type.dimension() != level.dimension()) return Optional.empty();
-        long deadline = nanos == Long.MAX_VALUE ? Long.MAX_VALUE : System.nanoTime() + nanos;
-        int cx = Math.floorDiv((int) Math.floor(x), CELL);
-        int cz = Math.floorDiv((int) Math.floor(z), CELL);
-        boolean cave = type == NodeType.SULFUR;
-        // finding a sulfur cave means testing the biome many times per cell, so that search stays closer
-        if (cave) maxCells = Math.min(maxCells, SULFUR_MAX_CELLS);
-        Node best = null;
-        double bestDistance = Double.MAX_VALUE;
-        for (int ring = 0; ring <= maxCells; ring++) {
-            // a node in ring r is at least (r - 1) cells away, so once the best is closer than that we are done
-            if (best != null && bestDistance <= (ring - 1) * (double) CELL) break;
-            if (System.nanoTime() > deadline) break;
-            // past the world border there is nothing to offer
-            if (ringOutside(border, cx, cz, ring)) {
-                if (ring > 0 && ringOutside(border, cx, cz, ring - 1)) break;
-                continue;
-            }
-            for (int dx = -ring; dx <= ring; dx++) {
-                for (int dz = -ring; dz <= ring; dz++) {
-                    if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
-                    if (cellOutside(border, cx + dx, cz + dz)) continue;
-                    List<Node> nodes = cave ? sulfurIn(level, cx + dx, cz + dz).map(List::of).orElse(List.of()) : surface(level, cx + dx, cz + dz);
-                    for (Node node : nodes) {
-                        if (node.type() != type || placeless(node) || !border.contains(node.x(), node.z())) continue;
-                        double distance = node.distanceTo(x, z);
-                        if (distance < bestDistance) {
-                            bestDistance = distance;
-                            best = node;
-                        }
-                    }
-                }
-            }
-        }
-        return Optional.ofNullable(best);
-    }
-
-    private static boolean cellOutside(Terrain.Border border, int cx, int cz) {
-        return ringOutside(border, cx, cz, 0);
-    }
-
-    /** True if the whole square ring of cells around (cx, cz) lies outside the border. */
-    private static boolean ringOutside(Terrain.Border border, int cx, int cz, int ring) {
-        double minX = (cx - ring) * (double) CELL, maxX = (cx + ring + 1) * (double) CELL;
-        double minZ = (cz - ring) * (double) CELL, maxZ = (cz + ring + 1) * (double) CELL;
-        boolean overlaps = maxX > border.minX() && minX < border.maxX() && maxZ > border.minZ() && minZ < border.maxZ();
-        if (!overlaps) return true;
-        if (ring == 0) return false;
-        // the ring is the square minus its inside: outside if the inside covers all of the border
-        double inMinX = (cx - ring + 1) * (double) CELL, inMaxX = (cx + ring) * (double) CELL;
-        double inMinZ = (cz - ring + 1) * (double) CELL, inMaxZ = (cz + ring) * (double) CELL;
-        return inMinX <= border.minX() && inMaxX >= border.maxX() && inMinZ <= border.minZ() && inMaxZ >= border.maxZ();
+        return NodeSearch.nearest(level, x, z, type, maxCells, border, nanos);
     }
 
     /**
@@ -377,23 +242,12 @@ public final class NodeMap {
      * world border is read now, on the calling (server) thread.
      */
     public static void nearestAsync(ServerLevel level, double x, double z, NodeType type, int maxCells, Consumer<Optional<Node>> then) {
-        Terrain.Border border = Terrain.Border.of(level);
-        async(level.getServer(), () -> nearest(level, x, z, type, maxCells, border, SEARCH_NANOS), found -> then.accept(found == null ? Optional.empty() : found));
+        NodeSearch.nearestAsync(level, x, z, type, maxCells, then);
     }
 
     /** Runs a job on the worker thread (a search that combines several lookups), answering on the server thread (null if it failed). */
     public static <T> void async(MinecraftServer server, Supplier<T> job, Consumer<@Nullable T> then) {
-        WORKER.execute(() -> {
-            T result;
-            try {
-                result = job.get();
-            } catch (RuntimeException e) {
-                Siftec.LOGGER.warn("Background search failed", e);
-                result = null;
-            }
-            T done = result;
-            server.execute(() -> then.accept(done));
-        });
+        NodeWorker.async(server, job, then);
     }
 
     /**
@@ -404,169 +258,7 @@ public final class NodeMap {
      */
     public static <I, R> void batched(MinecraftServer server, List<I> items, int size, Function<List<I>, R> piece,
                                       Consumer<@Nullable R> each, Runnable done) {
-        List<I> all = List.copyOf(items);
-        batchStep(server, all, 0, Math.max(1, size), piece, each, done);
-    }
-
-    private static <I, R> void batchStep(MinecraftServer server, List<I> all, int from, int size, Function<List<I>, R> piece,
-                                         Consumer<@Nullable R> each, Runnable done) {
-        if (from >= all.size()) {
-            server.execute(done);
-            return;
-        }
-        WORKER.execute(() -> {
-            R result;
-            try {
-                result = piece.apply(all.subList(from, Math.min(all.size(), from + size)));
-            } catch (RuntimeException e) {
-                Siftec.LOGGER.warn("Background search failed", e);
-                result = null;
-            }
-            R answer = result;
-            server.execute(() -> each.accept(answer));
-            batchStep(server, all, from + size, size, piece, each, done);
-        });
-    }
-
-    // ---- working out one cell
-
-    private static List<Node> nether(ServerLevel level, int cellX, int cellZ, int[] from) {
-        long h = mix(level.getSeed() ^ mix(cellX * 0x9E3779B97F4A7C15L + cellZ * 0xC2B2AE3D27D4EB4FL + 0x4E37));
-        int span = CELL - 2 * MARGIN;
-        int x = cellX * CELL + MARGIN + (int) Long.remainderUnsigned(h, span);
-        h = mix(h);
-        int z = cellZ * CELL + MARGIN + (int) Long.remainderUnsigned(h, span);
-        h = mix(h);
-        // purity goes by the matching distance in the Overworld: 8 times as far in a vanilla Nether, the same in a 1:1 one
-        double ratio = level.dimensionType().coordinateScale() / level.getServer().overworld().dimensionType().coordinateScale();
-        double distance = Math.sqrt(Math.pow(x * ratio - from[0], 2) + Math.pow(z * ratio - from[1], 2));
-        float chance = (h >>> 40) / (float) (1 << 24);
-        h = mix(h);
-        return chance < NODE_CHANCE ? List.of(new Node(x, z, NodeType.QUARTZ, purity(h, distance))) : List.of();
-    }
-
-    private static List<Node> overworld(ServerLevel level, int cellX, int cellZ, int[] from) {
-        long seed = level.getSeed();
-        int originX = from[0], originZ = from[1];
-        long h = mix(seed ^ mix(cellX * 0x9E3779B97F4A7C15L + cellZ * 0xC2B2AE3D27D4EB4FL + 0x51F7EC));
-        int span = CELL - 2 * MARGIN;
-        int baseX = cellX * CELL + MARGIN, baseZ = cellZ * CELL + MARGIN;
-        int x = baseX + (int) Long.remainderUnsigned(h, span);
-        h = mix(h);
-        int z = baseZ + (int) Long.remainderUnsigned(h, span);
-        h = mix(h);
-        long spotHash = mix(h ^ 0x6C0A57L);
-
-        // the starter iron, copper and stone nodes: normal, on dry land within STARTER blocks of spawn (see starters)
-        Starter starter = starters(level, from).get(cellKey(cellX, cellZ));
-        if (starter != null) {
-            Node node = new Node(starter.spot().x(), starter.spot().z(), starter.type(), Purity.NORMAL);
-            GROUND.put(node.key(), starter.spot().column().y());
-            PAD.put(node.key(), padHeight(level, node.x(), node.z()));
-            return List.of(node);
-        }
-
-        float chance = (h >>> 40) / (float) (1 << 24);
-        h = mix(h);
-        int mask = -1;
-        if (chance >= NODE_CHANCE) {
-            // no node, unless this cell holds a small island of its own: nothing around it would ever get one
-            if (!quickVoid(level, x, z)) return List.of();
-            mask = landMask(level, cellX, cellZ, CELL, MARGIN);
-            if ((mask & ALL_POINTS) == 0) return List.of();
-            for (int[] d : new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
-                if ((landMask(level, cellX + d[0], cellZ + d[1], CELL, MARGIN) & ALL_POINTS) != 0) return List.of();
-            }
-        }
-
-        Terrain.Column column = Terrain.column(level, x, z);
-        if (column == null) {
-            // over void: take a spot on the cell's land, if it has any
-            if (mask == -1) mask = landMask(level, cellX, cellZ, CELL, MARGIN);
-            Spot spot = landSpot(level, baseX, baseZ, span, mask, spotHash);
-            if (spot == null) return List.of();
-            x = spot.x();
-            z = spot.z();
-            column = spot.column();
-        } else if (column.water()) {
-            // no nodes in the sea, a river or a lake
-            return List.of();
-        }
-        // nor on a lake's shore, where most of the pad would stand in the water on a pillar of fill
-        if (padWet(level, x, z)) return List.of();
-        Holder<Biome> biome = column.biome();
-        double distance = Math.sqrt(Math.pow(x - originX, 2) + Math.pow(z - originZ, 2));
-        int total = 0;
-        for (NodeType type : NodeType.values()) {
-            if (allowed(type, biome, distance)) total += type.weight;
-        }
-        int roll = (int) Long.remainderUnsigned(h, total);
-        h = mix(h);
-        NodeType picked = NodeType.IRON;
-        for (NodeType type : NodeType.values()) {
-            if (!allowed(type, biome, distance)) continue;
-            roll -= type.weight;
-            if (roll < 0) {
-                picked = type;
-                break;
-            }
-        }
-        Node node = new Node(x, z, picked, purity(h, distance));
-        GROUND.put(node.key(), column.y());
-        PAD.put(node.key(), padHeight(level, x, z));
-        return List.of(node);
-    }
-
-    // ---- the starter nodes
-
-    private record Starter(NodeType type, Spot spot) {
-    }
-
-    /** Which cells round spawn hold the starter nodes (by cell key), worked out once per world. */
-    private static volatile @Nullable Map<Long, Starter> starters;
-    /** The cells round spawn the starters may take, in order: the four beside it, the four corners, then its own. */
-    private static final int[][] STARTER_CELLS = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, 1}, {1, -1}, {-1, -1}, {0, 0}};
-
-    /**
-     * Spawn always has a normal iron, copper and stone node within STARTER blocks. Each takes the next cell round
-     * spawn that has a dry spot that near, so a sea or a river beside spawn only moves them on to another cell.
-     */
-    private static Map<Long, Starter> starters(ServerLevel level, int[] from) {
-        Map<Long, Starter> known = starters;
-        if (known != null) return known;
-        synchronized (NodeMap.class) {
-            if (starters != null) return starters;
-            Map<Long, Starter> out = new HashMap<>();
-            NodeType[] types = {NodeType.IRON, NodeType.COPPER, NodeType.STONE};
-            int scx = Math.floorDiv(from[0], CELL), scz = Math.floorDiv(from[1], CELL);
-            for (int[] d : STARTER_CELLS) {
-                if (out.size() == types.length) break;
-                Spot spot = starterSpot(level, scx + d[0], scz + d[1], from);
-                if (spot != null) out.put(cellKey(scx + d[0], scz + d[1]), new Starter(types[out.size()], spot));
-            }
-            starters = out;
-            return out;
-        }
-    }
-
-    /** A dry spot in the cell within STARTER blocks of spawn, or null: random spots first, then the cell's nearest point. */
-    private static @Nullable Spot starterSpot(ServerLevel level, int cellX, int cellZ, int[] from) {
-        int span = CELL - 2 * MARGIN;
-        int baseX = cellX * CELL + MARGIN, baseZ = cellZ * CELL + MARGIN;
-        long h = mix(level.getSeed() ^ mix(cellX * 0x9E3779B97F4A7C15L + cellZ * 0xC2B2AE3D27D4EB4FL + 0x57A47E5L));
-        for (int attempt = 0; attempt < STARTER_ATTEMPTS; attempt++) {
-            int x = baseX + (int) Long.remainderUnsigned(h, span);
-            h = mix(h);
-            int z = baseZ + (int) Long.remainderUnsigned(h, span);
-            h = mix(h);
-            if (Math.hypot(x - from[0], z - from[1]) > STARTER) continue;
-            Terrain.Column column = Terrain.column(level, x, z);
-            if (column != null && !column.water()) return new Spot(x, z, column);
-        }
-        int x = Math.clamp(from[0], baseX, baseX + span), z = Math.clamp(from[1], baseZ, baseZ + span);
-        if (Math.hypot(x - from[0], z - from[1]) > STARTER) return null;
-        Terrain.Column column = Terrain.column(level, x, z);
-        return column != null && !column.water() ? new Spot(x, z, column) : null;
+        NodeWorker.batched(server, items, size, piece, each, done);
     }
 
     // ---- land in a cell
@@ -575,36 +267,14 @@ public final class NodeMap {
     public record Spot(int x, int z, Terrain.Column column) {
     }
 
-    private static final int GRID = 5, ALL_POINTS = (1 << GRID * GRID) - 1, DONE = 1 << 25;
-
     /** Two biome samples: enough to tell void from land where the void biome fills whole columns. The full test comes after. */
     public static boolean quickVoid(ServerLevel level, int x, int z) {
-        SAMPLES.addAndGet(2);
-        int min = level.getMinY(), max = level.getMaxY();
-        return Terrain.isVoid(Terrain.biome(level, x, Math.clamp(Terrain.SAMPLE_Y, min, max), z))
-            && Terrain.isVoid(Terrain.biome(level, x, (min + max) / 2, z));
-    }
-
-    private static int gridX(int base, int span, int i) {
-        return base + span * (i % GRID) / (GRID - 1);
-    }
-
-    private static int gridZ(int base, int span, int i) {
-        return base + span * (i / GRID) / (GRID - 1);
+        return NodeLand.quickVoid(level, x, z);
     }
 
     /** Which points of a cell's 5 x 5 grid have land by biome. Cached per cell and cell size. */
     public static int landMask(ServerLevel level, int cellX, int cellZ, int cell, int margin) {
-        long key = cellKey(cellX, cellZ) * 31 + cell;
-        Integer known = LAND.get(key);
-        if (known != null) return known;
-        int span = cell - 2 * margin, baseX = cellX * cell + margin, baseZ = cellZ * cell + margin;
-        int mask = DONE;
-        for (int i = 0; i < GRID * GRID; i++) {
-            if (!quickVoid(level, gridX(baseX, span, i), gridZ(baseZ, span, i))) mask |= 1 << i;
-        }
-        LAND.put(key, mask);
-        return mask;
+        return NodeLand.landMask(level, cellX, cellZ, cell, margin);
     }
 
     /**
@@ -612,134 +282,14 @@ public final class NodeMap {
      * the grid when the nudged spot is land too. Null when the cell has none.
      */
     public static @Nullable Spot landSpot(ServerLevel level, int baseX, int baseZ, int span, int mask, long h) {
-        int[] order = new int[GRID * GRID];
-        for (int i = 0; i < order.length; i++) order[i] = i;
-        for (int i = order.length - 1; i > 0; i--) {
-            h = mix(h);
-            int j = (int) Long.remainderUnsigned(h, i + 1);
-            int t = order[i];
-            order[i] = order[j];
-            order[j] = t;
-        }
-        int probes = 0;
-        for (int i : order) {
-            if ((mask & (1 << i)) == 0) continue;
-            if (++probes > LAND_PROBES) break;
-            int x = gridX(baseX, span, i), z = gridZ(baseZ, span, i);
-            Terrain.Column column = Terrain.column(level, x, z);
-            if (column == null || column.water()) continue;
-            h = mix(h);
-            int nx = Math.clamp(x + (int) Long.remainderUnsigned(h, 2 * NUDGE + 1) - NUDGE, baseX, baseX + span);
-            int nz = Math.clamp(z + (int) Long.remainderUnsigned(h >>> 20, 2 * NUDGE + 1) - NUDGE, baseZ, baseZ + span);
-            Terrain.Column nudged = Terrain.column(level, nx, nz);
-            if (nudged != null && !nudged.water()) return new Spot(nx, nz, nudged);
-            return new Spot(x, z, column);
-        }
-        return null;
-    }
-
-    // ---- sulfur caves
-
-    /**
-     * A sulfur node, if a sulfur cave pocket lies under this cell's land. Looks on a coarse grid (no pocket of
-     * radius 40 or more can slip between its points) at heights below the cell's ground and at the heights of an
-     * ordinary world's caves, then finds the middle of the pocket. The cell that holds the middle owns the node.
-     */
-    private static @Nullable Node sulfur(ServerLevel level, int cellX, int cellZ, int[] from) {
-        int baseX = cellX * CELL, baseZ = cellZ * CELL;
-        int[] offsets = {24, 64, 104};
-        Integer ground = null;
-        int[] heights = null;
-        List<int[]> hits = new ArrayList<>();
-        for (int ox : offsets) {
-            for (int oz : offsets) {
-                int x = baseX + ox, z = baseZ + oz;
-                if (quickVoid(level, x, z)) continue;
-                if (ground == null) {
-                    Terrain.Column column = Terrain.column(level, x, z);
-                    if (column == null) continue;
-                    ground = column.y();
-                    heights = caveHeights(level, ground);
-                }
-                for (int y : heights) {
-                    SAMPLES.incrementAndGet();
-                    if (Terrain.biome(level, x, y, z).is(SULFUR_CAVES)) hits.add(new int[]{x, y, z});
-                }
-            }
-        }
-        if (hits.isEmpty()) return null;
-        double sx = 0, sz = 0;
-        int[] ys = new int[hits.size()];
-        for (int i = 0; i < hits.size(); i++) {
-            sx += hits.get(i)[0];
-            sz += hits.get(i)[2];
-            ys[i] = hits.get(i)[1];
-        }
-        Arrays.sort(ys);
-        int y = ys[ys.length / 2];
-        int cx = (int) Math.round(sx / hits.size()), cz = (int) Math.round(sz / hits.size());
-        // the middle of the pocket, on a finer grid at that height
-        double fx = 0, fz = 0;
-        int n = 0;
-        for (int dx = -POCKET_REACH; dx <= POCKET_REACH; dx += POCKET_STEP) {
-            for (int dz = -POCKET_REACH; dz <= POCKET_REACH; dz += POCKET_STEP) {
-                SAMPLES.incrementAndGet();
-                if (Terrain.biome(level, cx + dx, y, cz + dz).is(SULFUR_CAVES)) {
-                    fx += cx + dx;
-                    fz += cz + dz;
-                    n++;
-                }
-            }
-        }
-        if (n > 0) {
-            cx = (int) Math.round(fx / n);
-            cz = (int) Math.round(fz / n);
-        }
-        if (Math.floorDiv(cx, CELL) != cellX || Math.floorDiv(cz, CELL) != cellZ) return null;
-        cx = Math.clamp(cx, baseX + MARGIN, baseX + CELL - MARGIN - 1);
-        cz = Math.clamp(cz, baseZ + MARGIN, baseZ + CELL - MARGIN - 1);
-        long h = mix(level.getSeed() ^ mix(cellX * 0xD6E8FEB86659FD93L + cellZ * 0xA0761D6478BD642FL + 0x5F1F));
-        double distance = Math.sqrt(Math.pow(cx - from[0], 2) + Math.pow(cz - from[1], 2));
-        return new Node(cx, cz, NodeType.SULFUR, purity(h, distance), y);
-    }
-
-    private static int[] caveHeights(ServerLevel level, int ground) {
-        int min = level.getMinY() + CAVE_ABOVE_BOTTOM;
-        List<Integer> heights = new ArrayList<>();
-        for (int y = ground - CAVE_BELOW_GROUND; y >= Math.max(min, ground - CAVE_DEPTH); y -= CAVE_STEP) heights.add(y);
-        for (int y : CAVE_HEIGHTS) {
-            if (y >= min && y < ground - CAVE_UNDER_GROUND && heights.stream().noneMatch(o -> Math.abs(o - y) < CAVE_GAP))
-                heights.add(y);
-        }
-        return heights.stream().mapToInt(Integer::intValue).toArray();
+        return NodeLand.landSpot(level, baseX, baseZ, span, mask, h);
     }
 
     // ---- types and purity
 
     /** A purity drawn by the nodes' rule from a hash and a distance from spawn (sulfur geysers have theirs this way too). */
     public static Purity purityOf(long h, double distance) {
-        return purity(h, distance);
-    }
-
-    /** Impure is the common one near spawn, pure the common one far out. */
-    private static Purity purity(long h, double distance) {
-        float t = (float) Math.clamp((distance - NEAR) / (FAR - NEAR), 0, 1);
-        float impure = IMPURE_NEAR - IMPURE_DROP * t;
-        float pure = PURE_NEAR + PURE_RISE * t;
-        float p = (mix(h) >>> 40) / (float) (1 << 24);
-        return p < impure ? Purity.IMPURE : p < impure + pure ? Purity.PURE : Purity.NORMAL;
-    }
-
-    private static boolean allowed(NodeType type, Holder<Biome> biome, double distance) {
-        if (distance < type.minDistance) return false;
-        return switch (type.where) {
-            case ANY -> true;
-            case HILLS -> biome.is(BiomeTags.IS_MOUNTAIN) || biome.is(BiomeTags.IS_HILL);
-            case HOT -> biome.is(BiomeTags.IS_JUNGLE) || biome.is(BiomeTags.IS_SAVANNA) || biome.is(BiomeTags.IS_BADLANDS);
-            case COLD -> biome.is(COLD) || biome.is(BiomeTags.IS_MOUNTAIN);
-            case OILY -> biome.is(DESERT) || biome.is(SWAMP) || biome.is(BiomeTags.IS_BADLANDS) || biome.is(BiomeTags.IS_BEACH);
-            case NETHER, SULFUR_CAVE -> false;
-        };
+        return NodeRules.purity(h, distance);
     }
 
     public static long mix(long v) {
