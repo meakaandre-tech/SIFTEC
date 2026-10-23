@@ -13,6 +13,9 @@ import java.util.Locale;
  * @param purity for nodes and wells the purity's ordinal (0 impure, 1 normal, 2 pure); 0 otherwise
  */
 public record MapPoi(Kind kind, String sub, int purity, int x, int y, int z) {
+    /** Longest sub-kind read from the network. */
+    private static final int MAX_SUB = 32;
+
     /** The filter panel's categories, in Satisfactory's order (no vehicles). */
     public enum Category {
         PLAYERS, MARKERS, NODES, WELLS, GEYSERS, CRASH_SITES, ARTIFACTS, BUILDINGS;
@@ -51,7 +54,7 @@ public record MapPoi(Kind kind, String sub, int purity, int x, int y, int z) {
     public static MapPoi read(FriendlyByteBuf buf) {
         Kind[] kinds = Kind.values();
         Kind kind = kinds[Math.floorMod(buf.readByte(), kinds.length)];
-        return new MapPoi(kind, buf.readUtf(32), buf.readByte(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt());
+        return new MapPoi(kind, buf.readUtf(MAX_SUB), buf.readByte(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt());
     }
 
     /** What identifies it for pins: the same thing at the same place. */

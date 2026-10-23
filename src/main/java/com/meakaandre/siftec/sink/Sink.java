@@ -31,6 +31,10 @@ import java.util.Set;
  * company, and any member prints them as coupons at the Sink.
  */
 public final class Sink {
+    /** Satisfactory 1.0's coupon curve: the price steps up every three coupons, by this times the step squared. */
+    private static final int COUPONS_PER_STEP = 3, COUPON_STEP_COST = 250, COUPON_BASE_COST = 1000;
+    /** Coupons printed at most at a time: a stack. */
+    private static final int MOST_PRINTED = 64;
     private static @Nullable Map<String, Integer> points;
     private static final List<Map.Entry<TagKey<Item>, Integer>> TAGS = new ArrayList<>();
     private static final Map<String, Integer> RARITY = new HashMap<>();
@@ -105,8 +109,8 @@ public final class Sink {
         load();
         if (n <= first) return firstCost;
         if (n <= last) {
-            long step = (n + 2) / 3 - 1;
-            return 250 * step * step + 1000;
+            long step = (n + COUPONS_PER_STEP - 1) / COUPONS_PER_STEP - 1;
+            return COUPON_STEP_COST * step * step + COUPON_BASE_COST;
         }
         return cap;
     }
@@ -132,7 +136,7 @@ public final class Sink {
     /** Prints as many coupons as the company's points pay for, at most a stack at a time. Returns how many. */
     public static int print(Company company) {
         int made = 0;
-        while (made < 64) {
+        while (made < MOST_PRINTED) {
             long cost = couponCost(company.couponsPrinted + 1);
             if (company.points < cost) break;
             company.points -= cost;

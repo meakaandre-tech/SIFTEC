@@ -10,6 +10,11 @@ import net.minecraft.world.level.biome.Biome;
  * deep one.
  */
 public final class MapPalette {
+    /** Water this deep (blocks) or deeper is drawn in the deepest blue. */
+    private static final float DEEPEST_WATER = 20f;
+    /** How much of the top block's map colour is mixed into the biome's ground colour. */
+    private static final float BLOCK_MIX = 0.25f;
+
     private MapPalette() {
     }
 
@@ -36,13 +41,13 @@ public final class MapPalette {
 
     /** A water pixel by depth (blocks of water over the floor). */
     public static int water(int depth) {
-        float t = Math.min(1f, Math.max(0, depth) / 20f);
+        float t = Math.min(1f, Math.max(0, depth) / DEEPEST_WATER);
         return mix(0x79BED0, 0x2D5F88, t);
     }
 
     /** Ground: the biome's colour with a little of the top block's map colour, softened. */
     public static int ground(int biomeColour, int blockColour) {
-        int c = blockColour == 0 ? biomeColour : mix(biomeColour, blockColour, 0.25f);
+        int c = blockColour == 0 ? biomeColour : mix(biomeColour, blockColour, BLOCK_MIX);
         return soften(c);
     }
 

@@ -32,6 +32,14 @@ public class MapScreen extends Screen {
     private static final int PANEL = 140, BAR = 16, FOOT = 14, ROW = 12;
     /** Zoomed out no further than about a hundred regions on screen, so the tiles drawn stay few and cached. */
     private static final double MIN_SCALE = 0.15, MAX_SCALE = 4;
+    /** Zoom factor of one scroll step in and out. */
+    private static final double ZOOM_IN = 1.25, ZOOM_OUT = 0.8;
+    /** Length of the scale bar (pixels). */
+    private static final int SCALE_BAR = 80;
+    /** How near the mouse (pixels) a thing must be to be hovered. */
+    private static final int HOVER_RADIUS = 7;
+    /** Height a new marker gets where the map has no ground recorded. */
+    private static final int DEFAULT_MARKER_Y = 64;
     /** Categories whose kinds are folded out in the panel. */
     private static final Set<String> OPEN = new HashSet<>();
     private static double lastScale = 0.5;
@@ -111,7 +119,7 @@ public class MapScreen extends Screen {
         // the top bar: title, the scale, and the world position under the mouse
         g.fill(0, 0, width, BAR, 0xF0101418);
         g.text(font, title, 6, 4, 0xFFFFA530, false);
-        String scaleText = MapDraw.distance(80 / scale);
+        String scaleText = MapDraw.distance(SCALE_BAR / scale);
         g.fill(width - 96, 10, width - 16, 11, 0xFFE6E6E6);
         g.text(font, scaleText, width - 96, 1, 0xFFE6E6E6, false);
         if (inMap(mouseX, mouseY)) {
@@ -196,7 +204,7 @@ public class MapScreen extends Screen {
         if (!inMap(mx, my)) return null;
         MapDraw.View v = view();
         Minecraft mc = Minecraft.getInstance();
-        double best = 7 * 7;
+        double best = HOVER_RADIUS * HOVER_RADIUS;
         Hover found = null;
         for (MapMarker m : MapClient.markers) {
             if (!m.dimension.equals("minecraft:overworld") || (!MapFilters.shows(m) && !MapClient.pinned(m.pinKey()))) continue;
@@ -313,7 +321,7 @@ public class MapScreen extends Screen {
         if (editing || !inMap(mx, my) || sy == 0) return super.mouseScrolled(mx, my, sx, sy);
         MapDraw.View v = view();
         double wx = v.wx(mx), wz = v.wz(my);
-        scale = Math.clamp(scale * (sy > 0 ? 1.25 : 0.8), MIN_SCALE, MAX_SCALE);
+        scale = Math.clamp(scale * (sy > 0 ? ZOOM_IN : ZOOM_OUT), MIN_SCALE, MAX_SCALE);
         lastScale = scale;
         // keep the spot under the mouse where it is
         MapDraw.View after = view();
@@ -368,7 +376,7 @@ public class MapScreen extends Screen {
         editX = x;
         editZ = z;
         Integer h = ClientTiles.height(x, z);
-        editY = h == null ? 64 : h + 1;
+        editY = h == null ? DEFAULT_MARKER_Y : h + 1;
         editIcon = 0;
         editColour = 0;
         editCompany = false;

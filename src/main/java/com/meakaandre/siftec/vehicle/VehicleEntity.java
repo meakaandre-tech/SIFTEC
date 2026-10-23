@@ -69,6 +69,52 @@ public class VehicleEntity extends Entity {
     public static final int DOCK_TICKS = 100;
     /** Blocks between the points of a recorded route. */
     static final double POINT_SPACING = 2.0;
+    /** Ticks between the driver's HUD updates, and between "no fuel" reminders. */
+    private static final int HUD_INTERVAL_TICKS = 10, NO_FUEL_MESSAGE_TICKS = 40;
+    /** mB in a bucket, as a fuel's megajoules are given per mB. */
+    private static final int MB_PER_BUCKET = 1000;
+    // ---- driving: speeds are blocks a tick, shares are of the kind's top speed
+    /** Speed kept each tick while braking, and while rolling with no throttle. */
+    private static final double BRAKE_DRAG = 0.7, COAST_DRAG = 0.94;
+    /** Top speed in reverse, as a share of the top speed forward. */
+    private static final double REVERSE_SHARE = 0.4;
+    /** Below this speed it stands still. */
+    private static final double STOP_SPEED = 0.003;
+    /** The share of top speed at which its wheels turn it fully; slower, it turns less. */
+    private static final double FULL_GRIP_SHARE = 0.3;
+    /** Downward speed while on the ground; gravity and air drag a tick while falling (vanilla's). */
+    private static final double GROUND_VY = -0.04, GRAVITY = 0.08, AIR_DRAG = 0.98;
+    /** In water: lift a tick, the fastest it rises, and the speed it keeps a tick. */
+    private static final double SWIM_LIFT = 0.06, MAX_SWIM_RISE = 0.1, WATER_DRAG = 0.9;
+    /** Least change of speed that is sent to clients. */
+    private static final double SPEED_SYNC_STEP = 0.005;
+    /**
+     * {@link #bodyBlocked}: the share of its width checked, how high over its feet the check starts (over a one-block
+     * step) and ends at least, and the gap left under its roof.
+     */
+    private static final double BODY_CHECK_WIDTH = 0.7, STEP_CLEARANCE = 1.05, MIN_CHECK_TOP = 1.1, ROOF_GAP = 0.05;
+    // ---- routes
+    /** The fewest points a recorded route keeps. */
+    private static final int MIN_ROUTE_POINTS = 3;
+    /** Points it must have recorded since its last stop at a station before that station counts as a new stop. */
+    private static final int RESTOP_POINTS = 6;
+    /** Distances under this count as the same place, or as no progress. */
+    private static final double SAME_SPOT = 0.01;
+    /** Farther than this from its next point, it carries on from the nearest point instead. */
+    private static final int OFF_ROUTE_DISTANCE = 24;
+    /** How close it must come to a stop, and to any other point, to have reached it. */
+    private static final double STOP_ARRIVE = 1.2, POINT_ARRIVE = 1.8;
+    /** Ticks without getting closer before it gives up on a point. */
+    private static final int STUCK_TICKS = 80;
+    /** Degrees off its heading beyond which it slows for the turn, and how close to a stop it slows to dock. */
+    private static final int SHARP_TURN_DEGREES = 45, APPROACH_DISTANCE = 6;
+    /** Autopilot speeds: turning hard, coming up to a stop, cruising; and how far over its limit it goes before braking. */
+    private static final double TURN_SPEED_SHARE = 0.3, APPROACH_SPEED_SHARE = 0.35, CRUISE_SPEED_SHARE = 0.8;
+    private static final double BRAKE_MARGIN = 0.05;
+    /** The least grip the autopilot reckons with, so its steering never divides by zero. */
+    private static final double MIN_GRIP = 0.05;
+    /** How high over the ground a vehicle that fell out of the world is put back. */
+    private static final double RESCUE_LIFT = 0.1;
 
     public final VehicleKind kind;
     public final SimpleContainer cargo;
@@ -207,7 +253,8 @@ public class VehicleEntity extends Entity {
     int bodyBlocked() {
         double w = kind.boxWidth, l = kind.boxLength;
         int n = squares();
-        double side = w * 0.7 / 2, from = getY() + 1.05, to = getY() + Math.max(1.1, kind.boxHeight - 0.05);
+        double side = w * BODY_CHECK_WIDTH / 2, from = getY() + STEP_CLEARANCE,
+            to = getY() + Math.max(MIN_CHECK_TOP, kind.boxHeight - ROOF_GAP);
         double reach = Math.max(0, l / 2 - side);
         int mask = 0;
         for (int i = 0; i < n; i++) {
@@ -261,7 +308,7 @@ public class VehicleEntity extends Entity {
             brake = keys.brake();
             docked = 0;
             if (recording) record(level);
-            if (driver != null && tickCount % 10 == 0) hud(driver);
+            if (driver != null && tickCount % HUD_INTERVAL_TICKS == 0) hud(driver);
         } else if (!recording && route.size() >= 2) {
             double[] auto = autopilot(level);
             throttle = auto[0];
@@ -270,7 +317,8 @@ public class VehicleEntity extends Entity {
         }
         if (fuelMj <= 0 && throttle != 0) {
             throttle = 0;
-            if (driver != null && tickCount % 40 == 0) driver.sendOverlayMessage(Component.translatable("siftec.vehicle.no_fuel"));
+            if (driver != null && tickCount % NO_FUEL_MESSAGE_TICKS == 0)
+                driver.sendOverlayMessage(Component.translatable("siftec.vehicle.no_fuel"));
         }
         drive(throttle, steer, brake);
         if (throttle != 0) {
@@ -283,26 +331,26 @@ public class VehicleEntity extends Entity {
     void drive(double throttle, double steer, boolean brake) {
         double max = kind.maxSpeed;
         if (brake) {
-            speed *= 0.7;
+            speed *= BRAKE_DRAG;
         } else if (throttle != 0) {
-            speed = Mth.clamp(speed + throttle * kind.accel, -max * 0.4, max);
+            speed = Mth.clamp(speed + throttle * kind.accel, -max * REVERSE_SHARE, max);
         } else {
-            speed *= 0.94;
+            speed *= COAST_DRAG;
         }
-        if (Math.abs(speed) < 0.003) speed = 0;
+        if (Math.abs(speed) < STOP_SPEED) speed = 0;
         Vec3 before = position();
         // what its body already stands in (a dock it parked in, say) does not hold it; only driving into more does
         int blockedBefore = speed == 0 ? 0 : bodyBlocked();
         if (steer != 0 && speed != 0) {
-            double grip = Math.min(1, Math.abs(speed) / (max * 0.3));
+            double grip = Math.min(1, Math.abs(speed) / (max * FULL_GRIP_SHARE));
             setYRot(getYRot() + (float) (Mth.clamp(steer, -1, 1) * kind.turnDegrees * grip * Math.signum(speed)));
         }
         Vec3 f = forward();
         Vec3 v = getDeltaMovement();
-        double vy = onGround() ? -0.04 : (v.y - 0.08) * 0.98;
+        double vy = onGround() ? GROUND_VY : (v.y - GRAVITY) * AIR_DRAG;
         if (isInWater()) {
-            vy = Math.min(v.y + 0.06, 0.1);
-            speed *= 0.9;
+            vy = Math.min(v.y + SWIM_LIFT, MAX_SWIM_RISE);
+            speed *= WATER_DRAG;
         }
         setDeltaMovement(f.x * speed, vy, f.z * speed);
         // it moves as the square middle of its body; its front and back must not end up in a wall
@@ -320,7 +368,7 @@ public class VehicleEntity extends Entity {
         }
         setBoundingBox(makeBoundingBox());
         if (horizontalCollision) speed *= 0.5;
-        if (Math.abs(entityData.get(SPEED) - speed) > 0.005) entityData.set(SPEED, (float) speed);
+        if (Math.abs(entityData.get(SPEED) - speed) > SPEED_SYNC_STEP) entityData.set(SPEED, (float) speed);
     }
 
     @Override
@@ -350,7 +398,7 @@ public class VehicleEntity extends Entity {
             return;
         }
         recording = false;
-        if (route.size() < 3) {
+        if (route.size() < MIN_ROUTE_POINTS) {
             route.clear();
             stopAt.clear();
             stopStation.clear();
@@ -369,9 +417,10 @@ public class VehicleEntity extends Entity {
         if (here.distanceTo(route.getLast()) >= POINT_SPACING) route.add(here);
         BlockPos station = TruckStations.near(level, here, this);
         if (station == null) return;
-        boolean again = !stopStation.isEmpty() && stopStation.getLast().equals(station) && route.size() - 1 - stopAt.getLast() < 6;
+        boolean again = !stopStation.isEmpty() && stopStation.getLast().equals(station)
+            && route.size() - 1 - stopAt.getLast() < RESTOP_POINTS;
         if (again) return;
-        if (here.distanceTo(route.getLast()) > 0.01) route.add(here);
+        if (here.distanceTo(route.getLast()) > SAME_SPOT) route.add(here);
         stopAt.add(route.size() - 1);
         stopStation.add(station);
         lastStation = station;
@@ -388,7 +437,7 @@ public class VehicleEntity extends Entity {
         Vec3 goal = route.get(target);
         double dx = goal.x - getX(), dz = goal.z - getZ(), dist = Math.sqrt(dx * dx + dz * dz);
         // got out somewhere else along the way: carry on from the nearest point
-        if (dist > 24) {
+        if (dist > OFF_ROUTE_DISTANCE) {
             legStart = -1;
             target = nearestPoint();
             goal = route.get(target);
@@ -397,7 +446,7 @@ public class VehicleEntity extends Entity {
             dist = Math.sqrt(dx * dx + dz * dz);
         }
         int stop = stopIndex(target);
-        if (dist < (stop >= 0 ? 1.2 : 1.8)) {
+        if (dist < (stop >= 0 ? STOP_ARRIVE : POINT_ARRIVE)) {
             if (docked == 0 && legStart >= 0) {
                 while (legTicks.size() < route.size()) legTicks.add(0);
                 legTicks.set(target, Math.max(1, tickCount - legStart));
@@ -420,10 +469,10 @@ public class VehicleEntity extends Entity {
             return new double[]{0, 0, 0};
         }
         // not getting any closer for a while (something in the way): try the next point
-        if (dist < lastDist - 0.01) {
+        if (dist < lastDist - SAME_SPOT) {
             lastDist = dist;
             stuck = 0;
-        } else if (++stuck > 80) {
+        } else if (++stuck > STUCK_TICKS) {
             target = (target + 1) % route.size();
             lastDist = Double.MAX_VALUE;
             stuck = 0;
@@ -431,12 +480,13 @@ public class VehicleEntity extends Entity {
         }
         float want = (float) (Math.atan2(-dx, dz) * Mth.RAD_TO_DEG);
         double off = Mth.wrapDegrees(want - getYRot());
-        double limit = kind.maxSpeed * (Math.abs(off) > 45 ? 0.3 : stop >= 0 && dist < 6 ? 0.35 : 0.8);
+        double limit = kind.maxSpeed * (Math.abs(off) > SHARP_TURN_DEGREES ? TURN_SPEED_SHARE
+            : stop >= 0 && dist < APPROACH_DISTANCE ? APPROACH_SPEED_SHARE : CRUISE_SPEED_SHARE);
         // wheels turn it only while it rolls: creep forward while turning hard rather than stopping
         double throttle = speed < limit ? 1 : 0;
-        boolean brake = speed > limit + 0.05;
+        boolean brake = speed > limit + BRAKE_MARGIN;
         // drive() turns by steering x turnDegrees x grip: aim the turn at what is off, no further
-        double grip = Math.max(0.05, Math.min(1, Math.abs(speed) / (kind.maxSpeed * 0.3)));
+        double grip = Math.max(MIN_GRIP, Math.min(1, Math.abs(speed) / (kind.maxSpeed * FULL_GRIP_SHARE)));
         double steer = Mth.clamp(off / (kind.turnDegrees * grip), -1, 1);
         return new double[]{throttle, steer, brake ? 1 : 0};
     }
@@ -552,9 +602,9 @@ public class VehicleEntity extends Entity {
         setDeltaMovement(Vec3.ZERO);
         resetFallDistance();
         if (to == level) {
-            setPos(spot.x, spot.y + 0.1, spot.z);
-        } else if (teleport(new TeleportTransition(to, new Vec3(spot.x, spot.y + 0.1, spot.z), Vec3.ZERO, getYRot(), getXRot(),
-            TeleportTransition.DO_NOTHING)) == null) {
+            setPos(spot.x, spot.y + RESCUE_LIFT, spot.z);
+        } else if (teleport(new TeleportTransition(to, new Vec3(spot.x, spot.y + RESCUE_LIFT, spot.z), Vec3.ZERO, getYRot(),
+            getXRot(), TeleportTransition.DO_NOTHING)) == null) {
             return false;
         }
         Siftec.LOGGER.info("SIFTEC: {} fell out of the world; put back at {} {}", kind.id, to.dimension().identifier(), BlockPos.containing(spot).toShortString());
@@ -581,7 +631,7 @@ public class VehicleEntity extends Entity {
         for (String id : BuildingPower.fluidFuels(PowerRole.FUEL)) {
             Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(id));
             if (fluid.getBucket() == Items.AIR || !held.is(fluid.getBucket())) continue;
-            double mj = BuildingPower.fluidMj(PowerRole.FUEL, fluid) * 1000;
+            double mj = BuildingPower.fluidMj(PowerRole.FUEL, fluid) * MB_PER_BUCKET;
             if (fuelMj + mj > kind.tankMj() + 1) {
                 player.sendOverlayMessage(Component.translatable("siftec.vehicle.full", getName()));
                 return true;

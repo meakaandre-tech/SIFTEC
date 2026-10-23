@@ -39,6 +39,8 @@ public final class Radar {
     /** How often it sweeps again while powered: every in-game day. */
     public static final long SWEEP_TICKS = 24000;
     private static final int NODE_CELLS = 16, OBJECT_CELLS = 16;
+    /** Each kind looked for gets this fraction (1 / n) of the node search time budget. */
+    private static final int SEARCH_SHARE = 4;
 
     private Radar() {
     }
@@ -125,12 +127,12 @@ public final class Radar {
             List<Component> out = new ArrayList<>();
             for (Object what : batch) {
                 if (what instanceof NodeType type) {
-                    Optional<Node> node = NodeMap.nearest(server, pos.getX(), pos.getZ(), type, NODE_CELLS, border, NodeMap.SEARCH_NANOS / 4);
+                    Optional<Node> node = NodeMap.nearest(server, pos.getX(), pos.getZ(), type, NODE_CELLS, border, NodeMap.SEARCH_NANOS / SEARCH_SHARE);
                     if (node.isEmpty()) continue;
                     Node n = node.get();
                     out.add(line(NodeBlock.label(type, node), n.x() - pos.getX(), n.z() - pos.getZ(), n.x(), n.z()));
                 } else if (what instanceof Collectible type) {
-                    Optional<Collectibles.Spot> spot = Collectibles.nearest(server, pos.getX(), pos.getZ(), type, collected, OBJECT_CELLS, border, NodeMap.SEARCH_NANOS / 4);
+                    Optional<Collectibles.Spot> spot = Collectibles.nearest(server, pos.getX(), pos.getZ(), type, collected, OBJECT_CELLS, border, NodeMap.SEARCH_NANOS / SEARCH_SHARE);
                     if (spot.isEmpty()) continue;
                     Collectibles.Spot s = spot.get();
                     Component name = Component.translatable("siftec.scanner.target." + (type == Collectible.CRASH_SITE ? "hard_drive" : type.id()));

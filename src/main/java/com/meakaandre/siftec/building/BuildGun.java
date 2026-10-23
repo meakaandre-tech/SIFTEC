@@ -59,9 +59,17 @@ public final class BuildGun {
     private static final Map<UUID, BuildGunPayloads.View> SENT = new HashMap<>();
     /** What players built and took down with the gun lately ("placed <id> x y z", "dismantled <id>"), for the client selftest. */
     public static final List<String> USES = new ArrayList<>();
+    /** How many of the latest {@link #USES} are kept. */
+    private static final int MAX_USES = 64;
+    /** Placements snap to a grid of this many blocks. */
+    private static final int GRID = 8;
+    /** How far past {@link Buildings#RANGE} a client's hologram spot is still believed, in blocks. */
+    private static final int HOLOGRAM_SLACK = 16;
+    /** How often each holding player's hologram verdict is worked out again, in ticks. */
+    private static final int VIEW_INTERVAL_TICKS = 4;
 
     private static void used(String line) {
-        if (USES.size() >= 64) USES.removeFirst();
+        if (USES.size() >= MAX_USES) USES.removeFirst();
         USES.add(line);
     }
 
@@ -118,13 +126,14 @@ public final class BuildGun {
         BlockPos a = p.at(t.minX, 0, 0), b = p.at(t.maxX, 0, t.depth - 1);
         int x = Math.min(a.getX(), b.getX()), z = Math.min(a.getZ(), b.getZ());
         // the nearest multiple of 8 in whole numbers (float division loses blocks far from the world's middle)
-        int dx = Math.floorDiv(x + 4, 8) * 8 - x, dz = Math.floorDiv(z + 4, 8) * 8 - z;
+        int dx = Math.floorDiv(x + GRID / 2, GRID) * GRID - x, dz = Math.floorDiv(z + GRID / 2, GRID) * GRID - z;
         return new Placement(p.def(), p.anchor().offset(dx, 0, dz), p.facing(), p.flip());
     }
 
     /** A client's hologram spot is believed only near the player (it may be nudged a little past the aim). */
     private static boolean reachable(Player player, Placement p) {
-        return p.anchor().distToCenterSqr(player.getEyePosition()) <= (Buildings.RANGE + 16) * (Buildings.RANGE + 16);
+        return p.anchor().distToCenterSqr(player.getEyePosition())
+            <= (Buildings.RANGE + HOLOGRAM_SLACK) * (Buildings.RANGE + HOLOGRAM_SLACK);
     }
 
     // ------------------------------------------------------------------------------------------------ using
@@ -292,7 +301,7 @@ public final class BuildGun {
     // ------------------------------------------------------------------------------------------------ the hologram's verdict
 
     private static void tick(MinecraftServer server) {
-        if (server.getTickCount() % 4 != 0) return;
+        if (server.getTickCount() % VIEW_INTERVAL_TICKS != 0) return;
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (!holding(player)) {
                 SENT.remove(player.getUUID());
@@ -315,7 +324,8 @@ public final class BuildGun {
             AABB box = vehicle.getBoundingBox();
             Component refused = mayDismantle(player, Companies.of(player), vehicle.companyId, box);
             view = BuildGunPayloads.View.of(refused == null, refused != null ? refused : Component.translatable("siftec.build_gun.dismantle_vehicle", vehicle.getName()),
-                BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1e-4, box.maxY - 1e-4, box.maxZ - 1e-4));
+                BlockPos.containing(box.minX, box.minY, box.minZ),
+                BlockPos.containing(box.maxX - Buildings.EDGE_EPSILON, box.maxY - Buildings.EDGE_EPSILON, box.maxZ - Buildings.EDGE_EPSILON));
         } else if (sel.dismantle) {
             BlockHitResult hit = aimed(player);
             ControllerBlockEntity controller = hit == null ? null : controllerAt(player.level(), hit.getBlockPos());

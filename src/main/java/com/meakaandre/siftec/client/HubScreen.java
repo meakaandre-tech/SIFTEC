@@ -31,6 +31,8 @@ import java.util.Optional;
 public class HubScreen extends AbstractContainerScreen<HubMenu> {
     private static final int W = 320, H = 214;
     private static final int WORMHOLE_TAB = Milestones.TIERS;
+    /** Lines of a milestone's unlocks and of its description shown under its name at most (all of them on hover). */
+    private static final int MAX_UNLOCK_LINES = 3, MAX_ABOUT_LINES = 4;
 
     // the old screen's colours
     private static final int GOLD = 0xFFFFD060, GREY = 0xFFC0C0C0, DIM = 0xFF909090, WHITE = 0xFFFFFFFF, GREEN = 0xFF60FF60,
@@ -309,10 +311,10 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
         Component unlocks = Component.translatable("siftec.hub.unlocks", sel.unlockText());
         List<FormattedCharSequence> lines = font.split(unlocks, width);
         int room = (bottom - y - 4 - costs.size() * row - (lockLine ? 10 : 0)) / 10;
-        int shown = Math.max(1, Math.min(lines.size(), Math.min(3, room)));
+        int shown = Math.max(1, Math.min(lines.size(), Math.min(MAX_UNLOCK_LINES, room)));
         // the milestone's text under its name, in what room the unlocks and costs leave; all of it on hover
         List<FormattedCharSequence> about = font.split(sel.desc().copy().withStyle(ChatFormatting.ITALIC), width);
-        int aboutShown = Math.max(0, Math.min(about.size(), Math.min(4, room - shown - 1)));
+        int aboutShown = Math.max(0, Math.min(about.size(), Math.min(MAX_ABOUT_LINES, room - shown - 1)));
         for (int i = 0; i < aboutShown; i++) {
             g.text(font, about.get(i), x, y, DIM, false);
             y += 10;

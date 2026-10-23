@@ -26,6 +26,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NodeScannerItem extends Item {
     /** How far it looks, in cells of 128 blocks. */
     private static final int RANGE = 64;
+    /** Cooldown after a scan (ticks); the Object Scanner uses the same. */
+    static final int SCAN_COOLDOWN_TICKS = 20;
+    /** Degrees each compass direction covers. */
+    private static final double COMPASS_STEP = 45.0;
     private static final String[] COMPASS = {"south", "south_west", "west", "north_west", "north", "north_east", "east", "south_east"};
     /** What each player has the scanner set to. Kept until the server restarts. */
     private static final Map<UUID, NodeType> SELECTED = new ConcurrentHashMap<>();
@@ -54,7 +58,7 @@ public class NodeScannerItem extends Item {
             return InteractionResult.SUCCESS;
         }
         // the search samples the world generator: it runs on the node map's worker thread and answers when done
-        player.getCooldowns().addCooldown(player.getItemInHand(hand), 20);
+        player.getCooldowns().addCooldown(player.getItemInHand(hand), SCAN_COOLDOWN_TICKS);
         NodeType looking = type;
         double px = player.getX(), pz = player.getZ();
         NodeMap.nearestAsync(server, px, pz, looking, RANGE, found -> {
@@ -77,7 +81,7 @@ public class NodeScannerItem extends Item {
     /** Compass direction of an offset. South is +z and east is +x. */
     public static String direction(double dx, double dz) {
         double angle = Math.toDegrees(Math.atan2(-dx, dz));
-        int index = Math.floorMod((int) Math.round(angle / 45.0), 8);
+        int index = Math.floorMod((int) Math.round(angle / COMPASS_STEP), COMPASS.length);
         return COMPASS[index];
     }
 

@@ -22,9 +22,12 @@ import org.jspecify.annotations.Nullable;
 
 /** Claims the 3 by 3 chunks around it for the company of whoever places it. */
 public class ClaimMarkerBlock extends Block {
+    /** Explosion resistance of bedrock: no explosion breaks it. */
+    private static final float UNBREAKABLE_RESISTANCE = 3600000.0F;
+
     public ClaimMarkerBlock(Properties properties) {
         // a marker holds land: it cannot be blown up or pushed, or its claim would be left behind
-        super(properties.explosionResistance(3600000.0F).pushReaction(PushReaction.IMMOVEABLE));
+        super(properties.explosionResistance(UNBREAKABLE_RESISTANCE).pushReaction(PushReaction.IMMOVEABLE));
     }
 
     @Override

@@ -11,6 +11,9 @@ import net.minecraft.world.level.Level;
 
 /** A saved Blueprint. Use it on a block to see where it would stand; use it there again to build it. Sneak and use it in the air to turn it. */
 public class BlueprintItem extends Item {
+    /** Degrees in a quarter turn. */
+    private static final int DEGREES_PER_TURN = 90;
+
     public BlueprintItem(Properties properties) {
         super(properties);
     }
@@ -21,7 +24,7 @@ public class BlueprintItem extends Item {
         if (!player.isShiftKeyDown()) return InteractionResult.PASS;
         if (player instanceof ServerPlayer server) {
             int turns = Blueprints.rotate(server, player.getItemInHand(hand));
-            server.sendOverlayMessage(Component.translatable("siftec.blueprint.turned", turns * 90));
+            server.sendOverlayMessage(Component.translatable("siftec.blueprint.turned", turns * DEGREES_PER_TURN));
         }
         return InteractionResult.SUCCESS;
     }

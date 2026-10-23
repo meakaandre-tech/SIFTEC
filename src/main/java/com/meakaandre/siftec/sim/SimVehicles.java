@@ -29,6 +29,10 @@ import java.util.WeakHashMap;
  */
 public final class SimVehicles {
     private static final Set<VehicleEntity> LOADED = Collections.newSetFromMap(new WeakHashMap<>());
+    /** Ticks between two looks, while the worker is idle, for simulated vehicles that can come back into the world. */
+    private static final int RETURN_TICKS = 5;
+    /** How far above its route point a returning vehicle is put, so it does not start inside the ground. */
+    private static final double RETURN_LIFT = 0.05;
 
     private SimVehicles() {
     }
@@ -72,7 +76,7 @@ public final class SimVehicles {
                 if (!level.isPositionEntityTicking(v.blockPosition())) virtualize(level, v);
             }
         }
-        if (!idle || now % 5 != 0) return;
+        if (!idle || now % RETURN_TICKS != 0) return;
         SimData data = SimData.get(server);
         if (data.stored.vehicles.isEmpty()) return;
         for (SimData.Vehicle v : new ArrayList<>(data.stored.vehicles)) {
@@ -126,7 +130,7 @@ public final class SimVehicles {
         // from the last point it passed it drives the rest of that leg again
         if (v.docked < 0) v.leg = 0;
         e.fromSim(v);
-        e.snapTo(p[0], p[1] + 0.05, p[2], v.yaw, 0);
+        e.snapTo(p[0], p[1] + RETURN_LIFT, p[2], v.yaw, 0);
         data.stored.vehicles.remove(v);
         if (!level.addFreshEntity(e)) {
             data.stored.vehicles.add(v);

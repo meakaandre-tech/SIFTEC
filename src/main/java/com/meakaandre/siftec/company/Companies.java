@@ -41,6 +41,13 @@ import java.util.UUID;
 
 /** Looking companies up, the /company command, and the starting HUB. */
 public final class Companies {
+    /** Longest company name; a longer one is cut. */
+    private static final int MAX_NAME = 32;
+    /** Characters of an unknown member's uuid shown in place of a name. */
+    private static final int SHORT_ID = 8;
+    /** Research whose time is up is finished this often (ticks: once a second). */
+    private static final int RESEARCH_CHECK_TICKS = 20;
+
     private Companies() {
     }
 
@@ -78,7 +85,7 @@ public final class Companies {
         });
         // once a second: finish any research whose time is up
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if (server.getTickCount() % 20 != 0) return;
+            if (server.getTickCount() % RESEARCH_CHECK_TICKS != 0) return;
             long now = server.overworld().getGameTime();
             for (Company company : new ArrayList<>(CompanyData.get(server).companies().values())) {
                 if (company.research.isEmpty() || now < company.researchEnd) continue;
@@ -197,7 +204,7 @@ public final class Companies {
             UUID uuid = UUID.fromString(member);
             ServerPlayer online = server.getPlayerList().getPlayer(uuid);
             if (online != null) return online.getGameProfile().name();
-            return server.services().nameToIdCache().get(uuid).map(NameAndId::name).orElse(member.substring(0, Math.min(8, member.length())));
+            return server.services().nameToIdCache().get(uuid).map(NameAndId::name).orElse(member.substring(0, Math.min(SHORT_ID, member.length())));
         } catch (IllegalArgumentException e) {
             Siftec.LOGGER.debug("SIFTEC: member {} is not a UUID; shown as it is", member, e);
             return member;
@@ -276,7 +283,7 @@ public final class Companies {
 
     private static int rename(CommandSourceStack source, String name) throws CommandSyntaxException {
         Company company = of(source.getPlayerOrException());
-        company.name = name.length() > 32 ? name.substring(0, 32) : name;
+        company.name = name.length() > MAX_NAME ? name.substring(0, MAX_NAME) : name;
         save(source.getServer());
         tell(source.getServer(), company, Component.translatable("siftec.company.renamed", company.name));
         return 1;

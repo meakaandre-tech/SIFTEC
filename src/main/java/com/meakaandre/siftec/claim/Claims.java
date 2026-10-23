@@ -66,6 +66,8 @@ import java.util.Set;
 public final class Claims {
     public static final int HUB_RADIUS = 2, MARKER_RADIUS = 1, HUB_SPACING = 8;
     public static final int HUB_CHUNKS = 25, MARKER_CHUNKS = 9;
+    /** Claim Markers a company may have at Tier 0, and how many more each tier opened adds. */
+    private static final int BASE_MARKERS = 4, MARKERS_PER_TIER = 2;
 
     /** One claimed chunk: who holds it and which block (HUB or marker) made the claim. */
     public static class Claim {
@@ -278,7 +280,7 @@ public final class Claims {
     public static int markerBudget(Company company) {
         int tiers = 0;
         for (int t = 1; t < Milestones.TIERS; t++) if (Milestones.tierOpen(company, t)) tiers = t;
-        return 4 + 2 * tiers;
+        return BASE_MARKERS + MARKERS_PER_TIER * tiers;
     }
 
     /** How many chunks a company may claim in all: one HUB's worth plus a full marker's worth per marker allowed. */

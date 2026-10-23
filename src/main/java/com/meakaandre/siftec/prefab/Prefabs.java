@@ -73,6 +73,14 @@ public final class Prefabs {
     public static final int RANGE = 32;
     /** How many blocks of legs a column may get down to the ground. */
     public static final int MAX_DROP = 6;
+    /** HUB Upgrades there are; after the last the HUB is at {@link Templates#HUB_MAX} while the freighter is docked. */
+    private static final int HUB_UPGRADES = 6;
+    /** Eye height above a player's feet tested against the portal. */
+    private static final double PORTAL_EYE_HEIGHT = 0.9;
+    /** Ticks between two checks of the land rules for a held HUB or Gateway. */
+    private static final int PREVIEW_TICKS = 4;
+    /** Kept off a box's far faces when listing its blocks, so a face on a block boundary takes no extra row. */
+    private static final double BOX_EPSILON = 1e-4;
     /** Parts are set without telling the blocks around, so a bed's two halves never see each other half-built. */
     private static final int FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
     private static final int REMOVE_FLAGS = FLAGS | Block.UPDATE_SUPPRESS_DROPS;
@@ -266,7 +274,7 @@ public final class Prefabs {
         }
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, bounds(spot))) {
             AABB box = entity.getBoundingBox();
-            for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1e-4, box.maxY - 1e-4, box.maxZ - 1e-4))) {
+            for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - BOX_EPSILON, box.maxY - BOX_EPSILON, box.maxZ - BOX_EPSILON))) {
                 if (solid.contains(pos.asLong())) {
                     check.fail("siftec.prefab.entity");
                     break;
@@ -340,8 +348,8 @@ public final class Prefabs {
             for (int i = 1; i <= Templates.GATEWAY_MAX; i++) if (company.has("phase_" + i)) level = i;
             return level;
         }
-        for (int i = 1; i <= 6; i++) if (company.has("hub_upgrade_" + i)) level = i;
-        if (level == 6 && company.lockUntil <= server.overworld().getGameTime()) level = 7;
+        for (int i = 1; i <= HUB_UPGRADES; i++) if (company.has("hub_upgrade_" + i)) level = i;
+        if (level == HUB_UPGRADES && company.lockUntil <= server.overworld().getGameTime()) level = Templates.HUB_MAX;
         return level;
     }
 
@@ -472,7 +480,7 @@ public final class Prefabs {
             // the player's place in the gateway's own frame (x right, y up, z away from the front edge)
             double ox = player.getX() - (hub.anchor.getX() + 0.5), oz = player.getZ() - (hub.anchor.getZ() + 0.5);
             double x = ox * right.getStepX() + oz * right.getStepZ() + 0.5, z = ox * hub.facing.getStepX() + oz * hub.facing.getStepZ() + 0.5;
-            double y = player.getY() + 0.9 - hub.anchor.getY();
+            double y = player.getY() + PORTAL_EYE_HEIGHT - hub.anchor.getY();
             if (!Templates.inPortal(x, y, z) || player.isSpectator()) continue;
             if (!player.hasInfiniteMaterials() && !Companies.of(player).has("phase_5")) {
                 player.sendOverlayMessage(Component.translatable("siftec.sift.closed"));
@@ -686,7 +694,7 @@ public final class Prefabs {
         });
         // the server checks the land rules for whoever holds a HUB or Gateway, and tells their hologram
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if (server.getTickCount() % 4 != 0) return;
+            if (server.getTickCount() % PREVIEW_TICKS != 0) return;
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 ItemStack held = player.getMainHandItem();
                 if (!(held.getItem() instanceof PrefabItem item)) {

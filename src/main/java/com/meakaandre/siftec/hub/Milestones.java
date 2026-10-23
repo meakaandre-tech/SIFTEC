@@ -22,6 +22,8 @@ import java.util.Set;
 /** Every milestone and wormhole phase, read from siftec_content.json (written by tools/gen_assets.py). */
 public final class Milestones {
     public static final int TIERS = 10;
+    /** The tier of a milestone that belongs to no HUB tier (a MAM research node, or one the json gives none). */
+    public static final int NO_TIER = 100;
     private static final Map<String, Milestone> BY_ID = new LinkedHashMap<>();
     private static final List<List<Milestone>> BY_TIER = new ArrayList<>();
     private static final List<Milestone> PHASES = new ArrayList<>();
@@ -90,7 +92,7 @@ public final class Milestones {
                 Milestone base = read(o, nodes.size());
                 List<String> needs = new ArrayList<>();
                 for (JsonElement n : o.getAsJsonArray("needs")) needs.add(n.getAsString());
-                Milestone m = new Milestone(base.id(), 100, base.index(), base.cost(), base.seconds(), base.items(), base.tokens(), o.get("tree").getAsString(), needs);
+                Milestone m = new Milestone(base.id(), NO_TIER, base.index(), base.cost(), base.seconds(), base.items(), base.tokens(), o.get("tree").getAsString(), needs);
                 nodes.add(m);
                 BY_ID.put(m.id(), m);
             }
@@ -116,7 +118,7 @@ public final class Milestones {
         List<String> tokens = new ArrayList<>();
         JsonArray t = o.getAsJsonArray("tokens");
         for (JsonElement i : t) tokens.add(i.getAsString());
-        return new Milestone(o.get("id").getAsString(), o.has("tier") ? o.get("tier").getAsInt() : 100, index, cost, o.get("seconds").getAsInt(), items, tokens);
+        return new Milestone(o.get("id").getAsString(), o.has("tier") ? o.get("tier").getAsInt() : NO_TIER, index, cost, o.get("seconds").getAsInt(), items, tokens);
     }
 
     public static Set<Identifier> removedRecipes() {

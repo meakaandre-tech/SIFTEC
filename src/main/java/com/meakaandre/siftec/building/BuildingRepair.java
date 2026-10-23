@@ -38,6 +38,8 @@ public final class BuildingRepair {
 
     /** Ticks between looks once it has loaded. */
     static final int EVERY = 100;
+    /** How many of the rebuilt blocks a repair names in the log. */
+    private static final int LOGGED_BLOCKS = 6;
     private static final TagKey<Block> MAGNETS = TagKey.create(Registries.BLOCK,
         Identifier.fromNamespaceAndPath("create_new_age", "magnet"));
 
@@ -122,7 +124,7 @@ public final class BuildingRepair {
             Buildings.giveBack(level, at.above(), c.companyId, spilled);
             PowerGrids.dirty();
             List<String> what = new ArrayList<>();
-            for (BlockPos pos : rebuilt.subList(0, Math.min(6, rebuilt.size()))) {
+            for (BlockPos pos : rebuilt.subList(0, Math.min(LOGGED_BLOCKS, rebuilt.size()))) {
                 what.add(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pos).getBlock()).getPath() + "@" + pos.toShortString());
             }
             if (reshape) {

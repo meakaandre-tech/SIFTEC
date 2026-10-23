@@ -45,6 +45,8 @@ import java.util.Locale;
  */
 public class ShopMenu extends ChestMenu {
     private static final int SIZE = 54, PER_PAGE = 45, PREVIOUS = 45, INFO = 49, NEXT = 53;
+    /** Rows of the window. */
+    private static final int ROWS = 6;
     private final SimpleContainer view;
     private final ServerPlayer player;
     /** The company it sells to, looked up by id on every click; and the Shop's controller, which must stay in reach. */
@@ -53,7 +55,7 @@ public class ShopMenu extends ChestMenu {
     private int page;
 
     private ShopMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, String companyId, BlockPos at) {
-        super(MenuType.GENERIC_9x6, id, inventory, view, 6);
+        super(MenuType.GENERIC_9x6, id, inventory, view, ROWS);
         this.view = view;
         this.player = player;
         this.companyId = companyId;

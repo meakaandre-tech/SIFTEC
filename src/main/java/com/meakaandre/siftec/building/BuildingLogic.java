@@ -77,6 +77,18 @@ public final class BuildingLogic {
     public static final float LIFT_RPM = 256;
     /** Items the Smelter puts on its Depot at once (the Depot holds one stack; a few at a time keeps the gaps short). */
     static final int SMELTER_BATCH = 4;
+    /** Crack stages a block goes through as it is broken (Create's Drill and vanilla's both show ten). */
+    private static final int BREAK_STAGES = 10;
+    /** Break time assumed for a miner whose building is unknown, in ticks. */
+    private static final int DEFAULT_BREAK_TICKS = 10;
+    /** The lowest hardness a node is taken to have, so a speed is never worked out from zero. */
+    private static final float MIN_HARDNESS = 0.01f;
+    /** Most raw copper one copper ore drops without Fortune (every other ore drops one). */
+    private static final int RAW_COPPER_MOST = 5;
+    /** Block-breaking ids of miners count down from here, clear of the entity ids players use. */
+    private static final int BREAKER_ID_BASE = -1000;
+    /** How high over the floor of its spot a Portable Miner's drop appears. */
+    private static final double DROP_HEIGHT = 0.1;
 
     private BuildingLogic() {
     }
@@ -335,8 +347,8 @@ public final class BuildingLogic {
         }
         int total = Math.max(1, def.breakTicks());
         c.progress++;
-        int stage = (int) (c.progress * 10 / total);
-        level.destroyBlockProgress(breakerId(c), c.node, stage >= 10 ? -1 : stage);
+        int stage = (int) (c.progress * BREAK_STAGES / total);
+        level.destroyBlockProgress(breakerId(c), c.node, stage >= BREAK_STAGES ? -1 : stage);
         if (c.progress < total) return;
         c.progress = 0;
         mined(level, c, state);
@@ -351,12 +363,12 @@ public final class BuildingLogic {
         if (def.logic() == Logic.PORTABLE_MINER) return item == Items.AIR || !groundFull(level, c, item);
         ItemStack out = c.output.getItem(0);
         // a break gives at most Fortune + 1 times the block's own most (copper ore drops up to 5 raw copper, the rest one)
-        int most = (def.fortune() + 1) * (item == Items.RAW_COPPER ? 5 : 1);
+        int most = (def.fortune() + 1) * (item == Items.RAW_COPPER ? RAW_COPPER_MOST : 1);
         return out.isEmpty() || out.is(item) && out.getCount() + most <= out.getMaxStackSize();
     }
 
     private static int breakerId(ControllerBlockEntity c) {
-        return -1000 - (int) (c.getBlockPos().asLong() & 0x3FFFFFFF);
+        return BREAKER_ID_BASE - (int) (c.getBlockPos().asLong() & 0x3FFFFFFF);
     }
 
     /** The miner a Drill belongs to, if it is the Drill of a miner and points at that miner's node. */
@@ -380,13 +392,13 @@ public final class BuildingLogic {
      */
     public static float breakSpeed(ControllerBlockEntity c, float hardness) {
         BuildingDef def = c.def();
-        int ticks = def == null ? 10 : Math.max(1, def.breakTicks());
-        float h = Math.max(hardness, 0.01f);
-        if (ticks >= 10) {
-            int wait = ticks / 10 - 1;
+        int ticks = def == null ? DEFAULT_BREAK_TICKS : Math.max(1, def.breakTicks());
+        float h = Math.max(hardness, MIN_HARDNESS);
+        if (ticks >= BREAK_STAGES) {
+            int wait = ticks / BREAK_STAGES - 1;
             return wait <= 0 ? h * 1.5f : h / (wait + 0.5f);
         }
-        int step = (10 + ticks - 1) / ticks;
+        int step = (BREAK_STAGES + ticks - 1) / ticks;
         return h * (step + 0.5f);
     }
 
@@ -409,7 +421,7 @@ public final class BuildingLogic {
             if (def.logic() == Logic.PORTABLE_MINER) {
                 BlockPos at = dropSpot(c);
                 if (at == null) continue;
-                ItemEntity entity = new ItemEntity(level, at.getX() + 0.5, at.getY() + 0.1, at.getZ() + 0.5, drop);
+                ItemEntity entity = new ItemEntity(level, at.getX() + 0.5, at.getY() + DROP_HEIGHT, at.getZ() + 0.5, drop);
                 entity.setDeltaMovement(Vec3.ZERO);
                 level.addFreshEntity(entity);
             } else {

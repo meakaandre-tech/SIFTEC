@@ -61,6 +61,20 @@ public final class NodeMap {
     /** Where sulfur caves are looked for: these heights below the cell's ground, and these absolute heights (an ordinary world's caves). */
     private static final int CAVE_DEPTH = 136, CAVE_STEP = 16;
     private static final int[] CAVE_HEIGHTS = {-40, -24, -8, 8, 24, 40};
+    /** The first height looked at below the ground, the least a height stays under it, and how far apart two are. */
+    private static final int CAVE_BELOW_GROUND = 8, CAVE_UNDER_GROUND = 4, CAVE_GAP = 8;
+    /** Cave heights stay this far above the bottom of the world (its bedrock). */
+    private static final int CAVE_ABOVE_BOTTOM = 4;
+    /** How far round a pocket's first hits its middle is looked for, and the step of that finer grid. */
+    private static final int POCKET_REACH = 40, POCKET_STEP = 8;
+    /** A sulfur search looks at most this many cells out. */
+    private static final int SULFUR_MAX_CELLS = 24;
+    /** Random spots tried for a starter node before the cell's nearest point. */
+    private static final int STARTER_ATTEMPTS = 48;
+    /** Land grid points tried at most for a dry spot, and how far (each way) a spot may be nudged off its point. */
+    private static final int LAND_PROBES = 8, NUDGE = 6;
+    /** Chance of an impure and of a pure node near spawn, and how much each changes by far out. */
+    private static final float IMPURE_NEAR = 0.5f, IMPURE_DROP = 0.3f, PURE_NEAR = 0.1f, PURE_RISE = 0.3f;
 
     private static final Map<ResourceKey<Level>, Map<Long, List<Node>>> CACHE = new ConcurrentHashMap<>();
     private static final Map<Long, Optional<Node>> SULFUR = new ConcurrentHashMap<>();
@@ -310,7 +324,7 @@ public final class NodeMap {
         int cz = Math.floorDiv((int) Math.floor(z), CELL);
         boolean cave = type == NodeType.SULFUR;
         // finding a sulfur cave means testing the biome many times per cell, so that search stays closer
-        if (cave) maxCells = Math.min(maxCells, 24);
+        if (cave) maxCells = Math.min(maxCells, SULFUR_MAX_CELLS);
         Node best = null;
         double bestDistance = Double.MAX_VALUE;
         for (int ring = 0; ring <= maxCells; ring++) {
@@ -540,7 +554,7 @@ public final class NodeMap {
         int span = CELL - 2 * MARGIN;
         int baseX = cellX * CELL + MARGIN, baseZ = cellZ * CELL + MARGIN;
         long h = mix(level.getSeed() ^ mix(cellX * 0x9E3779B97F4A7C15L + cellZ * 0xC2B2AE3D27D4EB4FL + 0x57A47E5L));
-        for (int attempt = 0; attempt < 48; attempt++) {
+        for (int attempt = 0; attempt < STARTER_ATTEMPTS; attempt++) {
             int x = baseX + (int) Long.remainderUnsigned(h, span);
             h = mix(h);
             int z = baseZ + (int) Long.remainderUnsigned(h, span);
@@ -567,7 +581,7 @@ public final class NodeMap {
     public static boolean quickVoid(ServerLevel level, int x, int z) {
         SAMPLES.addAndGet(2);
         int min = level.getMinY(), max = level.getMaxY();
-        return Terrain.isVoid(Terrain.biome(level, x, Math.clamp(64, min, max), z))
+        return Terrain.isVoid(Terrain.biome(level, x, Math.clamp(Terrain.SAMPLE_Y, min, max), z))
             && Terrain.isVoid(Terrain.biome(level, x, (min + max) / 2, z));
     }
 
@@ -610,13 +624,13 @@ public final class NodeMap {
         int probes = 0;
         for (int i : order) {
             if ((mask & (1 << i)) == 0) continue;
-            if (++probes > 8) break;
+            if (++probes > LAND_PROBES) break;
             int x = gridX(baseX, span, i), z = gridZ(baseZ, span, i);
             Terrain.Column column = Terrain.column(level, x, z);
             if (column == null || column.water()) continue;
             h = mix(h);
-            int nx = Math.clamp(x + (int) Long.remainderUnsigned(h, 13) - 6, baseX, baseX + span);
-            int nz = Math.clamp(z + (int) Long.remainderUnsigned(h >>> 20, 13) - 6, baseZ, baseZ + span);
+            int nx = Math.clamp(x + (int) Long.remainderUnsigned(h, 2 * NUDGE + 1) - NUDGE, baseX, baseX + span);
+            int nz = Math.clamp(z + (int) Long.remainderUnsigned(h >>> 20, 2 * NUDGE + 1) - NUDGE, baseZ, baseZ + span);
             Terrain.Column nudged = Terrain.column(level, nx, nz);
             if (nudged != null && !nudged.water()) return new Spot(nx, nz, nudged);
             return new Spot(x, z, column);
@@ -667,8 +681,8 @@ public final class NodeMap {
         // the middle of the pocket, on a finer grid at that height
         double fx = 0, fz = 0;
         int n = 0;
-        for (int dx = -40; dx <= 40; dx += 8) {
-            for (int dz = -40; dz <= 40; dz += 8) {
+        for (int dx = -POCKET_REACH; dx <= POCKET_REACH; dx += POCKET_STEP) {
+            for (int dz = -POCKET_REACH; dz <= POCKET_REACH; dz += POCKET_STEP) {
                 SAMPLES.incrementAndGet();
                 if (Terrain.biome(level, cx + dx, y, cz + dz).is(SULFUR_CAVES)) {
                     fx += cx + dx;
@@ -690,11 +704,12 @@ public final class NodeMap {
     }
 
     private static int[] caveHeights(ServerLevel level, int ground) {
-        int min = level.getMinY() + 4;
+        int min = level.getMinY() + CAVE_ABOVE_BOTTOM;
         List<Integer> heights = new ArrayList<>();
-        for (int y = ground - 8; y >= Math.max(min, ground - CAVE_DEPTH); y -= CAVE_STEP) heights.add(y);
+        for (int y = ground - CAVE_BELOW_GROUND; y >= Math.max(min, ground - CAVE_DEPTH); y -= CAVE_STEP) heights.add(y);
         for (int y : CAVE_HEIGHTS) {
-            if (y >= min && y < ground - 4 && heights.stream().noneMatch(o -> Math.abs(o - y) < 8)) heights.add(y);
+            if (y >= min && y < ground - CAVE_UNDER_GROUND && heights.stream().noneMatch(o -> Math.abs(o - y) < CAVE_GAP))
+                heights.add(y);
         }
         return heights.stream().mapToInt(Integer::intValue).toArray();
     }
@@ -709,8 +724,8 @@ public final class NodeMap {
     /** Impure is the common one near spawn, pure the common one far out. */
     private static Purity purity(long h, double distance) {
         float t = (float) Math.clamp((distance - NEAR) / (FAR - NEAR), 0, 1);
-        float impure = 0.5f - 0.3f * t;
-        float pure = 0.1f + 0.3f * t;
+        float impure = IMPURE_NEAR - IMPURE_DROP * t;
+        float pure = PURE_NEAR + PURE_RISE * t;
         float p = (mix(h) >>> 40) / (float) (1 << 24);
         return p < impure ? Purity.IMPURE : p < impure + pure ? Purity.PURE : Purity.NORMAL;
     }

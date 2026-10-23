@@ -56,6 +56,18 @@ public final class NodePlacer {
      * where the node stands.
      */
     private static final int MAX_FILL = 10, MAX_FILL_UNDERGROUND = 4;
+    /** Ticks between two returns of the chunks that waited (for their cell) to the queue. */
+    private static final int REQUEUE_TICKS = 10;
+    /** Chunks taken off the queue in one tick at most, and of those, chunks given nodes at most. */
+    private static final int MOST_POLLED = 512, MOST_PLACED = 8;
+    /** A floor must be this far under the top of the world (or of the Nether's logical height). */
+    private static final int TOP_MARGIN = 3;
+    /** A Nether at most this tall is an ordinary one, with a single lava sea. */
+    private static final int ORDINARY_NETHER_HEIGHT = 256;
+    /** How far up and down from a sulfur pocket's middle a floor is looked for. */
+    private static final int FLOOR_SEARCH = 32;
+    /** A cave pad's cut stops this far under the surface above. */
+    private static final int CAVE_ROOF_GAP = 4;
 
     private record Queued(ResourceKey<Level> dimension, int x, int z) {
     }
@@ -92,14 +104,14 @@ public final class NodePlacer {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             ServerLevel overworld = server.overworld();
             NodeMap.settle(overworld);
-            if (server.getTickCount() % 10 == 0 && !WAITING.isEmpty()) {
+            if (server.getTickCount() % REQUEUE_TICKS == 0 && !WAITING.isEmpty()) {
                 synchronized (QUEUE) {
                     QUEUE.addAll(WAITING);
                 }
                 WAITING.clear();
             }
             int placed = 0;
-            for (int i = 0; i < 512 && placed < 8; i++) {
+            for (int i = 0; i < MOST_POLLED && placed < MOST_PLACED; i++) {
                 Queued next;
                 synchronized (QUEUE) {
                     next = QUEUE.poll();
@@ -224,12 +236,13 @@ public final class NodePlacer {
         if (nether) {
             // every floor in the column that the whole mound can stand on (no lava or drop under its middle)
             List<Integer> floors = new ArrayList<>();
-            int top = Math.min(level.getMaxY() - 3, level.getMinY() + level.dimensionType().logicalHeight() - 3);
+            int top = Math.min(level.getMaxY() - TOP_MARGIN,
+                level.getMinY() + level.dimensionType().logicalHeight() - TOP_MARGIN);
             for (int y = level.getMinY() + 1; y <= top; y++) {
                 if (isFloor(level, pos, node.x(), y, node.z()) && supported(level, pos, node, y, chunkX, chunkZ)) floors.add(y);
             }
             if (floors.isEmpty()) return NO_PLACE;
-            if (level.getHeight() <= 256) {
+            if (level.getHeight() <= ORDINARY_NETHER_HEIGHT) {
                 // an ordinary Nether: the lowest floor above the lava sea, so nodes are on the ground and not up on a ledge
                 for (int y : floors) if (y > level.getSeaLevel()) return y;
                 return floors.getFirst();
@@ -238,8 +251,8 @@ public final class NodePlacer {
             return floors.get((int) Long.remainderUnsigned(hash(node.key(), 7, 11), floors.size()));
         }
         // a sulfur cave: the nearest floor to the pocket's middle that the pad can sit on, not over a drop or lava
-        int min = level.getMinY() + 1, max = level.getMaxY() - 3;
-        for (int d = 0; d <= 32; d++) {
+        int min = level.getMinY() + 1, max = level.getMaxY() - TOP_MARGIN;
+        for (int d = 0; d <= FLOOR_SEARCH; d++) {
             for (int y : d == 0 ? new int[]{node.y()} : new int[]{node.y() - d, node.y() + d}) {
                 if (y < min || y > max) continue;
                 if (isFloor(level, pos, node.x(), y, node.z()) && supported(level, pos, node, y, chunkX, chunkZ)) return y;
@@ -322,7 +335,7 @@ public final class NodePlacer {
                 int out = r <= PAD_RADIUS ? 0 : (int) Math.ceil(r - PAD_RADIUS);
                 if (out > FLARE) continue;
                 // a cave pad never cuts up to the surface: the cut stops a few blocks under the ground above
-                int roof = cave ? level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - 4 : Integer.MAX_VALUE;
+                int roof = cave ? level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - CAVE_ROOF_GAP : Integer.MAX_VALUE;
                 // the pad and the fill below it; the flare starts lower the further out it is
                 int top = height - out;
                 for (int y = top, depth = 0; y > minY && depth < maxFill; y--, depth++) {

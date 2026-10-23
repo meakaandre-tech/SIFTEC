@@ -31,6 +31,14 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
     private static final int MB = 81;
     /** Rotation needed per 100 mB on a normal node: 150 mB a second at 32 RPM. */
     private static final int CYCLE = 426;
+    /** Nitrogen made per {@link #CYCLE}, in mB. */
+    private static final int MB_PER_CYCLE = 100;
+    /** Size of the output tank, in mB. */
+    private static final int TANK_MB = 4000;
+    /** How often the node under it is looked up again, in ticks. */
+    private static final int NODE_RECHECK_TICKS = 40;
+    /** Stress impact per RPM. */
+    private static final float STRESS_IMPACT = 8f;
 
     public SmartFluidTankBehaviour tank;
     private float progress;
@@ -46,7 +54,7 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         super.addBehaviours(behaviours);
-        tank = SmartFluidTankBehaviour.single(this, 4000 * MB).forbidInsertion();
+        tank = SmartFluidTankBehaviour.single(this, TANK_MB * MB).forbidInsertion();
         behaviours.add(tank);
     }
 
@@ -55,7 +63,7 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
         super.tick();
         if (!(level instanceof ServerLevel server)) return;
         if (recheck-- <= 0) {
-            recheck = 40;
+            recheck = NODE_RECHECK_TICKS;
             node = Mining.nodeUnder(server, worldPosition).filter(n -> n.type() == NodeType.NITROGEN);
         }
         float speed = Math.abs(getSpeed());
@@ -69,7 +77,7 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
         progress += speed * node.get().purity().multiplier;
         while (progress >= CYCLE) {
             progress -= CYCLE;
-            if (tank.getPrimaryHandler().insert(new FluidStack(nitrogen.still, 100 * MB)) == 0) {
+            if (tank.getPrimaryHandler().insert(new FluidStack(nitrogen.still, MB_PER_CYCLE * MB)) == 0) {
                 progress = 0;
                 break;
             }
@@ -78,7 +86,7 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
 
     @Override
     public float calculateStressApplied() {
-        lastStressApplied = 8f;
+        lastStressApplied = STRESS_IMPACT;
         return lastStressApplied;
     }
 

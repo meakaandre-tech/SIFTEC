@@ -45,6 +45,8 @@ public class PowerMemory extends SavedData {
     public static final Codec<PowerMemory> CODEC = Entry.CODEC.listOf().xmap(PowerMemory::new, PowerMemory::entries);
     private static final SavedDataType<PowerMemory> TYPE = new SavedDataType<>(Siftec.id("power_memory"), PowerMemory::new, CODEC, null);
     private static final int BOOSTABLE = 1, FUSE = 2, TRIPPED = 4, AWAY = 8;
+    /** Longs in one saved {@link Entry}'s data. */
+    private static final int ENTRY_SIZE = 13;
 
     /** By dimension, by member position. */
     private final Map<String, Long2ObjectOpenHashMap<Remembered>> members = new HashMap<>();
@@ -55,7 +57,7 @@ public class PowerMemory extends SavedData {
     private PowerMemory(List<Entry> entries) {
         for (Entry e : entries) {
             List<Long> d = e.data();
-            if (d.size() < 13) continue;
+            if (d.size() < ENTRY_SIZE) continue;
             Remembered r = new Remembered(this, d.get(0), d.get(1));
             r.capacity = Double.longBitsToDouble(d.get(2));
             r.demand = Double.longBitsToDouble(d.get(3));
@@ -342,8 +344,8 @@ public class PowerMemory extends SavedData {
         @Override
         public double boost() {
             if (tripped || boost <= 0) return 0;
-            if (!away || boost <= 0.1) return boost;
-            if (boostUsed >= boostLeft) return 0.1;
+            if (!away || boost <= PowerMember.UNFED_BOOST) return boost;
+            if (boostUsed >= boostLeft) return PowerMember.UNFED_BOOST;
             boostUsed++;
             owner.setDirty();
             return boost;

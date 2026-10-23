@@ -9,6 +9,8 @@ import org.jspecify.annotations.Nullable;
  */
 public final class Patterns {
     private static final String YELLOW = "minecraft:yellow_concrete", BLACK = "minecraft:black_concrete", WHITE = "minecraft:white_concrete";
+    /** Cells each way across a foundation's top that a pattern paints. */
+    public static final int SIZE = 8;
 
     /** The Arrow (pointing away from the front), the Factory Icon (a FICSIT gear), the Transportation Icon (a truck), the Number (a 1). */
     private static final String[] ARROW = {
@@ -90,7 +92,7 @@ public final class Patterns {
 
         /** What a cell of the top (0 to 7 each way) becomes, or null where the floor stays as it is. */
         public @Nullable String at(int x, int z) {
-            if (x < 0 || x > 7 || z < 0 || z > 7) return null;
+            if (x < 0 || x > SIZE - 1 || z < 0 || z > SIZE - 1) return null;
             return ink.at(x, z);
         }
 

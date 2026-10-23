@@ -72,6 +72,18 @@ public final class TravelersBackpackCompat {
     public static final List<String> TIER_TOKENS = List.of("", "backpack:iron", "backpack:gold", "backpack:diamond", "backpack:netherite");
     /** The mark on the Crafting Upgrade that is the backpack's built-in 2x2 grid. */
     public static final String GRID_KEY = "siftec_grid";
+    /** Storage slots past which Traveler's Backpack draws the extended layout (11 a row, 2 more tank rows). */
+    private static final int EXTENDED_SLOTS = 81;
+    /** Storage slots a row in the extended and the normal layout. */
+    private static final int EXTENDED_ROW = 11, NORMAL_ROW = 9;
+    /** Tank rows the extended layout adds. */
+    private static final int EXTENDED_EXTRA_ROWS = 2;
+    /** Slots read out of a backpack container when trimming it, more than any tier holds. */
+    private static final int TRIM_SLOTS = 512;
+    /** Side of the built-in crafting grid, and of a Crafting Upgrade's. */
+    private static final int BUILT_IN_GRID = 2, UPGRADE_GRID = 3;
+    /** Worn backpacks are brought in line with the company's tier this often (ticks), at this offset in the second. */
+    private static final int SYNC_TICKS = 20, SYNC_PHASE = 7;
     /** While true the once-a-second check skips players, as if they were offline (selftests). */
     static volatile boolean held;
 
@@ -100,7 +112,7 @@ public final class TravelersBackpackCompat {
         ServerPlayerEvents.JOIN.register(TravelersBackpackCompat::sync);
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> sync(newPlayer));
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if (server.getTickCount() % 20 != 7 || held) return;
+            if (server.getTickCount() % SYNC_TICKS != SYNC_PHASE || held) return;
             for (ServerPlayer player : List.copyOf(server.getPlayerList().getPlayers())) sync(player);
         });
         UseItemCallback.EVENT.register((player, level, hand) -> {
@@ -224,8 +236,8 @@ public final class TravelersBackpackCompat {
         stack.set(ModDataComponents.TOOL_SLOTS, tier.getToolSlots());
         if (stack.has(ModDataComponents.RENDER_INFO)) {
             int slots = tier.getStorageSlots();
-            boolean extended = slots > 81;
-            int rows = (int) Math.ceil((double) slots / (extended ? 11 : 9)) + (extended ? 2 : 0);
+            boolean extended = slots > EXTENDED_SLOTS;
+            int rows = (int) Math.ceil((double) slots / (extended ? EXTENDED_ROW : NORMAL_ROW)) + (extended ? EXTENDED_EXTRA_ROWS : 0);
             CompoundTag tag = stack.get(ModDataComponents.RENDER_INFO).compoundTag().copy();
             RenderInfo info = new RenderInfo(tag);
             info.updateCapacity(tier.getTankCapacityPerRow() * rows);
@@ -295,7 +307,7 @@ public final class TravelersBackpackCompat {
     public static int gridSize(Player player) {
         int slot = gridSlot(player);
         if (slot < 0) return 0;
-        return isGrid(upgrades(worn(player)).get(slot)) ? 2 : 3;
+        return isGrid(upgrades(worn(player)).get(slot)) ? BUILT_IN_GRID : UPGRADE_GRID;
     }
 
     /** Gives the worn backpack its built-in grid if it has no crafting grid and a free upgrade slot. */
@@ -423,7 +435,7 @@ public final class TravelersBackpackCompat {
         List<ItemStack> extra = new ArrayList<>();
         ItemContainerContents contents = backpack.get(type);
         if (contents == null) return extra;
-        NonNullList<ItemStack> all = NonNullList.withSize(512, ItemStack.EMPTY);
+        NonNullList<ItemStack> all = NonNullList.withSize(TRIM_SLOTS, ItemStack.EMPTY);
         contents.copyInto(all);
         int last = 0;
         for (int i = 0; i < all.size(); i++) if (!all.get(i).isEmpty()) last = i + 1;

@@ -255,21 +255,23 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         public boolean dry;
         /** A stop (its index) at a Truck Station whose chunk ticks: the server thread loads or unloads it there. -1: none. */
         public int dockPending = -1;
+        /** Numbers in {@link #route} a point takes (x, y, z). */
+        static final int POINT_SIZE = 3;
 
         public int points() {
-            return route.size() / 3;
+            return route.size() / POINT_SIZE;
         }
 
         public double px(int i) {
-            return route.get(i * 3);
+            return route.get(i * POINT_SIZE);
         }
 
         public double py(int i) {
-            return route.get(i * 3 + 1);
+            return route.get(i * POINT_SIZE + 1);
         }
 
         public double pz(int i) {
-            return route.get(i * 3 + 2);
+            return route.get(i * POINT_SIZE + 2);
         }
     }
 

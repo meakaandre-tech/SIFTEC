@@ -30,12 +30,14 @@ import java.util.Map;
  */
 public class OutfitMenu extends ChestMenu {
     private static final int SIZE = 27, HELMETS = 0, TRIMS = 18;
+    /** Slots in a row of the window, and its rows. */
+    private static final int ROW = 9, ROWS = 3;
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final Company company;
 
     private OutfitMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company) {
-        super(MenuType.GENERIC_9x3, id, inventory, view, 3);
+        super(MenuType.GENERIC_9x3, id, inventory, view, ROWS);
         this.view = view;
         this.player = player;
         this.company = company;
@@ -57,7 +59,7 @@ public class OutfitMenu extends ChestMenu {
         view.setItem(HELMETS, SinkMenu.button(Items.IRON_HELMET, Component.translatable("siftec.outfit.helmet_own"), List.of()));
         int k = 1;
         for (String id : Shop.helmets().keySet()) {
-            if (k >= 9) break;
+            if (k >= ROW) break;
             Shop.Entry e = Shop.entry("helmet_" + id);
             boolean open = Shop.owns(player, company, "helmet:" + id);
             view.setItem(HELMETS + k++, SinkMenu.button(open && e != null ? ShopMenu.icon(e) : Items.BARRIER, Component.translatable("siftec.shop.entry.helmet_" + id),
@@ -66,7 +68,7 @@ public class OutfitMenu extends ChestMenu {
         view.setItem(TRIMS, SinkMenu.button(Items.SMITHING_TABLE, Component.translatable("siftec.outfit.trim_none"), List.of()));
         k = 1;
         for (Map.Entry<String, String[]> t : Shop.trims().entrySet()) {
-            if (k >= 9) break;
+            if (k >= ROW) break;
             boolean open = Shop.owns(player, company, "trim:" + t.getKey());
             view.setItem(TRIMS + k++, SinkMenu.button(open ? item(t.getValue()[0] + "_armor_trim_smithing_template") : Items.BARRIER,
                 Component.translatable("siftec.shop.entry.trim_" + t.getKey()),
@@ -76,7 +78,7 @@ public class OutfitMenu extends ChestMenu {
 
     private void press(int slot) {
         List<String> helmets = new ArrayList<>(Shop.helmets().keySet()), trims = new ArrayList<>(Shop.trims().keySet());
-        if (slot >= HELMETS && slot < HELMETS + 9) {
+        if (slot >= HELMETS && slot < HELMETS + ROW) {
             String id = slot == HELMETS ? "" : slot - HELMETS - 1 < helmets.size() ? helmets.get(slot - HELMETS - 1) : null;
             if (id == null) return;
             if (!id.isEmpty() && !Shop.owns(player, company, "helmet:" + id)) {
@@ -84,7 +86,7 @@ public class OutfitMenu extends ChestMenu {
                 return;
             }
             player.sendOverlayMessage(Component.translatable(Outfits.helmet(player, id) ? "siftec.outfit.helmet_done" : "siftec.outfit.no_helmet"));
-        } else if (slot >= TRIMS && slot < TRIMS + 9) {
+        } else if (slot >= TRIMS && slot < TRIMS + ROW) {
             String id = slot == TRIMS ? "" : slot - TRIMS - 1 < trims.size() ? trims.get(slot - TRIMS - 1) : null;
             if (id == null) return;
             if (!id.isEmpty() && !Shop.owns(player, company, "trim:" + id)) {

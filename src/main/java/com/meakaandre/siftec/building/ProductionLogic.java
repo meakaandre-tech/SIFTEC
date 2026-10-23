@@ -64,7 +64,11 @@ import java.util.List;
  * </ul>
  */
 public final class ProductionLogic {
-    private static final long MB = FluidConstants.BUCKET / 1000;
+    static final long MB = FluidConstants.BUCKET / 1000;
+    /** A Create Basin's item slots: inputs are 0 to 8, outputs 9 to 17. */
+    static final int BASIN_INPUT_SLOTS = 9, BASIN_SLOTS = 18;
+    /** Burn ticks a powered building keeps its Blaze Burners at: well over Create's 125 under which they fade. */
+    private static final int BURNER_FUEL_TICKS = 400;
 
     private ProductionLogic() {
     }
@@ -92,7 +96,7 @@ public final class ProductionLogic {
             BlazeBurnerAccessor fuel = (BlazeBurnerAccessor) burner;
             fuel.siftec$setActiveFuel(BlazeBurnerBlockEntity.FuelType.NORMAL);
             // well over the 125 ticks under which it fades, so the Basin always sees it heated while the power is on
-            fuel.siftec$setRemainingBurnTime(400);
+            fuel.siftec$setRemainingBurnTime(BURNER_FUEL_TICKS);
             burner.updateBlockState();
         }
     }
@@ -107,7 +111,7 @@ public final class ProductionLogic {
         for (BlockPos pos : basins) {
             if (!(level.getBlockEntity(pos) instanceof BasinBlockEntity basin)) continue;
             Container inv = basin.itemCapability;
-            int to = Math.min(outputs ? 18 : 9, inv.getContainerSize());
+            int to = Math.min(outputs ? BASIN_SLOTS : BASIN_INPUT_SLOTS, inv.getContainerSize());
             for (int i = 0; i < to; i++) if (!inv.getItem(i).isEmpty()) return true;
             if (basin.inputTank != null && !basin.inputTank.isEmpty()) return true;
         }
@@ -226,7 +230,7 @@ public final class ProductionLogic {
     /** Takes one item matching the cost out of the Basin's input slots (0 to 8), or its output slots (9 to 17). */
     static ItemStack takeFromBasin(BasinBlockEntity basin, Milestone.Cost cost, boolean output) {
         Container inv = basin.itemCapability;
-        int from = output ? 9 : 0, to = output ? Math.min(18, inv.getContainerSize()) : 9;
+        int from = output ? BASIN_INPUT_SLOTS : 0, to = output ? Math.min(BASIN_SLOTS, inv.getContainerSize()) : BASIN_INPUT_SLOTS;
         for (int i = from; i < to; i++) {
             ItemStack s = inv.getItem(i);
             if (s.isEmpty() || !cost.matches(s)) continue;
@@ -402,7 +406,7 @@ public final class ProductionLogic {
     /** An item taken out of the Basin that could not be used goes back into its input slots. */
     static void giveBack(BasinBlockEntity basin, ItemStack stack) {
         Container inv = basin.itemCapability;
-        for (int i = 0; i < 9 && !stack.isEmpty(); i++) {
+        for (int i = 0; i < BASIN_INPUT_SLOTS && !stack.isEmpty(); i++) {
             ItemStack s = inv.getItem(i);
             if (s.isEmpty()) {
                 inv.setItem(i, stack.copy());

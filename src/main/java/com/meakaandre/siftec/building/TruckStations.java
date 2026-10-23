@@ -40,6 +40,8 @@ import java.util.Set;
 public final class TruckStations {
     /** How close (blocks, level) a vehicle has to come to a station's dock to count as at it. */
     public static final double DOCK_RANGE = 3.5;
+    /** How many blocks in front of the station's front edge a vehicle stops. */
+    private static final int DOCK_DISTANCE = 3;
 
     private static final Map<ResourceKey<Level>, Set<BlockPos>> KNOWN = new HashMap<>();
 
@@ -70,7 +72,7 @@ public final class TruckStations {
     public static @Nullable Vec3 dock(ControllerBlockEntity c) {
         Placement p = c.placement();
         if (p == null) return null;
-        BlockPos at = p.at(0, 0, -3);
+        BlockPos at = p.at(0, 0, -DOCK_DISTANCE);
         return new Vec3(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
     }
 

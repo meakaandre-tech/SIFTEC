@@ -35,6 +35,9 @@ import java.util.Map;
  * loaded chunks are looked at each tick (the nodes are kept by chunk), however many the world has.
  */
 public final class NodeRegrowth {
+    /** Ticks between two looks at who wears the goggles. */
+    private static final int GOGGLES_TICKS = 5;
+
     private NodeRegrowth() {
     }
 
@@ -112,7 +115,7 @@ public final class NodeRegrowth {
                 }
             }
         }
-        if (server.getTickCount() % 5 == 0) goggles(server);
+        if (server.getTickCount() % GOGGLES_TICKS == 0) goggles(server);
     }
 
     /**

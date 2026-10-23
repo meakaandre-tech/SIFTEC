@@ -22,6 +22,8 @@ import java.util.Set;
  */
 public final class SiftGate {
     public static final ResourceKey<Level> SIFT = ResourceKey.create(Registries.DIMENSION, Identifier.fromNamespaceAndPath("the_sift", "the_sift"));
+    /** Height the player arrives at when The Sift has no ground under them. */
+    private static final int NO_GROUND_Y = 100;
 
     private SiftGate() {
     }
@@ -61,7 +63,7 @@ public final class SiftGate {
         int x = player.getBlockX(), z = player.getBlockZ();
         sift.getChunk(x >> 4, z >> 4);
         int y = sift.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + 1;
-        if (y <= sift.getMinY() + 1) y = 100;
+        if (y <= sift.getMinY() + 1) y = NO_GROUND_Y;
         player.teleportTo(sift, x + 0.5, y, z + 0.5, Set.of(), player.getYRot(), player.getXRot(), true);
     }
 }

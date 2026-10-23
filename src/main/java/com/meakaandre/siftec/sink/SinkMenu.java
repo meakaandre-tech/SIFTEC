@@ -38,6 +38,12 @@ import java.util.function.BooleanSupplier;
  */
 public class SinkMenu extends ChestMenu {
     private static final int SIZE = 27, INFO = 11, PRINT = 13, STATUS = 15;
+    /** Rows of the window. */
+    private static final int ROWS = 3;
+    /** Marks in the progress bar to the next coupon. */
+    private static final int BAR = 20;
+    /** Ticks between two refreshes of the open window. */
+    private static final int REFRESH_TICKS = 20;
     private final SimpleContainer view;
     private final ServerPlayer player;
     /** The company whose points it shows (looked up by id on every refresh and click, so a fold is followed). */
@@ -51,7 +57,7 @@ public class SinkMenu extends ChestMenu {
 
     private SinkMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, String companyId, BlockPos at, boolean operator,
                      BooleanSupplier powered) {
-        super(MenuType.GENERIC_9x3, id, inventory, view, 3);
+        super(MenuType.GENERIC_9x3, id, inventory, view, ROWS);
         this.view = view;
         this.player = player;
         this.companyId = companyId;
@@ -90,8 +96,8 @@ public class SinkMenu extends ChestMenu {
 
     /** "####------" for how far along to the next coupon. */
     static String bar(long have, long need) {
-        int filled = need <= 0 ? 20 : (int) Math.min(20, have * 20 / need);
-        return "|".repeat(filled) + ".".repeat(20 - filled);
+        int filled = need <= 0 ? BAR : (int) Math.min(BAR, have * BAR / need);
+        return "|".repeat(filled) + ".".repeat(BAR - filled);
     }
 
     private void refresh() {
@@ -145,7 +151,7 @@ public class SinkMenu extends ChestMenu {
 
     @Override
     public void broadcastChanges() {
-        if (++ticks % 20 == 0) refresh();
+        if (++ticks % REFRESH_TICKS == 0) refresh();
         super.broadcastChanges();
     }
 

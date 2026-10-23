@@ -34,6 +34,13 @@ import java.util.function.Supplier;
 
 /** Registers the pack's items: equipment, parts, foods and the guide's building stand-ins. */
 public class ModItems {
+    /** How many of one MAM inhaler, or of one preserve, a stack holds. */
+    private static final int INHALER_STACK = 16, PRESERVE_STACK = 16;
+    /** The Elytra Backpack's durability: a vanilla Elytra's. */
+    private static final int ELYTRA_BACKPACK_DURABILITY = 432;
+    /** What a preserve feeds: hunger points and saturation modifier. */
+    private static final int PRESERVE_NUTRITION = 6;
+    private static final float PRESERVE_SATURATION = 0.6f;
     public static final Supplier<NodeScannerItem> NODE_SCANNER = item("node_scanner", properties -> new NodeScannerItem(properties.stacksTo(1)));
     public static final Supplier<ObjectScannerItem> OBJECT_SCANNER = item("object_scanner", properties -> new ObjectScannerItem(properties.stacksTo(1)));
     public static final Supplier<GypsumItem> GYPSUM = item("gypsum", GypsumItem::new);
@@ -60,16 +67,16 @@ public class ModItems {
     public static final Supplier<Item> URANIUM = item("uranium", Item::new);
     /** The MAM's inhalers (item/MamItems.java): Protein (Alien Megafauna), Vitamin and Therapeutic (Mycelia), Nutritional (Nutrients). */
     public static final Supplier<Item> PROTEIN_INHALER = item("protein_inhaler",
-        properties -> new MamItems.InhalerItem(MamItems.Inhaler.PROTEIN, properties.stacksTo(16)));
+        properties -> new MamItems.InhalerItem(MamItems.Inhaler.PROTEIN, properties.stacksTo(INHALER_STACK)));
     public static final Supplier<Item> VITAMIN_INHALER = item("vitamin_inhaler",
-        properties -> new MamItems.InhalerItem(MamItems.Inhaler.VITAMIN, properties.stacksTo(16)));
+        properties -> new MamItems.InhalerItem(MamItems.Inhaler.VITAMIN, properties.stacksTo(INHALER_STACK)));
     public static final Supplier<Item> THERAPEUTIC_INHALER = item("therapeutic_inhaler",
-        properties -> new MamItems.InhalerItem(MamItems.Inhaler.THERAPEUTIC, properties.stacksTo(16)));
+        properties -> new MamItems.InhalerItem(MamItems.Inhaler.THERAPEUTIC, properties.stacksTo(INHALER_STACK)));
     public static final Supplier<Item> NUTRITIONAL_INHALER = item("nutritional_inhaler",
-        properties -> new MamItems.InhalerItem(MamItems.Inhaler.NUTRITIONAL, properties.stacksTo(16)));
+        properties -> new MamItems.InhalerItem(MamItems.Inhaler.NUTRITIONAL, properties.stacksTo(INHALER_STACK)));
     /** An Elytra and a Copper Backtank in one chest item (MAM, Mycelia): glides, and holds Create's backtank air. */
     public static final Supplier<Item> ELYTRA_BACKPACK = item("elytra_backpack", properties -> new MamItems.ElytraBackpackItem(
-        properties.stacksTo(1).durability(432).equippable(EquipmentSlot.CHEST)
+        properties.stacksTo(1).durability(ELYTRA_BACKPACK_DURABILITY).equippable(EquipmentSlot.CHEST)
             .component(DataComponents.GLIDER, Unit.INSTANCE)
             .component(AllDataComponents.BACKTANK_AIR, 0)));
 
@@ -134,8 +141,9 @@ public class ModItems {
 
     public static void register() {
         for (Map.Entry<String, Food.Intrinsic> preserve : Food.PRESERVES.entrySet()) {
-            item(preserve.getKey(), properties -> new PreserveItem(preserve.getValue(), properties.stacksTo(16)
-                .food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.6f).alwaysEdible().build())));
+            item(preserve.getKey(), properties -> new PreserveItem(preserve.getValue(), properties.stacksTo(PRESERVE_STACK)
+                .food(new FoodProperties.Builder().nutrition(PRESERVE_NUTRITION).saturationModifier(PRESERVE_SATURATION)
+                    .alwaysEdible().build())));
         }
         for (JsonElement entry : Milestones.raw().getAsJsonArray("parts")) {
             JsonObject part = entry.getAsJsonObject();

@@ -16,6 +16,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(value = BoilerData.class, remap = false)
 public abstract class BoilerWaterMixin implements BoilerWater {
+    /** Create's highest boiler heat level. */
+    @Unique
+    private static final int MAX_HEAT_LEVEL = 18;
+    /** Slack added before flooring, so a supply a hair under a whole level still counts it. */
+    @Unique
+    private static final float LEVEL_SLACK = 0.05f;
+
     @Shadow
     public float waterSupply;
 
@@ -36,13 +43,13 @@ public abstract class BoilerWaterMixin implements BoilerWater {
     private void siftec$satisfactoryWater(CallbackInfoReturnable<Integer> cir) {
         if (siftec$perLevel < 0) return;
         if (siftec$perLevel == 0) {
-            cir.setReturnValue(18);
+            cir.setReturnValue(MAX_HEAT_LEVEL);
             return;
         }
         if (Float.isInfinite(siftec$perLevel)) {
             cir.setReturnValue(0);
             return;
         }
-        cir.setReturnValue(Math.min(18, (int) Math.floor(waterSupply / siftec$perLevel + 0.05f)));
+        cir.setReturnValue(Math.min(MAX_HEAT_LEVEL, (int) Math.floor(waterSupply / siftec$perLevel + LEVEL_SLACK)));
     }
 }

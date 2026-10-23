@@ -31,6 +31,8 @@ import java.util.List;
 /** The Equipment Workshop window: one button per thing the company can build. Run by the server, like the HUB. */
 public class WorkshopMenu extends ChestMenu {
     private static final int SIZE = 54;
+    /** Rows of the chest window. */
+    private static final int ROWS = 6;
     private final SimpleContainer view;
     private final ServerPlayer player;
     /** The company it builds for, looked up by id on every click; and the Workshop's controller, which must stay in reach. */
@@ -39,7 +41,7 @@ public class WorkshopMenu extends ChestMenu {
     private final List<Milestones.Build> shown = new ArrayList<>();
 
     private WorkshopMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, String companyId, BlockPos at) {
-        super(MenuType.GENERIC_9x6, id, inventory, view, 6);
+        super(MenuType.GENERIC_9x6, id, inventory, view, ROWS);
         this.view = view;
         this.player = player;
         this.companyId = companyId;

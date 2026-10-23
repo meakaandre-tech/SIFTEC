@@ -48,6 +48,12 @@ public class HubMenu extends AbstractContainerMenu {
     /** The "tier" that stands for the wormhole phases in a button id. */
     public static final int PHASES = Milestones.TIERS;
     private static final double REACH = 8.0;
+    /** Ticks between two syncs of the open window. */
+    private static final int SYNC_TICKS = 10;
+    /** Seconds in a minute, for the clock. */
+    private static final int SECONDS_PER_MINUTE = 60;
+    /** Seconds under this get a leading zero on the clock. */
+    private static final int TWO_DIGITS = 10;
 
     private final @Nullable ServerPlayer player;
     private final @Nullable Company company;
@@ -129,7 +135,8 @@ public class HubMenu extends AbstractContainerMenu {
 
     public static String clock(long ticks) {
         long seconds = (ticks + 19) / 20;
-        return seconds / 60 + ":" + (seconds % 60 < 10 ? "0" : "") + seconds % 60;
+        return seconds / SECONDS_PER_MINUTE + ":" + (seconds % SECONDS_PER_MINUTE < TWO_DIGITS ? "0" : "")
+            + seconds % SECONDS_PER_MINUTE;
     }
 
     @Override
@@ -207,7 +214,7 @@ public class HubMenu extends AbstractContainerMenu {
     public void broadcastChanges() {
         super.broadcastChanges();
         // payments by belt or by other members and the freighter's timer change while the window is open
-        if (player != null && ++ticks % 10 == 0) sync(false);
+        if (player != null && ++ticks % SYNC_TICKS == 0) sync(false);
     }
 
     // the menu has no slots: nothing can be put in, taken out or shift-clicked

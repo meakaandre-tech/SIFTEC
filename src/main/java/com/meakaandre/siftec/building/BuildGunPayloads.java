@@ -20,6 +20,8 @@ public final class BuildGunPayloads {
      */
     public record Select(String building, boolean dismantle, boolean hasSpot, BlockPos anchor, int facing, boolean flip) implements CustomPacketPayload {
         public static final Type<Select> TYPE = new Type<>(Siftec.id("build_gun_select"));
+        /** Longest building id a client may send. */
+        private static final int MAX_ID_LENGTH = 64;
         public static final StreamCodec<RegistryFriendlyByteBuf, Select> STREAM_CODEC = StreamCodec.of(
             (buf, p) -> {
                 buf.writeUtf(p.building);
@@ -29,7 +31,7 @@ public final class BuildGunPayloads {
                 buf.writeVarInt(p.facing);
                 buf.writeBoolean(p.flip);
             },
-            buf -> new Select(buf.readUtf(64), buf.readBoolean(), buf.readBoolean(), buf.readBlockPos(), buf.readVarInt() & 3, buf.readBoolean()));
+            buf -> new Select(buf.readUtf(MAX_ID_LENGTH), buf.readBoolean(), buf.readBoolean(), buf.readBlockPos(), buf.readVarInt() & 3, buf.readBoolean()));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

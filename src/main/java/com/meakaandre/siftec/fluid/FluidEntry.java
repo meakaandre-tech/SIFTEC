@@ -21,6 +21,11 @@ import net.minecraft.world.level.material.FluidState;
 
 /** One custom fluid: its still and flowing forms, block and bucket. Built on Create Fly's FlowableFluid. */
 public class FluidEntry {
+    /** How it spreads: levels lost per block, how far it looks for a slope, ticks between spreads. */
+    private static final int DROP_OFF = 2, SLOPE_FIND_DISTANCE = 3, TICK_DELAY = 20;
+    private static final float EXPLOSION_RESISTANCE = 100f;
+    /** A source block's amount: a full block, as vanilla's fluids count it. */
+    private static final int SOURCE_AMOUNT = 8;
     public final String id;
     public final int color;
     public final FlowableFluid flowing = new Flowing(this);
@@ -68,17 +73,17 @@ public class FluidEntry {
 
         @Override
         public int getDropOff(LevelReader world) {
-            return 2;
+            return DROP_OFF;
         }
 
         @Override
         public int getSlopeFindDistance(LevelReader world) {
-            return 3;
+            return SLOPE_FIND_DISTANCE;
         }
 
         @Override
         public int getTickDelay(LevelReader world) {
-            return 20;
+            return TICK_DELAY;
         }
 
         @Override
@@ -93,7 +98,7 @@ public class FluidEntry {
 
         @Override
         protected float getExplosionResistance() {
-            return 100f;
+            return EXPLOSION_RESISTANCE;
         }
 
         @Override
@@ -130,7 +135,7 @@ public class FluidEntry {
 
         @Override
         public int getAmount(FluidState state) {
-            return 8;
+            return SOURCE_AMOUNT;
         }
 
         @Override

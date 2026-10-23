@@ -52,6 +52,22 @@ import java.util.function.Predicate;
 public final class Equipment {
     /** What a charged Xeno-Zapper jolt does (Satisfactory's zapper does little but stun). */
     private static final float ZAPPER_DAMAGE = 4f;
+    /** Swing charge the Xeno-Zapper needs to jolt. */
+    private static final float ZAPPER_CHARGE = 0.9f;
+    /** How long a jolt stuns (ticks), and the slowness level it stuns with. */
+    private static final int ZAPPER_STUN_TICKS = 40, ZAPPER_SLOWNESS = 3;
+    /** Length of the effects worn equipment keeps topping up (ticks); outlasts the time between top-ups. */
+    private static final int WORN_EFFECT_TICKS = 40;
+    /** A safe fall's slow falling is renewed once less than this is left (ticks). */
+    private static final int SAFE_FALL_RENEW_TICKS = 20;
+    /** Worn equipment is checked this often per player (ticks). */
+    private static final int WORN_CHECK_TICKS = 10;
+    /** Fall distance (blocks) past which a worn Parachute opens. */
+    private static final int PARACHUTE_FALL = 3;
+    /** Thrust a creative player's jetpack is filled with (ticks). */
+    private static final int CREATIVE_JET_TICKS = 1200;
+    /** Thrust stops when the client has not repeated itself for this long (ticks); it repeats twice a second. */
+    private static final int THRUST_TIMEOUT_TICKS = 15;
     /** How close a turning pole has to be for the Hover Pack. */
     public static final double HOVER_RANGE = 32;
     /** One filter lasts this long while the mask or suit is actually stopping something. */
@@ -71,7 +87,7 @@ public final class Equipment {
     /** Slow falling from now until the player is on the ground (or in water, or flying). */
     public static void safeFall(ServerPlayer player) {
         SAFE_FALL.add(player.getUUID());
-        player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, true, false, false));
+        player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, WORN_EFFECT_TICKS, 0, true, false, false));
     }
 
     private static void tickSafeFall(MinecraftServer server) {
@@ -83,8 +99,8 @@ public final class Equipment {
                 continue;
             }
             player.resetFallDistance();
-            if (!player.hasEffect(MobEffects.SLOW_FALLING) || player.getEffect(MobEffects.SLOW_FALLING).getDuration() < 20) {
-                player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, true, false, false));
+            if (!player.hasEffect(MobEffects.SLOW_FALLING) || player.getEffect(MobEffects.SLOW_FALLING).getDuration() < SAFE_FALL_RENEW_TICKS) {
+                player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, WORN_EFFECT_TICKS, 0, true, false, false));
             }
         }
     }
@@ -119,10 +135,10 @@ public final class Equipment {
             if (!player.getItemInHand(hand).is(ModItems.XENO_ZAPPER.get()) || !(entity instanceof LivingEntity living)) {
                 return InteractionResult.PASS;
             }
-            if (player.getAttackStrengthScale(0.5f) < 0.9f) return InteractionResult.PASS;
+            if (player.getAttackStrengthScale(0.5f) < ZAPPER_CHARGE) return InteractionResult.PASS;
             if (living.hurtServer(server, server.damageSources().playerAttack(player), ZAPPER_DAMAGE)) {
-                living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 3));
-                living.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 1));
+                living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, ZAPPER_STUN_TICKS, ZAPPER_SLOWNESS));
+                living.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, ZAPPER_STUN_TICKS, 1));
                 server.playSound(null, living.blockPosition(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.8f, 1.6f);
             }
             return InteractionResult.PASS;
@@ -184,7 +200,7 @@ public final class Equipment {
     /** Starts a new fill of the jetpack from the first fuel carried (inventory or backpack). False when there is none. */
     public static boolean refuel(ServerPlayer player) {
         if (player.hasInfiniteMaterials()) {
-            player.setAttached(JET_TICKS, 1200);
+            player.setAttached(JET_TICKS, CREATIVE_JET_TICKS);
             return true;
         }
         for (String[] fuel : JET_FUEL) {
@@ -218,7 +234,7 @@ public final class Equipment {
             Map.Entry<UUID, Integer> entry = it.next();
             ServerPlayer player = server.getPlayerList().getPlayer(entry.getKey());
             // the client repeats itself twice a second while the key is held; silence means it stopped
-            if (player == null || server.getTickCount() - entry.getValue() > 15 || !wearing(player, EquipmentSlot.CHEST, ModItems.JETPACK.get())) {
+            if (player == null || server.getTickCount() - entry.getValue() > THRUST_TIMEOUT_TICKS || !wearing(player, EquipmentSlot.CHEST, ModItems.JETPACK.get())) {
                 it.remove();
                 continue;
             }
@@ -243,13 +259,13 @@ public final class Equipment {
         tickSafeFall(server);
         Blueprints.tick(server);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            if ((server.getTickCount() + player.getId()) % 10 != 0) continue;
+            if ((server.getTickCount() + player.getId()) % WORN_CHECK_TICKS != 0) continue;
             if (wearing(player, EquipmentSlot.FEET, ModItems.BLADE_RUNNERS.get())) {
-                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 1, true, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 1, true, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, WORN_EFFECT_TICKS, 1, true, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, WORN_EFFECT_TICKS, 1, true, false, false));
             }
-            if (wearing(player, EquipmentSlot.CHEST, ModItems.PARACHUTE.get()) && !player.onGround() && player.fallDistance > 3) {
-                player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, true, false, false));
+            if (wearing(player, EquipmentSlot.CHEST, ModItems.PARACHUTE.get()) && !player.onGround() && player.fallDistance > PARACHUTE_FALL) {
+                player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, WORN_EFFECT_TICKS, 0, true, false, false));
             }
             if (wearing(player, EquipmentSlot.HEAD, ModItems.GAS_MASK.get()) && (player.hasEffect(MobEffects.POISON) || player.hasEffect(MobEffects.NAUSEA))
                 && filtered(player, MASK_UNTIL, ModItems.PARTS.get("gas_filter"))) {

@@ -57,6 +57,17 @@ import java.util.Optional;
  * curve for the recipe: from its least to its most over each cycle ({@link #demand}).
  */
 public final class Processors {
+    /** Blocks over the crusher's gap that the Particle Accelerator's column reaches, and crushed results are looked for. */
+    private static final int COLUMN_HEIGHT = 3;
+    /** How far either side of the block centre the column reaches horizontally. */
+    private static final double COLUMN_HALF_WIDTH = 0.45;
+    /** How much wider than the gap's column crushed results are looked for. */
+    private static final double CRUSHED_SEARCH_INFLATE = 0.6;
+    /** Where over the fan's block a Core is let go, and how fast it starts upward. */
+    private static final double LAUNCH_HEIGHT = 1.05, LAUNCH_SPEED = 0.1;
+    /** The fan's haunting takes this fraction (one in so many) of the recipe's time. */
+    private static final int HAUNT_SHARE = 4;
+
     private Processors() {
     }
 
@@ -194,7 +205,7 @@ public final class Processors {
             if (!on.is(ProcessorRecipe.item(s.on()))) continue;
             if (s.apply().matches(new ItemStack(cellItem()))) return c.carrier.is(cellItem());
             Container inv = basin.itemCapability;
-            for (int i = 0; i < 9; i++) if (s.apply().matches(inv.getItem(i))) return true;
+            for (int i = 0; i < ProductionLogic.BASIN_INPUT_SLOTS; i++) if (s.apply().matches(inv.getItem(i))) return true;
             return false;
         }
         return false;
@@ -206,7 +217,7 @@ public final class Processors {
         Container inv = basin.itemCapability;
         for (Milestone.Cost cost : r.inputs()) {
             boolean found = false;
-            for (int i = 0; i < 9 && !found; i++) found = cost.matches(inv.getItem(i));
+            for (int i = 0; i < ProductionLogic.BASIN_INPUT_SLOTS && !found; i++) found = cost.matches(inv.getItem(i));
             if (!found) return false;
         }
         return r.fluidIn() == null || basin.inputTank != null && !basin.inputTank.isEmpty();
@@ -214,7 +225,8 @@ public final class Processors {
 
     private static boolean basinHolds(BasinBlockEntity basin, Item item, boolean output) {
         Container inv = basin.itemCapability;
-        int from = output ? 9 : 0, to = output ? Math.min(18, inv.getContainerSize()) : 9;
+        int from = output ? ProductionLogic.BASIN_INPUT_SLOTS : 0,
+            to = output ? Math.min(ProductionLogic.BASIN_SLOTS, inv.getContainerSize()) : ProductionLogic.BASIN_INPUT_SLOTS;
         for (int i = from; i < to; i++) if (inv.getItem(i).is(item)) return true;
         return false;
     }
@@ -246,7 +258,8 @@ public final class Processors {
 
     /** The air over the fan, up to over the wheels. */
     private static AABB column(BlockPos fan, BlockPos gap) {
-        return new AABB(fan.above()).minmax(new AABB(gap.above(3))).inflate(0.45, 0, 0.45);
+        return new AABB(fan.above()).minmax(new AABB(gap.above(COLUMN_HEIGHT)))
+            .inflate(COLUMN_HALF_WIDTH, 0, COLUMN_HALF_WIDTH);
     }
 
     private static void accelerate(ServerLevel level, ControllerBlockEntity c, ProcessorRecipe r, BasinBlockEntity basin) {
@@ -266,7 +279,8 @@ public final class Processors {
         // what the wheels crushed comes out over them, marked as theirs
         boolean out = false;
         int results = 0;
-        for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(gap).expandTowards(0, 3, 0).inflate(0.6))) {
+        for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(gap)
+            .expandTowards(0, COLUMN_HEIGHT, 0).inflate(CRUSHED_SEARCH_INFLATE))) {
             Optional<BlockPos> from = AllSynchedDatas.BYPASS_CRUSHING_WHEEL.get(e);
             if (from == null || from.isEmpty() || !from.get().equals(gap) || e.getItem().isEmpty()) continue;
             ItemStack stack = e.getItem();
@@ -322,8 +336,8 @@ public final class Processors {
         }
         ItemStack next = ProductionLogic.takeFromBasin(basin, new Milestone.Cost(BuiltInRegistries.ITEM.getKey(core).toString(), 1), true);
         if (next.isEmpty()) return;
-        ItemEntity drop = new ItemEntity(level, fan.getX() + 0.5, fan.getY() + 1.05, fan.getZ() + 0.5, next);
-        drop.setDeltaMovement(0, 0.1, 0);
+        ItemEntity drop = new ItemEntity(level, fan.getX() + 0.5, fan.getY() + LAUNCH_HEIGHT, fan.getZ() + 0.5, next);
+        drop.setDeltaMovement(0, LAUNCH_SPEED, 0);
         drop.setNeverPickUp();
         drop.setUnlimitedLifetime();
         level.addFreshEntity(drop);
@@ -477,7 +491,8 @@ public final class Processors {
     static ItemStack returnToBasin(BasinBlockEntity basin, ItemStack stack, boolean output) {
         Container inv = basin.itemCapability;
         ItemStack left = stack.copy();
-        int from = output ? 9 : 0, to = output ? Math.min(18, inv.getContainerSize()) : 9;
+        int from = output ? ProductionLogic.BASIN_INPUT_SLOTS : 0,
+            to = output ? Math.min(ProductionLogic.BASIN_SLOTS, inv.getContainerSize()) : ProductionLogic.BASIN_INPUT_SLOTS;
         for (int pass = 0; pass < 2 && !left.isEmpty(); pass++) {
             for (int i = from; i < to && !left.isEmpty(); i++) {
                 ItemStack there = inv.getItem(i);
@@ -547,7 +562,7 @@ public final class Processors {
             held.processedBy = null;
             held.processingTime = 0;
         }
-        int most = Math.max(1, r.seconds() * 20 / 4);
+        int most = Math.max(1, r.seconds() * 20 / HAUNT_SHARE);
         if (held.processedBy == AllFanProcessingTypes.HAUNTING && held.processingTime > most) held.processingTime = most;
     }
 

@@ -94,6 +94,8 @@ public final class HubView {
 
     /** Lists coming from the network are capped, so a bad packet cannot ask for huge arrays. */
     private static final int MAX = 4096;
+    /** Counts paid into one milestone read at most (one for each of its costs). */
+    private static final int MAX_COSTS = 64;
 
     public static HubView read(FriendlyByteBuf buf) {
         HubView v = new HubView();
@@ -106,7 +108,7 @@ public final class HubView {
         int n = Math.min(MAX, buf.readVarInt());
         for (int i = 0; i < n; i++) v.done.add(buf.readUtf());
         n = Math.min(MAX, buf.readVarInt());
-        for (int i = 0; i < n; i++) v.paid.put(buf.readUtf(), buf.readVarIntArray(64));
+        for (int i = 0; i < n; i++) v.paid.put(buf.readUtf(), buf.readVarIntArray(MAX_COSTS));
         return v;
     }
 

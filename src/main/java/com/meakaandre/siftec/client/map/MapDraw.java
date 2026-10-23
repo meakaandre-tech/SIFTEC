@@ -33,6 +33,10 @@ public final class MapDraw {
     private static final int[] PURITY = {0xFFD9534F, 0xFFE8B43C, 0xFF5CB85C};
     private static final Map<NodeType, ItemStack> NODE_ITEMS = new EnumMap<>(NodeType.class);
     public static final int PLAYER = 0xFFFFFFFF, MATE = 0xFF5FD4FF, FOG_BACK = 0xFF2A3440;
+    /** Size a node's ore item is drawn at on the map (pixels; items are 16). */
+    private static final int NODE_ITEM_PX = 9;
+    /** Blocks in a kilometre: distances from this on are given in km. */
+    private static final int BLOCKS_PER_KM = 1000;
 
     private MapDraw() {
     }
@@ -156,8 +160,8 @@ public final class MapDraw {
             MapIcons.centred(g, MapIcons.DISC, x, y, 0xE0202020);
             MapIcons.centred(g, MapIcons.RING, x, y, colour(poi));
             g.pose().pushMatrix();
-            g.pose().translate(x - 4.5f, y - 4.5f);
-            g.pose().scale(9 / 16f, 9 / 16f);
+            g.pose().translate(x - NODE_ITEM_PX / 2f, y - NODE_ITEM_PX / 2f);
+            g.pose().scale(NODE_ITEM_PX / 16f, NODE_ITEM_PX / 16f);
             g.fakeItem(stack, 0, 0);
             g.pose().popMatrix();
             return;
@@ -199,6 +203,6 @@ public final class MapDraw {
     }
 
     public static String distance(double blocks) {
-        return blocks >= 1000 ? String.format(Locale.ROOT, "%.1f km", blocks / 1000) : Math.round(blocks) + " m";
+        return blocks >= BLOCKS_PER_KM ? String.format(Locale.ROOT, "%.1f km", blocks / BLOCKS_PER_KM) : Math.round(blocks) + " m";
     }
 }

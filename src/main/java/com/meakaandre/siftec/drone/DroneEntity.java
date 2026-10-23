@@ -28,6 +28,15 @@ public class DroneEntity extends Entity {
     private static final EntityDataAccessor<Boolean> FLYING = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> LOADED = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.BOOLEAN);
     public static EntityType<DroneEntity> TYPE;
+    /** Its hitbox, in blocks, and how many chunks away clients still track it. */
+    private static final float WIDTH = 1.3f, HEIGHT = 0.6f;
+    private static final int TRACKING_RANGE_CHUNKS = 10;
+    /** Degrees its propellers turn a tick while it flies. */
+    private static final float SPIN_PER_TICK = 50f;
+    /** Degrees of lean per block a tick of speed, and the most it leans nose down or up and sideways. */
+    private static final int LEAN_PER_SPEED = 30, MAX_PITCH = 25, MAX_ROLL = 20;
+    /** The share of the way to its wanted lean it eases each tick. */
+    private static final float LEAN_EASE = 0.15f;
 
     // ---- client only: how it leans, eased from how it moves
     public float pitch, pitchO, roll, rollO, spin, spinO;
@@ -42,8 +51,8 @@ public class DroneEntity extends Entity {
     public static void register() {
         ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Siftec.id("cardboard_drone"));
         TYPE = Registry.register(BuiltInRegistries.ENTITY_TYPE, key,
-            EntityType.Builder.<DroneEntity>of(DroneEntity::new, MobCategory.MISC).noLootTable().fireImmune().sized(1.3f, 0.6f)
-                .clientTrackingRange(10).updateInterval(1).build(key));
+            EntityType.Builder.<DroneEntity>of(DroneEntity::new, MobCategory.MISC).noLootTable().fireImmune()
+                .sized(WIDTH, HEIGHT).clientTrackingRange(TRACKING_RANGE_CHUNKS).updateInterval(1).build(key));
     }
 
     @Override
@@ -73,16 +82,17 @@ public class DroneEntity extends Entity {
         pitchO = pitch;
         rollO = roll;
         spinO = spin;
-        if (flying()) spin += 50f;
+        if (flying()) spin += SPIN_PER_TICK;
         if (!Double.isNaN(lastX)) {
             // it leans into where it is going: nose down as it speeds up along its heading, level while it climbs or hovers
             double dx = getX() - lastX, dz = getZ() - lastZ;
             float yaw = getYRot() * Mth.DEG_TO_RAD;
             double ahead = -Mth.sin(yaw) * dx + Mth.cos(yaw) * dz;
             double side = Mth.cos(yaw) * dx + Mth.sin(yaw) * dz;
-            float wantPitch = (float) Mth.clamp(ahead * 30, -25, 25), wantRoll = (float) Mth.clamp(side * 30, -20, 20);
-            pitch += (wantPitch - pitch) * 0.15f;
-            roll += (wantRoll - roll) * 0.15f;
+            float wantPitch = (float) Mth.clamp(ahead * LEAN_PER_SPEED, -MAX_PITCH, MAX_PITCH),
+                wantRoll = (float) Mth.clamp(side * LEAN_PER_SPEED, -MAX_ROLL, MAX_ROLL);
+            pitch += (wantPitch - pitch) * LEAN_EASE;
+            roll += (wantRoll - roll) * LEAN_EASE;
         }
         lastX = getX();
         lastY = getY();

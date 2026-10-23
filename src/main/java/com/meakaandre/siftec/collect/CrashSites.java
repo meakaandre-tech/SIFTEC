@@ -41,6 +41,16 @@ public final class CrashSites {
         {"siftec:heavy_modular_frame", "2"}, {"siftec:radio_control_unit", "1"}};
     /** The megawatts a powered pod asks a grid to have spare: more the further out, up to the last. */
     private static final int[] POWER_MW = {5, 10, 20, 30, 50};
+    /** One pod in this many asks nothing; of those that ask, one in this many past POWER_FROM asks power. */
+    private static final int FREE_ONE_IN = 4, POWER_ONE_IN = 3;
+    /** Wants a pod nearest spawn picks from, and how many more it may pick from each STEP further out. */
+    private static final int FIRST_WANTS = 3, WANTS_PER_STEP = 2;
+    /** Pods at least this far from spawn may carry a Somersloop, one in this many. */
+    private static final int SLOOP_FROM = 1000, SLOOP_ONE_IN = 5;
+    /** SU short of the asked power that still counts as enough. */
+    private static final double POWER_EPSILON = 1e-6;
+    /** Pieces of wreckage tried round a pod, and how far below one it may settle. */
+    private static final int WRECK_PIECES = 6, WRECK_DROP = 3;
 
     private CrashSites() {
     }
@@ -73,19 +83,19 @@ public final class CrashSites {
     public static Requirement requirement(ServerLevel level, BlockPos pos) {
         double distance = fromSpawn(level, pos);
         long h = hash(pos);
-        if (distance < FREE || Long.remainderUnsigned(h, 4) == 0) return Requirement.NONE;
+        if (distance < FREE || Long.remainderUnsigned(h, FREE_ONE_IN) == 0) return Requirement.NONE;
         int steps = (int) ((distance - FREE) / STEP);
-        if (distance >= POWER_FROM && Long.remainderUnsigned(h >>> 40, 3) == 0) {
+        if (distance >= POWER_FROM && Long.remainderUnsigned(h >>> 40, POWER_ONE_IN) == 0) {
             return new Requirement(Requirement.Kind.POWER, null, POWER_MW[Math.min(POWER_MW.length - 1, (int) ((distance - POWER_FROM) / STEP))]);
         }
-        int reach = Math.min(WANTS.length, 3 + steps * 2);
+        int reach = Math.min(WANTS.length, FIRST_WANTS + steps * WANTS_PER_STEP);
         String[] want = WANTS[(int) Long.remainderUnsigned(h >>> 8, reach)];
         return new Requirement(Requirement.Kind.PARTS, new Milestone.Cost(want[0], Integer.parseInt(want[1])), 0);
     }
 
     /** One pod in five that landed well away from spawn also carries a Somersloop. */
     public static boolean hasSomersloop(ServerLevel level, BlockPos pos) {
-        return fromSpawn(level, pos) >= 1000 && Long.remainderUnsigned(hash(pos) >>> 20, 5) == 0;
+        return fromSpawn(level, pos) >= SLOOP_FROM && Long.remainderUnsigned(hash(pos) >>> 20, SLOOP_ONE_IN) == 0;
     }
 
     /** The block a powered pod's wire connector stands in: the first side of the pod with room and ground under it. */
@@ -190,7 +200,7 @@ public final class CrashSites {
 
     /** True if the pod's grid has the megawatts it asks for to spare. */
     public static boolean powered(ServerLevel level, BlockPos pod, int mw) {
-        return spareSu(level, pod) >= Power.su((double) mw) - 1e-6;
+        return spareSu(level, pod) >= Power.su((double) mw) - POWER_EPSILON;
     }
 
     /** A few broken pieces of casing and scorched ground next to the pod, and its wire connector if it wants power. */
@@ -205,14 +215,14 @@ public final class CrashSites {
     public static void wreckage(ServerLevel level, BlockPos pod, @Nullable ChunkPos only) {
         Block casing = BuiltInRegistries.BLOCK.getOptional(Identifier.parse("create:andesite_casing")).orElse(Blocks.IRON_BLOCK);
         long h = hash(pod);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < WRECK_PIECES; i++) {
             h = h * 6364136223846793005L + 1442695040888963407L;
             int dx = (int) Long.remainderUnsigned(h >>> 16, 5) - 2, dz = (int) Long.remainderUnsigned(h >>> 24, 5) - 2;
             if (Math.abs(dx) <= 1 && Math.abs(dz) <= 1) continue;  // the cells round the pod stay clear for its connector
             BlockPos at = pod.offset(dx, 0, dz);
             if (!Collectibles.inside(only, at)) continue;
             // settle onto the ground within a couple of blocks, and never replace anything solid
-            for (int drop = 0; drop < 3 && level.getBlockState(at.below()).canBeReplaced(); drop++) at = at.below();
+            for (int drop = 0; drop < WRECK_DROP && level.getBlockState(at.below()).canBeReplaced(); drop++) at = at.below();
             if (!level.getBlockState(at).canBeReplaced() || level.getBlockState(at.below()).canBeReplaced()) continue;
             BlockState piece = i % 3 == 0 ? Blocks.COARSE_DIRT.defaultBlockState() : i % 3 == 1 ? casing.defaultBlockState() : Blocks.IRON_BARS.defaultBlockState();
             if (i % 3 == 0) level.setBlock(at.below(), piece, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);

@@ -58,6 +58,14 @@ public final class SimAccess {
     public static final int SMELTER_LAG = 11;
     /** Ticks after a Basin recipe starts until its result is in the Basin (the Press or Mixer working). */
     public static final int BASIN_OUT = 20;
+    /** Items one slot holds, as the simulation counts a building's item room. */
+    private static final int STACK = 64;
+    /** mB a Basin's fluid tanks hold, each way. */
+    private static final int BASIN_TANK_MB = 2000;
+    /** mB a building's fluid tank holds, as the simulation counts it. */
+    private static final int TANK_MB = 4000;
+    /** How many breaks are sampled to average what a node's block drops. */
+    private static final int DROP_SAMPLES = 48;
 
     private SimAccess() {
     }
@@ -157,7 +165,7 @@ public final class SimAccess {
             case POWER -> generator(level, c, def, n);
             case SINK -> {
                 n.mode = NodeMode.SINK;
-                n.inCap = 64;
+                n.inCap = STACK;
             }
             case STORAGE, TRUCK_STATION -> {
                 n.mode = NodeMode.STORE;
@@ -173,7 +181,7 @@ public final class SimAccess {
 
     private static void mine(ServerLevel level, ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
         n.mode = NodeMode.MINE;
-        n.outCap = 64;
+        n.outCap = STACK;
         var site = c.node == null || !level.isLoaded(c.node) ? null : NodeSites.at(level, c.node);
         if (site == null) {
             n.mineItem = "";
@@ -182,7 +190,7 @@ public final class SimAccess {
         // what a break gives, on average: the node's own ore block's loot, mined with the miner's Fortune
         BlockState state = site.look.nodeState();
         Map<String, Long> got = new HashMap<>();
-        int samples = 48;
+        int samples = DROP_SAMPLES;
         ItemStack tool = new ItemStack(Items.NETHERITE_PICKAXE);
         if (def.fortune() > 0) {
             var holder = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
@@ -205,13 +213,13 @@ public final class SimAccess {
         Purity purity = site.purity;
         boolean powered = def.logic() == Logic.MINER;
         n.minePeriod = NodeRegrowth.ticks(purity) + Math.max(1, def.breakTicks()) + (powered ? MINER_LAG : 0);
-        if (!powered) n.outCap = 64;
+        if (!powered) n.outCap = STACK;
     }
 
     private static void smelter(SimData.Node n) {
         n.mode = NodeMode.SMELT;
-        n.inCap = 64;
-        n.outCap = 64;
+        n.inCap = STACK;
+        n.outCap = STACK;
         JsonObject raw = Milestones.raw();
         JsonObject times = raw != null && raw.has("smelter_ticks") ? raw.getAsJsonObject("smelter_ticks") : new JsonObject();
         for (String id : times.keySet()) {
@@ -238,10 +246,10 @@ public final class SimAccess {
     /** A Constructor, Assembler, Foundry, Refinery or Blender: the Basin recipe its filter picks, at Satisfactory's time. */
     private static void basin(ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
         n.mode = NodeMode.CRAFT;
-        n.inCap = 9 * 64;
-        n.outCap = 9 * 64;
-        n.fluidInCap = 2000;
-        n.fluidOutCap = 2000;
+        n.inCap = ProductionLogic.BASIN_INPUT_SLOTS * STACK;
+        n.outCap = ProductionLogic.BASIN_INPUT_SLOTS * STACK;
+        n.fluidInCap = BASIN_TANK_MB;
+        n.fluidOutCap = BASIN_TANK_MB;
         String type = cells(c, "create:mechanical_press").isEmpty() ? "create:mixing" : "create:compacting";
         Map<String, Integer> ticks = machineTicks();
         List<Recipes.Parsed> candidates = new ArrayList<>();
@@ -278,9 +286,9 @@ public final class SimAccess {
     /** The Manufacturer and the Quantum Encoder: the Core's inputs plus each step's item or fluid, the result at the line's end. */
     private static void assembly(ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
         n.mode = NodeMode.CRAFT;
-        n.inCap = 9 * 64;
-        n.outCap = 64;
-        n.fluidInCap = 2000;
+        n.inCap = ProductionLogic.BASIN_INPUT_SLOTS * STACK;
+        n.outCap = STACK;
+        n.fluidInCap = BASIN_TANK_MB;
         ProductionLogic.Assembly a = ProductionLogic.assembly(c, def);
         if (a == null) return;
         SimData.Recipe r = recipe(a.ticks(), a.ticks());
@@ -304,10 +312,10 @@ public final class SimAccess {
 
     private static void packager(SimData.Node n) {
         n.mode = NodeMode.CRAFT;
-        n.inCap = 64;
-        n.outCap = 64;
-        n.fluidInCap = 4000;
-        n.fluidOutCap = 4000;
+        n.inCap = STACK;
+        n.outCap = STACK;
+        n.fluidInCap = TANK_MB;
+        n.fluidOutCap = TANK_MB;
         for (ProductionLogic.Pack p : ProductionLogic.packs()) {
             if (p.in() == Items.AIR || p.out() == Items.AIR) continue;
             SimData.Recipe r = recipe(p.ticks(), p.ticks());
@@ -321,10 +329,10 @@ public final class SimAccess {
 
     private static void processor(ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
         n.mode = NodeMode.CRAFT;
-        n.inCap = 9 * 64;
-        n.outCap = 64;
-        n.fluidInCap = 4000;
-        n.fluidOutCap = 4000;
+        n.inCap = ProductionLogic.BASIN_INPUT_SLOTS * STACK;
+        n.outCap = STACK;
+        n.fluidInCap = TANK_MB;
+        n.fluidOutCap = TANK_MB;
         for (ProcessorRecipe p : ProductionLogic.processorRecipes(c, def)) {
             SimData.Recipe r = recipe(p.seconds() * 20L, p.seconds() * 20L);
             for (Milestone.Cost cost : p.inputs()) ingredient(n, r.in, cost.key(), cost.count());
@@ -346,28 +354,28 @@ public final class SimAccess {
             Purity purity = ExtractorLogic.nodePurity(level, c, def);
             rate = purity == null ? 0 : purity.multiplier;
         }
-        n.fluidRate = def.rate() * rate / 1200.0;
-        n.fluidOutCap = 4000;
+        n.fluidRate = def.rate() * rate / BuildingDef.TICKS_PER_MINUTE;
+        n.fluidOutCap = TANK_MB;
     }
 
     private static void generator(ServerLevel level, ControllerBlockEntity c, BuildingDef def, SimData.Node n) {
         PowerRole kind = def.power();
         n.fullSu = Power.su(def.mw());
         // the Coal Generator and the Nuclear Power Plant drink water at their intake: none, no power
-        n.water = def.water() > 0 ? def.water() * BuildingPower.mbPerM3() / 1200.0 : 0;
-        if (n.water > 0) n.fluidInCap = Math.max(n.fluidInCap, 4000);
+        n.water = def.water() > 0 ? def.water() * BuildingPower.mbPerM3() / BuildingDef.TICKS_PER_MINUTE : 0;
+        if (n.water > 0) n.fluidInCap = Math.max(n.fluidInCap, TANK_MB);
         switch (kind) {
             case BIOMASS, COAL, NUCLEAR -> {
                 n.mode = NodeMode.GEN;
-                n.inCap = 64;
+                n.inCap = STACK;
                 // a nuclear plant's waste: its output slot and waste store (BuildingPower.WASTE_ROOM), several rods' worth
-                n.outCap = kind == PowerRole.NUCLEAR ? BuildingPower.WASTE_ROOM : 64;
+                n.outCap = kind == PowerRole.NUCLEAR ? BuildingPower.WASTE_ROOM : STACK;
                 ItemStack in = c.input.getItem(0);
                 if (!in.isEmpty()) fuel(n, kind, in);
             }
             case FUEL -> {
                 n.mode = NodeMode.GEN;
-                n.fluidInCap = 4000;
+                n.fluidInCap = TANK_MB;
                 for (String fuel : BuildingPower.fluidFuels(PowerRole.FUEL)) {
                     Fluid f = BuiltInRegistries.FLUID.getValue(Identifier.parse(fuel));
                     n.fuelMj.put(Keys.fluid(f), BuildingPower.fluidMj(PowerRole.FUEL, f));
@@ -378,11 +386,11 @@ public final class SimAccess {
                 PowerMember m = BuildingPower.member(level, c);
                 n.fullSu = m == null ? 0 : m.steady(n.fullSu);
                 n.fluidOut = "fluid:siftec:sulfuric_acid";
-                n.fluidOutCap = 4000;
+                n.fluidOutCap = TANK_MB;
             }
             case AUGMENTER -> {
                 n.mode = NodeMode.GEN;
-                n.inCap = 64;
+                n.inCap = STACK;
                 ItemStack in = c.input.getItem(0);
                 if (!in.isEmpty() && BuildingPower.itemMj(PowerRole.AUGMENTER, in) > 0) n.fuelMj.put(Keys.of(in), 1.0);
             }

@@ -44,6 +44,8 @@ public final class GeyserSearch {
     public static final int MAX_RADIUS = 20;
     /** Times a chunk that failed to generate is asked for again before the search gives up on it (it is not marked read). */
     private static final int RETRIES = 3;
+    /** Where in a chunk its biome is sampled for sulfur caves (x and z within the chunk). */
+    private static final int[][] SAMPLE_POINTS = {{4, 4}, {12, 12}, {4, 12}, {12, 4}};
     /** Heights where sulfur caves are looked for (the survey's): every 8 blocks from -60 to 100. */
     private static final int Y_FROM = -60, Y_TO = 100, Y_STEP = 8;
 
@@ -125,7 +127,7 @@ public final class GeyserSearch {
     /** True if a chunk has sulfur caves under it, as the generator gives the biome (worker thread). */
     public static boolean sulfurBelow(ServerLevel level, int cx, int cz) {
         for (int y = Y_FROM; y <= Y_TO; y += Y_STEP) {
-            for (int[] d : new int[][]{{4, 4}, {12, 12}, {4, 12}, {12, 4}}) {
+            for (int[] d : SAMPLE_POINTS) {
                 if (Terrain.biome(level, (cx << 4) + d[0], y, (cz << 4) + d[1]).unwrapKey()
                     .map(k -> k.identifier().getPath().equals("sulfur_caves")).orElse(false)) return true;
             }

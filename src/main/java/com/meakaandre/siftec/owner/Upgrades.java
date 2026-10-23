@@ -18,7 +18,7 @@ public final class Upgrades {
         if (!(pump.getLevel() instanceof ServerLevel level)) return 1;
         long now = level.getGameTime();
         long[] known = PUMPS.get(pump);
-        if (known != null && now - known[0] < 100 && now >= known[0]) return (int) known[1];
+        if (known != null && now - known[0] < PUMP_RELOOK_TICKS && now >= known[0]) return (int) known[1];
         Company company = Ownership.of(pump);
         int factor = company != null && company.hasToken("pumps:2") ? 2 : 1;
         PUMPS.put(pump, new long[]{now, factor});
@@ -27,4 +27,6 @@ public final class Upgrades {
 
     /** Pump -> {when looked up, factor}. Server thread only; forgets pumps that are gone. */
     private static final Map<BlockEntity, long[]> PUMPS = new WeakHashMap<>();
+    /** A pump's company is looked up again after this long (ticks: five seconds). */
+    private static final int PUMP_RELOOK_TICKS = 100;
 }

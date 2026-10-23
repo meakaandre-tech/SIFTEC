@@ -22,6 +22,9 @@ import net.minecraft.world.level.block.Block;
 public class PrefabItem extends BlockItem {
     public final Prefabs.Kind kind;
 
+    /** Degrees in one of the structure's quarter turns. */
+    private static final int DEGREES_PER_TURN = 90;
+
     public PrefabItem(Prefabs.Kind kind, Block block, Properties properties) {
         super(block, properties);
         this.kind = kind;
@@ -42,7 +45,7 @@ public class PrefabItem extends BlockItem {
     private InteractionResult build(Level level, Player player, InteractionHand hand) {
         if (player.isShiftKeyDown()) {
             int turns = Prefabs.turn(player);
-            if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.prefab.turned", turns * 90));
+            if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.prefab.turned", turns * DEGREES_PER_TURN));
             return InteractionResult.SUCCESS;
         }
         if (!(player instanceof ServerPlayer server) || !(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;

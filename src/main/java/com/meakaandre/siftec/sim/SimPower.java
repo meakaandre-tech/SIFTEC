@@ -22,6 +22,8 @@ import java.util.Map;
  * tick.
  */
 final class SimPower {
+    /** Most connectors one grid's walk visits: a stop against a runaway walk. */
+    private static final int GUARD = 20_000;
     record Grid(List<SimData.Node> members, boolean mixed) {
     }
 
@@ -40,7 +42,7 @@ final class SimPower {
             Deque<Long> queue = new ArrayDeque<>();
             for (long c : start.connectors) if (seen.add(c)) queue.add(c);
             int guard = 0;
-            while (!queue.isEmpty() && guard++ < 20_000) {
+            while (!queue.isEmpty() && guard++ < GUARD) {
                 long pos = queue.poll();
                 if (PowerGrids.at(level, pos) != null) mixed = true;
                 BlockPos at = BlockPos.of(pos);

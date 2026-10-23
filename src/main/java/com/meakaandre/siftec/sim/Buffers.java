@@ -67,6 +67,12 @@ final class Buffers {
     }
 
     private static final long MB = FluidConstants.BUCKET / 1000;
+    /** A Create basin's slots: the first nine take ingredients, the next nine hold its output. */
+    private static final int BASIN_INPUTS = 9, BASIN_SLOTS = 18;
+    /** How high above a dropped item's block it spawns. */
+    private static final double GROUND_DROP_Y = 0.1;
+    /** Blocks above a building's position that spilled items are dropped at. */
+    static final double DROP_HEIGHT = 1.1;
 
     /**
      * Where the buffers are read from: the level, or (for a chunk that is leaving, whose block entities are still there
@@ -171,8 +177,8 @@ final class Buffers {
                 }
             } else if (target instanceof BasinBlockEntity basin && !store) {
                 Container inv = basin.itemCapability;
-                if (role == Role.IN) b.addSlots(seen, inv, 0, Math.min(9, inv.getContainerSize()), Role.IN);
-                else b.addSlots(seen, inv, 9, Math.min(18, inv.getContainerSize()), Role.OUT);
+                if (role == Role.IN) b.addSlots(seen, inv, 0, Math.min(BASIN_INPUTS, inv.getContainerSize()), Role.IN);
+                else b.addSlots(seen, inv, BASIN_INPUTS, Math.min(BASIN_SLOTS, inv.getContainerSize()), Role.OUT);
             } else if (target instanceof ItemVaultBlockEntity vault) {
                 // each vault block's own slots: read straight from the block, never through its multiblock's controller
                 Container inv = vault.getInventoryOfBlock();
@@ -235,7 +241,7 @@ final class Buffers {
             for (int i = s.from; i < s.to; i++) {
                 ItemStack stack = s.c.getItem(i);
                 if (!stack.isEmpty()) Sim.add(into, Keys.of(stack), stack.getCount());
-                long cap = stack.isEmpty() ? 64 : stack.getMaxStackSize();
+                long cap = stack.isEmpty() ? Keys.STACK : stack.getMaxStackSize();
                 if (s.role == Role.IN) inCap += cap;
                 else outCap += cap;
             }
@@ -260,7 +266,7 @@ final class Buffers {
             if (s.role == Role.IN) fInCap += cap;
             else fOutCap += cap;
         }
-        if (ground != null) outCap = 64;
+        if (ground != null) outCap = Keys.STACK;
         // a nuclear plant's output holds its waste up to the room the real plant gives it, not all its slots could
         if (n.power == PowerRole.NUCLEAR) outCap = Math.min(outCap, BuildingPower.WASTE_ROOM);
         // the model's own figures stand where the buffers say less (a storage's capacity is what it is)
@@ -307,11 +313,12 @@ final class Buffers {
         for (ItemStack s : spill) {
             if (s.isEmpty()) continue;
             if (ground != null) {
-                ItemEntity entity = new ItemEntity(level, drop.getX() + 0.5, drop.getY() + 0.1, drop.getZ() + 0.5, s);
+                ItemEntity entity = new ItemEntity(level, drop.getX() + 0.5, drop.getY() + GROUND_DROP_Y, drop.getZ() + 0.5,
+                    s);
                 entity.setDeltaMovement(Vec3.ZERO);
                 level.addFreshEntity(entity);
             } else {
-                Drops.at(level, drop, 1.1, s);
+                Drops.at(level, drop, DROP_HEIGHT, s);
             }
         }
         if (ground == null && !spill.isEmpty()) Siftec.LOGGER.info("SIFTEC: {} at {}: {} stacks the catch-up had no room for were dropped", n.building, at.toShortString(), spill.size());
@@ -455,7 +462,7 @@ final class Buffers {
             return count;
         }
         BlockPos at = n.blockPos();
-        Drops.all(level, at, 1.1, b.add(key, count, role));
+        Drops.all(level, at, DROP_HEIGHT, b.add(key, count, role));
         for (Slots s : b.slots) s.c.setChanged();
         return count;
     }

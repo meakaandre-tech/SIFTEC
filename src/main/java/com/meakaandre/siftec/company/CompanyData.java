@@ -21,6 +21,9 @@ public class CompanyData extends JsonSavedData<CompanyData.Stored> {
         Map<String, String> moved = new HashMap<>();
     }
 
+    /** Folded-company links followed at most (guards against a loop). */
+    private static final int MAX_MOVE_HOPS = 8;
+
     public static final Codec<CompanyData> CODEC = JsonSavedData.codec(CompanyData::new);
     private static final SavedDataType<CompanyData> TYPE = new SavedDataType<>(
         Siftec.id("companies"), CompanyData::new, CODEC, null
@@ -44,7 +47,7 @@ public class CompanyData extends JsonSavedData<CompanyData.Stored> {
 
     /** Follows a company that was folded into another, so what it built keeps working. */
     public Company byId(String id) {
-        for (int hops = 0; hops < 8 && id != null; hops++) {
+        for (int hops = 0; hops < MAX_MOVE_HOPS && id != null; hops++) {
             Company company = stored.companies.get(id);
             if (company != null) return company;
             id = stored.moved.get(id);

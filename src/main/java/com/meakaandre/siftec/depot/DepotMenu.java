@@ -35,6 +35,10 @@ import java.util.TreeMap;
  */
 public class DepotMenu extends ChestMenu {
     private static final int SIZE = 54, PER_PAGE = 45, PREVIOUS = 45, NEXT = 53;
+    /** Rows of the chest window. */
+    private static final int ROWS = 6;
+    /** The window is refreshed this often (ticks). */
+    private static final int REFRESH_TICKS = 20;
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final Company company;
@@ -45,7 +49,7 @@ public class DepotMenu extends ChestMenu {
     private int ticks;
 
     private DepotMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, @Nullable BlockPos at) {
-        super(MenuType.GENERIC_9x6, id, inventory, view, 6);
+        super(MenuType.GENERIC_9x6, id, inventory, view, ROWS);
         this.view = view;
         this.player = player;
         this.company = company;
@@ -157,7 +161,7 @@ public class DepotMenu extends ChestMenu {
 
     @Override
     public void broadcastChanges() {
-        if (++ticks % 20 == 0) refresh();
+        if (++ticks % REFRESH_TICKS == 0) refresh();
         super.broadcastChanges();
     }
 
