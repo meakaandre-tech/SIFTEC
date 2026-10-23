@@ -54,7 +54,7 @@ public final class SiftecConfig {
         } catch (IOException | IllegalArgumentException e) {
             Siftec.LOGGER.warn("SIFTEC: could not read or write {}; using defaults", file, e);
         }
-        Siftec.LOGGER.info("SIFTEC settings: spawn_free_radius={}, member_cooldown_hours={}", spawnFreeRadius, memberCooldownHours);
+        Siftec.LOGGER.info("SIFTEC: settings: spawn_free_radius={}, member_cooldown_hours={}", spawnFreeRadius, memberCooldownHours);
     }
 
     private static int read(Properties props, String key, int fallback) {

@@ -335,7 +335,7 @@ public final class TravelersBackpackCompat {
         if (attachment == null || !attachment.hasBackpack()) return false;
         if (!Locks.allowed(player, held)) {
             Milestone lock = Locks.lockOf(held.getItem());
-            if (lock != null) player.sendOverlayMessage(Component.translatable("siftec.lock.item", lock.name()));
+            if (lock != null) Locks.tellLocked(player, lock);
             return false;
         }
         ItemStack backpack = attachment.getBackpack();
@@ -489,7 +489,7 @@ public final class TravelersBackpackCompat {
         var recipe = upgrade == null ? null : upgrade.resultSlots.getRecipeUsed();
         if (recipe == null || !RecipeLocks.blocked(server, recipe.value())) return true;
         Milestone lock = Milestones.get(RecipeLocks.lockOf(server.level().getServer(), recipe.value()));
-        if (lock != null) server.sendOverlayMessage(Component.translatable("siftec.lock.item", lock.name()));
+        if (lock != null) Locks.tellLocked(server, lock);
         return false;
     }
 

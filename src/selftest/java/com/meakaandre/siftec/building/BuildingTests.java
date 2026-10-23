@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -10,8 +12,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -26,7 +26,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
@@ -62,11 +61,8 @@ public final class BuildingTests {
     private static final String COMPANY = "selftest_buildings";
     private static final String TEST = "test_building";
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST buildings ");
 
     private BuildingTests() {
     }
@@ -93,15 +89,7 @@ public final class BuildingTests {
 
     public static void register() {
         PayloadTypeRegistry.clientboundPlay().register(Tab.TYPE, Tab.STREAM_CODEC);
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("buildings").executes(BuildingTests::run)
@@ -123,19 +111,15 @@ public final class BuildingTests {
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        LATER.add(new Later(level.getGameTime() + ticks, run));
+        LATER.add(level.getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST buildings " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Company company(ServerLevel level) {
@@ -275,7 +259,7 @@ public final class BuildingTests {
 
     private static void runSettled(CommandSourceStack source) {
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         Company company = company(level);
         BuildingDef def = Buildings.def(TEST);
         expect(source, "test building is listed", def != null, String.valueOf(Buildings.all().size()) + " buildings");
@@ -426,7 +410,7 @@ public final class BuildingTests {
                 standing(level, f) + " blocks left, gave back " + count(dropsF, "create:iron_sheet") + " sheets and " + count(dropsF, "siftec:iron_rod") + " rods");
             // B and C stay up for the restart test
         });
-        later(level, BuildingRepair.EVERY + 60, () -> report(source, "result: " + passed + " passed, " + failed + " failed"));
+        later(level, BuildingRepair.EVERY + 60, () -> report(source, "result: " + REPORT.totals()));
     }
 
     /** Places as a survival player of the company would (cost taken, land checked); dev buildings are allowed here. */
@@ -443,7 +427,7 @@ public final class BuildingTests {
     private static int restart(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         BuildingDef def = Buildings.def(TEST);
         BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
         if (t == null) {
@@ -465,7 +449,7 @@ public final class BuildingTests {
             back.size() + " stacks back");
         Placement c2 = new Placement(def, new BlockPos(X + 3, Y, Z), Direction.NORTH, false);
         if (level.getBlockEntity(c2.at(t.controller)) instanceof ControllerBlockEntity cc) Buildings.dismantle(level, cc);
-        report(source, "restart result: " + passed + " passed, " + failed + " failed");
+        report(source, "restart result: " + REPORT.totals());
         return 1;
     }
 
@@ -494,7 +478,7 @@ public final class BuildingTests {
      */
     private static int gunCheck(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        passed = failed = 0;
+        REPORT.reset();
         List<String> uses = new ArrayList<>(BuildGun.USES);
         report(source, "gun uses: " + uses);
         List<BlockPos> built = new ArrayList<>();
@@ -509,7 +493,7 @@ public final class BuildingTests {
             expect(source, "client: two nudges forward moved it two blocks north", built.get(1).equals(built.get(0).offset(0, 0, -2)),
                 built.get(0).toShortString() + " then " + built.get(1).toShortString());
         }
-        report(source, "client result: " + passed + " passed, " + failed + " failed");
+        report(source, "client result: " + REPORT.totals());
         return 1;
     }
 }

@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.prefab;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.block.Facing;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.building.BuildingPower;
@@ -31,7 +31,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -65,6 +64,8 @@ public final class PrefabTests {
     private static final int Y = 230, AX = 2000, AZ = 2000, BX = 2400, BZ = 2000, GZ = 2100, VX = -2000, VZ = 2000;
     private static final String A = "selftest_hub_a", B = "selftest_hub_b";
 
+    private static final TestReport REPORT = new TestReport("SELFTEST prefab ");
+
     private PrefabTests() {
     }
 
@@ -93,9 +94,7 @@ public final class PrefabTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST prefab " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static Company company(ServerLevel level, String id, String name) {

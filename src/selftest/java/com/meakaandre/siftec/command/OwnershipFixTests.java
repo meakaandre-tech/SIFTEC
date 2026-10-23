@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingTemplate;
@@ -32,13 +34,10 @@ import com.zurrtum.create.content.fluids.OpenEndedPipe;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -55,7 +54,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,25 +82,15 @@ public final class OwnershipFixTests {
     private static final UUID EXTRA_2 = UUID.fromString("0e7a5000-0000-4000-8000-000000000005");
     private static final UUID MEMBER_FOE = UUID.fromString("0e7a5000-0000-4000-8000-000000000006");
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed, pending;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST ownership ");
+    private static int pending;
 
     private OwnershipFixTests() {
     }
 
     public static void register() {
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("ownership").executes(OwnershipFixTests::run)))));
@@ -112,22 +100,18 @@ public final class OwnershipFixTests {
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
         pending++;
-        LATER.add(new Later(level.getServer().overworld().getGameTime() + ticks, () -> {
+        LATER.add(level.getServer().overworld().getGameTime() + ticks, () -> {
             run.run();
             pending--;
-        }));
+        });
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST ownership " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     /** A test company, made afresh: the id's old record, if any, is replaced. */
@@ -163,7 +147,8 @@ public final class OwnershipFixTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = pending = 0;
+        REPORT.reset();
+        pending = 0;
         BuildingTests.platform(level, X - 8, Z - 8, X + 120, Z + 156, Y, 64);
         for (VehicleEntity v : level.getEntitiesOfClass(VehicleEntity.class, new AABB(X - 8, Y - 80, Z - 8, X + 120, Y + 64, Z + 156))) v.discard();
         later(level, 10, () -> {
@@ -189,10 +174,10 @@ public final class OwnershipFixTests {
 
     private static void finish(CommandSourceStack source, ServerLevel level) {
         if (pending > 0) {
-            LATER.add(new Later(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level)));
+            LATER.add(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level));
             return;
         }
-        report(source, "done: " + passed + " passed, " + failed + " failed");
+        report(source, "done: " + REPORT.totals());
     }
 
     // ------------------------------------------------------------------------------------------------ 3: the MAM

@@ -65,7 +65,7 @@ public final class BuildingProtection {
                 }
                 return InteractionResult.SUCCESS;
             }
-            if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.build_gun.part", nameAt(level, controller)));
+            tellPart(player, level, controller);
             return InteractionResult.FAIL;
         });
     }
@@ -79,6 +79,13 @@ public final class BuildingProtection {
             if (level.getBlockEntity(p.at(cell)) instanceof AbstractElectricalConnector) return p.at(cell);
         }
         return null;
+    }
+
+    /** Tells a player, over the hotbar, that the block is part of a building and comes down only with the Build Gun. */
+    private static void tellPart(@Nullable Player player, Level level, BlockPos controller) {
+        if (player instanceof ServerPlayer server) {
+            server.sendOverlayMessage(Component.translatable("siftec.build_gun.part", nameAt(level, controller)));
+        }
     }
 
     static Component nameAt(Level level, BlockPos controller) {
@@ -96,7 +103,7 @@ public final class BuildingProtection {
     public static boolean shellChangeRefused(Level level, @Nullable Player player, BlockPos pos) {
         BlockPos controller = BuildingIndex.controllerOf(level, pos);
         if (controller == null || pos.equals(controller) || level.getBlockState(pos).getBlock() instanceof PortBlock) return false;
-        if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.build_gun.part", nameAt(level, controller)));
+        tellPart(player, level, controller);
         return true;
     }
 

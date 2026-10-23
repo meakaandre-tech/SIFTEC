@@ -228,7 +228,7 @@ public final class MapClient {
                 PINS.put(pin.key(), pin);
             }
         } catch (IOException | RuntimeException e) {
-            Siftec.LOGGER.warn("SIFTEC map: unreadable {}", file, e);
+            Siftec.LOGGER.warn("SIFTEC: unreadable map file {}", file, e);
         }
     }
 
@@ -251,7 +251,7 @@ public final class MapClient {
             Files.createDirectories(dir);
             Files.writeString(dir.resolve("pins.json"), GSON.toJson(array));
         } catch (IOException e) {
-            Siftec.LOGGER.warn("SIFTEC map: could not save pins", e);
+            Siftec.LOGGER.warn("SIFTEC: could not save the map pins", e);
         }
     }
 
@@ -269,7 +269,7 @@ public final class MapClient {
             if (o.has("minimap")) minimapOn = o.get("minimap").getAsBoolean();
             if (o.has("hidden")) for (JsonElement e : o.getAsJsonArray("hidden")) HIDDEN.add(e.getAsString());
         } catch (IOException | RuntimeException e) {
-            Siftec.LOGGER.warn("SIFTEC map: unreadable {}", file, e);
+            Siftec.LOGGER.warn("SIFTEC: unreadable map file {}", file, e);
         }
     }
 
@@ -284,7 +284,7 @@ public final class MapClient {
             Files.createDirectories(file.getParent());
             Files.writeString(file, GSON.toJson(o));
         } catch (IOException e) {
-            Siftec.LOGGER.warn("SIFTEC map: could not save settings", e);
+            Siftec.LOGGER.warn("SIFTEC: could not save the map settings", e);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.power;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.BuildingPower;
@@ -31,7 +32,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
@@ -82,6 +82,8 @@ public final class PowerTests {
         boolean tick();
     }
 
+    private static final TestReport REPORT = new TestReport("SELFTEST power ");
+
     private PowerTests() {
     }
 
@@ -116,9 +118,7 @@ public final class PowerTests {
     }
 
     static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST power " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     // ------------------------------------------------------------------------------------------------ helpers

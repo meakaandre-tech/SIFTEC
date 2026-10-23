@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.command;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.block.NodePadBlock;
 import com.meakaandre.siftec.building.BuildingDef;
@@ -37,7 +37,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -95,6 +94,8 @@ import java.util.function.Predicate;
  * </ul>
  */
 public final class NodeTests {
+    private static final TestReport REPORT = new TestReport("SELFTEST world ");
+
     private NodeTests() {
     }
 
@@ -142,9 +143,7 @@ public final class NodeTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST world " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     /** One check: PASS or FAIL, counted into {@code tally} ({passed, failed}). */

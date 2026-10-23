@@ -35,7 +35,7 @@ final class NodeWorker {
             try {
                 NodeMap.inCell(level, cellX, cellZ);
             } catch (RuntimeException e) {
-                Siftec.LOGGER.warn("Could not work out node cell {} {}", cellX, cellZ, e);
+                Siftec.LOGGER.warn("SIFTEC: could not work out node cell {} {}", cellX, cellZ, e);
             } finally {
                 PENDING.remove(pending);
             }
@@ -51,7 +51,7 @@ final class NodeWorker {
             try {
                 result = job.get();
             } catch (RuntimeException e) {
-                Siftec.LOGGER.warn("Background search failed", e);
+                Siftec.LOGGER.warn("SIFTEC: a background search failed", e);
                 result = null;
             }
             T done = result;
@@ -82,7 +82,7 @@ final class NodeWorker {
             try {
                 result = piece.apply(all.subList(from, Math.min(all.size(), from + size)));
             } catch (RuntimeException e) {
-                Siftec.LOGGER.warn("Background search failed", e);
+                Siftec.LOGGER.warn("SIFTEC: a background search failed", e);
                 result = null;
             }
             R answer = result;

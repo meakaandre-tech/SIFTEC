@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.sim;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.BuildingTemplate;
@@ -42,7 +44,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -83,11 +84,8 @@ public final class AlwaysTests {
     private static final int WARMUP = 300, RUN = 12_000;
     private static final String ROD = "siftec:iron_rod", COMPANY = "selftest_always";
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST always ");
     /** Chunk loads in twin B's area while it is supposed to be unloaded. */
     private static int bLoads;
     private static boolean watchB;
@@ -99,12 +97,7 @@ public final class AlwaysTests {
     public static void register() {
         EdgeTests.register();
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
+            LATER.runDue(server.overworld().getGameTime());
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             LATER.clear();
@@ -127,19 +120,15 @@ public final class AlwaysTests {
     }
 
     private static void later(MinecraftServer server, int ticks, Runnable run) {
-        LATER.add(new Later(server.overworld().getGameTime() + ticks, run));
+        LATER.add(server.overworld().getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST always " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Item item(String id) {
@@ -276,7 +265,7 @@ public final class AlwaysTests {
         CommandSourceStack source = context.getSource();
         MinecraftServer server = source.getServer();
         ServerLevel level = server.overworld();
-        passed = failed = 0;
+        REPORT.reset();
         bLoads = 0;
         watchB = false;
         for (Twin t : List.of(A, B)) build(level, source, t);
@@ -570,7 +559,7 @@ public final class AlwaysTests {
         report(source, Factories.stats().line());
         if (!afterRestart) {
             bench(source);
-            report(source, "result: " + passed + " passed, " + failed + " failed");
+            report(source, "result: " + REPORT.totals());
         }
     }
 
@@ -580,7 +569,7 @@ public final class AlwaysTests {
         CommandSourceStack source = context.getSource();
         MinecraftServer server = source.getServer();
         ServerLevel level = server.overworld();
-        passed = failed = 0;
+        REPORT.reset();
         watchB = true;
         bLoads = 0;
         if (truckA == null || truckB == null) {
@@ -604,7 +593,7 @@ public final class AlwaysTests {
                 boolean back = truckB != null && level.getEntity(truckB) instanceof VehicleEntity;
                 expect(source, "loaded again: twin B's Truck is back in the world on its route", back, back ? "" : "not found");
                 report(source, Factories.stats().line());
-                report(source, "restart result: " + passed + " passed, " + failed + " failed");
+                report(source, "restart result: " + REPORT.totals());
             });
         });
         return 1;

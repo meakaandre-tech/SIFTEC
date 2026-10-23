@@ -89,7 +89,7 @@ public final class MamItems {
             ItemStack stack = player.getItemInHand(hand);
             if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
             if (!Locks.allowed(player, stack)) {
-                server.sendOverlayMessage(Component.translatable("siftec.lock.item", Locks.lockOf(stack.getItem()).name()));
+                Locks.tellLocked(server, Locks.lockOf(stack.getItem()));
                 return InteractionResult.FAIL;
             }
             kind.apply(player);

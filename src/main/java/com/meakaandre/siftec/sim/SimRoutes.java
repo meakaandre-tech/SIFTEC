@@ -3,14 +3,15 @@ package com.meakaandre.siftec.sim;
 import com.meakaandre.siftec.sim.SimData.Node;
 import com.meakaandre.siftec.sim.SimData.Slot;
 import com.meakaandre.siftec.sim.SimData.Vehicle;
+import com.meakaandre.siftec.vehicle.VehicleEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** A simulated vehicle driving its route by time, and loading and unloading at its Truck Stations. */
 final class SimRoutes {
-    /** A stopped vehicle stands this long at a Truck Station (VehicleEntity.DOCK_TICKS). */
-    static final int DOCK_TICKS = 100;
+    /** A stopped vehicle stands this long at a Truck Station. */
+    static final int DOCK_TICKS = VehicleEntity.DOCK_TICKS;
     /** Share of its top speed the autopilot keeps on the straight. */
     private static final double AUTOPILOT_SPEED = 0.8;
     /** Slowest speed (blocks a tick) a leg's time is worked out at, so a stopped kind still gets somewhere. */

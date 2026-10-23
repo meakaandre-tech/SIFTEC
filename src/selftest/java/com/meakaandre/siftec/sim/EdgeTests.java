@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.sim;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.BuildingTemplate;
@@ -73,13 +74,10 @@ public final class EdgeTests {
     private static final int CX = -900, CZ0 = -900, SPACING = 12;
     private static final Item IRON = Items.IRON_INGOT;
 
-    private record Later(long at, Runnable run) {
-    }
-
     private record Poll(BooleanSupplier until, long giveUpAt, Runnable then) {
     }
 
-    private static final List<Later> LATER = new ArrayList<>();
+    private static final TestQueue LATER = new TestQueue();
     private static final List<Poll> POLLS = new ArrayList<>();
     private static int passed, failed, open;
     private static @Nullable CommandSourceStack source;
@@ -93,11 +91,7 @@ public final class EdgeTests {
     static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                run(l.run);
-            }
+            LATER.runDue(now, EdgeTests::run);
             for (Poll p : new ArrayList<>(POLLS)) {
                 if (!p.until.getAsBoolean() && now < p.giveUpAt) continue;
                 POLLS.remove(p);
@@ -125,7 +119,7 @@ public final class EdgeTests {
     }
 
     private static void later(MinecraftServer server, int ticks, Runnable run) {
-        LATER.add(new Later(server.overworld().getGameTime() + ticks, run));
+        LATER.add(server.overworld().getGameTime() + ticks, run);
     }
 
     private static void until(MinecraftServer server, BooleanSupplier cond, int most, Runnable then) {

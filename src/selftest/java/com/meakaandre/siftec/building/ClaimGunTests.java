@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.building;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -15,7 +15,6 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -46,21 +45,17 @@ public final class ClaimGunTests {
     /** The test chunks: FOE at (CX, CZ), unclaimed at CX + 1, OWN at CX + 2. Well away from the other selftests. */
     private static final int CX = 330, CZ = 200, Y = 200;
     private static final String BUILDING = "storage_container";
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST state gun ");
 
     private ClaimGunTests() {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST state gun " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Company company(CompanyData data, String id, String member) {
@@ -122,7 +117,7 @@ public final class ClaimGunTests {
     }
 
     public static void run(CommandSourceStack source, ServerLevel level, Function<Integer, String> fake) {
-        passed = failed = 0;
+        REPORT.reset();
         CompanyData data = CompanyData.get(level.getServer());
         Company own = company(data, OWN, fake.apply(10)), foe = company(data, FOE, fake.apply(11));
         BuildingDef def = Buildings.def(BUILDING);
@@ -272,6 +267,6 @@ public final class ClaimGunTests {
         // the platform force-loaded its chunks; let them go so the restart check only sees what claims hold
         for (int cx = (x0 - 16) >> 4; cx <= (x0 + 63) >> 4; cx++)
             for (int cz = (z0 - 16) >> 4; cz <= (z0 + 31) >> 4; cz++) level.setChunkForced(cx, cz, false);
-        report(source, (failed == 0 ? "OK" : "FAILED") + ": " + passed + " passed, " + failed + " failed");
+        report(source, (REPORT.failed == 0 ? "OK" : "FAILED") + ": " + REPORT.totals());
     }
 }

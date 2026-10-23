@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.compat;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -33,7 +33,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -84,6 +83,8 @@ public final class TravelersBackpackSelfTest {
     private static final String CRAFTING_NODE = "mam_megafauna_structural_analysis";
     private static final String PICKUP_NODE = "mam_caterium_quickwire";
 
+    private static final TestReport REPORT = new TestReport("SELFTEST tb ");
+
     private TravelersBackpackSelfTest() {
     }
 
@@ -114,9 +115,7 @@ public final class TravelersBackpackSelfTest {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST tb " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {

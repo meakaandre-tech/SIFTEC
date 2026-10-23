@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.blueprint.DesignerBlock;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingTests;
@@ -23,14 +25,11 @@ import com.meakaandre.siftec.sink.Sink;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -69,25 +68,15 @@ public final class DataFixTests {
     private static final int X = 10800, Y = 200, Z = -10800;
     private static final String COMPANY = "selftest_datafix";
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed, pending;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST datafix ");
+    private static int pending;
 
     private DataFixTests() {
     }
 
     public static void register() {
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("datafix").executes(DataFixTests::run)))));
@@ -97,22 +86,18 @@ public final class DataFixTests {
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
         pending++;
-        LATER.add(new Later(level.getServer().overworld().getGameTime() + ticks, () -> {
+        LATER.add(level.getServer().overworld().getGameTime() + ticks, () -> {
             run.run();
             pending--;
-        }));
+        });
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST datafix " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Company company(ServerLevel level, String id, String... done) {
@@ -176,7 +161,8 @@ public final class DataFixTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = pending = 0;
+        REPORT.reset();
+        pending = 0;
         BuildingTests.platform(level, X - 8, Z - 8, X + 24, Z + 24, Y, 8);
         later(level, 10, () -> {
             run(source, "4 alternates", () -> alternates(source, level));
@@ -202,10 +188,10 @@ public final class DataFixTests {
 
     private static void finish(CommandSourceStack source, ServerLevel level) {
         if (pending > 0) {
-            LATER.add(new Later(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level)));
+            LATER.add(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level));
             return;
         }
-        report(source, "done: " + passed + " passed, " + failed + " failed");
+        report(source, "done: " + REPORT.totals());
     }
 
     // ------------------------------------------------------------------------------------------------ 4

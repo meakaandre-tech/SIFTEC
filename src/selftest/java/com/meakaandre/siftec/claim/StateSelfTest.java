@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.claim;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.ClaimGunTests;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -16,7 +16,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -43,6 +42,8 @@ public final class StateSelfTest {
     /** The test area, well away from spawn. */
     private static final int AREA = 3000;
     private static BlockPos markerA, markerB, dirtB, hub;
+
+    private static final TestReport REPORT = new TestReport("");
 
     private StateSelfTest() {
     }
@@ -276,7 +277,6 @@ public final class StateSelfTest {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        Siftec.LOGGER.info(text);
-        source.sendSuccess(() -> Component.literal(text), false);
+        REPORT.report(source, text);
     }
 }

@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.command;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.depot.DepotBlockEntity;
 import com.meakaandre.siftec.hub.Milestone;
@@ -10,7 +10,6 @@ import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +23,7 @@ import java.util.TreeMap;
  * companies only. Every check prints "SELFTEST progression"; failures say FAIL.
  */
 public final class ProgressionTests {
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST progression ");
 
     private ProgressionTests() {
     }
@@ -36,15 +35,11 @@ public final class ProgressionTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST progression " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Company company(String... done) {
@@ -57,8 +52,7 @@ public final class ProgressionTests {
 
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        passed = 0;
-        failed = 0;
+        REPORT.reset();
 
         // ---- the HUB: tiers 0 to 9 with Satisfactory 1.0's milestones (48 with the four 1.0 added), phases opening tiers
         int milestones = 0;
@@ -132,7 +126,7 @@ public final class ProgressionTests {
         expect(source, "the Wormhole Gateway has five phases of parts", Templates.GATEWAY_MAX == 5 && Templates.gateway().maxLevel == 5
             && Templates.gateway().height() <= 48, Templates.gateway().width() + " x " + Templates.gateway().length() + " x " + Templates.gateway().height());
 
-        report(source, "done: " + passed + " passed, " + failed + " failed");
-        return failed == 0 ? 1 : 0;
+        report(source, "done: " + REPORT.totals());
+        return REPORT.failed == 0 ? 1 : 0;
     }
 }

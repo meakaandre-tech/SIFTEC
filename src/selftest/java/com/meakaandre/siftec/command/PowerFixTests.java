@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildGunPayloads;
 import com.meakaandre.siftec.building.BuildingDef;
@@ -30,15 +32,12 @@ import com.zurrtum.create.content.kinetics.transmission.GearshiftBlock;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -49,7 +48,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
@@ -74,25 +72,15 @@ public final class PowerFixTests {
     private static final String COMPANY = "selftest_powerfix";
     private static final UUID GUNNER = UUID.fromString("5e1f7e57-f1c5-4000-8000-000000000014");
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed, pending;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST powerfix ");
+    private static int pending;
 
     private PowerFixTests() {
     }
 
     public static void register() {
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("powerfix").executes(PowerFixTests::run)))));
@@ -102,13 +90,13 @@ public final class PowerFixTests {
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
         pending++;
-        LATER.add(new Later(level.getServer().overworld().getGameTime() + ticks, () -> {
+        LATER.add(level.getServer().overworld().getGameTime() + ticks, () -> {
             try {
                 run.run();
             } finally {
                 pending--;
             }
-        }));
+        });
     }
 
     /** Runs {@code then} once the condition holds, or after {@code max} ticks either way. */
@@ -120,15 +108,11 @@ public final class PowerFixTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST powerfix " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static void run(CommandSourceStack source, String part, Runnable checks) {
@@ -142,10 +126,10 @@ public final class PowerFixTests {
 
     private static void finish(CommandSourceStack source, ServerLevel level) {
         if (pending > 0) {
-            LATER.add(new Later(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level)));
+            LATER.add(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level));
             return;
         }
-        report(source, "done: " + passed + " passed, " + failed + " failed");
+        report(source, "done: " + REPORT.totals());
     }
 
     /** A test company that has done the milestones given. */
@@ -169,7 +153,8 @@ public final class PowerFixTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = pending = 0;
+        REPORT.reset();
+        pending = 0;
         BuildingTests.platform(level, X - 8, Z - 8, X + 72, Z + 40, Y, 16);
         BuildingTests.platform(level, X + FAR - 8, Z - 8, X + FAR + 8, Z + 8, Y, 16);
         later(level, 10, () -> {

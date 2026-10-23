@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.vehicle;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingLogic;
@@ -32,7 +34,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -67,12 +68,9 @@ public final class VehicleTests {
     private static final int LOAD = 64;
     private static final String COMPANY = "selftest_vehicles";
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
+    private static final TestQueue LATER = new TestQueue();
     private static final List<Runnable> EVERY_TICK = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST vehicles ");
 
     private VehicleTests() {
     }
@@ -80,12 +78,7 @@ public final class VehicleTests {
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (Runnable r : new ArrayList<>(EVERY_TICK)) r.run();
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
+            LATER.runDue(server.overworld().getGameTime());
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             LATER.clear();
@@ -101,19 +94,15 @@ public final class VehicleTests {
     // ------------------------------------------------------------------------------------------------ helpers
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        LATER.add(new Later(level.getGameTime() + ticks, run));
+        LATER.add(level.getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST vehicles " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Company company(ServerLevel level, String id, String... done) {
@@ -162,7 +151,7 @@ public final class VehicleTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         BuildingTests.platform(level, X - 30, Z - 10, X + GAP + 30, Z + 32, Y, 12);
         for (VehicleEntity v : level.getEntitiesOfClass(VehicleEntity.class, site())) v.discard();
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, site())) e.discard();
@@ -171,7 +160,7 @@ public final class VehicleTests {
             gun(source, level);
             route(source, level);
         });
-        later(level, 4400, () -> report(source, "done: " + passed + " passed, " + failed + " failed"));
+        later(level, 4400, () -> report(source, "done: " + REPORT.totals()));
         report(source, "test site ready; the test runs in a second and reports in about three minutes");
         return 1;
     }
@@ -347,7 +336,7 @@ public final class VehicleTests {
     private static int restart(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         int[] tries = {0};
         Runnable[] look = new Runnable[1];
         look[0] = () -> {
@@ -371,7 +360,7 @@ public final class VehicleTests {
             later(level, VehicleEntity.DOCK_TICKS + 140, () -> {
                 expect(source, "restart: it is still driving itself", !truck.isRemoved() && truck.position().distanceTo(was) > 2,
                     "moved " + String.format("%.1f", truck.position().distanceTo(was)));
-                report(source, "restart done: " + passed + " passed, " + failed + " failed");
+                report(source, "restart done: " + REPORT.totals());
             });
         };
         later(level, 10, look[0]);

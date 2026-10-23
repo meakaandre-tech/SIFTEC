@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
@@ -33,8 +35,6 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -76,25 +76,14 @@ public final class ExplorationTests {
     private static final int X = 5600, Y = 230, Z = 2400;
     private static final String COMPANY = "selftest_wp10";
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST exploration ");
 
     private ExplorationTests() {
     }
 
     public static void register() {
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("exploration").executes(ExplorationTests::run)))
@@ -104,19 +93,15 @@ public final class ExplorationTests {
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        LATER.add(new Later(level.getGameTime() + ticks, run));
+        LATER.add(level.getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST exploration " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static boolean registered(String id) {
@@ -178,8 +163,7 @@ public final class ExplorationTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = 0;
-        failed = 0;
+        REPORT.reset();
 
         // ---- overclocking is gone: no slugs, no Power Shards
         expect(source, "the power slugs and Power Shards are gone", !registered("siftec:power_shard") && !registered("siftec:blue_power_slug")
@@ -415,7 +399,7 @@ public final class ExplorationTests {
                 boolean painted = sh != null && sh.placement() != null && level.getBlockState(sh.placement().at(0, 4, 0)).is(block("minecraft:lime_concrete"));
                 expect(source, "the Customizer's paint holds: the Shop's orange roof is lime and the building still stands", painted && sh.paint.equals("lime/black/painted/"),
                     sh == null ? "no Shop" : sh.paint + ", roof " + (sh.placement() == null ? "-" : level.getBlockState(sh.placement().at(0, 4, 0)).toString()));
-                report(source, "result: " + passed + " passed, " + failed + " failed");
+                report(source, "result: " + REPORT.totals());
             });
         });
     }

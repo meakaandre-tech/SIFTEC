@@ -172,7 +172,7 @@ public final class MapServer {
             Files.writeString(file, id);
             return id;
         } catch (IOException e) {
-            Siftec.LOGGER.error("SIFTEC map: could not read or write {}", file, e);
+            Siftec.LOGGER.error("SIFTEC: could not read or write the map file {}", file, e);
             return UUID.randomUUID().toString();
         }
     }
@@ -274,7 +274,7 @@ public final class MapServer {
                 if (player != null) send(player, payload);
             } catch (IllegalArgumentException ignored) {
                 // a test company's made-up member
-                Siftec.LOGGER.debug("SIFTEC map: member {} is not a UUID; not sent to", member, ignored);
+                Siftec.LOGGER.debug("SIFTEC: map member {} is not a UUID; not sent to", member, ignored);
             }
         }
     }
@@ -605,7 +605,7 @@ public final class MapServer {
                 if (player != null) sendMarkers(player);
             } catch (IllegalArgumentException ignored) {
                 // a test company's made-up member
-                Siftec.LOGGER.debug("SIFTEC map: member {} is not a UUID; not sent to", id, ignored);
+                Siftec.LOGGER.debug("SIFTEC: map member {} is not a UUID; not sent to", id, ignored);
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.command;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Locks;
@@ -13,7 +13,6 @@ import com.zurrtum.create.foundation.utility.FuelUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -27,6 +26,8 @@ import java.util.List;
 
 /** Used by the automated test (/siftec selftest content): fuels, item and recipe locks, and the shared Crafter cache. */
 final class ContentSelfTest {
+    private static final TestReport REPORT = new TestReport("");
+
     private ContentSelfTest() {
     }
 
@@ -101,7 +102,6 @@ final class ContentSelfTest {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        Siftec.LOGGER.info(text);
-        source.sendSuccess(() -> Component.literal(text), false);
+        REPORT.report(source, text);
     }
 }

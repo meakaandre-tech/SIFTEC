@@ -99,7 +99,7 @@ public final class ClientTiles {
                 try {
                     if (Files.exists(file)) read = MapTile.unpack(Files.readAllBytes(file));
                 } catch (IOException ex) {
-                    Siftec.LOGGER.warn("SIFTEC map: unreadable cached tile {}", file, ex);
+                    Siftec.LOGGER.warn("SIFTEC: unreadable cached map tile {}", file, ex);
                 }
                 MapTile tile = read;
                 Minecraft.getInstance().execute(() -> {
@@ -144,7 +144,7 @@ public final class ClientTiles {
         try {
             tile = MapTile.unpack(data);
         } catch (IOException e) {
-            Siftec.LOGGER.warn("SIFTEC map: bad tile from the server", e);
+            Siftec.LOGGER.warn("SIFTEC: bad map tile from the server", e);
             return;
         }
         Slot e = entry(region);
@@ -159,7 +159,7 @@ public final class ClientTiles {
             Files.write(tmp, data);
             Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ex) {
-            Siftec.LOGGER.warn("SIFTEC map: could not cache a tile", ex);
+            Siftec.LOGGER.warn("SIFTEC: could not cache a map tile", ex);
         }
     }
 

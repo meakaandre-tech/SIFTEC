@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -21,7 +22,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -52,6 +52,8 @@ import java.util.List;
 public final class AutomateTests {
     private static final String YES = "selftest_auto_yes", NO = "selftest_auto_no";
 
+    private static final TestReport REPORT = new TestReport("SELFTEST automate ");
+
     private AutomateTests() {
     }
 
@@ -62,9 +64,7 @@ public final class AutomateTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST automate " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static Item item(String id) {

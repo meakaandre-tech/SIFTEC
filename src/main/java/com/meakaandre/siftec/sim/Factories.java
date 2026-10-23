@@ -65,7 +65,6 @@ public final class Factories {
     });
     private static @Nullable Future<?> running;
     static List<Sim.Group> runningGroups = List.of();
-    private static long runningStarted;
     static boolean stopping;
     static @Nullable MinecraftServer server;
     /** Reads that fell due while the worker was busy (a building's or port's turn): done as soon as the step is in. */
@@ -317,7 +316,6 @@ public final class Factories {
         lastGroups = groups.size();
         if (groups.isEmpty()) return;
         runningGroups = groups;
-        runningStarted = System.nanoTime();
         running = WORKER.submit(() -> {
             long t0 = System.nanoTime();
             for (Sim.Group g : groups) {

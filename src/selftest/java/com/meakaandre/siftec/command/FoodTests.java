@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.command;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.fluid.ModFluids;
 import com.meakaandre.siftec.food.Food;
 import com.meakaandre.siftec.food.PreserveItem;
@@ -22,7 +22,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -55,7 +54,7 @@ import java.util.Set;
 public final class FoodTests {
     private static final String PRESERVED = "mam_nutrients_preserved_foods", KITCHEN = "mam_nutrients_automated_cooking",
         FERMENTING = "mam_nutrients_bulk_fermentation", CIDER = "mam_nutrients_cider_and_mead", BRASS = "mam_caterium_brass";
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST food ");
 
     private FoodTests() {
     }
@@ -67,15 +66,11 @@ public final class FoodTests {
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST food " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Item item(String id) {
@@ -136,8 +131,7 @@ public final class FoodTests {
         CommandSourceStack source = context.getSource();
         MinecraftServer server = source.getServer();
         ServerLevel level = server.overworld();
-        passed = 0;
-        failed = 0;
+        REPORT.reset();
         boolean fd = FabricLoader.getInstance().isModLoaded("farmersdelight");
         FakePlayer player = FakePlayer.get(level);
 
@@ -314,7 +308,7 @@ public final class FoodTests {
             makes(server, level, "siftec:crafting/block_of_sulfur", item("minecraft:sulfur")) == 1 && makes(server, level, "siftec:crafting/sulfur_from_block", item("cgs:sulfur")) == 4, "");
         expect(source, "water boils away in the Nether only", NetherWater.hot(server.getLevel(Level.NETHER)) && !NetherWater.hot(level), "");
 
-        report(source, "done: " + passed + " passed, " + failed + " failed");
-        return failed == 0 ? 1 : 0;
+        report(source, "done: " + REPORT.totals());
+        return REPORT.failed == 0 ? 1 : 0;
     }
 }

@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.building;
 
-import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.command.LogisticsTests;
 import com.meakaandre.siftec.company.Companies;
@@ -46,7 +47,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -87,12 +87,9 @@ public final class BuildingsATests {
     /** Ticks the buildings get to settle before the rates are measured, and how long they are measured over. */
     private static final int WARMUP = 300, MINUTE = 1200;
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
+    private static final TestQueue LATER = new TestQueue();
     private static final List<Runnable> EVERY_TICK = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestReport REPORT = new TestReport("SELFTEST buildings_a ");
 
     private BuildingsATests() {
     }
@@ -100,12 +97,7 @@ public final class BuildingsATests {
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (Runnable r : new ArrayList<>(EVERY_TICK)) r.run();
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
+            LATER.runDue(server.overworld().getGameTime());
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             LATER.clear();
@@ -121,19 +113,15 @@ public final class BuildingsATests {
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        LATER.add(new Later(level.getGameTime() + ticks, run));
+        LATER.add(level.getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST buildings_a " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Item item(String id) {
@@ -313,7 +301,7 @@ public final class BuildingsATests {
 
     private static void runSettled(CommandSourceStack source) {
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         Company company = company(level);
 
         // ---- the list: every building of this set, with its tab, unlock, SU and a template that reads
@@ -521,7 +509,7 @@ public final class BuildingsATests {
             int rods = 0;
             for (ItemStack s : back) if (s.is(item("siftec:iron_rod"))) rods += s.getCount();
             expect(source, "Smelter dismantles with its cost and contents", rods == 5, back.size() + " stacks back, " + rods + " rods");
-            report(source, "result: " + passed + " passed, " + failed + " failed");
+            report(source, "result: " + REPORT.totals());
         });
     }
 
@@ -700,7 +688,7 @@ public final class BuildingsATests {
     private static int restart(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = failed = 0;
+        REPORT.reset();
         Placement con = at("constructor", X, Z);
         level.getChunk(con.anchor());
         ControllerBlockEntity cc = controller(level, con);
@@ -722,7 +710,7 @@ public final class BuildingsATests {
             ControllerBlockEntity m2 = controller(level, mk1);
             expect(source, "restart: the Miner Mk.1 still knows its node and goes on mining", m2 != null && m2.node != null && m2.made > before,
                 m2 == null ? "no controller" : m2.node + ", " + before + " -> " + m2.made);
-            report(source, "restart result: " + passed + " passed, " + failed + " failed");
+            report(source, "restart result: " + REPORT.totals());
         });
         return 1;
     }

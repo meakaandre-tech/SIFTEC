@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.map;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.TestQueue;
+import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
@@ -17,15 +19,12 @@ import com.mojang.brigadier.context.CommandContext;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
@@ -35,7 +34,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.gamerules.GameRules;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -83,26 +81,15 @@ public final class MapTests {
         }
     }
 
-    private record Later(long at, Runnable run) {
-    }
-
-    private static final List<Later> LATER = new ArrayList<>();
-    private static int passed, failed;
+    private static final TestQueue LATER = new TestQueue();
+    private static final TestReport REPORT = new TestReport("SELFTEST map ");
 
     private MapTests() {
     }
 
     public static void register() {
         PayloadTypeRegistry.clientboundPlay().register(Control.TYPE, Control.CODEC);
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            long now = server.overworld().getGameTime();
-            for (Later l : new ArrayList<>(LATER)) {
-                if (l.at > now) continue;
-                LATER.remove(l);
-                l.run.run();
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
+        LATER.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("map").executes(MapTests::run)))
@@ -123,19 +110,15 @@ public final class MapTests {
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        LATER.add(new Later(level.getGameTime() + ticks, run));
+        LATER.add(level.getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
-        String line = "SELFTEST map " + text;
-        Siftec.LOGGER.info(line);
-        source.sendSuccess(() -> Component.literal(line), false);
+        REPORT.report(source, text);
     }
 
     private static void expect(CommandSourceStack source, String what, boolean ok, String detail) {
-        if (ok) passed++;
-        else failed++;
-        report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
+        REPORT.expect(source, what, ok, detail);
     }
 
     private static Company company(CommandSourceStack source, String id, String... members) {
@@ -167,8 +150,7 @@ public final class MapTests {
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
-        passed = 0;
-        failed = 0;
+        REPORT.reset();
 
         // ---- the unlock and the locator bar
         Milestone field = Milestones.get("field_research");
@@ -249,7 +231,7 @@ public final class MapTests {
             int px = Math.floorMod(rx + 700, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS, pz = Math.floorMod(rz, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS;
             boolean guessed = t != null && t.known(MapTile.index(px, pz));
             expect(source, "land nobody loaded in the sweep is filled in from the world generator", guessed, "");
-            report(source, "done (later checks): " + passed + " passed, " + failed + " failed");
+            report(source, "done (later checks): " + REPORT.totals());
         });
 
         // ---- markers: private, shared, and a second member of the company
@@ -292,8 +274,8 @@ public final class MapTests {
         markers.all().removeIf(m -> m.owner.equals(fakeId) || m.owner.equals(MEMBER_1) || m.owner.equals(MEMBER_2));
         markers.setDirty();
 
-        report(source, "done: " + passed + " passed, " + failed + " failed (a later check follows)");
-        return failed == 0 ? 1 : 0;
+        report(source, "done: " + REPORT.totals() + " (a later check follows)");
+        return REPORT.failed == 0 ? 1 : 0;
     }
 
     // ------------------------------------------------------------------------------------------------ the smoke run
