@@ -14,7 +14,7 @@ recipes clash only when they take the same kinds of input and make the same thin
 input is enough. A clash with a Hard Drive alternate is listed, not refused: the company chose the alternate."""
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import content
+from tables import content
 import recipes
 
 C = "create:"

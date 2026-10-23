@@ -1,7 +1,7 @@
 """Every recipe the pack adds, written against the Recipes tab of the design doc. build() returns {path under
 data/siftec/recipe: json}. Amounts of fluid are in mB here.
 
-Satisfactory 1.0's machine recipes come from tools/satisfactory.py at Satisfactory's amounts and times, each on the
+Satisfactory 1.0's machine recipes come from tools/tables/satisfactory.py at Satisfactory's amounts and times, each on the
 Create machines of the building Satisfactory makes it in:
 
     Constructor     Press over a Basin (compacting)          Foundry     heated Mixer over a Basin
@@ -16,7 +16,7 @@ Create machines of the building Satisfactory makes it in:
 A Basin's filter picks which recipe runs when more than one fits what is in it, so the Constructor and the other
 basin buildings set their recipe with that filter. Every recipe is locked to the milestone, MAM node or Hard Drive
 alternate that unlocks it in 1.0. The food, brass and heat recipes (Food and Brass tab) are carried over below."""
-import content
+from tables import content
 
 DROPLETS = 81  # Create Fly counts fluid in droplets: 81 per mB
 TICKS = 20

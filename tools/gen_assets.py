@@ -3,8 +3,8 @@
 Textures come from tools/import_art.py; anything without one borrows a vanilla or Create texture."""
 import json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
-import content
-import guide
+from tables import content
+from tables import guide
 import recipes
 import structures
 
@@ -440,10 +440,10 @@ for mid, name, cost, text in content.PHASES:
                            "seconds": 0, "items": [], "tokens": []})
     lang[f"siftec.milestone.{mid}"] = name
     lang[f"siftec.milestone.{mid}.unlocks"] = text
-# every milestone and phase has its Satisfactory-style text (tools/guide.py), shown in the HUB under its name
+# every milestone and phase has its Satisfactory-style text (tools/tables/guide.py), shown in the HUB under its name
 for m in data["milestones"] + data["phases"]:
     if m["id"] not in guide.MILESTONE_TEXT:
-        raise SystemExit(f"milestone {m['id']}: no text in tools/guide.py (MILESTONE_TEXT)")
+        raise SystemExit(f"milestone {m['id']}: no text in tools/tables/guide.py (MILESTONE_TEXT)")
     m["desc"] = True
     lang[f"siftec.milestone.{m['id']}.desc"] = guide.MILESTONE_TEXT[m["id"]]
 if set(guide.MILESTONE_TEXT) - {m["id"] for m in data["milestones"] + data["phases"]}:
@@ -1031,7 +1031,7 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
     # recipe and does nothing), and its Ponder scene's own lines (client/ponder/BuildingScenes.java)
     lines = guide.BUILDING_GUIDE.get(bid)
     if not lines:
-        raise SystemExit(f"building {bid}: no guide text in tools/guide.py (BUILDING_GUIDE)")
+        raise SystemExit(f"building {bid}: no guide text in tools/tables/guide.py (BUILDING_GUIDE)")
     b["guide"] = lines
     lang[f"item.siftec.building_{bid}"] = bname
     item_def(f"building_{bid}", "siftec:item/blueprint")

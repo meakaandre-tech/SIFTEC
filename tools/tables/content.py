@@ -1,8 +1,8 @@
 """The pack's content tables: parts, milestones, wormhole phases. gen_assets.py turns these into the
 files the mod reads. Costs are written the way the design doc writes them ("20 Iron Rod, 10 Iron Sheet").
 Satisfactory's own numbers (recipes, build costs, milestone costs and times, sink points) come from
-tools/satisfactory.py, the 1.0 game export; this file says what each Satisfactory name is in the pack."""
-import satisfactory as SF
+tools/tables/satisfactory.py, the 1.0 game export; this file says what each Satisfactory name is in the pack."""
+from . import satisfactory as SF
 
 # ---------------------------------------------------------------------------------------------------
 # Parts that already exist in vanilla or another mod: name -> item id
@@ -190,7 +190,7 @@ FLUIDS = [
 
 # ---------------------------------------------------------------------------------------------------
 # Milestones (HUB Milestones tab). (tier, id, name, unlock text, locked item ids, tokens). Cost and lock time are
-# Satisfactory 1.0's and come from tools/satisfactory.py (below); the list says what each unlocks in the pack.
+# Satisfactory 1.0's and come from tools/tables/satisfactory.py (below); the list says what each unlocks in the pack.
 # "items" are the things nobody in the company can craft or place until the milestone is done (the parts each
 # milestone's recipes make are added from PART_LOCKS, and the other mods' items from MORE_LOCKS).
 # "tokens" are switches other systems read: map (the minimap and fullscreen map open, map/MapServer.java), scanner:<node> (the node shows on the Resource Scanner), belt:<items a
@@ -335,7 +335,7 @@ MILESTONES = [
     (9, "peak_efficiency", "Peak Efficiency", "Belt Mk.6: belts with no shaft run at 1,200 items/min; Ficsonium and the Ficsonium Fuel Rod", [], ["belt:1200"]),
 ]
 
-# Satisfactory 1.0's cost and lock time for every milestone come from tools/satisfactory.py (Concrete as any stone,
+# Satisfactory 1.0's cost and lock time for every milestone come from tools/tables/satisfactory.py (Concrete as any stone,
 # Iron Plate as Iron Sheet). Hypertubes is Contraption Transit at the same cost.
 SAT_MILESTONES = {f"HUB Upgrade {n}": f"hub_upgrade_{n}" for n in range(1, 7)}
 SAT_MILESTONES.update({"Base Building": "base_building", "Logistics": "logistics", "Field Research": "field_research",
