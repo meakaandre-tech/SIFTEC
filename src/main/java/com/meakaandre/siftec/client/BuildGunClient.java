@@ -9,6 +9,12 @@ import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.Category;
 import com.meakaandre.siftec.building.Placement;
+import com.meakaandre.siftec.client.ponder.Guide;
+import com.meakaandre.siftec.prefab.Prefabs;
+import com.meakaandre.siftec.prefab.Template;
+import com.meakaandre.siftec.vehicle.VehicleEntity;
+import com.meakaandre.siftec.vehicle.VehicleKind;
+import com.meakaandre.siftec.vehicle.Vehicles;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.client.AllSpecialTextures;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
@@ -27,6 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -194,7 +201,7 @@ public final class BuildGunClient {
         // the guide: the picked building's Ponder scene
         while (PONDER.consumeClick()) {
             BuildingDef def = current(mc);
-            if (def != null && !dismantle) com.meakaandre.siftec.client.ponder.Guide.open(def);
+            if (def != null && !dismantle) Guide.open(def);
         }
     }
 
@@ -257,7 +264,7 @@ public final class BuildGunClient {
             shown = null;
             BuildGunPayloads.View v = verdict;
             // a vehicle: the outline is its turned body, along its whole length
-            com.meakaandre.siftec.vehicle.VehicleEntity vehicle = v != null && v.hasBox() ? com.meakaandre.siftec.vehicle.Vehicles.aimed(player) : null;
+            VehicleEntity vehicle = v != null && v.hasBox() ? Vehicles.aimed(player) : null;
             if (vehicle != null) {
                 outliner.remove(TARGET);
                 Vec3[] c = vehicle.bodyCorners(0.05);
@@ -290,16 +297,16 @@ public final class BuildGunClient {
         boolean rebuild = def.structure() ? (!spot.equals(shown) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10 : !spot.equals(shown) || ticks % 10 == 0;
         if (rebuild) {
             lastRebuild = ticks;
-            com.meakaandre.siftec.vehicle.VehicleKind vehicle = com.meakaandre.siftec.vehicle.Vehicles.kind(def);
+            VehicleKind vehicle = Vehicles.kind(def);
             if (vehicle != null) {
                 // a vehicle: its footprint, and whether there is room for it (unlock, land and cost are the server's)
-                Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.check(mc.level, spot, null, null, player.hasInfiniteMaterials());
-                shape = com.meakaandre.siftec.vehicle.Vehicles.cells(spot, vehicle);
+                Buildings.Check check = Vehicles.check(mc.level, spot, null, null, player.hasInfiniteMaterials());
+                shape = Vehicles.cells(spot, vehicle);
                 blocked = new ArrayList<>();
                 localOk = check.ok();
                 localMessage = check.ok() ? Component.translatable("siftec.build_gun.fits_vehicle", def.name()) : check.message();
             } else if (def.structure()) {
-                com.meakaandre.siftec.prefab.Prefabs.Check check = com.meakaandre.siftec.prefab.Prefabs.check(mc.level, BuildGun.hubSpot(spot), null, false);
+                Prefabs.Check check = Prefabs.check(mc.level, BuildGun.hubSpot(spot), null, false);
                 shape = hubCells(spot);
                 blocked = new ArrayList<>(check.blocked);
                 localOk = check.ok();
@@ -352,8 +359,8 @@ public final class BuildGunClient {
 
     /** Every block the HUB will ever have, in the world. */
     private static List<BlockPos> hubCells(Placement p) {
-        com.meakaandre.siftec.prefab.Prefabs.Spot spot = BuildGun.hubSpot(p);
-        com.meakaandre.siftec.prefab.Template t = spot.kind().template();
+        Prefabs.Spot spot = BuildGun.hubSpot(p);
+        Template t = spot.kind().template();
         List<BlockPos> out = new ArrayList<>();
         for (long key : t.keys()) {
             if (!t.solidAtAnyLevel(key)) continue;
@@ -391,7 +398,7 @@ public final class BuildGunClient {
     /** Forgets everything on leaving a world. */
     public static void reset() {
         category = 0;
-        java.util.Arrays.fill(picked, 0);
+        Arrays.fill(picked, 0);
         selected = dismantle = nudge = flip = ctrlHeld = scrolled = wasHolding = false;
         turns = 0;
         frozen = shown = null;

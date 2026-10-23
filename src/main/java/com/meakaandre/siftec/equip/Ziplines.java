@@ -1,14 +1,17 @@
 package com.meakaandre.siftec.equip;
 
-import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
+import com.meakaandre.siftec.mixin.DisplayInvoker;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3;
+import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -68,17 +71,17 @@ public final class Ziplines {
      * (the rider then comes down slowly).
      */
     private static Vec3 landing(ServerLevel level, BlockPos pole, Vec3 heading) {
-        java.util.List<net.minecraft.core.Direction> sides = new java.util.ArrayList<>(4);
-        net.minecraft.core.Direction ahead = heading.lengthSqr() < 0.01 ? net.minecraft.core.Direction.NORTH : net.minecraft.core.Direction.getApproximateNearest(heading.x, 0, heading.z);
+        List<Direction> sides = new ArrayList<>(4);
+        Direction ahead = heading.lengthSqr() < 0.01 ? Direction.NORTH : Direction.getApproximateNearest(heading.x, 0, heading.z);
         sides.add(ahead);
         sides.add(ahead.getClockWise());
         sides.add(ahead.getCounterClockWise());
         sides.add(ahead.getOpposite());
-        for (net.minecraft.core.Direction side : sides) {
+        for (Direction side : sides) {
             BlockPos column = pole.relative(side);
             for (int dy = 1; dy >= -8; dy--) {
                 BlockPos feet = column.above(dy);
-                if (level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), net.minecraft.core.Direction.UP)
+                if (level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), Direction.UP)
                     && level.getBlockState(feet).getCollisionShape(level, feet).isEmpty() && level.getBlockState(feet.above()).getCollisionShape(level, feet.above()).isEmpty()
                     && level.getFluidState(feet).isEmpty()) {
                     return new Vec3(feet.getX() + 0.5, feet.getY(), feet.getZ() + 0.5);
@@ -97,11 +100,11 @@ public final class Ziplines {
         // any line roughly ahead of where the player is looking will do to set off on
         BlockPos to = next(level, pole, heading.normalize(), null, -0.2);
         if (to == null) return false;
-        Display carrier = net.minecraft.world.entity.EntityTypes.BLOCK_DISPLAY.create(level, EntitySpawnReason.TRIGGERED);
+        Display carrier = EntityTypes.BLOCK_DISPLAY.create(level, EntitySpawnReason.TRIGGERED);
         if (carrier == null) return false;
         Vec3 at = top(pole);
         carrier.setPos(at.x, at.y, at.z);
-        ((com.meakaandre.siftec.mixin.DisplayInvoker) carrier).siftec$glide(2);
+        ((DisplayInvoker) carrier).siftec$glide(2);
         level.addFreshEntity(carrier);
         carrier.addTag(TAG);
         if (!player.startRiding(carrier, true, true)) {

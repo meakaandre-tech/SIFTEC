@@ -2,6 +2,7 @@ package com.meakaandre.siftec.sim;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingDef;
+import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
@@ -9,10 +10,15 @@ import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.building.SimAccess;
+import com.meakaandre.siftec.building.SpecialBuildings;
 import com.meakaandre.siftec.command.PolishTests;
+import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.drone.DronePortBlockEntity;
 import com.meakaandre.siftec.drone.PortContainer;
 import com.meakaandre.siftec.power.PowerTests;
+import com.meakaandre.siftec.save.JsonSavedData;
+import com.meakaandre.siftec.sink.Sink;
 import com.meakaandre.siftec.vehicle.VehicleKind;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
@@ -37,6 +43,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
@@ -102,7 +110,7 @@ public final class EdgeTests {
             watched = Long.MIN_VALUE;
         });
         ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
-            if (watched != Long.MIN_VALUE && level.dimension() == net.minecraft.world.level.Level.OVERWORLD && chunk.getPos().pack() == watched) watchedLoads++;
+            if (watched != Long.MIN_VALUE && level.dimension() == Level.OVERWORLD && chunk.getPos().pack() == watched) watchedLoads++;
         });
     }
 
@@ -500,18 +508,18 @@ public final class EdgeTests {
         burner.input.setItem(0, new ItemStack(item("siftec:solid_biofuel"), 64));
         Factories.recordNow(level, sink);
         Factories.recordNow(level, burner);
-        var company = com.meakaandre.siftec.company.CompanyData.get(server).byId(sink.companyId);
+        var company = CompanyData.get(server).byId(sink.companyId);
         String owner = sink.companyId;
         later(server, 200, () -> {
             ItemStack plates = ItemStack.EMPTY;
             for (String id : new String[]{"siftec:iron_plate", "siftec:iron_rod", "siftec:screw", "siftec:reinforced_iron_plate", "minecraft:iron_ingot"}) {
                 ItemStack one = new ItemStack(item(id));
-                if (!one.isEmpty() && com.meakaandre.siftec.sink.Sink.accepts(one) && com.meakaandre.siftec.sink.Sink.worthOne(one) > 0) {
+                if (!one.isEmpty() && Sink.accepts(one) && Sink.worthOne(one) > 0) {
                     plates = one.copyWithCount(32);
                     break;
                 }
             }
-            long worth = com.meakaandre.siftec.sink.Sink.worth(plates);
+            long worth = Sink.worth(plates);
             long before = company == null ? 0 : company.pointsEver;
             boolean powered = sink.powered;
             // the plates arrive just as the chunk stops ticking (it stays loaded through F): the real Sink is kept from
@@ -600,9 +608,9 @@ public final class EdgeTests {
             BlockPos terminal = new BlockPos(s.x(0) + 8, Y + 1, s.z(2) + dz);
             BuildingDef def = Buildings.def("drone_port");
             BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
-            int[] cell = t == null ? null : com.meakaandre.siftec.building.SpecialBuildings.terminalCell(t);
+            int[] cell = t == null ? null : SpecialBuildings.terminalCell(t);
             if (cell == null) return null;
-            Placement p = com.meakaandre.siftec.building.SpecialBuildings.forTerminal(def, cell, terminal, Direction.NORTH);
+            Placement p = SpecialBuildings.forTerminal(def, cell, terminal, Direction.NORTH);
             boolean ok = true;
             for (BuildingTemplate.Cell c : t.members) {
                 BlockPos at = p.at(c);
@@ -678,7 +686,7 @@ public final class EdgeTests {
             later(server, 60, () -> {
                 SimData.Node before = Factories.node(level, at);
                 boolean sim = before != null && before.sim;
-                level.setBlock(at, Blocks.AIR.defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+                level.setBlock(at, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                 later(server, 5, () -> {
                     SimData.Node after = Factories.node(level, at);
                     expect("broken port: a Drone Port broken while simulated is forgotten at once", sim && after == null,
@@ -777,7 +785,7 @@ public final class EdgeTests {
             SimData.Node b = Factories.node(level, p.b.getBlockPos());
             report("dead link: A " + state(level, p.a.getBlockPos()) + ", B " + state(level, p.b.getBlockPos()) + " simulated " + (b != null && b.sim) + "; " + onBelt + " iron on the simulated belt");
             // the belt is taken away
-            for (BlockPos pos : BlockPos.betweenClosed(p.beltFrom, p.beltTo)) level.setBlock(pos, Blocks.AIR.defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_ALL);
+            for (BlockPos pos : BlockPos.betweenClosed(p.beltFrom, p.beltTo)) level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             later(server, 220, () -> {
                 all(level, s);
                 later(server, 120, () -> {
@@ -909,7 +917,7 @@ public final class EdgeTests {
 
     /** Copies a node, so a step of it touches nothing real. */
     private static SimData.Node copy(SimData.Node n) {
-        SimData.Node c = com.meakaandre.siftec.save.JsonSavedData.GSON.fromJson(com.meakaandre.siftec.save.JsonSavedData.GSON.toJson(n), SimData.Node.class);
+        SimData.Node c = JsonSavedData.GSON.fromJson(JsonSavedData.GSON.toJson(n), SimData.Node.class);
         SimData.ensure(c);
         return c;
     }
@@ -937,7 +945,7 @@ public final class EdgeTests {
             return;
         }
         long now = level.getGameTime();
-        int room = com.meakaandre.siftec.building.BuildingPower.WASTE_ROOM;
+        int room = BuildingPower.WASTE_ROOM;
         expect("nuclear: the recorded plant's output holds several rods' worth of waste, as the real one", model.outCap == room,
             model.outCap + " (" + room + " wanted)");
         // with water and room for the waste: it runs (both before and after the fixes)
@@ -1123,7 +1131,7 @@ public final class EdgeTests {
     private static void saving(MinecraftServer server, ServerLevel level) {
         SimData.get(server).setDirty();
         int before = SimData.encodes();
-        com.meakaandre.siftec.company.Companies.save(server);
+        Companies.save(server);
         later(server, 140, () -> {
             int writes = SimData.encodes() - before;
             expect("saving: a company's quick save does not write the factory simulation out of step with the chunks", writes == 0, writes + " writes");

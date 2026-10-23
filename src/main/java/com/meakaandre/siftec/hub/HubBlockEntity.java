@@ -4,6 +4,7 @@ import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.prefab.Prefabs;
+import com.meakaandre.siftec.util.IntakeStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -15,6 +16,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The HUB Terminal or the Wormhole Gateway's terminal. It remembers which company it belongs to and, for a
@@ -31,13 +35,13 @@ public class HubBlockEntity extends BlockEntity {
     public int[] legs;
     public int builtLevel;
     /** What putting the HUB down cost (its 20 Raw Iron): given back when it is picked up. */
-    public final java.util.List<ItemStack> refund = new java.util.ArrayList<>();
+    public final List<ItemStack> refund = new ArrayList<>();
     private int clock;
     /** Ticks run, for the self-test. */
     public long ticked;
 
     /** Lets belts, funnels and hoppers deliver; it only takes parts the active milestone still needs. */
-    public final com.meakaandre.siftec.util.IntakeStorage intake = new com.meakaandre.siftec.util.IntakeStorage(this::wanted, this::accept);
+    public final IntakeStorage intake = new IntakeStorage(this::wanted, this::accept);
 
     public HubBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -66,7 +70,7 @@ public class HubBlockEntity extends BlockEntity {
             view.putInt("Level", builtLevel);
             if (legs != null) view.putIntArray("Legs", legs);
         }
-        if (!refund.isEmpty()) view.store("Refund", ItemStack.OPTIONAL_CODEC.listOf(), new java.util.ArrayList<>(refund));
+        if (!refund.isEmpty()) view.store("Refund", ItemStack.OPTIONAL_CODEC.listOf(), new ArrayList<>(refund));
     }
 
     @Override
@@ -80,7 +84,7 @@ public class HubBlockEntity extends BlockEntity {
         builtLevel = view.getIntOr("Level", 0);
         legs = view.getIntArray("Legs").orElse(null);
         refund.clear();
-        for (ItemStack stack : view.read("Refund", ItemStack.OPTIONAL_CODEC.listOf()).orElse(java.util.List.of())) if (!stack.isEmpty()) refund.add(stack);
+        for (ItemStack stack : view.read("Refund", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of())) if (!stack.isEmpty()) refund.add(stack);
         if (anchor == null) prefab = false;
     }
 

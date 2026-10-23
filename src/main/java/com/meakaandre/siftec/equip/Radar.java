@@ -2,11 +2,13 @@ package com.meakaandre.siftec.equip;
 
 import com.meakaandre.siftec.block.NodeBlock;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.building.SpecialBuildings;
 import com.meakaandre.siftec.collect.Collectible;
 import com.meakaandre.siftec.collect.Collectibles;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.geyser.GeyserSearch;
 import com.meakaandre.siftec.item.NodeScannerItem;
 import com.meakaandre.siftec.map.MapServer;
 import com.meakaandre.siftec.node.Node;
@@ -60,8 +62,8 @@ public final class Radar {
         // the geysers in its range, in land nobody has loaded too: the game generates the sulfur cave chunks in the
         // background and their geysers go on the map, within a capped radius (every chunk it generates stays on disk)
         String companyId = company.id;
-        int radius = Math.min(com.meakaandre.siftec.geyser.GeyserSearch.MAX_RADIUS, CELLS * Collectibles.CELL / 16);
-        com.meakaandre.siftec.geyser.GeyserSearch.search(level, c.getBlockPos(), radius, geysers -> {
+        int radius = Math.min(GeyserSearch.MAX_RADIUS, CELLS * Collectibles.CELL / 16);
+        GeyserSearch.search(level, c.getBlockPos(), radius, geysers -> {
             Company owner = CompanyData.get(level.getServer()).byId(companyId);
             if (owner != null && !geysers.isEmpty()) {
                 Companies.tell(level.getServer(), owner, Component.translatable("siftec.radar.geysers", geysers.size()).withStyle(ChatFormatting.GOLD));
@@ -99,7 +101,7 @@ public final class Radar {
     public static void use(ServerPlayer player, ControllerBlockEntity c) {
         if (!(player.level() instanceof ServerLevel server)) return;
         // the survey is the owning company's: what it lists depends on that company's scanner research
-        if (!com.meakaandre.siftec.building.SpecialBuildings.mayOperate(player, c)) {
+        if (!SpecialBuildings.mayOperate(player, c)) {
             player.sendOverlayMessage(Component.translatable("siftec.build_gun.not_yours"));
             return;
         }

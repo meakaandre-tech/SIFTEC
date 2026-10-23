@@ -1,18 +1,35 @@
 package com.meakaandre.siftec.building;
 
-import com.meakaandre.siftec.sink.Shop;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.blueprint.DesignerBlockEntity;
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.death.DeathCrates;
+import com.meakaandre.siftec.equip.Ziplines;
+import com.meakaandre.siftec.geyser.Vents;
+import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
+import com.meakaandre.siftec.node.NodePlacer;
+import com.meakaandre.siftec.node.NodeSites;
+import com.meakaandre.siftec.owner.Ownership;
+import com.meakaandre.siftec.power.PowerGrids;
+import com.meakaandre.siftec.sim.Factories;
+import com.meakaandre.siftec.sink.Shop;
+import com.zurrtum.create.AllItems;
+import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -23,28 +40,35 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * The building framework: the list of buildings, and placing, dismantling and protecting them.
@@ -213,10 +237,10 @@ public final class Buildings {
         if (intake != null) {
             BlockPos water = p.at(intake[0], intake[1], intake[2]);
             var fluid = level.getFluidState(water);
-            if (!fluid.isSource() || !fluid.is(net.minecraft.tags.FluidTags.WATER)) check.fail("siftec.build_gun.no_water");
+            if (!fluid.isSource() || !fluid.is(FluidTags.WATER)) check.fail("siftec.build_gun.no_water");
         }
         int[] vent = p.def().vent();
-        if (vent != null && com.meakaandre.siftec.geyser.Vents.findVent(level, p.at(vent[0], vent[1], vent[2])) == null) {
+        if (vent != null && Vents.findVent(level, p.at(vent[0], vent[1], vent[2])) == null) {
             check.fail("siftec.power.no_geyser_place");
         }
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, p.bounds(t))) {
@@ -256,19 +280,19 @@ public final class Buildings {
             check.fail("siftec.build_gun.no_node", p.def().name());
             return;
         }
-        int left = com.meakaandre.siftec.node.NodePlacer.clumpLeft(level, node);
+        int left = NodePlacer.clumpLeft(level, node);
         if (left > 0) check.fail("siftec.build_gun.clump", left);
     }
 
     /** An ore node's position, its ore grown or the spot empty and growing back (nodes are kept by position: node.NodeSites). */
     static boolean isNode(Level level, BlockPos pos) {
-        return com.meakaandre.siftec.node.NodeSites.isSite(level, pos);
+        return NodeSites.isSite(level, pos);
     }
 
     /** The node a building stands on: an ore node for a miner, or a fluid node of its type for an extractor (oil, nitrogen). */
     static boolean isNode(BuildingDef def, Level level, BlockPos pos) {
         if (def.fluidNode().isEmpty()) return isNode(level, pos);
-        return level.getBlockState(pos).getBlock() instanceof com.meakaandre.siftec.block.NodeBlock node && node.look.fluid() && node.look.type().id().equals(def.fluidNode());
+        return level.getBlockState(pos).getBlock() instanceof NodeBlock node && node.look.fluid() && node.look.type().id().equals(def.fluidNode());
     }
 
     /**
@@ -352,7 +376,7 @@ public final class Buildings {
             controller.setChanged();
             BuildingLogic.placed(level, controller);
         }
-        com.meakaandre.siftec.power.PowerGrids.dirty();
+        PowerGrids.dirty();
         Siftec.LOGGER.info("SIFTEC: building {} placed at {} facing {}{} ({} blocks, {} refund stacks)", p.def().id(), controllerPos.toShortString(),
             p.facing(), p.flip() ? " flipped" : "", t.members.size(), refund.size());
         return check;
@@ -375,7 +399,7 @@ public final class Buildings {
         if (companyId.isEmpty()) return;
         for (BuildingTemplate.Cell cell : t.members) {
             BlockEntity be = level.getBlockEntity(p.at(cell));
-            if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, companyId);
+            if (be != null) be.setAttached(Ownership.OWNER, companyId);
         }
     }
 
@@ -414,15 +438,15 @@ public final class Buildings {
         controller.refund.clear();
         out.addAll(controller.takeContents());
         BlockPos controllerPos = controller.getBlockPos().immutable();
-        com.meakaandre.siftec.sim.Factories.removed(level, controllerPos);
+        Factories.removed(level, controllerPos);
         if (p != null) out.addAll(takeDown(level, p, controllerPos));
         // the Converter's cell is part of its machine, not something it holds: plain, loaded or charged, it stays
         out.removeIf(Processors::cellBearing);
         if (level.getBlockState(controllerPos).getBlock() instanceof ControllerBlock) {
-            level.setBlock(controllerPos, Blocks.AIR.defaultBlockState(), controller instanceof com.meakaandre.siftec.blueprint.DesignerBlockEntity ? QUIET : SET);
+            level.setBlock(controllerPos, Blocks.AIR.defaultBlockState(), controller instanceof DesignerBlockEntity ? QUIET : SET);
         }
         Siftec.LOGGER.info("SIFTEC: building {} at {} dismantled; {} stacks given back", controller.buildingId, controllerPos.toShortString(), out.size());
-        com.meakaandre.siftec.power.PowerGrids.dirty();
+        PowerGrids.dirty();
         return out;
     }
 
@@ -457,8 +481,8 @@ public final class Buildings {
         // machines that drop what they hold as they go (a basin's input, say) are caught too: it all comes back. Things
         // lying in a Blueprint Designer's volume are not the building's, and stay where they are
         AABB box = p.bounds(t).inflate(1);
-        AABB open = com.meakaandre.siftec.blueprint.DesignerBlockEntity.openSpace(p);
-        Set<java.util.UUID> before = new HashSet<>();
+        AABB open = DesignerBlockEntity.openSpace(p);
+        Set<UUID> before = new HashSet<>();
         for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, box)) {
             if (open != null && open.contains(e.position())) {
                 before.add(e.getUUID());
@@ -498,7 +522,7 @@ public final class Buildings {
         out.addAll(fluids(level, pos));
         // a Basin keeps its input and output in one inventory that its item storage only lets the output out of
         Container container = be instanceof Container c ? c
-            : be instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity basin ? basin.itemCapability : null;
+            : be instanceof BasinBlockEntity basin ? basin.itemCapability : null;
         if (container != null) {
             for (int i = 0; i < container.getContainerSize(); i++) {
                 ItemStack stack = container.removeItemNoUpdate(i);
@@ -531,19 +555,19 @@ public final class Buildings {
      */
     public static List<ItemStack> fluids(ServerLevel level, BlockPos pos) {
         List<ItemStack> out = new ArrayList<>();
-        Storage<net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant> tanks = net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.find(level, pos, null);
+        Storage<FluidVariant> tanks = FluidStorage.SIDED.find(level, pos, null);
         if (tanks == null) return out;
         try (Transaction tx = Transaction.openOuter()) {
-            for (StorageView<net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant> view : tanks.nonEmptyViews()) {
+            for (StorageView<FluidVariant> view : tanks.nonEmptyViews()) {
                 var variant = view.getResource();
                 if (variant.isBlank()) continue;
                 ItemStack unit = ProductionLogic.packaged(variant.getFluid());
                 long size;
                 if (!unit.isEmpty()) {
-                    size = (long) ProductionLogic.packagedMb(variant.getFluid()) * (net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants.BUCKET / 1000);
-                } else if (variant.getFluid().getBucket() != net.minecraft.world.item.Items.AIR) {
+                    size = (long) ProductionLogic.packagedMb(variant.getFluid()) * (FluidConstants.BUCKET / 1000);
+                } else if (variant.getFluid().getBucket() != Items.AIR) {
                     unit = new ItemStack(variant.getFluid().getBucket());
-                    size = net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants.BUCKET;
+                    size = FluidConstants.BUCKET;
                 } else {
                     continue;
                 }
@@ -642,7 +666,7 @@ public final class Buildings {
     static void controllerGone(ServerLevel level, ControllerBlockEntity controller) {
         controller.removing = true;
         BlockPos at = controller.getBlockPos().immutable();
-        com.meakaandre.siftec.sim.Factories.removed(level, at);
+        Factories.removed(level, at);
         Placement p = controller.placement();
         List<ItemStack> kept = new ArrayList<>(copy(controller.refund));
         controller.refund.clear();
@@ -665,7 +689,7 @@ public final class Buildings {
         List<ItemStack> out = new ArrayList<>(items);
         out.removeIf(s -> s.isEmpty() || Processors.cellBearing(s));
         if (out.isEmpty()) return;
-        if (com.meakaandre.siftec.death.DeathCrates.stash(level, at, companyId, out)) return;
+        if (DeathCrates.stash(level, at, companyId, out)) return;
         drop(level, at, out);
     }
 
@@ -705,7 +729,7 @@ public final class Buildings {
             BlockPos controller = BuildingIndex.controllerOf(level, pos);
             if (controller == null) return true;
             if (player instanceof ServerPlayer server) {
-                boolean hub = level.getBlockState(controller).getBlock() instanceof com.meakaandre.siftec.hub.HubBlock;
+                boolean hub = level.getBlockState(controller).getBlock() instanceof HubBlock;
                 server.sendOverlayMessage(Component.translatable(hub ? "siftec.prefab.part" : "siftec.build_gun.part", nameAt(level, controller)));
             }
             return false;
@@ -714,20 +738,20 @@ public final class Buildings {
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             if (level.isClientSide() || !changesBlock(player.getItemInHand(hand))) return InteractionResult.PASS;
             if (!shellChangeRefused(level, player, hit.getBlockPos())) return InteractionResult.PASS;
-            com.meakaandre.siftec.claim.Claims.resync(player, level, hit.getBlockPos(), hit.getDirection());
+            Claims.resync(player, level, hit.getBlockPos(), hit.getDirection());
             return InteractionResult.FAIL;
         });
         // nor wrenched off or turned; a wrench on a Power Pole or Tower rides its wires instead (the Zipline research)
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
-            if (level.isClientSide() || !player.getItemInHand(hand).is(com.zurrtum.create.AllItems.WRENCH)) return InteractionResult.PASS;
+            if (level.isClientSide() || !player.getItemInHand(hand).is(AllItems.WRENCH)) return InteractionResult.PASS;
             BlockPos controller = BuildingIndex.controllerOf(level, hit.getBlockPos());
             if (controller == null) return InteractionResult.PASS;
             if (player instanceof ServerPlayer rider && level.getBlockEntity(controller) instanceof ControllerBlockEntity c && c.def() != null
                 && c.def().power().equals("pole")) {
                 BlockPos connector = connectorOf(level, c);
-                if (!player.hasInfiniteMaterials() && !com.meakaandre.siftec.company.Companies.of(rider).hasToken("zipline")) {
+                if (!player.hasInfiniteMaterials() && !Companies.of(rider).hasToken("zipline")) {
                     rider.sendOverlayMessage(Component.translatable("siftec.zipline.locked"));
-                } else if (connector == null || !com.meakaandre.siftec.equip.Ziplines.start(rider, connector)) {
+                } else if (connector == null || !Ziplines.start(rider, connector)) {
                     rider.sendOverlayMessage(Component.translatable("siftec.zipline.no_line"));
                 }
                 return InteractionResult.SUCCESS;
@@ -743,7 +767,7 @@ public final class Buildings {
         BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
         if (t == null) return null;
         for (BuildingTemplate.Cell cell : t.members) {
-            if (level.getBlockEntity(p.at(cell)) instanceof org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector) return p.at(cell);
+            if (level.getBlockEntity(p.at(cell)) instanceof AbstractElectricalConnector) return p.at(cell);
         }
         return null;
     }
@@ -751,7 +775,7 @@ public final class Buildings {
     static Component nameAt(Level level, BlockPos controller) {
         if (level.getBlockEntity(controller) instanceof ControllerBlockEntity c && def(c.buildingId) != null) return def(c.buildingId).name();
         // the HUB's Craft Station is listed under the HUB's terminal
-        if (level.getBlockState(controller).getBlock() instanceof com.meakaandre.siftec.hub.HubBlock) return Component.translatable("block.siftec.hub");
+        if (level.getBlockState(controller).getBlock() instanceof HubBlock) return Component.translatable("block.siftec.hub");
         return Component.translatable("siftec.build_gun.building");
     }
 
@@ -760,7 +784,7 @@ public final class Buildings {
      * stripping it, wax going on or off, a casing applied to it. Changing one would bring the building down; its shell
      * changes only with the Build Gun and the Customizer. The controller and the ports are left to their own use.
      */
-    public static boolean shellChangeRefused(Level level, net.minecraft.world.entity.player.@Nullable Player player, BlockPos pos) {
+    public static boolean shellChangeRefused(Level level, @Nullable Player player, BlockPos pos) {
         BlockPos controller = BuildingIndex.controllerOf(level, pos);
         if (controller == null || pos.equals(controller) || level.getBlockState(pos).getBlock() instanceof PortBlock) return false;
         if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.build_gun.part", nameAt(level, controller)));
@@ -769,23 +793,23 @@ public final class Buildings {
 
     /** Items whose use on a block changes that block (an axe strips or scrapes, honeycomb waxes, a shovel or hoe turns soil). */
     static boolean changesBlock(ItemStack stack) {
-        return stack.is(net.minecraft.tags.ItemTags.AXES) || stack.is(net.minecraft.tags.ItemTags.SHOVELS) || stack.is(net.minecraft.tags.ItemTags.HOES)
-            || stack.is(net.minecraft.world.item.Items.HONEYCOMB);
+        return stack.is(ItemTags.AXES) || stack.is(ItemTags.SHOVELS) || stack.is(ItemTags.HOES)
+            || stack.is(Items.HONEYCOMB);
     }
 
     /** Controllers one of whose blocks changed since they last looked (for the foundations, which do not look every second). */
-    private static final Map<String, it.unimi.dsi.fastutil.longs.LongOpenHashSet> CHANGED = new java.util.HashMap<>();
+    private static final Map<String, LongOpenHashSet> CHANGED = new HashMap<>();
 
     /** A block changed in the world (LevelChunkMixin): if it is a building's, its controller looks over its blocks again. */
     public static void blockChanged(ServerLevel level, BlockPos pos) {
         BlockPos controller = BuildingIndex.controllerOf(level, pos);
         if (controller == null) return;
-        CHANGED.computeIfAbsent(level.dimension().identifier().toString(), k -> new it.unimi.dsi.fastutil.longs.LongOpenHashSet()).add(controller.asLong());
+        CHANGED.computeIfAbsent(level.dimension().identifier().toString(), k -> new LongOpenHashSet()).add(controller.asLong());
     }
 
     /** True (once) if one of the controller's blocks changed since it last asked. */
     static boolean takeChanged(ServerLevel level, BlockPos controller) {
-        it.unimi.dsi.fastutil.longs.LongOpenHashSet set = CHANGED.get(level.dimension().identifier().toString());
+        LongOpenHashSet set = CHANGED.get(level.dimension().identifier().toString());
         return set != null && set.remove(controller.asLong());
     }
 
@@ -816,7 +840,7 @@ public final class Buildings {
 
     /** True if the spot is in the open space of a building that is no part of it (a Blueprint Designer's volume). */
     static boolean inOpenSpace(ControllerBlockEntity c, BlockPos pos) {
-        AABB open = com.meakaandre.siftec.blueprint.DesignerBlockEntity.openSpace(c);
+        AABB open = DesignerBlockEntity.openSpace(c);
         return open != null && open.contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 

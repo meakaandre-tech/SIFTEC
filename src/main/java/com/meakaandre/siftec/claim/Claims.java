@@ -1,10 +1,12 @@
 package com.meakaandre.siftec.claim;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.config.SiftecConfig;
+import com.meakaandre.siftec.death.DeathCrateBlockEntity;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
@@ -41,6 +43,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -178,17 +181,17 @@ public final class Claims {
      */
     public static boolean mayUse(Player player, Level level, BlockPos pos) {
         if (allowed(player, level, pos)) return true;
-        if (!(level.getBlockEntity(pos) instanceof com.meakaandre.siftec.death.DeathCrateBlockEntity crate)) return false;
+        if (!(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) return false;
         if (!crate.companyId.isEmpty()) return player instanceof ServerPlayer server && Companies.owns(Companies.find(server), crate.companyId);
         return crate.owner != null && crate.owner.equals(player.getUUID());
     }
 
     /**
-     * The first chunk under the box (block coordinates, max exclusive, as an {@link net.minecraft.world.phys.AABB}
+     * The first chunk under the box (block coordinates, max exclusive, as an {@link AABB}
      * gives them) that another company holds, or null if all of it is the company's own or unclaimed. A Build Gun
      * building is placed, or taken down when it has no owner, only where this finds nothing.
      */
-    public static @Nullable Claim foreign(Level level, net.minecraft.world.phys.AABB box, String company) {
+    public static @Nullable Claim foreign(Level level, AABB box, String company) {
         for (int cx = ((int) Math.floor(box.minX)) >> 4; cx <= ((int) Math.ceil(box.maxX) - 1) >> 4; cx++)
             for (int cz = ((int) Math.floor(box.minZ)) >> 4; cz <= ((int) Math.ceil(box.maxZ) - 1) >> 4; cz++) {
                 Claim claim = at(level, cx, cz);
@@ -223,7 +226,7 @@ public final class Claims {
         });
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             // the Build Gun never uses the block it points at; it checks the land under what it builds or takes down itself
-            if (player.getItemInHand(hand).getItem() instanceof com.meakaandre.siftec.building.BuildGunItem) return InteractionResult.PASS;
+            if (player.getItemInHand(hand).getItem() instanceof BuildGunItem) return InteractionResult.PASS;
             if (mayUse(player, level, hit.getBlockPos())) return InteractionResult.PASS;
             deny(player, level, hit.getBlockPos());
             resync(player, level, hit.getBlockPos(), hit.getDirection());

@@ -8,6 +8,7 @@ import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.registry.ModItems;
+import com.meakaandre.siftec.sink.Shop;
 import com.meakaandre.siftec.tweak.SelfMovingBelts;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -221,7 +222,7 @@ public final class ClaimGunTests {
             if (b.dev() || b.unlock().isEmpty()) continue;
             // the Billboard Set's billboards are unlocked in the AWESOME Shop
             boolean shop = b.unlock().startsWith("shop:");
-            if (shop ? com.meakaandre.siftec.sink.Shop.entry(b.unlock().substring(5)) == null : Milestones.get(b.unlock()) == null) unknown.add(b.id() + ":" + b.unlock());
+            if (shop ? Shop.entry(b.unlock().substring(5)) == null : Milestones.get(b.unlock()) == null) unknown.add(b.id() + ":" + b.unlock());
             if (!Buildings.locked(b, fresh)) notLocked.add(b.id());
             Company one = new Company();
             one.id = "selftest_gun_probe";

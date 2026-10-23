@@ -1,8 +1,10 @@
 package com.meakaandre.siftec.collect;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.power.Power;
+import com.meakaandre.siftec.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -87,7 +89,7 @@ public class CollectibleBlock extends Block {
         }
         collect(server, company, key, type);
         if (type == Collectible.CRASH_SITE && CrashSites.hasSomersloop(server.level(), pos)) {
-            server.getInventory().placeItemBackInInventory(new ItemStack(com.meakaandre.siftec.registry.ModItems.PARTS.get("somersloop")), Prediction.SERVER_ONLY);
+            server.getInventory().placeItemBackInInventory(new ItemStack(ModItems.PARTS.get("somersloop")), Prediction.SERVER_ONLY);
             server.sendSystemMessage(Component.translatable("siftec.crash.somersloop"));
             Collectibles.startTree(server, company, Collectible.SOMERSLOOP);
         }
@@ -97,7 +99,7 @@ public class CollectibleBlock extends Block {
     /** The company collects it: remembered, the item given, its MAM tree started. */
     static void collect(ServerPlayer player, Company company, String key, Collectible type) {
         company.collected.add(key);
-        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(com.meakaandre.siftec.Siftec.id(type.itemId())));
+        ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(Siftec.id(type.itemId())));
         player.sendOverlayMessage(Component.translatable("siftec.collect.got", stack.getItemName()));
         player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
         Collectibles.startTree(player, company, type);

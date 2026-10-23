@@ -1,7 +1,9 @@
 package com.meakaandre.siftec.governor;
 
 import com.zurrtum.create.content.kinetics.RotationPropagator;
+import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity;
+import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -30,7 +32,7 @@ public class GovernorBlockEntity extends SplitShaftBlockEntity {
 
     /** The most a governor gives: Create's own top speed. */
     public static int limit() {
-        return com.zurrtum.create.infrastructure.config.AllConfigs.server().kinetics.maxRotationSpeed.get();
+        return AllConfigs.server().kinetics.maxRotationSpeed.get();
     }
 
     @Override
@@ -44,7 +46,7 @@ public class GovernorBlockEntity extends SplitShaftBlockEntity {
      * The exact speed passed across the far end, given what Create worked out. Dividing and multiplying back
      * does not always land on the same number, and Create reads the difference as one side overpowering the other.
      */
-    public float exact(com.zurrtum.create.content.kinetics.base.KineticBlockEntity from, com.zurrtum.create.content.kinetics.base.KineticBlockEntity to, float worked) {
+    public float exact(KineticBlockEntity from, KineticBlockEntity to, float worked) {
         if (worked == 0 || !hasSource()) return worked;
         float in = getTheoreticalSpeed();
         BlockPos other = (from == this ? to : from).getBlockPos();

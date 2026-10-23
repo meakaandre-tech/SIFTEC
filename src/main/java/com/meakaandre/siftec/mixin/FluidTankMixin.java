@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.mixin;
 
 import com.meakaandre.siftec.tweak.NetherWater;
+import com.meakaandre.siftec.tweak.TankSizes;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.foundation.fluid.FluidTank;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Water in a Create Fluid Tank boils away in the Nether; and a company's tanks stay one block wide until Petroleum
- * Power ({@link com.meakaandre.siftec.tweak.TankSizes}).
+ * Power ({@link TankSizes}).
  */
 @Mixin(value = FluidTankBlockEntity.class, remap = false)
 public abstract class FluidTankMixin {
@@ -30,6 +31,6 @@ public abstract class FluidTankMixin {
 
     @Inject(method = "getMaxWidth", at = @At("HEAD"), cancellable = true)
     private void siftec$petroleum(CallbackInfoReturnable<Integer> cir) {
-        if (com.meakaandre.siftec.tweak.TankSizes.small((FluidTankBlockEntity) (Object) this)) cir.setReturnValue(1);
+        if (TankSizes.small((FluidTankBlockEntity) (Object) this)) cir.setReturnValue(1);
     }
 }

@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.command;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.blueprint.DesignerBlockEntity;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingLogic;
@@ -51,6 +52,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -285,15 +287,15 @@ public final class ReviewFixTests {
         BlockPos node = new BlockPos(X + 44, Y, Z + 4);
         emptyNode(level, node);
         level.setBlock(node, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
-        if (level.getBlockEntity(node) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity chest) chest.setItem(0, new ItemStack(Items.DIAMOND, 4));
+        if (level.getBlockEntity(node) instanceof ChestBlockEntity chest) chest.setItem(0, new ItemStack(Items.DIAMOND, 4));
         NodeSites.release(level, node);
         int regrow = NodeRegrowth.ticks(Purity.PURE);
         later(level, regrow + 10, () -> {
-            boolean kept = level.getBlockEntity(node) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity chest && chest.getItem(0).is(Items.DIAMOND)
+            boolean kept = level.getBlockEntity(node) instanceof ChestBlockEntity chest && chest.getItem(0).is(Items.DIAMOND)
                 && chest.getItem(0).getCount() == 4;
             expect(source, "1: a node due to grow back waits while a chest stands in its spot, and the chest and its things stay",
                 kept && NodeSites.emptyAt(level, node), "spot " + BuiltInRegistries.BLOCK.getKey(level.getBlockState(node).getBlock()));
-            if (level.getBlockEntity(node) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity chest) chest.clearContent();
+            if (level.getBlockEntity(node) instanceof ChestBlockEntity chest) chest.clearContent();
             level.setBlock(node, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             later(level, 3, () -> {
                 expect(source, "1: the chest taken away, the node grows back", NodeSites.grownAt(level, node),
@@ -361,7 +363,7 @@ public final class ReviewFixTests {
             }
             Buildings.Check built = Buildings.place(level, dp, company, null, true);
             ControllerBlockEntity terminal = BuildGun.controllerAt(level, dp.at(dt.controller));
-            if (!built.ok() || !(terminal instanceof com.meakaandre.siftec.blueprint.DesignerBlockEntity designer)) {
+            if (!built.ok() || !(terminal instanceof DesignerBlockEntity designer)) {
                 expect(source, "2: a Blueprint Designer Mk.3 goes down round the building", false, built.message().getString()
                     + (built.blocked.isEmpty() ? "" : " first blocked " + built.blocked.getFirst().toShortString()));
             } else {

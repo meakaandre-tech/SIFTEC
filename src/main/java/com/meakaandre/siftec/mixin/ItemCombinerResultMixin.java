@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.mixin;
 
+import com.meakaandre.siftec.hub.Locks;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
@@ -17,6 +18,6 @@ public abstract class ItemCombinerResultMixin extends Slot {
 
     @Inject(method = "mayPickup", at = @At("HEAD"), cancellable = true)
     private void siftec$lockedResult(Player player, CallbackInfoReturnable<Boolean> cir) {
-        if (!com.meakaandre.siftec.hub.Locks.mayTake(player, getItem())) cir.setReturnValue(false);
+        if (!Locks.mayTake(player, getItem())) cir.setReturnValue(false);
     }
 }

@@ -3,15 +3,20 @@ package com.meakaandre.siftec.building;
 import com.google.gson.JsonElement;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.command.LogisticsTests;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.node.NodeLook;
+import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.node.NodeType;
 import com.meakaandre.siftec.node.Purity;
+import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.tweak.SelfMovingBelts;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
@@ -36,8 +41,10 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
@@ -45,15 +52,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluid;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.LongSupplier;
 
 /**
  * Selftests for work package 9's buildings, run by the smoke test on a test world: {@code /siftec selftest buildings_b}
@@ -102,8 +113,8 @@ public final class BuildingsBTests {
                 .then(Commands.literal("selftest").then(Commands.literal("buildings_b").executes(BuildingsBTests::run)
                     .then(Commands.literal("restart").executes(BuildingsBTests::restart))))
                 .then(Commands.literal("worldtest").then(Commands.literal("buildings_b").then(Commands.literal("view")
-                    .then(Commands.argument("n", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 5))
-                        .executes(c -> view(c, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n")))))))));
+                    .then(Commands.argument("n", IntegerArgumentType.integer(0, 5))
+                        .executes(c -> view(c, IntegerArgumentType.getInteger(c, "n")))))))));
     }
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
@@ -204,12 +215,12 @@ public final class BuildingsBTests {
         level.setBlock(to, shaftState, Block.UPDATE_ALL);
         BeltConnectorItem.createBelts(level, from, to);
         // belts move by themselves at their company's speed (no shaft drives one): owned by a company fast enough
-        String company = com.meakaandre.siftec.command.LogisticsTests.beltCompany(level, (int) Math.ceil(rpm * com.meakaandre.siftec.tweak.SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM));
+        String company = LogisticsTests.beltCompany(level, (int) Math.ceil(rpm * SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM));
         int length = Math.abs(dx) + Math.abs(dz);
         for (int i = 0; i <= length; i++) {
-            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(from.relative(along, i));
-            if (be != null) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, company);
-            if (be instanceof BeltBlockEntity b) com.meakaandre.siftec.tweak.SelfMovingBelts.recheck(b);
+            BlockEntity be = level.getBlockEntity(from.relative(along, i));
+            if (be != null) be.setAttached(Ownership.OWNER, company);
+            if (be instanceof BeltBlockEntity b) SelfMovingBelts.recheck(b);
         }
     }
 
@@ -322,7 +333,7 @@ public final class BuildingsBTests {
         NodeLook look = NodeLook.of(type);
         level.setBlock(at.below(), look.patchStone(), Block.UPDATE_ALL);
         if (look.fluid()) level.setBlock(at, ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(NodeBlock.PURITY, purity), Block.UPDATE_ALL);
-        else com.meakaandre.siftec.node.NodeSites.put(level, at, look, purity);
+        else NodeSites.put(level, at, look, purity);
         return at;
     }
 
@@ -339,7 +350,7 @@ public final class BuildingsBTests {
     }
 
     /** What each building is measured on: the count when the measuring starts, and how it is read. */
-    private record Measure(String what, java.util.function.LongSupplier read, long low, long high, int minutes) {
+    private record Measure(String what, LongSupplier read, long low, long high, int minutes) {
     }
 
     private static void runSettled(CommandSourceStack source) {
@@ -366,7 +377,7 @@ public final class BuildingsBTests {
                 def == null ? "missing" : def.category() + " " + def.unlock() + " " + def.logic() + " su " + def.su() + (t == null ? " no template: " + BuildingTemplate.problem(w[0]) : ""));
         }
         // the Pure Aluminum Ingot alternate runs in the Foundry's heated Mixer
-        var pure = level.getServer().getRecipeManager().byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
+        var pure = level.getServer().getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE,
             Siftec.id("mixing/foundry/pure_aluminum_ingot")));
         expect(source, "the Pure Aluminum Ingot alternate is a Foundry recipe (heated Mixer)", pure.isPresent(), "");
 
@@ -583,7 +594,7 @@ public final class BuildingsBTests {
         long[] start = new long[measures.size()];
         later(level, WARMUP, () -> {
             for (int i = 0; i < measures.size(); i++) start[i] = measures.get(i).read().getAsLong();
-            report(source, "measuring from " + java.util.Arrays.toString(start));
+            report(source, "measuring from " + Arrays.toString(start));
         });
         for (int i = 0; i < measures.size(); i++) {
             final int k = i;
@@ -726,12 +737,12 @@ public final class BuildingsBTests {
         player.getAbilities().flying = true;
         player.onUpdateAbilities();
         switch (n) {
-            case 0 -> player.teleportTo(level, mid + 0.5, VY + 30, VZ + 60.5, java.util.Set.of(), 180f, 25f, true);
-            case 1 -> player.teleportTo(level, where.getOrDefault("assembler", VX) + 4.5, VY + 8, VZ + 22.5, java.util.Set.of(), 160f, 15f, true);
-            case 2 -> player.teleportTo(level, where.getOrDefault("blender", VX) + 6.5, VY + 9, VZ + 24.5, java.util.Set.of(), 160f, 15f, true);
-            case 3 -> player.teleportTo(level, where.getOrDefault("quantum_encoder", VX) + 2.5, VY + 10, VZ + 26.5, java.util.Set.of(), 165f, 15f, true);
-            case 4 -> player.teleportTo(level, where.getOrDefault("oil_extractor", VX) + 2.5, VY + 9, VZ + 22.5, java.util.Set.of(), 165f, 12f, true);
-            default -> player.teleportTo(level, where.getOrDefault("particle_accelerator", VX) + 6.5, VY + 12, VZ + 30.5, java.util.Set.of(), 165f, 18f, true);
+            case 0 -> player.teleportTo(level, mid + 0.5, VY + 30, VZ + 60.5, Set.of(), 180f, 25f, true);
+            case 1 -> player.teleportTo(level, where.getOrDefault("assembler", VX) + 4.5, VY + 8, VZ + 22.5, Set.of(), 160f, 15f, true);
+            case 2 -> player.teleportTo(level, where.getOrDefault("blender", VX) + 6.5, VY + 9, VZ + 24.5, Set.of(), 160f, 15f, true);
+            case 3 -> player.teleportTo(level, where.getOrDefault("quantum_encoder", VX) + 2.5, VY + 10, VZ + 26.5, Set.of(), 165f, 15f, true);
+            case 4 -> player.teleportTo(level, where.getOrDefault("oil_extractor", VX) + 2.5, VY + 9, VZ + 22.5, Set.of(), 165f, 12f, true);
+            default -> player.teleportTo(level, where.getOrDefault("particle_accelerator", VX) + 6.5, VY + 12, VZ + 30.5, Set.of(), 165f, 18f, true);
         }
         report(source, "view " + n + " ready");
         return 1;

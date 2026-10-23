@@ -3,6 +3,8 @@ package com.meakaandre.siftec.power;
 import com.meakaandre.siftec.building.BuildingIndex;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.mixin.power.MotorAccessor;
+import com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -89,12 +91,12 @@ final class Members {
 
         private double fullSu() {
             if (motor.isRemoved() || motor.speedBehavior == null || motor.speedBehavior.getValue() == 0 || motor.needsPower != motor.powered) return 0;
-            var variant = ((com.meakaandre.siftec.mixin.power.MotorAccessor) motor).siftec$variant();
+            var variant = ((MotorAccessor) motor).siftec$variant();
             float multiplier = 1;
             var level = motor.getLevel();
-            Direction facing = motor.getBlockState().getValue(com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING);
+            Direction facing = motor.getBlockState().getValue(DirectionalKineticBlock.FACING);
             if (level != null && level.getBlockEntity(motor.getBlockPos().relative(facing.getOpposite())) instanceof MotorExtensionBlockEntity extension
-                && extension.getBlockState().getOptionalValue(com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING).orElse(facing.getOpposite()) == facing) {
+                && extension.getBlockState().getOptionalValue(DirectionalKineticBlock.FACING).orElse(facing.getOpposite()) == facing) {
                 multiplier = extension.getMultiplier();
             }
             return variant.getStress() * multiplier * CNAConfig.getServer().motorSUMultiplier.get();

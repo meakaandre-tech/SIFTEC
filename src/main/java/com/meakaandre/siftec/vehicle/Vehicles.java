@@ -5,12 +5,14 @@ import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Milestone;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -122,9 +124,9 @@ public final class Vehicles {
     }
 
     /** The space its body takes up standing at its spot, facing the way it is put down. */
-    static AABB box(Vec3 at, VehicleKind kind, net.minecraft.core.Direction facing) {
+    static AABB box(Vec3 at, VehicleKind kind, Direction facing) {
         double hw = kind.boxWidth / 2.0, hl = kind.boxLength / 2.0;
-        double ex = facing.getAxis() == net.minecraft.core.Direction.Axis.X ? hl : hw, ez = facing.getAxis() == net.minecraft.core.Direction.Axis.X ? hw : hl;
+        double ex = facing.getAxis() == Direction.Axis.X ? hl : hw, ez = facing.getAxis() == Direction.Axis.X ? hw : hl;
         return new AABB(at.x - ex, at.y, at.z - ez, at.x + ex, at.y + kind.boxHeight, at.z + ez);
     }
 
@@ -220,7 +222,7 @@ public final class Vehicles {
     /** True if the vehicle is a company's other than this one (creative players count as anyone's). */
     static boolean foreign(Entity vehicle, String ownerId, ServerPlayer player) {
         if (player.hasInfiniteMaterials() || ownerId.isEmpty()) return false;
-        Company company = com.meakaandre.siftec.company.Companies.of(player);
-        return !com.meakaandre.siftec.company.Companies.owns(company, ownerId);
+        Company company = Companies.of(player);
+        return !Companies.owns(company, ownerId);
     }
 }

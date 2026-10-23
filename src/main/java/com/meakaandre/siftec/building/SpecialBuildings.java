@@ -2,18 +2,27 @@ package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.drone.DroneMenu;
+import com.meakaandre.siftec.drone.DronePortBlockEntity;
 import com.meakaandre.siftec.equip.Radar;
+import com.meakaandre.siftec.hub.HubBlockEntity;
+import com.meakaandre.siftec.place.Places;
+import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.sink.ShopMenu;
 import com.meakaandre.siftec.sink.Sink;
 import com.meakaandre.siftec.sink.SinkMenu;
 import com.meakaandre.siftec.workshop.WorkshopMenu;
+import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import org.jspecify.annotations.Nullable;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Work package 10's buildings: the Equipment Workshop, the AWESOME Sink and Shop, and the Radar Tower. Using one opens
@@ -28,10 +37,10 @@ public final class SpecialBuildings {
      * True if the block is one of the HUB's Craft Station machines (its Presses, Mixers, Basins, cogwheel and hand cranks):
      * the real Create machines of a HUB structure, listed in the building index under the HUB's terminal.
      */
-    public static boolean craftStation(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
-        net.minecraft.core.BlockPos terminal = BuildingIndex.controllerOf(level, pos);
+    public static boolean craftStation(Level level, BlockPos pos) {
+        BlockPos terminal = BuildingIndex.controllerOf(level, pos);
         // never loads a chunk: this is asked while rotation propagates
-        return terminal != null && level.isLoaded(terminal) && level.getBlockEntity(terminal) instanceof com.meakaandre.siftec.hub.HubBlockEntity hub
+        return terminal != null && level.isLoaded(terminal) && level.getBlockEntity(terminal) instanceof HubBlockEntity hub
             && hub.prefab && !hub.gateway();
     }
 
@@ -41,9 +50,9 @@ public final class SpecialBuildings {
      * never a shaft, motor or water wheel brought up to it (and it turns nothing outside either). For the rotation
      * propagator ({@code PropagatorMixin}); always false on the client, where the index is not kept.
      */
-    public static boolean cutsRotation(com.zurrtum.create.content.kinetics.base.KineticBlockEntity from,
-                                       com.zurrtum.create.content.kinetics.base.KineticBlockEntity to) {
-        net.minecraft.world.level.Level level = to.getLevel();
+    public static boolean cutsRotation(KineticBlockEntity from,
+                                       KineticBlockEntity to) {
+        Level level = to.getLevel();
         if (level == null || level.isClientSide() || from.getLevel() != level) return false;
         return craftStation(level, from.getBlockPos()) != craftStation(level, to.getBlockPos());
     }
@@ -56,14 +65,14 @@ public final class SpecialBuildings {
             case "shop" -> ShopMenu.open(player, company, c.getBlockPos());
             case "sink" -> {
                 // a Sink is its company's: anyone may look, but only its members print the owner's points as coupons
-                Company owner = c.companyId.isEmpty() ? company : com.meakaandre.siftec.company.CompanyData.get(player.level().getServer()).byId(c.companyId);
+                Company owner = c.companyId.isEmpty() ? company : CompanyData.get(player.level().getServer()).byId(c.companyId);
                 SinkMenu.open(player, owner == null ? company : owner, c.getBlockPos(), mayOperate(player, c), () -> c.powered);
             }
             case "radar" -> Radar.use(player, c);
             case "truck_station" -> TruckStations.use(player, c, def);
             case "drone_port" -> {
                 if (!mayOperate(player, c)) player.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
-                else if (droneTerminal(player.level(), c) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port) com.meakaandre.siftec.drone.DroneMenu.open(player, port, c.getBlockPos());
+                else if (droneTerminal(player.level(), c) instanceof DronePortBlockEntity port) DroneMenu.open(player, port, c.getBlockPos());
             }
             default -> {
                 return false;
@@ -74,31 +83,31 @@ public final class SpecialBuildings {
 
     /** The Drone Port template's terminal cell (the Drone Port block under its pad), in the Build Gun frame. */
     public static int @Nullable [] terminalCell(BuildingTemplate t) {
-        for (BuildingTemplate.Cell cell : t.members) if (cell.state().is(com.meakaandre.siftec.registry.ModBlocks.DRONE_PORT.get())) return new int[]{cell.x(), cell.y(), cell.z()};
+        for (BuildingTemplate.Cell cell : t.members) if (cell.state().is(ModBlocks.DRONE_PORT.get())) return new int[]{cell.x(), cell.y(), cell.z()};
         return null;
     }
 
     /** The placement that puts a Drone Port's terminal at a spot, facing one way. */
-    public static Placement forTerminal(BuildingDef def, int[] terminal, BlockPos at, net.minecraft.core.Direction facing) {
-        net.minecraft.core.Direction right = facing.getClockWise();
+    public static Placement forTerminal(BuildingDef def, int[] terminal, BlockPos at, Direction facing) {
+        Direction right = facing.getClockWise();
         BlockPos anchor = at.offset(-right.getStepX() * terminal[0] - facing.getStepX() * terminal[2], -terminal[1],
             -right.getStepZ() * terminal[0] - facing.getStepZ() * terminal[2]);
         return new Placement(def, anchor, facing, false);
     }
 
     /** The Drone Port building's loading terminal (the Drone Port block under its pad), or null. */
-    public static @Nullable BlockEntity droneTerminal(net.minecraft.world.level.Level level, ControllerBlockEntity c) {
-        BlockPos at = BuildingLogic.cell(c, com.meakaandre.siftec.registry.ModBlocks.DRONE_PORT.get());
+    public static @Nullable BlockEntity droneTerminal(Level level, ControllerBlockEntity c) {
+        BlockPos at = BuildingLogic.cell(c, ModBlocks.DRONE_PORT.get());
         return at == null ? null : level.getBlockEntity(at);
     }
 
     /** A Drone Port building put down: its terminal is the company's, and it is on the company's list of ports. */
     static void dronePortPlaced(ServerLevel level, ControllerBlockEntity c) {
-        if (!(droneTerminal(level, c) instanceof com.meakaandre.siftec.drone.DronePortBlockEntity port)) return;
+        if (!(droneTerminal(level, c) instanceof DronePortBlockEntity port)) return;
         port.companyId = c.companyId;
         port.setChanged();
         BlockPos pos = port.getBlockPos();
-        if (!c.companyId.isEmpty()) com.meakaandre.siftec.place.Places.add(level, pos, com.meakaandre.siftec.place.Places.DRONE_PORT, c.companyId, "Port " + pos.getX() + ", " + pos.getZ());
+        if (!c.companyId.isEmpty()) Places.add(level, pos, Places.DRONE_PORT, c.companyId, "Port " + pos.getX() + ", " + pos.getZ());
     }
 
     /**

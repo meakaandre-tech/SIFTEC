@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -83,7 +84,7 @@ public final class Sink {
                     break;
                 }
             }
-            base = byTag != null ? byTag : RARITY.getOrDefault(stack.getRarity().name().toLowerCase(java.util.Locale.ROOT), 2);
+            base = byTag != null ? byTag : RARITY.getOrDefault(stack.getRarity().name().toLowerCase(Locale.ROOT), 2);
         }
         return base + (long) enchant * (levels(stack.get(DataComponents.ENCHANTMENTS)) + levels(stack.get(DataComponents.STORED_ENCHANTMENTS)));
     }

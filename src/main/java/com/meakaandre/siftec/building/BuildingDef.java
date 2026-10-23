@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.prefab.Prefabs;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
@@ -23,7 +24,7 @@ import java.util.List;
  * megawatts a generator gives, {@code water} the m3 of water a minute it takes at full load, {@code lines} how many
  * wires its connector takes, and {@code vent} the open cell a Geothermal Generator must stand over a geyser with.
  * <p>
- * {@code prefab} names a structure the Build Gun puts down through {@link com.meakaandre.siftec.prefab.Prefabs} instead
+ * {@code prefab} names a structure the Build Gun puts down through {@link Prefabs} instead
  * of a structure template ("hub": the HUB), "vehicle" for a vehicle (an entity, {@link com.meakaandre.siftec.vehicle.Vehicles}),
  * or is "" for an ordinary building.
  * <p>
@@ -38,12 +39,12 @@ public record BuildingDef(String id, Category category, List<Milestone.Cost> cos
         this(id, category, cost, unlock, dev, node, node ? new int[]{0, 0, 1} : null, "", 0, 0, 0, "", 0, 0, 0, null, "", "", 0, "", null);
     }
 
-    /** The HUB: put down by the Build Gun through {@link com.meakaandre.siftec.prefab.Prefabs}. */
+    /** The HUB: put down by the Build Gun through {@link Prefabs}. */
     public boolean hub() {
         return prefab.equals("hub");
     }
 
-    /** A structure (the HUB or the Wormhole Gateway) the Build Gun puts down whole through {@link com.meakaandre.siftec.prefab.Prefabs}. */
+    /** A structure (the HUB or the Wormhole Gateway) the Build Gun puts down whole through {@link Prefabs}. */
     public boolean structure() {
         return prefab.equals("hub") || prefab.equals("gateway");
     }
@@ -54,8 +55,8 @@ public record BuildingDef(String id, Category category, List<Milestone.Cost> cos
     }
 
     /** Which structure it is, for {@link #structure()} ones. */
-    public com.meakaandre.siftec.prefab.Prefabs.Kind kind() {
-        return prefab.equals("gateway") ? com.meakaandre.siftec.prefab.Prefabs.Kind.GATEWAY : com.meakaandre.siftec.prefab.Prefabs.Kind.HUB;
+    public Prefabs.Kind kind() {
+        return prefab.equals("gateway") ? Prefabs.Kind.GATEWAY : Prefabs.Kind.HUB;
     }
 
     public String nameKey() {

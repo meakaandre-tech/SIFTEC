@@ -1,9 +1,11 @@
 package com.meakaandre.siftec.claim;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.ClaimGunTests;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.config.SiftecConfig;
 import com.meakaandre.siftec.place.Places;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.save.JsonSavedData;
@@ -28,6 +30,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,7 +38,7 @@ import java.util.UUID;
 /**
  * Used by the automated test ({@code /siftec selftest state setup|check|verify}): saves far bigger than the old
  * 64 KB limit, claims given up when their block goes, explosions, the HUB budget, the spawn area, claims loading no chunks,
- * kicking, and Build Gun buildings on claimed land with the per-company unlocks ({@link com.meakaandre.siftec.building.ClaimGunTests}). {@code verify} runs after the restart and removes everything the test made.
+ * kicking, and Build Gun buildings on claimed land with the per-company unlocks ({@link ClaimGunTests}). {@code verify} runs after the restart and removes everything the test made.
  */
 public final class StateSelfTest {
     private static final String BIG = "selftest_big", OTHER = "selftest_other", BUDGET = "selftest_budget", LOAD = "selftest_load", KICK = "selftest_kick";
@@ -144,7 +147,7 @@ public final class StateSelfTest {
         // 4. the spawn area
         BlockPos spawn = level.getRespawnData().pos();
         int atSpawn = Claims.claim(level, other, spawn, Claims.MARKER_RADIUS, true, 9);
-        report(source, "SELFTEST state spawn: radius " + com.meakaandre.siftec.config.SiftecConfig.spawnFreeRadius + ", spawn in zone " + Claims.inSpawnZone(level, spawn)
+        report(source, "SELFTEST state spawn: radius " + SiftecConfig.spawnFreeRadius + ", spawn in zone " + Claims.inSpawnZone(level, spawn)
             + ", 300 blocks out in zone " + Claims.inSpawnZone(level, spawn.offset(300, 0, 300)) + ", a marker at spawn claimed " + atSpawn);
 
         // 5. claims keep no chunk loaded (work package 17: their factories run simulated instead), members online or not
@@ -166,7 +169,7 @@ public final class StateSelfTest {
         boolean byFounder = Companies.kick(server, kick, fake(3), fake(4));
         float multiplier = kick.costMultiplier();
         boolean cooling = kick.coolingDown(fake(4));
-        kick.paid.put("selftest", new java.util.HashMap<>(Map.of("minecraft:iron_ingot", 15)));
+        kick.paid.put("selftest", new HashMap<>(Map.of("minecraft:iron_ingot", 15)));
         kick.paidAt = 2.0f;
         kick.leftAt.clear();
         kick.syncPaid();
@@ -175,7 +178,7 @@ public final class StateSelfTest {
             + " at x" + kick.costMultiplier());
 
         // 7. Build Gun buildings and claims, and the per-company unlocks of buildings and belt speed
-        com.meakaandre.siftec.building.ClaimGunTests.run(source, level, StateSelfTest::fake);
+        ClaimGunTests.run(source, level, StateSelfTest::fake);
         return 1;
     }
 
@@ -185,7 +188,7 @@ public final class StateSelfTest {
         Company c = new Company();
         c.id = "codec";
         for (int i = 0; i < 5000; i++) c.collected.add("x" + i + ",z" + i);
-        c.paid.put("m", new java.util.HashMap<>(Map.of("minecraft:iron_ingot", 7)));
+        c.paid.put("m", new HashMap<>(Map.of("minecraft:iron_ingot", 7)));
         c.lockUntil = 123_456_789_012L;
         data.companies().put(c.id, c);
         Tag tree = CompanyData.CODEC.encodeStart(NbtOps.INSTANCE, data).getOrThrow();

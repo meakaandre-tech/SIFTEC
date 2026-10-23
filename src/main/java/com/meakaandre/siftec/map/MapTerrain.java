@@ -2,11 +2,13 @@ package com.meakaandre.siftec.map;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.drone.DronePortBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.node.Terrain;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet;
@@ -18,12 +20,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.PotentSulfurBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.LevelResource;
 import org.jspecify.annotations.Nullable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -271,11 +276,11 @@ public final class MapTerrain {
             } else if (be instanceof DronePortBlockEntity port) {
                 kind = MapPoi.Kind.DRONE_PORT;
                 owner = port.companyId;
-            } else if (be instanceof com.zurrtum.create.content.trains.station.StationBlockEntity) {
+            } else if (be instanceof StationBlockEntity) {
                 kind = MapPoi.Kind.TRAIN_STATION;
                 String id = be.getAttached(Ownership.OWNER);
                 owner = id == null ? "" : id;
-            } else if (be instanceof net.minecraft.world.level.block.entity.PotentSulfurBlockEntity) {
+            } else if (be instanceof PotentSulfurBlockEntity) {
                 kind = MapPoi.Kind.GEYSER;
             }
             if (kind != null) found.add(new Found(new MapPoi(kind, "", 0, p.getX(), p.getY(), p.getZ()), owner == null ? "" : owner));
@@ -328,7 +333,7 @@ public final class MapTerrain {
                 }
             }
         }
-        out.sort(java.util.Comparator.comparingLong(p -> (long) (p.getX() - x) * (p.getX() - x) + (long) (p.getZ() - z) * (p.getZ() - z)));
+        out.sort(Comparator.comparingLong(p -> (long) (p.getX() - x) * (p.getX() - x) + (long) (p.getZ() - z) * (p.getZ() - z)));
         return out;
     }
 
@@ -366,7 +371,7 @@ public final class MapTerrain {
         Long2ObjectOpenHashMap<List<Found>> byChunk = FOUND.get(region);
         if (byChunk == null || root == null) return;
         Path file = foundFile(region);
-        try (var bytes = new java.io.ByteArrayOutputStream(); DataOutputStream out = new DataOutputStream(bytes)) {
+        try (var bytes = new ByteArrayOutputStream(); DataOutputStream out = new DataOutputStream(bytes)) {
             out.writeInt(byChunk.size());
             for (var e : byChunk.long2ObjectEntrySet()) {
                 out.writeLong(e.getLongKey());
@@ -391,7 +396,7 @@ public final class MapTerrain {
         List<MapPoi> out = new ArrayList<>();
         for (List<Found> list : found(region).values()) {
             for (Found f : list) {
-                boolean mine = com.meakaandre.siftec.company.Companies.same(f.owner(), companyId) || (f.poi().kind() == MapPoi.Kind.GEYSER)
+                boolean mine = Companies.same(f.owner(), companyId) || (f.poi().kind() == MapPoi.Kind.GEYSER)
                     || (f.poi().kind() == MapPoi.Kind.TRAIN_STATION && f.owner().isEmpty());
                 if (mine) out.add(f.poi());
             }

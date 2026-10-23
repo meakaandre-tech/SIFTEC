@@ -1,18 +1,19 @@
 package com.meakaandre.siftec.building;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
-
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.death.DeathCrateBlockEntity;
 import com.meakaandre.siftec.registry.ModItems;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -22,8 +23,11 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -34,9 +38,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Selftests for the building framework, run by the automated smoke test with the test building:
@@ -82,10 +88,10 @@ public final class BuildingTests {
     }
 
     /** Puts every player's Build Gun on a tab, with a building picked or nothing picked. */
-    private static int gunTab(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx, String building) {
+    private static int gunTab(CommandContext<CommandSourceStack> ctx, String building) {
         Category tab = Category.of(StringArgumentType.getString(ctx, "tab"));
-        for (net.minecraft.server.level.ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) {
-            net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, new BuildGunPayloads.Tab(tab.ordinal(), building));
+        for (ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) {
+            ServerPlayNetworking.send(player, new BuildGunPayloads.Tab(tab.ordinal(), building));
         }
         report(ctx.getSource(), "gun tab " + tab + " " + building);
         return 1;
@@ -156,7 +162,7 @@ public final class BuildingTests {
 
     private static SimpleContainer wallet(int sheets, int rods) {
         SimpleContainer c = new SimpleContainer(9);
-        Item sheet = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse("create:iron_sheet"));
+        Item sheet = BuiltInRegistries.ITEM.getValue(Identifier.parse("create:iron_sheet"));
         if (sheets > 0) c.addItem(new ItemStack(sheet, sheets));
         if (rods > 0) c.addItem(new ItemStack(ModItems.PARTS.get("iron_rod"), rods));
         return c;
@@ -164,7 +170,7 @@ public final class BuildingTests {
 
     private static int count(List<ItemStack> stacks, String id) {
         int n = 0;
-        for (ItemStack s : stacks) if (net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(s.getItem()).toString().equals(id)) n += s.getCount();
+        for (ItemStack s : stacks) if (BuiltInRegistries.ITEM.getKey(s.getItem()).toString().equals(id)) n += s.getCount();
         return n;
     }
 
@@ -183,7 +189,7 @@ public final class BuildingTests {
     }
 
     /** A block of the building's shell: not a machine, the controller or a port. */
-    private static @org.jspecify.annotations.Nullable BlockPos shellOf(Placement p) {
+    private static @Nullable BlockPos shellOf(Placement p) {
         BuildingTemplate t = BuildingTemplate.of(p.def());
         for (BuildingTemplate.Cell cell : t.members) {
             if (cell != t.controller && !BuildingRepair.machine(cell.state()) && !(cell.state().getBlock() instanceof PortBlock) && !cell.state().isAir()) return p.at(cell);
@@ -194,7 +200,7 @@ public final class BuildingTests {
     private static BlockPos cellOf(Placement p, String block) {
         BuildingTemplate t = BuildingTemplate.of(p.def());
         for (BuildingTemplate.Cell cell : t.members) {
-            if (net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(cell.state().getBlock()).toString().equals(block)) return p.at(cell);
+            if (BuiltInRegistries.BLOCK.getKey(cell.state().getBlock()).toString().equals(block)) return p.at(cell);
         }
         return null;
     }
@@ -214,8 +220,8 @@ public final class BuildingTests {
             e.discard();
         }
         for (BlockPos pos : BlockPos.betweenClosed(at.offset(-4, -4, -4), at.offset(4, 4, 4))) {
-            if (!(level.getBlockEntity(pos) instanceof com.meakaandre.siftec.death.DeathCrateBlockEntity crate)) continue;
-            for (com.meakaandre.siftec.death.DeathCrateBlockEntity.Entry e : crate.entries) out.add(e.stack().copy());
+            if (!(level.getBlockEntity(pos) instanceof DeathCrateBlockEntity crate)) continue;
+            for (DeathCrateBlockEntity.Entry e : crate.entries) out.add(e.stack().copy());
             crate.entries.clear();
             level.setBlock(pos.immutable(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         }
@@ -377,7 +383,7 @@ public final class BuildingTests {
         BlockPos pressG = cellOf(g, "create:mechanical_press");
         level.setBlock(pressG, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         later(level, BuildingRepair.EVERY + 40, () -> expect(source, "a lost machine (its press) is put back and the building stays up",
-            level.getBlockState(pressG).is(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse("create:mechanical_press")))
+            level.getBlockState(pressG).is(BuiltInRegistries.BLOCK.getValue(Identifier.parse("create:mechanical_press")))
                 && standing(level, g) == t.members.size(), standing(level, g) + " of " + t.members.size() + " blocks standing, " + level.getBlockState(pressG)));
         // and the controller of another one
         Placement f = new Placement(def, new BlockPos(X - 12, Y, Z + 12), Direction.NORTH, false);
@@ -449,7 +455,7 @@ public final class BuildingTests {
         platform(level, GX - 10, GZ - 16, GX + 10, GZ + 6, GY, 12);
         BuildGun.USES.clear();
         for (var player : source.getServer().getPlayerList().getPlayers()) {
-            player.teleportTo(level, GX + 0.5, GY, GZ + 0.5, java.util.Set.of(), 180f, 35f, true);
+            player.teleportTo(level, GX + 0.5, GY, GZ + 0.5, Set.of(), 180f, 35f, true);
             player.getInventory().clearContent();
             player.getInventory().setItem(player.getInventory().getSelectedSlot(), new ItemStack(ModItems.BUILD_GUN.get()));
         }

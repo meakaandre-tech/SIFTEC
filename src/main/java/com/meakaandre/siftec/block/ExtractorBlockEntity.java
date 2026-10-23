@@ -1,14 +1,17 @@
 package com.meakaandre.siftec.block;
 
+import com.meakaandre.siftec.building.ExtractorLogic;
 import com.meakaandre.siftec.fluid.FluidEntry;
 import com.meakaandre.siftec.fluid.ModFluids;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeType;
+import com.meakaandre.siftec.owner.Ownership;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -20,8 +23,8 @@ import java.util.Optional;
 /**
  * The placeable Resource Well Extractor block: on a nitrogen node, turned by a shaft on top, it fills its tank. Like the
  * Build Gun's Resource Well Extractor it needs a running Resource Well Pressurizer of its company within
- * {@link com.meakaandre.siftec.building.ExtractorLogic#WELL_RANGE} blocks, and counts toward that Pressurizer's
- * {@link com.meakaandre.siftec.building.ExtractorLogic#WELL_EXTRACTORS}; one left over gives nothing, and using it says why.
+ * {@link ExtractorLogic#WELL_RANGE} blocks, and counts toward that Pressurizer's
+ * {@link ExtractorLogic#WELL_EXTRACTORS}; one left over gives nothing, and using it says why.
  */
 public class ExtractorBlockEntity extends KineticBlockEntity {
     /** Fluid is counted in droplets: 81 to the millibucket. */
@@ -50,7 +53,7 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!(level instanceof net.minecraft.server.level.ServerLevel server)) return;
+        if (!(level instanceof ServerLevel server)) return;
         if (recheck-- <= 0) {
             recheck = 40;
             node = Mining.nodeUnder(server, worldPosition).filter(n -> n.type() == NodeType.NITROGEN);
@@ -59,8 +62,8 @@ public class ExtractorBlockEntity extends KineticBlockEntity {
         FluidEntry nitrogen = ModFluids.ALL.get("nitrogen");
         if (node.isEmpty() || nitrogen == null) return;
         // it asks for its well every tick, turning or not, so it keeps its place at its Pressurizer
-        var company = com.meakaandre.siftec.owner.Ownership.of(this);
-        var draw = com.meakaandre.siftec.building.ExtractorLogic.draw(server, worldPosition, company == null ? "" : company.id);
+        var company = Ownership.of(this);
+        var draw = ExtractorLogic.draw(server, worldPosition, company == null ? "" : company.id);
         problem = draw.purity() != null ? "" : draw.full() ? "siftec.building.well_full" : "siftec.building.no_well";
         if (speed == 0 || draw.purity() == null) return;
         progress += speed * node.get().purity().multiplier;

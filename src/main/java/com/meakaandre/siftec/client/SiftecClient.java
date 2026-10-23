@@ -1,22 +1,36 @@
 package com.meakaandre.siftec.client;
 
-import com.meakaandre.siftec.registry.ModBlockEntities;
-import com.zurrtum.create.client.content.kinetics.base.ShaftRenderer;
-import com.zurrtum.create.client.content.kinetics.base.SingleKineticRenderState;
-import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import com.meakaandre.siftec.client.map.MapClient;
+import com.meakaandre.siftec.client.ponder.Guide;
+import com.meakaandre.siftec.equip.JetFuelPayload;
 import com.meakaandre.siftec.fluid.FluidEntry;
 import com.meakaandre.siftec.fluid.ModFluids;
+import com.meakaandre.siftec.hub.HubMenu;
+import com.meakaandre.siftec.hub.HubViewPayload;
 import com.meakaandre.siftec.net.ClientState;
-import com.zurrtum.create.client.AllFluidConfigs;
-import net.minecraft.client.renderer.block.FluidModel;
-import net.minecraft.client.resources.model.sprite.Material;
-import net.minecraft.resources.Identifier;
 import com.meakaandre.siftec.net.StatePayload;
+import com.meakaandre.siftec.prefab.PreviewPayload;
+import com.meakaandre.siftec.registry.ModBlockEntities;
+import com.zurrtum.create.client.AllFluidConfigs;
+import com.zurrtum.create.client.content.kinetics.base.ShaftRenderer;
+import com.zurrtum.create.client.content.kinetics.base.SingleKineticRenderState;
+import com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer;
+import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 public class SiftecClient implements ClientModInitializer {
     @Override
@@ -27,9 +41,9 @@ public class SiftecClient implements ClientModInitializer {
         // a generator building's turbine, turning its generator coils
         BlockEntityRendererRegistry.register(ModBlockEntities.TURBINE.get(), shaft);
         // the Speed Governor's two shaft halves turn at different speeds, like a Gearshift's
-        BlockEntityRendererProvider<com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity,
-            com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer.SplitShaftRenderState> split =
-            com.zurrtum.create.client.content.kinetics.transmission.SplitShaftRenderer::new;
+        BlockEntityRendererProvider<SplitShaftBlockEntity,
+            SplitShaftRenderer.SplitShaftRenderState> split =
+            SplitShaftRenderer::new;
         BlockEntityRendererRegistry.register(ModBlockEntities.GOVERNOR.get(), split);
         // the AWESOME Shop's signs and billboards, and the cosmetics drawn on players and blocks
         BlockEntityRendererRegistry.register(ModBlockEntities.SHOP_SIGN.get(), ShopSignRenderer::new);
@@ -42,31 +56,31 @@ public class SiftecClient implements ClientModInitializer {
             AllFluidConfigs.tint(fluid.still, (f, components) -> color);
         }
         // every locked item says, in red, what unlocks it: in the inventory and in recipe viewers alike
-        net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {
-            net.minecraft.network.chat.Component why = ClientLocks.item(stack);
-            if (why != null) lines.add(why.copy().withStyle(net.minecraft.ChatFormatting.RED));
+        ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {
+            Component why = ClientLocks.item(stack);
+            if (why != null) lines.add(why.copy().withStyle(ChatFormatting.RED));
         });
         ClientPlayNetworking.registerGlobalReceiver(StatePayload.TYPE, (payload, context) -> ClientState.accept(payload));
         SimDebug.register();
         // the HUB screen, and what the server says it shows
-        net.minecraft.client.gui.screens.MenuScreens.register(com.meakaandre.siftec.hub.HubMenu.TYPE, HubScreen::new);
-        ClientPlayNetworking.registerGlobalReceiver(com.meakaandre.siftec.hub.HubViewPayload.TYPE, (payload, context) -> net.minecraft.client.Minecraft.getInstance().execute(() -> {
-            var player = net.minecraft.client.Minecraft.getInstance().player;
-            if (player != null && player.containerMenu instanceof com.meakaandre.siftec.hub.HubMenu menu && menu.containerId == payload.containerId()) {
+        MenuScreens.register(HubMenu.TYPE, HubScreen::new);
+        ClientPlayNetworking.registerGlobalReceiver(HubViewPayload.TYPE, (payload, context) -> Minecraft.getInstance().execute(() -> {
+            var player = Minecraft.getInstance().player;
+            if (player != null && player.containerMenu instanceof HubMenu menu && menu.containerId == payload.containerId()) {
                 menu.view = payload.view();
             }
         }));
-        ClientPlayNetworking.registerGlobalReceiver(com.meakaandre.siftec.equip.JetFuelPayload.TYPE, (payload, context) -> ClientState.jetFuel = payload.ok());
-        net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(JetpackClient::tick);
+        ClientPlayNetworking.registerGlobalReceiver(JetFuelPayload.TYPE, (payload, context) -> ClientState.jetFuel = payload.ok());
+        ClientTickEvents.END_CLIENT_TICK.register(JetpackClient::tick);
         // the HUB and Wormhole Gateway holograms, and the server's verdict on where they stand
-        ClientPlayNetworking.registerGlobalReceiver(com.meakaandre.siftec.prefab.PreviewPayload.TYPE, (payload, context) -> net.minecraft.client.Minecraft.getInstance().execute(() -> PrefabPreview.accept(payload)));
-        net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(PrefabPreview::tick);
+        ClientPlayNetworking.registerGlobalReceiver(PreviewPayload.TYPE, (payload, context) -> Minecraft.getInstance().execute(() -> PrefabPreview.accept(payload)));
+        ClientTickEvents.END_CLIENT_TICK.register(PrefabPreview::tick);
         BuildGunClient.register();
         VehicleClient.register();
         CloudButton.register();
-        com.meakaandre.siftec.client.map.MapClient.register();
+        MapClient.register();
         // the guide: Ponder scenes for every building and vehicle (work package 13)
-        com.meakaandre.siftec.client.ponder.Guide.register();
+        Guide.register();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientState.done = null;
             ClientState.jetFuel = true;

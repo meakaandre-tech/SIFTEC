@@ -44,12 +44,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Selftests for work package 14, vehicles, run by the smoke test: {@code /siftec selftest vehicles}. The building list
@@ -393,7 +395,7 @@ public final class VehicleTests {
         var players = source.getServer().getPlayerList().getPlayers();
         if (!players.isEmpty()) {
             ServerPlayer player = players.get(0);
-            player.teleportTo(level, vx + 6.5, Y + 4, Z + 14.5, java.util.Set.of(), 180f, 18f, true);
+            player.teleportTo(level, vx + 6.5, Y + 4, Z + 14.5, Set.of(), 180f, 18f, true);
         }
         report(source, "view: one of each vehicle at " + vx + " " + Y + " " + Z);
         return 1;
@@ -403,9 +405,9 @@ public final class VehicleTests {
     private static final class TankFluid {
         static Fluid at(ServerLevel level, BlockPos tank) {
             Storage<FluidVariant> s = FluidStorage.SIDED.find(level, tank, null);
-            if (s == null) return net.minecraft.world.level.material.Fluids.EMPTY;
+            if (s == null) return Fluids.EMPTY;
             for (StorageView<FluidVariant> v : s) if (!v.isResourceBlank() && v.getAmount() > 0) return v.getResource().getFluid();
-            return net.minecraft.world.level.material.Fluids.EMPTY;
+            return Fluids.EMPTY;
         }
     }
 }

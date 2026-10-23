@@ -8,6 +8,10 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Toxic Shot: Toxic Residue packed into a Gunsmithing paper shot. A gun with the Blunderbuss Barrel takes it
@@ -24,23 +28,23 @@ public final class ToxicShot {
     /** The gun library's ammo type for the shot, or null when the library is not installed. */
     public static Object ammoType() {
         try {
-            java.lang.reflect.Method method = getType();
+            Method method = getType();
             return method == null ? null : method.invoke(null, ID);
         } catch (ReflectiveOperationException | LinkageError e) {
             return null;
         }
     }
 
-    private static volatile java.util.Optional<java.lang.reflect.Method> getType;
+    private static volatile Optional<Method> getType;
 
     /** The library's AmmoHolder.getType, looked up once; null when the library is not installed. */
-    private static java.lang.reflect.Method getType() {
-        java.util.Optional<java.lang.reflect.Method> known = getType;
+    private static Method getType() {
+        Optional<Method> known = getType;
         if (known == null) {
             try {
-                known = java.util.Optional.of(Class.forName("com.nukateam.ntgl.common.data.holders.AmmoHolder").getMethod("getType", Identifier.class));
+                known = Optional.of(Class.forName("com.nukateam.ntgl.common.data.holders.AmmoHolder").getMethod("getType", Identifier.class));
             } catch (ReflectiveOperationException | LinkageError e) {
-                known = java.util.Optional.empty();
+                known = Optional.empty();
             }
             getType = known;
         }
@@ -48,11 +52,11 @@ public final class ToxicShot {
     }
 
     /** Per projectile class, the field holding its ammunition (empty if that class has none). */
-    private static final java.util.Map<Class<?>, java.util.Optional<Field>> AMMO_FIELDS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<Class<?>, Optional<Field>> AMMO_FIELDS = new ConcurrentHashMap<>();
 
     /** The id of the ammunition a gun library projectile was fired as, or "" for anything else. */
     private static String ammoOf(Entity projectile) {
-        java.util.Optional<Field> field = AMMO_FIELDS.computeIfAbsent(projectile.getClass(), ToxicShot::ammoField);
+        Optional<Field> field = AMMO_FIELDS.computeIfAbsent(projectile.getClass(), ToxicShot::ammoField);
         if (field.isEmpty()) return "";
         try {
             Object holder = field.get().get(projectile);
@@ -62,18 +66,18 @@ public final class ToxicShot {
         }
     }
 
-    private static java.util.Optional<Field> ammoField(Class<?> projectile) {
+    private static Optional<Field> ammoField(Class<?> projectile) {
         for (Class<?> type = projectile; type != null && type != Entity.class; type = type.getSuperclass()) {
             if (!type.getName().startsWith("com.nukateam.")) continue;
             try {
                 Field field = type.getDeclaredField("ammoHolder");
                 field.setAccessible(true);
-                return java.util.Optional.of(field);
+                return Optional.of(field);
             } catch (ReflectiveOperationException | RuntimeException e) {
                 // not the class that holds it; try its parent
             }
         }
-        return java.util.Optional.empty();
+        return Optional.empty();
     }
 
     public static void register() {

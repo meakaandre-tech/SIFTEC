@@ -3,6 +3,7 @@ package com.meakaandre.siftec.building;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
+import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -23,6 +24,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -81,9 +83,9 @@ public class PortBlockEntity extends SmartBlockEntity {
     public @Nullable Storage<ItemVariant> items(@Nullable Direction side) {
         if (!serves(side, false)) return null;
         // a Basin lets its ingredients out as well as what it has made: an output port only takes what it has made
-        if (kind() == PortBlock.Kind.ITEM_OUT && level.getBlockEntity(target) instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity basin) {
+        if (kind() == PortBlock.Kind.ITEM_OUT && level.getBlockEntity(target) instanceof BasinBlockEntity basin) {
             var slots = ContainerStorage.of(basin.itemCapability, null).getSlots();
-            return FilteringStorage.extractOnlyOf(new CombinedStorage<>(new java.util.ArrayList<>(slots.subList(9, Math.min(18, slots.size())))));
+            return FilteringStorage.extractOnlyOf(new CombinedStorage<>(new ArrayList<>(slots.subList(9, Math.min(18, slots.size())))));
         }
         // the controller's slots (a miner's ore, the Smelter's ore and ingots, a generator's fuel) are reached only from
         // its ports: it registers no item storage of its own, so nothing beside it can take from or put into it
@@ -93,7 +95,7 @@ public class PortBlockEntity extends SmartBlockEntity {
         // the Particle Accelerator's and the Converter's input port lets in only what the current recipe takes, so junk
         // never jams the Basin
         if (kind() == PortBlock.Kind.ITEM_IN && controller != null && level.getBlockEntity(controller) instanceof ControllerBlockEntity c
-            && c.def() != null && c.def().logic().equals("processor") && level.getBlockEntity(target) instanceof com.zurrtum.create.content.processing.basin.BasinBlockEntity) {
+            && c.def() != null && c.def().logic().equals("processor") && level.getBlockEntity(target) instanceof BasinBlockEntity) {
             return new FilteringStorage<>(inner) {
                 @Override
                 protected boolean canInsert(ItemVariant resource) {

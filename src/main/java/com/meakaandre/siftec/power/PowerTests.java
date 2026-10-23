@@ -5,6 +5,7 @@ import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.BuildingTemplate;
+import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.Placement;
@@ -27,6 +28,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -39,6 +41,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
 import org.antarcticgardens.cna.content.electricity.network.ElectricalNetwork;
@@ -47,9 +50,12 @@ import org.antarcticgardens.cna.content.motor.MotorBlockEntity;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Selftests for the power grid (work package 6). Every line of output starts with "SELFTEST power".
@@ -66,7 +72,7 @@ import java.util.Map;
  */
 public final class PowerTests {
     private static final List<Monitor> MONITORS = new ArrayList<>();
-    private static final Map<Long, Integer> LOADS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<Long, Integer> LOADS = new ConcurrentHashMap<>();
     private static int allLoads;
 
     private interface Monitor {
@@ -152,7 +158,7 @@ public final class PowerTests {
         return a.isConnected(b.getBlockPos());
     }
 
-    private static void fill(ServerLevel level, @Nullable BlockPos tank, net.minecraft.world.level.material.Fluid fluid, long mb) {
+    private static void fill(ServerLevel level, @Nullable BlockPos tank, Fluid fluid, long mb) {
         Storage<FluidVariant> s = tank == null ? null : FluidStorage.SIDED.find(level, tank, null);
         if (s == null) return;
         try (Transaction tx = Transaction.openOuter()) {
@@ -362,7 +368,7 @@ public final class PowerTests {
 
     /** New Age's reactor burns the pack's fuel rods: what its fuel tag holds now. */
     private static void reactorTag(ServerLevel level, CommandSourceStack source) {
-        TagKey<Item> fuel = TagKey.create(net.minecraft.core.registries.Registries.ITEM, Identifier.fromNamespaceAndPath("create_new_age", "nuclear/fuel"));
+        TagKey<Item> fuel = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("create_new_age", "nuclear/fuel"));
         report(source, "New Age reactor fuel: uranium rod " + new ItemStack(item("siftec:uranium_fuel_rod")).is(fuel) + ", plutonium rod "
             + new ItemStack(item("siftec:plutonium_fuel_rod")).is(fuel) + ", New Age's own fuel " + new ItemStack(item("create_new_age:nuclear_fuel")).is(fuel));
     }
@@ -391,7 +397,7 @@ public final class PowerTests {
         if (players.isEmpty()) return 0;
         var player = players.get(0);
         if (n == 0) {
-            com.meakaandre.siftec.building.BuildingTests.platform(level, VX - 12, VZ - 20, VX + 110, VZ + 30, VY, 18);
+            BuildingTests.platform(level, VX - 12, VZ - 20, VX + 110, VZ + 30, VY, 18);
             String[] row = {"power_pole_mk1", "biomass_burner", "coal_generator", "fuel_generator", "geothermal_generator", "nuclear_power_plant",
                 "alien_power_augmenter", "power_storage", "power_pole_mk2", "power_pole_mk3", "power_tower", "constructor"};
             List<ControllerBlockEntity> built = new ArrayList<>();
@@ -436,9 +442,9 @@ public final class PowerTests {
             report(source, "view: " + built.size() + " power buildings built and wired");
         }
         switch (n) {
-            case 0 -> player.teleportTo(level, VX + 40.5, VY + 9, VZ + 26.5, java.util.Set.of(), 180f, 14f, true);
-            case 1 -> player.teleportTo(level, VX - 8.5, VY + 12, VZ + 4.5, java.util.Set.of(), 255f, 18f, true);
-            default -> player.teleportTo(level, VX + 9.5, VY + 3, VZ + 9.5, java.util.Set.of(), 180f, 10f, true);
+            case 0 -> player.teleportTo(level, VX + 40.5, VY + 9, VZ + 26.5, Set.of(), 180f, 14f, true);
+            case 1 -> player.teleportTo(level, VX - 8.5, VY + 12, VZ + 4.5, Set.of(), 255f, 18f, true);
+            default -> player.teleportTo(level, VX + 9.5, VY + 3, VZ + 9.5, Set.of(), 180f, 10f, true);
         }
         report(source, "view " + n + " ready");
         return 1;
@@ -483,7 +489,7 @@ public final class PowerTests {
             wired.append(wire(connector(level, burner), connector(level, towers[0])) ? "+" : "-");
             wired.append(wire(connector(level, far), connector(level, towers[4])) ? "+" : "-");
             wired.append(wire(connector(level, branch), connector(level, towers[5])) ? "+" : "-");
-            report(source, "chain setup: towers " + java.util.Arrays.stream(t).map(BlockPos::toShortString).toList() + "; wires " + wired);
+            report(source, "chain setup: towers " + Arrays.stream(t).map(BlockPos::toShortString).toList() + "; wires " + wired);
         } else {
             for (int i : ends) level.setChunkForced(t[i].getX() >> 4, t[i].getZ() >> 4, true);
             for (BlockPos p : new BlockPos[]{burnAt, farAt, branchAt}) level.setChunkForced(p.getX() >> 4, p.getZ() >> 4, true);

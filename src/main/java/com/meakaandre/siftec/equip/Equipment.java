@@ -1,30 +1,47 @@
 package com.meakaandre.siftec.equip;
 
+import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.backpack.Carried;
+import com.meakaandre.siftec.blueprint.Blueprints;
+import com.meakaandre.siftec.blueprint.DesignerBlockEntity;
+import com.meakaandre.siftec.compat.SiftGate;
 import com.meakaandre.siftec.mixin.ConnectionAccessor;
 import com.meakaandre.siftec.power.Poles;
 import com.meakaandre.siftec.registry.ModItems;
+import com.mojang.serialization.Codec;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Prediction;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -49,7 +66,7 @@ public final class Equipment {
      * keep slow falling until they land, are in water, or are flying again. Kept by id, so it also holds for
      * someone who drops off by leaving the game and comes back in the air.
      */
-    private static final java.util.Set<UUID> SAFE_FALL = new java.util.HashSet<>();
+    private static final Set<UUID> SAFE_FALL = new HashSet<>();
 
     /** Slow falling from now until the player is on the ground (or in water, or flying). */
     public static void safeFall(ServerPlayer player) {
@@ -72,12 +89,12 @@ public final class Equipment {
         }
     }
     /** Thrust left in the tank, and when the running filters give out. Kept with the player. */
-    private static final net.fabricmc.fabric.api.attachment.v1.AttachmentType<Integer> JET_TICKS = net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.create(
-        com.meakaandre.siftec.Siftec.id("jet_fuel"), builder -> builder.persistent(com.mojang.serialization.Codec.INT).copyOnDeath());
-    private static final net.fabricmc.fabric.api.attachment.v1.AttachmentType<Long> MASK_UNTIL = net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.create(
-        com.meakaandre.siftec.Siftec.id("mask_filter"), builder -> builder.persistent(com.mojang.serialization.Codec.LONG).copyOnDeath());
-    private static final net.fabricmc.fabric.api.attachment.v1.AttachmentType<Long> SUIT_UNTIL = net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.create(
-        com.meakaandre.siftec.Siftec.id("suit_filter"), builder -> builder.persistent(com.mojang.serialization.Codec.LONG).copyOnDeath());
+    private static final AttachmentType<Integer> JET_TICKS = AttachmentRegistry.create(
+        Siftec.id("jet_fuel"), builder -> builder.persistent(Codec.INT).copyOnDeath());
+    private static final AttachmentType<Long> MASK_UNTIL = AttachmentRegistry.create(
+        Siftec.id("mask_filter"), builder -> builder.persistent(Codec.LONG).copyOnDeath());
+    private static final AttachmentType<Long> SUIT_UNTIL = AttachmentRegistry.create(
+        Siftec.id("suit_filter"), builder -> builder.persistent(Codec.LONG).copyOnDeath());
 
     private static int jet(ServerPlayer player) {
         Integer left = player.getAttached(JET_TICKS);
@@ -97,34 +114,34 @@ public final class Equipment {
         ServerTickEvents.END_SERVER_TICK.register(Equipment::tick);
         // the Xeno-Zapper: a jolt that hurts more than a fist and stuns (slowness and weakness for a moment); it needs the
         // swing charged, as any weapon does
-        net.fabricmc.fabric.api.event.player.AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
-            if (!(level instanceof net.minecraft.server.level.ServerLevel server) || player.isSpectator()) return net.minecraft.world.InteractionResult.PASS;
-            if (!player.getItemInHand(hand).is(ModItems.XENO_ZAPPER.get()) || !(entity instanceof net.minecraft.world.entity.LivingEntity living)) {
-                return net.minecraft.world.InteractionResult.PASS;
+        AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+            if (!(level instanceof ServerLevel server) || player.isSpectator()) return InteractionResult.PASS;
+            if (!player.getItemInHand(hand).is(ModItems.XENO_ZAPPER.get()) || !(entity instanceof LivingEntity living)) {
+                return InteractionResult.PASS;
             }
-            if (player.getAttackStrengthScale(0.5f) < 0.9f) return net.minecraft.world.InteractionResult.PASS;
+            if (player.getAttackStrengthScale(0.5f) < 0.9f) return InteractionResult.PASS;
             if (living.hurtServer(server, server.damageSources().playerAttack(player), ZAPPER_DAMAGE)) {
                 living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 3));
                 living.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 1));
-                server.playSound(null, living.blockPosition(), net.minecraft.sounds.SoundEvents.BEE_STING, net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 1.6f);
+                server.playSound(null, living.blockPosition(), SoundEvents.BEE_STING, SoundSource.PLAYERS, 0.8f, 1.6f);
             }
-            return net.minecraft.world.InteractionResult.PASS;
+            return InteractionResult.PASS;
         });
         // carriers and drones are only ever drawn for something in flight; one read back from disk is left over from a restart
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+        ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
             if (entity.entityTags().contains(Ziplines.TAG)) level.getServer().execute(entity::discard);
             // The Sift's own rifts are switched off outside The Sift: the wormhole is the only way in
-            if (level.dimension() != com.meakaandre.siftec.compat.SiftGate.SIFT && com.meakaandre.siftec.compat.SiftGate.isRift(entity)) level.getServer().execute(entity::discard);
+            if (level.dimension() != SiftGate.SIFT && SiftGate.isRift(entity)) level.getServer().execute(entity::discard);
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             THRUSTING.clear();
             SAFE_FALL.clear();
             Poles.clear();
             Ziplines.clear();
-            com.meakaandre.siftec.blueprint.Blueprints.clear();
-            com.meakaandre.siftec.blueprint.DesignerBlockEntity.clear();
+            Blueprints.clear();
+            DesignerBlockEntity.clear();
         });
-        FLIGHT_ZONES.add(com.meakaandre.siftec.blueprint.DesignerBlockEntity::inside);
+        FLIGHT_ZONES.add(DesignerBlockEntity::inside);
         FLIGHT_ZONES.add(player -> wearing(player, EquipmentSlot.CHEST, ModItems.HOVER_PACK.get())
             && Poles.near(player.level(), player.getX(), player.getY(), player.getZ(), HOVER_RANGE));
     }
@@ -135,7 +152,7 @@ public final class Equipment {
 
     /** Takes one of the item out of what the player carries: the inventory, then the backpack. */
     private static boolean take(ServerPlayer player, Item item) {
-        com.meakaandre.siftec.backpack.Carried carried = com.meakaandre.siftec.backpack.Carried.of(player);
+        Carried carried = Carried.of(player);
         for (int i = 0; i < carried.getContainerSize(); i++) {
             if (carried.getItem(i).is(item)) {
                 carried.removeItem(i, 1);
@@ -146,7 +163,7 @@ public final class Equipment {
     }
 
     /** True while a filter is running, starting a new one from the inventory when the last has run out. */
-    private static boolean filtered(ServerPlayer player, net.fabricmc.fabric.api.attachment.v1.AttachmentType<Long> until, Item filter) {
+    private static boolean filtered(ServerPlayer player, AttachmentType<Long> until, Item filter) {
         if (player.hasInfiniteMaterials()) return true;
         long now = player.level().getGameTime();
         Long end = player.getAttached(until);
@@ -224,7 +241,7 @@ public final class Equipment {
         tickJetpacks(server);
         Ziplines.tick(server);
         tickSafeFall(server);
-        com.meakaandre.siftec.blueprint.Blueprints.tick(server);
+        Blueprints.tick(server);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if ((server.getTickCount() + player.getId()) % 10 != 0) continue;
             if (wearing(player, EquipmentSlot.FEET, ModItems.BLADE_RUNNERS.get())) {

@@ -1,11 +1,13 @@
 package com.meakaandre.siftec.sim;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.building.SimAccess;
-import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.content.logistics.vault.ItemVaultBlockEntity;
+import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
+import com.zurrtum.create.content.processing.basin.BasinInventory;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -18,11 +20,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -255,7 +260,7 @@ final class Buffers {
         }
         if (ground != null) outCap = 64;
         // a nuclear plant's output holds its waste up to the room the real plant gives it, not all its slots could
-        if (n.power.equals("nuclear")) outCap = Math.min(outCap, com.meakaandre.siftec.building.BuildingPower.WASTE_ROOM);
+        if (n.power.equals("nuclear")) outCap = Math.min(outCap, BuildingPower.WASTE_ROOM);
         // the model's own figures stand where the buffers say less (a storage's capacity is what it is)
         if (!slots.isEmpty() || !items.isEmpty()) {
             if (n.mode.equals("store")) n.outCap = outCap;
@@ -300,11 +305,11 @@ final class Buffers {
         for (ItemStack s : spill) {
             if (s.isEmpty()) continue;
             if (ground != null) {
-                net.minecraft.world.entity.item.ItemEntity entity = new net.minecraft.world.entity.item.ItemEntity(level, drop.getX() + 0.5, drop.getY() + 0.1, drop.getZ() + 0.5, s);
-                entity.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                ItemEntity entity = new ItemEntity(level, drop.getX() + 0.5, drop.getY() + 0.1, drop.getZ() + 0.5, s);
+                entity.setDeltaMovement(Vec3.ZERO);
                 level.addFreshEntity(entity);
             } else {
-                net.minecraft.world.Containers.dropItemStack(level, drop.getX() + 0.5, drop.getY() + 1.1, drop.getZ() + 0.5, s);
+                Containers.dropItemStack(level, drop.getX() + 0.5, drop.getY() + 1.1, drop.getZ() + 0.5, s);
             }
         }
         if (ground == null && !spill.isEmpty()) Siftec.LOGGER.info("SIFTEC: {} at {}: {} stacks the catch-up had no room for were dropped", n.building, at.toShortString(), spill.size());
@@ -395,7 +400,7 @@ final class Buffers {
 
     /** Sets a slot even where the container would check what goes in (a Basin's own check is for players and funnels). */
     private static void setItem(Container c, int slot, ItemStack stack) {
-        if (c instanceof com.zurrtum.create.content.processing.basin.BasinInventory basin) {
+        if (c instanceof BasinInventory basin) {
             basin.disableCheck();
             basin.setItem(slot, stack);
             basin.enableCheck();
@@ -460,7 +465,7 @@ final class Buffers {
             return count;
         }
         BlockPos at = n.blockPos();
-        for (ItemStack s : b.add(key, count, role)) net.minecraft.world.Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, s);
+        for (ItemStack s : b.add(key, count, role)) Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1.1, at.getZ() + 0.5, s);
         for (Slots s : b.slots) s.c.setChanged();
         return count;
     }

@@ -14,8 +14,10 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * The HUD: Satisfactory's compass strip across the top (from the start) and SIFTEC's small square minimap at the top
@@ -162,7 +164,7 @@ public final class MapHud {
         int bearingHalf = (int) Math.ceil(mc.font.width(bearingText) * 0.75 / 2) + 1;
         labelRows.add(new ArrayList<>(List.of(new int[]{cx + 1 - bearingHalf, cx + 1 + bearingHalf})));
         // pins at (nearly) the same bearing are spread apart a little, so each icon stays readable
-        java.util.Map<Mark, Integer> spread = spreadPins(marks, heading, cx, perDeg);
+        Map<Mark, Integer> spread = spreadPins(marks, heading, cx, perDeg);
         for (Mark mark : marks) {
             double rel = wrap180(mark.bearing - heading);
             boolean edge = Math.abs(rel) > 88;
@@ -199,10 +201,10 @@ public final class MapHud {
      * Where each pin's icon goes: at its bearing, except that pins closer than {@link #PIN_GAP} to each other are spread
      * out evenly around where the group stands.
      */
-    private static java.util.Map<Mark, Integer> spreadPins(List<Mark> marks, double heading, int cx, double perDeg) {
+    private static Map<Mark, Integer> spreadPins(List<Mark> marks, double heading, int cx, double perDeg) {
         List<Mark> pins = new ArrayList<>();
         for (Mark m : marks) if (m.pinned) pins.add(m);
-        java.util.Map<Mark, Integer> out = new java.util.HashMap<>();
+        Map<Mark, Integer> out = new HashMap<>();
         if (pins.isEmpty()) return out;
         List<int[]> xs = new ArrayList<>();
         for (int i = 0; i < pins.size(); i++) {

@@ -3,6 +3,7 @@ package com.meakaandre.siftec.death;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -48,7 +49,7 @@ public class DeathCrateBlockEntity extends BlockEntity {
     /** Taken away by something other than its owner emptying it (a creative player, a command): nothing is lost. */
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-        if (level instanceof net.minecraft.server.level.ServerLevel server) DeathCrates.removed(server, this);
+        if (level instanceof ServerLevel server) DeathCrates.removed(server, this);
     }
 
     @Override

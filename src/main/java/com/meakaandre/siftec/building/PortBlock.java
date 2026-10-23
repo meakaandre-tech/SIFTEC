@@ -14,6 +14,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
+import java.util.Locale;
+
 /**
  * A building's input or output, as in Satisfactory: belts, funnels and pipes attach only here, on the face that
  * points out of the building ({@code facing}). An input passes what it is given to its target inside (a basin, a
@@ -28,7 +30,7 @@ public class PortBlock extends Block implements IBE<PortBlockEntity> {
 
         @Override
         public String getSerializedName() {
-            return name().toLowerCase(java.util.Locale.ROOT);
+            return name().toLowerCase(Locale.ROOT);
         }
 
         public boolean input() {

@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.jspecify.annotations.Nullable;
@@ -106,7 +107,7 @@ public final class Keys {
     }
 
     public static String fluid(Fluid fluid) {
-        Fluid still = fluid instanceof net.minecraft.world.level.material.FlowingFluid flowing ? flowing.getSource() : fluid;
+        Fluid still = fluid instanceof FlowingFluid flowing ? flowing.getSource() : fluid;
         return "fluid:" + BuiltInRegistries.FLUID.getKey(still);
     }
 

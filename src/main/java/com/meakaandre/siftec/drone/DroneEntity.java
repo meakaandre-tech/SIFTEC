@@ -9,6 +9,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -76,10 +77,10 @@ public class DroneEntity extends Entity {
         if (!Double.isNaN(lastX)) {
             // it leans into where it is going: nose down as it speeds up along its heading, level while it climbs or hovers
             double dx = getX() - lastX, dz = getZ() - lastZ;
-            float yaw = getYRot() * net.minecraft.util.Mth.DEG_TO_RAD;
-            double ahead = -net.minecraft.util.Mth.sin(yaw) * dx + net.minecraft.util.Mth.cos(yaw) * dz;
-            double side = net.minecraft.util.Mth.cos(yaw) * dx + net.minecraft.util.Mth.sin(yaw) * dz;
-            float wantPitch = (float) net.minecraft.util.Mth.clamp(ahead * 30, -25, 25), wantRoll = (float) net.minecraft.util.Mth.clamp(side * 30, -20, 20);
+            float yaw = getYRot() * Mth.DEG_TO_RAD;
+            double ahead = -Mth.sin(yaw) * dx + Mth.cos(yaw) * dz;
+            double side = Mth.cos(yaw) * dx + Mth.sin(yaw) * dz;
+            float wantPitch = (float) Mth.clamp(ahead * 30, -25, 25), wantRoll = (float) Mth.clamp(side * 30, -20, 20);
             pitch += (wantPitch - pitch) * 0.15f;
             roll += (wantRoll - roll) * 0.15f;
         }

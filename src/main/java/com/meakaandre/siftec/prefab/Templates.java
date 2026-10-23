@@ -3,10 +3,13 @@ package com.meakaandre.siftec.prefab;
 import com.meakaandre.siftec.block.Facing;
 import com.meakaandre.siftec.registry.ModBlocks;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
 
 /**
  * The two structures, at Satisfactory's size with the player 1.8 blocks tall (one metre is one block).
@@ -173,11 +176,11 @@ public final class Templates {
     }
 
     private static BlockState create(String id) {
-        return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath("create", id)).defaultBlockState();
+        return BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", id)).defaultBlockState();
     }
 
     /** A Create block for the Craft Station, with one property set (Create's own blocks use the vanilla properties). */
-    private static <T extends Comparable<T>> BlockState create(String id, net.minecraft.world.level.block.state.properties.Property<T> property, T value) {
+    private static <T extends Comparable<T>> BlockState create(String id, Property<T> property, T value) {
         BlockState state = create(id);
         return state.hasProperty(property) ? state.setValue(property, value) : state;
     }
@@ -193,7 +196,7 @@ public final class Templates {
 
     /** A Create: New Age wire connector standing on the block below it. */
     private static BlockState connector() {
-        BlockState state = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.fromNamespaceAndPath("create_new_age", "electrical_connector")).defaultBlockState();
+        BlockState state = BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create_new_age", "electrical_connector")).defaultBlockState();
         return state.hasProperty(BlockStateProperties.FACING) ? state.setValue(BlockStateProperties.FACING, Direction.UP) : state;
     }
 
@@ -238,7 +241,7 @@ public final class Templates {
     static BlockState parse(String spec) {
         int open = spec.indexOf('[');
         String id = open < 0 ? spec : spec.substring(0, open);
-        BlockState state = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.Identifier.parse(id)).defaultBlockState();
+        BlockState state = BuiltInRegistries.BLOCK.getValue(Identifier.parse(id)).defaultBlockState();
         if (open < 0) return state;
         for (String pair : spec.substring(open + 1, spec.length() - 1).split(",")) {
             String[] kv = pair.split("=");
@@ -248,7 +251,7 @@ public final class Templates {
         return state;
     }
 
-    private static <T extends Comparable<T>> BlockState with(BlockState state, net.minecraft.world.level.block.state.properties.Property<T> property, String value) {
+    private static <T extends Comparable<T>> BlockState with(BlockState state, Property<T> property, String value) {
         return property.getValue(value).map(v -> state.setValue(property, v)).orElse(state);
     }
 

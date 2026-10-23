@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.blueprint;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.backpack.Carried;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingTemplate;
@@ -12,7 +13,9 @@ import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.registry.ModItems;
 import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
@@ -25,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -40,7 +44,9 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -83,8 +89,8 @@ public final class DesignerTests {
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("designer").executes(DesignerTests::run)))
                 .then(Commands.literal("worldtest").then(Commands.literal("designer").then(Commands.literal("view")
-                    .then(Commands.argument("n", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 5))
-                        .executes(c -> view(c, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n")))))))));
+                    .then(Commands.argument("n", IntegerArgumentType.integer(0, 5))
+                        .executes(c -> view(c, IntegerArgumentType.getInteger(c, "n")))))))));
     }
 
     private static void report(CommandSourceStack source, String text) {
@@ -168,10 +174,10 @@ public final class DesignerTests {
             look = Vec3.atCenterOf(terminal);
         }
         for (var player : players) {
-            player.teleportTo(level, at.x, at.y, at.z, java.util.Set.of(), player.getYRot(), player.getXRot(), true);
+            player.teleportTo(level, at.x, at.y, at.z, Set.of(), player.getYRot(), player.getXRot(), true);
             player.lookAt(EntityAnchorArgument.Anchor.EYES, look);
         }
-        report(source, "view " + n + " ready: " + TIERS[k] + " from " + String.format(java.util.Locale.ROOT, "%.1f %.1f %.1f", at.x, at.y, at.z));
+        report(source, "view " + n + " ready: " + TIERS[k] + " from " + String.format(Locale.ROOT, "%.1f %.1f %.1f", at.x, at.y, at.z));
         return 1;
     }
 
@@ -195,7 +201,7 @@ public final class DesignerTests {
             int left = cost.count();
             while (left > 0) {
                 int n = Math.min(left, kind.getMaxStackSize());
-                player.getInventory().placeItemBackInInventory(kind.copyWithCount(n), net.minecraft.util.Prediction.SERVER_ONLY);
+                player.getInventory().placeItemBackInInventory(kind.copyWithCount(n), Prediction.SERVER_ONLY);
                 left -= n;
             }
         }
@@ -251,14 +257,14 @@ public final class DesignerTests {
         pay(gunner, def.cost());
 
         // locked until the milestone, then the Build Gun puts it down and takes the cost
-        Buildings.Check locked = Buildings.check(level, p, company, com.meakaandre.siftec.backpack.Carried.of(gunner), false);
+        Buildings.Check locked = Buildings.check(level, p, company, Carried.of(gunner), false);
         expect(source, id + ": locked for a company without " + UNLOCKS[k], "siftec.build_gun.locked".equals(locked.reason), String.valueOf(locked.reason));
         company.done.add(UNLOCKS[k]);
         BuildGun.select(gunner, id, false, p);
         BuildGun.act(gunner, company);
         ControllerBlockEntity c = BuildGun.controllerAt(level, p.at(t.controller));
         if (!(c instanceof DesignerBlockEntity designer)) {
-            Buildings.Check why = Buildings.check(level, p, company, com.meakaandre.siftec.backpack.Carried.of(gunner), false);
+            Buildings.Check why = Buildings.check(level, p, company, Carried.of(gunner), false);
             expect(source, id + ": the Build Gun puts it down", false, why.message().getString()
                 + (why.blocked.isEmpty() ? "" : " first blocked " + why.blocked.getFirst().toShortString()));
             return;
@@ -312,12 +318,12 @@ public final class DesignerTests {
             new BlockHitResult(Vec3.atCenterOf(terminal), Direction.SOUTH, terminal, false));
         ItemStack print = ItemStack.EMPTY;
         for (int i = 0; i < gunner.getInventory().getContainerSize(); i++) {
-            if (gunner.getInventory().getItem(i).is(com.meakaandre.siftec.registry.ModItems.BLUEPRINT.get())) print = gunner.getInventory().getItem(i).copy();
+            if (gunner.getInventory().getItem(i).is(ModItems.BLUEPRINT.get())) print = gunner.getInventory().getItem(i).copy();
         }
         expect(source, id + ": paper at the terminal saves what is built inside (5 blocks)", !print.isEmpty() && Blueprints.count(print) == 5,
             print.isEmpty() ? "no blueprint" : Blueprints.count(print) + " blocks");
         for (int i = 0; i < gunner.getInventory().getContainerSize(); i++) {
-            if (gunner.getInventory().getItem(i).is(com.meakaandre.siftec.registry.ModItems.BLUEPRINT.get())) gunner.getInventory().setItem(i, ItemStack.EMPTY);
+            if (gunner.getInventory().getItem(i).is(ModItems.BLUEPRINT.get())) gunner.getInventory().setItem(i, ItemStack.EMPTY);
         }
 
         // the blueprint builds it again, out on the platform (a creative player carries every block)

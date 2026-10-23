@@ -4,6 +4,7 @@ import com.meakaandre.siftec.block.Facing;
 import com.meakaandre.siftec.power.PowerGrids;
 import com.meakaandre.siftec.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -16,6 +17,8 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
@@ -31,7 +34,7 @@ import org.jspecify.annotations.Nullable;
 public class HubBurnerBlock extends Block implements EntityBlock, PrefabPart {
     public HubBurnerBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(Facing.FACING, net.minecraft.core.Direction.NORTH));
+        registerDefaultState(defaultBlockState().setValue(Facing.FACING, Direction.NORTH));
     }
 
     @Override
@@ -40,8 +43,8 @@ public class HubBurnerBlock extends Block implements EntityBlock, PrefabPart {
     }
 
     @Override
-    public <T extends BlockEntity> net.minecraft.world.level.block.entity.@Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state,
-                                                                                                                 net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state,
+                                                                                                                 BlockEntityType<T> type) {
         return level.isClientSide() ? null : (l, p, s, be) -> {
             if (be instanceof HubBurnerBlockEntity burner) burner.serverTick();
         };

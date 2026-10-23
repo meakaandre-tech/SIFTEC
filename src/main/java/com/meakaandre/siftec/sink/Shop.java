@@ -5,8 +5,10 @@ import com.google.gson.JsonObject;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
+import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.Nullable;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +35,7 @@ public final class Shop {
 
         /** True if it can be bought this month (always, but for a holiday set out of its season). */
         public boolean inSeason() {
-            return months.isEmpty() || months.contains(java.time.LocalDate.now().getMonthValue());
+            return months.isEmpty() || months.contains(LocalDate.now().getMonthValue());
         }
 
         public String kind() {
@@ -214,7 +216,7 @@ public final class Shop {
     }
 
     /** The same, for a member: a creative player has everything. */
-    public static boolean owns(net.minecraft.server.level.ServerPlayer player, Company company, String gives) {
+    public static boolean owns(ServerPlayer player, Company company, String gives) {
         return player.hasInfiniteMaterials() || owns(company, gives);
     }
 

@@ -1,15 +1,27 @@
 package com.meakaandre.siftec.prefab;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.backpack.Carried;
+import com.meakaandre.siftec.building.BuildGunItem;
+import com.meakaandre.siftec.building.BuildingIndex;
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.compat.SiftGate;
 import com.meakaandre.siftec.config.SiftecConfig;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.hub.Milestones;
+import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.registry.ModItems;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -21,7 +33,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Prediction;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -30,6 +44,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -348,7 +363,7 @@ public final class Prefabs {
         }
         // paid from the inventory and the backpack alike
         List<ItemStack> paid = player == null ? new ArrayList<>()
-            : new ArrayList<>(com.meakaandre.siftec.building.Buildings.take(com.meakaandre.siftec.backpack.Carried.of(player), cost));
+            : new ArrayList<>(Buildings.take(Carried.of(player), cost));
         Template t = spot.kind.template();
         int target = levelOf(spot.kind, company, level.getServer());
         // inside space is cleared once, at the start; legs go down to the ground
@@ -463,7 +478,7 @@ public final class Prefabs {
                 player.sendOverlayMessage(Component.translatable("siftec.sift.closed"));
                 continue;
             }
-            com.meakaandre.siftec.compat.SiftGate.enter(player);
+            SiftGate.enter(player);
         }
     }
 
@@ -479,9 +494,9 @@ public final class Prefabs {
     public static List<Milestone.Cost> cost(Kind kind) {
         String name = kind == Kind.GATEWAY ? "Space Elevator" : "The HUB";
         List<Milestone.Cost> out = new ArrayList<>();
-        com.google.gson.JsonObject raw = com.meakaandre.siftec.hub.Milestones.raw();
+        JsonObject raw = Milestones.raw();
         if (raw == null || !raw.has("build_costs") || !raw.getAsJsonObject("build_costs").has(name)) return out;
-        for (com.google.gson.JsonElement e : raw.getAsJsonObject("build_costs").getAsJsonArray(name)) {
+        for (JsonElement e : raw.getAsJsonObject("build_costs").getAsJsonArray(name)) {
             out.add(new Milestone.Cost(e.getAsJsonObject().get("item").getAsString(), e.getAsJsonObject().get("count").getAsInt()));
         }
         return out;
@@ -504,11 +519,11 @@ public final class Prefabs {
      * join and when they respawn. The first thing they build with it is the HUB.
      */
     public static void giveBuildGun(ServerPlayer player) {
-        if (com.meakaandre.siftec.company.Companies.isFake(player)) return;
+        if (Companies.isFake(player)) return;
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            if (player.getInventory().getItem(i).getItem() instanceof com.meakaandre.siftec.building.BuildGunItem) return;
+            if (player.getInventory().getItem(i).getItem() instanceof BuildGunItem) return;
         }
-        player.getInventory().placeItemBackInInventory(new ItemStack(com.meakaandre.siftec.registry.ModItems.BUILD_GUN.get()), Prediction.SERVER_ONLY);
+        player.getInventory().placeItemBackInInventory(new ItemStack(ModItems.BUILD_GUN.get()), Prediction.SERVER_ONLY);
         player.sendSystemMessage(Component.translatable("siftec.prefab.build_gun"));
     }
 
@@ -533,7 +548,7 @@ public final class Prefabs {
     public static @Nullable HubBlockEntity structureAt(Level level, BlockPos pos, Kind kind) {
         boolean gateway = kind == Kind.GATEWAY;
         if (level.getBlockEntity(pos) instanceof HubBlockEntity own) return own.prefab && own.gateway() == gateway ? own : null;
-        BlockPos indexed = com.meakaandre.siftec.building.BuildingIndex.controllerOf(level, pos);
+        BlockPos indexed = BuildingIndex.controllerOf(level, pos);
         if (indexed != null && level.getBlockEntity(indexed) instanceof HubBlockEntity hub) return hub.prefab && hub.gateway() == gateway ? hub : null;
         if (!isPart(level.getBlockState(pos))) return null;
         Template t = kind.template();
@@ -541,7 +556,7 @@ public final class Prefabs {
         for (int cx = (pos.getX() - reach) >> 4; cx <= (pos.getX() + reach) >> 4; cx++) {
             for (int cz = (pos.getZ() - reach) >> 4; cz <= (pos.getZ() + reach) >> 4; cz++) {
                 if (!level.hasChunk(cx, cz)) continue;
-                for (net.minecraft.world.level.block.entity.BlockEntity be : level.getChunk(cx, cz).getBlockEntities().values()) {
+                for (BlockEntity be : level.getChunk(cx, cz).getBlockEntities().values()) {
                     if (!(be instanceof HubBlockEntity hub) || !hub.prefab || hub.gateway() != gateway || hub.anchor == null || hub.facing == null) continue;
                     if (bounds(new Spot(kind, hub.anchor, hub.facing)).contains(Vec3.atCenterOf(pos))) return hub;
                 }
@@ -555,7 +570,7 @@ public final class Prefabs {
      * terminal, so they are as safe as its shell, and belong to its company, so they run what it has unlocked.
      */
     static void indexMachines(ServerLevel level, Spot spot, int at, BlockPos terminal, String companyId) {
-        com.meakaandre.siftec.building.BuildingIndex index = com.meakaandre.siftec.building.BuildingIndex.get(level);
+        BuildingIndex index = BuildingIndex.get(level);
         if (index == null) return;
         Template t = spot.kind.template();
         for (long key : t.keys()) {
@@ -565,7 +580,7 @@ public final class Prefabs {
             BlockPos pos = spot.at(local.getX(), local.getY(), local.getZ());
             index.put(level, pos, terminal);
             var be = level.getBlockEntity(pos);
-            if (be != null && !companyId.isEmpty()) be.setAttached(com.meakaandre.siftec.owner.Ownership.OWNER, companyId);
+            if (be != null && !companyId.isEmpty()) be.setAttached(Ownership.OWNER, companyId);
         }
     }
 
@@ -605,9 +620,9 @@ public final class Prefabs {
                     remove.add(pos);
                 } else if (now.getBlock() == built.getBlock()) {
                     // the Craft Station's machines: unlisted, and what their Basins hold comes back
-                    com.meakaandre.siftec.building.BuildingIndex index = com.meakaandre.siftec.building.BuildingIndex.get(level);
+                    BuildingIndex index = BuildingIndex.get(level);
                     if (index != null) index.remove(level, pos, terminal);
-                    out.addAll(com.meakaandre.siftec.building.Buildings.contents(level, pos));
+                    out.addAll(Buildings.contents(level, pos));
                     remove.add(pos);
                 }
             }
@@ -625,9 +640,9 @@ public final class Prefabs {
             // whatever a machine still drops as it goes (a Basin's input) is caught and given back too
             AABB box = bounds(spot).inflate(1);
             Set<UUID> before = new HashSet<>();
-            for (net.minecraft.world.entity.item.ItemEntity e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, box)) before.add(e.getUUID());
+            for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, box)) before.add(e.getUUID());
             for (BlockPos pos : remove) level.setBlock(pos, Blocks.AIR.defaultBlockState(), REMOVE_FLAGS);
-            for (net.minecraft.world.entity.item.ItemEntity e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, box)) {
+            for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, box)) {
                 if (before.contains(e.getUUID()) || e.getItem().isEmpty()) continue;
                 out.add(e.getItem().copy());
                 e.discard();
@@ -651,7 +666,7 @@ public final class Prefabs {
             if (player != null) {
                 player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
             } else {
-                net.minecraft.world.Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1, at.getZ() + 0.5, stack);
+                Containers.dropItemStack(level, at.getX() + 0.5, at.getY() + 1, at.getZ() + 0.5, stack);
             }
         }
     }
@@ -663,8 +678,8 @@ public final class Prefabs {
     public static void register() {
         PayloadTypeRegistry.clientboundPlay().register(PreviewPayload.TYPE, PreviewPayload.STREAM_CODEC);
         // every player spawns with the Build Gun, and gets another if they have lost theirs when they join or respawn
-        net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.JOIN.register(Prefabs::giveBuildGun);
-        net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> giveBuildGun(newPlayer));
+        ServerPlayerEvents.JOIN.register(Prefabs::giveBuildGun);
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> giveBuildGun(newPlayer));
         // a part cannot be mined, not even in creative: the structure is picked up from its terminal
         PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
             if (!isPart(state)) return true;
@@ -692,7 +707,7 @@ public final class Prefabs {
                 ServerPlayNetworking.send(player, payload);
             }
         });
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             SENT.clear();
             forget();
         });

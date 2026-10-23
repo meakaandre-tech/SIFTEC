@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.node;
 
+import com.meakaandre.siftec.Siftec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -10,18 +11,23 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.Heightmap;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Where every node is. Nothing is stored: a node's position, type and purity are worked out from the world
@@ -68,7 +74,7 @@ public final class NodeMap {
     /** The point the map is measured from (world spawn when the world was new); null until settled. */
     private static volatile int @Nullable [] origin;
     /** Nodes left out for having nowhere to stand (NodeSavedData's live set): never offered by a search or the map. */
-    private static volatile java.util.Set<Long> unplaceable = java.util.Set.of();
+    private static volatile Set<Long> unplaceable = Set.of();
     /** Biome samples taken, for the selftest. */
     public static final AtomicLong SAMPLES = new AtomicLong();
 
@@ -155,7 +161,7 @@ public final class NodeMap {
     public static void clear() {
         clearCaches();
         origin = null;
-        unplaceable = java.util.Set.of();
+        unplaceable = Set.of();
         cacheSeed = Long.MIN_VALUE;
     }
 
@@ -188,14 +194,14 @@ public final class NodeMap {
             try {
                 inCell(level, cellX, cellZ);
             } catch (RuntimeException e) {
-                com.meakaandre.siftec.Siftec.LOGGER.warn("Could not work out node cell {} {}", cellX, cellZ, e);
+                Siftec.LOGGER.warn("Could not work out node cell {} {}", cellX, cellZ, e);
             } finally {
                 PENDING.remove(pending);
             }
         });
     }
 
-    private static final java.util.Set<Long> PENDING = ConcurrentHashMap.newKeySet();
+    private static final Set<Long> PENDING = ConcurrentHashMap.newKeySet();
 
     /** The surface (or Nether) node of a cell, if any. */
     private static List<Node> surface(ServerLevel level, int cellX, int cellZ) {
@@ -286,7 +292,7 @@ public final class NodeMap {
         var random = level.getChunkSource().randomState();
         int[] ys = new int[PAD_POINTS.length];
         for (int i = 0; i < ys.length; i++) {
-            ys[i] = generator.getBaseHeight(x + PAD_POINTS[i][0], z + PAD_POINTS[i][1], net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG, level, random) - 1;
+            ys[i] = generator.getBaseHeight(x + PAD_POINTS[i][0], z + PAD_POINTS[i][1], Heightmap.Types.OCEAN_FLOOR_WG, level, random) - 1;
         }
         Arrays.sort(ys);
         return Math.max(ys[ys.length / 2], level.getMinY() + 1);
@@ -362,13 +368,13 @@ public final class NodeMap {
     }
 
     /** Runs a job on the worker thread (a search that combines several lookups), answering on the server thread (null if it failed). */
-    public static <T> void async(MinecraftServer server, java.util.function.Supplier<T> job, Consumer<@Nullable T> then) {
+    public static <T> void async(MinecraftServer server, Supplier<T> job, Consumer<@Nullable T> then) {
         WORKER.execute(() -> {
             T result;
             try {
                 result = job.get();
             } catch (RuntimeException e) {
-                com.meakaandre.siftec.Siftec.LOGGER.warn("Background search failed", e);
+                Siftec.LOGGER.warn("Background search failed", e);
                 result = null;
             }
             T done = result;
@@ -382,13 +388,13 @@ public final class NodeMap {
      * generated) runs in between. {@code each} gets every piece's answer on the server thread (null if it failed), and
      * {@code done} runs there after the last.
      */
-    public static <I, R> void batched(MinecraftServer server, List<I> items, int size, java.util.function.Function<List<I>, R> piece,
+    public static <I, R> void batched(MinecraftServer server, List<I> items, int size, Function<List<I>, R> piece,
                                       Consumer<@Nullable R> each, Runnable done) {
         List<I> all = List.copyOf(items);
         batchStep(server, all, 0, Math.max(1, size), piece, each, done);
     }
 
-    private static <I, R> void batchStep(MinecraftServer server, List<I> all, int from, int size, java.util.function.Function<List<I>, R> piece,
+    private static <I, R> void batchStep(MinecraftServer server, List<I> all, int from, int size, Function<List<I>, R> piece,
                                          Consumer<@Nullable R> each, Runnable done) {
         if (from >= all.size()) {
             server.execute(done);
@@ -399,7 +405,7 @@ public final class NodeMap {
             try {
                 result = piece.apply(all.subList(from, Math.min(all.size(), from + size)));
             } catch (RuntimeException e) {
-                com.meakaandre.siftec.Siftec.LOGGER.warn("Background search failed", e);
+                Siftec.LOGGER.warn("Background search failed", e);
                 result = null;
             }
             R answer = result;
@@ -516,7 +522,7 @@ public final class NodeMap {
         if (known != null) return known;
         synchronized (NodeMap.class) {
             if (starters != null) return starters;
-            Map<Long, Starter> out = new java.util.HashMap<>();
+            Map<Long, Starter> out = new HashMap<>();
             NodeType[] types = {NodeType.IRON, NodeType.COPPER, NodeType.STONE};
             int scx = Math.floorDiv(from[0], CELL), scz = Math.floorDiv(from[1], CELL);
             for (int[] d : STARTER_CELLS) {

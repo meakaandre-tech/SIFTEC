@@ -1,8 +1,19 @@
 package com.meakaandre.siftec.blueprint;
 
 import com.meakaandre.siftec.backpack.Carried;
+import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.claim.ClaimMarkerBlock;
 import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.equip.Ziplines;
+import com.meakaandre.siftec.hub.HubBlock;
+import com.meakaandre.siftec.hub.Locks;
+import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.mixin.BlockDisplayInvoker;
+import com.meakaandre.siftec.mixin.DisplayInvoker;
+import com.meakaandre.siftec.node.NodeSites;
+import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.registry.ModItems;
+import com.mojang.math.Transformation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.component.DataComponents;
@@ -12,21 +23,36 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Display;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AbstractCauldronBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.AABB;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -86,16 +112,16 @@ public final class Blueprints {
     /** Blocks that claim land or are a designer themselves are left out of a blueprint. */
     private static boolean copyable(BlockState state) {
         Block block = state.getBlock();
-        return !(block instanceof com.meakaandre.siftec.hub.HubBlock || block instanceof com.meakaandre.siftec.claim.ClaimMarkerBlock || block instanceof DesignerBlock);
+        return !(block instanceof HubBlock || block instanceof ClaimMarkerBlock || block instanceof DesignerBlock);
     }
 
-    private static final java.util.Set<String> FRESH = java.util.Set.of("age", "level", "honey_level", "charges", "moisture", "stage", "berries",
+    private static final Set<String> FRESH = Set.of("age", "level", "honey_level", "charges", "moisture", "stage", "berries",
         "has_bottle_0", "has_bottle_1", "has_bottle_2", "has_book", "has_record", "dusted", "hatch", "bites", "extended",
         // running state, not shape: a furnace is not burning, a lever or button is not pressed, a dispenser has not fired
         "lit", "powered", "triggered", "power");
-    private static final java.util.Set<String> COUNTS = java.util.Set.of("candles", "pickles", "eggs", "flower_amount", "segment_amount", "layers");
+    private static final Set<String> COUNTS = Set.of("candles", "pickles", "eggs", "flower_amount", "segment_amount", "layers");
 
-    private static <T extends Comparable<T>> BlockState fresh(BlockState state, net.minecraft.world.level.block.state.properties.Property<T> property) {
+    private static <T extends Comparable<T>> BlockState fresh(BlockState state, Property<T> property) {
         return state.setValue(property, state.getBlock().defaultBlockState().getValue(property));
     }
 
@@ -104,12 +130,12 @@ public final class Blueprints {
      * doing: crops go back to seedlings, cauldrons and composters are empty, nothing holds water, furnaces are out.
      */
     public static BlockState tidy(BlockState state) {
-        if (state.getBlock() instanceof net.minecraft.world.level.block.AbstractCauldronBlock) return net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState();
-        for (net.minecraft.world.level.block.state.properties.Property<?> property : state.getProperties()) {
+        if (state.getBlock() instanceof AbstractCauldronBlock) return Blocks.CAULDRON.defaultBlockState();
+        for (Property<?> property : state.getProperties()) {
             if (FRESH.contains(property.getName())) state = fresh(state, property);
         }
-        if (state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED)) {
-            state = state.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED, false);
+        if (state.hasProperty(BlockStateProperties.WATERLOGGED)) {
+            state = state.setValue(BlockStateProperties.WATERLOGGED, false);
         }
         return state;
     }
@@ -117,10 +143,10 @@ public final class Blueprints {
     /** How many of its item a block costs: none for the top of a door or the head of a bed, two for a double slab, one per candle. */
     private static int price(BlockState state) {
         int count = 1;
-        for (net.minecraft.world.level.block.state.properties.Property<?> property : state.getProperties()) {
+        for (Property<?> property : state.getProperties()) {
             Object value = state.getValue(property);
-            if (value == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER || value == net.minecraft.world.level.block.state.properties.BedPart.HEAD) return 0;
-            if (value == net.minecraft.world.level.block.state.properties.SlabType.DOUBLE) count = 2;
+            if (value == DoubleBlockHalf.UPPER || value == BedPart.HEAD) return 0;
+            if (value == SlabType.DOUBLE) count = 2;
             if (value instanceof Integer amount && COUNTS.contains(property.getName())) count = amount;
         }
         return count;
@@ -161,7 +187,7 @@ public final class Blueprints {
         for (int i = 0; i < states.size(); i++) palette.add(NbtUtils.readBlockState(blocks, states.getCompoundOrEmpty(i)));
         int half = side / 2;
         int turns = tag.getIntOr("turns", 0) & 3;
-        net.minecraft.world.level.block.Rotation rotation = net.minecraft.world.level.block.Rotation.values()[turns];
+        Rotation rotation = Rotation.values()[turns];
         for (int y = 0; y < side; y++) for (int z = 0; z < side; z++) for (int x = 0; x < side; x++) {
             int index = cells[(y * side + z) * side + x];
             if (index <= 0 || index > palette.size() || palette.get(index - 1).isAir()) continue;
@@ -191,33 +217,33 @@ public final class Blueprints {
     }
 
     /** The ghost blocks each player is being shown, and the game time they vanish. */
-    private static final Map<UUID, List<net.minecraft.world.entity.Display>> GHOSTS = new ConcurrentHashMap<>();
+    private static final Map<UUID, List<Display>> GHOSTS = new ConcurrentHashMap<>();
     private static final Map<UUID, Long> GHOSTS_UNTIL = new ConcurrentHashMap<>();
     private static final int MAX_GHOSTS = 1500;
     private static final float GHOST_SCALE = 0.8f;
 
     private static void clearGhosts(UUID player) {
-        List<net.minecraft.world.entity.Display> old = GHOSTS.remove(player);
-        if (old != null) for (net.minecraft.world.entity.Display ghost : old) ghost.discard();
+        List<Display> old = GHOSTS.remove(player);
+        if (old != null) for (Display ghost : old) ghost.discard();
         GHOSTS_UNTIL.remove(player);
     }
 
     /** The hologram: every block of the blueprint drawn a little small, where it would go. It fades after half a minute. */
     private static void showGhosts(ServerLevel level, ServerPlayer player, Map<BlockPos, BlockState> layout) {
         clearGhosts(player.getUUID());
-        List<net.minecraft.world.entity.Display> ghosts = new ArrayList<>();
+        List<Display> ghosts = new ArrayList<>();
         float inset = (1f - GHOST_SCALE) / 2f;
-        com.mojang.math.Transformation shape = new com.mojang.math.Transformation(new org.joml.Vector3f(inset, inset, inset), new org.joml.Quaternionf(),
-            new org.joml.Vector3f(GHOST_SCALE, GHOST_SCALE, GHOST_SCALE), new org.joml.Quaternionf());
+        Transformation shape = new Transformation(new Vector3f(inset, inset, inset), new Quaternionf(),
+            new Vector3f(GHOST_SCALE, GHOST_SCALE, GHOST_SCALE), new Quaternionf());
         for (Map.Entry<BlockPos, BlockState> entry : layout.entrySet()) {
             if (ghosts.size() >= MAX_GHOSTS) break;
-            net.minecraft.world.entity.Display.BlockDisplay ghost = net.minecraft.world.entity.EntityTypes.BLOCK_DISPLAY.create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
+            Display.BlockDisplay ghost = EntityTypes.BLOCK_DISPLAY.create(level, EntitySpawnReason.TRIGGERED);
             if (ghost == null) break;
-            ((com.meakaandre.siftec.mixin.BlockDisplayInvoker) ghost).siftec$show(entry.getValue());
-            ((com.meakaandre.siftec.mixin.DisplayInvoker) ghost).siftec$shape(shape);
+            ((BlockDisplayInvoker) ghost).siftec$show(entry.getValue());
+            ((DisplayInvoker) ghost).siftec$shape(shape);
             ghost.setPos(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ());
             level.addFreshEntity(ghost);
-            ghost.addTag(com.meakaandre.siftec.equip.Ziplines.TAG);
+            ghost.addTag(Ziplines.TAG);
             ghosts.add(ghost);
         }
         GHOSTS.put(player.getUUID(), ghosts);
@@ -225,7 +251,7 @@ public final class Blueprints {
     }
 
     /** Called every server tick: holograms whose time is up, or whose player has gone, are taken down. */
-    public static void tick(net.minecraft.server.MinecraftServer server) {
+    public static void tick(MinecraftServer server) {
         if (GHOSTS.isEmpty() || server.getTickCount() % 20 != 0) return;
         long now = server.overworld().getGameTime();
         for (UUID id : List.copyOf(GHOSTS.keySet())) {
@@ -244,8 +270,8 @@ public final class Blueprints {
      * there), a block of a Build Gun building (a doorway or the room inside included) or of the HUB's shell.
      */
     public static boolean reserved(ServerLevel level, BlockPos pos) {
-        return com.meakaandre.siftec.node.NodeSites.isSite(level, pos) || com.meakaandre.siftec.building.Buildings.within(level, pos)
-            || com.meakaandre.siftec.prefab.Prefabs.isPart(level.getBlockState(pos));
+        return NodeSites.isSite(level, pos) || Buildings.within(level, pos)
+            || Prefabs.isPart(level.getBlockState(pos));
     }
 
     /**
@@ -277,8 +303,8 @@ public final class Blueprints {
             if (price > 0) need.merge(entry.getValue().getBlock().asItem(), price, Integer::sum);
         }
         for (Item item : need.keySet()) {
-            if (com.meakaandre.siftec.hub.Locks.allowed(player, new ItemStack(item))) continue;
-            com.meakaandre.siftec.hub.Milestone lock = com.meakaandre.siftec.hub.Locks.lockOf(item);
+            if (Locks.allowed(player, new ItemStack(item))) continue;
+            Milestone lock = Locks.lockOf(item);
             player.sendOverlayMessage(Component.translatable("siftec.lock.item", lock == null ? "?" : lock.name()));
             return;
         }

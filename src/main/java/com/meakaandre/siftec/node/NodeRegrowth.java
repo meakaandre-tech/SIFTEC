@@ -1,5 +1,9 @@
 package com.meakaandre.siftec.node;
 
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
@@ -12,9 +16,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Nodes are infinite. An ore node's position ({@link NodeSites}) whose ore block is gone (mined by hand, drilled by a
@@ -48,18 +56,18 @@ public final class NodeRegrowth {
     }
 
     /** The loaded chunks of each dimension (keys as {@link NodeSavedData#chunkKey}), kept from the chunk events. */
-    private static final java.util.Map<String, it.unimi.dsi.fastutil.longs.LongOpenHashSet> LOADED = new java.util.HashMap<>();
+    private static final Map<String, LongOpenHashSet> LOADED = new HashMap<>();
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(NodeRegrowth::tick);
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) ->
-            LOADED.computeIfAbsent(level.dimension().identifier().toString(), k -> new it.unimi.dsi.fastutil.longs.LongOpenHashSet())
+        ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) ->
+            LOADED.computeIfAbsent(level.dimension().identifier().toString(), k -> new LongOpenHashSet())
                 .add(NodeSavedData.chunkKey(chunk.getPos().x(), chunk.getPos().z())));
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> {
+        ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> {
             var set = LOADED.get(level.dimension().identifier().toString());
             if (set != null) set.remove(NodeSavedData.chunkKey(chunk.getPos().x(), chunk.getPos().z()));
         });
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> LOADED.clear());
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> LOADED.clear());
         // a node's ore is a plain block: using it with an empty hand still says what node it is
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             if (hand != InteractionHand.MAIN_HAND || !player.getMainHandItem().isEmpty() || !(player instanceof ServerPlayer)) return InteractionResult.PASS;
@@ -77,7 +85,7 @@ public final class NodeRegrowth {
             var loaded = LOADED.get(dim);
             if (loaded == null || loaded.isEmpty() || data.chunksWithSites(dim) == 0) continue;
             // the nodes in loaded chunks: walk whichever of the two is smaller
-            it.unimi.dsi.fastutil.longs.LongArrayList chunks = new it.unimi.dsi.fastutil.longs.LongArrayList();
+            LongArrayList chunks = new LongArrayList();
             if (loaded.size() <= data.chunksWithSites(dim)) {
                 for (long c : loaded) if (data.sitesIn(dim, c) != null) chunks.add(c);
             } else {
@@ -129,9 +137,9 @@ public final class NodeRegrowth {
     /** A player wearing Create's Engineer's Goggles sees the node they look at: its type, purity and regrowth time. */
     private static void goggles(MinecraftServer server) {
         if (gogglesItem == null) {
-            gogglesItem = BuiltInRegistries.ITEM.getOptional(Identifier.fromNamespaceAndPath("create", "goggles")).orElse(net.minecraft.world.item.Items.AIR);
+            gogglesItem = BuiltInRegistries.ITEM.getOptional(Identifier.fromNamespaceAndPath("create", "goggles")).orElse(Items.AIR);
         }
-        if (gogglesItem == net.minecraft.world.item.Items.AIR) return;
+        if (gogglesItem == Items.AIR) return;
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (!player.getItemBySlot(EquipmentSlot.HEAD).is(gogglesItem)) continue;
             BlockPos node = NodeSites.lookedAt(player, player.blockInteractionRange());

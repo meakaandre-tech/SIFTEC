@@ -1,9 +1,13 @@
 package com.meakaandre.siftec.building;
 
+import com.meakaandre.siftec.backpack.Carried;
+import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.prefab.Prefabs;
+import com.meakaandre.siftec.vehicle.VehicleEntity;
+import com.meakaandre.siftec.vehicle.Vehicles;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -13,8 +17,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +32,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -50,7 +58,7 @@ public final class BuildGun {
     private static final Map<UUID, Selection> SELECTIONS = new HashMap<>();
     private static final Map<UUID, BuildGunPayloads.View> SENT = new HashMap<>();
     /** What players built and took down with the gun lately ("placed <id> x y z", "dismantled <id>"), for the client selftest. */
-    public static final java.util.List<String> USES = new java.util.ArrayList<>();
+    public static final List<String> USES = new ArrayList<>();
 
     private static void used(String line) {
         if (USES.size() >= 64) USES.removeFirst();
@@ -90,7 +98,7 @@ public final class BuildGun {
             Vec3 eye = player.getEyePosition();
             BlockHitResult wet = level.clip(new ClipContext(eye, eye.add(player.getViewVector(1f).scale(Buildings.RANGE)), ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.SOURCE_ONLY, player));
-            if (wet.getType() == HitResult.Type.BLOCK && level.getFluidState(wet.getBlockPos()).is(net.minecraft.tags.FluidTags.WATER)) {
+            if (wet.getType() == HitResult.Type.BLOCK && level.getFluidState(wet.getBlockPos()).is(FluidTags.WATER)) {
                 anchor = wet.getBlockPos();
             }
         }
@@ -137,7 +145,7 @@ public final class BuildGun {
         ServerLevel level = player.level();
         if (sel.dismantle) {
             // a vehicle in the way is what the gun points at first
-            com.meakaandre.siftec.vehicle.VehicleEntity vehicle = com.meakaandre.siftec.vehicle.Vehicles.aimed(player);
+            VehicleEntity vehicle = Vehicles.aimed(player);
             if (vehicle != null) {
                 Component refused = mayDismantle(player, company, vehicle.companyId, vehicle.getBoundingBox());
                 if (refused != null) {
@@ -145,7 +153,7 @@ public final class BuildGun {
                     return;
                 }
                 Component name = vehicle.getName();
-                Prefabs.give(level, player, vehicle.blockPosition(), com.meakaandre.siftec.vehicle.Vehicles.dismantle(vehicle));
+                Prefabs.give(level, player, vehicle.blockPosition(), Vehicles.dismantle(vehicle));
                 used("dismantled " + vehicle.kind.id);
                 player.sendOverlayMessage(Component.translatable("siftec.build_gun.dismantled", name));
                 return;
@@ -187,7 +195,7 @@ public final class BuildGun {
         Component message;
         if (def.vehicle()) {
             // a vehicle goes down as one entity (vehicle/Vehicles.java); its cost comes back when it is taken back
-            Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.place(level, p, company, com.meakaandre.siftec.backpack.Carried.of(player), player.hasInfiniteMaterials());
+            Buildings.Check check = Vehicles.place(level, p, company, Carried.of(player), player.hasInfiniteMaterials());
             ok = check.ok();
             message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
         } else if (def.structure()) {
@@ -198,7 +206,7 @@ public final class BuildGun {
             ok = check.ok();
             message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
         } else {
-            Buildings.Check check = Buildings.place(level, p, company, com.meakaandre.siftec.backpack.Carried.of(player), player.hasInfiniteMaterials());
+            Buildings.Check check = Buildings.place(level, p, company, Carried.of(player), player.hasInfiniteMaterials());
             ok = check.ok();
             message = ok ? Component.translatable("siftec.prefab.placed", def.name()) : check.message();
         }
@@ -277,13 +285,13 @@ public final class BuildGun {
         if (ownerId != null && !ownerId.isEmpty()) {
             return Companies.owns(company, ownerId) ? null : Component.translatable("siftec.build_gun.not_yours");
         }
-        com.meakaandre.siftec.claim.Claims.Claim claim = com.meakaandre.siftec.claim.Claims.foreign(player.level(), box, company.id);
-        return claim == null ? null : Component.translatable("siftec.claim.denied", com.meakaandre.siftec.claim.Claims.holder(player.level(), claim));
+        Claims.Claim claim = Claims.foreign(player.level(), box, company.id);
+        return claim == null ? null : Component.translatable("siftec.claim.denied", Claims.holder(player.level(), claim));
     }
 
     // ------------------------------------------------------------------------------------------------ the hologram's verdict
 
-    private static void tick(net.minecraft.server.MinecraftServer server) {
+    private static void tick(MinecraftServer server) {
         if (server.getTickCount() % 4 != 0) return;
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (!holding(player)) {
@@ -302,7 +310,7 @@ public final class BuildGun {
     public static BuildGunPayloads.@Nullable View view(ServerPlayer player) {
         Selection sel = selection(player);
         BuildGunPayloads.View view;
-        com.meakaandre.siftec.vehicle.VehicleEntity vehicle = sel.dismantle ? com.meakaandre.siftec.vehicle.Vehicles.aimed(player) : null;
+        VehicleEntity vehicle = sel.dismantle ? Vehicles.aimed(player) : null;
         if (vehicle != null) {
             AABB box = vehicle.getBoundingBox();
             Component refused = mayDismantle(player, Companies.of(player), vehicle.companyId, box);
@@ -332,7 +340,7 @@ public final class BuildGun {
             Placement p = sel.spot;
             if (p == null || !reachable(player, p)) return null;
             if (p.def().vehicle()) {
-                Buildings.Check check = com.meakaandre.siftec.vehicle.Vehicles.check(player.level(), p, Companies.of(player), com.meakaandre.siftec.backpack.Carried.of(player), player.hasInfiniteMaterials());
+                Buildings.Check check = Vehicles.check(player.level(), p, Companies.of(player), Carried.of(player), player.hasInfiniteMaterials());
                 view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable("siftec.build_gun.fits_vehicle", p.def().name()) : check.message(),
                     p.anchor(), p.anchor());
             } else if (p.def().structure()) {
@@ -340,7 +348,7 @@ public final class BuildGun {
                 view = BuildGunPayloads.View.of(check.ok(), check.ok() ? Component.translatable(p.def().hub() ? "siftec.build_gun.fits_hub" : "siftec.build_gun.fits_gateway")
                     : check.message(), p.anchor(), p.anchor());
             } else {
-                Buildings.Check check = Buildings.check(player.level(), p, Companies.of(player), com.meakaandre.siftec.backpack.Carried.of(player), player.hasInfiniteMaterials());
+                Buildings.Check check = Buildings.check(player.level(), p, Companies.of(player), Carried.of(player), player.hasInfiniteMaterials());
                 // where it really goes (a miner snapped onto its node), and the spot the client sent, so it can move its hologram there
                 view = BuildGunPayloads.View.of(check.ok(), check.message(), p.anchor(), p.anchor()).from(sel.aimed == null ? p.anchor() : sel.aimed);
             }

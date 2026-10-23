@@ -5,18 +5,23 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.longs.LongSets;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * What the node system has to remember about a world: the point the node map is measured from, which
@@ -45,7 +50,7 @@ public class NodeSavedData extends SavedData {
     private final LongSet placed = new LongOpenHashSet();
     private final Long2IntOpenHashMap heights = new Long2IntOpenHashMap();
     /** The nodes that had nowhere to stand (height NO_PLACE), readable from the node map's worker thread. */
-    private final java.util.Set<Long> unplaceable = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private final Set<Long> unplaceable = ConcurrentHashMap.newKeySet();
     /** Nodes placed as a flat pad (all nodes started since pads came in); the others keep their old mound. */
     private final LongSet flat = new LongOpenHashSet();
 
@@ -132,14 +137,14 @@ public class NodeSavedData extends SavedData {
         ).apply(i, SiteEntry::new));
     }
 
-    /** Every ore node by dimension, then by {@link net.minecraft.core.BlockPos#asLong} position. */
+    /** Every ore node by dimension, then by {@link BlockPos#asLong} position. */
     private final Map<String, Long2ObjectOpenHashMap<Site>> sites = new HashMap<>();
     /** The same nodes' positions by dimension, then by chunk ({@link net.minecraft.world.level.ChunkPos#pack}-style key). */
-    private final Map<String, Long2ObjectOpenHashMap<it.unimi.dsi.fastutil.longs.LongArrayList>> byChunk = new HashMap<>();
+    private final Map<String, Long2ObjectOpenHashMap<LongArrayList>> byChunk = new HashMap<>();
 
     /** A chunk's key from a block position's packed long. */
     public static long chunkOf(long pos) {
-        net.minecraft.core.BlockPos p = net.minecraft.core.BlockPos.of(pos);
+        BlockPos p = BlockPos.of(pos);
         return chunkKey(p.getX() >> 4, p.getZ() >> 4);
     }
 
@@ -148,11 +153,11 @@ public class NodeSavedData extends SavedData {
     }
 
     private void index(String dimension, long pos) {
-        Long2ObjectOpenHashMap<it.unimi.dsi.fastutil.longs.LongArrayList> map = byChunk.computeIfAbsent(dimension, k -> new Long2ObjectOpenHashMap<>());
+        Long2ObjectOpenHashMap<LongArrayList> map = byChunk.computeIfAbsent(dimension, k -> new Long2ObjectOpenHashMap<>());
         long chunk = chunkOf(pos);
-        it.unimi.dsi.fastutil.longs.LongArrayList list = map.get(chunk);
+        LongArrayList list = map.get(chunk);
         if (list == null) {
-            list = new it.unimi.dsi.fastutil.longs.LongArrayList(2);
+            list = new LongArrayList(2);
             map.put(chunk, list);
         }
         if (!list.contains(pos)) list.add(pos);
@@ -181,9 +186,9 @@ public class NodeSavedData extends SavedData {
     }
 
     /** The chunks of a dimension that hold ore nodes (keys as {@link #chunkKey}). Read only. */
-    public it.unimi.dsi.fastutil.longs.LongSet siteChunks(String dimension) {
+    public LongSet siteChunks(String dimension) {
         var map = byChunk.get(dimension);
-        return map == null ? it.unimi.dsi.fastutil.longs.LongSets.EMPTY_SET : map.keySet();
+        return map == null ? LongSets.EMPTY_SET : map.keySet();
     }
 
     private List<SiteEntry> packSites() {
@@ -282,8 +287,8 @@ public class NodeSavedData extends SavedData {
     }
 
     /** The nodes left out for having nowhere to stand: a live view, safe to read from any thread. */
-    public java.util.Set<Long> unplaceable() {
-        return java.util.Collections.unmodifiableSet(unplaceable);
+    public Set<Long> unplaceable() {
+        return Collections.unmodifiableSet(unplaceable);
     }
 
     public boolean isFlat(long node) {

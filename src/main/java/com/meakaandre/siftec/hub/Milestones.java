@@ -11,9 +11,12 @@ import net.minecraft.resources.Identifier;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** Every milestone and wormhole phase, read from siftec_content.json (written by tools/gen_assets.py). */
 public final class Milestones {
@@ -23,7 +26,7 @@ public final class Milestones {
     private static final List<Milestone> PHASES = new ArrayList<>();
     private static final List<String> PART_IDS = new ArrayList<>();
     private static final List<Identifier> DISABLED = new ArrayList<>();
-    private static final java.util.Set<Identifier> REMOVED_RECIPES = new java.util.HashSet<>();
+    private static final Set<Identifier> REMOVED_RECIPES = new HashSet<>();
     private static final List<FluidDef> FLUIDS = new ArrayList<>();
     private static final List<Build> WORKSHOP = new ArrayList<>();
     private static final List<Tree> TREES = new ArrayList<>();
@@ -79,7 +82,7 @@ public final class Milestones {
                 PHASES.add(m);
                 BY_ID.put(m.id(), m);
             }
-            java.util.Map<String, List<Milestone>> byTree = new java.util.HashMap<>();
+            Map<String, List<Milestone>> byTree = new HashMap<>();
             for (JsonElement e : root.getAsJsonArray("milestones_mam")) {
                 JsonObject o = e.getAsJsonObject();
                 List<Milestone> nodes = byTree.computeIfAbsent(o.get("tree").getAsString(), k -> new ArrayList<>());
@@ -115,7 +118,7 @@ public final class Milestones {
         return new Milestone(o.get("id").getAsString(), o.has("tier") ? o.get("tier").getAsInt() : 100, index, cost, o.get("seconds").getAsInt(), items, tokens);
     }
 
-    public static java.util.Set<Identifier> removedRecipes() {
+    public static Set<Identifier> removedRecipes() {
         return REMOVED_RECIPES;
     }
 

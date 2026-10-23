@@ -4,13 +4,18 @@ import com.meakaandre.siftec.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The AWESOME Shop's signs (Signs and billboards): a Label Sign or Display Sign hung on a wall, and the sign at the foot
@@ -47,9 +52,9 @@ public class ShopSignBlock extends WallSignBlock {
      * walked away), so nobody else is locked out. Vanilla's own ticker only knows the vanilla sign's block entity type.
      */
     @Override
-    public <T extends BlockEntity> net.minecraft.world.level.block.entity.@org.jspecify.annotations.Nullable BlockEntityTicker<T> getTicker(
-        net.minecraft.world.level.Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
-        return createTickerHelper(type, ModBlockEntities.SHOP_SIGN.get(), net.minecraft.world.level.block.entity.SignBlockEntity::tick);
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+        Level level, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, ModBlockEntities.SHOP_SIGN.get(), SignBlockEntity::tick);
     }
 
     /** A thin panel against the wall behind it. */

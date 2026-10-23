@@ -1,12 +1,28 @@
 package com.meakaandre.siftec.company;
 
+import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.config.SiftecConfig;
+import com.meakaandre.siftec.depot.DepotMenu;
+import com.meakaandre.siftec.hub.Alternates;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
-import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.item.NodeScannerItem;
+import com.meakaandre.siftec.item.ObjectScannerItem;
+import com.meakaandre.siftec.map.MapServer;
 import com.meakaandre.siftec.net.CompanyState;
+import com.meakaandre.siftec.place.Places;
+import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.save.JsonSavedData;
+import com.meakaandre.siftec.sim.SimData;
+import com.meakaandre.siftec.sink.Shop;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.zurrtum.create.api.entity.FakePlayerHandler;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -14,10 +30,15 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /** Looking companies up, the /company command, and the starting HUB. */
@@ -32,40 +53,40 @@ public final class Companies {
             CompanyState.recompute(player.level().getServer());
         });
         // valuable changes (payments, the cloud, points) are written within a few seconds instead of at the next autosave
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
             int since = server.getTickCount() - lastUrgentSave;
             if (urgent && since >= URGENT_SAVE_TICKS || soon && since >= SOON_SAVE_TICKS) {
                 urgent = false;
                 soon = false;
                 lastUrgentSave = server.getTickCount();
                 // the factory simulation is written with the world save only, in step with the chunks
-                com.meakaandre.siftec.sim.SimData.quickSave(() -> server.getDataStorage().scheduleSave());
+                SimData.quickSave(() -> server.getDataStorage().scheduleSave());
             }
         });
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             running = server;
-            com.meakaandre.siftec.config.SiftecConfig.load();
-            com.meakaandre.siftec.save.JsonSavedData.serverStarting(server);
+            SiftecConfig.load();
+            JsonSavedData.serverStarting(server);
         });
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             running = null;
             urgent = false;
             soon = false;
             lastUrgentSave = 0;
-            com.meakaandre.siftec.save.JsonSavedData.serverStopped();
+            JsonSavedData.serverStopped();
             // per-player choices held in memory belong to this server run only
-            com.meakaandre.siftec.item.NodeScannerItem.forget();
-            com.meakaandre.siftec.item.ObjectScannerItem.forget();
+            NodeScannerItem.forget();
+            ObjectScannerItem.forget();
         });
         // once a second: finish any research whose time is up
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server -> {
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
             if (server.getTickCount() % 20 != 0) return;
             long now = server.overworld().getGameTime();
-            for (Company company : new java.util.ArrayList<>(CompanyData.get(server).companies().values())) {
+            for (Company company : new ArrayList<>(CompanyData.get(server).companies().values())) {
                 if (company.research.isEmpty() || now < company.researchEnd) continue;
-                if (company.research.equals(com.meakaandre.siftec.hub.Alternates.RESEARCH)) {
+                if (company.research.equals(Alternates.RESEARCH)) {
                     company.research = "";
-                    com.meakaandre.siftec.hub.Alternates.makeOffer(server, company);
+                    Alternates.makeOffer(server, company);
                     continue;
                 }
                 Milestone m = Milestones.get(company.research);
@@ -98,14 +119,14 @@ public final class Companies {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("depot").executes(context -> {
                 ServerPlayer player = context.getSource().getPlayerOrException();
-                com.meakaandre.siftec.depot.DepotMenu.open(player, of(player));
+                DepotMenu.open(player, of(player));
                 return 1;
             })
         ));
     }
 
     /** The server running now, so ownership can be checked where no server is at hand (mixins, the map). */
-    private static @org.jspecify.annotations.Nullable MinecraftServer running;
+    private static @Nullable MinecraftServer running;
 
     /**
      * True if two company ids name the same company today. A company folded into another keeps answering under its old
@@ -113,7 +134,7 @@ public final class Companies {
      * map find) belongs to the company that took it over. Every ownership comparison goes through here. An empty id is
      * nobody's and matches nothing.
      */
-    public static boolean same(@org.jspecify.annotations.Nullable String a, @org.jspecify.annotations.Nullable String b) {
+    public static boolean same(@Nullable String a, @Nullable String b) {
         if (a == null || b == null || a.isEmpty() || b.isEmpty()) return false;
         if (a.equals(b)) return true;
         if (running == null) return false;
@@ -123,7 +144,7 @@ public final class Companies {
     }
 
     /** True if something stamped with {@code ownerId} belongs to this company (directly, or through a company folded into it). */
-    public static boolean owns(@org.jspecify.annotations.Nullable Company company, @org.jspecify.annotations.Nullable String ownerId) {
+    public static boolean owns(@Nullable Company company, @Nullable String ownerId) {
         return company != null && same(company.id, ownerId);
     }
 
@@ -144,13 +165,13 @@ public final class Companies {
     }
 
     /** The player's company if they have one; never makes one. */
-    public static @org.jspecify.annotations.Nullable Company find(ServerPlayer player) {
+    public static @Nullable Company find(ServerPlayer player) {
         return CompanyData.get(player.level().getServer()).ofMember(player.getUUID().toString());
     }
 
     /** True for players that machines use (Create's Deployer, or any Fabric fake player). */
     public static boolean isFake(Player player) {
-        return player instanceof net.fabricmc.fabric.api.entity.FakePlayer || com.zurrtum.create.api.entity.FakePlayerHandler.has(player);
+        return player instanceof FakePlayer || FakePlayerHandler.has(player);
     }
 
     /** A company of nobody: its id is empty, so whatever it is stamped on counts as unowned. */
@@ -167,7 +188,7 @@ public final class Companies {
             UUID uuid = UUID.fromString(member);
             ServerPlayer online = server.getPlayerList().getPlayer(uuid);
             if (online != null) return online.getGameProfile().name();
-            return server.services().nameToIdCache().get(uuid).map(net.minecraft.server.players.NameAndId::name).orElse(member.substring(0, Math.min(8, member.length())));
+            return server.services().nameToIdCache().get(uuid).map(NameAndId::name).orElse(member.substring(0, Math.min(8, member.length())));
         } catch (IllegalArgumentException e) {
             return member;
         }
@@ -226,7 +247,7 @@ public final class Companies {
         if (m.isPhase() && Milestones.freePlay(company)) tell(server, company, Component.translatable("siftec.sift.open").withStyle(ChatFormatting.LIGHT_PURPLE));
     }
 
-    private static int info(CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+    private static int info(CommandSourceStack source) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         Company company = of(player);
         MinecraftServer server = source.getServer();
@@ -243,7 +264,7 @@ public final class Companies {
         return 1;
     }
 
-    private static int rename(CommandSourceStack source, String name) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+    private static int rename(CommandSourceStack source, String name) throws CommandSyntaxException {
         Company company = of(source.getPlayerOrException());
         company.name = name.length() > 32 ? name.substring(0, 32) : name;
         save(source.getServer());
@@ -251,7 +272,7 @@ public final class Companies {
         return 1;
     }
 
-    private static int invite(CommandSourceStack source, ServerPlayer target) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+    private static int invite(CommandSourceStack source, ServerPlayer target) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         Company company = of(player);
         company.invites.add(target.getUUID().toString());
@@ -262,7 +283,7 @@ public final class Companies {
         return 1;
     }
 
-    private static int accept(CommandSourceStack source, ServerPlayer inviter) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+    private static int accept(CommandSourceStack source, ServerPlayer inviter) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         MinecraftServer server = source.getServer();
         CompanyData data = CompanyData.get(server);
@@ -274,7 +295,7 @@ public final class Companies {
         }
         if (target.coolingDown(me)) {
             source.sendFailure(Component.translatableWithFallback("siftec.company.cooldown",
-                "You left %s less than %s hours ago and cannot join it again yet", target.name, com.meakaandre.siftec.config.SiftecConfig.memberCooldownHours));
+                "You left %s less than %s hours ago and cannot join it again yet", target.name, SiftecConfig.memberCooldownHours));
             return 0;
         }
         target.invites.remove(me);
@@ -315,15 +336,15 @@ public final class Companies {
         target.shop.addAll(old.shop);
         target.revealed.addAll(old.revealed);
         target.collected.addAll(old.collected);
-        for (String swatch : old.swatches) if (target.swatches.size() < com.meakaandre.siftec.sink.Shop.MAX_SWATCHES && !target.swatches.contains(swatch)) target.swatches.add(swatch);
+        for (String swatch : old.swatches) if (target.swatches.size() < Shop.MAX_SWATCHES && !target.swatches.contains(swatch)) target.swatches.add(swatch);
         old.cloud.forEach((item, count) -> target.cloud.merge(item, count, Integer::sum));
         // a company has one Gateway: the target keeps its own, else takes the old one's (its terminal answers to the target through the old id)
         if ((target.gateway == null || target.gateway.isEmpty()) && old.gateway != null) target.gateway = old.gateway;
         mergePaid(old, target);
         data.fold(old.id, target.id);
-        com.meakaandre.siftec.map.MapServer.fold(server, old.id, target.id);
-        com.meakaandre.siftec.claim.Claims.reassign(server, old.id, target.id);
-        com.meakaandre.siftec.place.Places.reassign(server, old.id, target.id);
+        MapServer.fold(server, old.id, target.id);
+        Claims.reassign(server, old.id, target.id);
+        Places.reassign(server, old.id, target.id);
         save(server);
     }
 
@@ -341,12 +362,12 @@ public final class Companies {
             if (to.has(milestone)) return;
             Milestone m = Milestones.get(milestone);
             float scale = m != null && m.isResearch() ? 1f : ratio;
-            java.util.Map<String, Integer> into = to.paid.computeIfAbsent(milestone, k -> new java.util.HashMap<>());
+            Map<String, Integer> into = to.paid.computeIfAbsent(milestone, k -> new HashMap<>());
             parts.forEach((item, count) -> into.merge(item, Math.round(count * scale), Integer::sum));
         });
     }
 
-    private static int leave(CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+    private static int leave(CommandSourceStack source) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         CompanyData data = CompanyData.get(source.getServer());
         Company old = of(player);
@@ -374,7 +395,7 @@ public final class Companies {
     }
 
     /** The founder can put a member (online or not) out of the company. */
-    private static int kick(CommandSourceStack source, String name) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+    private static int kick(CommandSourceStack source, String name) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         MinecraftServer server = source.getServer();
         CompanyData data = CompanyData.get(server);

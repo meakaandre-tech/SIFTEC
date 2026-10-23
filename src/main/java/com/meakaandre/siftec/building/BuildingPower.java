@@ -4,42 +4,60 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.fluid.FluidEntry;
 import com.meakaandre.siftec.fluid.ModFluids;
+import com.meakaandre.siftec.geyser.GeyserPurity;
 import com.meakaandre.siftec.geyser.Vents;
 import com.meakaandre.siftec.hub.Milestones;
+import com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor;
 import com.meakaandre.siftec.power.GridStats;
 import com.meakaandre.siftec.power.Power;
 import com.meakaandre.siftec.power.PowerGrids;
 import com.meakaandre.siftec.power.PowerMember;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.sim.Keys;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.PotentSulfurBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.PotentSulfurState;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import org.antarcticgardens.cna.content.motor.MotorBlock;
 import org.antarcticgardens.cna.content.motor.MotorBlockEntity;
+import org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * How a Build Gun building takes part in its power grid ({@link PowerGrids}), by its definition's {@code power}:
@@ -155,7 +173,7 @@ public final class BuildingPower {
         Placement p = c.placement();
         BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
         if (t == null) return out;
-        for (BuildingTemplate.Cell cell : t.members) if (cell.state().getBlock() instanceof org.antarcticgardens.cna.content.motor.MotorBlock) out.add(p.at(cell));
+        for (BuildingTemplate.Cell cell : t.members) if (cell.state().getBlock() instanceof MotorBlock) out.add(p.at(cell));
         return out;
     }
 
@@ -242,9 +260,9 @@ public final class BuildingPower {
     }
 
     /** The fluids a generator of this kind burns ("fuel": the Fuel Generator's), by id. */
-    public static java.util.Set<String> fluidFuels(String kind) {
+    public static Set<String> fluidFuels(String kind) {
         readFuel();
-        return java.util.Set.copyOf(FUEL.getOrDefault(kind, Map.of()).keySet());
+        return Set.copyOf(FUEL.getOrDefault(kind, Map.of()).keySet());
     }
 
     /** Megajoules of one item of this fuel in a generator of this kind, or 0 if it does not burn it. */
@@ -256,7 +274,7 @@ public final class BuildingPower {
         Double mj = table.get(id);
         if (mj != null) return mj;
         for (Map.Entry<String, Double> e : table.entrySet()) {
-            if (e.getKey().startsWith("#") && stack.is(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, Identifier.parse(e.getKey().substring(1))))) {
+            if (e.getKey().startsWith("#") && stack.is(TagKey.create(Registries.ITEM, Identifier.parse(e.getKey().substring(1))))) {
                 return e.getValue();
             }
         }
@@ -267,7 +285,7 @@ public final class BuildingPower {
     public static double fluidMj(String kind, Fluid fluid) {
         readFuel();
         Map<String, Double> table = FUEL.getOrDefault(kind, Map.of());
-        Fluid still = fluid instanceof net.minecraft.world.level.material.FlowingFluid flowing ? flowing.getSource() : fluid;
+        Fluid still = fluid instanceof FlowingFluid flowing ? flowing.getSource() : fluid;
         Double mj = table.get(BuiltInRegistries.FLUID.getKey(still).toString());
         return mj == null ? 0 : mj / mbPerM3;
     }
@@ -447,7 +465,7 @@ public final class BuildingPower {
          * The same, reading its machines through {@code at} (a chunk that is unloading hands its block entities out only
          * from itself, not through the level).
          */
-        double reserve(java.util.function.Function<BlockPos, net.minecraft.world.level.block.entity.BlockEntity> at) {
+        double reserve(Function<BlockPos, BlockEntity> at) {
             String kind = def.power();
             if (kind.equals("geothermal")) return Double.POSITIVE_INFINITY;
             double r = 0;
@@ -455,7 +473,7 @@ public final class BuildingPower {
                 case "biomass", "coal" -> {
                     List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
                     for (BlockPos pos : burners) {
-                        if (at.apply(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b) {
+                        if (at.apply(pos) instanceof BlazeBurnerBlockEntity b) {
                             r += full / Math.max(1, burners.size()) * b.getRemainingBurnTime();
                         }
                     }
@@ -484,7 +502,7 @@ public final class BuildingPower {
             if (!def.power().equals("geothermal")) return capacity;
             BlockPos vent = vent(level, c);
             if (vent == null || c.problem.equals("siftec.power.acid_full")) return 0;
-            return Power.su(switch (com.meakaandre.siftec.geyser.GeyserPurity.of(level, vent)) {
+            return Power.su(switch (GeyserPurity.of(level, vent)) {
                 case IMPURE -> 100.0;
                 case PURE -> 400.0;
                 default -> 200.0;
@@ -508,9 +526,9 @@ public final class BuildingPower {
                     double per = full / Math.max(1, burners.size());
                     for (BlockPos pos : burners) {
                         if (left <= 0) break;
-                        if (!level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b)) continue;
+                        if (!level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof BlazeBurnerBlockEntity b)) continue;
                         int ticks = (int) Math.min(b.getRemainingBurnTime(), Math.ceil(left / per));
-                        ((com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor) b).siftec$setRemainingBurnTime(b.getRemainingBurnTime() - ticks);
+                        ((BlazeBurnerAccessor) b).siftec$setRemainingBurnTime(b.getRemainingBurnTime() - ticks);
                         left -= ticks * per;
                     }
                 }
@@ -529,7 +547,7 @@ public final class BuildingPower {
                     // the rods burn a tick of fuel each for every tick at full power
                     long ticks = (long) Math.ceil(left / full);
                     for (BlockPos pos : BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod"))) {
-                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity rod) {
+                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof ReactorRodBlockEntity rod) {
                             rod.fuel = (int) Math.max(0, rod.fuel - ticks);
                             rod.setChanged();
                         }
@@ -567,9 +585,9 @@ public final class BuildingPower {
                 if (per <= 0 || burners.isEmpty()) return;
                 int each = (int) Math.min(Integer.MAX_VALUE / 2, Math.floor(suTicks / per / burners.size()));
                 for (BlockPos pos : burners) {
-                    if (each <= 0 || !level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b)) continue;
-                    var access = (com.meakaandre.siftec.mixin.building.BlazeBurnerAccessor) b;
-                    if (b.getRemainingBurnTime() <= 0) access.siftec$setActiveFuel(com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity.FuelType.NORMAL);
+                    if (each <= 0 || !level.isLoaded(pos) || !(level.getBlockEntity(pos) instanceof BlazeBurnerBlockEntity b)) continue;
+                    var access = (BlazeBurnerAccessor) b;
+                    if (b.getRemainingBurnTime() <= 0) access.siftec$setActiveFuel(BlazeBurnerBlockEntity.FuelType.NORMAL);
                     access.siftec$setRemainingBurnTime(b.getRemainingBurnTime() + each);
                     b.setChanged();
                 }
@@ -577,7 +595,7 @@ public final class BuildingPower {
             case "fuel" -> {
                 BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
                 if (at == null || !level.isLoaded(at) || !(level.getBlockEntity(at) instanceof EngineControl e)) return;
-                net.minecraft.world.level.material.Fluid fluid = e.siftec$fuel().isEmpty() ? com.meakaandre.siftec.sim.Keys.fluidOf(lastFuel) : e.siftec$fuel().getFluid();
+                Fluid fluid = e.siftec$fuel().isEmpty() ? Keys.fluidOf(lastFuel) : e.siftec$fuel().getFluid();
                 double perMb = fluidMj("fuel", fluid);
                 Storage<FluidVariant> tank = ProductionLogic.fluids(level, at, null);
                 if (perMb <= 0 || tank == null) return;
@@ -593,8 +611,8 @@ public final class BuildingPower {
                 int ticks = (int) Math.min(Integer.MAX_VALUE / 2, Math.floor(suTicks / full));
                 if (ticks <= 0) return;
                 for (BlockPos pos : BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod"))) {
-                    if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity rod) {
-                        rod.fuel = (int) Math.min(org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity.MAX_FUEL, (long) rod.fuel + ticks);
+                    if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof ReactorRodBlockEntity rod) {
+                        rod.fuel = (int) Math.min(ReactorRodBlockEntity.MAX_FUEL, (long) rod.fuel + ticks);
                         rod.setChanged();
                     }
                 }
@@ -737,7 +755,7 @@ public final class BuildingPower {
                 }
             }
         }
-        return BuildingLogic.cell(c, net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", "fluid_tank")));
+        return BuildingLogic.cell(c, BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", "fluid_tank")));
     }
 
     private static @Nullable Storage<FluidVariant> tankStorage(Level level, @Nullable BlockPos pos) {
@@ -793,9 +811,9 @@ public final class BuildingPower {
             BlockPos pos = p.at(cell);
             BlockState state = level.getBlockState(pos);
             if ((state.getBlock() instanceof CampfireBlock || state.getBlock() instanceof AbstractFurnaceBlock)
-                && state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT)
-                && state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) != on) {
-                level.setBlock(pos, state.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT, on), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+                && state.hasProperty(BlockStateProperties.LIT)
+                && state.getValue(BlockStateProperties.LIT) != on) {
+                level.setBlock(pos, state.setValue(BlockStateProperties.LIT, on), Block.UPDATE_CLIENTS);
             }
         }
     }
@@ -814,7 +832,7 @@ public final class BuildingPower {
                 parts.add(Component.translatable("siftec.power.gives", Power.su((float) c.lastGenerated), Power.su((float) c.offered)));
                 if (def.power().equals("geothermal") && level instanceof ServerLevel server) {
                     BlockPos vent = vent(level, c);
-                    if (vent != null) parts.add(Component.translatable("siftec.power.geyser", Component.translatable(com.meakaandre.siftec.geyser.GeyserPurity.of(server, vent).key())));
+                    if (vent != null) parts.add(Component.translatable("siftec.power.geyser", Component.translatable(GeyserPurity.of(server, vent).key())));
                 }
             }
             default -> {
@@ -860,20 +878,20 @@ public final class BuildingPower {
             }
             // the rest into the waste store (room for WASTE_ROOM in all, which wasteFits keeps to)
             if (!out.isEmpty()) out = c.waste.addItem(out);
-            if (!out.isEmpty()) net.minecraft.world.Containers.dropItemStack(level, plant.getX() + 0.5, plant.getY() + 1.1, plant.getZ() + 0.5, out.copy());
+            if (!out.isEmpty()) Containers.dropItemStack(level, plant.getX() + 0.5, plant.getY() + 1.1, plant.getZ() + 0.5, out.copy());
             c.output.setChanged();
             return;
         }
-        for (net.minecraft.core.Direction side : net.minecraft.core.Direction.values()) {
+        for (Direction side : Direction.values()) {
             if (out.isEmpty()) break;
-            var into = net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, acceptor.relative(side), side.getOpposite());
+            var into = ItemStorage.SIDED.find(level, acceptor.relative(side), side.getOpposite());
             if (into == null) continue;
             try (Transaction tx = Transaction.openOuter()) {
-                long put = into.insert(net.fabricmc.fabric.api.transfer.v1.item.ItemVariant.of(out), out.getCount(), tx);
+                long put = into.insert(ItemVariant.of(out), out.getCount(), tx);
                 tx.commit();
                 out.shrink((int) put);
             }
         }
-        if (!out.isEmpty()) net.minecraft.world.Containers.dropItemStack(level, acceptor.getX() + 0.5, acceptor.getY() + 1.1, acceptor.getZ() + 0.5, out);
+        if (!out.isEmpty()) Containers.dropItemStack(level, acceptor.getX() + 0.5, acceptor.getY() + 1.1, acceptor.getZ() + 0.5, out);
     }
 }

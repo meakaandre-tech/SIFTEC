@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.mixin;
 
+import com.meakaandre.siftec.node.NodeSites;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BucketItem;
@@ -16,6 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class NodeBucketMixin {
     @Inject(method = "emptyContents", at = @At("HEAD"), cancellable = true)
     private void siftec$notIntoNode(@Nullable LivingEntity user, Level level, BlockPos pos, @Nullable BlockHitResult hit, CallbackInfoReturnable<Boolean> cir) {
-        if (com.meakaandre.siftec.node.NodeSites.isSite(level, pos)) cir.setReturnValue(false);
+        if (NodeSites.isSite(level, pos)) cir.setReturnValue(false);
     }
 }

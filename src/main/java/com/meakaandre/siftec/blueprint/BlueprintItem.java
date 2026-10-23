@@ -1,9 +1,13 @@
 package com.meakaandre.siftec.blueprint;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 /** A saved Blueprint. Use it on a block to see where it would stand; use it there again to build it. Sneak and use it in the air to turn it. */
 public class BlueprintItem extends Item {
@@ -13,11 +17,11 @@ public class BlueprintItem extends Item {
 
     /** Sneak and use it in the air to turn the blueprint a quarter turn. */
     @Override
-    public InteractionResult use(net.minecraft.world.level.Level level, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (!player.isShiftKeyDown()) return InteractionResult.PASS;
         if (player instanceof ServerPlayer server) {
             int turns = Blueprints.rotate(server, player.getItemInHand(hand));
-            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.blueprint.turned", turns * 90));
+            server.sendOverlayMessage(Component.translatable("siftec.blueprint.turned", turns * 90));
         }
         return InteractionResult.SUCCESS;
     }

@@ -174,7 +174,7 @@ public class HubBurnerBlockEntity extends BlockEntity implements PowerMember {
         BlazeBurnerBlockEntity burner = blaze();
         boolean ready = !isRemoved() && !tripped && offered <= 0 && burner != null && burner.getActiveFuel() != BlazeBurnerBlockEntity.FuelType.NONE;
         // only for a few seconds after it last became ready (a burner missing its brushes never gets going)
-        long[] w = com.meakaandre.siftec.power.PowerMember.startWindow(ready, startingSince, level == null ? 0 : level.getGameTime());
+        long[] w = PowerMember.startWindow(ready, startingSince, level == null ? 0 : level.getGameTime());
         startingSince = w[0];
         return w[1] == 1;
     }

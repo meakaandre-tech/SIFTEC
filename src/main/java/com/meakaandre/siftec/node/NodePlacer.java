@@ -1,7 +1,11 @@
 package com.meakaandre.siftec.node;
 
+import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.block.NodePadBlock;
+import com.meakaandre.siftec.collect.Collectibles;
 import com.meakaandre.siftec.registry.ModBlocks;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -15,7 +19,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -70,10 +76,10 @@ public final class NodePlacer {
 
     public static void register() {
         // a new world (or the next single player world) starts with nothing remembered from the last one
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             clear();
             NodeMap.clear();
-            com.meakaandre.siftec.collect.Collectibles.clear();
+            Collectibles.clear();
         });
         // only note the chunk here: blocks are placed from the tick, when the chunk is fully in the world
         ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
@@ -107,7 +113,7 @@ public final class NodePlacer {
                     continue;
                 }
                 if (placeChunk(level, next.x(), next.z())) placed++;
-                com.meakaandre.siftec.collect.Collectibles.placeChunk(level, next.x(), next.z());
+                Collectibles.placeChunk(level, next.x(), next.z());
             }
         });
     }
@@ -125,8 +131,8 @@ public final class NodePlacer {
                 }
             }
         }
-        if (!com.meakaandre.siftec.collect.Collectibles.cached(level, chunkX, chunkZ)) {
-            com.meakaandre.siftec.collect.Collectibles.prefetch(level, chunkX, chunkZ);
+        if (!Collectibles.cached(level, chunkX, chunkZ)) {
+            Collectibles.prefetch(level, chunkX, chunkZ);
             ready = false;
         }
         return ready;
@@ -217,7 +223,7 @@ public final class NodePlacer {
         boolean nether = node.type().where == NodeType.Where.NETHER;
         if (nether) {
             // every floor in the column that the whole mound can stand on (no lava or drop under its middle)
-            java.util.List<Integer> floors = new java.util.ArrayList<>();
+            List<Integer> floors = new ArrayList<>();
             int top = Math.min(level.getMaxY() - 3, level.getMinY() + level.dimensionType().logicalHeight() - 3);
             for (int y = level.getMinY() + 1; y <= top; y++) {
                 if (isFloor(level, pos, node.x(), y, node.z()) && supported(level, pos, node, y, chunkX, chunkZ)) floors.add(y);
@@ -275,7 +281,7 @@ public final class NodePlacer {
     public static BlockState coreState(Node node) {
         NodeLook look = NodeLook.of(node);
         if (!look.fluid()) return look.nodeState();
-        return ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(com.meakaandre.siftec.block.NodeBlock.PURITY, node.purity());
+        return ModBlocks.NODES.get(look.id()).get().defaultBlockState().setValue(NodeBlock.PURITY, node.purity());
     }
 
     /** True for blocks a site must never remove: other unbreakable blocks (bedrock, nodes, collectibles) and anything with a block entity. */
@@ -374,7 +380,7 @@ public final class NodePlacer {
     private static final int CLUMP_HEIGHT = 3;
 
     static {
-        java.util.List<int[]> cells = new java.util.ArrayList<>();
+        List<int[]> cells = new ArrayList<>();
         for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) {
             int r2 = dx * dx + dz * dz;
             if (r2 > 0 && r2 <= 4) cells.add(new int[]{dx, 0, dz});
@@ -415,12 +421,12 @@ public final class NodePlacer {
     }
 
     /** How many blocks still stand where a clump can be round the node block at {@code core}: 0 once it is mined away. */
-    public static int clumpLeft(net.minecraft.world.level.Level level, BlockPos core) {
+    public static int clumpLeft(Level level, BlockPos core) {
         int left = 0;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int[] c : CLUMP_SPACE) {
             BlockState here = level.getBlockState(pos.set(core.getX() + c[0], core.getY() + c[1], core.getZ() + c[2]));
-            if (!here.isAir() && !here.canBeReplaced() && !(here.getBlock() instanceof com.meakaandre.siftec.block.NodePadBlock)) left++;
+            if (!here.isAir() && !here.canBeReplaced() && !(here.getBlock() instanceof NodePadBlock)) left++;
         }
         return left;
     }
@@ -434,8 +440,8 @@ public final class NodePlacer {
     }
 
     /** The cells this node's clump fills, round its node block at {@code core}. */
-    public static java.util.List<BlockPos> clumpCells(Node node, BlockPos core) {
-        java.util.List<BlockPos> out = new java.util.ArrayList<>();
+    public static List<BlockPos> clumpCells(Node node, BlockPos core) {
+        List<BlockPos> out = new ArrayList<>();
         for (int[] c : CLUMP_SPACE) if (isClump(node, c[0], c[1], c[2])) out.add(core.offset(c[0], c[1], c[2]));
         return out;
     }

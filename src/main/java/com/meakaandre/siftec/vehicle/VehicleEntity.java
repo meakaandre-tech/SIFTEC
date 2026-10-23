@@ -1,9 +1,16 @@
 package com.meakaandre.siftec.vehicle;
 
+import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.TruckStations;
+import com.meakaandre.siftec.claim.Claims;
+import com.meakaandre.siftec.node.NodeSavedData;
+import com.meakaandre.siftec.prefab.Prefabs;
+import com.meakaandre.siftec.sim.Keys;
+import com.meakaandre.siftec.sim.SimData;
+import com.meakaandre.siftec.sim.SimVehicles;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -30,7 +37,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
@@ -39,6 +48,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A Tractor, Truck or Explorer ({@link VehicleKind}): one entity, moved by the server, drawn by
@@ -167,7 +177,7 @@ public class VehicleEntity extends Entity {
     }
 
     /** Where the line from {@code from} to {@code to} first meets its turned body (grown by {@code grow}), if it does. */
-    public java.util.Optional<Vec3> bodyHit(Vec3 from, Vec3 to, double grow) {
+    public Optional<Vec3> bodyHit(Vec3 from, Vec3 to, double grow) {
         return body(grow).clip(toLocal(from), toLocal(to)).map(p -> local(p.x, p.y, p.z));
     }
 
@@ -524,7 +534,7 @@ public class VehicleEntity extends Entity {
             if (station != null && TruckStations.serves(station, this)) spot = TruckStations.dock(station);
         }
         if (spot == null) {
-            var hub = com.meakaandre.siftec.claim.Claims.hubOf(level.getServer(), companyId);
+            var hub = Claims.hubOf(level.getServer(), companyId);
             ServerLevel hubLevel = hub == null ? null : level.getServer().getLevel(hub.dimension());
             if (hubLevel != null) {
                 to = hubLevel;
@@ -533,10 +543,10 @@ public class VehicleEntity extends Entity {
         }
         if (spot == null) {
             to = level.getServer().overworld();
-            var origin = com.meakaandre.siftec.node.NodeSavedData.get(level.getServer());
+            var origin = NodeSavedData.get(level.getServer());
             int x = origin.hasOrigin() ? origin.originX() : 0, z = origin.hasOrigin() ? origin.originZ() : 0;
             to.getChunk(new BlockPos(x, 0, z));
-            spot = new Vec3(x + 0.5, to.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z + 0.5);
+            spot = new Vec3(x + 0.5, to.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z + 0.5);
         }
         speed = 0;
         docked = 0;
@@ -546,11 +556,11 @@ public class VehicleEntity extends Entity {
         resetFallDistance();
         if (to == level) {
             setPos(spot.x, spot.y + 0.1, spot.z);
-        } else if (teleport(new net.minecraft.world.level.portal.TeleportTransition(to, new Vec3(spot.x, spot.y + 0.1, spot.z), Vec3.ZERO, getYRot(), getXRot(),
-            net.minecraft.world.level.portal.TeleportTransition.DO_NOTHING)) == null) {
+        } else if (teleport(new TeleportTransition(to, new Vec3(spot.x, spot.y + 0.1, spot.z), Vec3.ZERO, getYRot(), getXRot(),
+            TeleportTransition.DO_NOTHING)) == null) {
             return false;
         }
-        com.meakaandre.siftec.Siftec.LOGGER.info("SIFTEC: {} fell out of the world; put back at {} {}", kind.id, to.dimension().identifier(), BlockPos.containing(spot).toShortString());
+        Siftec.LOGGER.info("SIFTEC: {} fell out of the world; put back at {} {}", kind.id, to.dimension().identifier(), BlockPos.containing(spot).toShortString());
         return true;
     }
 
@@ -558,14 +568,14 @@ public class VehicleEntity extends Entity {
     private static Vec3 besideHub(ServerLevel level, BlockPos terminal) {
         level.getChunk(terminal);
         int x = terminal.getX(), z = terminal.getZ();
-        var hub = com.meakaandre.siftec.prefab.Prefabs.hubAt(level, terminal);
+        var hub = Prefabs.hubAt(level, terminal);
         if (hub != null && hub.anchor != null && hub.facing != null) {
-            var box = com.meakaandre.siftec.prefab.Prefabs.bounds(new com.meakaandre.siftec.prefab.Prefabs.Spot(com.meakaandre.siftec.prefab.Prefabs.Kind.HUB, hub.anchor, hub.facing));
+            var box = Prefabs.bounds(new Prefabs.Spot(Prefabs.Kind.HUB, hub.anchor, hub.facing));
             x = (int) Math.floor(box.maxX) + 2;
             z = (int) Math.floor((box.minZ + box.maxZ) / 2);
             level.getChunk(new BlockPos(x, 0, z));
         }
-        return new Vec3(x + 0.5, level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z + 0.5);
+        return new Vec3(x + 0.5, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z + 0.5);
     }
 
     /** A bucket of a fuel the Fuel Generator burns goes into the tank, and the empty bucket comes back. */
@@ -656,14 +666,14 @@ public class VehicleEntity extends Entity {
 
     /**
      * True while it drives its route by itself: a route, nobody driving or recording, no selftest pilot. Only such a
-     * vehicle goes on by time while its land does not tick ({@link com.meakaandre.siftec.sim.SimVehicles}).
+     * vehicle goes on by time while its land does not tick ({@link SimVehicles}).
      */
     public boolean autonomous() {
         return !recording && route.size() >= 2 && pilot == null && getFirstPassenger() == null;
     }
 
     /** Everything the time-driven vehicle needs, written into the simulation's record of it. */
-    public void toSim(com.meakaandre.siftec.sim.SimData.Vehicle v) {
+    public void toSim(SimData.Vehicle v) {
         v.uuid = getUUID().toString();
         v.type = kind.id;
         v.dim = level().dimension().identifier().toString();
@@ -676,10 +686,10 @@ public class VehicleEntity extends Entity {
         v.cargo.clear();
         for (int i = 0; i < cargo.getContainerSize(); i++) {
             ItemStack s = cargo.getItem(i);
-            if (!s.isEmpty()) v.cargo.add(new com.meakaandre.siftec.sim.SimData.Slot(com.meakaandre.siftec.sim.Keys.of(s), s.getCount()));
+            if (!s.isEmpty()) v.cargo.add(new SimData.Slot(Keys.of(s), s.getCount()));
         }
         v.refund.clear();
-        for (ItemStack s : refund) if (!s.isEmpty()) v.refund.add(new com.meakaandre.siftec.sim.SimData.Slot(com.meakaandre.siftec.sim.Keys.of(s), s.getCount()));
+        for (ItemStack s : refund) if (!s.isEmpty()) v.refund.add(new SimData.Slot(Keys.of(s), s.getCount()));
         v.route.clear();
         for (Vec3 p : route) {
             v.route.add(p.x);
@@ -705,17 +715,17 @@ public class VehicleEntity extends Entity {
         int n = route.size();
         Vec3 to = route.get(v.target), from = route.get((v.target - 1 + n) % n);
         double leg = from.distanceTo(to), left = position().distanceTo(to);
-        v.leg = leg <= 0 ? 0 : Math.max(0, Math.min(1, 1 - left / leg)) * com.meakaandre.siftec.sim.SimVehicles.legTicks(v, v.target);
+        v.leg = leg <= 0 ? 0 : Math.max(0, Math.min(1, 1 - left / leg)) * SimVehicles.legTicks(v, v.target);
     }
 
     /** Puts a vehicle the simulation drove back into the world as it left it. */
-    public void fromSim(com.meakaandre.siftec.sim.SimData.Vehicle v) {
+    public void fromSim(SimData.Vehicle v) {
         companyId = v.company;
         fuelMj = v.fuel;
         for (int i = 0; i < cargo.getContainerSize(); i++) cargo.setItem(i, ItemStack.EMPTY);
         int slot = 0;
         for (var s : v.cargo) {
-            ItemStack stack = com.meakaandre.siftec.sim.Keys.stack(s.key, s.count);
+            ItemStack stack = Keys.stack(s.key, s.count);
             while (!stack.isEmpty() && slot < cargo.getContainerSize()) {
                 ItemStack part = stack.split(stack.getMaxStackSize());
                 cargo.setItem(slot++, part);
@@ -723,7 +733,7 @@ public class VehicleEntity extends Entity {
         }
         refund.clear();
         for (var s : v.refund) {
-            ItemStack stack = com.meakaandre.siftec.sim.Keys.stack(s.key, s.count);
+            ItemStack stack = Keys.stack(s.key, s.count);
             if (!stack.isEmpty()) refund.add(stack);
         }
         route.clear();

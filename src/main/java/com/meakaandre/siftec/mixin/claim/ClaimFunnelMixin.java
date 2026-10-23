@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
+import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.CapManipulationBehaviourBase;
 import net.minecraft.core.BlockPos;
@@ -26,7 +27,7 @@ public abstract class ClaimFunnelMixin {
         if (level == null || level.isClientSide()) return;
         BlockPos target = self.getTarget().getOpposite().getPos();
         // nor to a building's blocks other than its ports
-        if (Claims.crosses(level, self.getPos(), target) || com.meakaandre.siftec.building.Buildings.sealed(level, self.getPos(), target)) {
+        if (Claims.crosses(level, self.getPos(), target) || Buildings.sealed(level, self.getPos(), target)) {
             targetCapability = null;
             ci.cancel();
         }

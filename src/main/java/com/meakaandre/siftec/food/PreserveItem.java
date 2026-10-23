@@ -1,7 +1,10 @@
 package com.meakaandre.siftec.food;
 
+import com.meakaandre.siftec.company.Companies;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -34,8 +37,8 @@ public class PreserveItem extends Item {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (!player.isShiftKeyDown() || intrinsic.effect == null) return super.use(level, player, hand);
         // throwing a jar is the Preserved Foods research's ("food:preserves")
-        if (player instanceof net.minecraft.server.level.ServerPlayer server && !mayThrow(server)) {
-            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.preserve.locked"));
+        if (player instanceof ServerPlayer server && !mayThrow(server)) {
+            server.sendOverlayMessage(Component.translatable("siftec.preserve.locked"));
             return InteractionResult.FAIL;
         }
         if (level instanceof ServerLevel server) {
@@ -49,7 +52,7 @@ public class PreserveItem extends Item {
     }
 
     /** True if the player's company may throw jars: it has done the research carrying "food:preserves" (creative always may). */
-    public static boolean mayThrow(net.minecraft.server.level.ServerPlayer player) {
-        return player.hasInfiniteMaterials() || com.meakaandre.siftec.company.Companies.of(player).hasToken(Food.TOKEN_PRESERVES);
+    public static boolean mayThrow(ServerPlayer player) {
+        return player.hasInfiniteMaterials() || Companies.of(player).hasToken(Food.TOKEN_PRESERVES);
     }
 }

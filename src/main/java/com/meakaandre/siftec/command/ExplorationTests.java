@@ -21,7 +21,9 @@ import com.meakaandre.siftec.hub.MapLock;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.item.ObjectScannerItem;
+import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
+import com.meakaandre.siftec.node.NodePlacer;
 import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.registry.ModItems;
@@ -46,6 +48,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,6 +57,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -197,7 +201,7 @@ public final class ExplorationTests {
         int sloopsNear = 0, crash = 0, crashFreeNear = 0, crashNear = 0, crashPower = 0, crashPowerNear = 0, crashParts = 0;
         int oc = Math.floorDiv(origin[0], Collectibles.CELL), oz = Math.floorDiv(origin[1], Collectibles.CELL);
         boolean same = true;
-        List<String> onNodes = new java.util.ArrayList<>();
+        List<String> onNodes = new ArrayList<>();
         for (int dx = -25; dx <= 25; dx++) {
             for (int dz = -25; dz <= 25; dz++) {
                 Optional<Collectibles.Spot> s = Collectibles.inCell(level, oc + dx, oz + dz);
@@ -206,10 +210,10 @@ public final class ExplorationTests {
                 Collectibles.Spot spot = s.get();
                 counts.merge(spot.type(), 1, Integer::sum);
                 // never on a node's site: a node within its reach plus the wreckage's room
-                int keep = com.meakaandre.siftec.node.NodePlacer.REACH + 3;
+                int keep = NodePlacer.REACH + 3;
                 for (int cx = Math.floorDiv(spot.x() - keep, NodeMap.CELL); cx <= Math.floorDiv(spot.x() + keep, NodeMap.CELL); cx++) {
                     for (int cz = Math.floorDiv(spot.z() - keep, NodeMap.CELL); cz <= Math.floorDiv(spot.z() + keep, NodeMap.CELL); cz++) {
-                        for (com.meakaandre.siftec.node.Node n : NodeMap.inCell(level, cx, cz)) {
+                        for (Node n : NodeMap.inCell(level, cx, cz)) {
                             if (Math.abs(n.x() - spot.x()) <= keep && Math.abs(n.z() - spot.z()) <= keep && onNodes.size() < 3) onNodes.add(spot + " by " + n);
                         }
                     }
@@ -241,7 +245,7 @@ public final class ExplorationTests {
 
         // ---- placing, scanning and collecting each kind (a fake player of a fresh company does the collecting)
         FakePlayer fake = FakePlayer.get(level);
-        fake.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        fake.setGameMode(GameType.SURVIVAL);
         fake.getInventory().clearContent();
         // a fake player is nobody's member: for the test it joins a company of its own, and leaves it again at the end
         CompanyData data = CompanyData.get(level.getServer());
@@ -349,7 +353,7 @@ public final class ExplorationTests {
         expect(source, "decorations and cups exist for every Shop entry", ModBlocks.DECOR.size() >= 20 && ModItems.CUPS.size() == 2, ModBlocks.DECOR.size() + " decorations");
 
         // ---- the Equipment Workshop's list: equipment only, the Xeno-Zapper, Rebar Gun and Xeno-Basher among it
-        Set<String> workshop = new java.util.HashSet<>();
+        Set<String> workshop = new HashSet<>();
         for (Milestones.Build b : Milestones.workshop()) workshop.add(b.item().toString());
         expect(source, "Equipment Workshop: builds the Xeno-Zapper, the Rebar Gun and the Xeno-Basher, and no longer the Sink, Shop or Radar Tower",
             workshop.containsAll(List.of("siftec:xeno_zapper", "cgs:nailgun", "cgs:hammer", "siftec:object_scanner", "siftec:jetpack"))

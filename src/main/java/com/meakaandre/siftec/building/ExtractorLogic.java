@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.building;
 
 import com.meakaandre.siftec.block.NodeBlock;
+import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.node.Purity;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.BlockPos;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -232,13 +234,13 @@ public final class ExtractorLogic {
                 Purity purity = def.logic().equals("well_extractor") ? (level instanceof ServerLevel s ? well(s, c).purity() : null)
                     : def.node() ? nodePurity(level, c, def) : Purity.NORMAL;
                 float perMinute = purity == null ? 0 : def.rate() * purity.multiplier;
-                parts.add(Component.translatable("siftec.building.extracting", Math.round(perMinute / com.meakaandre.siftec.building.ExtractorLogic.mbPerM3()),
+                parts.add(Component.translatable("siftec.building.extracting", Math.round(perMinute / ExtractorLogic.mbPerM3()),
                     fluid(def).defaultFluidState().createLegacyBlock().getBlock().getName()));
                 parts.add(Component.translatable("siftec.building.extracted", c.mined));
             }
             case "pressurizer" -> {
                 Purity purity = nodePurity(level, c, def);
-                if (purity != null) parts.add(Component.translatable("siftec.building.pressurized", Component.translatable("siftec.purity." + purity.name().toLowerCase(java.util.Locale.ROOT))));
+                if (purity != null) parts.add(Component.translatable("siftec.building.pressurized", Component.translatable("siftec.purity." + purity.name().toLowerCase(Locale.ROOT))));
             }
             default -> {
             }
@@ -247,7 +249,7 @@ public final class ExtractorLogic {
 
     /** mB in a cubic metre of a Satisfactory fluid (siftec_content.json "mb_per_m3"). */
     static int mbPerM3() {
-        var raw = com.meakaandre.siftec.hub.Milestones.raw();
+        var raw = Milestones.raw();
         return raw != null && raw.has("mb_per_m3") ? raw.get("mb_per_m3").getAsInt() : 40;
     }
 }

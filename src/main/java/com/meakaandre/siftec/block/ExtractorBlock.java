@@ -6,12 +6,23 @@ import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 /** Resource Well Extractor: sits on the middle vent of a nitrogen node, takes a shaft on top, gives nitrogen to pipes on its sides. */
@@ -47,34 +58,34 @@ public class ExtractorBlock extends KineticBlock implements IBE<ExtractorBlockEn
 
     /** Says why it gives nothing, if it does not (no running Pressurizer near, or every one near is full). */
     @Override
-    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
-        if (!(level.getBlockEntity(pos) instanceof ExtractorBlockEntity be) || be.problem.isEmpty()) return net.minecraft.world.InteractionResult.PASS;
-        if (player instanceof net.minecraft.server.level.ServerPlayer server) {
-            server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("siftec.building.status", state.getBlock().getName(),
-                net.minecraft.network.chat.Component.translatable(be.problem)));
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!(level.getBlockEntity(pos) instanceof ExtractorBlockEntity be) || be.problem.isEmpty()) return InteractionResult.PASS;
+        if (player instanceof ServerPlayer server) {
+            server.sendOverlayMessage(Component.translatable("siftec.building.status", state.getBlock().getName(),
+                Component.translatable(be.problem)));
         }
-        return net.minecraft.world.InteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     // the front looks at whoever placed it
     @Override
-    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.state.BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(com.meakaandre.siftec.block.Facing.FACING);
+        builder.add(Facing.FACING);
     }
 
     @Override
-    public net.minecraft.world.level.block.state.BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
-        return com.meakaandre.siftec.block.Facing.place(super.getStateForPlacement(context), context);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return Facing.place(super.getStateForPlacement(context), context);
     }
 
     @Override
-    protected net.minecraft.world.level.block.state.BlockState rotate(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.Rotation rotation) {
-        return com.meakaandre.siftec.block.Facing.rotate(state, rotation);
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+        return Facing.rotate(state, rotation);
     }
 
     @Override
-    protected net.minecraft.world.level.block.state.BlockState mirror(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.Mirror mirror) {
-        return com.meakaandre.siftec.block.Facing.mirror(state, mirror);
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+        return Facing.mirror(state, mirror);
     }
 }

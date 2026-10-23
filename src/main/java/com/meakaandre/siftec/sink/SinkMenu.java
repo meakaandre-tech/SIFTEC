@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Prediction;
 import net.minecraft.world.SimpleContainer;
@@ -24,12 +25,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * The AWESOME Sink's screen: the company's points, how far it is to the next FICSIT Coupon, and Print Coupons. Run by
@@ -62,7 +62,7 @@ public class SinkMenu extends ChestMenu {
 
     /**
      * Opens the Sink at {@code at} showing {@code company}'s points. Anyone may look; only {@code operator}s (members
-     * of the owning company, {@link com.meakaandre.siftec.building.SpecialBuildings#mayOperate}) may print.
+     * of the owning company, {@link SpecialBuildings#mayOperate}) may print.
      */
     public static void open(ServerPlayer player, Company company, BlockPos at, boolean operator, BooleanSupplier powered) {
         player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new SinkMenu(id, inventory, new SimpleContainer(SIZE), player, company.id, at,
@@ -106,7 +106,7 @@ public class SinkMenu extends ChestMenu {
             List.of(Component.translatable(company.points >= next ? "siftec.sink.status" : "siftec.sink.print_none", company.points,
                 company.couponsPrinted + 1, next).withStyle(company.points >= next ? ChatFormatting.GREEN : ChatFormatting.RED))));
         boolean on = powered.getAsBoolean();
-        view.setItem(STATUS, button(BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.withDefaultNamespace(on ? "lime_dye" : "red_dye")),
+        view.setItem(STATUS, button(BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(on ? "lime_dye" : "red_dye")),
             on ? Component.translatable("siftec.sink.feed") : Component.translatable("siftec.sink.no_power").withStyle(ChatFormatting.RED), List.of()));
     }
 

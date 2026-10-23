@@ -14,7 +14,9 @@ import net.minecraft.network.chat.Component;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * /siftec selftest progression (work package 8): the HUB's tiers and milestones, the Wormhole phases that open them and
@@ -82,10 +84,10 @@ public final class ProgressionTests {
         expect(source, "free play once Phase 5 is delivered", Milestones.phases().size() == 5 && !before && Milestones.freePlay(five), phase5.id());
         expect(source, "belt Mk.1 comes with HUB Upgrade 4", Milestones.get("hub_upgrade_4").tokens().contains("belt:60"), "");
         // the backpack is worn from the start; four of Satisfactory's inventory-slot milestones raise its tier
-        java.util.Map<String, String> tiers = new java.util.TreeMap<>();
+        Map<String, String> tiers = new TreeMap<>();
         for (Milestone m : Milestones.all()) for (String t : m.tokens()) if (t.startsWith("backpack")) tiers.put(t, m.id());
         expect(source, "the backpack's tiers come with Field Research, Vehicular Transport, Jetpack and Hover Pack",
-            tiers.equals(java.util.Map.of("backpack:iron", "field_research", "backpack:gold", "vehicular_transport", "backpack:diamond", "jetpack",
+            tiers.equals(Map.of("backpack:iron", "field_research", "backpack:gold", "vehicular_transport", "backpack:diamond", "jetpack",
                 "backpack:netherite", "hover_pack")), tiers.toString());
 
         // ---- the MAM: seven trees, every node 3 seconds, the starting items, and needs across trees and either-or

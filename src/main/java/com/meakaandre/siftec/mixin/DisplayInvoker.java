@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.mixin;
 
+import com.mojang.math.Transformation;
 import net.minecraft.world.entity.Display;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -11,5 +12,5 @@ public interface DisplayInvoker {
     void siftec$glide(int ticks);
 
     @Invoker("setTransformation")
-    void siftec$shape(com.mojang.math.Transformation transformation);
+    void siftec$shape(Transformation transformation);
 }

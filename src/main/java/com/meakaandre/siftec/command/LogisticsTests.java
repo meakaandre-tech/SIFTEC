@@ -13,6 +13,7 @@ import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.registry.ModBlocks;
+import com.meakaandre.siftec.sim.Factories;
 import com.meakaandre.siftec.tweak.SelfMovingBelts;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.AllBlocks;
@@ -25,6 +26,7 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlock;
+import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -53,6 +55,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Selftests for work package 7, logistics, run by the smoke test: {@code /siftec selftest logistics}. Self-moving
@@ -285,7 +288,7 @@ public final class LogisticsTests {
                 // a belt that does not move takes nothing on, as in Create
                 boolean ok = perMinute == 0 ? now == start[0] : start[0] >= 0 && Math.abs(measured - perMinute) <= Math.max(1, perMinute * 0.03f);
                 expect(source, perMinute == 0 ? "a shaftless belt before Logistics stands still" : "an item on the shaftless belt moves at " + perMinute + " items/min", ok,
-                    String.format(java.util.Locale.ROOT, "measured %.1f items/min, %.3f -> %.3f blocks", measured, start[0], now));
+                    String.format(Locale.ROOT, "measured %.1f items/min, %.3f -> %.3f blocks", measured, start[0], now));
             });
         }
         // belts never connect to shafts: a Creative Motor at 200 RPM on a belt's end shaft turns neither the belt nor a
@@ -317,7 +320,7 @@ public final class LogisticsTests {
         later(level, 45 + MEASURE_TICKS, () -> {
             float measured = (lead(level, from) - start[0]) / MEASURE_TICKS * 1200;
             expect(source, "an item on the belt beside the motor moves at the company's 60 items/min", start[0] >= 0 && Math.abs(measured - 60) <= 2,
-                String.format(java.util.Locale.ROOT, "measured %.1f items/min", measured));
+                String.format(Locale.ROOT, "measured %.1f items/min", measured));
         });
         // a belt an older world saved inside a kinetic network (taking a motor's rotation, and handing it on to a shaft):
         // its first ticks take it out, and the shaft it was turning stops
@@ -493,7 +496,7 @@ public final class LogisticsTests {
         });
         later(level, 200, () -> {
             if (level.getBlockEntity(lonely) instanceof DronePortBlockEntity p) {
-                var farNode = com.meakaandre.siftec.sim.Factories.node(level, nowhere);
+                var farNode = Factories.node(level, nowhere);
                 expect(source, "a drone sets off for a port whose chunk does not tick", p.state == DronePortBlockEntity.OUTBOUND && !level.isLoaded(nowhere)
                     && farNode != null && farNode.sim, "state " + p.state + ", far port " + (farNode == null ? "unknown" : farNode.sim ? "simulated" : "not simulated"));
                 p.land();
@@ -501,7 +504,7 @@ public final class LogisticsTests {
         });
         later(level, 260, () -> {
             DronePortBlockEntity p = level.getBlockEntity(lonely) instanceof DronePortBlockEntity q ? q : null;
-            var farNode = com.meakaandre.siftec.sim.Factories.node(level, nowhere);
+            var farNode = Factories.node(level, nowhere);
             long arrived = 0;
             if (farNode != null) for (int i = 10; i < farNode.slots.size(); i++) if (!farNode.slots.get(i).empty()) arrived += farNode.slots.get(i).count;
             expect(source, "there it unloads into the simulated port and heads home: no waiting, nothing brought back",
@@ -536,7 +539,7 @@ public final class LogisticsTests {
         }
     }
 
-    private static int countIn(com.zurrtum.create.infrastructure.items.ItemStackHandler handler, Item item) {
+    private static int countIn(ItemStackHandler handler, Item item) {
         int n = 0;
         for (int i = 0; i < handler.getContainerSize(); i++) if (handler.getItem(i).is(item)) n += handler.getItem(i).getCount();
         return n;

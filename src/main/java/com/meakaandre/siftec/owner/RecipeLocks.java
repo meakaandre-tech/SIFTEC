@@ -1,15 +1,22 @@
 package com.meakaandre.siftec.owner;
 
 import com.google.gson.JsonObject;
+import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.hub.Locks;
+import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
+import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import com.meakaandre.siftec.company.Companies;
+import net.minecraft.util.context.ContextMap;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.ArrayList;
@@ -20,7 +27,7 @@ import java.util.Map;
 /**
  * Recipes are unlocked per company. A machine only runs a locked recipe once the company it belongs to has
  * finished the milestone that unlocks the result. Which recipe needs which milestone is listed in
- * siftec_content.json ("recipe_locks"); crafting by hand is handled by {@link com.meakaandre.siftec.hub.Locks}.
+ * siftec_content.json ("recipe_locks"); crafting by hand is handled by {@link Locks}.
  */
 public final class RecipeLocks {
     private static final String SEQUENCE = "sequenced_assembly_";
@@ -51,14 +58,14 @@ public final class RecipeLocks {
             if (locks.has(key)) map.put(holder.value(), locks.get(key).getAsString());
         }
         // any other recipe, from any mod, that makes an item a milestone unlocks is locked to that milestone too
-        net.minecraft.util.context.ContextMap context = net.minecraft.world.item.crafting.display.SlotDisplayContext.fromLevel(server.overworld());
+        ContextMap context = SlotDisplayContext.fromLevel(server.overworld());
         for (RecipeHolder<?> holder : server.getRecipeManager().getRecipes()) {
             if (map.containsKey(holder.value())) continue;
             try {
                 search:
-                for (net.minecraft.world.item.crafting.display.RecipeDisplay display : holder.value().display()) {
-                    for (net.minecraft.world.item.ItemStack made : display.result().resolveForStacks(context)) {
-                        com.meakaandre.siftec.hub.Milestone lock = made.isEmpty() ? null : com.meakaandre.siftec.hub.Locks.lockOf(made.getItem());
+                for (RecipeDisplay display : holder.value().display()) {
+                    for (ItemStack made : display.result().resolveForStacks(context)) {
+                        Milestone lock = made.isEmpty() ? null : Locks.lockOf(made.getItem());
                         if (lock == null) continue;
                         map.put(holder.value(), lock.id());
                         break search;
@@ -73,10 +80,10 @@ public final class RecipeLocks {
         // assemblies' steps are listed by their result's name, "seq:...", above.)
         for (RecipeHolder<?> holder : server.getRecipeManager().getRecipes()) {
             if (holder.id().identifier().getNamespace().equals("siftec")
-                || !(holder.value() instanceof com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe line)) continue;
+                || !(holder.value() instanceof SequencedAssemblyRecipe line)) continue;
             String lock = map.get(line);
             if (lock == null) {
-                com.meakaandre.siftec.hub.Milestone m = com.meakaandre.siftec.hub.Locks.lockOf(line.result().item().value());
+                Milestone m = Locks.lockOf(line.result().item().value());
                 if (m != null) lock = m.id();
             }
             for (Recipe<?> step : line.sequence()) {

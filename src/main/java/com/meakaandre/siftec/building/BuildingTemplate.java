@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A building's blocks, read from a structure file (the format a Structure Block saves, so a building can be built
@@ -137,7 +139,7 @@ public final class BuildingTemplate {
             cells.add(cell);
         }
         if (controllers != 1) {
-            java.util.Set<String> kinds = new java.util.TreeSet<>();
+            Set<String> kinds = new TreeSet<>();
             for (BlockState st : states) kinds.add(BuiltInRegistries.BLOCK.getKey(st.getBlock()).toString());
             PROBLEMS.put(id, controllers + " controllers (needs exactly one siftec:building_controller); read " + blocks.size() + " blocks, "
                 + palette.size() + " palette entries " + kinds + ", size " + size + ", first palette entry " + (palette.isEmpty() ? "-" : palette.getCompoundOrEmpty(0)));
