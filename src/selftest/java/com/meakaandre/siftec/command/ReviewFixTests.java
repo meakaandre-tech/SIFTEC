@@ -5,6 +5,8 @@ import com.meakaandre.siftec.blueprint.DesignerBlockEntity;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingLogic;
+import com.meakaandre.siftec.building.BuildingNodes;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
@@ -250,7 +252,7 @@ public final class ReviewFixTests {
         BuildingTemplate mt = miner == null ? null : BuildingTemplate.of(miner);
         if (miner != null && mt != null) {
             Placement p = new Placement(miner, new BlockPos(X + 20, Y, Z + 4), Direction.SOUTH, false);
-            BlockPos own = Buildings.ownNodeCell(p);
+            BlockPos own = BuildingNodes.ownNodeCell(p);
             AABB box = p.bounds(mt);
             BlockPos other = null;
             for (BlockPos pos : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.minY, (int) box.maxZ - 1)) {
@@ -263,10 +265,10 @@ public final class ReviewFixTests {
                 expect(source, "1: the miner has a node cell and room for a second node", false, at(own) + " / " + at(other));
             } else {
                 emptyNode(level, other);
-                BlockPos onlyOther = Buildings.nodeIn(level, p, mt);
+                BlockPos onlyOther = BuildingNodes.nodeIn(level, p, mt);
                 Buildings.Check offCell = Buildings.check(level, p, company, null, true);
                 emptyNode(level, own);
-                BlockPos both = Buildings.nodeIn(level, p, mt);
+                BlockPos both = BuildingNodes.nodeIn(level, p, mt);
                 Buildings.Check withOther = Buildings.check(level, p, company, null, true);
                 forgetNode(level, other);
                 Buildings.Check alone = Buildings.check(level, p, company, null, true);
@@ -345,8 +347,8 @@ public final class ReviewFixTests {
         // a Deployer of no building (or of another one) may not act on it; one of the same building may
         BlockPos outside = p.at(t.controller).offset(0, 0, -6);
         expect(source, "2: a Deployer outside the building may not act on its blocks; one that is part of it may",
-            !Buildings.deployerMayAct(level, outside, member) && Buildings.deployerMayAct(level, p.at(t.controller), member)
-                && Buildings.deployerMayAct(level, outside, outside.above()), "");
+            !BuildingProtection.deployerMayAct(level, outside, member) && BuildingProtection.deployerMayAct(level, p.at(t.controller), member)
+                && BuildingProtection.deployerMayAct(level, outside, outside.above()), "");
         // the Designer's sneak-clear goes round it: a Blueprint Designer Mk.3 built round the building (its floor under it,
         // in place of the platform's stone), its terminal sneak-clicked
         AABB box = p.bounds(t);
@@ -371,7 +373,7 @@ public final class ReviewFixTests {
                 AABB volume = designer.volume();
                 BlockPos loose = null;
                 for (BlockPos pos : BlockPos.betweenClosed((int) volume.minX, Y, (int) volume.minZ, (int) volume.maxX - 1, Y, (int) volume.maxZ - 1)) {
-                    if (level.getBlockState(pos).isAir() && !Buildings.protectedAt(level, pos) && !box.contains(Vec3.atCenterOf(pos))) {
+                    if (level.getBlockState(pos).isAir() && !BuildingProtection.protectedAt(level, pos) && !box.contains(Vec3.atCenterOf(pos))) {
                         loose = pos.immutable();
                         break;
                     }
@@ -409,7 +411,7 @@ public final class ReviewFixTests {
         List<ItemStack> back = Buildings.dismantle(level, c);
         int left = 0;
         for (BuildingTemplate.Cell cell : t.members) if (level.getBlockState(p.at(cell)).getBlock() == cell.state().getBlock()) left++;
-        expect(source, "2: the Build Gun's dismantle still takes the building down", left == 0 && !Buildings.protectedAt(level, member), back.size() + " stacks back");
+        expect(source, "2: the Build Gun's dismantle still takes the building down", left == 0 && !BuildingProtection.protectedAt(level, member), back.size() + " stacks back");
     }
 
     // ------------------------------------------------------------------------------------------------ 4: the death crate

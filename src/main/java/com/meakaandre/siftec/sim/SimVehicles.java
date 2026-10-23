@@ -23,7 +23,7 @@ import java.util.WeakHashMap;
  * Trucks, Tractors and Explorers on a recorded route keep driving while the land they are on does not tick. As soon
  * as one driving its route by itself is in a chunk that stops ticking entities, it leaves the world into the
  * simulation's record ({@link SimData.Vehicle}): there it drives each leg in the time it last took for real (or its length
- * at the autopilot's speed), burns its fuel, and stands at each Truck Station to load or unload, as {@link Sim#drive}
+ * at the autopilot's speed), burns its fuel, and stands at each Truck Station to load or unload, as {@link SimRoutes#drive}
  * does. When where it would be is ticking land again, it comes back into the world there, with its cargo and fuel.
  * Nothing loads a chunk for it, and the map shows it where it would be ({@link #positions}).
  */
@@ -39,7 +39,7 @@ public final class SimVehicles {
 
     /** The ticks a leg takes, as the simulation drives it. */
     public static double legTicks(SimData.Vehicle v, int to) {
-        return Sim.legTicks(v, to);
+        return SimRoutes.legTicks(v, to);
     }
 
     static void clear() {
@@ -80,7 +80,7 @@ public final class SimVehicles {
         SimData data = SimData.get(server);
         if (data.stored.vehicles.isEmpty()) return;
         for (SimData.Vehicle v : new ArrayList<>(data.stored.vehicles)) {
-            ServerLevel level = Factories.level(server, v.dim);
+            ServerLevel level = FactoryChunks.level(server, v.dim);
             if (level == null) continue;
             double[] p = returnAt(v);
             BlockPos at = BlockPos.containing(p[0], p[1], p[2]);
@@ -109,7 +109,7 @@ public final class SimVehicles {
      */
     static double[] returnAt(SimData.Vehicle v) {
         if (v.points() < 1) return new double[]{v.x, v.y, v.z};
-        int i = Sim.returnPoint(v);
+        int i = SimRoutes.returnPoint(v);
         return new double[]{v.px(i), v.py(i), v.pz(i)};
     }
 
@@ -154,13 +154,13 @@ public final class SimVehicles {
         SimData data = SimData.get(server);
         for (SimData.Vehicle v : data.stored.vehicles) out.add(new Shown(v.dim, v.x, v.z, v.yaw, v.type, v.company, true));
         for (SimData.Node n : data.stored.nodes.values()) {
-            if (n.kind != NodeKind.DRONE_PORT || n.state == Sim.IDLE || n.destination == null || n.total <= 0) continue;
+            if (n.kind != NodeKind.DRONE_PORT || n.state == SimDrones.IDLE || n.destination == null || n.total <= 0) continue;
             BlockPos home = n.blockPos(), far = BlockPos.of(n.destination);
             double done = 1 - n.ticks / (double) n.total;
-            double t = n.state == Sim.OUTBOUND ? done : 1 - done;
+            double t = n.state == SimDrones.OUTBOUND ? done : 1 - done;
             double x = home.getX() + 0.5 + (far.getX() - home.getX()) * t, z = home.getZ() + 0.5 + (far.getZ() - home.getZ()) * t;
-            float yaw = (float) Math.toDegrees(Math.atan2(-(far.getX() - home.getX()) * (n.state == Sim.OUTBOUND ? 1 : -1),
-                (far.getZ() - home.getZ()) * (n.state == Sim.OUTBOUND ? 1 : -1)));
+            float yaw = (float) Math.toDegrees(Math.atan2(-(far.getX() - home.getX()) * (n.state == SimDrones.OUTBOUND ? 1 : -1),
+                (far.getZ() - home.getZ()) * (n.state == SimDrones.OUTBOUND ? 1 : -1)));
             out.add(new Shown(n.dim, x, z, yaw, "drone", n.company, n.sim));
         }
         return out;

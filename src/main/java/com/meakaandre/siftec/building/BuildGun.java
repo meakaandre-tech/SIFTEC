@@ -116,7 +116,7 @@ public final class BuildGun {
         // foundations, walls and roofs snap to an 8-block grid, so they line up with each other
         if (def.logic() == Logic.FOUNDATION && !def.id().startsWith("billboard_")) p = snapToGrid(p);
         // a miner snaps onto the node it is aimed near, so its drill stands right over it
-        return Buildings.snapToNode(player.level(), p);
+        return BuildingNodes.snapToNode(player.level(), p);
     }
 
     /** The placement moved (by up to 4 blocks either way) so its corner is on the 8-block grid. */
@@ -183,7 +183,7 @@ public final class BuildGun {
                 player.sendOverlayMessage(refused);
                 return;
             }
-            Component name = Buildings.nameAt(level, controller.getBlockPos());
+            Component name = BuildingProtection.nameAt(level, controller.getBlockPos());
             String id = controller.buildingId;
             Prefabs.give(level, player, controller.getBlockPos(), Buildings.dismantle(level, controller));
             used("dismantled " + id);
@@ -391,7 +391,7 @@ public final class BuildGun {
 
     /**
      * What a client said it picked and where its hologram is. Only the server knows where the ore nodes are, so a miner's
-     * spot is snapped onto the node near it here ({@link Buildings#snapToNode}); the snapped spot is what is built and
+     * spot is snapped onto the node near it here ({@link BuildingNodes#snapToNode}); the snapped spot is what is built and
      * what the client is told ({@link BuildGunPayloads.View#from}), so its hologram moves onto the node too.
      */
     public static void selected(ServerPlayer player, BuildGunPayloads.Select payload) {
@@ -401,7 +401,7 @@ public final class BuildGun {
         BuildingDef def = Buildings.def(payload.building());
         Placement spot = def != null && payload.hasSpot() ? new Placement(def, payload.anchor(), Direction.from2DDataValue(payload.facing()), payload.flip()) : null;
         sel.aimed = spot == null ? null : spot.anchor();
-        sel.spot = spot == null ? null : Buildings.snapToNode(player.level(), spot);
+        sel.spot = spot == null ? null : BuildingNodes.snapToNode(player.level(), spot);
     }
 
     /** The building a selftest picks, as a client would (the selftest has no client). */

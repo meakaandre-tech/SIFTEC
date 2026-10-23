@@ -84,7 +84,7 @@ public final class ExtractorLogic {
     static @Nullable Purity nodePurity(Level level, ControllerBlockEntity c, BuildingDef def) {
         if (c.node == null || !level.isLoaded(c.node)) return null;
         BlockState state = level.getBlockState(c.node);
-        if (!Buildings.isNode(def, level, c.node) || !state.hasProperty(NodeBlock.PURITY)) return null;
+        if (!BuildingNodes.isNode(def, level, c.node) || !state.hasProperty(NodeBlock.PURITY)) return null;
         return state.getValue(NodeBlock.PURITY);
     }
 

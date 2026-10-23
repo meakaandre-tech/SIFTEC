@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingIndex;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
@@ -458,7 +459,7 @@ public final class PolishTests {
             expect(source, "8: a chute from outside puts nothing into a building's machine; into anything else it does",
                 sealedIn == 0 && openIn == 8, "building's " + sealedIn + ", other " + openIn);
             expect(source, "8: chutes and smart chutes (a Chute underneath) stop at the building: only its ports take and give",
-                Buildings.sealed(level, sealedFrom.below(2), sealedChest) && !Buildings.sealed(level, openFrom.below(2), openChest), "");
+                BuildingProtection.sealed(level, sealedFrom.below(2), sealedChest) && !BuildingProtection.sealed(level, openFrom.below(2), openChest), "");
             Objects.requireNonNull(BuildingIndex.get(level)).remove(level, sealedChest, owner.getBlockPos());
         });
     }

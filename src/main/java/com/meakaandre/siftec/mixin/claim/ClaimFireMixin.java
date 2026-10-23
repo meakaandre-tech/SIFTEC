@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -36,7 +36,7 @@ public abstract class ClaimFireMixin {
         BlockPos fire = SIFTEC_FIRE.get();
         if (fire != null && Claims.crosses(level, fire, target)) return false;
         // a building's blocks never burn or catch (a plank skin would burn away and bring it down)
-        if (Buildings.protectedAt(level, target)) return false;
+        if (BuildingProtection.protectedAt(level, target)) return false;
         return level.setBlock(target, state, flags);
     }
 
@@ -44,6 +44,6 @@ public abstract class ClaimFireMixin {
     private void siftec$burn(Level level, BlockPos pos, int chance, RandomSource random, int age, CallbackInfo ci) {
         BlockPos fire = SIFTEC_FIRE.get();
         if (fire != null && Claims.crosses(level, fire, pos)) ci.cancel();
-        else if (Buildings.protectedAt(level, pos)) ci.cancel();
+        else if (BuildingProtection.protectedAt(level, pos)) ci.cancel();
     }
 }

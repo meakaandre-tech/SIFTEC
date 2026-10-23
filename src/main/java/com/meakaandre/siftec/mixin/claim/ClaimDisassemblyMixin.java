@@ -1,7 +1,7 @@
 package com.meakaandre.siftec.mixin.claim;
 
 import com.meakaandre.siftec.Siftec;
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.prefab.Prefabs;
@@ -40,7 +40,7 @@ public abstract class ClaimDisassemblyMixin {
         for (Iterator<Map.Entry<BlockPos, StructureTemplate.StructureBlockInfo>> it = self.getBlocks().entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<BlockPos, StructureTemplate.StructureBlockInfo> e = it.next();
             BlockPos target = transform.apply(e.getValue().pos());
-            if (!Claims.crosses(level, anchor, target) && !Buildings.protectedAt(level, target)
+            if (!Claims.crosses(level, anchor, target) && !BuildingProtection.protectedAt(level, target)
                 && !NodeSites.isSite(level, target)
                 && !Prefabs.isPart(level.getBlockState(target))) continue;
             BlockState state = e.getValue().state();

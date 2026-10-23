@@ -417,7 +417,7 @@ public class SimData extends JsonSavedData<SimData.Stored> {
         return n;
     }
 
-    /** Forgets a node and every link to or from it (the building is gone; {@link Factories#forget} first puts what is on those links somewhere). */
+    /** Forgets a node and every link to or from it (the building is gone; {@link FactoryBorder#forget} first puts what is on those links somewhere). */
     public void remove(String key) {
         if (stored.nodes.remove(key) == null) return;
         version++;

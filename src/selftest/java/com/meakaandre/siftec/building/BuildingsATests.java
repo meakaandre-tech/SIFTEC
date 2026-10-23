@@ -370,7 +370,7 @@ public final class BuildingsATests {
             int x = X + 40 + 15 * i;
             BlockPos n = node(level, (NodeType) miners[i][1], (Purity) miners[i][2], x, Z);
             Placement rough = at((String) miners[i][0], x + 1, Z + 3);
-            Placement snapped = Buildings.snapToNode(level, rough);
+            Placement snapped = BuildingNodes.snapToNode(level, rough);
             int[] cell = snapped.def().nodeCell();
             expect(source, miners[i][0] + " snaps onto the node it is aimed near", snapped.at(cell[0], cell[1], cell[2]).equals(n), snapped.anchor().toShortString());
             put(level, source, company, snapped);
@@ -383,7 +383,7 @@ public final class BuildingsATests {
 
         // ---- Portable Miner on a normal copper node: it breaks the node about 20 times a minute, the ore dropped in front
         BlockPos pmNode = node(level, NodeType.IRON, Purity.NORMAL, X + 90, Z);
-        Placement pm = Buildings.snapToNode(level, at("portable_miner", X + 90, Z + 2));
+        Placement pm = BuildingNodes.snapToNode(level, at("portable_miner", X + 90, Z + 2));
         put(level, source, company, pm);
 
         // ---- every miner really mines: count each time its node's ore block goes from grown to plain air, seen from outside
@@ -715,7 +715,7 @@ public final class BuildingsATests {
             expect(source, "restart: the Constructor is back on its grid and its motor turns while it works", c2 != null && c2.powered && (c2.idle || motorTurns(level, c2)),
                 c2 == null ? "no controller" : BuildingLogic.status(level, c2).getString());
         });
-        Placement mk1 = Buildings.snapToNode(level, at("miner_mk1", X + 41, Z + 3));
+        Placement mk1 = BuildingNodes.snapToNode(level, at("miner_mk1", X + 41, Z + 3));
         ControllerBlockEntity mc = controller(level, mk1);
         long before = mc == null ? -1 : mc.made;
         later(level, 100, () -> {

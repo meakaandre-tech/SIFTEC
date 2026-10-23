@@ -4,6 +4,7 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.backpack.Carried;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingDef;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
@@ -280,10 +281,10 @@ public final class DesignerTests {
         boolean onFloor = (int) volume.minY == Y + 1 && (int) volume.minY == terminal.getY() && !volume.contains(Vec3.atCenterOf(terminal));
         int members = 0, floor = 0;
         for (BlockPos pos : BlockPos.betweenClosed((int) volume.minX, (int) volume.minY, (int) volume.minZ, (int) volume.maxX - 1, (int) volume.maxY - 1, (int) volume.maxZ - 1)) {
-            if (Buildings.protectedAt(level, pos) || Buildings.within(level, pos) || Blueprints.reserved(level, pos)) members++;
+            if (BuildingProtection.protectedAt(level, pos) || BuildingProtection.within(level, pos) || Blueprints.reserved(level, pos)) members++;
         }
         for (BlockPos pos : BlockPos.betweenClosed((int) volume.minX, Y, (int) volume.minZ, (int) volume.maxX - 1, Y, (int) volume.maxZ - 1)) {
-            if (Buildings.protectedAt(level, pos)) floor++;
+            if (BuildingProtection.protectedAt(level, pos)) floor++;
         }
         expect(source, id + ": the build volume is " + side + " blocks each way, over the floor and level with the terminal",
             sized && onFloor, volume + ", terminal " + terminal.toShortString());
@@ -362,7 +363,7 @@ public final class DesignerTests {
         BuildGun.select(gunner, "", true, null);
         BuildGun.act(gunner, company);
         boolean gone = !(level.getBlockState(terminal).getBlock() instanceof DesignerBlock) && level.getBlockState(floorBlock).isAir()
-            && !Buildings.protectedAt(level, floorBlock);
+            && !BuildingProtection.protectedAt(level, floorBlock);
         expect(source, id + ": the Build Gun dismantles it (floor, frame and terminal gone)", gone,
             "terminal now " + level.getBlockState(terminal).getBlock() + ", floor now " + level.getBlockState(floorBlock).getBlock());
         Map<String, Integer> back = carried(gunner, def.cost());

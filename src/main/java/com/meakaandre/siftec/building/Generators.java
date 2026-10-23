@@ -286,7 +286,7 @@ public final class Generators {
         }
         // the waste still to come from rods its acceptors hold, so they cannot all take a rod at once past a full stack
         int promised = 0;
-        for (ReactorFuelAcceptorBlockEntity acceptor : acceptors) promised += BuildingPower.pendingWaste(acceptor.container.getItem(0));
+        for (ReactorFuelAcceptorBlockEntity acceptor : acceptors) promised += NuclearWaste.pendingWaste(acceptor.container.getItem(0));
         for (ReactorFuelAcceptorBlockEntity acceptor : acceptors) {
             List<ReactorRodBlockEntity> rods = rods(acceptor);
             if (rods.isEmpty()) continue;
@@ -300,13 +300,13 @@ public final class Generators {
                 waiting = true;
                 continue;
             }
-            if (!BuildingPower.wasteFits(c, in, promised)) {
+            if (!NuclearWaste.wasteFits(c, in, promised)) {
                 c.machineProblem = "siftec.power.waste_full";
                 continue;
             }
-            promised += BuildingPower.pendingWaste(in.copyWithCount(1));
+            promised += NuclearWaste.pendingWaste(in.copyWithCount(1));
             // the next rod into this acceptor; New Age shares its fuel out over the acceptor's rods, and the waste it
-            // leaves comes to the plant's output (BuildingPower.reactorWaste)
+            // leaves comes to the plant's output (NuclearWaste.reactorWaste)
             acceptor.container.setItem(0, in.split(1));
             acceptor.setChanged();
             c.input.setChanged();

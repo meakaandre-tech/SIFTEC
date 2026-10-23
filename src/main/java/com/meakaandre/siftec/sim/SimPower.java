@@ -18,7 +18,7 @@ import java.util.Map;
  * Which simulated buildings share a power grid, read from the {@link WireMap} (no chunk is loaded for it). A grid that
  * also reaches a connector {@link PowerGrids} balances (one with a ticking connector somewhere) is "mixed": it is
  * balanced there, with the simulated members standing in through {@link com.meakaandre.siftec.power.PowerMemory}; every
- * other grid is balanced by the simulation ({@link Sim#power}), including grids that sit entirely in chunks that do not
+ * other grid is balanced by the simulation ({@link SimPowerBalance#power}), including grids that sit entirely in chunks that do not
  * tick.
  */
 final class SimPower {

@@ -865,7 +865,7 @@ public final class EdgeTests {
         l.cap = 100_000;
         long now = level.getGameTime();
         l.last = now - 200;
-        Sim.pull(l, from, now);
+        SimBelts.pull(l, from, now);
         expect("allowance: a belt carrying one a tick takes 200 over a 200-tick step", l.carrying() == 200, l.carrying() + " taken");
         closed();
     }
@@ -893,7 +893,7 @@ public final class EdgeTests {
             closed();
             return;
         }
-        double charge = Sim.storageCap() / 2;
+        double charge = SimPowerBalance.storageCap() / 2;
         store.energy = charge;
         store.setChanged();
         for (ControllerBlockEntity c : new ControllerBlockEntity[]{con, store, burner}) Factories.recordNow(level, c);
@@ -960,7 +960,7 @@ public final class EdgeTests {
         ok.fin.clear();
         ok.fin.put(water, 100_000L);
         ok.outCap = room;
-        Sim.power(List.of(ok), now + 400);
+        SimPowerBalance.power(List.of(ok), now + 400);
         expect("nuclear: with rods, water and room for the waste the plant gives power", ok.given > 0, Math.round(ok.given) + " SU-ticks");
         SimData.Node full = copy(ok);
         full.simTime = now;
@@ -972,7 +972,7 @@ public final class EdgeTests {
         full.out.put(waste, (long) room);
         full.fin.clear();
         full.fin.put(water, 100_000L);
-        Sim.power(List.of(full), now + 400);
+        SimPowerBalance.power(List.of(full), now + 400);
         expect("nuclear: with its waste output full it takes no rod and spills no waste", Sim.get(full.in, rod) == 10 && Sim.total(full.out) <= room,
             Sim.get(full.in, rod) + " rods left, " + Sim.total(full.out) + " waste");
         // one rod's waste still waiting to be carried away: it takes its next rod all the same
@@ -986,7 +986,7 @@ public final class EdgeTests {
         waiting.out.put(waste, 50L);
         waiting.fin.clear();
         waiting.fin.put(water, 100_000L);
-        Sim.power(List.of(waiting), now + 400);
+        SimPowerBalance.power(List.of(waiting), now + 400);
         expect("nuclear: with one rod's waste still in its output it takes its next rod and gives power", waiting.given > 0 && Sim.get(waiting.in, rod) < 10,
             Math.round(waiting.given) + " SU-ticks, " + Sim.get(waiting.in, rod) + " rods left, " + Sim.total(waiting.out) + " waste");
         SimData.Node dry = copy(ok);
@@ -997,7 +997,7 @@ public final class EdgeTests {
         dry.in.put(rod, 10L);
         dry.out.clear();
         dry.fin.clear();
-        Sim.power(List.of(dry), now + 400);
+        SimPowerBalance.power(List.of(dry), now + 400);
         expect("nuclear: with no water it makes nothing and keeps its rods", dry.given == 0 && Sim.get(dry.in, rod) == 10,
             Math.round(dry.given) + " SU-ticks, " + Sim.get(dry.in, rod) + " rods left");
         none(level, s);

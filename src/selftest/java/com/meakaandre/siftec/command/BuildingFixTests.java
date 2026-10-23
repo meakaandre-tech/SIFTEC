@@ -6,6 +6,7 @@ import com.meakaandre.siftec.building.BasinPace;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.BuildingPower;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
@@ -230,7 +231,7 @@ public final class BuildingFixTests {
         BlockPos hopperAt = null;
         for (Direction d : Direction.Plane.HORIZONTAL) {
             BlockPos at = controller.relative(d);
-            if (level.getBlockState(at).isAir() && !Buildings.protectedAt(level, at)) {
+            if (level.getBlockState(at).isAir() && !BuildingProtection.protectedAt(level, at)) {
                 hopperAt = at;
                 break;
             }
@@ -261,15 +262,15 @@ public final class BuildingFixTests {
         }
         expect(source, "8: the Smelter's input port still puts ore into its controller", in == 4 && sm.input.getItem(0).is(Items.RAW_IRON),
             "port " + (port != null) + ", " + in + " went in");
-        // funnels and hoppers (Buildings.sealed) reach a building's ports only, never its machines from outside
+        // funnels and hoppers (BuildingProtection.sealed) reach a building's ports only, never its machines from outside
         ControllerBlockEntity con = place(source, level, company, "constructor", new BlockPos(X + 4, Y, Z + 40));
         BlockPos basin = con == null ? null : BuildingLogic.cell(con, create("basin"));
         BlockPos conPort = con == null || con.placement() == null ? null : con.placement().at(0, 0, 0);
         BlockPos press = con == null ? null : BuildingLogic.cell(con, create("mechanical_press"));
         BlockPos outside = conPort == null ? null : conPort.relative(Direction.SOUTH, 2);
         expect(source, "8: from outside, only a building's ports can be reached; its own machines may reach each other",
-            basin != null && press != null && outside != null && Buildings.sealed(level, outside, basin) && Buildings.sealed(level, outside, con.getBlockPos())
-                && !Buildings.sealed(level, outside, conPort) && !Buildings.sealed(level, press, basin),
+            basin != null && press != null && outside != null && BuildingProtection.sealed(level, outside, basin) && BuildingProtection.sealed(level, outside, con.getBlockPos())
+                && !BuildingProtection.sealed(level, outside, conPort) && !BuildingProtection.sealed(level, press, basin),
             "basin " + basin + ", port " + conPort);
     }
 

@@ -599,7 +599,7 @@ public final class MachineTests {
             near(source, "its rods burn 0.2 Uranium Fuel Rods a minute (16,800 fuel units) at full, whatever the load", burnt / (double) MINUTES, 16_800, 0.03);
             near(source, "it drinks 240 m3 (9,600 mB) of water a minute", mb(nuke == null ? 0 : nuke.waterUsed - start[6]) / (double) MINUTES, 9600, 0.05);
             expect(source, "every Uranium Fuel Rod it took left 50 Uranium Waste at its output", nuke != null && nuke.made > 0 && nuke.wasteMade == 50 * nuke.made
-                    && out[2] + BuildingPower.wasteHeld(nuke) == nuke.wasteMade,
+                    && out[2] + NuclearWaste.wasteHeld(nuke) == nuke.wasteMade,
                 nuke == null ? "missing" : nuke.made + " rods, " + nuke.wasteMade + " waste made, " + out[2] + " taken out");
             // Particle Accelerator and Converters
             near(source, "Particle Accelerator: 30 Diamonds a minute, out of its Crushing Wheels", (out[0] - start[7]) / (double) MINUTES, 30, 0.07);

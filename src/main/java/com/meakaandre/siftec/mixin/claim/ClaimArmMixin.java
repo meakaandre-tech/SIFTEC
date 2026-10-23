@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmInteractionPoint;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * A Mechanical Arm takes from and puts into a point only where a funnel could: never across someone else's claim border
- * ({@link Claims#crosses}), and never into a building's machines or controller from outside it ({@link Buildings#sealed}:
+ * ({@link Claims#crosses}), and never into a building's machines or controller from outside it ({@link BuildingProtection#sealed}:
  * a building is fed and emptied only at its ports).
  */
 @Mixin(value = ArmInteractionPoint.class, remap = false)
@@ -30,7 +30,7 @@ public abstract class ClaimArmMixin {
     private boolean siftec$refused(ArmBlockEntity arm) {
         if (level == null || level.isClientSide() || arm == null || pos == null) return false;
         BlockPos from = arm.getBlockPos();
-        return Claims.crosses(level, from, pos) || Buildings.sealed(level, from, pos);
+        return Claims.crosses(level, from, pos) || BuildingProtection.sealed(level, from, pos);
     }
 
     @Inject(method = "insert", at = @At("HEAD"), cancellable = true)

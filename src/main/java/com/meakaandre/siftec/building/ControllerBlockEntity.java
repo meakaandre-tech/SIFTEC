@@ -249,15 +249,15 @@ public class ControllerBlockEntity extends BlockEntity {
         // a foundation's blocks are looked over only when one of them changed (and once after it loads), not every second
         if (foundation && membersChecked && !Buildings.takeChanged(server, getBlockPos())) return;
         membersChecked = true;
-        BlockPos missing = Buildings.missingMember(server, this);
-        if (missing != null) Buildings.collapse(server, this, missing);
+        BlockPos missing = BuildingTeardown.missingMember(server, this);
+        if (missing != null) BuildingTeardown.collapse(server, this, missing);
     }
 
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
         // the controller itself went without the Build Gun: the rest of the building follows next tick
-        if (!removing && level instanceof ServerLevel server) Buildings.controllerGone(server, this);
+        if (!removing && level instanceof ServerLevel server) BuildingTeardown.controllerGone(server, this);
     }
 
     @Override

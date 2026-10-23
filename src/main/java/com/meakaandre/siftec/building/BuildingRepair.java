@@ -31,7 +31,7 @@ import java.util.Set;
  * nothing, and says so, until the spot is cleared.</li>
  * </ul>
  * A building never makes up for a missing machine by producing in code: its machines do the work or nothing does. A
- * missing piece of its shell (not a machine) still brings it down, as before ({@link Buildings#missingMember}).
+ * missing piece of its shell (not a machine) still brings it down, as before ({@link BuildingTeardown#missingMember}).
  */
 public final class BuildingRepair {
     public enum Result { OK, REBUILT, BLOCKED, WAITING }
@@ -101,7 +101,7 @@ public final class BuildingRepair {
                 blocked.add(pos);
                 continue;
             }
-            if (!now.isAir()) spilled.addAll(Buildings.contents(level, pos));
+            if (!now.isAir()) spilled.addAll(BuildingTeardown.contents(level, pos));
             level.setBlock(pos, p.orient(paint.look(cell, storage)), Block.UPDATE_ALL);
             if (index != null) index.put(level, pos, at);
             rebuilt.add(pos);
@@ -110,7 +110,7 @@ public final class BuildingRepair {
             // the old shape's blocks the new one has no more
             for (BlockPos old : index.members(level, at)) {
                 if (cells.contains(old.asLong()) || !level.isLoaded(old)) continue;
-                spilled.addAll(Buildings.contents(level, old));
+                spilled.addAll(BuildingTeardown.contents(level, old));
                 index.remove(level, old, at);
                 if (!level.getBlockState(old).isAir()) level.setBlock(old, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                 removed++;
@@ -121,7 +121,7 @@ public final class BuildingRepair {
             Buildings.wire(level, p, t, at, c.companyId);
             BuildingLogic.placed(level, c);
             // what the replaced blocks held goes to the company (a crate only its members open), never the Converter's cells
-            Buildings.giveBack(level, at.above(), c.companyId, spilled);
+            BuildingTeardown.giveBack(level, at.above(), c.companyId, spilled);
             PowerGrids.dirty();
             List<String> what = new ArrayList<>();
             for (BlockPos pos : rebuilt.subList(0, Math.min(LOGGED_BLOCKS, rebuilt.size()))) {

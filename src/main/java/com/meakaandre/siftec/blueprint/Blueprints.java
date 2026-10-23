@@ -1,7 +1,7 @@
 package com.meakaandre.siftec.blueprint;
 
 import com.meakaandre.siftec.backpack.Carried;
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.ClaimMarkerBlock;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.equip.Ziplines;
@@ -278,7 +278,7 @@ public final class Blueprints {
      * there), a block of a Build Gun building (a doorway or the room inside included) or of the HUB's shell.
      */
     public static boolean reserved(ServerLevel level, BlockPos pos) {
-        return NodeSites.isSite(level, pos) || Buildings.within(level, pos)
+        return NodeSites.isSite(level, pos) || BuildingProtection.within(level, pos)
             || Prefabs.isPart(level.getBlockState(pos));
     }
 
