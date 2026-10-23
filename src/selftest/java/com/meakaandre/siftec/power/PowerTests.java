@@ -4,6 +4,7 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.BuildingPower;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.building.BuildingTemplate;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
@@ -146,7 +147,7 @@ public final class PowerTests {
     }
 
     public static @Nullable AbstractElectricalConnector connector(ServerLevel level, @Nullable ControllerBlockEntity c) {
-        BlockPos pos = c == null ? null : Buildings.connectorOf(level, c);
+        BlockPos pos = c == null ? null : BuildingProtection.connectorOf(level, c);
         return pos != null && level.getBlockEntity(pos) instanceof AbstractElectricalConnector e ? e : null;
     }
 

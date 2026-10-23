@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceMovement;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
@@ -20,6 +20,6 @@ public abstract class ClaimPsiMixin {
     private void siftec$claim(MovementContext context, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         if (context.world == null || context.world.isClientSide()) return;
         BlockPos from = context.contraption == null ? null : context.contraption.anchor;
-        if (Buildings.protectedAt(context.world, pos) || from != null && Claims.crosses(context.world, from, pos)) cir.setReturnValue(false);
+        if (BuildingProtection.protectedAt(context.world, pos) || from != null && Claims.crosses(context.world, from, pos)) cir.setReturnValue(false);
     }
 }

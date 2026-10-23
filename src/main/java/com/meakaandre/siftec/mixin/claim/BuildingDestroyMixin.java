@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.prefab.Prefabs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -21,6 +21,6 @@ public abstract class BuildingDestroyMixin {
     @Inject(method = "destroyBlock(Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/entity/Entity;I)Z", at = @At("HEAD"), cancellable = true)
     private void siftec$keepBuildings(BlockPos pos, boolean drop, Entity breaker, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
         Level self = (Level) (Object) this;
-        if (!self.isClientSide() && (Buildings.protectedAt(self, pos) || Prefabs.isPart(self.getBlockState(pos)))) cir.setReturnValue(false);
+        if (!self.isClientSide() && (BuildingProtection.protectedAt(self, pos) || Prefabs.isPart(self.getBlockState(pos)))) cir.setReturnValue(false);
     }
 }

@@ -6,11 +6,11 @@ import com.google.gson.JsonParseException;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.blueprint.DesignerBlock;
 import com.meakaandre.siftec.building.BuildingDef;
-import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.Category;
 import com.meakaandre.siftec.building.MachineTimes;
+import com.meakaandre.siftec.building.NuclearWaste;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Alternates;
@@ -276,7 +276,7 @@ public final class DataFixTests {
             level.setBlock(acceptor, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             level.setBlock(chest, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             level.setBlock(chest, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
-            BuildingPower.reactorWaste(level, acceptor, new ItemStack(item(rods[k][0])), 1);
+            NuclearWaste.reactorWaste(level, acceptor, new ItemStack(item(rods[k][0])), 1);
             got[k] = level.getBlockEntity(chest) instanceof Container c ? count(c, item(rods[k][1])) : -1;
             level.setBlock(chest, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         }

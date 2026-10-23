@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.mixin.power;
 
-import com.meakaandre.siftec.building.BuildingPower;
+import com.meakaandre.siftec.building.NuclearWaste;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -31,7 +31,7 @@ public abstract class FuelAcceptorMixin {
         if (world.isClientSide() || siftec$before.isEmpty()) return;
         ItemStack now = ((ReactorFuelAcceptorBlockEntity) (Object) this).container.getItem(0);
         int used = ItemStack.isSameItemSameComponents(now, siftec$before) ? siftec$before.getCount() - now.getCount() : now.isEmpty() ? siftec$before.getCount() : 0;
-        if (used > 0) BuildingPower.reactorWaste(world, pos, siftec$before, used);
+        if (used > 0) NuclearWaste.reactorWaste(world, pos, siftec$before, used);
         siftec$before = ItemStack.EMPTY;
     }
 }

@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.blueprint;
 
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.building.ControllerBlock;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.registry.ModBlockEntities;
@@ -85,7 +85,7 @@ public class DesignerBlock extends ControllerBlock {
         for (BlockPos at : BlockPos.betweenClosed((int) box.minX, (int) box.minY, (int) box.minZ, (int) box.maxX - 1, (int) box.maxY - 1, (int) box.maxZ - 1)) {
             // a Build Gun building's blocks come down only with the Build Gun, never with the Designer
             if (level.getBlockState(at).isAir() || level.getBlockState(at).getDestroySpeed(level, at) < 0 || !Claims.allowed(player, level, at)
-                || Buildings.protectedAt(level, at)) continue;
+                || BuildingProtection.protectedAt(level, at)) continue;
             level.destroyBlock(at, true, player, DESTROY_UPDATE_LIMIT);
             cleared++;
         }

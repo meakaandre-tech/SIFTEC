@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -23,7 +23,7 @@ public abstract class ClaimHopperMixin {
     private static void siftec$noSiphon(Level level, Hopper hopper, CallbackInfoReturnable<Boolean> cir) {
         if (level.isClientSide()) return;
         BlockPos at = BlockPos.containing(hopper.getLevelX(), hopper.getLevelY(), hopper.getLevelZ());
-        if (Claims.crosses(level, at, at.above()) || Buildings.sealed(level, at, at.above())) cir.setReturnValue(false);
+        if (Claims.crosses(level, at, at.above()) || BuildingProtection.sealed(level, at, at.above())) cir.setReturnValue(false);
     }
 
     @Inject(method = "ejectItems", at = @At("HEAD"), cancellable = true)
@@ -31,6 +31,6 @@ public abstract class ClaimHopperMixin {
         BlockState state = level.getBlockState(pos);
         if (!state.hasProperty(HopperBlock.FACING)) return;
         BlockPos into = pos.relative(state.getValue(HopperBlock.FACING));
-        if (Claims.crosses(level, pos, into) || Buildings.sealed(level, pos, into)) cir.setReturnValue(false);
+        if (Claims.crosses(level, pos, into) || BuildingProtection.sealed(level, pos, into)) cir.setReturnValue(false);
     }
 }

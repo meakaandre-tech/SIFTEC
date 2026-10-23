@@ -1,6 +1,6 @@
 package com.meakaandre.siftec.mixin.claim;
 
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingMovementBehaviour;
@@ -17,9 +17,9 @@ public abstract class ClaimContraptionDrillMixin {
     private void siftec$claim(MovementContext context, BlockPos pos, CallbackInfo ci) {
         if (context.world == null || context.world.isClientSide()) return;
         if (context.contraption == null || context.contraption.anchor == null) {
-            if (Buildings.protectedAt(context.world, pos)) ci.cancel();
+            if (BuildingProtection.protectedAt(context.world, pos)) ci.cancel();
             return;
         }
-        if (Claims.crosses(context.world, context.contraption.anchor, pos) || Buildings.protectedAt(context.world, pos)) ci.cancel();
+        if (Claims.crosses(context.world, context.contraption.anchor, pos) || BuildingProtection.protectedAt(context.world, pos)) ci.cancel();
     }
 }

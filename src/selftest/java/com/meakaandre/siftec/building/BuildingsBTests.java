@@ -494,7 +494,7 @@ public final class BuildingsBTests {
         x += STEP;
         Placement oe = at("oil_extractor", x, Z);
         node(level, NodeType.OIL, Purity.PURE, oe.at(0, 0, 2));
-        Placement oeSnapped = Buildings.snapToNode(level, at("oil_extractor", x + 1, Z + 1));
+        Placement oeSnapped = BuildingNodes.snapToNode(level, at("oil_extractor", x + 1, Z + 1));
         expect(source, "the Oil Extractor snaps onto the oil node it is aimed near", oeSnapped.at(0, 0, 2).equals(oe.at(0, 0, 2)), oeSnapped.anchor().toShortString());
         put(level, source, company, oeSnapped);
         long[] oout = pipeOut(level, oeSnapped, new int[]{0, 0, 0}, fluid("createdieselgenerators:crude_oil"));

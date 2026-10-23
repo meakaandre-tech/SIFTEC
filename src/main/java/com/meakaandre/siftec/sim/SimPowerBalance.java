@@ -63,7 +63,7 @@ final class SimPowerBalance {
         return e;
     }
 
-    /** How many of this fuel the output still has room for the waste of (BuildingPower.wasteFits); any number if it leaves none. */
+    /** How many of this fuel the output still has room for the waste of (NuclearWaste.wasteFits); any number if it leaves none. */
     static long wasteRoom(Node n, String fuel) {
         String waste = n.waste.get(fuel);
         if (waste == null) return Long.MAX_VALUE;

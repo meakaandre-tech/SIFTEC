@@ -2,7 +2,7 @@ package com.meakaandre.siftec.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.owner.Ownership;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationHelper;
 import net.minecraft.core.BlockPos;
@@ -25,7 +25,7 @@ public abstract class ManualApplicationMixin {
     private static InteractionResult siftec$asPlayer(Level level, Player player, ItemStack held, InteractionHand hand, BlockHitResult hit, BlockPos pos,
                                                      Operation<InteractionResult> original) {
         // a building's shell changes only with the Build Gun: a casing put on one of its blocks would bring it down
-        if (!level.isClientSide() && Buildings.shellChangeRefused(level, player, pos)) return InteractionResult.FAIL;
+        if (!level.isClientSide() && BuildingProtection.shellChangeRefused(level, player, pos)) return InteractionResult.FAIL;
         ServerPlayer before = Ownership.asking(player instanceof ServerPlayer server ? server : null);
         try {
             return original.call(level, player, held, hand, hit, pos);

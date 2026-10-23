@@ -407,7 +407,7 @@ public final class SimAccess {
         if (mj <= 0) return;
         String key = Keys.of(stack);
         n.fuelMj.put(key, kind == PowerRole.AUGMENTER ? 1.0 : mj);
-        String[] waste = BuildingPower.wasteOf(stack);
+        String[] waste = NuclearWaste.wasteOf(stack);
         if (waste != null) {
             n.waste.put(key, waste[0]);
             n.wasteCount.put(key, Integer.parseInt(waste[1]));
@@ -439,7 +439,7 @@ public final class SimAccess {
         BuildingDef def = c.def();
         if (m == null || def == null) return 0;
         double r;
-        if (has != null && at != null && m instanceof BuildingPower.Generator g) {
+        if (has != null && at != null && m instanceof PowerGenerator g) {
             // a cell of it out of reach: its machines cannot be read now (NaN: keep what was read before)
             Placement p = c.placement();
             BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
@@ -469,7 +469,7 @@ public final class SimAccess {
                     PowerMember m = BuildingPower.member(level, c);
                     if (spent > 0 && m != null) m.spend(spent);
                     // the last fuel the simulation took is not all burnt: what is left goes back into the machines
-                    else if (spent < 0 && m instanceof BuildingPower.Generator g) g.refund(-spent, n.lastFuel);
+                    else if (spent < 0 && m instanceof PowerGenerator g) g.refund(-spent, n.lastFuel);
                 }
                 default -> {
                 }

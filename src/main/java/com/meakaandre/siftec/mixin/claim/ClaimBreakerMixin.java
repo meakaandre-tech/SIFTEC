@@ -1,7 +1,7 @@
 package com.meakaandre.siftec.mixin.claim;
 
 import com.meakaandre.siftec.building.BuildingLogic;
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -23,10 +23,10 @@ public abstract class ClaimBreakerMixin {
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lcom/zurrtum/create/content/kinetics/base/BlockBreakingKineticBlockEntity;canBreak(Lnet/minecraft/world/level/block/state/BlockState;F)Z"))
     private boolean siftec$claim(BlockBreakingKineticBlockEntity self, BlockState state, float hardness) {
         // a drill inside a building breaks nothing but its miner's own node, once it has regrown and the output has room
-        if (Buildings.protectedAt(self.getLevel(), self.getBlockPos())) {
+        if (BuildingProtection.protectedAt(self.getLevel(), self.getBlockPos())) {
             var miner = BuildingLogic.minerOf(self.getLevel(), self.getBlockPos(), breakingPos);
             return miner != null && BuildingLogic.mayBreak(self.getLevel(), miner, state);
         }
-        return self.canBreak(state, hardness) && (breakingPos == null || (Claims.machineMayBreak(self, breakingPos) && !Buildings.protectedAt(self.getLevel(), breakingPos)));
+        return self.canBreak(state, hardness) && (breakingPos == null || (Claims.machineMayBreak(self, breakingPos) && !BuildingProtection.protectedAt(self.getLevel(), breakingPos)));
     }
 }

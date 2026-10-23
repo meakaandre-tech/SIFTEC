@@ -4,6 +4,7 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildGunPayloads;
 import com.meakaandre.siftec.building.BuildingDef;
+import com.meakaandre.siftec.building.BuildingNodes;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
@@ -309,7 +310,7 @@ public final class PowerFixTests {
         try {
             // the client's hologram, aimed two blocks off the node (it does not know where the nodes are)
             Placement aimed = new Placement(miner, BlockPos.ZERO, Direction.SOUTH, false);
-            BlockPos cell = Buildings.ownNodeCell(aimed);
+            BlockPos cell = BuildingNodes.ownNodeCell(aimed);
             if (cell == null) {
                 expect(source, "16: the miner has a node cell", false, "");
                 return;
@@ -317,7 +318,7 @@ public final class PowerFixTests {
             BlockPos sent = node.offset(2 - cell.getX(), -cell.getY(), 1 - cell.getZ());
             BuildGun.selected(gunner, new BuildGunPayloads.Select(miner.id(), false, true, sent, Direction.SOUTH.get2DDataValue(), false));
             Placement spot = BuildGun.selection(gunner).spot;
-            BlockPos landed = spot == null ? null : Buildings.ownNodeCell(spot);
+            BlockPos landed = spot == null ? null : BuildingNodes.ownNodeCell(spot);
             expect(source, "16: the server snaps a miner's spot onto the node near where it was aimed", node.equals(landed),
                 "sent " + at(sent) + ", node cell now " + at(landed) + ", node " + at(node));
             BuildGunPayloads.View view = BuildGun.view(gunner);

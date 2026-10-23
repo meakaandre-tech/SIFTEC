@@ -6,6 +6,7 @@ import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.backpack.Carried;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.building.BuildingIndex;
+import com.meakaandre.siftec.building.BuildingTeardown;
 import com.meakaandre.siftec.building.Buildings;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
@@ -625,7 +626,7 @@ public final class Prefabs {
                     // the Craft Station's machines: unlisted, and what their Basins hold comes back
                     BuildingIndex index = BuildingIndex.get(level);
                     if (index != null) index.remove(level, pos, terminal);
-                    out.addAll(Buildings.contents(level, pos));
+                    out.addAll(BuildingTeardown.contents(level, pos));
                     remove.add(pos);
                 }
             }

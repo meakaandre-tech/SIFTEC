@@ -137,7 +137,7 @@ public class VehicleEntity extends Entity {
      * Its box: the whole of its turned body (its model's width and length), as the smallest box round it, so the game
      * finds it to pick, hit and interact with along all its length; picking it is then narrowed to the body itself
      * ({@code mixin.VehiclePickMixin}). While it moves itself it collides as the square middle of its body, and its
-     * ends are kept out of walls ({@link #bodyClear}).
+     * ends are kept out of walls ({@link VehicleDriving#bodyBlocked}).
      */
     @Override
     protected AABB makeBoundingBox(Vec3 pos) {

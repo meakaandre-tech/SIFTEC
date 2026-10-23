@@ -2,7 +2,7 @@ package com.meakaandre.siftec.death;
 
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.building.BuildGunItem;
-import com.meakaandre.siftec.building.Buildings;
+import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
@@ -211,7 +211,7 @@ public final class DeathCrates {
      */
     public static boolean free(ServerLevel level, BlockPos pos) {
         if (NodeSites.isSite(level, pos)) return false;
-        if (Buildings.within(level, pos)) return false;
+        if (BuildingProtection.within(level, pos)) return false;
         BlockState state = level.getBlockState(pos);
         if (Prefabs.isPart(state)) return false;
         return state.isAir() || (state.canBeReplaced() && !state.hasBlockEntity());

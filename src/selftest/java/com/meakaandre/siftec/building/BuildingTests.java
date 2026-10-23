@@ -179,7 +179,7 @@ public final class BuildingTests {
                 if (x >= x0 && x <= x1 && z >= z0 && z <= z1) continue;
                 pos.set(x, y, z);
                 BlockState state = level.getBlockState(pos);
-                if ((state.isAir() || !state.getFluidState().isEmpty() && !state.getFluidState().isSource()) && !Buildings.protectedAt(level, pos)) {
+                if ((state.isAir() || !state.getFluidState().isEmpty() && !state.getFluidState().isSource()) && !BuildingProtection.protectedAt(level, pos)) {
                     level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
                 }
             }
