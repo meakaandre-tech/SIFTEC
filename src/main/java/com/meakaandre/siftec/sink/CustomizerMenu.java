@@ -39,6 +39,10 @@ import java.util.Map;
  */
 public class CustomizerMenu extends ChestMenu {
     private static final int SIZE = 54, PALETTE = 18, INDUSTRIAL = 34, RESET = 35, FINISHES = 36, SKINS = 45;
+    /** Slots in a row of the window, and its rows. */
+    private static final int ROW = 9, ROWS = 6;
+    /** The dye colours shown in the palette. */
+    private static final int DYES = 16;
     private final SimpleContainer view;
     private final ServerPlayer player;
     private final Company company;
@@ -46,7 +50,7 @@ public class CustomizerMenu extends ChestMenu {
     private int editing;
 
     private CustomizerMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, BlockPos controller) {
-        super(MenuType.GENERIC_9x6, id, inventory, view, 6);
+        super(MenuType.GENERIC_9x6, id, inventory, view, ROWS);
         this.view = view;
         this.player = player;
         this.company = company;
@@ -98,7 +102,7 @@ public class CustomizerMenu extends ChestMenu {
                 Component.translatable("siftec.customizer.material", Component.translatable("siftec.material." + m)),
                 open ? List.of() : List.of(Component.translatable("siftec.customizer.locked").withStyle(ChatFormatting.RED)));
             if (paint.material().equals(m)) stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-            if (k < 9) view.setItem(k++, stack);
+            if (k < ROW) view.setItem(k++, stack);
         }
         if (!kind.equals("foundation")) return;
         ItemStack none = SinkMenu.button(item("minecraft:light_gray_concrete"), Component.translatable("siftec.customizer.pattern", Component.translatable("siftec.customizer.pattern_none")), List.of());
@@ -111,14 +115,14 @@ public class CustomizerMenu extends ChestMenu {
                 Component.translatable("siftec.customizer.pattern", Component.translatable("siftec.pattern." + pattern)),
                 open ? List.of() : List.of(Component.translatable("siftec.customizer.locked").withStyle(ChatFormatting.RED)));
             if (paint.pattern().equals(pattern)) stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-            if (k < 9) view.setItem(PALETTE + k++, stack);
+            if (k < ROW) view.setItem(PALETTE + k++, stack);
         }
     }
 
     private void pressMaterials(String kind, int slot, Paint paint) {
         if (slot == 0) {
             apply(paint.withMaterial(""));
-        } else if (slot < 9) {
+        } else if (slot < ROW) {
             List<String> ms = materialsFor(kind);
             if (slot - 1 >= ms.size()) return;
             String m = ms.get(slot - 1);
@@ -129,7 +133,7 @@ public class CustomizerMenu extends ChestMenu {
             apply(paint.withMaterial(m));
         } else if (kind.equals("foundation") && slot == PALETTE) {
             apply(paint.withPattern(""));
-        } else if (kind.equals("foundation") && slot > PALETTE && slot < PALETTE + 9) {
+        } else if (kind.equals("foundation") && slot > PALETTE && slot < PALETTE + ROW) {
             List<String> ps = Shop.patterns();
             if (slot - PALETTE - 1 >= ps.size()) return;
             String pattern = ps.get(slot - PALETTE - 1);
@@ -169,7 +173,7 @@ public class CustomizerMenu extends ChestMenu {
             refreshMaterials(kind, paint);
             return;
         }
-        for (int i = 0; i < company.swatches.size() && i < 18; i++) {
+        for (int i = 0; i < company.swatches.size() && i < Shop.MAX_SWATCHES; i++) {
             String[] sw = company.swatches.get(i).split("/", -1);
             String secondary = sw.length > 1 ? sw[1] : "industrial";
             ItemStack stack = SinkMenu.button(concrete(sw[0]), Component.translatable("siftec.customizer.swatch", i + 1, colour(sw[0]), colour(secondary)),
@@ -178,7 +182,7 @@ public class CustomizerMenu extends ChestMenu {
             view.setItem(i, stack);
         }
         List<String> dyes = Shop.dyes();
-        for (int i = 0; i < dyes.size() && i < 16; i++) {
+        for (int i = 0; i < dyes.size() && i < DYES; i++) {
             view.setItem(PALETTE + i, SinkMenu.button(concrete(dyes.get(i)), colour(dyes.get(i)),
                 List.of(Component.translatable("siftec.customizer.primary", editing + 1).withStyle(ChatFormatting.GRAY))));
         }
@@ -192,14 +196,14 @@ public class CustomizerMenu extends ChestMenu {
             ItemStack stack = SinkMenu.button(icon, Component.translatable("siftec.customizer.finish", Component.translatable("siftec.finish." + e.getKey())),
                 open ? List.of() : List.of(Component.translatable("siftec.customizer.locked").withStyle(ChatFormatting.RED)));
             if (paint.finish().equals(e.getKey())) stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-            if (f < 9) view.setItem(FINISHES + f++, stack);
+            if (f < ROW) view.setItem(FINISHES + f++, stack);
         }
         ItemStack none = SinkMenu.button(Items.IRON_BLOCK, Component.translatable("siftec.customizer.skin", Component.translatable("siftec.customizer.skin_none")), List.of());
         if (paint.skin().isEmpty()) none.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         view.setItem(SKINS, none);
         int k = 1;
         for (Map.Entry<String, String> e : skins()) {
-            if (k >= 9) break;
+            if (k >= ROW) break;
             boolean open = Shop.hasSkin(company, e.getKey()) || player.hasInfiniteMaterials();
             ItemStack stack = SinkMenu.button(open ? item(e.getValue()) : Items.BARRIER,
                 Component.translatable("siftec.customizer.skin", Component.translatable("siftec.skin." + e.getKey())),
@@ -226,10 +230,10 @@ public class CustomizerMenu extends ChestMenu {
             refresh();
             return;
         }
-        if (slot < 18 && slot < company.swatches.size()) {
+        if (slot < Shop.MAX_SWATCHES && slot < company.swatches.size()) {
             if (right) editing = slot;
             else apply(paint.withSwatch(company.swatches.get(slot)));
-        } else if (slot >= PALETTE && slot < PALETTE + 16 || slot == INDUSTRIAL) {
+        } else if (slot >= PALETTE && slot < PALETTE + DYES || slot == INDUSTRIAL) {
             if (editing >= company.swatches.size()) return;
             String dye = slot == INDUSTRIAL ? "industrial" : Shop.dyes().get(slot - PALETTE);
             String[] sw = company.swatches.get(editing).split("/", -1);
@@ -242,7 +246,7 @@ public class CustomizerMenu extends ChestMenu {
             player.sendOverlayMessage(Component.translatable("siftec.customizer.editing", editing + 1));
         } else if (slot == RESET) {
             apply(Paint.NONE);
-        } else if (slot >= FINISHES && slot < FINISHES + 9) {
+        } else if (slot >= FINISHES && slot < FINISHES + ROW) {
             List<String> ids = new ArrayList<>(Shop.finishes().keySet());
             int i = slot - FINISHES;
             if (i >= ids.size()) return;

@@ -61,10 +61,14 @@ import java.util.function.Supplier;
 public class ModBlocks {
     /** Items shown in the creative tab, in registration order. */
     public static final List<Item> TAB_ITEMS = new ArrayList<>();
+    /** Hardness and blast resistance of a block nothing breaks or blows up (bedrock's). */
+    private static final float UNBREAKABLE_HARDNESS = -1.0F, UNBREAKABLE_RESISTANCE = 3600000.0F;
+    /** How far each way from its terminal each Blueprint Designer Mk's cube reaches, in blocks. */
+    private static final int DESIGNER_MK1_REACH = 4, DESIGNER_MK2_REACH = 6, DESIGNER_MK3_REACH = 8;
 
     /** Patches and fluid nodes cannot be broken, pushed or blown up. */
     private static BlockBehaviour.Properties node() {
-        return BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable()
+        return BlockBehaviour.Properties.of().strength(UNBREAKABLE_HARDNESS, UNBREAKABLE_RESISTANCE).noLootTable()
             .sound(SoundType.DEEPSLATE).pushReaction(PushReaction.IMMOVEABLE);
     }
 
@@ -154,8 +158,8 @@ public class ModBlocks {
     }
 
     private static BlockBehaviour.Properties prefabProperties(Block like, int light, boolean open) {
-        BlockBehaviour.Properties p = BlockBehaviour.Properties.ofFullCopy(like).strength(-1.0F, 3600000.0F).noLootTable()
-            .pushReaction(PushReaction.IMMOVEABLE).lightLevel(state -> light);
+        BlockBehaviour.Properties p = BlockBehaviour.Properties.ofFullCopy(like).strength(UNBREAKABLE_HARDNESS, UNBREAKABLE_RESISTANCE)
+            .noLootTable().pushReaction(PushReaction.IMMOVEABLE).lightLevel(state -> light);
         return open ? p.noOcclusion() : p;
     }
 
@@ -164,7 +168,8 @@ public class ModBlocks {
     public static final Supplier<StorageBoxBlock> PERSONAL_STORAGE = blockOnly("personal_storage", StorageBoxBlock::new,
         () -> prefabProperties(Blocks.BARREL, 0));
     public static final Supplier<HubBurnerBlock> HUB_BURNER = blockOnly("hub_burner", HubBurnerBlock::new,
-        () -> BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.METAL).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
+        () -> BlockBehaviour.Properties.of().strength(UNBREAKABLE_HARDNESS, UNBREAKABLE_RESISTANCE).noLootTable()
+            .sound(SoundType.METAL).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
 
     /**
      * The Build Gun's buildings (see building.Buildings): each one's controller and its ports. Like the HUB's shell,
@@ -194,11 +199,11 @@ public class ModBlocks {
      * Mk.1's 9-block cube and Mk.3's 17, as 1.0's 40 m is between 32 and 48.
      */
     public static final Supplier<DesignerBlock> BLUEPRINT_DESIGNER = blockOnly("blueprint_designer",
-        properties -> new DesignerBlock(4, properties), () -> machine().noLootTable());
+        properties -> new DesignerBlock(DESIGNER_MK1_REACH, properties), () -> machine().noLootTable());
     public static final Supplier<DesignerBlock> BLUEPRINT_DESIGNER_MK2 = blockOnly("blueprint_designer_mk2",
-        properties -> new DesignerBlock(6, properties), () -> machine().noLootTable());
+        properties -> new DesignerBlock(DESIGNER_MK2_REACH, properties), () -> machine().noLootTable());
     public static final Supplier<DesignerBlock> BLUEPRINT_DESIGNER_MK3 = blockOnly("blueprint_designer_mk3",
-        properties -> new DesignerBlock(8, properties), () -> machine().noLootTable());
+        properties -> new DesignerBlock(DESIGNER_MK3_REACH, properties), () -> machine().noLootTable());
     public static final Supplier<Block> STEEL_CASING = block("steel_casing", Block::new, () -> BlockBehaviour.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL));
 
     public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);
@@ -227,8 +232,8 @@ public class ModBlocks {
      * Nothing breaks, blows up or pushes it, and it drops nothing; its owner empties it by clicking it.
      */
     public static final Supplier<DeathCrateBlock> DEATH_CRATE = blockOnly("death_crate", DeathCrateBlock::new,
-        () -> BlockBehaviour.Properties.of().strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.WOOD)
-            .pushReaction(PushReaction.IMMOVEABLE));
+        () -> BlockBehaviour.Properties.of().strength(UNBREAKABLE_HARDNESS, UNBREAKABLE_RESISTANCE).noLootTable()
+            .sound(SoundType.WOOD).pushReaction(PushReaction.IMMOVEABLE));
 
     /** The AWESOME Shop's decorations (sink/DecorBlock.java), by id, from siftec_content.json (tools/content.py, DECOR). */
     public static final Map<String, Block> DECOR = new LinkedHashMap<>();

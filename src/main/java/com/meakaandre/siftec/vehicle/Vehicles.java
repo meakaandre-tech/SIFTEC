@@ -50,6 +50,13 @@ public final class Vehicles {
     private static final Map<VehicleKind, EntityType<VehicleEntity>> TYPES = new EnumMap<>(VehicleKind.class);
     private static final Map<EntityType<?>, VehicleKind> KINDS = new HashMap<>();
     private static final Map<UUID, VehicleInputPayload> INPUTS = new HashMap<>();
+    /** Chunks away a client still tracks a vehicle. */
+    private static final int TRACKING_RANGE_CHUNKS = 10;
+    /** Taken off a new vehicle's box before checking it is clear, so touching the ground or a wall is no collision. */
+    private static final double PLACE_CLEARANCE = 0.05;
+    /** How far round the aim line vehicles are looked for, and how much their body grows for the aim to hit it. */
+    private static final int AIM_SEARCH_INFLATE = 3;
+    private static final double AIM_GROW = 0.2;
 
     private Vehicles() {
     }
@@ -59,7 +66,8 @@ public final class Vehicles {
             ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Siftec.id(kind.id));
             EntityType<VehicleEntity> type = Registry.register(BuiltInRegistries.ENTITY_TYPE, key,
                 EntityType.Builder.<VehicleEntity>of(VehicleEntity::new, MobCategory.MISC).noLootTable().fireImmune()
-                    .sized(kind.boxWidth, kind.boxHeight).clientTrackingRange(10).updateInterval(1).build(key));
+                    .sized(kind.boxWidth, kind.boxHeight).clientTrackingRange(TRACKING_RANGE_CHUNKS).updateInterval(1)
+                    .build(key));
             TYPES.put(kind, type);
             KINDS.put(type, kind);
         }
@@ -143,7 +151,7 @@ public final class Vehicles {
             return check;
         }
         AABB box = box(spot(p, kind), kind, p.facing());
-        if (!level.noCollision(box.deflate(0.05))) check.fail("siftec.vehicle.blocked");
+        if (!level.noCollision(box.deflate(PLACE_CLEARANCE))) check.fail("siftec.vehicle.blocked");
         if (creative) return check;
         if (company != null && Buildings.locked(p.def(), company)) check.fail("siftec.build_gun.locked", Buildings.unlockName(p.def()));
         if (company != null && level instanceof ServerLevel server) {
@@ -192,9 +200,10 @@ public final class Vehicles {
         Vec3 end = eye.add(player.getViewVector(1f).scale(Buildings.RANGE));
         VehicleEntity best = null;
         double bestDist = Double.MAX_VALUE;
-        for (VehicleEntity v : player.level().getEntitiesOfClass(VehicleEntity.class, new AABB(eye, end).inflate(3))) {
+        for (VehicleEntity v : player.level().getEntitiesOfClass(VehicleEntity.class,
+            new AABB(eye, end).inflate(AIM_SEARCH_INFLATE))) {
             // its turned body, along all its length (not the square box round it)
-            var hit = v.bodyHit(eye, end, 0.2);
+            var hit = v.bodyHit(eye, end, AIM_GROW);
             if (hit.isEmpty()) continue;
             double d = hit.get().distanceToSqr(eye);
             if (d < bestDist) {

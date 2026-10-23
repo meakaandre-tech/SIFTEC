@@ -16,6 +16,9 @@ package com.meakaandre.siftec.power;
  * the grid.
  */
 public interface PowerMember {
+    /** An Alien Power Augmenter's boost while fed with matrices (+30%), and unfed (+10%), as in Satisfactory. */
+    double FED_BOOST = 0.3, UNFED_BOOST = 0.1;
+
     default double capacity() {
         return 0;
     }

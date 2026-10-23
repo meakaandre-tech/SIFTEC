@@ -69,6 +69,16 @@ public final class MapServer {
     private static final int REQUEST_REGIONS = 64;
     /** Regions of seed POIs kept per company; past this the cache is emptied and worked out again as needed. */
     private static final int SEED_REGIONS_KEPT = 4096;
+    /** Ticks in a second: fog clearing round players, found-change checks and mover updates run once a second. */
+    private static final int TICKS_PER_SECOND = 20;
+    /** Ticks between company-mate updates (twice a second). */
+    private static final int MATES_TICKS = 10;
+    /** Ticks between fog saves (a minute). */
+    private static final int FOG_SAVE_TICKS = 1200;
+    /** Packed tiles cached at most; past this the cache is emptied. */
+    private static final int PACKED_KEPT = 256;
+    /** Multiplier mixing the done-count hash into a company's seed stamp. */
+    private static final int STAMP_HASH = 31;
 
     private static @Nullable String mapId;
     /** Per company: what the seed puts in each explored region (nodes, wells, crash sites, artifacts). */
@@ -173,15 +183,15 @@ public final class MapServer {
         ServerLevel overworld = server.overworld();
         MapTerrain.tick(overworld);
         int t = server.getTickCount();
-        if (t % 20 == 0) explore(server);
-        if (t % 10 == 5) mates(server);
-        if (t % 20 == 15) movers(server);
-        if (t % 20 == 10) {
+        if (t % TICKS_PER_SECOND == 0) explore(server);
+        if (t % MATES_TICKS == 5) mates(server);
+        if (t % TICKS_PER_SECOND == 15) movers(server);
+        if (t % TICKS_PER_SECOND == 10) {
             long[] changed = MapTerrain.takeFoundChanges();
             if (changed.length > 0) foundChanged(server, changed);
             runPending(server);
         }
-        if (t % 1200 == 600) MapFog.saveAll();
+        if (t % FOG_SAVE_TICKS == 600) MapFog.saveAll();
     }
 
     /** Company members clear the fog round them. */
@@ -334,7 +344,7 @@ public final class MapServer {
     }
 
     private static int stamp(Company company) {
-        return company.done.hashCode() * 31 + company.collected.size();
+        return company.done.hashCode() * STAMP_HASH + company.collected.size();
     }
 
     // ------------------------------------------------------------------------------------------------ points of interest
@@ -515,7 +525,7 @@ public final class MapServer {
                 packed = tile.pack();
                 PACKED.put(region, packed);
                 PACKED_AT.put(region, tile.version);
-                if (PACKED.size() > 256) {
+                if (PACKED.size() > PACKED_KEPT) {
                     PACKED.clear();
                     PACKED_AT.clear();
                 }

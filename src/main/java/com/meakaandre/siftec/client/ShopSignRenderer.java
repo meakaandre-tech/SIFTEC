@@ -29,6 +29,14 @@ import java.util.List;
  */
 public class ShopSignRenderer implements BlockEntityRenderer<ShopSignBlockEntity, ShopSignRenderer.State> {
     private static final int LINE = 10, FULL_BRIGHT = 0xF000F0;
+    /** Share of the face's width and height the text may fill (the rest is margin). */
+    private static final float FILL_WIDTH = 0.85f, FILL_HEIGHT = 0.8f;
+    /** Narrowest text width (font pixels) scaled to, so a short line is not drawn huge. */
+    private static final int MIN_TEXT_WIDTH = 24;
+    /** Gap between the panel's face and the text, so they do not z-fight (blocks). */
+    private static final double TEXT_OFFSET = 0.005;
+    /** How far away the sign's text is still drawn (blocks). */
+    private static final int VIEW_DISTANCE = 128;
     private final Font font;
 
     public ShopSignRenderer(BlockEntityRendererProvider.Context context) {
@@ -80,12 +88,12 @@ public class ShopSignRenderer implements BlockEntityRenderer<ShopSignBlockEntity
         for (int w : state.widths) widest = Math.max(widest, w);
         int n = state.lines.size();
         // fills the face: as large as the widest line and the lines' height allow, leaving a margin
-        float scale = Math.min(block.faceWidth * 0.85f / Math.max(widest, 24), block.faceHeight * 0.8f / (n * LINE));
+        float scale = Math.min(block.faceWidth * FILL_WIDTH / Math.max(widest, MIN_TEXT_WIDTH), block.faceHeight * FILL_HEIGHT / (n * LINE));
         ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.rotateDegrees(Axis.YP, -state.yRot);
         // the panel lies against the wall behind (the north side as it faces south), 1.5 pixels thick
-        ms.translate(block.faceX, block.faceY, -0.5 + 1.5 / 16 + 0.005);
+        ms.translate(block.faceX, block.faceY, -0.5 + ShopSignBlock.PANEL_THICKNESS / 16 + TEXT_OFFSET);
         ms.scale(scale, -scale, scale);
         int light = state.glow ? FULL_BRIGHT : state.lightCoords;
         for (int i = 0; i < n; i++) {
@@ -102,6 +110,6 @@ public class ShopSignRenderer implements BlockEntityRenderer<ShopSignBlockEntity
 
     @Override
     public int getViewDistance() {
-        return 128;
+        return VIEW_DISTANCE;
     }
 }

@@ -24,6 +24,8 @@ public final class TbEquipSlots {
     public static final EquipmentSlot[] ARMOR = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
     private static final Identifier[] ICONS = {InventoryMenu.EMPTY_ARMOR_SLOT_HELMET, InventoryMenu.EMPTY_ARMOR_SLOT_CHESTPLATE,
         InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS, InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS};
+    /** The vanilla inventory's first armour slot (armour slots are this plus the piece's index). */
+    private static final int ARMOR_INVENTORY_START = 36;
     /** Where the column's slots sit, relative to the window's left and top edge. */
     public static final int X = -21;
     public static final int TOP = 8;
@@ -55,7 +57,7 @@ public final class TbEquipSlots {
     }
 
     public static int y(int row) {
-        return row < 4 ? TOP + row * 18 : TOP + 4 * 18 + 6;
+        return row < ARMOR.length ? TOP + row * 18 : TOP + ARMOR.length * 18 + 6;
     }
 
     /** The five slots, in the order they are added. */
@@ -63,9 +65,9 @@ public final class TbEquipSlots {
         List<Slot> out = new ArrayList<>();
         for (int i = 0; i < ARMOR.length; i++) {
             EquipmentSlot slot = ARMOR[i];
-            out.add(new ArmorSlot(inventory, inventory.player, slot, 36 + slot.getIndex(), X, y(i), ICONS[i]));
+            out.add(new ArmorSlot(inventory, inventory.player, slot, ARMOR_INVENTORY_START + slot.getIndex(), X, y(i), ICONS[i]));
         }
-        out.add(new OffhandSlot(inventory, X, y(4)));
+        out.add(new OffhandSlot(inventory, X, y(ARMOR.length)));
         return out;
     }
 
@@ -77,7 +79,7 @@ public final class TbEquipSlots {
     public static int find(AbstractContainerMenu menu, EquipmentSlot equipment) {
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot slot = menu.slots.get(i);
-            if (slot instanceof ArmorSlot && slot.container instanceof Inventory && slot.getContainerSlot() == 36 + equipment.getIndex()) return i;
+            if (slot instanceof ArmorSlot && slot.container instanceof Inventory && slot.getContainerSlot() == ARMOR_INVENTORY_START + equipment.getIndex()) return i;
         }
         return -1;
     }

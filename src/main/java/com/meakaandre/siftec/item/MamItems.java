@@ -28,6 +28,15 @@ import java.util.Locale;
  * other way to heal (Food and Brass tab: no natural regeneration), so an inhaler is a heal to carry.
  */
 public final class MamItems {
+    /** Health a Protein, Therapeutic and Nutritional Inhaler heal. */
+    private static final float PROTEIN_HEAL = 6f, THERAPEUTIC_HEAL = 4f, NUTRITIONAL_HEAL = 14f;
+    /** Regeneration a Vitamin and a Nutritional Inhaler give (ticks). */
+    private static final int VITAMIN_REGEN_TICKS = 20 * 20, NUTRITIONAL_REGEN_TICKS = 10 * 20;
+    /** Width of an item's durability bar in pixels (vanilla's). */
+    private static final float BAR_WIDTH = 13f;
+    /** Colour of the Elytra Backpack's bar while it shows air (a backtank's). */
+    private static final int AIR_BAR_COLOUR = 0xEFEFEF;
+
     private MamItems() {
     }
 
@@ -48,19 +57,19 @@ public final class MamItems {
 
         void apply(Player player) {
             switch (this) {
-                case PROTEIN -> player.heal(6f);
-                case VITAMIN -> player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 20 * 20, 1));
+                case PROTEIN -> player.heal(PROTEIN_HEAL);
+                case VITAMIN -> player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, VITAMIN_REGEN_TICKS, 1));
                 case THERAPEUTIC -> {
                     List<Holder<MobEffect>> bad = new ArrayList<>();
                     for (MobEffectInstance effect : player.getActiveEffects()) {
                         if (effect.getEffect().value().getCategory() == MobEffectCategory.HARMFUL) bad.add(effect.getEffect());
                     }
                     for (Holder<MobEffect> effect : bad) player.removeEffect(effect);
-                    player.heal(4f);
+                    player.heal(THERAPEUTIC_HEAL);
                 }
                 case NUTRITIONAL -> {
-                    player.heal(14f);
-                    player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 10 * 20, 0));
+                    player.heal(NUTRITIONAL_HEAL);
+                    player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, NUTRITIONAL_REGEN_TICKS, 0));
                 }
             }
         }
@@ -128,13 +137,13 @@ public final class MamItems {
         @Override
         public int getBarWidth(ItemStack stack) {
             // the bar shows the air while there is some missing, as a backtank's does, else the Elytra's wear
-            if (BacktankUtil.getAir(stack) < BacktankUtil.maxAir(stack)) return Math.round(13f * BacktankUtil.getAir(stack) / Math.max(1, BacktankUtil.maxAir(stack)));
+            if (BacktankUtil.getAir(stack) < BacktankUtil.maxAir(stack)) return Math.round(BAR_WIDTH * BacktankUtil.getAir(stack) / Math.max(1, BacktankUtil.maxAir(stack)));
             return super.getBarWidth(stack);
         }
 
         @Override
         public int getBarColor(ItemStack stack) {
-            return BacktankUtil.getAir(stack) < BacktankUtil.maxAir(stack) ? 0xEFEFEF : super.getBarColor(stack);
+            return BacktankUtil.getAir(stack) < BacktankUtil.maxAir(stack) ? AIR_BAR_COLOUR : super.getBarColor(stack);
         }
     }
 }

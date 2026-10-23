@@ -46,6 +46,8 @@ public final class Recipes {
     private static boolean loaded;
     /** Droplets in a mB (Fabric's 81000 a bucket). */
     private static final long DROPLETS = 81;
+    /** Droplets a fluid ingredient without an amount stands for: a bucket. */
+    private static final int BUCKET_DROPLETS = 81000;
 
     private Recipes() {
     }
@@ -200,7 +202,7 @@ public final class Recipes {
     private static void fluid(JsonObject f, Map<String, Long> into) {
         if (!f.has("fluid")) return;
         String fluid = f.get("fluid").getAsString();
-        long amount = f.has("amount") ? f.get("amount").getAsLong() : 81000;
+        long amount = f.has("amount") ? f.get("amount").getAsLong() : BUCKET_DROPLETS;
         into.merge("fluid:" + fluid, Math.max(1, amount / DROPLETS), Long::sum);
     }
 }

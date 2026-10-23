@@ -24,6 +24,8 @@ import org.jspecify.annotations.Nullable;
  * building and its text fills the whole board.
  */
 public class ShopSignBlock extends WallSignBlock {
+    /** Thickness of the sign's panel against the wall, in pixels (sixteenths of a block). */
+    public static final double PANEL_THICKNESS = 1.5;
     /** The face the text fills, in blocks, and where its middle is from the middle of the sign's cell (right, up). */
     public final float faceWidth, faceHeight, faceX, faceY;
     private final double panelBottom, panelTop;
@@ -61,7 +63,7 @@ public class ShopSignBlock extends WallSignBlock {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         Direction facing = state.getValue(FACING);
-        double t = 1.5;
+        double t = PANEL_THICKNESS;
         return switch (facing) {
             case NORTH -> Shapes.box(0, panelBottom / 16, (16 - t) / 16, 1, panelTop / 16, 1);
             case EAST -> Shapes.box(0, panelBottom / 16, 0, t / 16, panelTop / 16, 1);

@@ -11,6 +11,9 @@ import net.minecraft.world.level.ChunkPos;
  * of the pack's oil nodes is, the node never runs dry, and its purity sets how much each stroke brings up.
  */
 public final class OilNodes {
+    /** Oil per Pumpjack stroke from an impure, normal and pure node (mB). */
+    private static final int IMPURE_MB = 125, NORMAL_MB = 250, PURE_MB = 500;
+
     private OilNodes() {
     }
 
@@ -19,9 +22,9 @@ public final class OilNodes {
         for (Node node : NodePlacer.nodesTouching(level, chunk.x(), chunk.z())) {
             if (node.type() != NodeType.OIL) continue;
             return switch (node.purity()) {
-                case IMPURE -> 125;
-                case NORMAL -> 250;
-                case PURE -> 500;
+                case IMPURE -> IMPURE_MB;
+                case NORMAL -> NORMAL_MB;
+                case PURE -> PURE_MB;
             };
         }
         return 0;

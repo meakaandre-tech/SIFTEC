@@ -31,6 +31,9 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
 
     /** One line of a cost: an item id, or a tag written "#namespace:path" for "any of these". */
     public record Cost(String key, int count) {
+        /** Milliseconds each item of a tag is shown for in turn. */
+        private static final int MILLIS_PER_ICON = 1000;
+
         public boolean isTag() {
             return key.startsWith("#");
         }
@@ -59,7 +62,7 @@ public record Milestone(String id, int tier, int index, List<Cost> cost, int sec
             List<Item> items = new ArrayList<>();
             for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag())) items.add(holder.value());
             if (items.isEmpty()) return new ItemStack(Items.BARRIER);
-            return new ItemStack(items.get((int) (System.currentTimeMillis() / 1000 % items.size())));
+            return new ItemStack(items.get((int) (System.currentTimeMillis() / MILLIS_PER_ICON % items.size())));
         }
 
         public Component label() {

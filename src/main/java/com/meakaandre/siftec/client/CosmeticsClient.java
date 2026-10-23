@@ -31,6 +31,8 @@ public final class CosmeticsClient {
     /** entity id -> the emote it plays and the client tick it began */
     private static final Map<Integer, Playing> PLAYING = new HashMap<>();
     private static long ticks;
+    /** Ticks an emote takes to ease in at its start and out at its end. */
+    private static final float EASE_TICKS = 6f;
 
     private record Playing(@Nullable Emote emote, long start) {
     }
@@ -118,7 +120,7 @@ public final class CosmeticsClient {
         if (playing == null) return;
         float t = state.ageInTicks;
         // eases in and out over the first and last few ticks
-        float age = ticks - playing.start, w = Mth.clamp(Math.min(age, Emotes.TICKS - age) / 6f, 0, 1);
+        float age = ticks - playing.start, w = Mth.clamp(Math.min(age, Emotes.TICKS - age) / EASE_TICKS, 0, 1);
         if (playing.emote == null) return;
         Pose p = playing.emote.pose.at(t);
         float rx = p.rx(), ry = p.ry(), rz = p.rz(), lx = p.lx(), ly = p.ly(), lz = p.lz(), head = p.head(), body = p.body();

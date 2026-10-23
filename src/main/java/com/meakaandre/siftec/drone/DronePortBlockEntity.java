@@ -45,6 +45,8 @@ public class DronePortBlockEntity extends BlockEntity {
     private static final int CLIMB_TICKS = GROUND_TICKS / 2;
     /** The landing pad's deck is this far over the terminal, straight up (tools/structures.py, drone_port). */
     public static final int PAD_DY = 10;
+    /** The most fire charges one trip takes: the one stack the port's fuel slot holds. */
+    private static final int MAX_CHARGES = 64;
 
     public String companyId = "";
     public final PortContainer items = new PortContainer(this::setChanged);
@@ -62,7 +64,7 @@ public class DronePortBlockEntity extends BlockEntity {
     public int chargesNeeded() {
         if (destination == null) return 0;
         // never more than the one stack the port can hold
-        return Math.clamp((int) Math.ceil(Math.sqrt(destination.distSqr(worldPosition)) * 2 / BLOCKS_PER_CHARGE), 1, 64);
+        return Math.clamp((int) Math.ceil(Math.sqrt(destination.distSqr(worldPosition)) * 2 / BLOCKS_PER_CHARGE), 1, MAX_CHARGES);
     }
 
     public String statusKey() {

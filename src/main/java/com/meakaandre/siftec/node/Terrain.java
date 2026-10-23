@@ -16,6 +16,13 @@ import org.jspecify.annotations.Nullable;
  * game itself does from its world generation threads, so it may run off the server thread.
  */
 public final class Terrain {
+    /** The height a column's biome is first sampled at: an ordinary world's surface. */
+    public static final int SAMPLE_Y = 64;
+    /** The second sample stands this far above the generator's sea level. */
+    private static final long SEA_SAMPLE_ABOVE = 8L;
+    /** Samples spread from the bottom to the top of the world before a column counts as void. */
+    private static final int VOID_SAMPLES = 6;
+
     /**
      * The top solid block of a column and the biome just above it, and whether water stands over that ground: a sea
      * or river biome, or any lake or pond the generator fills (its surface is above the ground).
@@ -55,10 +62,10 @@ public final class Terrain {
      */
     public static boolean voidColumn(ServerLevel level, int x, int z) {
         int min = level.getMinY(), max = level.getMaxY();
-        if (!isVoid(biome(level, x, Math.clamp(64, min, max), z))) return false;
-        if (!isVoid(biome(level, x, Math.clamp(level.getSeaLevel() + 8L, min, max), z))) return false;
-        for (int i = 0; i < 6; i++) {
-            int y = min + (int) ((max - min) * (i + 0.5) / 6);
+        if (!isVoid(biome(level, x, Math.clamp(SAMPLE_Y, min, max), z))) return false;
+        if (!isVoid(biome(level, x, Math.clamp(level.getSeaLevel() + SEA_SAMPLE_ABOVE, min, max), z))) return false;
+        for (int i = 0; i < VOID_SAMPLES; i++) {
+            int y = min + (int) ((max - min) * (i + 0.5) / VOID_SAMPLES);
             if (!isVoid(biome(level, x, y, z))) return false;
         }
         return true;

@@ -82,7 +82,7 @@ public record Paint(String primary, String secondary, String finish, String skin
         Block b = built.getBlock(), out = null;
         String id = BuiltInRegistries.BLOCK.getKey(b).toString();
         if (!pattern.isEmpty() && x != Integer.MIN_VALUE && id.equals(FOUNDATION_TOP)) {
-            String painted = Patterns.at(pattern, x + 4, z);
+            String painted = Patterns.at(pattern, x + Patterns.SIZE / 2, z);
             if (painted != null) out = block(painted);
         }
         if (out == null && !material.isEmpty()) {

@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -18,6 +19,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(value = BasinInventory.class, remap = false)
 public abstract class BrassBasinInventoryMixin {
+    /** A Basin's input slots. */
+    @Unique
+    private static final int INPUT_SLOTS = 9;
+
     @Shadow
     @Final
     private BasinBlockEntity blockEntity;
@@ -31,14 +36,14 @@ public abstract class BrassBasinInventoryMixin {
 
     @Inject(method = "canPlaceItem", at = @At("HEAD"), cancellable = true)
     private void siftec$brassStacks(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (!check || slot >= 9 || blockEntity == null || !(blockEntity.getBlockState().getBlock() instanceof BrassBasinBlock)) return;
+        if (!check || slot >= INPUT_SLOTS || blockEntity == null || !(blockEntity.getBlockState().getBlock() instanceof BrassBasinBlock)) return;
         ItemStack here = stacks.get(slot);
         if (!here.isEmpty()) {
             cir.setReturnValue(ItemStack.isSameItemSameComponents(here, stack));
             return;
         }
         int held = 0;
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < INPUT_SLOTS; i++) {
             ItemStack other = stacks.get(i);
             if (i == slot || other.isEmpty() || !ItemStack.isSameItemSameComponents(other, stack)) continue;
             // a new slot only once the item's other slots are full

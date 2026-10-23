@@ -23,6 +23,17 @@ import java.util.List;
  */
 public final class Ziplines {
     private static final double SPEED = 0.9, HANG = 2.3;
+    /** Squared horizontal length under which a vector has no usable direction. */
+    private static final double MIN_DIRECTION_SQR = 0.01;
+    /** Shortest line length divided by, so a zero-length span does not divide by zero. */
+    private static final double MIN_SPAN = 0.01;
+    /** Least alignment (dot product) with the look direction a line needs to set off on. */
+    private static final double START_LEAST_DOT = -0.2;
+    /** Blocks below the line searched for ground to land on. */
+    private static final int LANDING_DEPTH = 8;
+    /** Deepest sag of a line in the middle (blocks), and the span length per block of sag. */
+    private static final double MAX_SAG = 1.5;
+    private static final int SPAN_PER_SAG = 12;
     public static final String TAG = "siftec_zipline";
 
     private static final class Ride {
@@ -54,7 +65,7 @@ public final class Ziplines {
             BlockPos offset = other.subtract(pole);
             if (other.equals(cameFrom)) continue;
             Vec3 way = new Vec3(offset.getX(), 0, offset.getZ());
-            if (way.lengthSqr() < 0.01) continue;
+            if (way.lengthSqr() < MIN_DIRECTION_SQR) continue;
             double dot = way.normalize().dot(heading);
             if (dot > bestDot) {
                 bestDot = dot;
@@ -71,14 +82,14 @@ public final class Ziplines {
      */
     private static Vec3 landing(ServerLevel level, BlockPos pole, Vec3 heading) {
         List<Direction> sides = new ArrayList<>(4);
-        Direction ahead = heading.lengthSqr() < 0.01 ? Direction.NORTH : Direction.getApproximateNearest(heading.x, 0, heading.z);
+        Direction ahead = heading.lengthSqr() < MIN_DIRECTION_SQR ? Direction.NORTH : Direction.getApproximateNearest(heading.x, 0, heading.z);
         sides.add(ahead);
         sides.add(ahead.getClockWise());
         sides.add(ahead.getCounterClockWise());
         sides.add(ahead.getOpposite());
         for (Direction side : sides) {
             BlockPos column = pole.relative(side);
-            for (int dy = 1; dy >= -8; dy--) {
+            for (int dy = 1; dy >= -LANDING_DEPTH; dy--) {
                 BlockPos feet = column.above(dy);
                 if (level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), Direction.UP)
                     && level.getBlockState(feet).getCollisionShape(level, feet).isEmpty() && level.getBlockState(feet.above()).getCollisionShape(level, feet.above()).isEmpty()
@@ -95,9 +106,9 @@ public final class Ziplines {
         ServerLevel level = player.level();
         Vec3 look = player.getLookAngle();
         Vec3 heading = new Vec3(look.x, 0, look.z);
-        if (heading.lengthSqr() < 0.01) heading = new Vec3(1, 0, 0);
+        if (heading.lengthSqr() < MIN_DIRECTION_SQR) heading = new Vec3(1, 0, 0);
         // any line roughly ahead of where the player is looking will do to set off on
-        BlockPos to = next(level, pole, heading.normalize(), null, -0.2);
+        BlockPos to = next(level, pole, heading.normalize(), null, START_LEAST_DOT);
         if (to == null) return false;
         Display carrier = EntityTypes.BLOCK_DISPLAY.create(level, EntitySpawnReason.TRIGGERED);
         if (carrier == null) return false;
@@ -152,9 +163,9 @@ public final class Ziplines {
                 b = top(ride.to);
                 length = a.distanceTo(b);
             }
-            double t = Math.min(1, ride.travelled / Math.max(0.01, length));
+            double t = Math.min(1, ride.travelled / Math.max(MIN_SPAN, length));
             // the line sags in the middle, the same curve the sparks follow
-            double sag = Math.sin(t * Math.PI) * Math.min(1.5, length / 12);
+            double sag = Math.sin(t * Math.PI) * Math.min(MAX_SAG, length / SPAN_PER_SAG);
             ride.carrier.setPos(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t - sag, a.z + (b.z - a.z) * t);
             ride.rider.resetFallDistance();
         }

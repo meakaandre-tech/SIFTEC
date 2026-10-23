@@ -12,6 +12,10 @@ import net.minecraft.world.level.material.Fluids;
 public final class NetherWater {
     /** mB lost per tick: a full eight-bucket tank is gone in about four seconds. */
     private static final int PER_TICK = 100, DROPLETS = 81;
+    /** Steam puffs from a boiling tank this often (ticks). */
+    private static final int STEAM_TICKS = 10;
+    /** Cloud particles a puff sends. */
+    private static final int STEAM_PARTICLES = 3;
 
     private NetherWater() {
     }
@@ -23,8 +27,8 @@ public final class NetherWater {
     public static void boil(Level level, BlockPos pos, FluidInventory tank, FluidStack held) {
         if (!hot(level) || held == null || held.isEmpty() || held.getFluid() != Fluids.WATER) return;
         tank.extract(held, PER_TICK * DROPLETS);
-        if (level.getGameTime() % 10 == 0 && level instanceof ServerLevel server) {
-            server.sendParticles(ParticleTypes.CLOUD, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 3, 0.3, 0.1, 0.3, 0.02);
+        if (level.getGameTime() % STEAM_TICKS == 0 && level instanceof ServerLevel server) {
+            server.sendParticles(ParticleTypes.CLOUD, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, STEAM_PARTICLES, 0.3, 0.1, 0.3, 0.02);
         }
     }
 }

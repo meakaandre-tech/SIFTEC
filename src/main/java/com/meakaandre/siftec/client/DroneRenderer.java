@@ -30,6 +30,10 @@ public class DroneRenderer extends EntityRenderer<DroneEntity, DroneRenderer.Sta
     private static final float ARM = 0.55f;
     /** How much larger than its parts' sizes it is drawn: about two blocks across, half the pad's touchdown square. */
     private static final float SIZE = 1.6f;
+    /** Height in the frame the drone leans about (just over its skids). */
+    private static final float LEAN_PIVOT = 0.25f;
+    /** Scale of a propeller's fan model. */
+    private static final float PROPELLER_SCALE = 0.62f;
 
     public DroneRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -83,7 +87,7 @@ public class DroneRenderer extends EntityRenderer<DroneEntity, DroneRenderer.Sta
     private record Parts(List<SuperByteBufferRenderState> out, float yaw, float pitch, float roll, int light) {
         private SuperByteBuffer frame(SuperByteBuffer b) {
             // turned to its heading, then leaned about its middle (just over its skids)
-            return b.rotateYDegrees(-yaw).scale(SIZE).translate(0, 0.25f, 0).rotateXDegrees(pitch).rotateZDegrees(-roll).translate(0, -0.25f, 0);
+            return b.rotateYDegrees(-yaw).scale(SIZE).translate(0, LEAN_PIVOT, 0).rotateXDegrees(pitch).rotateZDegrees(-roll).translate(0, -LEAN_PIVOT, 0);
         }
 
         /** A block's model, its middle at (x, y, z) of the frame, scaled to sx by sy by sz and turned by yawDegrees about y. */
@@ -96,7 +100,7 @@ public class DroneRenderer extends EntityRenderer<DroneEntity, DroneRenderer.Sta
         void propeller(float x, float y, float z, float degrees) {
             BlockState fan = AllBlocks.ENCASED_FAN.defaultBlockState();
             SuperByteBuffer b = frame(CachedBuffers.partialFacing(AllPartialModels.ENCASED_FAN_INNER, fan, Direction.UP))
-                .translate(-x, y, z).rotateYDegrees(degrees).scale(0.62f, 0.62f, 0.62f).translate(-0.5f, -0.5f, -0.5f);
+                .translate(-x, y, z).rotateYDegrees(degrees).scale(PROPELLER_SCALE, PROPELLER_SCALE, PROPELLER_SCALE).translate(-0.5f, -0.5f, -0.5f);
             out.add(b.light(light).extractRenderState());
         }
     }

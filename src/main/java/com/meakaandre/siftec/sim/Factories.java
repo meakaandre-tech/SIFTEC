@@ -72,6 +72,8 @@ public final class Factories {
     public static final int STEP = 10;
     /** Ticks between two full recordings of a ticking building (its model and belts); its buffers are read every {@link #STEP}. */
     static final int RECORD = 100;
+    /** Weights of the running averages of the time taken: what the average keeps, and what the newest step adds. */
+    private static final double MAIN_AVG_KEEP = 0.98, MAIN_AVG_NEW = 0.02, WORKER_AVG_KEEP = 0.9, WORKER_AVG_NEW = 0.1;
     private static final ExecutorService WORKER = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "SIFTEC factory simulation");
         t.setDaemon(true);
@@ -297,7 +299,7 @@ public final class Factories {
         SimVehicles.tick(s, now, running == null);
         long took = System.nanoTime() - t0;
         mainLastNanos = took;
-        mainAvgNanos = mainAvgNanos * 0.98 + took * 0.02;
+        mainAvgNanos = mainAvgNanos * MAIN_AVG_KEEP + took * MAIN_AVG_NEW;
         if (now % 20 == 0) SimStatsPayload.send(s, stats());
     }
 
@@ -771,7 +773,7 @@ public final class Factories {
             int c = (int) Math.min(count, max);
             ItemStack stack = Keys.stack(key, c);
             if (stack.isEmpty()) return;
-            Drops.at(level, at, 1.1, stack);
+            Drops.at(level, at, Buffers.DROP_HEIGHT, stack);
             count -= c;
         }
     }
@@ -791,7 +793,7 @@ public final class Factories {
             long dt = l.last == Long.MIN_VALUE ? 0 : Math.max(0, now - l.last);
             l.last = now;
             l.allowance = Sim.allow(l, dt);
-            long most = Math.min((long) Math.floor(l.allowance + 1e-9), Math.max(0, l.cap - l.carrying()));
+            long most = Math.min((long) Math.floor(l.allowance + Sim.FLOOR_EPSILON), Math.max(0, l.cap - l.carrying()));
             if (most <= 0) continue;
             Map<String, Long> got = Buffers.extract(level, from, most, l.fluid);
             for (Map.Entry<String, Long> e : got.entrySet()) {
@@ -926,7 +928,7 @@ public final class Factories {
             List<SimData.Slot> cargo = new ArrayList<>(v.cargo);
             while (cargo.size() < v.slots) cargo.add(new SimData.Slot());
             long room = 0;
-            for (SimData.Slot c : cargo) room += c.empty() ? 64 : Math.max(0, Keys.max(c.key) - c.count);
+            for (SimData.Slot c : cargo) room += c.empty() ? Keys.STACK : Math.max(0, Keys.max(c.key) - c.count);
             Map<String, Long> got = Buffers.extract(level, st, room, false);
             for (Map.Entry<String, Long> e : got.entrySet()) {
                 long rest = Sim.addSlots(cargo, 0, v.slots, e.getKey(), e.getValue());
@@ -974,7 +976,7 @@ public final class Factories {
             }
             long took = System.nanoTime() - t0;
             workerLastNanos = took;
-            workerAvgNanos = workerAvgNanos == 0 ? took : workerAvgNanos * 0.9 + took * 0.1;
+            workerAvgNanos = workerAvgNanos == 0 ? took : workerAvgNanos * WORKER_AVG_KEEP + took * WORKER_AVG_NEW;
         });
     }
 

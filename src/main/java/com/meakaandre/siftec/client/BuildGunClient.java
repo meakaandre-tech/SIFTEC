@@ -72,6 +72,8 @@ public final class BuildGunClient {
         for (Object key : VEHICLE_EDGE) outliner.remove(key);
     }
     private static final int GREEN = 0x5CD65C, RED = 0xE03C3C, BLUE = 0x4AA8FF;
+    /** How far a vehicle's outline stands off its body (blocks). */
+    private static final double VEHICLE_OUTLINE_GROW = 0.05;
 
     static int category;
     static final int[] picked = new int[Category.values().length];
@@ -192,7 +194,7 @@ public final class BuildGunClient {
         int[][] moves = {{ahead.getStepX(), ahead.getStepZ()}, {-ahead.getStepX(), -ahead.getStepZ()},
             {ahead.getCounterClockWise().getStepX(), ahead.getCounterClockWise().getStepZ()}, {ahead.getClockWise().getStepX(), ahead.getClockWise().getStepZ()}};
         KeyMapping[] wasd = {o.keyUp, o.keyDown, o.keyLeft, o.keyRight};
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < wasd.length; i++) {
             while (wasd[i].consumeClick()) {
                 if (nudge && frozen != null) frozen = frozen.moved(moves[i][0], 0, moves[i][1]);
             }
@@ -257,19 +259,19 @@ public final class BuildGunClient {
             VehicleEntity vehicle = v != null && v.hasBox() ? Vehicles.aimed(player) : null;
             if (vehicle != null) {
                 outliner.remove(TARGET);
-                Vec3[] c = vehicle.bodyCorners(0.05);
+                Vec3[] c = vehicle.bodyCorners(VEHICLE_OUTLINE_GROW);
                 for (int i = 0; i < EDGES.length; i++) {
-                    outliner.showLine(VEHICLE_EDGE[i], c[EDGES[i][0]], c[EDGES[i][1]]).colored(v.ok() ? RED : BLUE).disableLineNormals().lineWidth(1 / 12f);
+                    outliner.showLine(VEHICLE_EDGE[i], c[EDGES[i][0]], c[EDGES[i][1]]).colored(v.ok() ? RED : BLUE).disableLineNormals().lineWidth(PrefabPreview.HIGHLIGHT_LINE);
                 }
             } else if (v != null && v.hasBox()) {
                 removeVehicleEdges(outliner);
                 AABB box = new AABB(v.min().getX(), v.min().getY(), v.min().getZ(), v.max().getX() + 1, v.max().getY() + 1, v.max().getZ() + 1);
-                outliner.showAABB(TARGET, box).colored(v.ok() ? RED : BLUE).disableLineNormals().lineWidth(1 / 12f).withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
+                outliner.showAABB(TARGET, box).colored(v.ok() ? RED : BLUE).disableLineNormals().lineWidth(PrefabPreview.HIGHLIGHT_LINE).withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
             } else {
                 removeVehicleEdges(outliner);
                 outliner.remove(TARGET);
             }
-            if (ticks % 10 == 0) player.sendOverlayMessage(Component.translatable("siftec.build_gun.overlay_dismantle",
+            if (ticks % PrefabPreview.OVERLAY_TICKS == 0) player.sendOverlayMessage(Component.translatable("siftec.build_gun.overlay_dismantle",
                 v == null ? Component.translatable("siftec.build_gun.dismantle_aim") : v.message()));
             return;
         }
@@ -279,12 +281,13 @@ public final class BuildGunClient {
             outliner.remove(SHAPE);
             outliner.remove(BLOCKED);
             shown = null;
-            if (ticks % 10 == 0) player.sendOverlayMessage(def == null ? Component.translatable("siftec.build_gun.overlay_none", tab())
+            if (ticks % PrefabPreview.OVERLAY_TICKS == 0) player.sendOverlayMessage(def == null ? Component.translatable("siftec.build_gun.overlay_none", tab())
                 : Component.translatable("siftec.build_gun.overlay", tab(), def.name(), Component.translatable("siftec.prefab.aim", Buildings.RANGE)));
             return;
         }
         // the HUB is a big structure: its ground and space are checked at most every third tick, and twice a second
-        boolean rebuild = def.structure() ? (!spot.equals(shown) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10 : !spot.equals(shown) || ticks % 10 == 0;
+        boolean rebuild = def.structure() ? (!spot.equals(shown) && ticks - lastRebuild >= PrefabPreview.MIN_RECHECK_TICKS) || ticks - lastRebuild >= PrefabPreview.RECHECK_TICKS
+            : !spot.equals(shown) || ticks % PrefabPreview.RECHECK_TICKS == 0;
         if (rebuild) {
             lastRebuild = ticks;
             VehicleKind vehicle = Vehicles.kind(def);
@@ -317,11 +320,11 @@ public final class BuildGunClient {
         boolean ok = oreNode ? same && v.ok() : localOk && (!same || v.ok());
         int color = ok ? GREEN : RED;
         if (rebuild || color != lastColor) {
-            outliner.showCluster(SHAPE, shape).colored(color).disableLineNormals().lineWidth(1 / 16f).withFaceTexture(AllSpecialTextures.CHECKERED);
+            outliner.showCluster(SHAPE, shape).colored(color).disableLineNormals().lineWidth(PrefabPreview.SHAPE_LINE).withFaceTexture(AllSpecialTextures.CHECKERED);
             if (blocked.isEmpty()) {
                 outliner.remove(BLOCKED);
             } else {
-                outliner.showCluster(BLOCKED, blocked).colored(RED).disableLineNormals().lineWidth(1 / 12f).withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
+                outliner.showCluster(BLOCKED, blocked).colored(RED).disableLineNormals().lineWidth(PrefabPreview.HIGHLIGHT_LINE).withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
             }
             lastColor = color;
         } else {
@@ -329,7 +332,7 @@ public final class BuildGunClient {
             outliner.keep(BLOCKED);
         }
         shown = spot;
-        if (ticks % 10 == 0) {
+        if (ticks % PrefabPreview.OVERLAY_TICKS == 0) {
             Component status = same && (oreNode || localOk && !v.ok()) ? v.message() : localMessage;
             player.sendOverlayMessage(Component.translatable(nudge ? "siftec.build_gun.overlay_nudge" : "siftec.build_gun.overlay", tab(), def.name(), status));
         }

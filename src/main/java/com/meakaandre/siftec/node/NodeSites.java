@@ -22,6 +22,9 @@ import java.util.Locale;
  * the ore while it stands. Fluid nodes (oil, nitrogen) are their own unbreakable blocks and are not in this list.
  */
 public final class NodeSites {
+    /** Blocks between two points tested along a player's line of sight. */
+    private static final double LOOK_STEP = 0.05;
+
     private NodeSites() {
     }
 
@@ -112,7 +115,7 @@ public final class NodeSites {
         Vec3 eye = player.getEyePosition();
         Vec3 dir = player.getViewVector(1f);
         BlockPos last = null;
-        for (double t = 0; t <= reach; t += 0.05) {
+        for (double t = 0; t <= reach; t += LOOK_STEP) {
             BlockPos pos = BlockPos.containing(eye.add(dir.scale(t)));
             if (pos.equals(last)) continue;
             last = pos;

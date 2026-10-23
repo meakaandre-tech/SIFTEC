@@ -29,6 +29,9 @@ import org.jspecify.annotations.Nullable;
  * clear the volume. Anything else it does is a building controller's (the Customizer, its status).
  */
 public class DesignerBlock extends ControllerBlock {
+    /** Neighbour-update limit passed when the Designer clears its volume (vanilla's default). */
+    private static final int DESTROY_UPDATE_LIMIT = 512;
+
     /** Blocks from the volume's middle column to each side: 4 makes a 9-block cube (Mk.1), 6 a 13-block cube (Mk.2), 8 a 17-block cube (Mk.3). */
     public final int reach;
 
@@ -83,7 +86,7 @@ public class DesignerBlock extends ControllerBlock {
             // a Build Gun building's blocks come down only with the Build Gun, never with the Designer
             if (level.getBlockState(at).isAir() || level.getBlockState(at).getDestroySpeed(level, at) < 0 || !Claims.allowed(player, level, at)
                 || Buildings.protectedAt(level, at)) continue;
-            level.destroyBlock(at, true, player, 512);
+            level.destroyBlock(at, true, player, DESTROY_UPDATE_LIMIT);
             cleared++;
         }
         server.sendOverlayMessage(Component.translatable("siftec.blueprint.cleared", cleared));

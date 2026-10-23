@@ -1,6 +1,9 @@
 package com.meakaandre.siftec.sim;
 
+import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.PowerRole;
+import com.meakaandre.siftec.power.Power;
+import com.meakaandre.siftec.power.PowerMember;
 import com.meakaandre.siftec.sim.SimData.Link;
 import com.meakaandre.siftec.sim.SimData.Node;
 import com.meakaandre.siftec.sim.SimData.Recipe;
@@ -50,6 +53,20 @@ public final class Sim {
     static final String WATER = "fluid:minecraft:water";
     /** Ticks a belt's unused allowance is kept for at least (a long step keeps its own length). */
     static final int ALLOWANCE_TICKS = 40;
+    /** Added before flooring a running fraction, so a sum that should be whole is not lost to rounding. */
+    static final double FLOOR_EPSILON = 1e-9;
+    /** Most passes of one step's loop (a miner's: {@link #MINE_GUARD}): a stop against a loop that never ends. */
+    private static final int GUARD = 10_000, MINE_GUARD = 100_000;
+    /** Share of its top speed the autopilot keeps on the straight. */
+    private static final double AUTOPILOT_SPEED = 0.8;
+    /** Slowest speed (blocks a tick) a leg's time is worked out at, so a stopped kind still gets somewhere. */
+    private static final double MIN_SPEED = 0.05;
+    /** Ticks added to every worked-out leg for slowing down near its end. */
+    private static final int LEG_EXTRA_TICKS = 2;
+    /** Ticks short of a leg's time that count as having driven it. */
+    private static final double LEG_EPSILON = 1e-6;
+    /** Squared length a leg needs for the vehicle to turn to face along it. */
+    private static final double MIN_HEADING_SQR = 1e-6;
 
     private Sim() {
     }
@@ -218,7 +235,7 @@ public final class Sim {
     }
 
     static double suTicksOfMj(double mj) {
-        return mj * 204.8 * 20;
+        return mj * Power.SU_PER_MW * 20;
     }
 
     /** Burns this much of a generator's energy: out of its machines first, then its next fuel. */
@@ -286,7 +303,7 @@ public final class Sim {
                 if (!n.tripped) {
                     caps[i] = n.fullSu;
                     flat += n.fullSu;
-                    boost += n.fed > 0 || hasMatrix(n) ? 0.3 : 0.1;
+                    boost += n.fed > 0 || hasMatrix(n) ? PowerMember.FED_BOOST : PowerMember.UNFED_BOOST;
                 }
             } else if (generator(n)) {
                 if (!n.tripped) {
@@ -359,11 +376,11 @@ public final class Sim {
     }
 
     static double storageCap() {
-        return 100 * 204.8 * 72_000;
+        return BuildingPower.STORAGE_MWH * Power.SU_PER_MW * Power.TICKS_PER_HOUR;
     }
 
     static double storageRate() {
-        return 100 * 204.8;
+        return BuildingPower.STORAGE_CHARGE_MW * Power.SU_PER_MW;
     }
 
     private static boolean hasMatrix(Node n) {
@@ -461,7 +478,7 @@ public final class Sim {
     /** A Basin building (and the line, packaging and processing buildings): one recipe at a time at its Satisfactory time. */
     static void craft(Node n, long t0, long end) {
         long t = t0;
-        for (int guard = 0; guard < 10_000; guard++) {
+        for (int guard = 0; guard < GUARD; guard++) {
             if (!n.pending.isEmpty() || !n.pendingFluid.isEmpty()) {
                 if (n.pendingAt > end) break;
                 t = Math.max(t, n.pendingAt);
@@ -497,7 +514,7 @@ public final class Sim {
     /** The Smelter: up to a batch of one ore at a time, each item taking the recipe's time; the ingots out when the batch is done. */
     static void smelt(Node n, long t0, long end) {
         long t = t0;
-        for (int guard = 0; guard < 10_000; guard++) {
+        for (int guard = 0; guard < GUARD; guard++) {
             if (!n.pending.isEmpty()) {
                 if (n.pendingAt > end) break;
                 t = Math.max(t, n.pendingAt);
@@ -525,7 +542,7 @@ public final class Sim {
     static void mine(Node n, long t0, long end) {
         if (n.mineItem.isEmpty() || n.minePeriod <= 0) return;
         if (n.nextBreak == Long.MIN_VALUE) n.nextBreak = t0 + n.minePeriod;
-        for (int guard = 0; guard < 100_000 && n.nextBreak <= end; guard++) {
+        for (int guard = 0; guard < MINE_GUARD && n.nextBreak <= end; guard++) {
             if (n.su > 0 && !n.powered) {
                 n.nextBreak = end + 1;
                 return;
@@ -536,7 +553,7 @@ public final class Sim {
                 return;
             }
             n.frac += n.minePer;
-            long got = (long) Math.floor(n.frac + 1e-9);
+            long got = (long) Math.floor(n.frac + FLOOR_EPSILON);
             n.frac -= got;
             add(n.out, n.mineItem, got);
             n.mined += got;
@@ -630,7 +647,7 @@ public final class Sim {
         Map<String, Long> src = source(from, l.fluid);
         if (src.isEmpty()) return;
         for (String key : new ArrayList<>(src.keySet())) {
-            long can = Math.min((long) Math.floor(l.allowance + 1e-9), space);
+            long can = Math.min((long) Math.floor(l.allowance + FLOOR_EPSILON), space);
             if (can <= 0) break;
             long n = Math.min(can, get(src, key));
             if (n <= 0) continue;
@@ -688,7 +705,7 @@ public final class Sim {
     static void port(Node n, long t0, long end, Group g) {
         pad(n.slots, PORT_SIZE);
         long t = t0;
-        for (int guard = 0; guard < 10_000 && t < end; guard++) {
+        for (int guard = 0; guard < GUARD && t < end; guard++) {
             if (n.state == IDLE) {
                 if (!n.hasDrone || n.destination == null) return;
                 long next = (t / 20 + 1) * 20;
@@ -767,7 +784,7 @@ public final class Sim {
         double dx = v.px(to) - v.px(from), dz = v.pz(to) - v.pz(from);
         double dist = Math.sqrt(dx * dx + dz * dz);
         // the autopilot keeps to 80% of its top speed on the straight, less near a stop
-        return Math.max(1, dist / Math.max(0.05, v.speed * 0.8)) + 2;
+        return Math.max(1, dist / Math.max(MIN_SPEED, v.speed * AUTOPILOT_SPEED)) + LEG_EXTRA_TICKS;
     }
 
     static int stopIndex(Vehicle v, int point) {
@@ -783,7 +800,7 @@ public final class Sim {
         if (dt <= 0 || n < 2) return;
         double perTick = v.mw / 20.0;
         double left = dt;
-        for (int guard = 0; guard < 10_000 && left > 0; guard++) {
+        for (int guard = 0; guard < GUARD && left > 0; guard++) {
             if (v.target >= n) v.target = 0;
             if (v.docked >= 0) {
                 double use = Math.min(left, DOCK_TICKS - v.docked);
@@ -806,7 +823,7 @@ public final class Sim {
             v.leg += use;
             left -= use;
             v.fuel = Math.max(0, v.fuel - use * perTick);
-            if (v.leg + 1e-6 < total) continue;
+            if (v.leg + LEG_EPSILON < total) continue;
             int stop = stopIndex(v, v.target);
             if (stop >= 0) {
                 dock(v, stop, g);
@@ -830,7 +847,7 @@ public final class Sim {
         v.y = v.py(from) + (v.py(to) - v.py(from)) * f;
         v.z = v.pz(from) + (v.pz(to) - v.pz(from)) * f;
         double dx = v.px(to) - v.px(from), dz = v.pz(to) - v.pz(from);
-        if (dx * dx + dz * dz > 1e-6) v.yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+        if (dx * dx + dz * dz > MIN_HEADING_SQR) v.yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
     }
 
     /**

@@ -85,6 +85,12 @@ public final class BuildingPower {
     public static final double STANDBY_SU = 1;
     /** Satisfactory's Power Storage: 100 MWh, charged at up to 100 MW. */
     public static final double STORAGE_MWH = 100, STORAGE_CHARGE_MW = 100;
+    /** mB in a cubic metre of a Satisfactory fluid when siftec_content.json does not say ("mb_per_m3"). */
+    static final int DEFAULT_MB_PER_M3 = 40;
+    /** The Augmenter's boost to its grid's capacity: with an Alien Power Matrix burning, and without. */
+    private static final double AUGMENTER_FED_BOOST = 0.3, AUGMENTER_BOOST = 0.1;
+    /** The same boosts in percent, as its status shows them. */
+    private static final int AUGMENTER_FED_BOOST_PERCENT = 30, AUGMENTER_BOOST_PERCENT = 10;
 
     private BuildingPower() {
     }
@@ -221,7 +227,7 @@ public final class BuildingPower {
     /** Nuclear rods: the waste each leaves, and how many. */
     private static final Map<String, String> WASTE = new HashMap<>();
     private static final Map<String, Integer> WASTE_COUNT = new HashMap<>();
-    private static int mbPerM3 = 40;
+    private static int mbPerM3 = DEFAULT_MB_PER_M3;
     private static boolean read;
 
     public static void forget() {
@@ -597,7 +603,7 @@ public final class BuildingPower {
                 if (perMb <= 0 || tank == null) return;
                 long mb = (long) Math.floor(suTicks / Power.suTicksOfMj(perMb));
                 if (mb <= 0) return;
-                Transfers.insert(tank, FluidVariant.of(fluid), mb * (FluidConstants.BUCKET / 1000));
+                Transfers.insert(tank, FluidVariant.of(fluid), mb * ProductionLogic.MB);
             }
             case NUCLEAR -> {
                 if (full <= 0) return;
@@ -624,7 +630,7 @@ public final class BuildingPower {
         try (Transaction tx = Transaction.openOuter()) {
             for (StorageView<FluidVariant> view : tank) {
                 if (view.isResourceBlank()) continue;
-                took += tank.extract(view.getResource(), (mb - took) * (FluidConstants.BUCKET / 1000), tx) / (FluidConstants.BUCKET / 1000);
+                took += tank.extract(view.getResource(), (mb - took) * ProductionLogic.MB, tx) / ProductionLogic.MB;
                 if (took >= mb) break;
             }
             tx.commit();
@@ -661,7 +667,7 @@ public final class BuildingPower {
                     c.made++;
                 }
             }
-            return c.fedTicks > 0 ? 0.3 : 0.1;
+            return c.fedTicks > 0 ? AUGMENTER_FED_BOOST : AUGMENTER_BOOST;
         }
 
         @Override
@@ -759,13 +765,13 @@ public final class BuildingPower {
         FluidEntry entry = ModFluids.ALL.get(fluidId);
         Storage<FluidVariant> tank = tankStorage(level, pos);
         if (entry == null || tank == null) return;
-        Transfers.insert(tank, FluidVariant.of(entry.still), mb * (FluidConstants.BUCKET / 1000));
+        Transfers.insert(tank, FluidVariant.of(entry.still), mb * ProductionLogic.MB);
     }
 
     private static boolean tankFull(Level level, @Nullable BlockPos pos) {
         Storage<FluidVariant> tank = tankStorage(level, pos);
         if (tank == null) return true;
-        for (StorageView<FluidVariant> view : tank) if (view.getCapacity() - view.getAmount() >= FluidConstants.BUCKET / 1000 * ACID_PER_SECOND) return false;
+        for (StorageView<FluidVariant> view : tank) if (view.getCapacity() - view.getAmount() >= ProductionLogic.MB * ACID_PER_SECOND) return false;
         return true;
     }
 
@@ -801,7 +807,8 @@ public final class BuildingPower {
             }
             case STORAGE -> parts.add(Component.translatable("siftec.power.stored", Power.suHours(c.energy),
                 Power.suHours(Power.su(STORAGE_MWH) * Power.TICKS_PER_HOUR)));
-            case AUGMENTER -> parts.add(Component.translatable("siftec.power.augmenter", Power.su((float) Power.su(def.mw())), c.fedTicks > 0 ? 30 : 10));
+            case AUGMENTER -> parts.add(Component.translatable("siftec.power.augmenter", Power.su((float) Power.su(def.mw())),
+                c.fedTicks > 0 ? AUGMENTER_FED_BOOST_PERCENT : AUGMENTER_BOOST_PERCENT));
             case BIOMASS, COAL, FUEL, NUCLEAR, GEOTHERMAL -> {
                 parts.add(Component.translatable("siftec.power.gives", Power.su((float) c.lastGenerated), Power.su((float) c.offered)));
                 if (def.power() == PowerRole.GEOTHERMAL && level instanceof ServerLevel server) {

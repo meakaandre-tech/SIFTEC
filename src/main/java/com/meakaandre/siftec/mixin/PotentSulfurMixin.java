@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.entity.PotentSulfurBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,10 +23,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(PotentSulfurBlockEntity.class)
 public abstract class PotentSulfurMixin {
+    /** Shortest rest between eruptions, in seconds (the countdown ticks once a second). */
+    @Unique
+    private static final int MIN_REST_SECONDS = 18;
+    /** Each of the two rolls added to the rest is 0 to this minus one seconds. */
+    @Unique
+    private static final int REST_ROLL_SECONDS = 25;
+
     @Inject(method = "lambda$static$4", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/PotentSulfurBlockEntity;waitingCountdown:I",
         opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     private static void siftec$unevenRest(Level level, BlockPos pos, BlockState state, PotentSulfurBlockEntity geyser, CallbackInfo ci) {
         // two rolls added together: most rests land near the middle, a few near either end
-        geyser.waitingCountdown = 18 + level.getRandom().nextInt(25) + level.getRandom().nextInt(25);
+        geyser.waitingCountdown = MIN_REST_SECONDS + level.getRandom().nextInt(REST_ROLL_SECONDS) + level.getRandom().nextInt(REST_ROLL_SECONDS);
     }
 }

@@ -48,6 +48,8 @@ public final class ExtractorLogic {
     private static final Map<ResourceKey<Level>, Map<BlockPos, Well>> WELLS = new HashMap<>();
     /** How many Extractors one running Pressurizer pressurizes (Satisfactory's wells have up to eight satellite nodes). */
     public static final int WELL_EXTRACTORS = 8;
+    /** How many ticks an Extractor's ask for its well, or a Pressurizer's last run, still counts as current. */
+    private static final int RECENT_TICKS = 5;
 
     /** A Resource Well Extractor that asked for its well recently: when, and its company. */
     private record Asker(long at, String company) {
@@ -162,10 +164,10 @@ public final class ExtractorLogic {
 
     /** Shares the Extractors that asked recently out to the running Pressurizers (see {@link #draw}). */
     private static Map<BlockPos, Draw> share(ServerLevel level, Map<BlockPos, Asker> askers, long now) {
-        askers.values().removeIf(a -> now - a.at() > 5 || a.at() > now);
+        askers.values().removeIf(a -> now - a.at() > RECENT_TICKS || a.at() > now);
         Map<BlockPos, Well> wells = WELLS.getOrDefault(level.dimension(), Map.of());
         List<BlockPos> running = new ArrayList<>();
-        for (Map.Entry<BlockPos, Well> e : wells.entrySet()) if (now - e.getValue().at() <= 5) running.add(e.getKey());
+        for (Map.Entry<BlockPos, Well> e : wells.entrySet()) if (now - e.getValue().at() <= RECENT_TICKS) running.add(e.getKey());
         double range = (double) WELL_RANGE * WELL_RANGE;
         // each Extractor's Pressurizers in range, nearest first
         Map<BlockPos, List<BlockPos>> reach = new HashMap<>();
@@ -208,7 +210,7 @@ public final class ExtractorLogic {
 
     /** Fills the tank at the building's rate times the purity; what does not fit waits (the tank is full). */
     private static void produce(ServerLevel level, ControllerBlockEntity c, BuildingDef def, float purity) {
-        c.fluidOwed += def.rate() * purity / 1200.0;
+        c.fluidOwed += def.rate() * purity / BuildingDef.TICKS_PER_MINUTE;
         long whole = (long) c.fluidOwed;
         if (whole <= 0) {
             c.problem = "";
@@ -220,7 +222,7 @@ public final class ExtractorLogic {
         c.mined += put;
         // a full tank does not bank more than a tick's worth
         if (put < whole) {
-            c.fluidOwed = Math.min(c.fluidOwed, def.rate() * purity / 1200.0);
+            c.fluidOwed = Math.min(c.fluidOwed, def.rate() * purity / BuildingDef.TICKS_PER_MINUTE);
             c.problem = "siftec.building.full";
         } else {
             c.problem = "";
@@ -250,6 +252,6 @@ public final class ExtractorLogic {
     /** mB in a cubic metre of a Satisfactory fluid (siftec_content.json "mb_per_m3"). */
     static int mbPerM3() {
         var raw = Milestones.raw();
-        return raw != null && raw.has("mb_per_m3") ? raw.get("mb_per_m3").getAsInt() : 40;
+        return raw != null && raw.has("mb_per_m3") ? raw.get("mb_per_m3").getAsInt() : BuildingPower.DEFAULT_MB_PER_M3;
     }
 }

@@ -64,6 +64,14 @@ public final class Blueprints {
     /** The last spot each player previewed a blueprint at, and when. Using it there again builds it. */
     private static final Map<UUID, long[]> PREVIEW = new ConcurrentHashMap<>();
     private static final int CONFIRM_TICKS = 20 * 30;
+    /** Quarter turns in a whole turn. */
+    private static final int QUARTER_TURNS = 4;
+    /** Slack on the outline's last step, so floating-point error does not drop the far corner. */
+    static final double OUTLINE_END = 1.0001;
+    /** Edges of a box parallel to each axis. */
+    static final int EDGES_PER_AXIS = 4;
+    /** Holograms are checked this often (ticks). */
+    private static final int GHOST_CHECK_TICKS = 20;
 
     private Blueprints() {
     }
@@ -159,7 +167,7 @@ public final class Blueprints {
 
     /** Turns the blueprint a quarter turn clockwise and says which way it now faces (0 to 3 quarter turns). */
     public static int rotate(ServerPlayer player, ItemStack stack) {
-        int turns = (data(stack).getIntOr("turns", 0) + 1) % 4;
+        int turns = (data(stack).getIntOr("turns", 0) + 1) % QUARTER_TURNS;
         CustomData.update(DataComponents.CUSTOM_DATA, stack, root -> {
             CompoundTag tag = root.getCompoundOrEmpty("siftec_blueprint");
             tag.putInt("turns", turns);
@@ -206,8 +214,8 @@ public final class Blueprints {
     private static void outline(ServerLevel level, ServerPlayer player, BlockPos base, int side) {
         int half = side / 2;
         AABB box = new AABB(base.getX() - half, base.getY(), base.getZ() - half, base.getX() + half + 1, base.getY() + side, base.getZ() + half + 1);
-        for (double t = 0; t <= 1.0001; t += 1.0 / side) {
-            for (int i = 0; i < 4; i++) {
+        for (double t = 0; t <= OUTLINE_END; t += 1.0 / side) {
+            for (int i = 0; i < EDGES_PER_AXIS; i++) {
                 double a = (i & 1) == 0 ? 0 : 1, b = (i & 2) == 0 ? 0 : 1;
                 level.sendParticles(player, ParticleTypes.HAPPY_VILLAGER, true, false, box.minX + box.getXsize() * t, box.minY + box.getYsize() * a, box.minZ + box.getZsize() * b, 1, 0, 0, 0, 0);
                 level.sendParticles(player, ParticleTypes.HAPPY_VILLAGER, true, false, box.minX + box.getXsize() * a, box.minY + box.getYsize() * t, box.minZ + box.getZsize() * b, 1, 0, 0, 0, 0);
@@ -252,7 +260,7 @@ public final class Blueprints {
 
     /** Called every server tick: holograms whose time is up, or whose player has gone, are taken down. */
     public static void tick(MinecraftServer server) {
-        if (GHOSTS.isEmpty() || server.getTickCount() % 20 != 0) return;
+        if (GHOSTS.isEmpty() || server.getTickCount() % GHOST_CHECK_TICKS != 0) return;
         long now = server.overworld().getGameTime();
         for (UUID id : List.copyOf(GHOSTS.keySet())) {
             if (server.getPlayerList().getPlayer(id) == null || GHOSTS_UNTIL.getOrDefault(id, 0L) <= now) clearGhosts(id);

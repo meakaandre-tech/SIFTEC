@@ -62,6 +62,28 @@ public final class BuildingScenes {
     static final Identifier SCHEMATIC = Siftec.id("building");
     private static final BlockState PLATE = Blocks.SMOOTH_STONE.defaultBlockState();
     private static final int FLAGS = 2;
+    /** How long a building's own line stays up (ticks): a base plus three ticks per four characters, within these bounds. */
+    private static final int MIN_LINE_TICKS = 70, MAX_LINE_TICKS = 200, BASE_LINE_TICKS = 40;
+    /** How long a shared line, and the outline shown with it, stays up (ticks). */
+    private static final int SHARED_LINE_TICKS = 90;
+    /** How long the HUB or Gateway terminal's outline stays up (ticks). */
+    private static final int TERMINAL_OUTLINE_TICKS = 120;
+    /** Pause after each line before the next (ticks). */
+    private static final int LINE_GAP_TICKS = 10;
+    /** Height in the window of a line that points at nothing. */
+    private static final int FREE_TEXT_Y = 10;
+    /** Pauses: after the plate shows, after the building drops in, after a vehicle appears (ticks). */
+    private static final int PLATE_IDLE_TICKS = 10, SHOW_IDLE_TICKS = 25, VEHICLE_IDLE_TICKS = 20;
+    /** Ticks each HUB upgrade and each Gateway phase is shown for, and the pause after the last one. */
+    private static final int HUB_LEVEL_TICKS = 30, GATEWAY_LEVEL_TICKS = 45, GROWN_IDLE_TICKS = 30;
+    /** Blocks of the scene that fit the window at scale 1, and the share of a building's height counted against it. */
+    private static final float VIEW_BLOCKS = 5.5f, HEIGHT_WEIGHT = 0.9f;
+    /** Plate margin round a vehicle (blocks, both sides together). */
+    private static final int VEHICLE_MARGIN = 4;
+    /** A vehicle's yaw for a three-quarter view (degrees). */
+    private static final int VEHICLE_YAW = -30;
+    /** Height above a vehicle its lines point at (blocks). */
+    private static final double VEHICLE_LABEL_RISE = 1.2;
 
     private BuildingScenes() {
     }
@@ -111,7 +133,7 @@ public final class BuildingScenes {
 
     /** How long a line stays up: long enough to read it. */
     private static int ticks(String text) {
-        return Math.max(70, Math.min(200, 40 + text.length() * 3 / 4));
+        return Math.max(MIN_LINE_TICKS, Math.min(MAX_LINE_TICKS, BASE_LINE_TICKS + text.length() * 3 / 4));
     }
 
     /** One of the building's own lines, pointing at a spot (or standing on its own when there is none). */
@@ -119,17 +141,17 @@ public final class BuildingScenes {
         int t = ticks(text);
         var box = scene.overlay().showText(t).text(text).attachKeyFrame();
         if (at != null) box.pointAt(at).placeNearTarget();
-        else box.independent(10);
-        scene.idle(t + 10);
+        else box.independent(FREE_TEXT_Y);
+        scene.idle(t + LINE_GAP_TICKS);
     }
 
     /** A shared line (siftec.ponder.shared.<key>), pointing at a spot. */
     private static void shared(SceneBuilder scene, String key, @Nullable Vec3 at, Object... args) {
-        int t = 90;
+        int t = SHARED_LINE_TICKS;
         var box = scene.overlay().showText(t).sharedText(key, args).attachKeyFrame();
         if (at != null) box.pointAt(at).placeNearTarget();
-        else box.independent(10);
-        scene.idle(t + 10);
+        else box.independent(FREE_TEXT_Y);
+        scene.idle(t + LINE_GAP_TICKS);
     }
 
     private static String cost(BuildingDef def) {
@@ -156,7 +178,7 @@ public final class BuildingScenes {
     /** Sizes the view so the whole plate and the building's height fit the window. */
     private static void frame(SceneBuilder scene, int plate, int height) {
         scene.configureBasePlate(0, 0, plate);
-        float scale = Math.min(1f, 5.5f / Math.max(plate, height * 0.9f));
+        float scale = Math.min(1f, VIEW_BLOCKS / Math.max(plate, height * HEIGHT_WEIGHT));
         scene.scaleSceneView(scale);
         // a building taller than its plate is wide stands lower in the window
         if (height > plate) scene.setSceneOffsetY(-(height - plate) / 2f);
@@ -217,16 +239,16 @@ public final class BuildingScenes {
 
         frame(scene, size, h + 1);
         scene.showBasePlate();
-        scene.idle(10);
+        scene.idle(PLATE_IDLE_TICKS);
         scene.world().showSection(util.select().fromTo(0, 1, 0, size - 1, h + 1, size - 1), Direction.DOWN);
-        scene.idle(25);
+        scene.idle(SHOW_IDLE_TICKS);
 
         Vec3 top = util.vector().of(size / 2.0, h + 1, size / 2.0);
         List<String> lines = lines(def);
         for (int i = 0; i < lines.size(); i++) say(scene, lines.get(i), i == 0 ? top : null);
 
         if (node != null) {
-            scene.overlay().showOutline(PonderPalette.GREEN, "node", util.select().position(node), 90);
+            scene.overlay().showOutline(PonderPalette.GREEN, "node", util.select().position(node), SHARED_LINE_TICKS);
             shared(scene, "node", util.vector().centerOf(node));
         }
         for (PortBlock.Kind kind : PortBlock.Kind.values()) {
@@ -234,14 +256,14 @@ public final class BuildingScenes {
             if (list == null || list.isEmpty()) continue;
             Selection sel = util.select().position(list.getFirst());
             for (BlockPos p : list) sel = sel.add(util.select().position(p));
-            scene.overlay().showOutline(kind.input() ? PonderPalette.INPUT : PonderPalette.OUTPUT, kind, sel, 90);
+            scene.overlay().showOutline(kind.input() ? PonderPalette.INPUT : PonderPalette.OUTPUT, kind, sel, SHARED_LINE_TICKS);
             BlockPos first = list.getFirst();
             shared(scene, kind.getSerializedName(), util.vector().blockSurface(first, facing.getOrDefault(first, Direction.SOUTH)));
         }
         power(def, scene, util, controller, connector);
         if (controller != null) {
             Vec3 panel = util.vector().centerOf(controller);
-            scene.overlay().showOutline(PonderPalette.WHITE, "panel", util.select().position(controller), 90);
+            scene.overlay().showOutline(PonderPalette.WHITE, "panel", util.select().position(controller), SHARED_LINE_TICKS);
             shared(scene, "panel", panel);
             if (BuildingLogic.hasFilter(def)) shared(scene, "panel_filter", panel);
         }
@@ -264,7 +286,7 @@ public final class BuildingScenes {
             shared(scene, "power_use", at, Power.fmt(def.su()));
         }
         if (connector != null) {
-            scene.overlay().showOutline(PonderPalette.BLUE, "connector", util.select().position(connector), 90);
+            scene.overlay().showOutline(PonderPalette.BLUE, "connector", util.select().position(connector), SHARED_LINE_TICKS);
             shared(scene, "power_wire", util.vector().topOf(connector));
         }
         if (generator || kind == PowerRole.STORAGE) shared(scene, "fuse", at);
@@ -302,9 +324,9 @@ public final class BuildingScenes {
 
         frame(scene, size, h + 1);
         scene.showBasePlate();
-        scene.idle(10);
+        scene.idle(PLATE_IDLE_TICKS);
         scene.world().showSection(util.select().fromTo(0, 1, 0, size - 1, h + 1, size - 1), Direction.DOWN);
-        scene.idle(25);
+        scene.idle(SHOW_IDLE_TICKS);
 
         int[] terminal = hub ? Templates.HUB_TERMINAL : Templates.GATEWAY_TERMINAL;
         BlockPos term = spots.getOrDefault(Template.key(terminal[0], terminal[1], terminal[2]),
@@ -314,7 +336,7 @@ public final class BuildingScenes {
         int line = 0;
         if (line < lines.size()) say(scene, lines.get(line++), util.vector().topOf(term));
         if (line < lines.size()) {
-            scene.overlay().showOutline(PonderPalette.WHITE, "terminal", util.select().position(term), 120);
+            scene.overlay().showOutline(PonderPalette.WHITE, "terminal", util.select().position(term), TERMINAL_OUTLINE_TICKS);
             say(scene, lines.get(line++), util.vector().topOf(term));
         }
         // the levels, one after another: the HUB's upgrades, the Gateway's phases
@@ -324,11 +346,11 @@ public final class BuildingScenes {
             scene.addInstruction(new Grow(t, spots, lvl, util.select().fromTo(0, 1, 0, size - 1, h + 1, size - 1)));
             if (lvl == 1 && growing != null) {
                 int dur = ticks(growing);
-                scene.overlay().showText(dur).text(growing).attachKeyFrame().independent(10);
+                scene.overlay().showText(dur).text(growing).attachKeyFrame().independent(FREE_TEXT_Y);
             }
-            scene.idle(hub ? 30 : 45);
+            scene.idle(hub ? HUB_LEVEL_TICKS : GATEWAY_LEVEL_TICKS);
         }
-        if (growing != null) scene.idle(30);
+        if (growing != null) scene.idle(GROWN_IDLE_TICKS);
         while (line < lines.size()) say(scene, lines.get(line++), line == lines.size() ? top : null);
         closing(def, scene, top);
     }
@@ -365,25 +387,25 @@ public final class BuildingScenes {
     private static void vehicle(BuildingDef def, SceneBuilder scene, SceneBuildingUtil util) {
         VehicleKind kind = Vehicles.kind(def);
         if (kind == null) throw new IllegalStateException("no vehicle kind for " + def.id());
-        int size = Math.max(kind.width, kind.length) + 4;
+        int size = Math.max(kind.width, kind.length) + VEHICLE_MARGIN;
         PonderLevel level = scene.getScene().getLevel();
         plate(level, size);
         level.createBackup();
 
         frame(scene, size, kind.height + 1);
         scene.showBasePlate();
-        scene.idle(10);
+        scene.idle(PLATE_IDLE_TICKS);
         double cx = size / 2.0, cz = size / 2.0;
         scene.world().createEntity(world -> {
             VehicleEntity e = new VehicleEntity(Vehicles.type(kind), world);
             e.setPos(cx, 1, cz);
             // a three-quarter view: its front turned towards the viewer
-            e.setYRot(-30);
-            e.yRotO = -30;
+            e.setYRot(VEHICLE_YAW);
+            e.yRotO = VEHICLE_YAW;
             return e;
         });
-        scene.idle(20);
-        Vec3 top = util.vector().of(cx, kind.height + 1.2, cz);
+        scene.idle(VEHICLE_IDLE_TICKS);
+        Vec3 top = util.vector().of(cx, kind.height + VEHICLE_LABEL_RISE, cz);
         for (String line : lines(def)) say(scene, line, top);
         closing(def, scene, top);
     }

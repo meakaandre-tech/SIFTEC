@@ -16,13 +16,15 @@ import net.minecraft.world.item.Item;
  */
 public final class Radiation {
     private static final double RANGE = 4;
+    /** Ticks between two doses. */
+    private static final int DOSE_TICKS = 40;
 
     private Radiation() {
     }
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if (server.getTickCount() % 40 != 0) return;
+            if (server.getTickCount() % DOSE_TICKS != 0) return;
             Item residue = ModItems.TOXIC_RESIDUE.get();
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 if (player.hasInfiniteMaterials() || player.isSpectator()) continue;

@@ -28,6 +28,10 @@ public final class Keys {
     private static final Map<ItemVariant, String> BY_VARIANT = new ConcurrentHashMap<>();
     private static final Map<String, ItemVariant> BY_KEY = new ConcurrentHashMap<>();
     private static final Map<String, Integer> MAX = new ConcurrentHashMap<>();
+    /** A full stack, taken for any key never seen on the server thread (and for an empty slot's room). */
+    static final int STACK = 64;
+    /** Length of the {@code "fluid:"} prefix of a fluid key. */
+    private static final int FLUID_PREFIX_LENGTH = 6;
     private static volatile @Nullable MinecraftServer server;
 
     private Keys() {
@@ -99,7 +103,7 @@ public final class Keys {
     /** The most of one key a stack holds (64 for anything never seen on the server thread). */
     public static int max(String key) {
         Integer m = MAX.get(key);
-        return m == null ? 64 : m;
+        return m == null ? STACK : m;
     }
 
     public static boolean isFluid(String key) {
@@ -117,7 +121,7 @@ public final class Keys {
 
     public static Fluid fluidOf(String key) {
         if (!isFluid(key)) return Fluids.EMPTY;
-        Identifier id = Identifier.tryParse(key.substring(6));
+        Identifier id = Identifier.tryParse(key.substring(FLUID_PREFIX_LENGTH));
         return id == null ? Fluids.EMPTY : BuiltInRegistries.FLUID.getOptional(id).orElse(Fluids.EMPTY);
     }
 

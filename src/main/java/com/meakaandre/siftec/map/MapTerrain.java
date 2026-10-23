@@ -58,6 +58,14 @@ public final class MapTerrain {
     private static final int PER_TICK = 48;
     /** Ticks a changed chunk waits before it is recorded again, so a busy build is recorded once, not every block. */
     private static final int CHANGE_DELAY = 100;
+    /** Ticks between saving tiles and dropping idle ones (a minute). */
+    private static final int SAVE_TICKS = 1200;
+    /** Colour of a column with nothing in it (the void). */
+    private static final int VOID_COLOUR = 0x202020;
+    /** Points a chunk's guess samples (2 by 2). */
+    private static final int GUESS_POINTS = 4;
+    /** Blocks between a guess's sample points, and from the chunk's corner to the first one. */
+    private static final int GUESS_SPACING = 8, GUESS_INSET = 4;
 
     /** A world-found point of interest, with the company owning it ("" for nobody). */
     public record Found(MapPoi poi, String owner) {
@@ -200,7 +208,7 @@ public final class MapTerrain {
             LevelChunk chunk = level.getChunkSource().getChunkNow(MapGrid.keyX(key), MapGrid.keyZ(key));
             if (chunk != null) record(level, chunk);
         }
-        if (++ticks % 1200 == 0) {
+        if (++ticks % SAVE_TICKS == 0) {
             saveAll();
             long cutoff = System.currentTimeMillis() - IDLE_MS;
             List<Long> idle = new ArrayList<>();
@@ -232,7 +240,7 @@ public final class MapTerrain {
                 int top = chunk.getHeight(Heightmap.Types.WORLD_SURFACE, lx, lz);
                 int colour, height;
                 if (top <= min) {
-                    colour = 0x202020 | MapTile.KNOWN;
+                    colour = VOID_COLOUR | MapTile.KNOWN;
                     height = min;
                 } else {
                     pos.set(x, top, z);
@@ -427,13 +435,13 @@ public final class MapTerrain {
 
     /** Off the server thread: the generator's ground for a chunk, at 2 by 2 points. */
     public static Guess guess(ServerLevel level, int cx, int cz, int seaLevel) {
-        int[] colour = new int[4];
-        short[] height = new short[4];
-        for (int s = 0; s < 4; s++) {
-            int x = (cx << 4) + (s & 1) * 8 + 4, z = (cz << 4) + (s >> 1) * 8 + 4;
+        int[] colour = new int[GUESS_POINTS];
+        short[] height = new short[GUESS_POINTS];
+        for (int s = 0; s < GUESS_POINTS; s++) {
+            int x = (cx << 4) + (s & 1) * GUESS_SPACING + GUESS_INSET, z = (cz << 4) + (s >> 1) * GUESS_SPACING + GUESS_INSET;
             Terrain.Column col = Terrain.column(level, x, z, false);
             if (col == null) {
-                colour[s] = 0x202020 | MapTile.KNOWN | MapTile.GUESSED;
+                colour[s] = VOID_COLOUR | MapTile.KNOWN | MapTile.GUESSED;
                 height[s] = (short) level.getMinY();
             } else if (col.y() < seaLevel - 1) {
                 colour[s] = MapPalette.water(seaLevel - 1 - col.y()) | MapTile.KNOWN | MapTile.GUESSED | MapTile.WATER;

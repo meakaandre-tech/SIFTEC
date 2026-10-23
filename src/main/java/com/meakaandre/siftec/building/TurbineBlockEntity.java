@@ -15,6 +15,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 public class TurbineBlockEntity extends GeneratingKineticBlockEntity {
     /** SU a turn it can bear: more than its coils' magnets and their own drag (480 + 2 x 24). */
     public static final float SU_PER_RPM = 600;
+    /** Its speed goes in steps of a quarter RPM: this many to the RPM. */
+    private static final int RPM_STEPS = 4;
     public float speed;
 
     public TurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -23,7 +25,7 @@ public class TurbineBlockEntity extends GeneratingKineticBlockEntity {
 
     /** Turns at this speed from now on (0 stops it). */
     public void drive(float rpm) {
-        float next = Math.round(rpm * 4) / 4f;
+        float next = Math.round(rpm * RPM_STEPS) / (float) RPM_STEPS;
         if (next == speed) return;
         speed = next;
         setChanged();

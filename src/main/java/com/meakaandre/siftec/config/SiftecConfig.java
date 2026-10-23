@@ -15,19 +15,24 @@ import java.util.Properties;
  * with its default.
  */
 public final class SiftecConfig {
+    /** Defaults written for a missing file or key. */
+    private static final int DEFAULT_SPAWN_FREE_RADIUS = 64, DEFAULT_MEMBER_COOLDOWN_HOURS = 24;
+    /** Milliseconds in an hour. */
+    private static final long MILLIS_PER_HOUR = 3_600_000L;
+
     /** No claim may come within this many blocks of the world spawn (square, horizontal). 0 turns it off. */
-    public static int spawnFreeRadius = 64;
+    public static int spawnFreeRadius = DEFAULT_SPAWN_FREE_RADIUS;
     /**
      * Hours of real time a player who left (or was kicked from) a company still counts toward its cost multiplier,
      * and before they may join that company again.
      */
-    public static int memberCooldownHours = 24;
+    public static int memberCooldownHours = DEFAULT_MEMBER_COOLDOWN_HOURS;
 
     private SiftecConfig() {
     }
 
     public static long memberCooldownMillis() {
-        return memberCooldownHours * 3_600_000L;
+        return memberCooldownHours * MILLIS_PER_HOUR;
     }
 
     public static void load() {
@@ -39,8 +44,8 @@ public final class SiftecConfig {
                     props.load(reader);
                 }
             }
-            spawnFreeRadius = read(props, "spawn_free_radius", 64);
-            memberCooldownHours = read(props, "member_cooldown_hours", 24);
+            spawnFreeRadius = read(props, "spawn_free_radius", DEFAULT_SPAWN_FREE_RADIUS);
+            memberCooldownHours = read(props, "member_cooldown_hours", DEFAULT_MEMBER_COOLDOWN_HOURS);
             Files.createDirectories(file.getParent());
             try (Writer writer = Files.newBufferedWriter(file)) {
                 props.store(writer, "SIFTEC server settings. spawn_free_radius: blocks around the world spawn where nothing can be claimed (0 = off). "

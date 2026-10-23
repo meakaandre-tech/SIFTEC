@@ -17,6 +17,9 @@ import java.util.UUID;
  * the whole thing is saved as JSON.
  */
 public class Company {
+    /** Cost multipliers closer than this count as unchanged. */
+    private static final double MULTIPLIER_EPSILON = 1e-4;
+
     public String id = UUID.randomUUID().toString();
     public String name = "";
     public Set<String> members = new LinkedHashSet<>();
@@ -96,7 +99,7 @@ public class Company {
             paidAt = now;
             return;
         }
-        if (Math.abs(paidAt - now) < 1e-4) return;
+        if (Math.abs(paidAt - now) < MULTIPLIER_EPSILON) return;
         float ratio = now / paidAt;
         paid.forEach((id, parts) -> {
             // a MAM node costs the same whatever the company's size: its parts are never scaled

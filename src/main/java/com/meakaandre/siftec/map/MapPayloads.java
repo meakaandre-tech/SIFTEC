@@ -11,6 +11,15 @@ import java.util.List;
 
 /** What the map's server and clients tell each other. */
 public final class MapPayloads {
+    /** Longest map id read from the network. */
+    private static final int MAX_MAP_ID = 64;
+    /** Largest packed tile read from the network (bytes). */
+    private static final int MAX_TILE_BYTES = 1 << 20;
+    /** Longest player name read from the network. */
+    private static final int MAX_PLAYER_NAME = 32;
+    /** Longest mover kind read from the network. */
+    private static final int MAX_MOVER_KIND = 32;
+
     private MapPayloads() {
     }
 
@@ -21,7 +30,7 @@ public final class MapPayloads {
     /** Server to client on joining: which map this is, so the client's disk cache keeps each world's tiles apart. */
     public record Hello(String mapId) implements CustomPacketPayload {
         public static final Type<Hello> TYPE = typeOf("map_hello");
-        public static final StreamCodec<RegistryFriendlyByteBuf, Hello> CODEC = StreamCodec.of((buf, p) -> buf.writeUtf(p.mapId), buf -> new Hello(buf.readUtf(64)));
+        public static final StreamCodec<RegistryFriendlyByteBuf, Hello> CODEC = StreamCodec.of((buf, p) -> buf.writeUtf(p.mapId), buf -> new Hello(buf.readUtf(MAX_MAP_ID)));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
@@ -113,7 +122,7 @@ public final class MapPayloads {
         public static final StreamCodec<RegistryFriendlyByteBuf, Tile> CODEC = StreamCodec.of((buf, p) -> {
             buf.writeLong(p.region);
             buf.writeByteArray(p.data);
-        }, buf -> new Tile(buf.readLong(), buf.readByteArray(1 << 20)));
+        }, buf -> new Tile(buf.readLong(), buf.readByteArray(MAX_TILE_BYTES)));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
@@ -181,7 +190,7 @@ public final class MapPayloads {
         }
 
         static Mate read(FriendlyByteBuf buf) {
-            return new Mate(buf.readUtf(32), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readFloat());
+            return new Mate(buf.readUtf(MAX_PLAYER_NAME), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readFloat());
         }
     }
 
@@ -215,7 +224,7 @@ public final class MapPayloads {
         }
 
         static Mover read(FriendlyByteBuf buf) {
-            return new Mover(buf.readUtf(32), buf.readDouble(), buf.readDouble(), buf.readFloat(), buf.readBoolean());
+            return new Mover(buf.readUtf(MAX_MOVER_KIND), buf.readDouble(), buf.readDouble(), buf.readFloat(), buf.readBoolean());
         }
     }
 

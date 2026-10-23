@@ -86,7 +86,8 @@ public class PortBlockEntity extends SmartBlockEntity {
         // a Basin lets its ingredients out as well as what it has made: an output port only takes what it has made
         if (kind() == PortBlock.Kind.ITEM_OUT && level.getBlockEntity(target) instanceof BasinBlockEntity basin) {
             var slots = ContainerStorage.of(basin.itemCapability, null).getSlots();
-            return FilteringStorage.extractOnlyOf(new CombinedStorage<>(new ArrayList<>(slots.subList(9, Math.min(18, slots.size())))));
+            return FilteringStorage.extractOnlyOf(new CombinedStorage<>(new ArrayList<>(
+                slots.subList(ProductionLogic.BASIN_INPUT_SLOTS, Math.min(ProductionLogic.BASIN_SLOTS, slots.size())))));
         }
         // the controller's slots (a miner's ore, the Smelter's ore and ingots, a generator's fuel) are reached only from
         // its ports: it registers no item storage of its own, so nothing beside it can take from or put into it

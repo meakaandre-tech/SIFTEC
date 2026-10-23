@@ -26,6 +26,9 @@ import java.util.Optional;
  * like a splash potion with the same effect.
  */
 public class PreserveItem extends Item {
+    /** Throw like a vanilla splash potion: pitch raised by this much (degrees), this speed, this inaccuracy. */
+    private static final float THROW_PITCH_OFFSET = -20.0f, THROW_SPEED = 0.5f, THROW_INACCURACY = 1.0f;
+
     public final Food.Intrinsic intrinsic;
 
     public PreserveItem(Food.Intrinsic intrinsic, Properties properties) {
@@ -45,7 +48,7 @@ public class PreserveItem extends Item {
             ItemStack jar = new ItemStack(Items.SPLASH_POTION);
             jar.set(DataComponents.POTION_CONTENTS, new PotionContents(Optional.empty(), Optional.empty(),
                 List.of(new MobEffectInstance(intrinsic.effect, Food.Prep.PRESERVED.duration, Food.Prep.PRESERVED.amplifier)), Optional.empty()));
-            Projectile.spawnProjectileFromRotation(ThrownSplashPotion::new, server, jar, player, -20.0f, 0.5f, 1.0f);
+            Projectile.spawnProjectileFromRotation(ThrownSplashPotion::new, server, jar, player, THROW_PITCH_OFFSET, THROW_SPEED, THROW_INACCURACY);
             player.getItemInHand(hand).consume(1, player);
         }
         return InteractionResult.SUCCESS;

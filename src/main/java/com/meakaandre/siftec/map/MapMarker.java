@@ -13,6 +13,14 @@ public final class MapMarker {
     /** The colours a marker can have. */
     public static final int[] COLOURS = {0xF2A33A, 0xE5533D, 0xF2D64B, 0x6BCB5A, 0x4FB8E8, 0x3F6FE0, 0xB06BE0, 0xF0F0F0};
     public static final int MAX_NAME = 32;
+    /** Longest marker id read from the network. */
+    private static final int MAX_ID = 64;
+    /** Longest dimension id read from the network. */
+    private static final int MAX_DIMENSION = 128;
+    /** Longest owner (player uuid) read from the network. */
+    private static final int MAX_OWNER = 64;
+    /** Bytes per character at most in a UTF-8 name. */
+    private static final int UTF8_BYTES_PER_CHAR = 4;
 
     public String id = "";
     public String dimension = "minecraft:overworld";
@@ -52,16 +60,16 @@ public final class MapMarker {
 
     public static MapMarker read(FriendlyByteBuf buf) {
         MapMarker m = new MapMarker();
-        m.id = buf.readUtf(64);
-        m.dimension = buf.readUtf(128);
+        m.id = buf.readUtf(MAX_ID);
+        m.dimension = buf.readUtf(MAX_DIMENSION);
         m.x = buf.readVarInt();
         m.y = buf.readVarInt();
         m.z = buf.readVarInt();
-        m.name = buf.readUtf(MAX_NAME * 4);
+        m.name = buf.readUtf(MAX_NAME * UTF8_BYTES_PER_CHAR);
         m.icon = buf.readVarInt();
         m.colour = buf.readVarInt();
         m.company = buf.readBoolean();
-        m.owner = buf.readUtf(64);
+        m.owner = buf.readUtf(MAX_OWNER);
         m.death = buf.readBoolean();
         m.at = buf.readLong();
         return m;

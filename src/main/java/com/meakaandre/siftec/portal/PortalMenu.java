@@ -26,11 +26,13 @@ import java.util.Set;
 /** The portal window: the company's other portals. Click one to go there. Run by the server. */
 public class PortalMenu extends ChestMenu {
     private static final int SIZE = 54;
+    /** Rows of the chest window. */
+    private static final int ROWS = 6;
     private final ServerPlayer player;
     private final List<Places.Place> shown = new ArrayList<>();
 
     private PortalMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, BlockPos here) {
-        super(MenuType.GENERIC_9x6, id, inventory, view, 6);
+        super(MenuType.GENERIC_9x6, id, inventory, view, ROWS);
         this.player = player;
         for (Places.Place place : Places.of(player.level().getServer(), company.id)) {
             if (!place.portal() || Places.same(place, player.level(), here) || shown.size() >= SIZE) continue;

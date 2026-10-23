@@ -35,6 +35,12 @@ import java.util.List;
  * miner's ore, the Smelter's ore and ingots).
  */
 public class ControllerBlockEntity extends BlockEntity {
+    /** Slots of a Nuclear Power Plant's waste store, beside its output slot. */
+    private static final int WASTE_SLOTS = 8;
+    /** Input slots of the Particle Accelerator's and the Converter's ingredient buffer. */
+    private static final int BUFFER_SLOTS = 9;
+    /** Ticks between tries to check an unindexed building's blocks against its shape. */
+    private static final int REPAIR_RETRY_TICKS = 20;
     public String buildingId = "";
     public @Nullable BlockPos anchor;
     public Direction facing = Direction.NORTH;
@@ -73,12 +79,12 @@ public class ControllerBlockEntity extends BlockEntity {
      * {@link BuildingPower#WASTE_ROOM} waste, several rods' worth as Satisfactory's plant does, so the plant keeps
      * refuelling while its waste waits to be carried away. Its output port takes from it after the output slot.
      */
-    public final SimpleContainer waste = slots(8);
+    public final SimpleContainer waste = slots(WASTE_SLOTS);
     /**
      * Nine input slots, for the Particle Accelerator's and the Converter's ingredients: slot i takes the recipe's input i
      * mod n, so a plentiful input never fills the slots a scarce one needs.
      */
-    public final SimpleContainer buffer = new SimpleContainer(9) {
+    public final SimpleContainer buffer = new SimpleContainer(BUFFER_SLOTS) {
         @Override
         public void setChanged() {
             super.setChanged();
@@ -222,7 +228,7 @@ public class ControllerBlockEntity extends BlockEntity {
         if (!(level instanceof ServerLevel server) || removing) return;
         // what the factory simulation did while its chunks did not tick goes in before it runs for real
         if (!Factories.awake(server, this)) return;
-        if (!indexed && (repairTried == 0 || server.getGameTime() - repairTried >= 20)) {
+        if (!indexed && (repairTried == 0 || server.getGameTime() - repairTried >= REPAIR_RETRY_TICKS)) {
             // its blocks are checked against its shape (and rebuilt where they differ) before they are listed again
             repairTried = server.getGameTime();
             indexed = BuildingRepair.check(server, this) != BuildingRepair.Result.WAITING;

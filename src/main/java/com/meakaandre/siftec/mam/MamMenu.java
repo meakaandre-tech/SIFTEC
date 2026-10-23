@@ -39,6 +39,10 @@ import java.util.List;
  */
 public class MamMenu extends ChestMenu {
     private static final int SIZE = 54, STATUS_SLOT = 17, FIRST_NODE = 27, MAX_NODES = 27, DRIVE_SLOT = 28, OFFER_SLOT = 31;
+    /** Rows of the chest window; the research trees fill its top row. */
+    private static final int ROWS = 6, TREE_SLOTS = 9;
+    /** The window is refreshed this often (ticks). */
+    private static final int REFRESH_TICKS = 20;
     private final SimpleContainer view;
     private final ServerPlayer player;
     /** The company it researches for: kept by id and looked up again on every refresh and click ({@link #relook}). */
@@ -50,7 +54,7 @@ public class MamMenu extends ChestMenu {
     private int ticks;
 
     private MamMenu(int id, Inventory inventory, SimpleContainer view, ServerPlayer player, Company company, BlockPos at) {
-        super(MenuType.GENERIC_9x6, id, inventory, view, 6);
+        super(MenuType.GENERIC_9x6, id, inventory, view, ROWS);
         this.view = view;
         this.player = player;
         this.companyId = company.id;
@@ -110,7 +114,7 @@ public class MamMenu extends ChestMenu {
         if (!relook()) return;
         for (int i = 0; i < SIZE; i++) view.setItem(i, ItemStack.EMPTY);
         List<Milestones.Tree> trees = Milestones.trees();
-        for (int t = 0; t < trees.size() && t < 9; t++) {
+        for (int t = 0; t < trees.size() && t < TREE_SLOTS; t++) {
             Milestones.Tree each = trees.get(t);
             if (!found(each)) {
                 view.setItem(t, button(item("minecraft:gray_dye"), Component.translatable("siftec.mam.undiscovered"),
@@ -261,7 +265,7 @@ public class MamMenu extends ChestMenu {
 
     private void press(int slot) {
         List<Milestones.Tree> trees = Milestones.trees();
-        if (slot < trees.size() && slot < 9) {
+        if (slot < trees.size() && slot < TREE_SLOTS) {
             if (!found(trees.get(slot))) {
                 player.sendOverlayMessage(Component.translatable("siftec.mam.bring", triggers(trees.get(slot))));
                 return;
@@ -324,7 +328,7 @@ public class MamMenu extends ChestMenu {
 
     @Override
     public void broadcastChanges() {
-        if (++ticks % 20 == 0) refresh();
+        if (++ticks % REFRESH_TICKS == 0) refresh();
         super.broadcastChanges();
     }
 

@@ -32,6 +32,22 @@ public final class MapHud {
     /** How far nodes and crash sites show on the compass. */
     private static final double NODE_RANGE = 120, CRASH_RANGE = 300;
     private static final String[] POINTS = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+    /** The compass strip's width: this share of the screen, within these bounds (pixels). */
+    private static final double COMPASS_SHARE = 0.45;
+    private static final int COMPASS_MIN_W = 180, COMPASS_MAX_W = 320;
+    /** Degrees the strip spans, and how far either side of the middle a mark still shows. */
+    private static final double COMPASS_SPAN = 180.0;
+    private static final int COMPASS_HALF_VIEW = 88;
+    /** Degrees between the strip's ticks, and between the points of the compass. */
+    private static final int TICK_STEP = 15, POINT_STEP = 45;
+    /** Scale of the small text under the strip and the minimap. */
+    private static final float SMALL_TEXT = 0.75f;
+    /** The same scale as a double, for measuring the small text's width. */
+    private static final double SMALL_TEXT_WIDTH = SMALL_TEXT;
+    /** Pixels outside a view an icon may stand and still be drawn (its half size). */
+    private static final int ICON_MARGIN = 8;
+    /** Below this map scale (pixels a block) nodes are left off a small map. */
+    private static final double NODE_MIN_SCALE = 0.3;
 
     private MapHud() {
     }
@@ -90,20 +106,20 @@ public final class MapHud {
         LocalPlayer player = mc.player;
         if (player == null) return;
         int sw = g.guiWidth();
-        int width = Math.clamp((int) (sw * 0.45), 180, 320);
+        int width = Math.clamp((int) (sw * COMPASS_SHARE), COMPASS_MIN_W, COMPASS_MAX_W);
         int cx = sw / 2, left = cx - width / 2, right = cx + width / 2;
-        double perDeg = width / 180.0;
+        double perDeg = width / COMPASS_SPAN;
         double heading = heading(player);
         g.fill(left, TOP, right, TOP + BAND, 0x90101418);
         g.fill(left, TOP, right, TOP + 1, 0x50FFFFFF);
         g.fill(left, TOP + BAND - 1, right, TOP + BAND, 0x50FFFFFF);
         // the scale: a tick every 15 degrees, the points of the compass every 45
-        for (int d = 0; d < 360; d += 15) {
+        for (int d = 0; d < 360; d += TICK_STEP) {
             double rel = wrap180(d - heading);
-            if (Math.abs(rel) > 88) continue;
+            if (Math.abs(rel) > COMPASS_HALF_VIEW) continue;
             int x = (int) Math.round(cx + rel * perDeg);
-            if (d % 45 == 0) {
-                String label = POINTS[d / 45];
+            if (d % POINT_STEP == 0) {
+                String label = POINTS[d / POINT_STEP];
                 int colour = d == 0 ? 0xFFFF6A4D : 0xFFE6E6E6;
                 g.centeredText(mc.font, label, x, TOP + 3, colour);
             } else {
@@ -161,23 +177,23 @@ public final class MapHud {
         // row, so they never run into each other; the bearing under the middle keeps its place
         List<List<int[]>> labelRows = new ArrayList<>();
         String bearingText = String.format(Locale.ROOT, "%03d", Math.round(heading) % 360);
-        int bearingHalf = (int) Math.ceil(mc.font.width(bearingText) * 0.75 / 2) + 1;
+        int bearingHalf = (int) Math.ceil(mc.font.width(bearingText) * SMALL_TEXT_WIDTH / 2) + 1;
         labelRows.add(new ArrayList<>(List.of(new int[]{cx + 1 - bearingHalf, cx + 1 + bearingHalf})));
         // pins at (nearly) the same bearing are spread apart a little, so each icon stays readable
         Map<Mark, Integer> spread = spreadPins(marks, heading, cx, perDeg);
         for (Mark mark : marks) {
             double rel = wrap180(mark.bearing - heading);
-            boolean edge = Math.abs(rel) > 88;
+            boolean edge = Math.abs(rel) > COMPASS_HALF_VIEW;
             if (edge && !mark.pinned) continue;
             // a pin behind the player waits at the end of the strip it is nearest
-            int x = spread.getOrDefault(mark, (int) Math.round(cx + Math.clamp(rel, -88, 88) * perDeg));
+            int x = spread.getOrDefault(mark, (int) Math.round(cx + Math.clamp(rel, -COMPASS_HALF_VIEW, COMPASS_HALF_VIEW) * perDeg));
             switch (mark.kind) {
                 case 0 -> {
                     MapClient.Pin pin = (MapClient.Pin) mark.what;
                     MapIcons.centred(g, MapIcons.DISC, x, iy, 0xC0101418);
                     MapIcons.centred(g, pin.icon(), x, iy, pin.argb());
                     String label = MapDraw.distance(mark.distance);
-                    int row = labelRow(labelRows, x, (int) Math.ceil(mc.font.width(label) * 0.75 / 2) + 2);
+                    int row = labelRow(labelRows, x, (int) Math.ceil(mc.font.width(label) * SMALL_TEXT_WIDTH / 2) + 2);
                     small(g, label, x, TOP + BAND + 2 + row * LABEL_ROW, 0xFFFFFFFF);
                 }
                 case 1 -> MapDraw.marker(g, (MapMarker) mark.what, x, iy);
@@ -209,7 +225,7 @@ public final class MapHud {
         List<int[]> xs = new ArrayList<>();
         for (int i = 0; i < pins.size(); i++) {
             double rel = wrap180(pins.get(i).bearing - heading);
-            xs.add(new int[]{(int) Math.round(cx + Math.clamp(rel, -88, 88) * perDeg), i});
+            xs.add(new int[]{(int) Math.round(cx + Math.clamp(rel, -COMPASS_HALF_VIEW, COMPASS_HALF_VIEW) * perDeg), i});
         }
         xs.sort((a, b) -> Integer.compare(a[0], b[0]));
         int start = 0;
@@ -264,7 +280,7 @@ public final class MapHud {
         Minecraft mc = Minecraft.getInstance();
         g.pose().pushMatrix();
         g.pose().translate(x, y);
-        g.pose().scale(0.75f, 0.75f);
+        g.pose().scale(SMALL_TEXT, SMALL_TEXT);
         g.text(mc.font, text, -mc.font.width(text) / 2, 0, colour, true);
         g.pose().popMatrix();
     }
@@ -299,29 +315,29 @@ public final class MapHud {
             if (!MapFilters.shows(poi) && !MapClient.pinned(poi.pinKey())) continue;
             if (!MapClient.explored(poi.x(), poi.z())) continue;
             double sx = v.sx(poi.x() + 0.5), sy = v.sy(poi.z() + 0.5);
-            if (!v.inside(sx, sy, 8)) continue;
+            if (!v.inside(sx, sy, ICON_MARGIN)) continue;
             // far out, the minimap and the zoomed-out map show only the bigger things
-            if (!big && v.scale() < 0.3 && poi.kind() == MapPoi.Kind.NODE) continue;
+            if (!big && v.scale() < NODE_MIN_SCALE && poi.kind() == MapPoi.Kind.NODE) continue;
             MapDraw.poi(g, poi, (int) Math.round(sx), (int) Math.round(sy));
         }
         for (MapMarker m : MapClient.markers) {
             if (!m.dimension.equals("minecraft:overworld") || (!MapFilters.shows(m) && !MapClient.pinned(m.pinKey()))) continue;
             double sx = v.sx(m.x + 0.5), sy = v.sy(m.z + 0.5);
-            if (v.inside(sx, sy, 8)) MapDraw.marker(g, m, (int) Math.round(sx), (int) Math.round(sy));
+            if (v.inside(sx, sy, ICON_MARGIN)) MapDraw.marker(g, m, (int) Math.round(sx), (int) Math.round(sy));
         }
         for (MapClient.Pin pin : MapClient.PINS.values()) {
             if (!pin.key().startsWith("poi:")) continue;
             double sx = v.sx(pin.x() + 0.5), sy = v.sy(pin.z() + 0.5);
-            if (v.inside(sx, sy, 8)) MapIcons.centred(g, MapIcons.PIN, (int) Math.round(sx), (int) Math.round(sy) - 7, 0xFFFFA530);
+            if (v.inside(sx, sy, ICON_MARGIN)) MapIcons.centred(g, MapIcons.PIN, (int) Math.round(sx), (int) Math.round(sy) - 7, 0xFFFFA530);
         }
         for (MapPayloads.Mover m : MapClient.movers) {
             double sx = v.sx(m.x()), sy = v.sy(m.z());
-            if (v.inside(sx, sy, 8)) MapDraw.mover(g, m, (float) sx, (float) sy);
+            if (v.inside(sx, sy, ICON_MARGIN)) MapDraw.mover(g, m, (float) sx, (float) sy);
         }
         if (MapFilters.showsPlayers()) {
             for (MapPayloads.Mate mate : MapClient.mates) {
                 double sx = v.sx(mate.x()), sy = v.sy(mate.z());
-                if (v.inside(sx, sy, 8)) MapDraw.mate(g, mate, (float) sx, (float) sy);
+                if (v.inside(sx, sy, ICON_MARGIN)) MapDraw.mate(g, mate, (float) sx, (float) sy);
             }
         }
     }

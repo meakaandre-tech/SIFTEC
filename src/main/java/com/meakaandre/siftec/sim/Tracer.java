@@ -44,6 +44,14 @@ final class Tracer {
     private static final double PORT_RATE = 1;
     /** mB a tick a pipe carries (Satisfactory's Pipeline Mk.1, 300 m3 a minute at 40 mB a m3, 10 a tick; twice that). */
     static final double PIPE_RATE = 20;
+    /** Pipe blocks a fluid search visits at most. */
+    private static final int MOST_PIPES = 512;
+    /** mB a fluid link holds at most: a base, and this much more for each pipe block it runs through. */
+    private static final long PIPE_BASE_CAP = 250L, PIPE_CAP_PER_BLOCK = 50L;
+    /** Create's belts: an RPM moves a belt 1/480 of a block a tick. */
+    private static final double RPM_PER_BLOCK_TICK = 480.0;
+    /** Ticks in a minute, for a belt's items a minute. */
+    private static final double TICKS_PER_MINUTE = 1200.0;
 
     private Tracer() {
     }
@@ -97,8 +105,8 @@ final class Tracer {
             forward = dot >= 0;
         }
         int end = forward ? len - 1 : 0, step = forward ? 1 : -1;
-        double perTick = rpm / 480.0;
-        double beltRate = rpm * SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM / 1200.0;
+        double perTick = rpm / RPM_PER_BLOCK_TICK;
+        double beltRate = rpm * SelfMovingBelts.ITEMS_PER_MINUTE_PER_RPM / TICKS_PER_MINUTE;
         double r = Math.min(rate, beltRate);
         // a tunnel on the belt splits what passes: straight on, and onto each belt beside it running away from it
         int travelled = 0;
@@ -153,7 +161,7 @@ final class Tracer {
         BlockPos first = port.relative(out);
         queue.add(first);
         dist.put(first, 1);
-        while (!queue.isEmpty() && dist.size() < 512) {
+        while (!queue.isEmpty() && dist.size() < MOST_PIPES) {
             BlockPos pos = queue.poll();
             if (!level.isLoaded(pos)) continue;
             int d = dist.get(pos);
@@ -161,7 +169,8 @@ final class Tracer {
             BlockState state = level.getBlockState(pos);
             if (be instanceof PortBlockEntity p) {
                 if (!pos.equals(port) && state.hasProperty(PortBlock.KIND) && state.getValue(PortBlock.KIND) == PortBlock.Kind.FLUID_IN && p.controller != null) {
-                    ends.add(new End(p.controller, false, pos.immutable(), PIPE_RATE, d, 250L + d * 50L, 1));
+                    ends.add(new End(p.controller, false, pos.immutable(), PIPE_RATE, d,
+                        PIPE_BASE_CAP + d * PIPE_CAP_PER_BLOCK, 1));
                 }
                 continue;
             }

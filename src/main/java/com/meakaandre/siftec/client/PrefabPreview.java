@@ -24,6 +24,12 @@ import java.util.List;
 public final class PrefabPreview {
     private static final Object SHAPE = "siftec:prefab_shape", BLOCKED = "siftec:prefab_blocked";
     private static final int GREEN = 0x5CD65C, RED = 0xE03C3C;
+    /** Outline widths: the shape's, and the thicker one for blocked blocks and targets (blocks). */
+    static final float SHAPE_LINE = 1 / 16f, HIGHLIGHT_LINE = 1 / 12f;
+    /** A big structure's ground is checked again at most this often when the spot moves, and at least this often (ticks). */
+    static final int MIN_RECHECK_TICKS = 3, RECHECK_TICKS = 10;
+    /** The action-bar message is sent again this often (ticks). */
+    static final int OVERLAY_TICKS = 10;
     private static @Nullable PreviewPayload verdict;
     private static Prefabs.@Nullable Spot shown, checked;
     private static List<BlockPos> shape = List.of(), blocked = List.of();
@@ -54,7 +60,7 @@ public final class PrefabPreview {
         ticks++;
         boolean rebuild = false;
         // checking the ground under a big structure is not free: at most every third tick, and again twice a second
-        if (checked == null || (!spot.equals(checked) && ticks - lastRebuild >= 3) || ticks - lastRebuild >= 10) {
+        if (checked == null || (!spot.equals(checked) && ticks - lastRebuild >= MIN_RECHECK_TICKS) || ticks - lastRebuild >= RECHECK_TICKS) {
             Prefabs.Check check = Prefabs.check(mc.level, spot, null, false);
             shape = cells(spot);
             blocked = new ArrayList<>(check.blocked);
@@ -70,18 +76,18 @@ public final class PrefabPreview {
         int color = ok ? GREEN : RED;
         Outliner outliner = Outliner.getInstance();
         if (rebuild || color != lastColor) {
-            outliner.showCluster(SHAPE, shape).colored(color).disableLineNormals().lineWidth(1 / 16f).withFaceTexture(AllSpecialTextures.CHECKERED);
+            outliner.showCluster(SHAPE, shape).colored(color).disableLineNormals().lineWidth(SHAPE_LINE).withFaceTexture(AllSpecialTextures.CHECKERED);
             if (blocked.isEmpty()) {
                 outliner.remove(BLOCKED);
             } else {
-                outliner.showCluster(BLOCKED, blocked).colored(RED).disableLineNormals().lineWidth(1 / 12f).withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
+                outliner.showCluster(BLOCKED, blocked).colored(RED).disableLineNormals().lineWidth(HIGHLIGHT_LINE).withFaceTexture(AllSpecialTextures.HIGHLIGHT_CHECKERED);
             }
             lastColor = color;
         } else {
             outliner.keep(SHAPE);
             outliner.keep(BLOCKED);
         }
-        if (ticks % 10 == 0) player.sendOverlayMessage(fits && same && !v.ok() ? v.message() : message);
+        if (ticks % OVERLAY_TICKS == 0) player.sendOverlayMessage(fits && same && !v.ok() ? v.message() : message);
         shown = spot;
     }
 

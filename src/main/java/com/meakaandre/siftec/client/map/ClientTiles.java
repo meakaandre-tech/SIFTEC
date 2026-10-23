@@ -31,6 +31,14 @@ public final class ClientTiles {
     private static final int FOG = 0x2A3440, FOG_LINE = 0x313C4A;
     /** Explored but not recorded yet. */
     private static final int UNKNOWN = 0x5A626A;
+    /** Pixels between the fog weave's diagonal lines. */
+    private static final int FOG_WEAVE = 6;
+    /** Hill shading: light per block of rise toward the north-west, and its most either way. */
+    private static final float SLOPE_LIGHT = 0.07f, MAX_SLOPE_LIGHT = 0.3f;
+    /** Blocks between contour lines, and between the darker major ones. */
+    private static final int CONTOUR_STEP = 16, MAJOR_CONTOUR_STEP = 64;
+    /** Light on a major contour, a contour and the shore. */
+    private static final float MAJOR_CONTOUR_LIGHT = 0.72f, CONTOUR_LIGHT = 0.86f, SHORE_LIGHT = 0.8f;
 
     /** Regions whose tile and texture are kept in memory; the least recently used beyond this are let go. */
     private static final int KEPT = 192;
@@ -209,7 +217,7 @@ public final class ClientTiles {
                 int chunkBit = (pz / MapGrid.CHUNK_PX) * MapGrid.REGION_CHUNKS + px / MapGrid.CHUNK_PX;
                 int rgb;
                 if (!MapGrid.get(fog, chunkBit)) {
-                    rgb = ((px + pz) % 6 == 0) ? FOG_LINE : FOG;
+                    rgb = ((px + pz) % FOG_WEAVE == 0) ? FOG_LINE : FOG;
                 } else if (tile == null || !tile.known(MapTile.index(px, pz))) {
                     rgb = UNKNOWN;
                 } else {
@@ -242,19 +250,19 @@ public final class ClientTiles {
         float light = 1f;
         if (!wet) {
             int nw = h(tile, px - 1, pz - 1);
-            if (nw != Integer.MIN_VALUE) light += Math.clamp((here - nw) * 0.07f, -0.3f, 0.3f);
+            if (nw != Integer.MIN_VALUE) light += Math.clamp((here - nw) * SLOPE_LIGHT, -MAX_SLOPE_LIGHT, MAX_SLOPE_LIGHT);
             int east = h(tile, px + 1, pz), south = h(tile, px, pz + 1);
             boolean contour = false, major = false;
             for (int o : new int[]{east, south}) {
                 if (o == Integer.MIN_VALUE) continue;
-                if (Math.floorDiv(o, 16) != Math.floorDiv(here, 16)) contour = true;
-                if (Math.floorDiv(o, 64) != Math.floorDiv(here, 64)) major = true;
+                if (Math.floorDiv(o, CONTOUR_STEP) != Math.floorDiv(here, CONTOUR_STEP)) contour = true;
+                if (Math.floorDiv(o, MAJOR_CONTOUR_STEP) != Math.floorDiv(here, MAJOR_CONTOUR_STEP)) major = true;
             }
-            if (major) light *= 0.72f;
-            else if (contour) light *= 0.86f;
+            if (major) light *= MAJOR_CONTOUR_LIGHT;
+            else if (contour) light *= CONTOUR_LIGHT;
         } else if (!water(tile, px + 1, pz) || !water(tile, px, pz + 1) || !water(tile, px - 1, pz) || !water(tile, px, pz - 1)) {
             // the shore
-            light = 0.8f;
+            light = SHORE_LIGHT;
         }
         int r = Math.clamp((int) ((c >> 16 & 255) * light), 0, 255);
         int g = Math.clamp((int) ((c >> 8 & 255) * light), 0, 255);

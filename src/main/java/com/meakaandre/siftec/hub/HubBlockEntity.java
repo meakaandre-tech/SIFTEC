@@ -36,6 +36,8 @@ public class HubBlockEntity extends BlockEntity {
     /** What putting the HUB down cost (its 20 Raw Iron): given back when it is picked up. */
     public final List<ItemStack> refund = new ArrayList<>();
     private int clock;
+    /** Ticks between two looks for players walking into a finished Gateway's portal, and between two rebuilds. */
+    private static final int PORTAL_TICKS = 10, REFRESH_TICKS = 20;
     /** Ticks run, for the self-test. */
     public long ticked;
 
@@ -52,8 +54,8 @@ public class HubBlockEntity extends BlockEntity {
      */
     public void serverTick() {
         ticked++;
-        if (ticked % 10 == 0) Prefabs.portal(this);
-        if (++clock < 20) return;
+        if (ticked % PORTAL_TICKS == 0) Prefabs.portal(this);
+        if (++clock < REFRESH_TICKS) return;
         clock = 0;
         Prefabs.refresh(this);
     }

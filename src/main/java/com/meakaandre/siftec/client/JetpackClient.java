@@ -12,6 +12,8 @@ import net.minecraft.world.phys.Vec3;
 /** The Jetpack's push. Holding jump in mid-air lifts the player while the server says there is fuel. */
 public final class JetpackClient {
     private static final double LIFT = 0.12, MAX_RISE = 0.55, PUSH = 0.03, MAX_RUN = 0.7;
+    /** While thrusting, the server is reminded this often (ticks: twice a second). */
+    private static final int RESEND_TICKS = 10;
     private static boolean sent;
     private static int since;
 
@@ -43,7 +45,7 @@ public final class JetpackClient {
             player.resetFallDistance();
         }
         // say so when it starts and stops, and keep saying so twice a second while it lasts
-        if (want != sent || (want && ++since >= 10)) {
+        if (want != sent || (want && ++since >= RESEND_TICKS)) {
             ClientPlayNetworking.send(new JetThrustPayload(want));
             sent = want;
             since = 0;

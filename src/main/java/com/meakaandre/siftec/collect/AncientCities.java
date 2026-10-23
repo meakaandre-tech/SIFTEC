@@ -57,6 +57,10 @@ public final class AncientCities {
     private static final int LOCATED_MAX = 512;
     /** How many cities each square remembers, and how far out (in placement regions) the search looks. */
     private static final int CITIES_KEPT = 6, SEARCH_REGIONS = 24;
+    /** Ticks between two looks at the cities waiting, and the tick of the second they are looked at in. */
+    private static final int SETTLE_TICKS = 20, SETTLE_OFFSET = 7;
+    /** The height a city's biome is sampled at (vanilla's city start), kept this far above the world's bottom. */
+    private static final int CITY_Y = -27, CITY_ABOVE_BOTTOM = 8;
 
     /** A chunk position as one number (x low, z high). */
     static long pack(int chunkX, int chunkZ) {
@@ -73,7 +77,7 @@ public final class AncientCities {
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            if (server.getTickCount() % 20 == 7 && !WAITING.isEmpty()) settle(server.overworld());
+            if (server.getTickCount() % SETTLE_TICKS == SETTLE_OFFSET && !WAITING.isEmpty()) settle(server.overworld());
         });
     }
 
@@ -253,7 +257,7 @@ public final class AncientCities {
         int rx = Math.floorDiv(from.getX() >> 4, spacing), rz = Math.floorDiv(from.getZ() >> 4, spacing);
         long seed = state.getLevelSeed();
         HolderSet<Biome> biomes = city.biomes();
-        int y = Math.max(level.getMinY() + 8, -27);
+        int y = Math.max(level.getMinY() + CITY_ABOVE_BOTTOM, CITY_Y);
         int extra = -1;
         for (int ring = 0; ring <= SEARCH_REGIONS; ring++) {
             for (int dx = -ring; dx <= ring; dx++) {

@@ -42,6 +42,10 @@ public final class Collectibles {
     private static final float CHANCE = 0.4f;
     /** A Somersloop's pocket lies between these heights (deepslate, above the bedrock). */
     private static final int DEEP_LOW = -52, DEEP_HIGH = -16;
+    /** Cells kept worked out at most; past this the cache is emptied. */
+    private static final int CELLS_KEPT = 65_536;
+    /** A siftslate patch: squared radius it reaches, and from which squared radius its edge is ragged. */
+    private static final int PATCH_R2 = 5, RAGGED_R2 = 4;
 
     public record Spot(int x, int z, Collectible type) {
         public String key() {
@@ -100,7 +104,7 @@ public final class Collectibles {
         Optional<Spot> cached = CACHE.get(key);
         if (cached == null) {
             // bounded: a server that has seen much of the world starts the cache afresh
-            if (CACHE.size() > 65_536) CACHE.clear();
+            if (CACHE.size() > CELLS_KEPT) CACHE.clear();
             cached = compute(level, seed, cellX, cellZ, from[0], from[1]);
             CACHE.put(key, cached);
         }
@@ -288,7 +292,7 @@ public final class Collectibles {
         for (int dx = -2; dx <= 2; dx++) {
             for (int dz = -2; dz <= 2; dz++) {
                 int d = dx * dx + dz * dz;
-                if (d > 5 || d >= 4 && ((h >>> ((dx + 2) * 5 + dz + 2)) & 1) == 0) continue;  // ragged edge
+                if (d > PATCH_R2 || d >= RAGGED_R2 && ((h >>> ((dx + 2) * 5 + dz + 2)) & 1) == 0) continue;  // ragged edge
                 BlockPos at = centre.offset(dx, 0, dz);
                 if (!inside(only, at)) continue;
                 // settle onto the ground there: down past air and plants, a block or two at most

@@ -19,6 +19,10 @@ public final class Power {
     public static final double SU_PER_MW = 204.8;
     /** Ticks in an hour, for the storage in SU-hours (Satisfactory shows MWh). */
     public static final double TICKS_PER_HOUR = 72_000;
+    /** New Age's default {@code suToEnergy}, used when its config cannot be read. */
+    private static final double DEFAULT_FE_PER_SU = 0.029296875;
+    /** From this many SU-hours up, storage is shown in whole SUh. */
+    private static final int WHOLE_SUH_FROM = 100;
 
     private Power() {
     }
@@ -29,7 +33,7 @@ public final class Power {
             return CNAConfig.getServer().suToEnergy.get();
         } catch (RuntimeException e) {
             Siftec.LOGGER.debug("SIFTEC: Create: New Age's suToEnergy could not be read; using the default", e);
-            return 0.029296875;
+            return DEFAULT_FE_PER_SU;
         }
     }
 
@@ -63,6 +67,6 @@ public final class Power {
     /** SU-ticks as SU-hours, the way Satisfactory shows a Power Storage in MWh. */
     public static String suHours(double suTicks) {
         double h = suTicks / TICKS_PER_HOUR;
-        return h >= 100 ? String.format(Locale.ROOT, "%,d SUh", Math.round(h)) : String.format(Locale.ROOT, "%.1f SUh", h);
+        return h >= WHOLE_SUH_FROM ? String.format(Locale.ROOT, "%,d SUh", Math.round(h)) : String.format(Locale.ROOT, "%.1f SUh", h);
     }
 }

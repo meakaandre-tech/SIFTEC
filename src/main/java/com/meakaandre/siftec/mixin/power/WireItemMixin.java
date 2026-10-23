@@ -16,6 +16,7 @@ import org.antarcticgardens.cna.content.electricity.connector.AbstractElectrical
 import org.antarcticgardens.cna.content.electricity.wire.ElectricWireItem;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,6 +31,10 @@ import static org.antarcticgardens.cna.CNADataComponents.BOUND_TO;
  */
 @Mixin(value = ElectricWireItem.class, remap = false)
 public abstract class WireItemMixin {
+    /** A bound wire lets go once the holder is farther than reach times the square root of this (squared distance). */
+    @Unique
+    private static final int LET_GO_REACH_SQR_FACTOR = 3;
+
     @Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
     private void siftec$rules(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Level level = context.getLevel();
@@ -77,7 +82,7 @@ public abstract class WireItemMixin {
             stack.remove(BOUND_TO);
             return;
         }
-        if (entity.distanceToSqr(bound.getX(), bound.getY(), bound.getZ()) > (double) reach * reach * 3) {
+        if (entity.distanceToSqr(bound.getX(), bound.getY(), bound.getZ()) > (double) reach * reach * LET_GO_REACH_SQR_FACTOR) {
             stack.remove(BOUND_TO);
             entity.playSound(SoundEvents.LEAD_UNTIED, 1.0f, 1.0f);
             if (entity instanceof Player player) player.sendOverlayMessage(Component.translatable("item.create_new_age.wire.message.too_far", reach));

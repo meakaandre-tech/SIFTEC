@@ -21,6 +21,10 @@ import java.util.zip.InflaterInputStream;
 public final class MapTile {
     public static final int KNOWN = 1 << 24, GUESSED = 1 << 25, WATER = 1 << 26;
     private static final int FORMAT = 1;
+    /** Starting size of the buffer a tile is packed into (bytes). */
+    private static final int PACK_BUFFER = 16384;
+    /** Deflate level used to pack a tile. */
+    private static final int PACK_LEVEL = 6;
     public static final int AREA = MapGrid.REGION_PX * MapGrid.REGION_PX;
 
     public final int[] colour = new int[AREA];
@@ -41,8 +45,8 @@ public final class MapTile {
     }
 
     public byte[] pack() {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream(16384);
-        try (DataOutputStream out = new DataOutputStream(new DeflaterOutputStream(bytes, new Deflater(6)))) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream(PACK_BUFFER);
+        try (DataOutputStream out = new DataOutputStream(new DeflaterOutputStream(bytes, new Deflater(PACK_LEVEL)))) {
             out.writeByte(FORMAT);
             out.writeLong(version);
             // the colours of a run of pixels are mostly alike, so runs of equal values pack small

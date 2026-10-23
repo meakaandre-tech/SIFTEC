@@ -16,6 +16,8 @@ import java.util.function.ToLongFunction;
  * nothing counts until the insert is really carried out.
  */
 public class IntakeStorage extends SnapshotParticipant<Integer> implements InsertionOnlyStorage<ItemVariant> {
+    /** Most items taken in one insert, so the count fits an int with room to spare. */
+    private static final int MAX_INSERT = 1 << 20;
     private final ToLongFunction<ItemStack> room;
     private final Consumer<ItemStack> taken;
     private final List<ItemStack> pending = new ArrayList<>();
@@ -34,7 +36,7 @@ public class IntakeStorage extends SnapshotParticipant<Integer> implements Inser
         for (ItemStack waiting : pending) {
             if (ItemStack.isSameItemSameComponents(waiting, one)) free -= waiting.getCount();
         }
-        int amount = (int) Math.min(Math.min(maxAmount, free), 1 << 20);
+        int amount = (int) Math.min(Math.min(maxAmount, free), MAX_INSERT);
         if (amount <= 0) return 0;
         updateSnapshots(transaction);
         pending.add(variant.toStack(amount));

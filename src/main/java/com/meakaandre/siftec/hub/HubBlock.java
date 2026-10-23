@@ -31,11 +31,14 @@ import org.jspecify.annotations.Nullable;
  * dismantle mode takes either down.
  */
 public class HubBlock extends Block implements EntityBlock {
+    /** Vanilla's bedrock figures: no breaking time, and no explosion takes it. */
+    private static final float UNBREAKABLE_HARDNESS = -1.0F, UNBREAKABLE_RESISTANCE = 3600000.0F;
     public final boolean gateway;
 
     public HubBlock(boolean gateway, Properties properties) {
         // a HUB holds land: it cannot be broken, blown up or pushed, or its claim would be left behind
-        super(properties.strength(-1.0F, 3600000.0F).noLootTable().pushReaction(PushReaction.IMMOVEABLE));
+        super(properties.strength(UNBREAKABLE_HARDNESS, UNBREAKABLE_RESISTANCE).noLootTable()
+            .pushReaction(PushReaction.IMMOVEABLE));
         this.gateway = gateway;
     }
 

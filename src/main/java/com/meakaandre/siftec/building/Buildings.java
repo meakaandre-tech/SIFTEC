@@ -86,6 +86,10 @@ import java.util.UUID;
 public final class Buildings {
     /** How far the Build Gun reaches, as Satisfactory's reaches further than a hand. */
     public static final int RANGE = 32;
+    /** Taken off a box's max corner so a box ending exactly on a block edge does not reach into the next block. */
+    static final double EDGE_EPSILON = 1e-4;
+    /** How far either way from the aimed cell a node-bound building looks for its node, horizontally and vertically. */
+    private static final int NODE_SNAP_XZ = 3, NODE_SNAP_Y = 1;
     private static final int SET = Block.UPDATE_ALL;
     /** Sent to clients, but no neighbour is told (nothing next to the block reacts to it going). */
     private static final int QUIET = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
@@ -247,7 +251,8 @@ public final class Buildings {
         }
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, p.bounds(t))) {
             AABB box = entity.getBoundingBox();
-            for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX - 1e-4, box.maxY - 1e-4, box.maxZ - 1e-4))) {
+            for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(box.minX, box.minY, box.minZ),
+                BlockPos.containing(box.maxX - EDGE_EPSILON, box.maxY - EDGE_EPSILON, box.maxZ - EDGE_EPSILON))) {
                 if (solid.contains(pos.asLong())) {
                     check.fail("siftec.prefab.entity");
                     break;
@@ -322,7 +327,8 @@ public final class Buildings {
         BlockPos aim = p.at(c[0], c[1], c[2]);
         BlockPos best = null;
         double bestDist = Double.MAX_VALUE;
-        for (BlockPos pos : BlockPos.betweenClosed(aim.offset(-3, -1, -3), aim.offset(3, 1, 3))) {
+        for (BlockPos pos : BlockPos.betweenClosed(aim.offset(-NODE_SNAP_XZ, -NODE_SNAP_Y, -NODE_SNAP_XZ),
+            aim.offset(NODE_SNAP_XZ, NODE_SNAP_Y, NODE_SNAP_XZ))) {
             if (!level.isLoaded(pos) || !isNode(p.def(), level, pos)) continue;
             double d = pos.distSqr(aim);
             if (d < bestDist) {
@@ -563,7 +569,7 @@ public final class Buildings {
                 ItemStack unit = ProductionLogic.packaged(variant.getFluid());
                 long size;
                 if (!unit.isEmpty()) {
-                    size = (long) ProductionLogic.packagedMb(variant.getFluid()) * (FluidConstants.BUCKET / 1000);
+                    size = (long) ProductionLogic.packagedMb(variant.getFluid()) * ProductionLogic.MB;
                 } else if (variant.getFluid().getBucket() != Items.AIR) {
                     unit = new ItemStack(variant.getFluid().getBucket());
                     size = FluidConstants.BUCKET;

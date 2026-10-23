@@ -24,6 +24,10 @@ import java.util.Set;
 
 /** Operator commands for testing: {@code /siftec node find <type>} and {@code /siftec node tp <type>}. */
 public final class SiftecCommands {
+    /** How far /siftec node looks, in the node map's cells of 128 blocks. */
+    private static final int SEARCH_CELLS = 64;
+    /** Blocks above and below a cave node searched for a floor to stand on. */
+    private static final int CAVE_FLOOR_SEARCH = 32;
     private SiftecCommands() {
     }
 
@@ -52,7 +56,7 @@ public final class SiftecCommands {
         ServerLevel level = source.getLevel();
         Vec3 from = source.getPosition();
         // searched on the node map's worker thread; the answer comes when it is done
-        NodeMap.nearestAsync(level, from.x, from.z, type, 64, found -> {
+        NodeMap.nearestAsync(level, from.x, from.z, type, SEARCH_CELLS, found -> {
             if (found.isEmpty()) {
                 source.sendFailure(Component.translatable("siftec.scanner.none", Component.translatable(type.key())));
                 return;
@@ -82,7 +86,7 @@ public final class SiftecCommands {
     /** The floor near a cave height with room to stand above it, or the world's bottom if there is none. */
     private static int caveFloor(ServerLevel level, int x, int around, int z) {
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        for (int d = 0; d <= 32; d++) {
+        for (int d = 0; d <= CAVE_FLOOR_SEARCH; d++) {
             for (int y : new int[]{around - d, around + d}) {
                 if (!level.getBlockState(pos.set(x, y, z)).isAir() && level.getBlockState(pos.set(x, y + 1, z)).isAir() && level.getBlockState(pos.set(x, y + 2, z)).isAir()) return y;
             }

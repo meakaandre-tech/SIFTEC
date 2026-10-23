@@ -22,6 +22,8 @@ import org.jspecify.annotations.Nullable;
 public final class VehicleClient {
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Siftec.id("vehicles"));
     public static final KeyMapping RECORD = new KeyMapping("key.siftec.vehicle.record", InputConstants.KEY_V, CATEGORY);
+    /** While driving, the keys are sent again this often (ticks: once a second). */
+    private static final int RESEND_TICKS = 20;
     private static @Nullable VehicleInputPayload sent;
     private static int since;
 
@@ -45,7 +47,7 @@ public final class VehicleClient {
             : new VehicleInputPayload(mc.options.keyUp.isDown(), mc.options.keyDown.isDown(), mc.options.keyLeft.isDown(), mc.options.keyRight.isDown(),
                 mc.options.keyJump.isDown());
         // say so when the keys change, and once a second while driving so a lost packet does not leave it running
-        if (!keys.equals(sent) || (driving && ++since >= 20)) {
+        if (!keys.equals(sent) || (driving && ++since >= RESEND_TICKS)) {
             if (driving || sent != null) ClientPlayNetworking.send(keys);
             sent = driving ? keys : null;
             since = 0;

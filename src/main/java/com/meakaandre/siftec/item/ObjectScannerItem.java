@@ -83,6 +83,8 @@ public class ObjectScannerItem extends Item {
 
     private static final Map<UUID, Target> SELECTED = new ConcurrentHashMap<>();
     private static final int MOB_RANGE = 64, PLANT_CHUNKS = 5;
+    /** How far it looks for collectibles, in the node map's cells. */
+    private static final int COLLECTIBLE_CELLS = 48;
     /** How far the scanner looks for geysers: it has the land this many chunks round it searched first. */
     public static final int GEYSER_CHUNKS = 16;
 
@@ -116,7 +118,7 @@ public class ObjectScannerItem extends Item {
             player.sendOverlayMessage(Component.translatable("siftec.scanner.selected", target.label()));
             return InteractionResult.SUCCESS;
         }
-        player.getCooldowns().addCooldown(player.getItemInHand(hand), 20);
+        player.getCooldowns().addCooldown(player.getItemInHand(hand), NodeScannerItem.SCAN_COOLDOWN_TICKS);
         Component name = target.label();
         if (target == Target.MOBS) {
             Monster nearest = null;
@@ -161,7 +163,7 @@ public class ObjectScannerItem extends Item {
         record Found(Optional<Collectibles.Spot> spot, List<BlockPos> cities) {
         }
         NodeMap.async(server.getServer(), () -> new Found(
-            Collectibles.nearest(server, px, pz, looking, collected, 48, border, NodeMap.SEARCH_NANOS),
+            Collectibles.nearest(server, px, pz, looking, collected, COLLECTIBLE_CELLS, border, NodeMap.SEARCH_NANOS),
             looking == Collectible.SOMERSLOOP ? AncientCities.candidates(server, at) : List.of()), found -> {
                 if (player.isRemoved()) return;
                 int[] best = null;

@@ -66,6 +66,8 @@ public final class Generators {
     static final float MIN_WATER_LOAD = 0.05f;
     /** Ticks over which a boiler's water use follows its load (the boiler measures its water over 50). */
     static final int WATER_WINDOW = 64;
+    /** The Geothermal Generator's turbine turns at most at Create's top speed. */
+    private static final int MAX_TURBINE_RPM = 256;
 
     private Generators() {
     }
@@ -189,7 +191,7 @@ public final class Generators {
         for (FluidTankBlockEntity b : boilers) engines += b.boiler.attachedEngines;
         if (engines == 0) return false;
         // droplets a tick at full load
-        double full = def.water() * BuildingPower.mbPerM3() / 1200.0 * (FluidConstants.BUCKET / 1000.0);
+        double full = def.water() * BuildingPower.mbPerM3() / BuildingDef.TICKS_PER_MINUTE * (FluidConstants.BUCKET / 1000.0);
         float use = constant ? 1 : load;
         // the boiler measures what it was given over the last 50 ticks: a level's need follows the least load of a while
         // longer, so a rising load never finds it short of what it has just been given
@@ -359,7 +361,7 @@ public final class Generators {
             mw = geyserMw(GeyserPurity.of(level, vent), level.getGameTime(), vent);
         }
         if (turbine == null) return;
-        float rpm = (float) Math.min(256, Power.su(mw) / GEO_STRESS);
+        float rpm = (float) Math.min(MAX_TURBINE_RPM, Power.su(mw) / GEO_STRESS);
         // a new speed once a second (the kinetic network is worked out again for every change)
         if (level.getGameTime() % 20 == 0 || rpm == 0 && turbine.speed != 0) turbine.drive(rpm);
     }

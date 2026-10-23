@@ -26,8 +26,10 @@ import java.util.Set;
  */
 public final class Locks {
     private static final Map<Identifier, Milestone> BY_ITEM = new HashMap<>();
+    /** A tier no HUB has, for the milestone that locks things for good. */
+    private static final int DISABLED_TIER = 99;
     /** Things the pack switches off for good. No company can ever finish this one. */
-    public static final Milestone DISABLED = new Milestone("disabled", 99, 0, List.of(), 0, List.of(), List.of());
+    public static final Milestone DISABLED = new Milestone("disabled", DISABLED_TIER, 0, List.of(), 0, List.of(), List.of());
 
     private Locks() {
     }

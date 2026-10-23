@@ -35,6 +35,9 @@ import java.util.List;
 public record BuildingDef(String id, Category category, List<Milestone.Cost> cost, String unlock, boolean dev, boolean node,
                           int @Nullable [] nodeCell, Logic logic, int su, int breakTicks, int fortune, PowerRole power, double mw, double water, int lines,
                           int @Nullable [] vent, String prefab, String fluid, int rate, String fluidNode, int @Nullable [] intake) {
+    /** Ticks in a minute, for {@code rate} and {@code water}, which are given a minute. */
+    public static final double TICKS_PER_MINUTE = 1200.0;
+
     public BuildingDef(String id, Category category, List<Milestone.Cost> cost, String unlock, boolean dev, boolean node) {
         this(id, category, cost, unlock, dev, node, node ? new int[]{0, 0, 1} : null, Logic.NONE, 0, 0, 0, PowerRole.NONE, 0, 0, 0, null, "", "", 0, "", null);
     }

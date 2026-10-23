@@ -17,6 +17,9 @@ public enum VehicleKind {
     TRUCK("truck", 0.38, 0.008, 2.5, 75, 6, 3, 6, 4, 3.0f, 3.2f, 5.0f, 0, 2.0, 1.0),
     EXPLORER("explorer", 0.75, 0.02, 5.0, 90, 1, 2, 4, 2, 2.0f, 1.8f, 3.5f, 0, 1.5, -0.5);
 
+    /** Slots in one row of its cargo (a chest menu row). */
+    private static final int SLOTS_PER_ROW = 9;
+
     public final String id;
     public final double maxSpeed, accel, turnDegrees;
     public final double mw;
@@ -44,7 +47,7 @@ public enum VehicleKind {
     }
 
     public int slots() {
-        return rows * 9;
+        return rows * SLOTS_PER_ROW;
     }
 
     /** Megajoules its tank holds: four buckets of Fuel (25 m3 a bucket at 750 MJ a m3, as {@code mb_per_m3} has it). */

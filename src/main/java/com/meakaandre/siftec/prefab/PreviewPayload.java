@@ -16,6 +16,8 @@ import java.util.List;
  */
 public record PreviewPayload(int kind, BlockPos anchor, int facing, boolean ok, String key, List<String> args) implements CustomPacketPayload {
     public static final Type<PreviewPayload> TYPE = new Type<>(Siftec.id("prefab_preview"));
+    /** Message arguments read at most, so a bad packet cannot ask for a huge list. */
+    private static final int MAX_ARGS = 8;
     public static final StreamCodec<RegistryFriendlyByteBuf, PreviewPayload> STREAM_CODEC = StreamCodec.of(
         (buf, p) -> {
             buf.writeVarInt(p.kind);
@@ -32,7 +34,7 @@ public record PreviewPayload(int kind, BlockPos anchor, int facing, boolean ok, 
             int facing = buf.readVarInt();
             boolean ok = buf.readBoolean();
             String key = buf.readUtf();
-            int n = Math.min(8, buf.readVarInt());
+            int n = Math.min(MAX_ARGS, buf.readVarInt());
             List<String> args = new ArrayList<>();
             for (int i = 0; i < n; i++) args.add(buf.readUtf());
             return new PreviewPayload(kind, anchor, facing, ok, key, args);

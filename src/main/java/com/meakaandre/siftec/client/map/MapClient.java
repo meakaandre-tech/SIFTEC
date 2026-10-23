@@ -70,6 +70,12 @@ public final class MapClient {
     }
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    /** Tiles are asked for this often (ticks: once a second). */
+    private static final int REQUEST_TICKS = 20;
+    /** A tile is asked for again at most this often (ms): the player's own region, its neighbours, the open map's. */
+    private static final int HERE_EVERY_MS = 8_000, AROUND_EVERY_MS = 20_000, SCREEN_EVERY_MS = 15_000;
+    /** Regions asked for in one request at most. */
+    private static final int REGIONS_PER_REQUEST = 24;
 
     private MapClient() {
     }
@@ -293,7 +299,7 @@ public final class MapClient {
                 saveSettings();
             }
         }
-        if (++ticks % 20 != 0 || !unlocked() || !mappedHere() || !ClientPlayNetworking.canSend(MapPayloads.TileRequest.TYPE)) return;
+        if (++ticks % REQUEST_TICKS != 0 || !unlocked() || !mappedHere() || !ClientPlayNetworking.canSend(MapPayloads.TileRequest.TYPE)) return;
         // ask for the tiles round the player and on the open map, each again at most every so often
         LongArrayList regions = new LongArrayList();
         LongArrayList versions = new LongArrayList();
@@ -302,15 +308,15 @@ public final class MapClient {
         for (int dz = -1; dz <= 1; dz++) {
             for (int dx = -1; dx <= 1; dx++) {
                 long region = MapGrid.key(MapGrid.keyX(here) + dx, MapGrid.keyZ(here) + dz);
-                want(region, dx == 0 && dz == 0 ? 8_000 : 20_000, regions, versions);
+                want(region, dx == 0 && dz == 0 ? HERE_EVERY_MS : AROUND_EVERY_MS, regions, versions);
             }
         }
-        if (mc.gui.screen() instanceof MapScreen screen) for (long region : screen.visibleRegions()) want(region, 15_000, regions, versions);
+        if (mc.gui.screen() instanceof MapScreen screen) for (long region : screen.visibleRegions()) want(region, SCREEN_EVERY_MS, regions, versions);
         if (!regions.isEmpty()) ClientPlayNetworking.send(new MapPayloads.TileRequest(regions.toLongArray(), versions.toLongArray()));
     }
 
     private static void want(long region, long every, LongArrayList regions, LongArrayList versions) {
-        if (regions.size() >= 24 || regions.contains(region) || !FOG.containsKey(region)) return;
+        if (regions.size() >= REGIONS_PER_REQUEST || regions.contains(region) || !FOG.containsKey(region)) return;
         // the disk copy is read first, so only a tile that changed since is sent again
         long version = ClientTiles.version(region);
         if (ClientTiles.loading(region) || ClientTiles.askedWithin(region, every)) return;

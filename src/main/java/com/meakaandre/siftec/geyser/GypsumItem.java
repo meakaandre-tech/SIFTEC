@@ -6,9 +6,13 @@ import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LevelEvent;
 
 /** Gypsum, from neutralised sulfuric acid. It fertilises like bone meal. */
 public class GypsumItem extends Item {
+    /** Growth particles shown, as bone meal shows them. */
+    private static final int GROWTH_PARTICLES = 15;
+
     public GypsumItem(Properties properties) {
         super(properties);
     }
@@ -18,7 +22,7 @@ public class GypsumItem extends Item {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         if (BoneMealItem.growCrop(context.getItemInHand(), level, pos)) {
-            if (!level.isClientSide()) level.levelEvent(1505, pos, 15);
+            if (!level.isClientSide()) level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, pos, GROWTH_PARTICLES);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;

@@ -32,6 +32,8 @@ import java.util.Set;
  */
 public final class Wires {
     public static final int TOWER_REACH = 256, BUILDING_REACH = 32;
+    /** New Age's default {@code maxWireLength}, used when its config cannot be read. */
+    private static final int NEW_AGE_DEFAULT_LENGTH = 16;
 
     private Wires() {
     }
@@ -77,7 +79,7 @@ public final class Wires {
             return CNAConfig.getServer().maxWireLength.get();
         } catch (RuntimeException e) {
             Siftec.LOGGER.debug("SIFTEC: Create: New Age's maxWireLength could not be read; using 16", e);
-            return 16;
+            return NEW_AGE_DEFAULT_LENGTH;
         }
     }
 

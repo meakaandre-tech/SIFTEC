@@ -52,6 +52,10 @@ import java.util.Set;
 public final class Food {
     /** 17: enough to sprint, one short of natural regeneration (18). */
     public static final int HELD_FOOD_LEVEL = 17;
+    /** Shortest effect a "bonus" seasoning adds (ticks). */
+    private static final int BONUS_MIN_TICKS = 30 * 20;
+    /** Passes made carrying effects through recipes, so effects reach foods several crafting steps away. */
+    private static final int CARRY_PASSES = 6;
 
     /** The ingredients whose effect carries into anything made from them. */
     public enum Intrinsic {
@@ -204,7 +208,7 @@ public final class Food {
         if (season.equals("bonus")) {
             List<Intrinsic> spare = new ArrayList<>();
             for (Intrinsic i : Intrinsic.values()) if (i.effect != null && !profile.intrinsics().contains(i)) spare.add(i);
-            if (!spare.isEmpty()) player.addEffect(new MobEffectInstance(spare.get(player.getRandom().nextInt(spare.size())).effect, Math.max(30 * 20, profile.prep().duration), 0));
+            if (!spare.isEmpty()) player.addEffect(new MobEffectInstance(spare.get(player.getRandom().nextInt(spare.size())).effect, Math.max(BONUS_MIN_TICKS, profile.prep().duration), 0));
         }
     }
 
@@ -273,7 +277,7 @@ public final class Food {
                 Siftec.LOGGER.debug("SIFTEC: recipe {} could not be read for food effects", holder.id(), ignored);
             }
         }
-        for (int pass = 0; pass < 6; pass++) {
+        for (int pass = 0; pass < CARRY_PASSES; pass++) {
             boolean changed = false;
             for (Parsed recipe : parsed) {
                 Set<Intrinsic> found = EnumSet.noneOf(Intrinsic.class);

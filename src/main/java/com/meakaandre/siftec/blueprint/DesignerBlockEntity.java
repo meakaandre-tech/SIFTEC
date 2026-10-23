@@ -27,13 +27,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DesignerBlockEntity extends ControllerBlockEntity {
     /** Loaded designers: where each one's terminal is, and the game time it last reported in. */
     private static final Map<ResourceKey<Level>, Map<BlockPos, Long>> LIVE = new ConcurrentHashMap<>();
+    /** Reach of a designer whose block is not a DesignerBlock (blocks from the terminal each way). */
+    private static final int DEFAULT_REACH = 4;
+    /** The volume's outline is drawn and the designer reports in this often (ticks). */
+    private static final int OUTLINE_TICKS = 40;
+    /** A designer that has not reported in for this long (ticks) is taken as unloaded. */
+    private static final int STALE_TICKS = 200;
 
     public DesignerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
     public int reach() {
-        return getBlockState().getBlock() instanceof DesignerBlock block ? block.reach : 4;
+        return getBlockState().getBlock() instanceof DesignerBlock block ? block.reach : DEFAULT_REACH;
     }
 
     /**
@@ -89,14 +95,14 @@ public class DesignerBlockEntity extends ControllerBlockEntity {
     @Override
     public void serverTick() {
         super.serverTick();
-        if (!(level instanceof ServerLevel server) || isRemoved() || placement() == null || (level.getGameTime() + worldPosition.hashCode()) % 40 != 0) return;
+        if (!(level instanceof ServerLevel server) || isRemoved() || placement() == null || (level.getGameTime() + worldPosition.hashCode()) % OUTLINE_TICKS != 0) return;
         report();
         AABB box = volume();
         int reach = reach();
         // the twelve edges of the volume
-        for (double t = 0; t <= 1.0001; t += 1.0 / (2 * reach + 1)) {
+        for (double t = 0; t <= Blueprints.OUTLINE_END; t += 1.0 / (2 * reach + 1)) {
             double x = box.minX + box.getXsize() * t, y = box.minY + box.getYsize() * t, z = box.minZ + box.getZsize() * t;
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < Blueprints.EDGES_PER_AXIS; i++) {
                 double a = (i & 1) == 0 ? 0 : 1, b = (i & 2) == 0 ? 0 : 1;
                 server.sendParticles(ParticleTypes.END_ROD, x, box.minY + box.getYsize() * a, box.minZ + box.getZsize() * b, 1, 0, 0, 0, 0);
                 server.sendParticles(ParticleTypes.END_ROD, box.minX + box.getXsize() * a, y, box.minZ + box.getZsize() * b, 1, 0, 0, 0, 0);
@@ -120,7 +126,7 @@ public class DesignerBlockEntity extends ControllerBlockEntity {
         if (map == null) return false;
         long now = player.level().getGameTime();
         for (Map.Entry<BlockPos, Long> entry : map.entrySet()) {
-            if (now - entry.getValue() > 200) continue;
+            if (now - entry.getValue() > STALE_TICKS) continue;
             if (!(player.level().getBlockEntity(entry.getKey()) instanceof DesignerBlockEntity designer) || designer.placement() == null) continue;
             if (designer.volume().inflate(0.5).contains(player.position())) return true;
         }

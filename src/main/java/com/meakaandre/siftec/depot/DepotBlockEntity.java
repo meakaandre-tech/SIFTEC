@@ -30,6 +30,12 @@ public class DepotBlockEntity extends BlockEntity {
      * (2 to 5): tokens depot:upload:<items a minute> and depot:stacks:<n>.
      */
     public static final int UPLOAD_PER_MINUTE = 15, CLOUD_STACKS = 1;
+    /** A depot uploads once a second (ticks). */
+    private static final int UPLOAD_TICKS = 20;
+    /** Seconds in a minute: the per-minute rate is owed in sixtieths of an item. */
+    private static final int SECONDS_PER_MINUTE = 60;
+    /** Most items owed at once, in whole items (a stack). */
+    private static final int MAX_OWED_ITEMS = 64;
     public String companyId = "";
     private int cooldown;
     /** Uploads owed but not yet whole items, in sixtieths of an item: a depot at 15 a minute moves one every 4 seconds. */
@@ -100,14 +106,14 @@ public class DepotBlockEntity extends BlockEntity {
     }
 
     public void serverTick() {
-        if (++cooldown < 20 || level == null) return;
+        if (++cooldown < UPLOAD_TICKS || level == null) return;
         cooldown = 0;
         Company company = Companies.byId(level.getServer(), companyId);
         if (company == null) return;
         moved = false;
         // this second's share of the rate, kept in sixtieths so slow rates add up to whole items
-        owed = Math.min(owed + uploadPerMinute(company), 60 * 64);
-        int budget = owed / 60;
+        owed = Math.min(owed + uploadPerMinute(company), SECONDS_PER_MINUTE * MAX_OWED_ITEMS);
+        int budget = owed / SECONDS_PER_MINUTE;
         if (budget <= 0) return;
         int spent = 0;
         for (Direction side : Direction.values()) {
@@ -141,7 +147,7 @@ public class DepotBlockEntity extends BlockEntity {
             if (budget <= 0) break;
         }
         // what was moved is paid off; a depot with nothing to move does not save up a burst for later
-        owed = spent > 0 ? owed - spent * 60 : owed % 60;
+        owed = spent > 0 ? owed - spent * SECONDS_PER_MINUTE : owed % SECONDS_PER_MINUTE;
         if (moved) Companies.save(level.getServer());
     }
 }
