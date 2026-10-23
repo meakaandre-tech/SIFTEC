@@ -16,7 +16,9 @@ Create machines of the building Satisfactory makes it in:
 A Basin's filter picks which recipe runs when more than one fits what is in it, so the Constructor and the other
 basin buildings set their recipe with that filter. Every recipe is locked to the milestone, MAM node or Hard Drive
 alternate that unlocks it in 1.0. The food, brass and heat recipes (Food and Brass tab) are carried over below."""
+from common import read_pack
 from tables import content
+from tables.recipe_tables import BACKPACK_UPGRADES, REMOVED, TB, WORKSHOP
 
 DROPLETS = 81  # Create Fly counts fluid in droplets: 81 per mB
 TICKS = 20
@@ -320,11 +322,8 @@ def satisfactory():
 # ---------------------------------------------------------------------------------------------------------------------
 # The Equipment Workshop builds by hand. Each piece of equipment can also be made by machine, the Manufacturer's way:
 # a Mixer makes its Core from all but one of each part, and one loop of sequenced assembly adds the rest.
-EQUIPMENT_BY_MACHINE = content.EQUIPMENT_BY_MACHINE
-
-
 def equipment_by_machine():
-    for iid, sat in EQUIPMENT_BY_MACHINE.items():
+    for iid, sat in content.EQUIPMENT_BY_MACHINE.items():
         parts = [(c, n) for c, n in content.parse_cost(content.EQUIPMENT_COSTS[sat])]
         rid = iid.split(":")[1]
         core = content.EQUIPMENT_CORES[iid]
@@ -361,13 +360,12 @@ def kitchen():
     """Farmer's Delight on Create machines. Every cooking pot recipe becomes a heated Mixer recipe with its bowl or
     bottle as an ingredient, and every cutting board recipe that uses a knife becomes a Deployer recipe with the
     knife held (and kept). Converted from the recipes shipped in Farmer's Delight (tools/pack/farmersdelight.json)."""
-    import json, os
-    path = os.path.join(os.path.dirname(__file__), "pack", "farmersdelight.json")
-    if not os.path.exists(path):
+    shipped = read_pack("farmersdelight")
+    if shipped is None:
         return
     bottles = {"apple_cider", "hot_cocoa", "glow_berry_custard"}
     plain = {"cabbage_rolls", "dumplings", "dog_food"}
-    for key, body in sorted(json.load(open(path)).items()):
+    for key, body in sorted(shipped.items()):
         if not key.startswith("data/farmersdelight/recipe/"):
             continue
         name = key.split("/")[-1][:-5]
@@ -597,16 +595,13 @@ def basin_times():
       Blank Circuit                                                       Circuit Board (8 s)
       Ignimbrite, lava, magma, drilling mud, coolant                      the Refinery's middle time (6 s)
       kitchen recipes and jams                                            the Cooking Pot's own time (10 s unless it says)"""
-    import json, os
     assembler, manufacturer, refinery = _sat_median("Assembler"), _sat_median("Manufacturer"), _sat_median("Refinery")
     leached = _sat_seconds("Alternate: Leached Iron ingot") / 10   # 5 Raw Iron and 1 m3 acid make 10 Iron Ingots
     acid = _sat_seconds("Sulfuric Acid") / 5                       # 5 Sulfur a run
     pot = {}
-    fd = os.path.join(os.path.dirname(__file__), "pack", "farmersdelight.json")
-    if os.path.exists(fd):
-        for key, body in json.load(open(fd)).items():
-            if body.get("type") == "farmersdelight:cooking":
-                pot["mixing/kitchen_" + key.split("/")[-1][:-5]] = body.get("cookingtime", 200) / TICKS
+    for key, body in (read_pack("farmersdelight") or {}).items():
+        if body.get("type") == "farmersdelight:cooking":
+            pot["mixing/kitchen_" + key.split("/")[-1][:-5]] = body.get("cookingtime", 200) / TICKS
     for path, body in OUT.items():
         if body["type"] not in ("create:mixing", "create:compacting") or body.get("processing_time"):
             continue
@@ -636,40 +631,15 @@ def basin_times():
             entry["ticks"] = round(manufacturer * TICKS)
 
 
-# Recipes from other mods that the pack takes out.
-REMOVED = [
-    "cgs:mixing/steel_ingot",                                   # superheated steel; the Foundry recipe replaces it
-    "create:mixing/brass_ingot",                                # brass comes from brass blend
-    "create:mixing/lava_from_cobble",                           # superheated; lava comes from Ignimbrite
-    "createdieselgenerators:distillation/superheated_crude_oil",
-    "create_new_age:compacting/blank_circuit",                  # superheated; the heated diesel recipe in carried_over() replaces it
-    "create:crafting/kinetics/water_wheel", "create:crafting/kinetics/large_water_wheel",
-    # washing crushed ore would make ingots outside 1.0's recipes (the Pure Iron and Pure Copper Ingot alternates)
-    "create:splashing/crushed_raw_iron", "create:splashing/crushed_raw_copper",
-    # rewritten in carried_over() with the pack's parts, so each machine can be built at the tier that unlocks it
-    "create:crafting/kinetics/deployer", "create:crafting/kinetics/mechanical_crafter", "create:crafting/kinetics/flywheel", "create:mechanical_crafting/crushing_wheel",
-    "createdieselgenerators:mechanical_crafting/pumpjack_crank", "cgs:mechanical_crafting/hammer", "cgs:mechanical_crafting/nailgun",
-    # sulfur and lava come only by the owner's routes: no sulfur from crushing magma (Gunsmithing ships this one under
-    # Create's name), no lava from fermenting cobblestone, and no Potent Sulfur (a geyser) from nine Blocks of Sulfur
-    "create:crushing/magma_block", "createdieselgenerators:bulk_fermenting/lava", "minecraft:potent_sulfur",
-    # Create's dough replaces Farmer's Delight's
-    "farmersdelight:wheat_dough_from_egg", "farmersdelight:wheat_dough_from_water", "farmersdelight:bread_from_smelting",
-    "farmersdelight:bread_from_smoking",
-    # an ingot pressed flat would be Iron or Copper Sheet without the Constructor: only the Constructor makes them
-    "create:pressing/iron_ingot", "create:pressing/copper_ingot",
-]
-
-
 def _foreign_locks():
     """Other mods' recipes the pack locks by their own id (their result alone does not say what unlocks them): every
     Create: Diesel Generators recipe that makes biodiesel (Satisfactory's Liquid Biofuel) needs Fluid Packaging.
     Read from the recipes shipped in Diesel Generators (tools/pack/diesel.json)."""
-    import json, os
     out = {}
-    path = os.path.join(os.path.dirname(__file__), "pack", "diesel.json")
-    if not os.path.exists(path):
+    shipped = read_pack("diesel")
+    if shipped is None:
         return out
-    for key, body in sorted(json.load(open(path)).items()):
+    for key, body in sorted(shipped.items()):
         if not key.startswith("data/createdieselgenerators/recipe/"):
             continue
         made = [r.get("id") for r in body.get("fluid_results", []) + body.get("results", []) if isinstance(r, dict)]
@@ -679,65 +649,6 @@ def _foreign_locks():
 
 
 FOREIGN_LOCKS = _foreign_locks()
-# What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked. Equipment and the
-# buildings 1.0 has cost what they cost in 1.0 (content.EQUIPMENT_COSTS and content.BUILD_COSTS, under the 1.0 name);
-# the buildings have moved to the Build Gun in work packages 5 and 9 (the HUB is every player's to start with and costs its
-# 20 Raw Iron when it goes down). The rest are the pack's own.
-_B, _E = content.BUILD_COSTS, content.EQUIPMENT_COSTS
-WORKSHOP = [
-    ("siftec:node_scanner", "2 Iron Sheet, 4 Wire"),
-    ("siftec:claim_marker", "5 Iron Rod, 5 Stone"),
-    ("siftec:mam", _B["MAM"]),
-    ("siftec:object_scanner", _E["Object Scanner"]),
-    ("siftec:speed_governor", "25 Quickwire, 2 Rotor, 2 Reinforced Iron Plate"),
-    ("siftec:landing_pad", _B["U-Jelly Landing Pad"]),
-    ("siftec:jetpack", _E["Jetpack"]),
-    ("siftec:hazmat_suit", _E["Hazmat Suit"]),
-    ("siftec:hover_pack", _E["Hoverpack"]),
-    ("siftec:blade_runners", _E["Blade Runners"]),
-    ("siftec:parachute", _E["Parachute"]),
-    ("siftec:gas_mask", _E["Gas Mask"]),
-    ("siftec:protein_inhaler", _E["Protein Inhaler"]),
-    ("siftec:vitamin_inhaler", _E["Vitamin Inhaler"]),
-    ("siftec:therapeutic_inhaler", _E["Therapeutic Inhaler"]),
-    ("siftec:nutritional_inhaler", _E["Nutritional Inhaler"]),
-    ("siftec:cardboard_drone", _B["Drone"]),
-    ("siftec:main_portal", _B["Main Portal"]),
-    ("siftec:satellite_portal", _B["Satellite Portal"]),
-    ("siftec:dimensional_depot", _B["Dimensional Depot Uploader"]),
-    # equipment from 1.0's Workshop list: the Xeno-Zapper (the pack's own), and Gunsmithing's nail gun and hammer as the
-    # Rebar Gun and the Xeno-Basher
-    ("siftec:xeno_zapper", _E["Xeno-Zapper"]),
-    ("cgs:nailgun", _E["Rebar Gun"]),
-    ("cgs:hammer", _E["Xeno-Basher"]),
-    # the Particle Accelerator, the Converter, the Resource Well Extractor, the AWESOME Sink and Shop and the Radar Tower
-    # are Build Gun buildings (work packages 9 and 10)
-]
-# Traveler's Backpack upgrades (Exploration and Equipment tab, Backpack): built at the Equipment Workshop, each once its
-# MAM node is researched (content.TB_UPGRADES), from the pack's parts. The mod's own crafting recipes are removed
-# (REMOVED); the Assembler (a Mixer on a Basin) makes each one too, under the same lock (backpack_upgrades()).
-TB = content.TB
-BACKPACK_UPGRADES = [
-    (TB + "crafting_upgrade", "4 Reinforced Iron Plate, 25 Screw"),
-    (TB + "tanks_upgrade", "10 Copper Sheet, 2 Rotor"),
-    (TB + "backpack_tank", "5 Copper Sheet, 4 minecraft:glass"),
-    (TB + "hose_nozzle", "2 Copper Sheet, 4 Screw"),
-    (TB + "hose", "1 travelersbackpack:hose_nozzle, 5 Cable"),
-    (TB + "pickup_upgrade", "20 Quickwire, 2 Rotor"),
-    (TB + "lantern_upgrade", "10 Silica, 4 Wire"),
-    (TB + "magnet_upgrade", "2 Crystal Oscillator, 10 Quickwire"),
-    (TB + "jukebox_upgrade", "1 minecraft:jukebox, 2 Crystal Oscillator"),
-    (TB + "feeding_upgrade", "1 minecraft:golden_carrot, 2 Rotor, 10 Iron Rod"),
-    (TB + "smoker_upgrade", "1 minecraft:smoker, 5 Reinforced Iron Plate"),
-    (TB + "furnace_upgrade", "1 minecraft:furnace, 5 Reinforced Iron Plate"),
-    (TB + "blast_furnace_upgrade", "1 minecraft:blast_furnace, 10 Steel Pipe"),
-    (TB + "void_upgrade", "1 SAM Fluctuator, 5 Iron Sheet"),
-    (TB + "refill_upgrade", "1 SAM Fluctuator, 2 Rotor"),
-]
-WORKSHOP += BACKPACK_UPGRADES
-# the mod's own recipe for each upgrade has the upgrade's id; the backpack itself, its designs, tier upgrades and sleeping
-# bags are switched off (content.DISABLED)
-REMOVED += [out for out, cost in BACKPACK_UPGRADES]
 
 
 def backpack_upgrades():
