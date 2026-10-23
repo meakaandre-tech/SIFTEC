@@ -4,7 +4,6 @@ import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.depot.DepotMenu;
 import com.meakaandre.siftec.place.Places;
-import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

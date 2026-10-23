@@ -4,7 +4,6 @@ import com.meakaandre.siftec.Siftec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
@@ -42,8 +41,6 @@ public class WireMap extends SavedData {
 
     public static final Codec<WireMap> CODEC = Entry.CODEC.listOf().xmap(WireMap::new, WireMap::entries);
     private static final SavedDataType<WireMap> TYPE = new SavedDataType<>(Siftec.id("wires"), WireMap::new, CODEC, null);
-    /** Most connectors a jump over unloaded land looks through; far more than any real line. */
-    private static final int MAX_WALK = 4096;
 
     private final Map<String, Long2ObjectOpenHashMap<LongSet>> nodes = new HashMap<>();
     /** Goes up with every change, for caches. */
@@ -147,31 +144,6 @@ public class WireMap extends SavedData {
             if (so != null) so.remove(pos.asLong());
         }
         changed();
-    }
-
-    /**
-     * The loaded connectors reached from {@code from} along the wire that starts at the unloaded connector
-     * {@code first}, walking only through unloaded connectors. Reads nothing but this map and which chunks are loaded.
-     */
-    public List<BlockPos> loadedBeyond(Level level, BlockPos from, BlockPos first) {
-        Long2ObjectOpenHashMap<LongSet> map = dim(key(level));
-        List<BlockPos> out = new ArrayList<>();
-        LongOpenHashSet seen = new LongOpenHashSet();
-        LongArrayFIFOQueue queue = new LongArrayFIFOQueue();
-        seen.add(from.asLong());
-        seen.add(first.asLong());
-        queue.enqueue(first.asLong());
-        while (!queue.isEmpty() && seen.size() < MAX_WALK) {
-            LongSet next = map.get(queue.dequeueLong());
-            if (next == null) continue;
-            for (long l : next) {
-                if (!seen.add(l)) continue;
-                BlockPos pos = BlockPos.of(l);
-                if (level.isLoaded(pos)) out.add(pos);
-                else queue.enqueue(l);
-            }
-        }
-        return out;
     }
 
     /** How many connectors and wires the map holds, for the selftests. */

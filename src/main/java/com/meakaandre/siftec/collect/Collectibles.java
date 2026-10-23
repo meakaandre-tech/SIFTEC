@@ -276,12 +276,12 @@ public final class Collectibles {
         return BuiltInRegistries.BLOCK.getOptional(Identifier.fromNamespaceAndPath("the_sift", "siftslate")).orElse(Blocks.DEEPSLATE).defaultBlockState();
     }
 
-    /** A small rough disc of siftslate set into the ground. */
     /** True if the position may be touched: anywhere without a chunk to keep to, else only inside that chunk. */
     static boolean inside(@Nullable ChunkPos only, BlockPos at) {
         return only == null || at.getX() >> 4 == only.x() && at.getZ() >> 4 == only.z();
     }
 
+    /** A small rough disc of siftslate set into the ground. */
     private static void siftslatePatch(ServerLevel level, BlockPos centre, @Nullable ChunkPos only) {
         BlockState slate = siftslate();
         long h = mix(((long) centre.getX() << 32) ^ centre.getZ() ^ 0x5D1F7L);

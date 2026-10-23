@@ -238,10 +238,6 @@ public class PowerMemory extends SavedData {
             this.on = on;
         }
 
-        public boolean lastOn() {
-            return on;
-        }
-
         /**
          * The factory simulation runs this member while its chunk does not tick (work package 17): what it can give, asks
          * for, holds and has in fuel is what the simulation says.
@@ -296,11 +292,6 @@ public class PowerMemory extends SavedData {
         /** SU-ticks of fuel it has given while away, not yet burnt from the real generator. */
         public double spent() {
             return spent;
-        }
-
-        /** SU-ticks of fuel it held when last seen loaded (looked at once a second). */
-        public double reserveWhenSeen() {
-            return reserve;
         }
 
         /** What it last gave, while its fuel lasts. */

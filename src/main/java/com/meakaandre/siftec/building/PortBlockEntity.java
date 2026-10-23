@@ -5,7 +5,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;

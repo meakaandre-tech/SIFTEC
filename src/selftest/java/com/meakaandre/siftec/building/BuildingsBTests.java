@@ -22,7 +22,6 @@ import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
-import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;

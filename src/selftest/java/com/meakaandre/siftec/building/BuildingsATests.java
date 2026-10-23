@@ -29,7 +29,6 @@ import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlockEntity;
-import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;

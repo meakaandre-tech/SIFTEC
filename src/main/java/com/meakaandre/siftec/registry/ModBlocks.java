@@ -116,7 +116,6 @@ public class ModBlocks {
 
     public static final Supplier<ExtractorBlock> RESOURCE_WELL_EXTRACTOR = block("resource_well_extractor", ExtractorBlock::new, ModBlocks::machine);
 
-    /** The HUB Terminal and the Wormhole Gateway's terminal; their items place the whole structure (see prefab.Prefabs). */
     /** The HUB's terminal. The HUB has no item: every player builds it with the Build Gun (it is listed in content BUILDINGS). */
     public static final Supplier<HubBlock> HUB = blockOnly("hub", properties -> new HubBlock(false, properties), ModBlocks::machine);
     public static final Supplier<HubBlock> WORMHOLE_GATEWAY = prefab("wormhole_gateway", Prefabs.Kind.GATEWAY, properties -> new HubBlock(true, properties));

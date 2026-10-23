@@ -13,17 +13,12 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -218,16 +213,6 @@ public final class StateSelfTest {
         boolean claimOk = cb2 != null && cb2.marker && cb2.source == claim.source;
         report(source, "SELFTEST state codec: tree round trip " + treeOk + " (" + json.length() + " chars as JSON); old string format loads " + legacyOk
             + "; unreadable file kept and not overwritten " + brokenOk + "; claim flags and positions " + claimOk);
-    }
-
-    private static CompoundTag entry(int slot, String id, int count) {
-        CompoundTag item = new CompoundTag();
-        item.putString("id", id);
-        item.putInt("count", count);
-        CompoundTag out = new CompoundTag();
-        out.putInt("Slot", slot);
-        out.put("Item", item);
-        return out;
     }
 
     private static int check(CommandSourceStack source) {

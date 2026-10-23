@@ -290,12 +290,4 @@ public class NodeSavedData extends SavedData {
     public Set<Long> unplaceable() {
         return Collections.unmodifiableSet(unplaceable);
     }
-
-    public boolean isFlat(long node) {
-        return flat.contains(node);
-    }
-
-    public void markFlat(long node) {
-        if (flat.add(node)) setDirty();
-    }
 }

@@ -63,8 +63,6 @@ public class ModBlockEntities {
     public static final Entry<DesignerBlockEntity> DESIGNER = register("blueprint_designer", DesignerBlockEntity::new, ModBlocks.BLUEPRINT_DESIGNER.get(), ModBlocks.BLUEPRINT_DESIGNER_MK2.get(), ModBlocks.BLUEPRINT_DESIGNER_MK3.get());
 
 
-    /** Only holds what the Workshop's removed automatic mode had in it, until it is given back. */
-
     public static final Entry<ControllerBlockEntity> BUILDING_CONTROLLER = register("building_controller", ControllerBlockEntity::new, ModBlocks.BUILDING_CONTROLLER.get());
     public static final Entry<PortBlockEntity> BUILDING_PORT = register("building_port", PortBlockEntity::new, ModBlocks.BUILDING_PORT.get());
     public static final Entry<DeathCrateBlockEntity> DEATH_CRATE = register("death_crate", DeathCrateBlockEntity::new, ModBlocks.DEATH_CRATE.get());

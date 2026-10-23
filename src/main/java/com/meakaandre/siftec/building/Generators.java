@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import org.antarcticgardens.cna.content.electricity.generation.brushes.CarbonBrushesBlockEntity;
-import org.antarcticgardens.cna.content.electricity.generation.coil.GeneratorCoilBlockEntity;
 import org.antarcticgardens.cna.content.nuclear.reactor.fuelacceptor.ReactorFuelAcceptorBlockEntity;
 import org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity;
 import org.jspecify.annotations.Nullable;
@@ -99,17 +98,6 @@ public final class Generators {
     /** The share of its power the grid drew on the last tick: 0 if it drew none, or the building is on no grid. */
     static float load(ServerLevel level, ControllerBlockEntity c) {
         return c.tripped || c.loadAt < level.getGameTime() - 1 ? 0 : c.load;
-    }
-
-    /** SU its coils turn the shaft's power into, read off the coils (for status lines and the selftests). */
-    public static double coilSu(ServerLevel level, ControllerBlockEntity c) {
-        double su = 0;
-        for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:generator_coil"))) {
-            if (level.getBlockEntity(pos) instanceof GeneratorCoilBlockEntity coil) {
-                su += Math.max(0, coil.calculateStressApplied() - 24) * Math.abs(coil.getSpeed());
-            }
-        }
-        return su;
     }
 
     // ------------------------------------------------------------------------------------------------ every tick

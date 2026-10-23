@@ -482,11 +482,6 @@ public final class Prefabs {
         }
     }
 
-    /** What the HUB costs to put down: Satisfactory's, from siftec_content.json ("build_costs", The HUB). */
-    public static List<Milestone.Cost> hubCost() {
-        return cost(Kind.HUB);
-    }
-
     /**
      * What a structure costs to put down with the Build Gun: Satisfactory's, from siftec_content.json ("build_costs"):
      * The HUB, or the Space Elevator for the Wormhole Gateway. It comes back when the structure is dismantled.

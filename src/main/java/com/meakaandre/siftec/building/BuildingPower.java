@@ -39,14 +39,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CampfireBlock;
-import net.minecraft.world.level.block.PotentSulfurBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.PotentSulfurState;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 import org.antarcticgardens.cna.content.motor.MotorBlock;
 import org.antarcticgardens.cna.content.motor.MotorBlockEntity;
 import org.antarcticgardens.cna.content.nuclear.reactor.rod.ReactorRodBlockEntity;
@@ -760,22 +757,6 @@ public final class BuildingPower {
 
     private static @Nullable Storage<FluidVariant> tankStorage(Level level, @Nullable BlockPos pos) {
         return pos == null ? null : FluidStorage.SIDED.find(level, pos, null);
-    }
-
-    private static boolean hasFluid(Level level, @Nullable BlockPos pos, Fluid fluid) {
-        Storage<FluidVariant> tank = tankStorage(level, pos);
-        if (tank == null) return false;
-        for (StorageView<FluidVariant> view : tank) if (!view.isResourceBlank() && view.getResource().isOf(fluid) && view.getAmount() > 0) return true;
-        return false;
-    }
-
-    private static void drain(Level level, @Nullable BlockPos pos, Fluid fluid, long mb) {
-        Storage<FluidVariant> tank = tankStorage(level, pos);
-        if (tank == null) return;
-        try (Transaction tx = Transaction.openOuter()) {
-            tank.extract(FluidVariant.of(fluid), mb * (FluidConstants.BUCKET / 1000), tx);
-            tx.commit();
-        }
     }
 
     private static void fill(Level level, @Nullable BlockPos pos, String fluidId, long mb) {

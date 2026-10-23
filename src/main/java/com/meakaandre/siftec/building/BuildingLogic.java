@@ -42,7 +42,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -446,10 +445,6 @@ public final class BuildingLogic {
             pick.enchant(holder, fortune);
         }
         return pick;
-    }
-
-    private static boolean fits(ItemStack slot, ItemStack one) {
-        return slot.isEmpty() || ItemStack.isSameItemSameComponents(slot, one) && slot.getCount() < slot.getMaxStackSize();
     }
 
     /** Where a Portable Miner drops its ore: on the ground just in front of it. */

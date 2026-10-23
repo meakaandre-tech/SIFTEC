@@ -221,11 +221,6 @@ public class VehicleEntity extends Entity {
         return Math.max(1, (int) Math.ceil(kind.boxLength / kind.boxWidth));
     }
 
-    /** True if nothing solid stands anywhere in its body ({@link #bodyBlocked}). */
-    boolean bodyClear() {
-        return bodyBlocked() == 0;
-    }
-
     public void addFuel(double mj) {
         fuelMj = Math.min(kind.tankMj(), fuelMj + mj);
         syncFuel();
