@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "smoke-fixes"]
   workflow_dispatch:
 
 permissions:
@@ -269,6 +269,20 @@ jobs:
             cp -r crash-reports /tmp/ci/ 2>/dev/null || true
             cd $root
           fi
+      - name: Which jar asks for minecraft:end_of_frame
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p /tmp/ci; out=/tmp/ci/post-effect.txt; : > $out
+          scan() { # $1 jar, $2 label: every file in it (and in jars inside it) that names the effect
+            local d; d=$(mktemp -d); unzip -o -q "$1" -d "$d" 2>/dev/null
+            grep -rla 'end_of_frame' "$d" | sed "s#^$d/#$2!#" | grep -v '\.jar$' >> $out
+            find "$d" -name '*.jar' | while read -r n; do scan "$n" "$2!${n#$d/}"; done
+            rm -rf "$d"
+          }
+          for j in server/mods/*.jar run/mods/*.jar; do [ -f "$j" ] && scan "$j" "$j"; done
+          find ~/.gradle/caches/fabric-loom -name '*.jar' 2>/dev/null | grep -i minecraft | while read -r j; do scan "$j" "${j#$HOME/}"; done
+          echo "--- end ---" >> $out; cat $out
       - name: Publish build log to the ci-logs branch
         if: always()
         shell: bash
@@ -290,7 +304,7 @@ jobs:
           name: siftec-26.3
           path: build/libs/*.jar
       - name: Publish the jar as a release
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
