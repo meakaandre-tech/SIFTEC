@@ -9,9 +9,12 @@ A port feeds or drains the cell just inside it, or the cell given as {"Target": 
 
 Run from outside the repository: cd /tmp && python3 -I -B /path/to/SIFTEC/tools/structures.py
 """
-import gzip, io, os, struct
+import gzip, io, os, struct, sys
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "data", "siftec", "structure", "building")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from common import DATAPACK
+
+ROOT = os.path.join(DATAPACK, "structure", "building")
 DATA_VERSION = 5023  # what the game's own 26.3 structures carry; the game upgrades older files when it loads them
 
 # ---- a minimal NBT writer (big-endian, gzip with no timestamp so the output never changes between runs)

@@ -18,7 +18,7 @@ basin buildings set their recipe with that filter. Every recipe is locked to the
 alternate that unlocks it in 1.0. The food, brass and heat recipes (Food and Brass tab) are carried over below."""
 from common import read_pack
 from tables import content
-from tables.recipe_tables import BACKPACK_UPGRADES, REMOVED, TB, WORKSHOP
+from tables.recipe_tables import BACKPACK_UPGRADES, TB
 
 DROPLETS = 81  # Create Fly counts fluid in droplets: 81 per mB
 TICKS = 20
@@ -273,7 +273,7 @@ def satisfactory():
             packed = [(n, a) for k, n, a in (outs if name.startswith("Packaged ") else ins) if k == "item"]
             fluid = [(n, a) for k, n, a in (ins if name.startswith("Packaged ") else outs) if k == "fluid"]
             if name.startswith("Packaged ") or name.startswith("Unpackage "):
-                (cname, cn), (pname, pn), (fname, fa) = container[0], packed[0], fluid[0]
+                (cname, _), (pname, pn), (fname, fa) = container[0], packed[0], fluid[0]
                 per = fa / pn
                 if name.startswith("Packaged "):
                     path = add("filling", f"{where}/{rslug}", {"type": "create:filling", "ingredient": item(cname), "fluid_ingredient": fl_in(fname, mb(per)),

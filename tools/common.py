@@ -5,7 +5,7 @@ import os
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 RESOURCES = os.path.join(TOOLS, "..", "src", "main", "resources")
 ASSETS = os.path.join(RESOURCES, "assets", "siftec")
-DATA = os.path.join(RESOURCES, "data", "siftec")
+DATAPACK = os.path.join(RESOURCES, "data", "siftec")
 CONTENT_JSON = os.path.join(RESOURCES, "siftec_content.json")
 
 # every file this run wrote (normalised paths): gen_assets.py deletes the generated files it did not write

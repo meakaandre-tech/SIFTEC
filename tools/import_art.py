@@ -2,10 +2,14 @@
 """Cuts the sprite sheets from the "SIFTEC Art & Sprite Set" canvas (tools/art/) into the mod's 16x16 textures.
 The sheets are drawn at 4x, so every sprite pixel is a 4x4 square; each one is read back as a single pixel."""
 import os
+import sys
+
 from PIL import Image
 
-HERE = os.path.dirname(__file__)
-OUT = os.path.join(HERE, "..", "src", "main", "resources", "assets", "siftec", "textures")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from common import ASSETS, TOOLS
+
+OUT = os.path.join(ASSETS, "textures")
 
 BLOCK_SHEETS = {
     "blocks_base.png": "hub wormhole_gateway mam awesome_sink awesome_shop equipment_workshop claim_marker dimensional_depot steel_casing "
@@ -78,7 +82,7 @@ def bucket_overlay():
 def main():
     blocks, items = [], []
     for file, ids in BLOCK_SHEETS.items():
-        sheet = Image.open(os.path.join(HERE, "art", file)).convert("RGBA")
+        sheet = Image.open(os.path.join(TOOLS, "art", file)).convert("RGBA")
         for i, bid in enumerate(ids.split()):
             if bid in GONE:
                 continue
@@ -88,7 +92,7 @@ def main():
                 save(shrink(sheet, x + dx, y + 20, bid), "block", f"{bid}_{face}")
             blocks.append(bid)
     for file, ids in ITEM_SHEETS.items():
-        sheet = Image.open(os.path.join(HERE, "art", file)).convert("RGBA")
+        sheet = Image.open(os.path.join(TOOLS, "art", file)).convert("RGBA")
         for i, iid in enumerate(ids.split()):
             if iid in GONE:
                 continue
