@@ -473,7 +473,7 @@ sleep 2
 cmd siftec worldtest guide close
 sleep 1
 cmd gamemode spectator @a
-cmd execute in minecraft:overworld run tp @a 14120.5 201.4 14104.5 180 10
+cmd execute in minecraft:overworld run tp @a 14120.5 200.2 14105.5 180 16
 sleep 6
 shot
 cmd execute in minecraft:overworld run tp @a 14134.5 204 14110 180 5
@@ -489,5 +489,24 @@ cmd execute in minecraft:overworld run tp @a 14156 210 14118 180 40
 sleep 4
 shot
 cmd execute in minecraft:overworld run tp @a 14123.5 201.5 14124 180 15
+sleep 4
+shot
+cmd time set noon
+cmd siftec worldtest designer view 0
+sleep 15
+shot
+cmd siftec worldtest designer view 1
+sleep 4
+shot
+cmd siftec worldtest designer view 2
+sleep 6
+shot
+cmd siftec worldtest designer view 3
+sleep 4
+shot
+cmd siftec worldtest designer view 4
+sleep 6
+shot
+cmd siftec worldtest designer view 5
 sleep 4
 shot

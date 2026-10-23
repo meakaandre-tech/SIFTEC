@@ -24,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import org.jspecify.annotations.Nullable;
@@ -33,6 +34,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * What the background simulation ({@link com.meakaandre.siftec.sim}) needs to know about a building, read on the server
@@ -349,7 +352,8 @@ public final class SimAccess {
             case "biomass", "coal", "nuclear" -> {
                 n.mode = "gen";
                 n.inCap = 64;
-                n.outCap = 64;
+                // a nuclear plant's waste: its output slot and waste store (BuildingPower.WASTE_ROOM), several rods' worth
+                n.outCap = kind.equals("nuclear") ? BuildingPower.WASTE_ROOM : 64;
                 ItemStack in = c.input.getItem(0);
                 if (!in.isEmpty()) fuel(n, kind, in);
             }
@@ -406,12 +410,30 @@ public final class SimAccess {
 
     /** A generator's energy in its machines (SU-ticks), not counting the fuel waiting at its input. */
     public static double machineEnergy(ServerLevel level, ControllerBlockEntity c) {
+        return machineEnergy(level, c, null, null);
+    }
+
+    /**
+     * The same, reading its machines through {@code has} and {@code at} when given: a chunk that is unloading outright
+     * is no longer the level's, but its block entities are still there, so a generator's fuel is read as it leaves.
+     */
+    public static double machineEnergy(ServerLevel level, ControllerBlockEntity c, @Nullable Predicate<BlockPos> has,
+                                       @Nullable Function<BlockPos, BlockEntity> at) {
         PowerMember m = BuildingPower.member(level, c);
         BuildingDef def = c.def();
         if (m == null || def == null) return 0;
-        // a cell of it is not loaded: its machines cannot be read now (NaN: keep what was read before)
-        for (long chunk : chunks(c)) if (!level.hasChunk(net.minecraft.world.level.ChunkPos.getX(chunk), net.minecraft.world.level.ChunkPos.getZ(chunk))) return Double.NaN;
-        double r = m.reserve();
+        double r;
+        if (has != null && at != null && m instanceof BuildingPower.Generator g) {
+            // a cell of it out of reach: its machines cannot be read now (NaN: keep what was read before)
+            Placement p = c.placement();
+            BuildingTemplate t = p == null ? null : BuildingTemplate.of(p.def());
+            if (t != null) for (BuildingTemplate.Cell cell : t.members) if (!has.test(p.at(cell))) return Double.NaN;
+            r = g.reserve(at);
+        } else {
+            // a cell of it is not loaded: its machines cannot be read now (NaN: keep what was read before)
+            for (long chunk : chunks(c)) if (!level.hasChunk(net.minecraft.world.level.ChunkPos.getX(chunk), net.minecraft.world.level.ChunkPos.getZ(chunk))) return Double.NaN;
+            r = m.reserve();
+        }
         if (!Double.isFinite(r)) return 0;
         ItemStack in = c.input.getItem(0);
         return Math.max(0, r - Power.suTicksOfMj(BuildingPower.itemMj(def.power(), in) * in.getCount()));
@@ -450,13 +472,19 @@ public final class SimAccess {
 
     /** The values the simulation starts from when the building's chunk stops ticking. */
     public static void snapshot(ServerLevel level, ControllerBlockEntity c, SimData.Node n) {
+        snapshot(level, c, n, null, null);
+    }
+
+    /** The same, reading the machines through {@code has} and {@code at} when given (see machineEnergy). */
+    public static void snapshot(ServerLevel level, ControllerBlockEntity c, SimData.Node n, @Nullable Predicate<BlockPos> has,
+                                @Nullable Function<BlockPos, BlockEntity> at) {
         n.made = 0;
         n.mined = 0;
         n.given = 0;
         n.tripped = c.tripped;
         n.stored = c.energy;
         n.fed = n.fed0 = c.fedTicks;
-        double energy = machineEnergy(level, c);
+        double energy = machineEnergy(level, c, has, at);
         if (!Double.isNaN(energy)) n.energy = n.energy0 = energy;
         else n.energy0 = n.energy;
         n.unload = c.unload;

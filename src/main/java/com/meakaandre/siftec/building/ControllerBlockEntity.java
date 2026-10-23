@@ -65,6 +65,12 @@ public class ControllerBlockEntity extends BlockEntity {
     public String problem = "";
     public final SimpleContainer input = slots(), output = slots();
     /**
+     * A Nuclear Power Plant's waste beyond its output slot: with the output slot it holds
+     * {@link BuildingPower#WASTE_ROOM} waste, several rods' worth as Satisfactory's plant does, so the plant keeps
+     * refuelling while its waste waits to be carried away. Its output port takes from it after the output slot.
+     */
+    public final SimpleContainer waste = slots(8);
+    /**
      * Nine input slots, for the Particle Accelerator's and the Converter's ingredients: slot i takes the recipe's input i
      * mod n, so a plentiful input never fills the slots a scarce one needs.
      */
@@ -151,7 +157,11 @@ public class ControllerBlockEntity extends BlockEntity {
     }
 
     private SimpleContainer slots() {
-        return new SimpleContainer(1) {
+        return slots(1);
+    }
+
+    private SimpleContainer slots(int size) {
+        return new SimpleContainer(size) {
             @Override
             public void setChanged() {
                 super.setChanged();
@@ -189,7 +199,7 @@ public class ControllerBlockEntity extends BlockEntity {
                 }
             };
             storage = new CombinedStorage<>(List.of(in, FilteringStorage.insertOnlyOf(ContainerStorage.of(buffer, null)),
-                FilteringStorage.extractOnlyOf(ContainerStorage.of(output, null))));
+                FilteringStorage.extractOnlyOf(ContainerStorage.of(output, null)), FilteringStorage.extractOnlyOf(ContainerStorage.of(waste, null))));
         }
         return storage;
     }
@@ -197,7 +207,7 @@ public class ControllerBlockEntity extends BlockEntity {
     /** Empties the input and output slots and returns what they held (dismantling gives it back). */
     public List<ItemStack> takeContents() {
         List<ItemStack> out = new ArrayList<>();
-        for (SimpleContainer c : new SimpleContainer[]{input, output, buffer}) {
+        for (SimpleContainer c : new SimpleContainer[]{input, output, waste, buffer}) {
             for (int i = 0; i < c.getContainerSize(); i++) {
                 ItemStack stack = c.removeItemNoUpdate(i);
                 if (!stack.isEmpty()) out.add(stack);
@@ -273,6 +283,9 @@ public class ControllerBlockEntity extends BlockEntity {
         List<ItemStack> held = new ArrayList<>();
         for (int i = 0; i < buffer.getContainerSize(); i++) held.add(buffer.getItem(i));
         view.store("Buffer", ItemStack.OPTIONAL_CODEC.listOf(), held);
+        List<ItemStack> wasteHeld = new ArrayList<>();
+        for (int i = 0; i < waste.getContainerSize(); i++) wasteHeld.add(waste.getItem(i));
+        view.store("Waste", ItemStack.OPTIONAL_CODEC.listOf(), wasteHeld);
         view.store("Line", ItemStack.OPTIONAL_CODEC.listOf(), new ArrayList<>(line));
         view.store("Carrier", ItemStack.OPTIONAL_CODEC, carrier);
         view.putInt("Shape", shape);
@@ -308,6 +321,8 @@ public class ControllerBlockEntity extends BlockEntity {
         unload = view.getBooleanOr("Unload", false);
         List<ItemStack> held = view.read("Buffer", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of());
         for (int i = 0; i < buffer.getContainerSize(); i++) buffer.setItem(i, i < held.size() ? held.get(i) : ItemStack.EMPTY);
+        List<ItemStack> wasteHeld = view.read("Waste", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of());
+        for (int i = 0; i < waste.getContainerSize(); i++) waste.setItem(i, i < wasteHeld.size() ? wasteHeld.get(i) : ItemStack.EMPTY);
         line.clear();
         line.addAll(view.read("Line", ItemStack.OPTIONAL_CODEC.listOf()).orElse(List.of()));
         carrier = view.read("Carrier", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);

@@ -92,9 +92,7 @@
     "client.DebugEntriesInvoker",
     "client.ContainerScreenAccessor",
     "client.ScreenInvoker",
-    "client.PlayerEmoteMixin",
-    "client.MixerVisualMixin",
-    "client.VisualBlockEntityAccessor"
+    "client.PlayerEmoteMixin"
   ],
   "injectors": {
     "defaultRequire": 1

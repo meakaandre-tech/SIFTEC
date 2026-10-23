@@ -303,6 +303,36 @@ public final class BuildingPower {
         };
     }
 
+    /**
+     * How much waste a Nuclear Power Plant's output holds (its output slot and its waste store), as Satisfactory's
+     * plant: ten Uranium Fuel Rods' worth, so it keeps refuelling while its waste waits to be carried away.
+     */
+    public static final int WASTE_ROOM = 500;
+
+    /** The waste a plant's output holds now, or -1 if something else is in it. */
+    public static int wasteHeld(ControllerBlockEntity c, Item wasteItem) {
+        int held = 0;
+        ItemStack out = c.output.getItem(0);
+        if (!out.isEmpty()) {
+            if (!out.is(wasteItem)) return -1;
+            held += out.getCount();
+        }
+        for (int i = 0; i < c.waste.getContainerSize(); i++) {
+            ItemStack s = c.waste.getItem(i);
+            if (s.isEmpty()) continue;
+            if (!s.is(wasteItem)) return -1;
+            held += s.getCount();
+        }
+        return held;
+    }
+
+    /** All the waste a plant's output holds (its output slot and its waste store), whatever it is. */
+    public static int wasteHeld(ControllerBlockEntity c) {
+        int held = c.output.getItem(0).getCount();
+        for (int i = 0; i < c.waste.getContainerSize(); i++) held += c.waste.getItem(i).getCount();
+        return held;
+    }
+
     /** True if the waste a fuel rod leaves fits into the plant's output now. */
     static boolean wasteFits(ControllerBlockEntity c, ItemStack rod) {
         return wasteFits(c, rod, 0);
@@ -319,10 +349,11 @@ public final class BuildingPower {
         if (waste == null) return true;
         Item wasteItem = BuiltInRegistries.ITEM.getValue(Identifier.parse(waste));
         int n = WASTE_COUNT.getOrDefault(id, 1);
-        ItemStack out = c.output.getItem(0);
-        if (!out.isEmpty() && !out.is(wasteItem)) return false;
-        int max = out.isEmpty() ? wasteItem.getDefaultMaxStackSize() : out.getMaxStackSize();
-        return out.getCount() + promised + n <= max;
+        int held = wasteHeld(c, wasteItem);
+        if (held < 0) return false;
+        // the output slot and the waste store hold at most WASTE_ROOM, and never more than their stacks can
+        int room = Math.min(WASTE_ROOM, wasteItem.getDefaultMaxStackSize() * (1 + c.waste.getContainerSize()));
+        return held + promised + n <= room;
     }
 
     /** The waste these rods will leave (a stack of rods in a fuel acceptor, not yet used up). */
@@ -409,6 +440,14 @@ public final class BuildingPower {
         /** SU-ticks of fuel it holds: in its machines (burner fuel, the engine's tank, the rods) and at its input. */
         @Override
         public double reserve() {
+            return reserve(pos -> level.isLoaded(pos) ? level.getBlockEntity(pos) : null);
+        }
+
+        /**
+         * The same, reading its machines through {@code at} (a chunk that is unloading hands its block entities out only
+         * from itself, not through the level).
+         */
+        double reserve(java.util.function.Function<BlockPos, net.minecraft.world.level.block.entity.BlockEntity> at) {
             String kind = def.power();
             if (kind.equals("geothermal")) return Double.POSITIVE_INFINITY;
             double r = 0;
@@ -416,20 +455,20 @@ public final class BuildingPower {
                 case "biomass", "coal" -> {
                     List<BlockPos> burners = BuildingLogic.cells(c, Generators.block("create:blaze_burner"));
                     for (BlockPos pos : burners) {
-                        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b) {
+                        if (at.apply(pos) instanceof com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity b) {
                             r += full / Math.max(1, burners.size()) * b.getRemainingBurnTime();
                         }
                     }
                 }
                 case "fuel" -> {
-                    BlockPos at = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
-                    if (at != null && level.isLoaded(at) && level.getBlockEntity(at) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
+                    BlockPos engine = BuildingLogic.cell(c, Generators.block("createdieselgenerators:diesel_engine"));
+                    if (engine != null && at.apply(engine) instanceof EngineControl e && !e.siftec$fuel().isEmpty()) {
                         r += Power.suTicksOfMj(fluidMj(kind, e.siftec$fuel().getFluid()) * e.siftec$fuel().getAmount() / (FluidConstants.BUCKET / 1000.0));
                     }
                 }
                 case "nuclear" -> {
                     int rods = Math.max(1, BuildingLogic.cells(c, Generators.block("create_new_age:reactor_rod")).size());
-                    r += full * Generators.rodFuel(level, c) / (double) rods;
+                    r += full * Generators.rodFuel(c, at) / (double) rods;
                 }
                 default -> {
                 }
@@ -819,6 +858,8 @@ public final class BuildingPower {
                     out.shrink(move);
                 }
             }
+            // the rest into the waste store (room for WASTE_ROOM in all, which wasteFits keeps to)
+            if (!out.isEmpty()) out = c.waste.addItem(out);
             if (!out.isEmpty()) net.minecraft.world.Containers.dropItemStack(level, plant.getX() + 0.5, plant.getY() + 1.1, plant.getZ() + 0.5, out.copy());
             c.output.setChanged();
             return;

@@ -785,6 +785,11 @@ for fid, name, colour in content.FLUIDS:
     write(f"{A}/items/{fid}_bucket.json", {"model": {"type": "minecraft:model", "model": f"siftec:item/{fid}_bucket",
           "tints": [{"type": "minecraft:constant", "value": -1}, {"type": "minecraft:constant", "value": colour}]}})
 write(f"{A}/models/block/fluid.json", {"textures": {"particle": "minecraft:block/water_still"}})
+# The Sift's ichor ships no blockstate for its fluid block, so the client warns once per level; like vanilla's water
+# and lava, every level gets an empty model with only a particle texture (the fluid renderer draws the liquid)
+_sift = os.path.join(ROOT, "assets", "the_sift")
+write(f"{_sift}/blockstates/ichor.json", {"variants": {"": {"model": "the_sift:block/ichor"}}})
+write(f"{_sift}/models/block/ichor.json", {"textures": {"particle": "minecraft:block/water_still"}})
 
 # ---- recipes
 import shutil

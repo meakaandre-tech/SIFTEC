@@ -160,6 +160,7 @@ final class Buffers {
                     if (n.logic.equals("processor")) b.addSlots(seen, tc.buffer, 0, tc.buffer.getContainerSize(), Role.IN);
                 } else {
                     b.addSlots(seen, tc.output, 0, 1, Role.OUT);
+                    if (n.power.equals("nuclear")) b.addSlots(seen, tc.waste, 0, tc.waste.getContainerSize(), Role.OUT);
                 }
             } else if (target instanceof BasinBlockEntity basin && !store) {
                 Container inv = basin.itemCapability;
@@ -178,6 +179,8 @@ final class Buffers {
         if (n.mode.equals("gen") || n.logic.equals("miner")) {
             b.addSlots(seen, c.input, 0, 1, Role.IN);
             b.addSlots(seen, c.output, 0, 1, Role.OUT);
+            // a nuclear plant's waste store, after its output slot (BuildingPower.WASTE_ROOM in all)
+            if (n.power.equals("nuclear")) b.addSlots(seen, c.waste, 0, c.waste.getContainerSize(), Role.OUT);
         }
         for (BlockPos vault : vaults) {
             if (reach.be(vault) instanceof ItemVaultBlockEntity v) {
@@ -251,6 +254,8 @@ final class Buffers {
             else fOutCap += cap;
         }
         if (ground != null) outCap = 64;
+        // a nuclear plant's output holds its waste up to the room the real plant gives it, not all its slots could
+        if (n.power.equals("nuclear")) outCap = Math.min(outCap, com.meakaandre.siftec.building.BuildingPower.WASTE_ROOM);
         // the model's own figures stand where the buffers say less (a storage's capacity is what it is)
         if (!slots.isEmpty() || !items.isEmpty()) {
             if (n.mode.equals("store")) n.outCap = outCap;

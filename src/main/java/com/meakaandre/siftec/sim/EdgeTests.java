@@ -937,6 +937,9 @@ public final class EdgeTests {
             return;
         }
         long now = level.getGameTime();
+        int room = com.meakaandre.siftec.building.BuildingPower.WASTE_ROOM;
+        expect("nuclear: the recorded plant's output holds several rods' worth of waste, as the real one", model.outCap == room,
+            model.outCap + " (" + room + " wanted)");
         // with water and room for the waste: it runs (both before and after the fixes)
         SimData.Node ok = copy(model);
         ok.sim = true;
@@ -948,7 +951,7 @@ public final class EdgeTests {
         ok.out.clear();
         ok.fin.clear();
         ok.fin.put(water, 100_000L);
-        ok.outCap = 64;
+        ok.outCap = room;
         Sim.power(List.of(ok), now + 400);
         expect("nuclear: with rods, water and room for the waste the plant gives power", ok.given > 0, Math.round(ok.given) + " SU-ticks");
         SimData.Node full = copy(ok);
@@ -958,12 +961,26 @@ public final class EdgeTests {
         full.in.clear();
         full.in.put(rod, 10L);
         full.out.clear();
-        full.out.put(waste, 64L);
+        full.out.put(waste, (long) room);
         full.fin.clear();
         full.fin.put(water, 100_000L);
         Sim.power(List.of(full), now + 400);
-        expect("nuclear: with its waste output full it takes no rod and spills no waste", Sim.get(full.in, rod) == 10 && Sim.total(full.out) <= 64,
+        expect("nuclear: with its waste output full it takes no rod and spills no waste", Sim.get(full.in, rod) == 10 && Sim.total(full.out) <= room,
             Sim.get(full.in, rod) + " rods left, " + Sim.total(full.out) + " waste");
+        // one rod's waste still waiting to be carried away: it takes its next rod all the same
+        SimData.Node waiting = copy(ok);
+        waiting.simTime = now;
+        waiting.energy = 0;
+        waiting.given = 0;
+        waiting.in.clear();
+        waiting.in.put(rod, 10L);
+        waiting.out.clear();
+        waiting.out.put(waste, 50L);
+        waiting.fin.clear();
+        waiting.fin.put(water, 100_000L);
+        Sim.power(List.of(waiting), now + 400);
+        expect("nuclear: with one rod's waste still in its output it takes its next rod and gives power", waiting.given > 0 && Sim.get(waiting.in, rod) < 10,
+            Math.round(waiting.given) + " SU-ticks, " + Sim.get(waiting.in, rod) + " rods left, " + Sim.total(waiting.out) + " waste");
         SimData.Node dry = copy(ok);
         dry.simTime = now;
         dry.energy = 0;

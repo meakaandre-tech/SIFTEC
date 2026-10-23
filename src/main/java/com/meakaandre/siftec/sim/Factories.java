@@ -568,7 +568,9 @@ public final class Factories {
         Buffers b = Buffers.of(level, reach, n);
         if (b == null) return false;
         b.read(n);
-        if (be instanceof ControllerBlockEntity c) SimAccess.snapshot(level, c, n);
+        // the machines are read through the same reach: a generator whose chunk unloads outright has its burner fuel
+        // read as the chunk leaves, as one whose chunk only stops ticking
+        if (be instanceof ControllerBlockEntity c) SimAccess.snapshot(level, c, n, reach::has, reach::be);
         return true;
     }
 

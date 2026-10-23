@@ -488,8 +488,8 @@ public final class TravelersBackpackSelfTest {
             expect(source, "fix 3: a backpack is worn", false, state(player));
             return;
         }
-        ItemStack two = new ItemStack(Items.IRON_HELMET);
-        two.setCount(2);
+        // a stack of two of something worn on the head: armour stacks to one, so a carved pumpkin (it stacks to 64)
+        ItemStack two = new ItemStack(Items.CARVED_PUMPKIN, 2);
         wrapper.getStorage().setStackInSlot(0, two);
         BackpackContainer.openBackpack(player, TravelersBackpackCompat.worn(player), Reference.WEARABLE_SCREEN_ID);
         if (!(player.containerMenu instanceof BackpackBaseMenu menu)) {
@@ -498,7 +498,7 @@ public final class TravelersBackpackSelfTest {
         }
         int index = -1;
         for (int i = menu.BACKPACK_INV_START; i < menu.BACKPACK_INV_END && i < menu.slots.size(); i++) {
-            if (menu.slots.get(i).getItem().is(Items.IRON_HELMET)) index = i;
+            if (menu.slots.get(i).getItem().is(Items.CARVED_PUMPKIN)) index = i;
         }
         if (index >= 0) menu.quickMoveStack(player, index);
         player.closeContainer();
@@ -506,11 +506,11 @@ public final class TravelersBackpackSelfTest {
         int saved = 0;
         for (ItemStack stack : ContainerContentsHelper.getItems(worn.getOrDefault(ModDataComponents.BACKPACK_CONTAINER, ItemContainerContents.EMPTY),
             wrapper.getStorage().getSlots())) {
-            if (stack.is(Items.IRON_HELMET)) saved += stack.getCount();
+            if (stack.is(Items.CARVED_PUMPKIN)) saved += stack.getCount();
         }
-        boolean on = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(Items.IRON_HELMET);
+        boolean on = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(Items.CARVED_PUMPKIN);
         expect(source, "fix 3: shift-clicking armour out of a backpack slot that keeps part of the stack saves the part left in the backpack",
-            index >= 0 && on && saved == 1, "slot " + index + ", helmet on " + on + ", the backpack's saved contents hold " + saved + " (1 wanted)");
+            index >= 0 && on && saved == 1, "slot " + index + ", pumpkin on " + on + ", the backpack's saved contents hold " + saved + " (1 wanted)");
         clearAll(player);
         player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, ItemStack.EMPTY);
     }

@@ -28,6 +28,7 @@ execute in minecraft:the_nether run siftec worldtest place quartz
 siftec worldtest pads 12
 siftec worldtest regrow
 siftec worldtest clump
+siftec worldtest deployer
 siftec worldtest drops
 #sleep 8
 siftec worldtest restart setup

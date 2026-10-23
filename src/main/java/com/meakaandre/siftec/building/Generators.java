@@ -325,9 +325,14 @@ public final class Generators {
 
     /** Fuel ticks left in all the plant's rods. */
     static long rodFuel(ServerLevel level, ControllerBlockEntity c) {
+        return rodFuel(c, pos -> level.isLoaded(pos) ? level.getBlockEntity(pos) : null);
+    }
+
+    /** The same, reading the rods through {@code at}. */
+    static long rodFuel(ControllerBlockEntity c, java.util.function.Function<BlockPos, net.minecraft.world.level.block.entity.BlockEntity> at) {
         long n = 0;
         for (BlockPos pos : BuildingLogic.cells(c, block("create_new_age:reactor_rod"))) {
-            if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof ReactorRodBlockEntity rod) n += rod.fuel;
+            if (at.apply(pos) instanceof ReactorRodBlockEntity rod) n += rod.fuel;
         }
         return n;
     }

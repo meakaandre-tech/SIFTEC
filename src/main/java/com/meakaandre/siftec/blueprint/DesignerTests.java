@@ -81,7 +81,10 @@ public final class DesignerTests {
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> LATER.clear());
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .then(Commands.literal("selftest").then(Commands.literal("designer").executes(DesignerTests::run)))));
+                .then(Commands.literal("selftest").then(Commands.literal("designer").executes(DesignerTests::run)))
+                .then(Commands.literal("worldtest").then(Commands.literal("designer").then(Commands.literal("view")
+                    .then(Commands.argument("n", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 5))
+                        .executes(c -> view(c, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n")))))))));
     }
 
     private static void report(CommandSourceStack source, String text) {
@@ -115,6 +118,60 @@ public final class DesignerTests {
             report(source, "done: " + passed + " passed, " + failed + " failed");
         }));
         report(source, "test site ready; the checks report in a moment");
+        return 1;
+    }
+
+    // ------------------------------------------------------------------------------------------------ camera spots
+
+    /** Where the camera views stand: a row of their own, clear of the selftest's site. */
+    private static final int VZ = Z + 140;
+
+    /**
+     * {@code /siftec worldtest designer view <n>}, for screenshots: n 0 builds Mk.1, Mk.2 and Mk.3 in a row (creative,
+     * no company); even n puts every player outside tier n/2, odd n on its floor at the back, facing its terminal.
+     */
+    private static int view(CommandContext<CommandSourceStack> context, int n) {
+        CommandSourceStack source = context.getSource();
+        ServerLevel level = source.getServer().overworld();
+        var players = source.getServer().getPlayerList().getPlayers();
+        if (n == 0) {
+            BuildingTemplate.forget();
+            BuildingTests.platform(level, X - 16, VZ - 40, X + 150, VZ + 30, Y, 26);
+            for (int k = 0; k < TIERS.length; k++) {
+                BuildingDef def = Buildings.def(TIERS[k]);
+                if (def == null) continue;
+                Placement p = new Placement(def, new BlockPos(X + 50 * k, Y, VZ), Direction.NORTH, false);
+                Buildings.Check check = Buildings.place(level, p, null, null, true);
+                report(source, "view: " + TIERS[k] + " " + (check.ok() ? "built" : check.message().getString()) + " at " + p.anchor().toShortString());
+            }
+        }
+        int k = n / 2;
+        BuildingDef def = Buildings.def(TIERS[k]);
+        BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
+        if (t == null) return 0;
+        Placement p = new Placement(def, new BlockPos(X + 50 * k, Y, VZ), Direction.NORTH, false);
+        if (!(level.getBlockEntity(p.at(t.controller)) instanceof DesignerBlockEntity designer)) {
+            report(source, "view " + n + ": no " + TIERS[k] + " at " + p.at(t.controller).toShortString());
+            return 0;
+        }
+        BlockPos terminal = designer.getBlockPos();
+        AABB volume = designer.volume();
+        Vec3 centre = volume.getCenter(), at, look;
+        int side = SIDES[k];
+        if (n % 2 == 0) {
+            // outside: in front of the terminal (south) and off to one side, above the frame's height
+            at = new Vec3(centre.x + side * 0.6, Y + side * 0.8 + 3, terminal.getZ() + side * 1.1 + 4);
+            look = centre;
+        } else {
+            // on the floor at the back of the volume, looking across it at the terminal
+            at = new Vec3(centre.x + 0.5, volume.minY, volume.minZ + 1.5);
+            look = Vec3.atCenterOf(terminal);
+        }
+        for (var player : players) {
+            player.teleportTo(level, at.x, at.y, at.z, java.util.Set.of(), player.getYRot(), player.getXRot(), true);
+            player.lookAt(EntityAnchorArgument.Anchor.EYES, look);
+        }
+        report(source, "view " + n + " ready: " + TIERS[k] + " from " + String.format(java.util.Locale.ROOT, "%.1f %.1f %.1f", at.x, at.y, at.z));
         return 1;
     }
 

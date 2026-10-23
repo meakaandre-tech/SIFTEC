@@ -100,6 +100,7 @@ public final class NodeTests {
                 .then(Commands.literal("restart").then(Commands.literal("setup").executes(c -> restart(c, true)))
                     .then(Commands.literal("check").executes(c -> restart(c, false))))
                 .then(Commands.literal("clump").executes(NodeTests::clump))
+                .then(Commands.literal("deployer").executes(NodeTests::deployer))
                 .then(Commands.literal("showroom").executes(NodeTests::showroom))
                 .then(Commands.literal("look")
                     .then(Commands.literal("showroom").then(Commands.argument("col", IntegerArgumentType.integer(0, 40))
@@ -618,6 +619,105 @@ public final class NodeTests {
         level.setBlock(at, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         report(source, "drops result: " + tally[0] + " passed, " + tally[1] + " failed");
         return 1;
+    }
+
+    // ---- a Deployer at a node
+
+    /**
+     * A real Deployer, turned by a Creative Motor and holding a diamond pickaxe in punch mode, pointed down at a grown
+     * node: it never mines the node (a Deployer with a Fortune pickaxe would make a Miner Mk.2 with no milestone). The
+     * control is the same Deployer and motor over the same ore block off any node, in the sky above: that one it mines.
+     */
+    private static int deployer(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        ServerLevel level = source.getServer().overworld();
+        NodeMap.settle(level);
+        int[] tally = new int[2];
+        // a node none of the other node tests uses (regrowth, restart, clump)
+        List<Node> candidates = mineable(level);
+        Map<Purity, Node> regrowing = new EnumMap<>(Purity.class);
+        for (Node n : candidates) regrowing.putIfAbsent(n.purity(), n);
+        Node restart = restartNode(level);
+        Node node = null;
+        for (int i = 0; i < candidates.size() - 1 && node == null; i++) {
+            Node n = candidates.get(i);
+            if (!regrowing.containsValue(n) && n != restart) node = n;
+        }
+        if (node == null) {
+            check(source, tally, false, "deployer: no node to try it on");
+            return 0;
+        }
+        place(level, node, true);
+        BlockPos core = core(level, node);
+        NodeLook look = NodeLook.of(node);
+        Block ore = look.nodeBlock();
+        if (core == null || ore == null || !exactNode(level, core, look, node.purity())) {
+            check(source, tally, false, "deployer: the node at " + node.x() + " " + node.z() + " is grown (" + (core == null ? "no site" : key(level.getBlockState(core).getBlock())) + ")");
+            release(level, node);
+            return 0;
+        }
+        // the control, over the clump, well clear of the node's own block
+        BlockPos control = core.above(10);
+        level.setBlock(control, ore.defaultBlockState(), Block.UPDATE_ALL);
+        BlockPos onNode = deployerOver(level, core), onControl = deployerOver(level, control);
+        if (onNode == null || onControl == null) {
+            check(source, tally, false, "deployer: the Deployers go down over the node and the control");
+            release(level, node);
+            return 0;
+        }
+        Node site = node;
+        MONITORS.add(new Monitor() {
+            int t;
+
+            @Override
+            public boolean tick() {
+                if (++t < 200) return false;
+                float speed = level.getBlockEntity(onNode) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k ? k.getSpeed() : 0;
+                float speed2 = level.getBlockEntity(onControl) instanceof com.zurrtum.create.content.kinetics.base.KineticBlockEntity k ? k.getSpeed() : 0;
+                boolean controlMined = !level.getBlockState(control).is(ore);
+                check(source, tally, speed != 0 && speed2 != 0 && controlMined,
+                    "deployer: a Deployer turned by a Creative Motor (" + speed2 + " RPM) with a diamond pickaxe mines " + key(ore) + " off any node: now "
+                        + key(level.getBlockState(control).getBlock()));
+                check(source, tally, speed != 0 && exactNode(level, core, look, site.purity()),
+                    "deployer: the same Deployer (" + speed + " RPM) over the node at " + core.toShortString() + " for 10 s leaves it whole: still "
+                        + key(level.getBlockState(core).getBlock()));
+                for (BlockPos at : new BlockPos[]{onNode, onNode.east(), onControl, onControl.east(), control}) level.setBlock(at, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+                clearDrops(level, control);
+                report(source, "deployer result: " + tally[0] + " passed, " + tally[1] + " failed");
+                release(level, site);
+                return true;
+            }
+        });
+        return 1;
+    }
+
+    /**
+     * A Deployer facing down onto {@code target} (it works on the block two in front of it, so it stands two above, over
+     * an air gap), a diamond pickaxe in its hand and set to punch, and a Creative Motor at 64 RPM on its east side turning
+     * it. Null if one of them did not go down.
+     */
+    private static BlockPos deployerOver(ServerLevel level, BlockPos target) {
+        Block deployer = BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", "deployer"));
+        Block motor = BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("create", "creative_motor"));
+        BlockPos at = target.above(2), motorAt = at.east();
+        level.setBlock(target.above(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+        // facing down, its shaft runs east-west (along the first coordinate), so the motor turns it from the east
+        level.setBlock(at, deployer.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, Direction.DOWN)
+            .setValue(com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE, true), Block.UPDATE_ALL);
+        level.setBlock(motorAt, motor.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, Direction.WEST), Block.UPDATE_ALL);
+        if (!(level.getBlockEntity(at) instanceof com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity d)
+            || !(level.getBlockEntity(motorAt) instanceof com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity m)) return null;
+        m.generatedSpeed.setValue(64);
+        d.mode = com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode.PUNCH;
+        // the pickaxe goes into its hand the way a funnel or a hand gives it one
+        var hand = net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, at, null);
+        if (hand == null) return null;
+        try (var tx = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            if (hand.insert(net.fabricmc.fabric.api.transfer.v1.item.ItemVariant.of(new ItemStack(Items.DIAMOND_PICKAXE)), 1, tx) != 1) return null;
+            tx.commit();
+        }
+        d.setChanged();
+        return at;
     }
 
     // ---- regrowth over a restart

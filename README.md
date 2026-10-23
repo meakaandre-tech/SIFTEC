@@ -69,7 +69,8 @@ grid draws sets how fast their fuel burns:
   Fuel or Ionized Fuel for Satisfactory's burn times (20, 7.5, 4.17 and 3 m3 a minute at full).
 - **Nuclear Power Plant** (2,500 MW): New Age's reactor (fuel acceptors, rods, heat vents) heats two 18-level boilers of
   Steam Engines; it burns at full whatever the load, as Satisfactory 1.0's does: a Uranium Fuel Rod every 5 minutes
-  (a Plutonium one every 10), 240 m3 of water a minute, and 50 Uranium Waste (10 Plutonium Waste) a rod at its output.
+  (a Plutonium one every 10), 240 m3 of water a minute, and 50 Uranium Waste (10 Plutonium Waste) a rod at its output,
+  which holds 500 waste as Satisfactory's does, so it keeps taking rods while its waste waits to be carried away.
 - **Geothermal Generator**: its geyser drives its turbine and coils, following the geyser's purity (impure 100, normal
   200, pure 400 MW on average) and swinging up and down over a minute (50-150, 100-300, 200-600 MW), with sulfuric acid
   as waste.
