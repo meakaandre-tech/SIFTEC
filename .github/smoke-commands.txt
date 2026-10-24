@@ -18,6 +18,7 @@ siftec selftest ownership
 siftec selftest datafix
 siftec selftest powerfix
 siftec selftest buildingfix
+siftec selftest quality
 siftec selftest machines
 siftec selftest state setup
 siftec selftest state check
@@ -51,3 +52,4 @@ siftec selftest always edges
 #sleep 120
 siftec selftest always setup
 #sleep 600
+#wait 900 SELFTEST always result:

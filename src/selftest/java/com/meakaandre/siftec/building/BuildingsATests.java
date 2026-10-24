@@ -50,6 +50,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -83,6 +84,8 @@ import java.util.Set;
  */
 public final class BuildingsATests {
     private static final int X = 3600, Y = 230, Z = 2400;
+    /** Ticks the Miner Mk.1 has after a restart to be ticking and mining again. */
+    private static final int MINER_RESTART_WAIT = 600;
     private static final String COMPANY = "selftest_wp5";
     /** Ticks the buildings get to settle before the rates are measured, and how long they are measured over. */
     private static final int WARMUP = 300, MINUTE = 1200;
@@ -706,10 +709,16 @@ public final class BuildingsATests {
         Placement mk1 = BuildingNodes.snapToNode(level, at("miner_mk1", X + 41, Z + 3));
         ControllerBlockEntity mc = controller(level, mk1);
         long before = mc == null ? -1 : mc.made;
-        later(level, 100, () -> {
+        // its chest fills at 60 ore a minute however long the server ran before the restart: emptied, so it has room to
+        // go on; then the check waits for its chunk to tick and for it to mine, rather than a fixed time
+        if (level.getBlockEntity(mk1.at(0, 0, -1)) instanceof Container chest) chest.clearContent();
+        LATER.when(level.getGameTime(), () -> {
+            ControllerBlockEntity m = controller(level, mk1);
+            return m != null && level.shouldTickBlocksAt(m.getBlockPos()) && m.made > before;
+        }, MINER_RESTART_WAIT, mined -> {
             ControllerBlockEntity m2 = controller(level, mk1);
-            expect(source, "restart: the Miner Mk.1 still knows its node and goes on mining", m2 != null && m2.node != null && m2.made > before,
-                m2 == null ? "no controller" : m2.node + ", " + before + " -> " + m2.made);
+            expect(source, "restart: the Miner Mk.1 still knows its node and goes on mining", mined && m2 != null && m2.node != null,
+                m2 == null ? "no controller" : m2.node + ", " + before + " -> " + m2.made + (level.shouldTickBlocksAt(m2.getBlockPos()) ? "" : ", its chunk not ticking"));
             report(source, "restart result: " + REPORT.totals());
         });
         return 1;

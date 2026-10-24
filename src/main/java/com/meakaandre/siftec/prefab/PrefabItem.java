@@ -51,10 +51,7 @@ public class PrefabItem extends BlockItem {
         if (!(player instanceof ServerPlayer server) || !(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
         if (Companies.isFake(server)) return InteractionResult.FAIL;
         ItemStack stack = player.getItemInHand(hand);
-        if (!Locks.allowed(player, stack)) {
-            Locks.tellLocked(server, Locks.lockOf(stack.getItem()));
-            return InteractionResult.FAIL;
-        }
+        if (Locks.refused(server, stack)) return InteractionResult.FAIL;
         Prefabs.Spot spot = Prefabs.aim(player, kind);
         if (spot == null) {
             server.sendOverlayMessage(Component.translatable("siftec.prefab.aim", Prefabs.RANGE));

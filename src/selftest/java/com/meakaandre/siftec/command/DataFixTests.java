@@ -3,6 +3,7 @@ package com.meakaandre.siftec.command;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.meakaandre.siftec.DelayedChecks;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.TestQueue;
 import com.meakaandre.siftec.TestReport;
@@ -70,7 +71,7 @@ public final class DataFixTests {
 
     private static final TestQueue LATER = new TestQueue();
     private static final TestReport REPORT = new TestReport("SELFTEST datafix ");
-    private static int pending;
+    private static final DelayedChecks DELAYED = new DelayedChecks(LATER, REPORT);
 
     private DataFixTests() {
     }
@@ -85,11 +86,7 @@ public final class DataFixTests {
     // ------------------------------------------------------------------------------------------------ helpers
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        pending++;
-        LATER.add(level.getServer().overworld().getGameTime() + ticks, () -> {
-            run.run();
-            pending--;
-        });
+        DELAYED.at(level.getServer().overworld().getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
@@ -162,7 +159,7 @@ public final class DataFixTests {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
         REPORT.reset();
-        pending = 0;
+        DELAYED.start(source);
         BuildingTests.platform(level, X - 8, Z - 8, X + 24, Z + 24, Y, 8);
         later(level, 10, () -> {
             run(source, "4 alternates", () -> alternates(source, level));
@@ -178,20 +175,12 @@ public final class DataFixTests {
     }
 
     private static void run(CommandSourceStack source, String part, Runnable checks) {
-        try {
-            checks.run();
-        } catch (RuntimeException e) {
-            Siftec.LOGGER.error("SIFTEC: selftest datafix {} threw", part, e);
-            expect(source, part + " runs to the end", false, e.toString());
-        }
+        REPORT.attempt(source, part, checks);
     }
 
+    /** Reports once every delayed check has run. */
     private static void finish(CommandSourceStack source, ServerLevel level) {
-        if (pending > 0) {
-            LATER.add(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level));
-            return;
-        }
-        report(source, "done: " + REPORT.totals());
+        DELAYED.finish(level.getServer().overworld().getGameTime(), () -> report(source, "done: " + REPORT.totals()));
     }
 
     // ------------------------------------------------------------------------------------------------ 4

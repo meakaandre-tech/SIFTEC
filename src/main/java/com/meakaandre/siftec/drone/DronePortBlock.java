@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.drone;
 
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.place.Places;
 import com.meakaandre.siftec.registry.ModBlockEntities;
@@ -88,7 +89,7 @@ public class DronePortBlock extends Block implements EntityBlock {
                 port.setChanged();
                 Places.add(server.level(), pos, Places.DRONE_PORT, port.companyId, "Port " + pos.getX() + ", " + pos.getZ());
             }
-            if (Companies.byId(server.level().getServer(), port.companyId) != Companies.of(server)) server.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
+            if (!BuildingMenus.member(server, port.companyId)) server.sendOverlayMessage(Component.translatable("siftec.place.not_yours"));
             else DroneMenu.open(server, port, pos);
         }
         return InteractionResult.SUCCESS;

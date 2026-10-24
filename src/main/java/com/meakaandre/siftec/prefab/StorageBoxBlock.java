@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.prefab;
 
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.registry.ModBlockEntities;
@@ -33,7 +34,7 @@ public class StorageBoxBlock extends Block implements EntityBlock, PrefabPart {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(player instanceof ServerPlayer server) || !(level.getBlockEntity(pos) instanceof StorageBoxBlockEntity box)) return InteractionResult.SUCCESS;
         Company owner = box.companyId.isEmpty() ? null : Companies.byId(server.level().getServer(), box.companyId);
-        if (owner != null && owner != Companies.of(server) && !server.hasInfiniteMaterials()) {
+        if (owner != null && !BuildingMenus.member(server, box.companyId) && !server.hasInfiniteMaterials()) {
             server.sendOverlayMessage(Component.translatable("siftec.hub.not_yours", owner.name));
             return InteractionResult.SUCCESS;
         }

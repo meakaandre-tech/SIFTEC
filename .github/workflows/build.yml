@@ -122,8 +122,21 @@ jobs:
           # .github/smoke-commands.txt, and (when .github/smoke-client exists) joins it with a dev client under Xvfb,
           # driven by .github/smoke-script.txt. Then restarts the server on the saved world
           # (.github/smoke-commands-restart.txt). Logs and screenshots go to the ci-logs branch.
+          # Waits are on conditions where they can be: "#wait <seconds> <text>" in the command files and
+          # "wait <seconds> <text>" in the script go on as soon as the text shows in the logs (or after the seconds).
           set +e
           mkdir -p /tmp/ci
+          # waits up to $1 seconds for the text $2 (taken as it is) to show in any of the files after it
+          waitfor() {
+            local secs=$1 text=$2
+            shift 2
+            for i in $(seq 1 "$secs"); do
+              for f in "$@"; do grep -qF -- "$text" "$f" 2>/dev/null && { echo "waited ${i}s for: $text"; return 0; }; done
+              sleep 1
+            done
+            echo "gave up after ${secs}s waiting for: $text"
+            return 1
+          }
           if [ -f .github/smoke-test ] && ls build/libs/*.jar >/dev/null 2>&1; then
             exec > >(tee /tmp/ci/smoke.txt) 2>&1
             root=$PWD
@@ -187,7 +200,7 @@ jobs:
             done
             if grep -q 'Done (' server.log; then
               if [ -f $root/.github/smoke-commands.txt ]; then
-                while read -r line; do case "$line" in "#sleep "*) sleep "${line#\#sleep }";; *) echo "$line" >&3; sleep 0.3;; esac; done < $root/.github/smoke-commands.txt
+                while read -r line; do case "$line" in "#sleep "*) sleep "${line#\#sleep }";; "#wait "*) w=${line#\#wait }; waitfor "${w%% *}" "${w#* }" server.log;; *) echo "$line" >&3; sleep 0.3;; esac; done < $root/.github/smoke-commands.txt
                 sleep 10
               fi
               if [ -f $root/.github/smoke-client ]; then
@@ -210,14 +223,17 @@ jobs:
                 sleep 2
                 (glxinfo -B; eglinfo -B 2>/dev/null | head -40; vulkaninfo --summary 2>/dev/null | head -40) > /tmp/ci/gfx.txt 2>&1
                 (env -u CI JAVA_TOOL_OPTIONS=-Dcreate.mixin.audit=true timeout 1500 ./gradlew runSelftestClient --no-daemon -Dorg.gradle.console=plain --args="--quickPlayMultiplayer localhost --width 1280 --height 720" > client-gradle.log 2>&1; echo "EXIT $?" >> client-gradle.log) &
-                for i in $(seq 1 130); do
+                # the client joins when it is ready, however slow: as long as its own timeout allows
+                for i in $(seq 1 300); do
                   if grep -q 'joined the game' server/server.log || grep -q '^EXIT' client-gradle.log || grep -q -e 'Failed to create backend Vulkan' -e 'Caught error loading resourcepacks' run/logs/latest.log 2>/dev/null; then break; fi
                   sleep 5
                 done
                 n=0
                 shot() { n=$((n+1)); import -window root /tmp/ci/client-$(printf '%02d' $n).png; }
                 if grep -q 'joined the game' server/server.log; then
-                  sleep 40
+                  # the script starts once the client has the world around it loaded and drawn
+                  echo "siftec worldtest ready 0" >&3
+                  waitfor 900 "SELFTEST client ready 0." run/logs/latest.log
                   xdotool mousemove 640 360
                   if [ -f .github/smoke-script.txt ]; then
                     while read -r kind arg; do
@@ -228,6 +244,7 @@ jobs:
                         keyup) xdotool keyup "$arg";;
                         type) xdotool type --delay 40 "$arg";;
                         sleep) sleep "$arg";;
+                        wait) waitfor "${arg%% *}" "${arg#* }" server/server.log run/logs/latest.log;;
                         shot) shot;;
                         move) xdotool mousemove $arg;;
                         click) xdotool mousemove $arg; sleep 0.3; xdotool click 1; sleep 0.4;;
@@ -263,7 +280,7 @@ jobs:
                 sleep 5
               done
               if grep -q 'Done (' server2.log; then
-                while read -r line; do case "$line" in "#sleep "*) sleep "${line#\#sleep }";; *) echo "$line" >&3; sleep 0.3;; esac; done < $root/.github/smoke-commands-restart.txt
+                while read -r line; do case "$line" in "#sleep "*) sleep "${line#\#sleep }";; "#wait "*) w=${line#\#wait }; waitfor "${w%% *}" "${w#* }" server2.log;; *) echo "$line" >&3; sleep 0.3;; esac; done < $root/.github/smoke-commands-restart.txt
                 sleep 10
                 echo "stop" >&3
                 for i in $(seq 1 60); do grep -q '^EXIT' server2.log && break; sleep 2; done

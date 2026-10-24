@@ -207,7 +207,7 @@ public final class MapTests {
         expect(source, "no other company's key buildings show", noBuildings, "");
 
         // ---- nodes: those of resources the company's scanner knows
-        if (NodeMap.ready(level)) {
+        if (NodeMap.ready()) {
             Optional<Node> iron = NodeMap.nearest(level, X, Z, NodeType.IRON, 12);
             if (iron.isPresent()) {
                 long nodeRegion = MapGrid.regionOfBlock(iron.get().x(), iron.get().z());

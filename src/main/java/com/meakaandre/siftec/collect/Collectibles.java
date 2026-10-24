@@ -73,7 +73,7 @@ public final class Collectibles {
 
     /** True if the spot of the cell holding this chunk is already worked out. */
     public static boolean cached(ServerLevel level, int chunkX, int chunkZ) {
-        if (level.dimension() != Level.OVERWORLD || !NodeMap.ready(level)) return true;
+        if (level.dimension() != Level.OVERWORLD || !NodeMap.ready()) return true;
         return CACHE.containsKey(key(Math.floorDiv(chunkX << 4, CELL), Math.floorDiv(chunkZ << 4, CELL)));
     }
 
@@ -92,7 +92,7 @@ public final class Collectibles {
     }
 
     public static Optional<Spot> inCell(ServerLevel level, int cellX, int cellZ) {
-        if (level.dimension() != Level.OVERWORLD || !NodeMap.ready(level)) return Optional.empty();
+        if (level.dimension() != Level.OVERWORLD || !NodeMap.ready()) return Optional.empty();
         int[] from = NodeMap.origin();
         if (from == null) return Optional.empty();
         long seed = level.getSeed();

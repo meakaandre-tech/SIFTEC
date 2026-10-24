@@ -29,6 +29,19 @@ public final class TestReport {
         report(source, (ok ? "PASS " : "FAIL ") + what + (detail.isEmpty() ? "" : " (" + detail + ")"));
     }
 
+    /**
+     * Runs one part of a suite, now or from its queue: a part that throws is logged and counted as a failed check
+     * ("FAIL part runs to the end"), so the rest of the suite still runs and its totals still print.
+     */
+    public void attempt(CommandSourceStack source, String part, Runnable checks) {
+        try {
+            checks.run();
+        } catch (RuntimeException e) {
+            Siftec.LOGGER.error("SIFTEC: {}{} threw", prefix, part, e);
+            expect(source, part + " runs to the end", false, e.toString());
+        }
+    }
+
     /** Starts the count again. */
     public void reset() {
         passed = failed = 0;

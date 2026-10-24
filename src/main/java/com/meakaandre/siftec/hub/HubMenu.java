@@ -230,7 +230,7 @@ public class HubMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player who) {
         if (player == null) return true;
-        if (who != player || company == null || pos == null || player.isRemoved()) return false;
+        if (who != player || company == null || pos == null || !BuildingMenus.alive(player)) return false;
         if (!BuildingMenus.withinReach(player, pos, REACH)) return false;
         HubBlockEntity hub = hub();
         if (hub == null || !(hub.getBlockState().getBlock() instanceof HubBlock block) || block.gateway != gateway) return false;

@@ -73,9 +73,12 @@ public final class Factories {
     private record Due(ServerLevel level, BlockPos pos, boolean port) {
     }
 
-    // ---- what the debug overlay shows
-    private static double mainAvgNanos, workerAvgNanos;
-    static long mainLastNanos, workerLastNanos;
+    // ---- what the debug overlay shows. The worker writes its own two times and the server thread reads them, so those
+    // are volatile (each a single writer); everything else is written and read on the server thread only.
+    private static double mainAvgNanos;
+    private static volatile double workerAvgNanos;
+    static long mainLastNanos;
+    static volatile long workerLastNanos;
     static int lastNodes, lastSimulated, lastGroups, lastVehicles;
     static long catchUps, snapshots;
 

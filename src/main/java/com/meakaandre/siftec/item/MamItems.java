@@ -88,10 +88,7 @@ public final class MamItems {
         public InteractionResult use(Level level, Player player, InteractionHand hand) {
             ItemStack stack = player.getItemInHand(hand);
             if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
-            if (!Locks.allowed(player, stack)) {
-                Locks.tellLocked(server, Locks.lockOf(stack.getItem()));
-                return InteractionResult.FAIL;
-            }
+            if (Locks.refused(server, stack)) return InteractionResult.FAIL;
             kind.apply(player);
             server.sendOverlayMessage(Component.translatable(kind.key()));
             if (!player.hasInfiniteMaterials()) stack.shrink(1);

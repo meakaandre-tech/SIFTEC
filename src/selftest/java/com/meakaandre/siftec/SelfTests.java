@@ -20,6 +20,7 @@ import com.meakaandre.siftec.command.OwnershipFixTests;
 import com.meakaandre.siftec.command.PolishTests;
 import com.meakaandre.siftec.command.PowerFixTests;
 import com.meakaandre.siftec.command.ProgressionTests;
+import com.meakaandre.siftec.command.QualityFixTests;
 import com.meakaandre.siftec.command.ReviewFixTests;
 import com.meakaandre.siftec.command.WorldTests;
 import com.meakaandre.siftec.compat.TravelersBackpackSelfTest;
@@ -51,6 +52,7 @@ public final class SelfTests implements SelfTestHooks.Plugin {
                 VehicleTests.register();
                 MapTests.register();
                 CoreTests.register();
+                SmokeWaits.register();
             }
             case CLAIMS -> StateSelfTest.register();
             case BACKPACK -> TravelersBackpackSelfTest.register();
@@ -65,6 +67,7 @@ public final class SelfTests implements SelfTestHooks.Plugin {
                 MachineTests.register();
                 ExploitTests.register();
                 DesignerTests.register();
+                QualityFixTests.register();
             }
             case SIMULATION -> AlwaysTests.register();
             case LATE -> PolishTests.register();

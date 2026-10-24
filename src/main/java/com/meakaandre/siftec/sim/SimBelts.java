@@ -76,7 +76,7 @@ final class SimBelts {
         }
     }
 
-    /** What a link carries along to a node: the next in its order that the node wants (for the boundary's deliveries). */
+    /** What a link takes from: its source node's fluid output for a pipe, its item output for a belt. */
     static Map<String, Long> source(Node n, boolean fluid) {
         if (fluid) return n.fout;
         return n.out;

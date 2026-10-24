@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,7 @@ public final class Locks {
             ItemStack stack = player.getItemInHand(hand);
             if (!(stack.getItem() instanceof BlockItem) || allowed(player, stack)) return InteractionResult.PASS;
             if (player instanceof ServerPlayer server) {
-                tellLocked(server, lockOf(stack.getItem()));
+                tellLocked(server, stack);
                 // the client has already drawn the block; put its inventory and view right again
                 server.containerMenu.broadcastFullState();
             }
@@ -58,18 +59,37 @@ public final class Locks {
     }
 
     /** The milestone or research node that carries a token, such as "food:preserves"; null if none does. */
-    public static Milestone carrier(String token) {
+    public static @Nullable Milestone carrier(String token) {
         for (Milestone m : Milestones.all()) if (m.tokens().contains(token)) return m;
         return null;
     }
 
-    public static Milestone lockOf(Item item) {
+    /** The milestone or research node that unlocks this item, or null when nothing locks it. */
+    public static @Nullable Milestone lockOf(Item item) {
         return BY_ITEM.get(BuiltInRegistries.ITEM.getKey(item));
     }
 
-    /** Tells the player, over the hotbar, that this milestone or research node has to be done first. */
-    public static void tellLocked(ServerPlayer player, Milestone lock) {
-        player.sendOverlayMessage(Component.translatable("siftec.lock.item", lock.name()));
+    /**
+     * Tells the player, over the hotbar, that this milestone or research node has to be done first. A missing lock
+     * (nothing locks the item, say after a data reload) says only that the item is locked, never fails.
+     */
+    public static void tellLocked(ServerPlayer player, @Nullable Milestone lock) {
+        player.sendOverlayMessage(lock == null ? Component.translatable("siftec.lock.unknown") : Component.translatable("siftec.lock.item", lock.name()));
+    }
+
+    /** {@link #tellLocked(ServerPlayer, Milestone)} for whatever locks this stack's item. */
+    public static void tellLocked(ServerPlayer player, ItemStack stack) {
+        tellLocked(player, lockOf(stack.getItem()));
+    }
+
+    /**
+     * True, with the reason shown to the player, if the player's company may not use this stack yet (see
+     * {@link #allowed}); false if it may, so a caller just stops on true.
+     */
+    public static boolean refused(ServerPlayer player, ItemStack stack) {
+        if (allowed(player, stack)) return false;
+        tellLocked(player, stack);
+        return true;
     }
 
     /** False, with the reason shown to the player, if the player's company may not take this item out of a result slot. */

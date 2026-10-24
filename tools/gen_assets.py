@@ -7,6 +7,7 @@ texture.
     cd /tmp && python3 -I -B <repo>/tools/gen_assets.py"""
 import json
 import os
+import re
 import shutil
 import sys
 
@@ -614,7 +615,11 @@ for e in recipes.ASSEMBLY:
     data["assembly"].append(entry)
 data["packager"] = [{**{k: v for k, v in p.items() if k != "path"}, "lock": recipe_lock(p["path"], p["out"])} for p in recipes.PACKAGER]
 print("assembly recipes:", len(data["assembly"]), "; packager recipes:", len(data["packager"]))
-print("recipes locked to a milestone:", len(data["recipe_locks"]), "of", len(built))
+# the locks also name sequenced assembly steps ("seq:...") and other mods' recipes, which are not among this pack's own
+_own_locks = sum(1 for k in data["recipe_locks"] if k.startswith("siftec:") and k[len("siftec:"):] in built)
+_seq_locks = sum(1 for k in data["recipe_locks"] if k.startswith("seq:"))
+print(f"recipes locked to a milestone: {_own_locks} of the pack's {len(built)}; also {_seq_locks} sequenced assembly steps and "
+      f"{len(data['recipe_locks']) - _own_locks - _seq_locks} other mods' recipes")
 data["removed_recipes"] = REMOVED
 data["workshop"] = [{"item": i, "cost": cost_list(cost)} for i, cost in WORKSHOP]
 # 1.0 build costs of every building the Build Gun will place, under its 1.0 name, for work packages 5 and 9
@@ -822,6 +827,19 @@ for b, top in (("hub", "create:block/andesite_casing"), ("wormhole_gateway", "cr
     # the HUB is built with the Build Gun and has no item; the Gateway is still an item
     if b != "hub":
         item_def(b, f"siftec:block/{b}")
+
+# every siftec.* key the mod's code names outright (Component.translatable / translatableWithFallback with a literal key)
+# needs its text here: a fallback in the code is only English for a missing key, not a translation file entry
+_KEY_IN_CODE = re.compile(r'translatable(?:WithFallback)?\(\s*"(siftec\.[^"]+)"\s*[,)]')
+_missing_keys = set()
+for _src in ("main", "client"):
+    for _dir, _, _files in os.walk(os.path.join(TOOLS, "..", "src", _src, "java")):
+        for _name in _files:
+            if _name.endswith(".java"):
+                with open(os.path.join(_dir, _name)) as _f:
+                    _missing_keys.update(k for k in _KEY_IN_CODE.findall(_f.read()) if k not in lang)
+if _missing_keys:
+    raise SystemExit("lang: keys named in the code with no text in tables/lang.py: " + ", ".join(sorted(_missing_keys)))
 
 write(f"{A}/lang/en_us.json", dict(sorted(lang.items())))
 
