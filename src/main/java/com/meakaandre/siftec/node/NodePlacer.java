@@ -118,7 +118,7 @@ public final class NodePlacer {
                 }
                 if (next == null) return;
                 ServerLevel level = server.getLevel(next.dimension());
-                if (level == null || !NodeMap.ready(level) || !level.hasChunk(next.x(), next.z())) continue;
+                if (level == null || !NodeMap.ready() || !level.hasChunk(next.x(), next.z())) continue;
                 // working a cell out samples the world generator: done on the worker thread, the chunk waits for it
                 if (!cellsReady(level, next.x(), next.z())) {
                     WAITING.add(next);
@@ -172,7 +172,7 @@ public final class NodePlacer {
 
     /** Places the node blocks that belong in this chunk, once. True if it placed any. */
     public static boolean placeChunk(ServerLevel level, int chunkX, int chunkZ) {
-        if (!NodeMap.ready(level) || !level.hasChunk(chunkX, chunkZ)) return false;
+        if (!NodeMap.ready() || !level.hasChunk(chunkX, chunkZ)) return false;
         NodeSavedData data = NodeSavedData.get(level.getServer());
         boolean any = false;
         for (Node node : nodesTouching(level, chunkX, chunkZ)) {

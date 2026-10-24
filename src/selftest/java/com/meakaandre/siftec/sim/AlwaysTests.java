@@ -73,8 +73,10 @@ import java.util.UUID;
  * The always-running simulation's main check: the same small factory built twice (a Miner Mk.1 on a normal iron node, a Smelter, a
  * Constructor making Iron Rods, its rods carried by a Truck from one Truck Station to another, into a Storage Container;
  * a Biomass Burner powering it), one left loaded and the other let go so its chunks unload. After ten in-game minutes the
- * two must hold the same rods (within one craft), with no chunk of the second loaded meanwhile, and they must still match
- * after a restart (with the second still unloaded, and again once it is loaded and caught up). Also: 200 simulated
+ * two must hold the same rods (within one craft), with no chunk of the second loaded meanwhile. The ten minutes are the
+ * twins' whole run: both fuses are blown at the same tick then, so however long the server runs on before its restart (a
+ * slow client), neither makes or backs up anything more. They must still match after the restart (with the second still
+ * unloaded, and again once it is loaded and caught up), checked once the world is back rather than after a fixed time. Also: 200 simulated
  * buildings cost less than 1 ms a tick. Every check prints "SELFTEST always"; failures say FAIL.
  */
 public final class AlwaysTests {
@@ -82,6 +84,11 @@ public final class AlwaysTests {
     private static final int OX = -9000, OZ = -9000, Y = 150, B_OFFSET = 600;
     /** Ticks for the Biomass Burners to light before the miners go down, and the ten minutes. */
     private static final int WARMUP = 300, RUN = 12_000;
+    /**
+     * After a restart, ticks to wait at most for twin A to tick with its Truck back and twin B's buildings in the
+     * simulation, and then for twin B, loaded again, to be caught up and running for real.
+     */
+    private static final int RESTART_WAIT = 1200, LOAD_WAIT = 600;
     private static final String ROD = "siftec:iron_rod", COMPANY = "selftest_always";
 
     private static final TestQueue LATER = new TestQueue();
@@ -558,9 +565,32 @@ public final class AlwaysTests {
         expect(source, tag + "twin B is still simulated", sim >= 6, sim + " buildings");
         report(source, Factories.stats().line());
         if (!afterRestart) {
+            stop(source, server, level);
             bench(source);
             report(source, "result: " + REPORT.totals());
         }
+    }
+
+    /**
+     * The end of the twins' run: both their fuses are blown in the same tick, twin A's in the world and twin B's in the
+     * simulation, so both factories stand still from now on, whenever the restart comes.
+     */
+    private static void stop(CommandSourceStack source, MinecraftServer server, ServerLevel level) {
+        ControllerBlockEntity a = controller(level, A.burner(), "biomass_burner");
+        if (a != null) {
+            a.tripped = true;
+            a.setChanged();
+        }
+        Factories.join();
+        SimData data = SimData.get(server);
+        SimData.Node b = null;
+        for (SimData.Node n : nodes(server, B)) if ("biomass_burner".equals(n.building)) b = n;
+        if (b != null) {
+            b.tripped = true;
+            data.setDirty();
+        }
+        expect(source, "the twins' run ends here: both fuses blown together", a != null && b != null,
+            (a == null ? "no burner in twin A" : "") + (b == null ? " no burner in twin B's simulation" : ""));
     }
 
     // ------------------------------------------------------------------------------------------------ after a restart
@@ -577,13 +607,20 @@ public final class AlwaysTests {
             for (SimData.Vehicle v : SimData.get(server).stored.vehicles) if (B.holds((int) v.x, (int) v.z)) truckB = UUID.fromString(v.uuid);
             for (VehicleEntity v : level.getEntitiesOfClass(VehicleEntity.class, new AABB(A.x0(), Y - 5, A.z0Area(), A.x1(), Y + 10, A.z1Area()))) truckA = v.getUUID();
         }
-        later(server, 100, () -> {
+        // the checks wait until the world is back, however long that takes: twin A ticking with its Truck in the world,
+        // and twin B's buildings in the simulation
+        LATER.when(level.getGameTime(), () -> level.shouldTickBlocksAt(A.constructor()) && truckA != null && level.getEntity(truckA) instanceof VehicleEntity
+            && nodes(server, B).stream().filter(n -> n.sim).count() >= 6, RESTART_WAIT, worldBack -> {
+            if (!worldBack) report(source, "after the restart: twin A or its Truck not back after " + RESTART_WAIT + " ticks; checking anyway");
             check(source, 0, true);
             // now twin B is loaded again: its catch-up writes what the simulation did into its buildings
             watchB = false;
             for (int cx = B.x0() >> 4; cx <= B.x1() >> 4; cx++) for (int cz = B.z0Area() >> 4; cz <= B.z1Area() >> 4; cz++) level.setChunkForced(cx, cz, true);
             for (int cx = B.x0() >> 4; cx <= B.x1() >> 4; cx++) for (int cz = B.z0Area() >> 4; cz <= B.z1Area() >> 4; cz++) level.getChunk(cx, cz);
-            later(server, 80, () -> {
+            // then until twin B is caught up and running for real, with its Truck back in the world
+            LATER.when(level.getGameTime(), () -> nodes(server, B).stream().filter(n -> !n.sim).count() >= 6
+                && truckB != null && level.getEntity(truckB) instanceof VehicleEntity, LOAD_WAIT, caughtUp -> {
+                if (!caughtUp) report(source, "loaded again: twin B not running for real with its Truck back after " + LOAD_WAIT + " ticks; checking anyway");
                 long active = nodes(server, B).stream().filter(n -> !n.sim).count();
                 StringBuilder da = new StringBuilder(), db = new StringBuilder();
                 long a = worldRods(level, A, truckA, da), b = worldRods(level, B, truckB, db);

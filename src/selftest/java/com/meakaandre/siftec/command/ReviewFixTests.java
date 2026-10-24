@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.command;
 
+import com.meakaandre.siftec.DelayedChecks;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.TestQueue;
 import com.meakaandre.siftec.TestReport;
@@ -93,7 +94,7 @@ public final class ReviewFixTests {
 
     private static final TestQueue LATER = new TestQueue();
     private static final TestReport REPORT = new TestReport("SELFTEST fixes ");
-    private static int pending;
+    private static final DelayedChecks DELAYED = new DelayedChecks(LATER, REPORT);
 
     private ReviewFixTests() {
     }
@@ -108,11 +109,7 @@ public final class ReviewFixTests {
     // ------------------------------------------------------------------------------------------------ helpers
 
     private static void later(ServerLevel level, int ticks, Runnable run) {
-        pending++;
-        LATER.add(level.getServer().overworld().getGameTime() + ticks, () -> {
-            run.run();
-            pending--;
-        });
+        DELAYED.at(level.getServer().overworld().getGameTime() + ticks, run);
     }
 
     private static void report(CommandSourceStack source, String text) {
@@ -180,7 +177,7 @@ public final class ReviewFixTests {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();
         REPORT.reset();
-        pending = 0;
+        DELAYED.start(source);
         BuildingTests.platform(level, X - 8, Z - 8, X + 120, Z + 72, Y, 16);
         for (VehicleEntity v : level.getEntitiesOfClass(VehicleEntity.class, new AABB(X - 8, Y - 80, Z - 8, X + 120, Y + 40, Z + 72))) v.discard();
         later(level, 10, () -> {
@@ -198,21 +195,12 @@ public final class ReviewFixTests {
     }
 
     private static void run(CommandSourceStack source, String part, Runnable checks) {
-        try {
-            checks.run();
-        } catch (RuntimeException e) {
-            Siftec.LOGGER.error("SIFTEC: selftest fixes {} threw", part, e);
-            expect(source, part + " runs to the end", false, e.toString());
-        }
+        REPORT.attempt(source, part, checks);
     }
 
     /** Reports once every delayed check has run. */
     private static void finish(CommandSourceStack source, ServerLevel level) {
-        if (pending > 0) {
-            LATER.add(level.getServer().overworld().getGameTime() + 10, () -> finish(source, level));
-            return;
-        }
-        report(source, "done: " + REPORT.totals());
+        DELAYED.finish(level.getServer().overworld().getGameTime(), () -> report(source, "done: " + REPORT.totals()));
     }
 
     // ------------------------------------------------------------------------------------------------ 1: node cells

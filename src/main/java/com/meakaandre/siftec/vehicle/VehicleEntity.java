@@ -354,6 +354,7 @@ public class VehicleEntity extends Entity {
         if (lastStation != null) view.store("LastStation", BlockPos.CODEC, lastStation);
         view.putBoolean("Recording", recording);
         view.putInt("StopsMade", stopsMade);
+        view.putLong("ItemsMoved", itemsMoved);
         view.store("LegTicks", Codec.INT.listOf(), new ArrayList<>(legTicks));
     }
 
@@ -379,6 +380,7 @@ public class VehicleEntity extends Entity {
         lastStation = view.read("LastStation", BlockPos.CODEC).orElse(null);
         recording = view.getBooleanOr("Recording", false);
         stopsMade = view.getIntOr("StopsMade", 0);
+        itemsMoved = view.getLongOr("ItemsMoved", 0L);
         legTicks.clear();
         legTicks.addAll(view.read("LegTicks", Codec.INT.listOf()).orElse(List.of()));
         syncFuel();

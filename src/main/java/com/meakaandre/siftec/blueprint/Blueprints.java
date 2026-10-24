@@ -7,7 +7,6 @@ import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.equip.Ziplines;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.hub.Locks;
-import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.mixin.BlockDisplayInvoker;
 import com.meakaandre.siftec.mixin.DisplayInvoker;
 import com.meakaandre.siftec.node.NodeSites;
@@ -311,10 +310,7 @@ public final class Blueprints {
             if (price > 0) need.merge(entry.getValue().getBlock().asItem(), price, Integer::sum);
         }
         for (Item item : need.keySet()) {
-            if (Locks.allowed(player, new ItemStack(item))) continue;
-            Milestone lock = Locks.lockOf(item);
-            player.sendOverlayMessage(Component.translatable("siftec.lock.item", lock == null ? "?" : lock.name()));
-            return;
+            if (Locks.refused(player, new ItemStack(item))) return;
         }
         // the blocks come from the inventory and the backpack alike
         Carried inventory = Carried.of(player);

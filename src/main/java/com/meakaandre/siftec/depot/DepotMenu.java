@@ -79,8 +79,9 @@ public class DepotMenu extends ChestMenu {
         if (!BuildingMenus.alive(player)) return false;
         if (!BuildingMenus.member(player, company.id)) return false;
         if (at == null) return true;
-        if (!(player.level().getBlockEntity(at) instanceof DepotBlockEntity)) return false;
-        return BuildingMenus.withinReach(player, at, REACH);
+        // reach first, and only a loaded depot counts: asking for the block entity must never load its chunk
+        if (!BuildingMenus.withinReach(player, at, REACH) || !player.level().isLoaded(at)) return false;
+        return player.level().getBlockEntity(at) instanceof DepotBlockEntity;
     }
 
     private void refresh() {

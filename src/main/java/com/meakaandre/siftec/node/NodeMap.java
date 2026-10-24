@@ -67,7 +67,7 @@ public final class NodeMap {
      * False for the first moments of a new world, until its spawn point is settled and recorded. Nothing
      * may be looked up before that, or the map would be measured from the wrong place.
      */
-    public static boolean ready(ServerLevel level) {
+    public static boolean ready() {
         return origin != null;
     }
 

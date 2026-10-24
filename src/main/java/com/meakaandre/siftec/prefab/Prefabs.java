@@ -320,12 +320,19 @@ public final class Prefabs {
     public static @Nullable BlockPos gatewayOf(MinecraftServer server, Company company) {
         if (company.gateway == null || company.gateway.isEmpty()) return null;
         String[] parts = company.gateway.split("\\|");
-        if (parts.length != 2) return null;
-        BlockPos pos;
-        try {
-            pos = BlockPos.of(Long.parseLong(parts[1]));
-        } catch (NumberFormatException e) {
-            Siftec.LOGGER.debug("SIFTEC: company {} has an unreadable gateway record {}", company.id, company.gateway, e);
+        BlockPos pos = null;
+        if (parts.length == 2) {
+            try {
+                pos = BlockPos.of(Long.parseLong(parts[1]));
+            } catch (NumberFormatException ignored) {
+                // left null: cleared below
+            }
+        }
+        if (pos == null) {
+            // a record that can never be read is dropped once, not parsed again at every check
+            Siftec.LOGGER.warn("SIFTEC: company {} had an unreadable Wormhole Gateway record \"{}\"; cleared", company.id, company.gateway);
+            company.gateway = "";
+            Companies.save(server);
             return null;
         }
         for (ServerLevel level : server.getAllLevels()) {

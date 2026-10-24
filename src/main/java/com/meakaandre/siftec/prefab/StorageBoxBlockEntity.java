@@ -1,5 +1,6 @@
 package com.meakaandre.siftec.prefab;
 
+import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.util.Transfers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.SimpleContainer;
@@ -17,8 +18,6 @@ import java.util.List;
 /** The Personal Storage Box's 27 slots and the company it belongs to. */
 public class StorageBoxBlockEntity extends BlockEntity {
     public static final int SIZE = 27;
-    /** Squared distance a player may use the box from (8 blocks). */
-    private static final int USE_RANGE_SQR = 64;
     public String companyId = "";
     public final SimpleContainer items = new SimpleContainer(SIZE) {
         @Override
@@ -30,7 +29,7 @@ public class StorageBoxBlockEntity extends BlockEntity {
         @Override
         public boolean stillValid(Player player) {
             return !isRemoved() && level != null && level.getBlockEntity(worldPosition) == StorageBoxBlockEntity.this
-                && player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5) <= USE_RANGE_SQR;
+                && BuildingMenus.withinReach(player, worldPosition, BuildingMenus.REACH);
         }
     };
 

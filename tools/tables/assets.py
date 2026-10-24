@@ -51,7 +51,7 @@ DEPOSIT = {
     "sulfur": ("sulfur", "sulfur", "siftec:sulfur_ore", "cgs:sulfur"),
 }
 # SIFTEC's own ore blocks: (name, texture). Bauxite, SAM and sulfur take the ore art drawn for their nodes (stone with
-# the resource in it); uranium borrows the emerald ore texture until it has its own.
+# the resource in it); uranium has an ore texture of its own (textures/block/uranium_ore.png).
 SIFTEC_ORES = {
     "bauxite_ore": ("Bauxite Ore", "siftec:block/bauxite_node_front"),
     "uranium_ore": ("Uranium Ore", "siftec:block/uranium_ore"),
