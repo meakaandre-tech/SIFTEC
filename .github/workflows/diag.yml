@@ -1,0 +1,95 @@
+name: Diag
+
+on:
+  push:
+    branches: ["release-selftest-diag"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Generated data matches the generators, and the recipe checkers pass
+        shell: bash
+        run: |
+          # tools/gen_assets.py writes src/main/resources and runs tools/check_recipes.py (reachability,
+          # automatability, conflicts); it stops on a checker error, and the committed files must be what it writes
+          (cd /tmp && python3 -I -B "$GITHUB_WORKSPACE/tools/gen_assets.py")
+          git status --porcelain
+          test -z "$(git status --porcelain)"
+      - name: Download Create Fly
+        shell: bash
+        run: |
+          mkdir -p libs
+          curl -fsSL -o libs/create-fly-26.3.jar https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
+          # Create: New Age (power: wires, connectors, motors, the reactor), the fork's fabric-26.3 build
+          curl -fsSL -o libs/create-new-age-26.3.jar https://github.com/meakaandre-tech/Create-New-Age/releases/download/fabric-26.3-latest/create-new-age-fabric-26.3.jar
+          # Create: Diesel Generators (the Fuel Generator's engine), the fork's fabric-26.3 build
+          curl -fsSL -o libs/createdieselgenerators-26.3.jar https://github.com/meakaandre-tech/Create-Diesel-Generators/releases/download/fabric-26.3-latest/createdieselgenerators-fabric-26.3.jar
+          ls -l libs
+      - name: Download Traveler's Backpack and its dependencies
+        shell: bash
+        run: |
+          # the pack's inventory: SIFTEC compiles its compat against it (libs/tb/compile), and the smoke server and
+          # client load the builds made for this game version (libs/tb/runtime)
+          mc=$(grep '^minecraft_version' gradle.properties | sed 's/.*= *//')
+          python3 .github/fetch-tb.py "$mc" libs/tb /tmp/ci
+          ls -l libs/tb/compile libs/tb/runtime
+      - name: Build
+        shell: bash
+        run: |
+          set -o pipefail
+          chmod +x gradlew
+          cat > /tmp/maxerrs.gradle <<'GRADLE'
+          allprojects {
+            tasks.withType(JavaCompile).configureEach {
+              options.compilerArgs += ["-Xmaxerrs", "20000", "-Xmaxwarns", "0"]
+            }
+            tasks.register("dumpCompileClasspath") {
+              doLast {
+                def files = new LinkedHashSet()
+                project.sourceSets.each { files.addAll(it.compileClasspath.files) }
+                new File("/tmp/compile-cp.txt").text = files.join("\n")
+              }
+            }
+          }
+          GRADLE
+          ./gradlew build --no-daemon --continue -Dorg.gradle.console=plain -I /tmp/maxerrs.gradle 2>&1 | tee build.log
+          # the release jar holds no selftest code: that is all in the selftest jar
+          jar=$(ls build/libs/siftec-[0-9]*.jar | grep -v sources | head -1)
+          if unzip -Z1 "$jar" | grep -E '(Tests|SelfTest)(\$[^/]*)?\.class$'; then echo "selftest classes in $jar"; exit 1; fi
+      - name: Publish the jar as a release
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p /tmp/ci && exec > >(tee /tmp/ci/diag.txt) 2>&1
+          set -x
+          ls -la build/libs
+          # the same commands as build.yml's release step, against the real `latest` tag; the release is left in place
+          gh release delete latest -y --cleanup-tag -R "${{ github.repository }}" || true
+          sleep 3
+          jar=$(ls build/libs/siftec-[0-9]*.jar | grep -v sources | head -1)
+          cp "$jar" siftec-26.3.jar
+          cp build/libs/siftec-selftest-*.jar siftec-selftest-26.3.jar
+          notes="Built from main's code at ${GITHUB_SHA} (diag branch: main plus this workflow). Needs Create Fly, Create: New Age (meakaandre-tech/Create-New-Age, fabric-26.3) and Fabric API; the pack adds Traveler's Backpack (with Forge Config API Port) as every player's inventory.
+          siftec-selftest-26.3.jar: test commands for CI only; don't put it in a normal pack."
+          gh release create latest siftec-26.3.jar siftec-selftest-26.3.jar -R "${{ github.repository }}" --target "${GITHUB_SHA}" --title "SIFTEC (latest build)" --notes "$notes"
+          gh release view latest -R "${{ github.repository }}" --json tagName,assets -q '.tagName, .assets[].name'
+      - name: Publish output
+        if: always()
+        shell: bash
+        run: |
+          cd /tmp/ci && git init -q -b x && git config user.name github-actions && git config user.email actions@users.noreply.github.com
+          git add -A && git commit -q -m diag && git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" x:ci-logs-release-selftest-diag
