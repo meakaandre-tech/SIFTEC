@@ -1,0 +1,25 @@
++ ls -la build/libs
+total 2716
+drwxr-xr-x 2 runner runner    4096 Oct 25 01:03 .
+drwxr-xr-x 9 runner runner    4096 Oct 25 01:03 ..
+-rw-r--r-- 1 runner runner 2147462 Oct 25 01:03 siftec-0.1.0+26.3.jar
+-rw-r--r-- 1 runner runner  619323 Oct 25 01:03 siftec-selftest-0.1.0+26.3.jar
++ gh release delete latest -y --cleanup-tag -R meakaandre-tech/SIFTEC
+release not found
++ true
++ sleep 3
+++ ls build/libs/siftec-0.1.0+26.3.jar
+++ grep -v sources
+++ head -1
++ jar=build/libs/siftec-0.1.0+26.3.jar
++ cp build/libs/siftec-0.1.0+26.3.jar siftec-26.3.jar
++ cp build/libs/siftec-selftest-0.1.0+26.3.jar siftec-selftest-26.3.jar
++ notes='Built from main'\''s code at 598602047993f48f2040ed25797b21dad9aa70ca (diag branch: main plus this workflow). Needs Create Fly, Create: New Age (meakaandre-tech/Create-New-Age, fabric-26.3) and Fabric API; the pack adds Traveler'\''s Backpack (with Forge Config API Port) as every player'\''s inventory.
+siftec-selftest-26.3.jar: test commands for CI only; don'\''t put it in a normal pack.'
++ gh release create latest siftec-26.3.jar siftec-selftest-26.3.jar -R meakaandre-tech/SIFTEC --target 598602047993f48f2040ed25797b21dad9aa70ca --title 'SIFTEC (latest build)' --notes 'Built from main'\''s code at 598602047993f48f2040ed25797b21dad9aa70ca (diag branch: main plus this workflow). Needs Create Fly, Create: New Age (meakaandre-tech/Create-New-Age, fabric-26.3) and Fabric API; the pack adds Traveler'\''s Backpack (with Forge Config API Port) as every player'\''s inventory.
+siftec-selftest-26.3.jar: test commands for CI only; don'\''t put it in a normal pack.'
+https://github.com/meakaandre-tech/SIFTEC/releases/tag/latest
++ gh release view latest -R meakaandre-tech/SIFTEC --json tagName,assets -q '.tagName, .assets[].name'
+latest
+siftec-26.3.jar
+siftec-selftest-26.3.jar
