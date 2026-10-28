@@ -4,6 +4,7 @@ siftec selftest prefab
 siftec selftest buildings
 siftec selftest buildings_a
 siftec selftest buildings_b
+siftec selftest style
 siftec selftest power
 siftec selftest logistics
 siftec selftest progression

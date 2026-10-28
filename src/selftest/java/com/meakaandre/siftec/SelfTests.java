@@ -6,6 +6,7 @@ import com.meakaandre.siftec.building.BuildingsATests;
 import com.meakaandre.siftec.building.BuildingsBTests;
 import com.meakaandre.siftec.building.ExploitTests;
 import com.meakaandre.siftec.building.MachineTests;
+import com.meakaandre.siftec.building.StyleTests;
 import com.meakaandre.siftec.claim.StateSelfTest;
 import com.meakaandre.siftec.command.AutomateTests;
 import com.meakaandre.siftec.command.BackpackFixTests;
@@ -42,6 +43,7 @@ public final class SelfTests implements SelfTestHooks.Plugin {
                 BuildingTests.register();
                 BuildingsATests.register();
                 BuildingsBTests.register();
+                StyleTests.register();
                 AutomateTests.register();
                 PowerTests.register();
                 NodeTests.register();

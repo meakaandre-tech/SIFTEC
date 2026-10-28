@@ -406,6 +406,11 @@ public final class PrefabTests {
         return hubSpot(VX, VZ, Direction.NORTH);
     }
 
+    /** Where the showcase HUB (or the Wormhole Gateway north of it) the {@code sathub} stages put up stands: its anchor. */
+    public static BlockPos showcase(boolean gateway) {
+        return gateway ? new BlockPos(VX, Y, VZ - 40) : new BlockPos(VX, Y, VZ);
+    }
+
     private static int stage(CommandContext<CommandSourceStack> context, String stage, int n) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = source.getServer().overworld();

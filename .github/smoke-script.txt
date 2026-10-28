@@ -521,3 +521,170 @@ shot
 cmd siftec worldtest designer view 5
 sleep 4
 shot
+cmd gamemode spectator @a
+cmd time set noon
+cmd weather clear
+cmd siftec worldtest style setup
+wait 300 SELFTEST style showroom result:
+cmd siftec worldtest style look portable_miner
+sleep 20
+key F1
+sleep 4
+shot
+cmd siftec worldtest style look miner_mk1
+sleep 4
+shot
+cmd siftec worldtest style look miner_mk2
+sleep 4
+shot
+cmd siftec worldtest style look miner_mk3
+sleep 4
+shot
+cmd siftec worldtest style look smelter
+sleep 4
+shot
+cmd siftec worldtest style look constructor
+sleep 4
+shot
+cmd siftec worldtest style look storage_container
+sleep 4
+shot
+cmd siftec worldtest style look industrial_storage_container
+sleep 4
+shot
+cmd siftec worldtest style look power_pole_mk1
+sleep 4
+shot
+cmd siftec worldtest style look power_pole_mk2
+sleep 4
+shot
+cmd siftec worldtest style look power_pole_mk3
+sleep 4
+shot
+cmd siftec worldtest style look power_tower
+sleep 4
+shot
+cmd siftec worldtest style look power_storage
+sleep 4
+shot
+cmd siftec worldtest style look biomass_burner
+sleep 4
+shot
+cmd siftec worldtest style look coal_generator
+sleep 4
+shot
+cmd siftec worldtest style look fuel_generator
+sleep 4
+shot
+cmd siftec worldtest style look geothermal_generator
+sleep 4
+shot
+cmd siftec worldtest style look nuclear_power_plant
+sleep 4
+shot
+cmd siftec worldtest style look alien_power_augmenter
+sleep 4
+shot
+cmd siftec worldtest style look assembler
+sleep 4
+shot
+cmd siftec worldtest style look foundry
+sleep 4
+shot
+cmd siftec worldtest style look refinery
+sleep 4
+shot
+cmd siftec worldtest style look blender
+sleep 4
+shot
+cmd siftec worldtest style look manufacturer
+sleep 4
+shot
+cmd siftec worldtest style look quantum_encoder
+sleep 4
+shot
+cmd siftec worldtest style look packager
+sleep 4
+shot
+cmd siftec worldtest style look water_extractor
+sleep 4
+shot
+cmd siftec worldtest style look oil_extractor
+sleep 4
+shot
+cmd siftec worldtest style look resource_well_pressurizer
+sleep 4
+shot
+cmd siftec worldtest style look resource_well_extractor
+sleep 4
+shot
+cmd siftec worldtest style look particle_accelerator
+sleep 4
+shot
+cmd siftec worldtest style look converter
+sleep 4
+shot
+cmd siftec worldtest style look equipment_workshop
+sleep 4
+shot
+cmd siftec worldtest style look awesome_sink
+sleep 4
+shot
+cmd siftec worldtest style look awesome_shop
+sleep 4
+shot
+cmd siftec worldtest style look radar_tower
+sleep 4
+shot
+cmd siftec worldtest style look blueprint_designer
+sleep 4
+shot
+cmd siftec worldtest style look blueprint_designer_mk2
+sleep 4
+shot
+cmd siftec worldtest style look blueprint_designer_mk3
+sleep 4
+shot
+cmd siftec worldtest style look truck_station
+sleep 4
+shot
+cmd siftec worldtest style look drone_port
+sleep 4
+shot
+cmd siftec worldtest style look foundation_1m
+sleep 4
+shot
+cmd siftec worldtest style look foundation_2m
+sleep 4
+shot
+cmd siftec worldtest style look foundation_4m
+sleep 4
+shot
+cmd siftec worldtest style look wall_4m
+sleep 4
+shot
+cmd siftec worldtest style look roof_4m
+sleep 4
+shot
+cmd siftec worldtest style look billboard_small
+sleep 4
+shot
+cmd siftec worldtest style look billboard_large
+sleep 4
+shot
+cmd siftec worldtest sathub level 7
+sleep 2
+cmd siftec worldtest style look hub
+sleep 14
+shot
+cmd siftec worldtest sathub gateway 5
+sleep 6
+cmd siftec worldtest style look wormhole_gateway
+sleep 14
+shot
+cmd siftec worldtest style look mam
+sleep 12
+shot
+key F1
+cmd siftec worldtest sathub level 7
+sleep 2
