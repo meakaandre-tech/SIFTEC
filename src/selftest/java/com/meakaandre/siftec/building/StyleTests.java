@@ -48,7 +48,7 @@ import java.util.TreeSet;
  * applied (a typo would quietly turn into air or a default state), every building carries the style's materials
  * (orange, dark industrial iron and half-block trim), and the HUB's bevels read as stairs.</li>
  * <li>{@code worldtest style setup}: every Build Gun building (not the vehicles) and the MAM put down on a white floor,
- * two rows of them facing south, the miners on nodes, the extractors on their wells, the Water Extractor in a pool and
+ * four rows of them facing south (a compact block, so its chunks load in one go without the client timing out), the miners on nodes, the extractors on their wells, the Water Extractor in a pool and
  * the Geothermal Generator over a geyser.</li>
  * <li>{@code worldtest style look <id>}: the camera on one of them from the front right and above, as Polartt's
  * reference shots look at his buildings; {@code hub} and {@code wormhole_gateway} look at the HUB and Gateway the
@@ -58,7 +58,7 @@ import java.util.TreeSet;
 public final class StyleTests {
     private static final TestReport REPORT = new TestReport("SELFTEST style ");
     private static final TestReport SHOWROOM = new TestReport("SELFTEST style showroom ");
-    private static final int SX = 3000, SY = 140, SZ = 3000, GAP = 30, ROW_GAP = 80, PER_ROW = 24;
+    private static final int SX = 3000, SY = 140, SZ = 3000, GAP = 16, ROW_GAP = 70, PER_ROW = 12;
     /** Where each showroom building stands: its anchor (the middle of its front edge), width, depth and height. */
     private static final Map<String, int[]> PLACED = new LinkedHashMap<>();
 
@@ -159,7 +159,7 @@ public final class StyleTests {
         SHOWROOM.reset();
         BuildingTemplate.forget();
         PLACED.clear();
-        // where each one goes: two rows facing south (the camera's side), a gap between neighbours
+        // where each one goes: rows facing south (the camera's side), a gap between neighbours
         List<BuildingDef> defs = shown();
         Map<String, BlockPos> anchors = new LinkedHashMap<>();
         int x = SX, row = 0, n = 0, maxX = SX;
@@ -233,7 +233,7 @@ public final class StyleTests {
         for (int x = x0; x <= x1; x++)
             for (int z = z0; z <= z1; z++) {
                 level.setBlock(pos.set(x, SY - 1, z), white, Block.UPDATE_CLIENTS);
-                for (int h = SY; h < SY + 45; h++) {
+                for (int h = SY; h < SY + 32; h++) {
                     if (!level.getBlockState(pos.set(x, h, z)).isAir()) level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
                 }
             }
