@@ -856,8 +856,8 @@ def nuclear_power_plant():
     # netherite magnets and one fluxuated magnetite take 2,000 SU a turn (512,000 SU, 2,500 MW) and the carbon brushes at
     # the end give it to the grid. Rods in and waste out at the controller's ports, water into the intake tank at the back.
     # Outside: a long dark hall with orange pilasters every fourth column below and an orange upper storey between dark
-    # pilasters, light bands, strip windows on the boilers and the engine rows, a ribbed roof and an orange crown over
-    # each cooling tower.
+    # pilasters, light bands, strip windows on the boilers and the engine rows, a ribbed roof bevelled in dark stairs
+    # and an orange crown over each cooling tower.
     f = Frame(21, 11)
     for bx, bz in NUCLEAR_BOILERS:
         f.mbox(bx, 4, bz, bx + 2, 11, bz + 2, TANK)
@@ -921,6 +921,7 @@ def nuclear_power_plant():
         f.set(x, 12, 0, VENT)
     f.hazard_x(-10, 10, 1, 0)
     f.deck(-10, 0, 10, 10, 15, eave=False)
+    f.chamfer(-10, 0, 10, 10, 15)
     for bx, bz in NUCLEAR_BOILERS:
         for x in range(bx - 1, bx + 4):
             for z in range(bz - 1, bz + 4):
@@ -1499,7 +1500,7 @@ def equipment_workshop():
 def awesome_sink():
     # 5 wide, 5 deep, 10 high (the Sink's funnel of a tower): an orange body on a dark plinth with dark corners and a light
     # band, a glass band to see the magma it burns things in, a dark deck with a hazard front, and a funnel of orange over a
-    # dark ring. Items go in at the input port at the back, on the ground; the controller in front opens the Sink's screen.
+    # dark ring, slab caps on its rim. Items go in at the input port at the back, on the ground; the controller in front opens the Sink's screen.
     # 30 MW through the connector on the funnel's rim.
     f = Frame(5, 5)
     f.controller(1, 2, 0)
@@ -1522,6 +1523,8 @@ def awesome_sink():
     f.walls(8, 8, DARK, ORANGE, -2, 2, 0, 4)
     for x in (-1, 1):
         f.set(x, 7, 0, VENT)
+    for x, z in ((-2, 0), (2, 0), (-2, 4)):
+        f.set(x, 9, z, dslab())
     return f.done()
 
 

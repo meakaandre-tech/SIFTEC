@@ -58,7 +58,7 @@ import java.util.TreeSet;
 public final class StyleTests {
     private static final TestReport REPORT = new TestReport("SELFTEST style ");
     private static final TestReport SHOWROOM = new TestReport("SELFTEST style showroom ");
-    private static final int SX = 3000, SY = 181, SZ = 3000, GAP = 12, ROW_GAP = 70, PER_ROW = 24;
+    private static final int SX = 3000, SY = 140, SZ = 3000, GAP = 30, ROW_GAP = 80, PER_ROW = 24;
     /** Where each showroom building stands: its anchor (the middle of its front edge), width, depth and height. */
     private static final Map<String, int[]> PLACED = new LinkedHashMap<>();
 
@@ -249,8 +249,9 @@ public final class StyleTests {
     // ------------------------------------------------------------------------------------------------ the camera
 
     /**
-     * The camera on a building from the front right, 35 degrees off its front and looking down 24 degrees at the middle
-     * of its lower half, far enough back that the whole of it is in the picture: the reference shots' angle.
+     * The camera on a building from the front right, 35 degrees off its front and looking down 22 degrees at the middle
+     * of its lower half, far enough back that the whole of it is in the picture: the reference shots' angle. The showroom
+     * stands well under the clouds, which would wash the pictures out.
      */
     private static int look(CommandContext<CommandSourceStack> context, String id) {
         CommandSourceStack source = context.getSource();
@@ -274,8 +275,8 @@ public final class StyleTests {
         }
         double cx = box[0] + 0.5, cz = box[2] + 0.5 - box[4] / 2.0, w = box[3], d = box[4], h = box[5];
         double size = Math.max(Math.max(w, d), h * 1.15);
-        double dist = Math.max(9, size * 1.45 + 4);
-        double yaw = 35, pitch = 24;
+        double dist = Math.max(8, size * 1.05 + 5);
+        double yaw = 35, pitch = 22;
         double horizontal = dist * Math.cos(Math.toRadians(pitch));
         double camX = cx + horizontal * Math.sin(Math.toRadians(yaw)), camZ = cz + horizontal * Math.cos(Math.toRadians(yaw));
         double targetY = box[1] + h * 0.4;
