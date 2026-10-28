@@ -25,6 +25,11 @@ import net.minecraft.world.level.block.state.properties.Property;
  * standing ring gate; Phase 3 the second third; Phase 4 closes the ring and runs energy conduits into it; Phase 5 lights
  * the ring's lining and opens a swirling portal to The Sift inside it. An original sci-fi ring of Create blocks, with no
  * chevrons or glyphs. Levels are the phases done.
+ * <p>
+ * Both follow the buildings' style (design/building-style.md, Polartt's builds): dark framed panels with light bands at
+ * the sill and eaves, flat orange panels and bands, framed glass, yellow and black hazard stripes on feet and edges, and
+ * roof edges bevelled with dark stairs. The stairs are plain blocks, not shell styles: they come in at a level and stay
+ * to the last, and the structure lists them under its terminal as it does the Craft Station's machines.
  */
 public final class Templates {
     public static final int HUB_MAX = 7, GATEWAY_MAX = 5;
@@ -67,6 +72,31 @@ public final class Templates {
         return ModBlocks.PREFAB.get(style).get().defaultBlockState();
     }
 
+    /** A dark stair (Create's polished cut deepslate) rising toward {@code facing}, as the buildings' trim has it. */
+    private static BlockState stair(String facing) {
+        return parse("create:polished_cut_deepslate_stairs[facing=" + facing + ",half=bottom,shape=straight,waterlogged=false]");
+    }
+
+    private static BlockState slab() {
+        return parse("create:polished_cut_deepslate_slab[type=bottom,waterlogged=false]");
+    }
+
+    /**
+     * Bevels a roof's edge (x0..x1, z0..z1 at height y) from level {@code from} on: dark stairs rising inward along its
+     * sides and slabs at its corners.
+     */
+    private static void bevel(Template t, int from, int x0, int z0, int x1, int z1, int y) {
+        int M = t.maxLevel;
+        for (int x = x0; x <= x1; x++) {
+            for (int z = z0; z <= z1; z++) {
+                boolean ex = x == x0 || x == x1, ez = z == z0 || z == z1;
+                if (ex && ez) t.set(from, M, x, y, z, slab());
+                else if (ex) t.set(from, M, x, y, z, stair(x == x0 ? "east" : "west"));
+                else if (ez) t.set(from, M, x, y, z, stair(z == z0 ? "north" : "south"));
+            }
+        }
+    }
+
     public static Template hub() {
         if (hub == null) hub = buildHub();
         return hub;
@@ -81,34 +111,50 @@ public final class Templates {
         Template t = new Template(HUB_MAX);
         int M = HUB_MAX;
         BlockState white = s("white"), orange = s("orange"), metal = s("metal"), floor = s("floor"), glass = s("glass"),
-            lamp = s("lamp"), step = s("step"), locker = s("locker"), air = Template.AIR;
+            lamp = s("lamp"), step = s("step"), locker = s("locker"), air = Template.AIR,
+            hazardY = s("hazard_yellow"), hazardB = s("hazard_black");
 
         // ---- the platform: entrance steps at the front, the floor, yellow and black hazard stripes down its sides (as
         // Polartt's pads have them) and an orange back edge
         t.box(0, M, -7, 0, 0, 6, 0, 0, step);
         t.box(0, M, -7, 0, 1, 6, 0, 25, floor);
-        BlockState hazardY = s("hazard_yellow"), hazardB = s("hazard_black");
         for (int z = 1; z <= 25; z++) {
             t.set(0, M, -7, 0, z, z % 2 == 0 ? hazardY : hazardB);
             t.set(0, M, 6, 0, z, z % 2 == 0 ? hazardY : hazardB);
         }
         t.box(0, M, -7, 0, 25, 6, 0, 25, orange);
 
-        // ---- terminal hall (z 1 to 9), open at the front, roof at y 7
+        // ---- terminal hall (z 1 to 9), open at the front, roof at y 7: dark panels between a light sill band and a light
+        // eave band, glass down the sides over an orange band, the back wall dark with an orange panel round its windows
         t.box(0, M, -6, 1, 1, 5, 5, 8, air);
         for (int[] c : new int[][]{{-7, 1}, {6, 1}, {-7, 9}, {6, 9}}) t.box(0, M, c[0], 1, c[1], c[0], 6, c[1], metal);
+        for (int[] c : new int[][]{{-7, 1}, {6, 1}}) {
+            t.set(0, M, c[0], 1, c[1], hazardY);
+            t.set(0, M, c[0], 2, c[1], hazardB);
+        }
         for (int x : new int[]{-7, 6}) {
             t.box(0, M, x, 1, 2, x, 1, 8, white);
             t.box(0, M, x, 2, 2, x, 4, 8, glass);
-            t.box(0, M, x, 5, 2, x, 6, 8, white);
+            t.box(0, M, x, 5, 2, x, 5, 8, orange);
+            t.box(0, M, x, 6, 2, x, 6, 8, white);
+            t.set(0, M, x, 2, 5, metal);
+            t.set(0, M, x, 3, 5, metal);
+            t.set(0, M, x, 4, 5, metal);
         }
-        t.box(0, M, -6, 1, 9, 5, 6, 9, white);
+        t.box(0, M, -6, 1, 9, 5, 1, 9, white);
+        t.box(0, M, -6, 2, 9, 5, 5, 9, metal);
+        t.box(0, M, -6, 6, 9, 5, 6, 9, white);
+        t.box(0, M, -6, 2, 9, -2, 5, 9, orange);
+        t.box(0, M, 1, 2, 9, 5, 5, 9, orange);
         t.box(0, M, -5, 3, 9, -3, 4, 9, glass);
         t.box(0, M, 2, 3, 9, 4, 4, 9, glass);
         t.box(0, M, -1, 1, 9, 0, 3, 9, air);
         t.box(0, M, -6, 6, 1, 5, 6, 1, orange);
         t.box(0, M, -7, 7, 1, 6, 7, 9, white);
+        for (int x = -6; x <= 5; x += 4) t.box(0, M, x, 7, 2, x, 7, 8, metal);
         t.box(0, M, -7, 7, 1, 6, 7, 1, orange);
+        bevel(t, 0, -7, 1, 6, 9, 7);
+        t.box(0, M, -6, 7, 1, 5, 7, 1, orange);
         for (int[] l : new int[][]{{-4, 3}, {3, 3}, {-4, 7}, {3, 7}, {0, 2}}) t.set(0, M, l[0], 7, l[1], lamp);
         // the HUB Terminal and its console
         t.set(0, M, HUB_TERMINAL[0], HUB_TERMINAL[1], HUB_TERMINAL[2], ModBlocks.HUB.get().defaultBlockState().setValue(Facing.FACING, Direction.SOUTH));
@@ -135,13 +181,19 @@ public final class Templates {
         for (int x : new int[]{-7, 6}) {
             t.box(4, M, x, 1, 10, x, 1, 16, white);
             t.box(4, M, x, 2, 10, x, 3, 16, glass);
-            t.box(4, M, x, 4, 10, x, 5, 16, white);
+            t.box(4, M, x, 4, 10, x, 4, 16, orange);
+            t.box(4, M, x, 5, 10, x, 5, 16, white);
             t.box(4, M, x, 1, 17, x, 6, 17, metal);
+            t.box(4, M, x, 2, 13, x, 4, 13, metal);
         }
-        t.box(4, M, -6, 1, 17, 5, 5, 17, white);
+        t.box(4, M, -6, 1, 17, 5, 1, 17, white);
+        t.box(4, M, -6, 2, 17, 5, 4, 17, metal);
+        t.box(4, M, -6, 5, 17, 5, 5, 17, white);
         t.box(4, M, -1, 1, 17, 0, 3, 17, air);
         t.box(4, M, -7, 6, 10, 6, 6, 16, white);
+        for (int x = -6; x <= 5; x += 4) t.box(4, M, x, 6, 10, x, 6, 16, metal);
         t.box(4, M, -6, 6, 17, 5, 6, 17, orange);
+        for (int x : new int[]{-7, 6}) for (int z = 10; z <= 16; z++) t.set(4, M, x, 6, z, stair(x < 0 ? "east" : "west"));
         t.set(4, M, -3, 6, 13, lamp);
         t.set(4, M, 2, 6, 13, lamp);
         // two bunk beds against the left wall
@@ -163,13 +215,21 @@ public final class Templates {
         t.box(0, M, -7, 1, 18, -7, 1, 25, metal);
         t.box(0, M, 6, 1, 18, 6, 1, 25, metal);
         t.box(0, M, -6, 1, 25, 5, 1, 25, metal);
+        for (int x : new int[]{-7, 6}) {
+            t.set(0, M, x, 1, 18, hazardY);
+            t.set(0, M, x, 1, 25, hazardY);
+        }
         burner(t, BURNER_1[0], 2);
         burner(t, BURNER_2[0], 5);
 
         // ---- the freighter's dock (HUB Upgrade 6) and the FICSIT Freighter itself (level 7: docked)
         t.box(6, M, -1, 1, 21, 0, 19, 24, metal);
+        t.box(6, M, -1, 1, 21, 0, 1, 24, hazardY);
+        t.box(6, M, -1, 2, 21, 0, 2, 24, hazardB);
+        for (int y : new int[]{7, 13}) t.box(6, M, -1, y, 21, 0, y, 24, orange);
         for (int y : new int[]{5, 10, 15}) t.box(6, M, -1, y, 21, 0, y, 21, lamp);
         t.box(6, M, -3, 20, 19, 2, 20, 25, orange);
+        t.ring(6, M, -3, 20, 19, 2, 20, 25, metal);
         t.box(6, M, -2, 20, 20, 1, 20, 24, white);
         freighter(t);
         return t;
@@ -274,15 +334,27 @@ public final class Templates {
         Template t = new Template(GATEWAY_MAX);
         int M = GATEWAY_MAX;
         BlockState white = s("white"), orange = s("orange"), metal = s("metal"), frame = s("railway"), floor = s("floor"), lamp = s("lamp"),
-            step = s("step"), coil = s("coil"), lit = s("coil_lit"), conduit = s("conduit"), portal = s("portal"), air = Template.AIR;
+            step = s("step"), coil = s("coil"), lit = s("coil_lit"), conduit = s("conduit"), portal = s("portal"), air = Template.AIR,
+            hazardY = s("hazard_yellow"), hazardB = s("hazard_black");
         int x0 = -24, x1 = 23, z0 = 0, z1 = 53;
 
-        // ---- placed (HUB Upgrade 6): the base platform, the delivery terminal and the power hookups
+        // ---- placed (HUB Upgrade 6): the base platform, the delivery terminal and the power hookups. The deck's edge is
+        // a band of hazard stripes inside an orange rim, as the Space Elevator's base has it
         t.box(0, M, x0, 0, z0, x1, 0, z1, floor);
         t.ring(0, M, x0, 0, z0, x1, 0, z1, orange);
+        for (int x = x0 + 1; x <= x1 - 1; x++) {
+            t.set(0, M, x, 0, z0 + 1, (x & 1) == 0 ? hazardY : hazardB);
+            t.set(0, M, x, 0, z1 - 1, (x & 1) == 0 ? hazardY : hazardB);
+        }
+        for (int z = z0 + 2; z <= z1 - 2; z++) {
+            t.set(0, M, x0 + 1, 0, z, (z & 1) == 0 ? hazardY : hazardB);
+            t.set(0, M, x1 - 1, 0, z, (z & 1) == 0 ? hazardY : hazardB);
+        }
         t.box(0, M, -6, 0, z0, 5, 0, z0, step);
         // a walkway from the terminal to the gate, and lamps along the edge
-        t.box(0, M, -2, 0, 1, 1, 0, RING_Z - 4, white);
+        t.box(0, M, -2, 0, 2, 1, 0, RING_Z - 4, white);
+        t.box(0, M, -3, 0, 2, -3, 0, RING_Z - 4, metal);
+        t.box(0, M, 2, 0, 2, 2, 0, RING_Z - 4, metal);
         for (int z = 4; z <= z1 - 4; z += 7) {
             t.set(0, M, x0, 0, z, lamp);
             t.set(0, M, x1, 0, z, lamp);
@@ -297,6 +369,7 @@ public final class Templates {
         // power hookups: a post on each side of the terminal with a wire connector on top
         for (int[] post : POWER_POSTS) {
             t.box(0, M, post[0], 1, post[2], post[0], post[1] - 1, post[2], metal);
+            t.set(0, M, post[0], 1, post[2], hazardY);
             t.set(0, M, post[0], post[1], post[2], connector());
         }
         // the cradle's outline, marked out on the deck before anything stands on it
@@ -320,7 +393,7 @@ public final class Templates {
                 int phase = angle <= 60 ? 2 : angle <= 120 ? 3 : 4;
                 boolean inner = d < RING_INNER + 1, outer = d >= RING_OUTER - 1;
                 for (int z = RING_Z - 1; z <= RING_Z + 1; z++) {
-                    BlockState body = inner && z == RING_Z ? coil : outer || z != RING_Z ? frame : metal;
+                    BlockState body = inner && z == RING_Z ? coil : outer ? metal : z != RING_Z ? frame : metal;
                     if (inner && z == RING_Z) {
                         // the inner lining is dark until the gate lights up with Phase 5
                         t.set(phase, 4, x, y, z, coil);
@@ -329,8 +402,8 @@ public final class Templates {
                         t.set(phase, M, x, y, z, body);
                     }
                 }
-                // an orange band round the ring's faces, halfway through it
-                if (!inner && !outer && Math.abs(d - (RING_INNER + RING_OUTER) / 2.0) < 0.5) {
+                // a broad orange band round the ring's faces, between its dark rims
+                if (!inner && !outer && Math.abs(d - (RING_INNER + RING_OUTER) / 2.0) < 1.0) {
                     t.set(phase, M, x, y, RING_Z - 1, orange);
                     t.set(phase, M, x, y, RING_Z + 1, orange);
                 }
@@ -343,11 +416,20 @@ public final class Templates {
         t.ring(1, M, -8, base - 1, RING_Z - 3, 7, base - 1, RING_Z + 3, orange);
         t.box(1, M, -6, 1, RING_Z - 4, 5, 1, RING_Z - 4, step);
         t.box(1, M, -6, 1, RING_Z + 4, 5, 1, RING_Z + 4, step);
+        for (int x = -7; x <= 6; x++) {
+            t.set(1, M, x, 1, RING_Z - 3, (x & 1) == 0 ? hazardY : hazardB);
+            t.set(1, M, x, 1, RING_Z + 3, (x & 1) == 0 ? hazardY : hazardB);
+        }
         for (int side : new int[]{-1, 1}) {
             int x = side < 0 ? -SUPPORT_X - 1 : SUPPORT_X;
             int top = supportTop(x);
             // an A-frame: a pylon fore and aft of the ring, braced together at the top
-            for (int z : new int[]{RING_Z - 3, RING_Z + 3}) t.box(1, M, x, 1, z, x, top, z, frame);
+            for (int z : new int[]{RING_Z - 3, RING_Z + 3}) {
+                t.box(1, M, x, 1, z, x, top, z, metal);
+                t.set(1, M, x, 1, z, hazardY);
+                t.set(1, M, x, 2, z, hazardB);
+                for (int y = 6; y < top; y += 5) t.set(1, M, x, y, z, orange);
+            }
             t.box(1, M, x, top, RING_Z - 3, x, top, RING_Z + 3, frame);
             t.box(1, M, x - side, 1, RING_Z - 3, x - side, 1, RING_Z + 3, metal);
             t.set(1, M, x, 1, RING_Z - 4, lamp);
