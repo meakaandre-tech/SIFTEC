@@ -1,0 +1,37 @@
+name: Pack jars (branch only, do not merge)
+on:
+  push:
+    branches: ["pack-jars"]
+permissions:
+  contents: write
+jobs:
+  jars:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the Modrinth mods CI runs with
+        shell: bash
+        run: |
+          set -e
+          mc=$(grep '^minecraft_version' gradle.properties | sed 's/.*= *//')
+          fapi=$(grep '^fabric_version' gradle.properties | sed 's/.*= *//')
+          mkdir -p out
+          url=$(curl -fsSL https://api.modrinth.com/v2/project/fabric-api/version | python3 -c "import json,sys; v=[x for x in json.load(sys.stdin) if x['version_number']=='$fapi']; print(v[0]['files'][0]['url'])")
+          curl -fsSL -o out/fabric-api.jar "$url"
+          while read -r u; do
+            case "$u" in
+              modrinth:*) u=$(curl -fsSL "https://api.modrinth.com/v2/project/${u#modrinth:}/version" | python3 -c "import json,sys; v=[x for x in json.load(sys.stdin) if '$mc' in x['game_versions'] and 'fabric' in x['loaders']]; print(v[0]['files'][0]['url'] if v else '')");;
+            esac
+            case "$u" in https://cdn.modrinth.com/*) curl -fsSL -o "out/$(basename "$u" | python3 -c 'import sys,urllib.parse; print(urllib.parse.unquote(sys.stdin.read().strip()))')" "$u";; esac
+          done < .github/smoke-pack-mods
+          python3 .github/fetch-tb.py "$mc" /tmp/tb /tmp/tbreport
+          cp /tmp/tb/runtime/*.jar out/
+          ls -l out
+      - name: Push them to branch pack-jars-out
+        shell: bash
+        run: |
+          cd out
+          git init -q -b pack-jars-out
+          git add -A
+          git -c user.name=ci -c user.email=ci@localhost commit -q -m "Modrinth jars for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pack-jars-out
