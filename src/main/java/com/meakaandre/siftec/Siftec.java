@@ -25,7 +25,7 @@ import com.meakaandre.siftec.hub.HubMenu;
 import com.meakaandre.siftec.hub.Locks;
 import com.meakaandre.siftec.hub.MapLock;
 import com.meakaandre.siftec.hub.Milestones;
-import com.meakaandre.siftec.map.MapServer;
+import com.meakaandre.siftec.mapapi.SiftecMap;
 import com.meakaandre.siftec.net.CompanyState;
 import com.meakaandre.siftec.net.StatePayload;
 import com.meakaandre.siftec.node.NodePlacer;
@@ -84,7 +84,7 @@ public class Siftec implements ModInitializer {
         Food.register();
         Locks.register();
         Companies.register();
-        MapServer.register();
+        SiftecMap.register();
         Claims.register();
         Prefabs.register();
         Buildings.register();

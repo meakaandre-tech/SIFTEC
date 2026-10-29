@@ -2,6 +2,9 @@ package com.meakaandre.siftec.command;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.meakaandre.mapmod.api.MapModApi;
+import com.meakaandre.mapmod.api.MapPoi;
+import com.meakaandre.mapmod.map.MapGrid;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.TestQueue;
 import com.meakaandre.siftec.TestReport;
@@ -27,9 +30,7 @@ import com.meakaandre.siftec.hub.Locks;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.item.ObjectScannerItem;
-import com.meakaandre.siftec.map.MapGrid;
-import com.meakaandre.siftec.map.MapPoi;
-import com.meakaandre.siftec.map.MapTerrain;
+import com.meakaandre.siftec.mapapi.SiftecMap;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.place.Places;
 import com.meakaandre.siftec.power.Power;
@@ -510,11 +511,11 @@ public final class PolishTests {
         pending++;
         GeyserSearch.search(level, cave, 6, found -> {
             pending--;
-            List<BlockPos> near = MapTerrain.geysersNear(cave.getX(), cave.getZ(), 6 * 16 + 16);
+            List<BlockPos> near = SiftecMap.geysersNear(cave.getX(), cave.getZ(), 6 * 16 + 16);
             boolean onMap = false;
             if (!found.isEmpty()) {
                 BlockPos g = found.getFirst();
-                for (MapPoi poi : MapTerrain.foundFor(MapGrid.regionOfBlock(g.getX(), g.getZ()), geoCo.id)) onMap |= poi.kind() == MapPoi.Kind.GEYSER && poi.x() == g.getX() && poi.z() == g.getZ();
+                for (MapPoi poi : MapModApi.foundIn(MapGrid.regionOfBlock(g.getX(), g.getZ()), geoCo.id)) onMap |= poi.kind().equals(SiftecMap.GEYSER.key()) && poi.x() == g.getX() && poi.z() == g.getZ();
             }
             expect(source, "2: a search has the sulfur cave chunks generated and reads their geysers onto the map (the Radar Tower's, and the scanner's)",
                 !found.isEmpty() && !near.isEmpty() && onMap, found.size() + " found in " + (System.nanoTime() - t0) / 1_000_000 + " ms, " + near.size() + " near, on the map " + onMap);

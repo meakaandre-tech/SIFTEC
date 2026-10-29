@@ -9,7 +9,7 @@ import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.geyser.GeyserSearch;
 import com.meakaandre.siftec.item.NodeScannerItem;
-import com.meakaandre.siftec.map.MapServer;
+import com.meakaandre.mapmod.api.MapModApi;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodeType;
@@ -59,7 +59,7 @@ public final class Radar {
         c.setChanged();
         Company company = Companies.byId(level.getServer(), c.companyId);
         if (company == null) return;
-        MapServer.radarSweep(level, company, c.getBlockPos(), CELLS * Collectibles.CELL);
+        MapModApi.reveal(level, company.id, c.getBlockPos(), CELLS * Collectibles.CELL, true);
         // the geysers in its range, in land nobody has loaded too: the game generates the sulfur cave chunks in the
         // background and their geysers go on the map, within a capped radius (every chunk it generates stays on disk)
         String companyId = company.id;

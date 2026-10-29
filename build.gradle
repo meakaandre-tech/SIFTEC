@@ -28,6 +28,9 @@ dependencies {
     // Create: New Age, built from the fabric-26.3 branch of the fork and downloaded by CI into libs/: the grid's wires,
     // connectors, motors and reactor
     compileOnly files("libs/create-new-age-26.3.jar")
+    // MapMod (meakaandre-tech/MapMod), the map: compass, minimap and fullscreen map; SIFTEC adds its POIs, companies and
+    // the Field Research unlock through its API (mapapi/). The latest release, downloaded by CI into libs/
+    compileOnly files("libs/mapmod-26.3.jar")
     // Create: Diesel Generators, the fabric-26.3 build of the fork, downloaded by CI into libs/: the Fuel Generator's engine
     // (mixin/DieselEngineMixin, in the optional siftec.cdg.mixins.json; nothing else touches its classes)
     compileOnly files("libs/createdieselgenerators-26.3.jar")

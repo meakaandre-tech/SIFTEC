@@ -1,5 +1,16 @@
 package com.meakaandre.siftec.map;
 
+import com.meakaandre.mapmod.api.MapModApi;
+import com.meakaandre.mapmod.api.MapPoi;
+import com.meakaandre.mapmod.api.MovingPoi;
+import com.meakaandre.mapmod.api.PoiArea;
+import com.meakaandre.mapmod.api.PoiCategory;
+import com.meakaandre.mapmod.map.MapGrid;
+import com.meakaandre.mapmod.map.MapMarker;
+import com.meakaandre.mapmod.map.MapPayloads;
+import com.meakaandre.mapmod.map.MapServer;
+import com.meakaandre.mapmod.map.MapTerrain;
+import com.meakaandre.mapmod.map.MapTile;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.TestQueue;
 import com.meakaandre.siftec.TestReport;
@@ -9,6 +20,8 @@ import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.MapLock;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
+import com.meakaandre.siftec.mapapi.NodePois;
+import com.meakaandre.siftec.mapapi.SiftecMap;
 import com.meakaandre.siftec.net.CompanyState;
 import com.meakaandre.siftec.node.Node;
 import com.meakaandre.siftec.node.NodeMap;
@@ -16,7 +29,6 @@ import com.meakaandre.siftec.node.NodeType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -31,19 +43,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.gamerules.GameRules;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
- * /siftec selftest map: Field Research gives the Map; the locator bar is off; fog is kept per
- * company; chunks are recorded into low-resolution tiles that pack and unpack whole; a Radar Tower's sweep clears
- * the fog over its range and fills unloaded land from the generator; geysers are found in recorded chunks; nodes
- * show for the scanner's resources; markers are private or shared, and a second member of the company sees, changes
- * and removes a shared one; death markers keep the last three.
+ * /siftec selftest map: SIFTEC on MapMod's map. A company is the map's group (and machines' fake players stay off the
+ * map); Field Research gives terrain, the minimap and the fullscreen map; SIFTEC's categories come in the filter panel
+ * in their order; geysers are found in recorded chunks and key buildings show only to their company; nodes show for
+ * the resources the company's scanner knows, with their purity; a Radar Tower's sweep clears the fog over its range
+ * and fills unloaded land from the generator; vehicles move on their company's map only. The map's own parts (fog,
+ * tiles, markers, death markers, the locator bar) are MapMod's and tested there.
  * <p>
  * {@code /siftec worldtest map ...} drives the smoke run's client for its screenshots (see {@link Control}).
  * Every check prints "SELFTEST map"; failures say FAIL.
@@ -96,7 +107,9 @@ public final class MapTests {
                 .then(Commands.literal("worldtest").then(Commands.literal("map")
                     .then(Commands.literal("setup").executes(MapTests::setup))
                     .then(Commands.literal("death").executes(context -> {
-                        for (ServerPlayer p : context.getSource().getServer().getPlayerList().getPlayers()) MapServer.deathMarker(p);
+                        for (ServerPlayer p : context.getSource().getServer().getPlayerList().getPlayers()) {
+                            MapModApi.deathMarker(p, p.level(), p.blockPosition(), false);
+                        }
                         return 1;
                     }))
                     .then(Commands.literal("open").then(Commands.argument("zoom", FloatArgumentType.floatArg(0.01f, 4))
@@ -143,67 +156,56 @@ public final class MapTests {
         m.z = z;
         m.icon = 1;
         m.colour = 2;
-        m.company = shared;
+        m.shared = shared;
         return m;
+    }
+
+    private static PoiArea area(long region) {
+        int minX = MapGrid.keyX(region) * MapGrid.REGION_BLOCKS, minZ = MapGrid.keyZ(region) * MapGrid.REGION_BLOCKS;
+        return new PoiArea(region, minX, minZ, minX + MapGrid.REGION_BLOCKS, minZ + MapGrid.REGION_BLOCKS);
     }
 
     private static int run(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        ServerLevel level = source.getServer().overworld();
+        var server = source.getServer();
+        ServerLevel level = server.overworld();
         REPORT.reset();
 
-        // ---- the unlock and the locator bar
+        // ---- the unlock
         Milestone field = Milestones.get("field_research");
         boolean oldToken = false;
         for (Milestone m : Milestones.all()) oldToken |= m.tokens().contains("minimap");
         expect(source, "Field Research gives the Map; no milestone still gives Xaero's minimap token",
-            field != null && field.tokens().contains(MapServer.TOKEN) && !oldToken, "");
+            field != null && field.tokens().contains(MapLock.TOKEN) && !oldToken, "");
         Company fresh = new Company();
         Company researched = new Company();
         researched.done.add("field_research");
         expect(source, "the minimap and fullscreen map are closed before Field Research and open after it",
-            !MapServer.unlocked(fresh) && MapServer.unlocked(researched) && MapLock.open(researched) && !MapLock.open(null), "");
-        expect(source, "vanilla's player locator bar is switched off", !source.getServer().getGameRules().get(GameRules.LOCATOR_BAR), "");
+            !MapLock.open(fresh) && MapLock.open(researched) && !MapLock.open(null), "");
+        expect(source, "the map's unlocks are SIFTEC's: Field Research or nothing, with SIFTEC's message",
+            MapModApi.unlocks() == SiftecMap.UNLOCKS && "siftec.map.locked".equals(SiftecMap.UNLOCKS.lockedMessage(FakePlayer.get(level))), "");
 
-        // ---- fog is per company, and shared inside it
+        // ---- companies are the map's groups
         Company a = company(source, A, MEMBER_1, MEMBER_2);
         Company b = company(source, B);
-        LongOpenHashSet fresh1 = new LongOpenHashSet();
-        var cleared = MapFog.reveal(A, X >> 4, Z >> 4, MapServer.VISIT_RADIUS, fresh1);
-        expect(source, "a member's visit clears a disc of chunks for their company",
-            !cleared.isEmpty() && MapFog.explored(A, X >> 4, Z >> 4) && MapFog.explored(A, (X >> 4) + 5, Z >> 4) && !MapFog.explored(A, (X >> 4) + 8, (Z >> 4) + 8),
-            cleared.size() + " chunks");
-        expect(source, "another company's fog is its own", !MapFog.explored(B, X >> 4, Z >> 4), "");
+        expect(source, "a company is the map's group: its members share one, another company has its own",
+            MapModApi.groups().groupOf(server, UUID.fromString(MEMBER_1)).equals(A) && MapModApi.groups().same(MapModApi.groups().groupOf(server, UUID.fromString(MEMBER_2)), A)
+                && !MapModApi.groups().same(A, B) && MapModApi.groups().groupOf(server, UUID.randomUUID()).isEmpty(), "");
+        expect(source, "machines' fake players stay off the map", MapModApi.groups().ignored(FakePlayer.get(level)), "");
+        List<PoiCategory> cats = MapModApi.categories();
+        expect(source, "the filter panel has SIFTEC's categories, after the map's own, in Satisfactory's order",
+            cats.size() == 8 && cats.subList(2, 8).equals(List.of(SiftecMap.NODES, SiftecMap.WELLS, SiftecMap.GEYSERS, SiftecMap.CRASH_SITES, SiftecMap.ARTIFACTS, SiftecMap.BUILDINGS)),
+            cats.size() + " categories");
 
-        // ---- terrain: a loaded chunk is recorded at 4 by 4 pixels, and the tile packs and unpacks whole
+        // ---- found in recorded chunks: geysers for everyone, key buildings for their company
         LevelChunk chunk = level.getChunk(X >> 4, Z >> 4);
         BlockPos geyser = new BlockPos((X & ~15) + 8, level.getMinY() + 12, (Z & ~15) + 8);
         level.setBlock(geyser, Blocks.POTENT_SULFUR.defaultBlockState(), 3);
         MapTerrain.record(level, chunk);
         long region = MapGrid.regionOfChunk(X >> 4, Z >> 4);
-        MapTile tile = MapTerrain.tile(region);
-        int known = 0;
-        if (tile != null) {
-            int bx = Math.floorMod(X >> 4, MapGrid.REGION_CHUNKS) * MapGrid.CHUNK_PX, bz = Math.floorMod(Z >> 4, MapGrid.REGION_CHUNKS) * MapGrid.CHUNK_PX;
-            for (int pz = 0; pz < MapGrid.CHUNK_PX; pz++) for (int px = 0; px < MapGrid.CHUNK_PX; px++) if (tile.known(MapTile.index(bx + px, bz + pz)) && !tile.guessed(MapTile.index(bx + px, bz + pz))) known++;
-        }
-        expect(source, "a loaded chunk is recorded as 16 pixels", known == 16, known + " of 16");
-        boolean same = false;
-        int bytes = 0;
-        if (tile != null) {
-            try {
-                byte[] packed = tile.pack();
-                bytes = packed.length;
-                MapTile back = MapTile.unpack(packed);
-                same = back.version == tile.version && Arrays.equals(back.colour, tile.colour) && Arrays.equals(back.height, tile.height);
-            } catch (IOException e) {
-                same = false;
-            }
-        }
-        expect(source, "a tile packs small and unpacks the same", same && bytes < 120_000, bytes + " bytes");
-        boolean found = MapTerrain.foundFor(region, B).stream().anyMatch(p -> p.kind() == MapPoi.Kind.GEYSER && p.x() == geyser.getX() && p.z() == geyser.getZ());
+        boolean found = MapModApi.foundIn(region, B).stream().anyMatch(p -> p.kind().equals(SiftecMap.GEYSER.key()) && p.x() == geyser.getX() && p.z() == geyser.getZ());
         expect(source, "a sulfur geyser in a recorded chunk is found for the map", found, "");
-        boolean noBuildings = MapTerrain.foundFor(region, B).stream().noneMatch(p -> p.kind().category == MapPoi.Category.BUILDINGS);
+        boolean noBuildings = MapModApi.foundIn(region, B).stream().noneMatch(p -> MapModApi.kind(p.kind()) != null && MapModApi.kind(p.kind()).category() == SiftecMap.BUILDINGS);
         expect(source, "no other company's key buildings show", noBuildings, "");
 
         // ---- nodes: those of resources the company's scanner knows
@@ -211,21 +213,22 @@ public final class MapTests {
             Optional<Node> iron = NodeMap.nearest(level, X, Z, NodeType.IRON, 12);
             if (iron.isPresent()) {
                 long nodeRegion = MapGrid.regionOfBlock(iron.get().x(), iron.get().z());
-                List<MapPoi> pois = MapServer.poisFor(level, b, nodeRegion);
-                expect(source, "an iron node shows on the map, with its purity", pois.stream().anyMatch(p -> p.kind() == MapPoi.Kind.NODE && p.sub().equals("iron")
+                List<MapPoi> pois = NodePois.seedPois(level, area(nodeRegion), NodePois.Knows.of(b));
+                expect(source, "an iron node shows on the map, with its purity", pois.stream().anyMatch(p -> p.kind().equals(SiftecMap.NODE.key()) && p.sub().equals("iron")
                     && p.x() == iron.get().x() && p.z() == iron.get().z() && p.purity() == iron.get().purity().ordinal()), "");
-                boolean noUnknown = pois.stream().noneMatch(p -> p.kind() == MapPoi.Kind.NODE && !NodeType.byId(p.sub()).onScanner(b));
+                boolean noUnknown = pois.stream().noneMatch(p -> p.kind().equals(SiftecMap.NODE.key()) && !NodeType.byId(p.sub()).onScanner(b));
                 expect(source, "nodes the scanner does not know yet stay off the map", noUnknown, "");
             } else {
                 report(source, "no iron node near the test spot");
             }
         }
 
-        // ---- a Radar Tower's sweep clears its range and fills unloaded land with the generator's guess
+        // ---- a Radar Tower's sweep clears the company's fog and fills unloaded land with the generator's guess
         int rx = X + 4000, rz = Z;
-        MapServer.radarSweep(level, b, new BlockPos(rx, 80, rz), 1056);
-        boolean near = MapFog.explored(B, (rx + 1000) >> 4, rz >> 4), beyond = MapFog.explored(B, (rx + 1200) >> 4, rz >> 4);
-        expect(source, "a Radar Tower's sweep clears the company's fog over about a kilometre", near && !beyond && MapFog.explored(B, rx >> 4, (rz - 900) >> 4), "");
+        MapModApi.reveal(level, b.id, new BlockPos(rx, 80, rz), 1056, true);
+        boolean near = MapModApi.explored(B, (rx + 1000) >> 4, rz >> 4), beyond = MapModApi.explored(B, (rx + 1200) >> 4, rz >> 4);
+        expect(source, "a Radar Tower's sweep clears the company's fog over about a kilometre", near && !beyond && MapModApi.explored(B, rx >> 4, (rz - 900) >> 4)
+            && !MapModApi.explored(A, rx >> 4, rz >> 4), "");
         later(level, 200, () -> {
             MapTile t = MapTerrain.tile(MapGrid.regionOfBlock(rx + 700, rz));
             int px = Math.floorMod(rx + 700, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS, pz = Math.floorMod(rz, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS;
@@ -234,45 +237,11 @@ public final class MapTests {
             report(source, "done (later checks): " + REPORT.totals());
         });
 
-        // ---- markers: private, shared, and a second member of the company
-        var server = source.getServer();
-        MapMarkers markers = MapMarkers.get(server);
-        markers.all().removeIf(m -> m.owner.equals(MEMBER_1) || m.owner.equals(MEMBER_2));
-        String r1 = MapServer.apply(server, MEMBER_1, A, MapPayloads.ADD, marker("Iron here", X + 10, Z, true));
-        String r2 = MapServer.apply(server, MEMBER_1, A, MapPayloads.ADD, marker("My secret", X + 20, Z, false));
-        MapMarker shared = markers.visibleTo(MEMBER_2, A).stream().filter(m -> m.name.equals("Iron here")).findFirst().orElse(null);
-        expect(source, "a company marker reaches the company's other member; a private one does not",
-            r1 == null && r2 == null && shared != null && markers.visibleTo(MEMBER_2, A).stream().noneMatch(m -> m.name.equals("My secret"))
-                && markers.visibleTo(MEMBER_1, A).size() == 2, "");
-        expect(source, "no other company sees either", markers.visibleTo("someone-else", B).stream().noneMatch(m -> m.owner.equals(MEMBER_1)), "");
-        if (shared != null) {
-            MapMarker rename = marker("Iron, pure", 0, 0, true);
-            rename.id = shared.id;
-            String r3 = MapServer.apply(server, MEMBER_2, A, MapPayloads.UPDATE, rename);
-            expect(source, "the other member changes the shared marker and the first sees the change",
-                r3 == null && markers.visibleTo(MEMBER_1, A).stream().anyMatch(m -> m.id.equals(shared.id) && m.name.equals("Iron, pure") && m.x == X + 10), "");
-            MapMarker secret = markers.visibleTo(MEMBER_1, A).stream().filter(m -> m.name.equals("My secret")).findFirst().orElse(null);
-            MapMarker hit = new MapMarker();
-            hit.id = secret == null ? "" : secret.id;
-            String r4 = MapServer.apply(server, MEMBER_2, A, MapPayloads.DELETE, hit);
-            String r5 = MapServer.apply(server, "someone-else", B, MapPayloads.DELETE, rename);
-            expect(source, "nobody else can remove a private marker, and no other company a shared one",
-                "siftec.map.not_yours".equals(r4) && "siftec.map.not_yours".equals(r5) && markers.byId(shared.id) != null, r4 + ", " + r5);
-            String r6 = MapServer.apply(server, MEMBER_2, A, MapPayloads.DELETE, rename);
-            expect(source, "the other member removes the shared marker for both", r6 == null && markers.byId(shared.id) == null, "");
-        }
-
-        // ---- death markers: private, the last three kept
+        // ---- vehicles: on their company's map only
         FakePlayer fake = FakePlayer.get(level);
-        String fakeId = fake.getUUID().toString();
-        markers.all().removeIf(m -> m.owner.equals(fakeId));
-        fake.setPos(X + 0.5, 90, Z + 0.5);
-        for (int i = 0; i < 4; i++) MapServer.deathMarker(fake);
-        long deaths = markers.all().stream().filter(m -> m.death && m.owner.equals(fakeId)).count();
-        boolean placedRight = markers.all().stream().anyMatch(m -> m.death && m.owner.equals(fakeId) && m.x == X && m.z == Z && !m.company);
-        expect(source, "dying leaves a private death marker where it happened; the last three are kept", deaths == 3 && placedRight, deaths + " kept");
-        markers.all().removeIf(m -> m.owner.equals(fakeId) || m.owner.equals(MEMBER_1) || m.owner.equals(MEMBER_2));
-        markers.setDirty();
+        List<MovingPoi> none = MapModApi.movingSources().getFirst().moving(fake, A);
+        expect(source, "the map's moving things are SIFTEC's vehicles and drones (one kind each)",
+            SiftecMap.MOVING.containsKey("drone") && SiftecMap.MOVING.size() > 1 && none.stream().allMatch(m -> SiftecMap.MOVING.containsValue(MapModApi.kind(m.kind()))), none.size() + " moving");
 
         report(source, "done: " + REPORT.totals() + " (a later check follows)");
         return REPORT.failed == 0 ? 1 : 0;
@@ -298,7 +267,7 @@ public final class MapTests {
             Companies.save(server);
             CompanyState.recompute(server);
             BlockPos at = player.blockPosition();
-            MapServer.radarSweep(level, company, at, 1056);
+            MapModApi.reveal(level, company.id, at, 1056, true);
             MapServer.apply(server, MATE, company.id, MapPayloads.ADD, marker("Placed by a company mate", at.getX() + 60, at.getZ() - 40, true));
             MapMarker mine = marker("My marker", at.getX() - 70, at.getZ() + 30, false);
             mine.icon = 2;

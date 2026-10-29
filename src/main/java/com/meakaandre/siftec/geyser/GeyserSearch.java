@@ -1,7 +1,7 @@
 package com.meakaandre.siftec.geyser;
 
 import com.meakaandre.siftec.Siftec;
-import com.meakaandre.siftec.map.MapTerrain;
+import com.meakaandre.siftec.mapapi.SiftecMap;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.Terrain;
 import com.meakaandre.siftec.save.JsonSavedData;
@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  * way nodes and crash sites are: a search samples the generator's biomes on the worker thread for the chunks with sulfur
  * caves under them, then has the game generate just those chunks and their neighbours (to the features step, in the
  * background, a few at a time, never loading them for play) and reads the potent sulfur out of them. What it finds goes
- * on the map ({@link MapTerrain#addFound}); every chunk it has read is remembered, so it is never generated for this
+ * on the map ({@link SiftecMap#geysersFound}); every chunk it has read is remembered, so it is never generated for this
  * again.
  */
 public final class GeyserSearch {
@@ -211,7 +211,7 @@ public final class GeyserSearch {
                     }
                     List<BlockPos> here = read(level, chunk);
                     job.found.addAll(here);
-                    MapTerrain.addFound(level, x, z, here);
+                    SiftecMap.geysersFound(level, x, z, here);
                     searched.add(c);
                 }, server);
             }

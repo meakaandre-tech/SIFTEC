@@ -1,6 +1,8 @@
 package com.meakaandre.siftec.client.map;
 
-import com.meakaandre.siftec.map.MapMarker;
+import com.meakaandre.mapmod.client.map.MapClient;
+import com.meakaandre.mapmod.client.map.MapScreen;
+import com.meakaandre.mapmod.map.MapMarker;
 import com.meakaandre.siftec.map.MapTests;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;

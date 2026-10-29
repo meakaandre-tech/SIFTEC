@@ -9,7 +9,7 @@ import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.item.NodeScannerItem;
 import com.meakaandre.siftec.item.ObjectScannerItem;
-import com.meakaandre.siftec.map.MapServer;
+import com.meakaandre.mapmod.api.MapModApi;
 import com.meakaandre.siftec.net.CompanyState;
 import com.meakaandre.siftec.place.Places;
 import com.meakaandre.siftec.save.JsonSavedData;
@@ -359,7 +359,7 @@ public final class Companies {
         if ((target.gateway == null || target.gateway.isEmpty()) && old.gateway != null) target.gateway = old.gateway;
         mergePaid(old, target);
         data.fold(old.id, target.id);
-        MapServer.fold(server, old.id, target.id);
+        MapModApi.mergeGroups(server, old.id, target.id);
         Claims.reassign(server, old.id, target.id);
         Places.reassign(server, old.id, target.id);
         save(server);

@@ -6,7 +6,7 @@ import com.meakaandre.siftec.building.BuildingProtection;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
-import com.meakaandre.siftec.map.MapServer;
+import com.meakaandre.mapmod.api.MapModApi;
 import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.registry.ModBlocks;
@@ -280,7 +280,7 @@ public final class DeathCrates {
         crate.owner = player.getUUID();
         crate.ownerName = player.getGameProfile().name();
         crate.entries.addAll(entries);
-        crate.markerId = MapServer.crateMarker(player, player.level(), crate.getBlockPos());
+        crate.markerId = MapModApi.deathMarker(player, player.level(), crate.getBlockPos(), true);
         crate.setChanged();
     }
 
@@ -348,7 +348,7 @@ public final class DeathCrates {
         crate.entries.clear();
         crate.entries.addAll(left);
         if (left.isEmpty()) {
-            MapServer.removeMarker(level.getServer(), crate.markerId);
+            MapModApi.removeMarker(level.getServer(), crate.markerId);
             crate.markerId = "";
             level.removeBlock(crate.getBlockPos(), false);
             player.sendOverlayMessage(Component.translatable(wasEmpty ? "siftec.crate.empty" : "siftec.crate.restored").withStyle(ChatFormatting.GOLD));
@@ -392,7 +392,7 @@ public final class DeathCrates {
         BlockPos pos = crate.getBlockPos();
         for (DeathCrateBlockEntity.Entry e : crate.entries) Drops.at(level, pos, 0.5, e.stack());
         crate.entries.clear();
-        MapServer.removeMarker(level.getServer(), crate.markerId);
+        MapModApi.removeMarker(level.getServer(), crate.markerId);
         crate.markerId = "";
     }
 }
