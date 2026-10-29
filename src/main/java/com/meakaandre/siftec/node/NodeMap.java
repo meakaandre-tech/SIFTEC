@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -246,6 +247,11 @@ public final class NodeMap {
     }
 
     /** Runs a job on the worker thread (a search that combines several lookups), answering on the server thread (null if it failed). */
+    /** The worker thread itself, for a caller that queues its own jobs there (MapMod's node POIs, through PoiSource.executor). */
+    public static Executor executor() {
+        return NodeWorker.executor();
+    }
+
     public static <T> void async(MinecraftServer server, Supplier<T> job, Consumer<@Nullable T> then) {
         NodeWorker.async(server, job, then);
     }

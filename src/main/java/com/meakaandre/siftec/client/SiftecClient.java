@@ -1,7 +1,6 @@
 package com.meakaandre.siftec.client;
 
 import com.meakaandre.siftec.SelfTestHooks;
-import com.meakaandre.siftec.client.map.MapClient;
 import com.meakaandre.siftec.client.ponder.Guide;
 import com.meakaandre.siftec.equip.JetFuelPayload;
 import com.meakaandre.siftec.fluid.FluidEntry;
@@ -80,7 +79,6 @@ public class SiftecClient implements ClientModInitializer {
         BuildGunClient.register();
         VehicleClient.register();
         CloudButton.register();
-        MapClient.register();
         // the guide: Ponder scenes for every building and vehicle
         Guide.register();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {

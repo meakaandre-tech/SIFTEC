@@ -3,7 +3,7 @@ package com.meakaandre.siftec.net;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.hub.MapLock;
-import com.meakaandre.siftec.map.MapServer;
+import com.meakaandre.mapmod.api.MapModApi;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,6 +25,8 @@ public final class CompanyState {
         Company company = Companies.find(player);
         ServerPlayNetworking.send(player, new StatePayload(company == null ? new ArrayList<>() : new ArrayList<>(company.done)));
         MapLock.update(player, company);
-        MapServer.companyChanged(player, company);
+        // the map: a player who changed company gets the new company's map, and a change of unlocks shows at once
+        MapModApi.groupChanged(player);
+        MapModApi.unlocksChanged(player);
     }
 }

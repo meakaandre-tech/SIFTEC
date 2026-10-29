@@ -1,5 +1,7 @@
 package com.meakaandre.siftec.compat;
 
+import com.meakaandre.mapmod.map.MapMarker;
+import com.meakaandre.mapmod.map.MapMarkers;
 import com.meakaandre.siftec.TestReport;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.company.Companies;
@@ -9,8 +11,6 @@ import com.meakaandre.siftec.death.DeathCrates;
 import com.meakaandre.siftec.hub.Locks;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
-import com.meakaandre.siftec.map.MapMarker;
-import com.meakaandre.siftec.map.MapMarkers;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.tiviacz.travelersbackpack.attachment.AttachmentUtils;
@@ -427,7 +427,7 @@ public final class TravelersBackpackSelfTest {
     private static Map<MapMarker, DeathCrateBlockEntity> crates(MinecraftServer server, String owner) {
         Map<MapMarker, DeathCrateBlockEntity> out = new LinkedHashMap<>();
         for (MapMarker m : MapMarkers.get(server).all()) {
-            if (!m.death || !m.crate || (owner != null && !m.owner.equals(owner))) continue;
+            if (!m.death || !m.kept || (owner != null && !m.owner.equals(owner))) continue;
             ServerLevel level = null;
             for (ServerLevel l : server.getAllLevels()) if (l.dimension().identifier().toString().equals(m.dimension)) level = l;
             if (level == null) continue;

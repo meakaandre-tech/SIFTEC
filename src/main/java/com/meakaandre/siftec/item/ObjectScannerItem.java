@@ -6,7 +6,7 @@ import com.meakaandre.siftec.collect.Collectibles;
 import com.meakaandre.siftec.company.Companies;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.geyser.GeyserSearch;
-import com.meakaandre.siftec.map.MapTerrain;
+import com.meakaandre.siftec.mapapi.SiftecMap;
 import com.meakaandre.siftec.node.NodeMap;
 import com.meakaandre.siftec.node.NodeSites;
 import com.meakaandre.siftec.node.Terrain;
@@ -136,7 +136,7 @@ public class ObjectScannerItem extends Item {
             int px = player.getBlockX(), pz = player.getBlockZ();
             GeyserSearch.search(server, player.blockPosition(), GEYSER_CHUNKS, found -> {
                 if (player.isRemoved()) return;
-                List<BlockPos> near = MapTerrain.geysersNear(px, pz, GEYSER_CHUNKS * 16 + 16);
+                List<BlockPos> near = SiftecMap.geysersNear(px, pz, GEYSER_CHUNKS * 16 + 16);
                 if (near.isEmpty()) tellNone(player, name);
                 else tellFound(player, name, near.getFirst().getX(), near.getFirst().getZ());
             });

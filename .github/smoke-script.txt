@@ -386,14 +386,14 @@ shot
 cmd siftec worldtest map open 0.3
 sleep 4
 shot
-cmd siftec worldtest map hide cat:crash_sites
-cmd siftec worldtest map hide cat:artifacts
-cmd siftec worldtest map hide node:iron
+cmd siftec worldtest map hide cat:siftec:crash_sites
+cmd siftec worldtest map hide cat:siftec:artifacts
+cmd siftec worldtest map hide sub:siftec:node/iron
 sleep 2
 shot
-cmd siftec worldtest map show cat:crash_sites
-cmd siftec worldtest map show cat:artifacts
-cmd siftec worldtest map show node:iron
+cmd siftec worldtest map show cat:siftec:crash_sites
+cmd siftec worldtest map show cat:siftec:artifacts
+cmd siftec worldtest map show sub:siftec:node/iron
 cmd siftec worldtest map open 1.5
 sleep 4
 shot

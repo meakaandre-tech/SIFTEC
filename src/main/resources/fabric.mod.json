@@ -19,7 +19,8 @@
     "minecraft": ">=26.3- <26.4-",
     "java": ">=25",
     "create": "*",
-    "create_new_age": "*"
+    "create_new_age": "*",
+    "mapmod": "*"
   },
   "recommends": {
     "travelersbackpack": ">=11.4.1 <11.5-"

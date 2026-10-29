@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -24,6 +25,11 @@ final class NodeWorker {
     });
 
     private NodeWorker() {
+    }
+
+    /** The worker thread, for jobs that must run where the node map's own work does (the map's node POIs). */
+    static Executor executor() {
+        return WORKER;
     }
 
     /** Works the cell out on the worker thread, so a later {@link NodeMap#inCell} finds it cached. */

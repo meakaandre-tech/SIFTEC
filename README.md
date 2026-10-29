@@ -195,7 +195,8 @@ and geysers there show, and lists the nearest node and collectible of each kind 
 
 ## Map
 
-SIFTEC has its own map (`map/`, `client/map/`) in place of Xaero's Minimap, laid out like Satisfactory's. A compass
+The map is [MapMod](https://github.com/meakaandre-tech/MapMod) (a required mod, SIFTEC's former map made standalone),
+in place of Xaero's Minimap, laid out like Satisfactory's; SIFTEC fills it through MapMod's API (`mapapi/`). A compass
 strip runs across the top of the screen from the start: the bearing, the HUB, placed markers, pinned things with their
 distance, company players, and scanned nodes and crash sites nearby. Vanilla's player locator bar is switched off
 (company players are on the compass instead). Field Research opens a small square minimap at the top right (N hides
@@ -207,10 +208,11 @@ generator. Markers are placed from the map (right click) with an icon, a colour 
 company; left click pins anything to the compass. Dying leaves a private death marker, pinned at once: on the Death
 Crate while there is one, otherwise where it happened (the last three of those are kept).
 
-It stays light: the terrain is kept at one pixel for 4 by 4 blocks in tiles of 512 by 512 blocks, recorded only when a
-chunk loads or a few seconds after a block in it changes (`map/MapTerrain.java`), saved under `data/siftec/map`, and
-sent to a client only when it holds an older copy; clients keep their tiles on disk (`siftec/map/<map id>` in the game
-folder), so a world's map is there at once on the next visit.
+SIFTEC's part (`mapapi/SiftecMap.java`): companies are the map's groups, Field Research is the unlock, the categories and
+kinds above, the nodes, wells, crash sites and artifacts the seed puts in a region (`mapapi/NodePois.java`, worked out on
+the node map's worker), geysers and the company's key buildings found in recorded chunks, vehicles and drones as moving
+things, Radar Tower sweeps (`MapModApi.reveal`) and Death Crates' kept death markers. MapMod keeps everything under
+`data/mapmod` in the world and `mapmod/<map id>` in the game folder.
 
 ## Backpack and death crate
 
