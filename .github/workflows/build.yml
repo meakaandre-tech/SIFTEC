@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "mapmod"]
   workflow_dispatch:
 
 permissions:
@@ -311,7 +311,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git add -A && git commit -q -m "Build log for ${GITHUB_SHA}"
-          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs:ci-logs-mapmod
       - name: Upload jars
         if: success()
         uses: actions/upload-artifact@v4
@@ -321,7 +321,7 @@ jobs:
             build/libs/*.jar
             !build/libs/siftec-selftest-*.jar
       - name: Publish the jar as a release
-        if: success()
+        if: false
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
