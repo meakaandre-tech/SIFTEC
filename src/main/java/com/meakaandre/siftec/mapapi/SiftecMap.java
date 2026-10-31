@@ -109,7 +109,7 @@ public final class SiftecMap {
         BUILDINGS = MapModApi.category(id("buildings"), filter("buildings"));
 
         PoiKind.Builder node = MapModApi.kind(id("node"), NODES).label(poi("node")).labeller(SiftecMap::nodeLabel)
-            .glyph(MapGlyphs.NODE, BUILDING_TINT).purity().subFilters().compassRange(NODE_RANGE).detail();
+            .glyph(MapGlyphs.NODE, BUILDING_TINT).purity().subFilters().compassRange(NODE_RANGE);
         PoiKind.Builder well = MapModApi.kind(id("well"), WELLS).label(poi("well")).labeller(SiftecMap::nodeLabel)
             .glyph(MapGlyphs.DROP, WATER_TINT).purity().subFilters().compassRange(NODE_RANGE);
         for (NodeType t : NodeType.values()) {

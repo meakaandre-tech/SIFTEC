@@ -5,12 +5,11 @@ import com.meakaandre.mapmod.api.MapPoi;
 import com.meakaandre.mapmod.api.MovingPoi;
 import com.meakaandre.mapmod.api.PoiArea;
 import com.meakaandre.mapmod.api.PoiCategory;
+import com.meakaandre.mapmod.map.MapFound;
 import com.meakaandre.mapmod.map.MapGrid;
 import com.meakaandre.mapmod.map.MapMarker;
 import com.meakaandre.mapmod.map.MapPayloads;
 import com.meakaandre.mapmod.map.MapServer;
-import com.meakaandre.mapmod.map.MapTerrain;
-import com.meakaandre.mapmod.map.MapTile;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.TestQueue;
 import com.meakaandre.siftec.TestReport;
@@ -50,10 +49,10 @@ import java.util.UUID;
 
 /**
  * /siftec selftest map: SIFTEC on MapMod's map. A company is the map's group (and machines' fake players stay off the
- * map); Field Research gives terrain, the minimap and the fullscreen map; SIFTEC's categories come in the filter panel
- * in their order; geysers are found in recorded chunks and key buildings show only to their company; nodes show for
- * the resources the company's scanner knows, with their purity; a Radar Tower's sweep clears the fog over its range
- * and fills unloaded land from the generator; vehicles move on their company's map only. The map's own parts (fog,
+ * map); Field Research gives the fullscreen map; SIFTEC's categories come in the filter panel
+ * in their order; geysers are found in scanned chunks and key buildings show only to their company; nodes show for
+ * the resources the company's scanner knows, with their purity; a Radar Tower's sweep clears the fog over its range;
+ * vehicles move on their company's map only. The map's own parts (fog,
  * tiles, markers, death markers, the locator bar) are MapMod's and tested there.
  * <p>
  * {@code /siftec worldtest map ...} drives the smoke run's client for its screenshots (see {@link Control}).
@@ -197,14 +196,14 @@ public final class MapTests {
             cats.size() == 8 && cats.subList(2, 8).equals(List.of(SiftecMap.NODES, SiftecMap.WELLS, SiftecMap.GEYSERS, SiftecMap.CRASH_SITES, SiftecMap.ARTIFACTS, SiftecMap.BUILDINGS)),
             cats.size() + " categories");
 
-        // ---- found in recorded chunks: geysers for everyone, key buildings for their company
+        // ---- found in scanned chunks: geysers for everyone, key buildings for their company
         LevelChunk chunk = level.getChunk(X >> 4, Z >> 4);
         BlockPos geyser = new BlockPos((X & ~15) + 8, level.getMinY() + 12, (Z & ~15) + 8);
         level.setBlock(geyser, Blocks.POTENT_SULFUR.defaultBlockState(), 3);
-        MapTerrain.record(level, chunk);
+        MapFound.scan(level, chunk);
         long region = MapGrid.regionOfChunk(X >> 4, Z >> 4);
         boolean found = MapModApi.foundIn(region, B).stream().anyMatch(p -> p.kind().equals(SiftecMap.GEYSER.key()) && p.x() == geyser.getX() && p.z() == geyser.getZ());
-        expect(source, "a sulfur geyser in a recorded chunk is found for the map", found, "");
+        expect(source, "a sulfur geyser in a scanned chunk is found for the map", found, "");
         boolean noBuildings = MapModApi.foundIn(region, B).stream().noneMatch(p -> MapModApi.kind(p.kind()) != null && MapModApi.kind(p.kind()).category() == SiftecMap.BUILDINGS);
         expect(source, "no other company's key buildings show", noBuildings, "");
 
@@ -223,19 +222,13 @@ public final class MapTests {
             }
         }
 
-        // ---- a Radar Tower's sweep clears the company's fog and fills unloaded land with the generator's guess
+        // ---- a Radar Tower's sweep clears the company's fog
         int rx = X + 4000, rz = Z;
-        MapModApi.reveal(level, b.id, new BlockPos(rx, 80, rz), 1056, true);
+        MapModApi.reveal(level, b.id, new BlockPos(rx, 80, rz), 1056);
         boolean near = MapModApi.explored(B, (rx + 1000) >> 4, rz >> 4), beyond = MapModApi.explored(B, (rx + 1200) >> 4, rz >> 4);
         expect(source, "a Radar Tower's sweep clears the company's fog over about a kilometre", near && !beyond && MapModApi.explored(B, rx >> 4, (rz - 900) >> 4)
             && !MapModApi.explored(A, rx >> 4, rz >> 4), "");
-        later(level, 200, () -> {
-            MapTile t = MapTerrain.tile(MapGrid.regionOfBlock(rx + 700, rz));
-            int px = Math.floorMod(rx + 700, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS, pz = Math.floorMod(rz, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS;
-            boolean guessed = t != null && t.known(MapTile.index(px, pz));
-            expect(source, "land nobody loaded in the sweep is filled in from the world generator", guessed, "");
-            report(source, "done (later checks): " + REPORT.totals());
-        });
+        later(level, 200, () -> report(source, "done (later checks): " + REPORT.totals()));
 
         // ---- vehicles: on their company's map only
         FakePlayer fake = FakePlayer.get(level);
@@ -267,7 +260,7 @@ public final class MapTests {
             Companies.save(server);
             CompanyState.recompute(server);
             BlockPos at = player.blockPosition();
-            MapModApi.reveal(level, company.id, at, 1056, true);
+            MapModApi.reveal(level, company.id, at, 1056);
             MapServer.apply(server, MATE, company.id, MapPayloads.ADD, marker("Placed by a company mate", at.getX() + 60, at.getZ() - 40, true));
             MapMarker mine = marker("My marker", at.getX() - 70, at.getZ() + 30, false);
             mine.icon = 2;
