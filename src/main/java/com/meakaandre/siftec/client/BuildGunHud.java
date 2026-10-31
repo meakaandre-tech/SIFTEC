@@ -189,11 +189,14 @@ public final class BuildGunHud {
 
     /** What the building does to the grid: the MW it draws or makes, or null for none. */
     static Component power(BuildingDef def) {
-        if (def.mw() > 0 && def.power() != PowerRole.NONE && def.power() != PowerRole.POLE && def.power() != PowerRole.STORAGE) {
-            return Component.translatable("siftec.build_gun.hud.power_make", mw(def.mw()));
-        }
+        if (makesPower(def)) return Component.translatable("siftec.build_gun.hud.power_make", mw(def.mw()));
         if (def.su() > 0) return Component.translatable("siftec.build_gun.hud.power_use", mw(def.su() / SU_PER_MW));
         return null;
+    }
+
+    /** True for a generator: it gives the grid its MW. */
+    static boolean makesPower(BuildingDef def) {
+        return def.mw() > 0 && def.power() != PowerRole.NONE && def.power() != PowerRole.POLE && def.power() != PowerRole.STORAGE;
     }
 
     static String mw(double mw) {

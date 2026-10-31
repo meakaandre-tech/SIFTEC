@@ -350,13 +350,20 @@ public class BuildMenuScreen extends Screen {
             y += 17;
         }
         y += 2;
-        Component power = BuildGunHud.power(def);
+        Component power = menuPower(def);
         g.text(font, Component.translatable("siftec.build_menu.power"), x, y, WHITE, false);
         g.text(font, power == null ? Component.translatable("siftec.build_menu.power_none") : power, x + 60, y, GREY, false);
         y += 12;
         int[] size = BuildingVisuals.footprint(def);
         g.text(font, Component.translatable("siftec.build_menu.footprint"), x, y, WHITE, false);
         if (size != null) g.text(font, Component.translatable("siftec.build_menu.footprint_value", size[0], size[1], size[2]), x + 60, y, GREY, false);
+    }
+
+    /** What it does to the grid, under the panel's own "Power" heading: the MW it uses or makes, or null for none. */
+    private static @Nullable Component menuPower(BuildingDef def) {
+        if (BuildGunHud.makesPower(def)) return Component.translatable("siftec.build_menu.power_make", BuildGunHud.mw(def.mw()));
+        if (def.su() > 0) return Component.translatable("siftec.build_menu.power_use", BuildGunHud.mw(def.su() / BuildGunHud.SU_PER_MW));
+        return null;
     }
 
     /** Its description: the first lines of its Ponder scene, Satisfactory's text for it. */
