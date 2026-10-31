@@ -24,8 +24,7 @@ public final class CloudButton {
 
     public static void register() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-            // creative players get the vanilla creative inventory (the InventoryScreen E builds only hands over to it)
-            if (!(screen instanceof InventoryScreen inventory) || client.player == null || client.player.hasInfiniteMaterials()) return;
+            if (!(screen instanceof InventoryScreen inventory)) return;
             Button button = add(inventory, PANEL_WIDTH);
             // the recipe book moves the panel sideways; the button follows it
             ScreenEvents.afterTick(screen).register(s -> place(inventory, button, PANEL_WIDTH));
