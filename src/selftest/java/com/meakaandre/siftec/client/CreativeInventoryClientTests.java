@@ -40,7 +40,8 @@ public final class CreativeInventoryClientTests {
             expect("a player is in the world", false, shown);
         } else if (player.hasInfiniteMaterials()) {
             expect("in creative E opens the vanilla creative inventory, not the backpack window",
-                screen instanceof CreativeModeInventoryScreen && player.containerMenu == player.inventoryMenu, shown);
+                // vanilla's creative screen makes its own item-picker menu the open one; no backpack menu is open
+                screen instanceof CreativeModeInventoryScreen creative && player.containerMenu == creative.getMenu(), shown);
         } else {
             boolean backpack = screen instanceof AbstractBackpackScreen<?> window && window.getWrapper() != null
                 && window.getWrapper().getScreenID() == Reference.WEARABLE_SCREEN_ID;
