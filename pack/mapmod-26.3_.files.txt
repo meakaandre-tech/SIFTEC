@@ -1,0 +1,3 @@
+fabric.mod.json
+mapmod.mixins.json
+META-INF/jars/aircompressor-v3-3.14.jar

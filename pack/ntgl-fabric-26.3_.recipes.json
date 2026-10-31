@@ -1,0 +1,1 @@
+{"data/minecraft/recipe/pistol10mm.json": {"type": "ntgl:workbench", "materials": [{"count": 14, "ingredient": {"tag": "c:ingots/iron"}}], "result": {"id": "ntgl:pistol10mm"}}}
