@@ -67,9 +67,9 @@ public final class MapTests {
     /** A second member for the smoke run's real player, who places a company marker for them. */
     private static final String MATE = "00000000-0000-4000-8000-00000000beef";
 
-    /** What the map's remote control does on the client: the map's screen, a filter, the minimap, a pin, a new marker. */
+    /** What the map's remote control does on the client: the map's screen, a filter, a pin, a new marker (MapMod has no minimap). */
     public enum Action {
-        OPEN, CLOSE, HIDE, SHOW, MINIMAP, PIN_MARKER, EDIT
+        OPEN, CLOSE, HIDE, SHOW, PIN_MARKER, EDIT
     }
 
     /**

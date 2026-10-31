@@ -33,7 +33,6 @@ public final class MapClientTests {
             }
             case HIDE -> MapClient.HIDDEN.add(p.arg());
             case SHOW -> MapClient.HIDDEN.remove(p.arg());
-            case MINIMAP -> MapClient.minimapOn = p.arg().equals("on");
             case PIN_MARKER -> {
                 for (MapMarker m : MapClient.markers) if (m.name.equals(p.arg())) MapClient.pin(MapClient.markerPin(m));
             }
