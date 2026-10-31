@@ -49,10 +49,10 @@ import java.util.UUID;
 
 /**
  * /siftec selftest map: SIFTEC on MapMod's map. A company is the map's group (and machines' fake players stay off the
- * map); Field Research gives terrain, the minimap and the fullscreen map; SIFTEC's categories come in the filter panel
- * in their order; geysers are found in recorded chunks and key buildings show only to their company; nodes show for
- * the resources the company's scanner knows, with their purity; a Radar Tower's sweep clears the fog over its range
- * and fills unloaded land from the generator; vehicles move on their company's map only. The map's own parts (fog,
+ * map); Field Research gives the fullscreen map; SIFTEC's categories come in the filter panel in their order; geysers
+ * are found in scanned chunks and key buildings show only to their company; nodes show for the resources the company's
+ * scanner knows, with their purity; a Radar Tower's sweep clears the fog over its range, and it stays cleared; vehicles
+ * move on their company's map only. The map's own parts (fog,
  * tiles, markers, death markers, the locator bar) are MapMod's and tested there.
  * <p>
  * {@code /siftec worldtest map ...} drives the smoke run's client for its screenshots (see {@link Control}).

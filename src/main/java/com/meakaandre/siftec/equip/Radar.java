@@ -28,8 +28,8 @@ import java.util.Set;
 
 /**
  * The Radar Tower (a Build Gun building, MAM Quartz: Radar Technology). While it has power it sweeps its range, as in
- * Satisfactory: the company's map has its fog cleared over the whole range (land nobody has loaded is filled in from
- * the world generator), so the crash sites, nodes and geysers there show on it, and the company is told how many
+ * Satisfactory: the company's map has its fog cleared over the whole range, so the crash sites, nodes and geysers
+ * there show on it, and the company is told how many
  * crash sites it has newly found. Using it lists the nearest node of each resource the company's scanner knows and
  * the nearest of each collectible.
  */
