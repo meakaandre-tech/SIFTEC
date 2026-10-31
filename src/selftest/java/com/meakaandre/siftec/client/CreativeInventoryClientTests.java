@@ -34,7 +34,7 @@ public final class CreativeInventoryClientTests {
             Siftec.LOGGER.info("SELFTEST creative-client done: {} passed, {} failed", passed, failed);
             return;
         }
-        Screen screen = mc.screen;
+        Screen screen = mc.gui.screen();
         String shown = screen == null ? "no screen" : screen.getClass().getName();
         if (player == null) {
             expect("a player is in the world", false, shown);
