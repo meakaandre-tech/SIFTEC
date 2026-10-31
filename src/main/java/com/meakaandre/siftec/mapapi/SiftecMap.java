@@ -233,7 +233,7 @@ public final class SiftecMap {
         }
     };
 
-    /** Field Research gives the Map: terrain, the minimap and the fullscreen map together. */
+    /** Field Research gives the Map: terrain and the fullscreen map together. */
     public static final UnlockProvider UNLOCKS = new UnlockProvider() {
         @Override
         public boolean unlocked(ServerPlayer player, MapFeature feature) {

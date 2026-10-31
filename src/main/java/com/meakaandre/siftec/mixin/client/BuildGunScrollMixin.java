@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Ctrl + Scroll with the Build Gun picks a building instead of moving the hotbar. */
+/** With the Build Gun in hand the wheel is the gun's: it turns the hologram, and with Alt switches build hotbars. */
 @Mixin(MouseHandler.class)
 public abstract class BuildGunScrollMixin {
     @Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)

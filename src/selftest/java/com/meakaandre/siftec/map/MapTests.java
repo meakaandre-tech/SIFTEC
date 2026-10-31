@@ -49,10 +49,10 @@ import java.util.UUID;
 
 /**
  * /siftec selftest map: SIFTEC on MapMod's map. A company is the map's group (and machines' fake players stay off the
- * map); Field Research gives the fullscreen map; SIFTEC's categories come in the filter panel
- * in their order; geysers are found in scanned chunks and key buildings show only to their company; nodes show for
- * the resources the company's scanner knows, with their purity; a Radar Tower's sweep clears the fog over its range;
- * vehicles move on their company's map only. The map's own parts (fog,
+ * map); Field Research gives terrain, the minimap and the fullscreen map; SIFTEC's categories come in the filter panel
+ * in their order; geysers are found in recorded chunks and key buildings show only to their company; nodes show for
+ * the resources the company's scanner knows, with their purity; a Radar Tower's sweep clears the fog over its range
+ * and fills unloaded land from the generator; vehicles move on their company's map only. The map's own parts (fog,
  * tiles, markers, death markers, the locator bar) are MapMod's and tested there.
  * <p>
  * {@code /siftec worldtest map ...} drives the smoke run's client for its screenshots (see {@link Control}).
@@ -66,7 +66,7 @@ public final class MapTests {
     /** A second member for the smoke run's real player, who places a company marker for them. */
     private static final String MATE = "00000000-0000-4000-8000-00000000beef";
 
-    /** What the map's remote control does on the client: the map's screen, a filter, a pin, a new marker. */
+    /** What the map's remote control does on the client: the map's screen, a filter, a pin, a new marker (MapMod has no minimap). */
     public enum Action {
         OPEN, CLOSE, HIDE, SHOW, PIN_MARKER, EDIT
     }
@@ -196,14 +196,14 @@ public final class MapTests {
             cats.size() == 8 && cats.subList(2, 8).equals(List.of(SiftecMap.NODES, SiftecMap.WELLS, SiftecMap.GEYSERS, SiftecMap.CRASH_SITES, SiftecMap.ARTIFACTS, SiftecMap.BUILDINGS)),
             cats.size() + " categories");
 
-        // ---- found in scanned chunks: geysers for everyone, key buildings for their company
+        // ---- found in recorded chunks: geysers for everyone, key buildings for their company
         LevelChunk chunk = level.getChunk(X >> 4, Z >> 4);
         BlockPos geyser = new BlockPos((X & ~15) + 8, level.getMinY() + 12, (Z & ~15) + 8);
         level.setBlock(geyser, Blocks.POTENT_SULFUR.defaultBlockState(), 3);
         MapFound.scan(level, chunk);
         long region = MapGrid.regionOfChunk(X >> 4, Z >> 4);
         boolean found = MapModApi.foundIn(region, B).stream().anyMatch(p -> p.kind().equals(SiftecMap.GEYSER.key()) && p.x() == geyser.getX() && p.z() == geyser.getZ());
-        expect(source, "a sulfur geyser in a scanned chunk is found for the map", found, "");
+        expect(source, "a sulfur geyser in a recorded chunk is found for the map", found, "");
         boolean noBuildings = MapModApi.foundIn(region, B).stream().noneMatch(p -> MapModApi.kind(p.kind()) != null && MapModApi.kind(p.kind()).category() == SiftecMap.BUILDINGS);
         expect(source, "no other company's key buildings show", noBuildings, "");
 
@@ -228,7 +228,11 @@ public final class MapTests {
         boolean near = MapModApi.explored(B, (rx + 1000) >> 4, rz >> 4), beyond = MapModApi.explored(B, (rx + 1200) >> 4, rz >> 4);
         expect(source, "a Radar Tower's sweep clears the company's fog over about a kilometre", near && !beyond && MapModApi.explored(B, rx >> 4, (rz - 900) >> 4)
             && !MapModApi.explored(A, rx >> 4, rz >> 4), "");
-        later(level, 200, () -> report(source, "done (later checks): " + REPORT.totals()));
+        later(level, 200, () -> {
+            // MapMod paints terrain from what clients see (no world generator guess since its MM-6); the cleared fog stays
+            expect(source, "land nobody loaded in the sweep stays cleared for the company", MapModApi.explored(B, (rx + 700) >> 4, rz >> 4), "");
+            report(source, "done (later checks): " + REPORT.totals());
+        });
 
         // ---- vehicles: on their company's map only
         FakePlayer fake = FakePlayer.get(level);

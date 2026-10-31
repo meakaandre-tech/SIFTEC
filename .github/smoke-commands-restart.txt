@@ -3,6 +3,7 @@ siftec selftest check
 siftec worldtest restart check
 siftec selftest prefab restart
 siftec selftest buildings restart
+siftec selftest buildgun_ui restart
 siftec selftest buildings_a restart
 siftec selftest buildings_b restart
 siftec selftest power restart

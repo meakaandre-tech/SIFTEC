@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The guide on the client: SIFTEC's Ponder plugin, opening a building's scene (the Build Gun's H
- * key), and the guide items' and the Build Gun's tooltip lines.
+ * The guide on the client: SIFTEC's Ponder plugin, opening a building's scene (right click on it in the Build Gun's
+ * build menu), and the guide items' and the Build Gun's tooltip lines.
  */
 public final class Guide {
     private Guide() {
@@ -39,7 +39,11 @@ public final class Guide {
             if (def != null) {
                 lines.add(Component.translatable("siftec.guide.tooltip", Component.translatable(def.category().key())).withStyle(ChatFormatting.GRAY));
             } else if (stack.is(ModItems.BUILD_GUN.get())) {
-                lines.add(Component.translatable("siftec.guide.ponder_hint", BuildGunClient.PONDER.getTranslatedKeyMessage()).withStyle(ChatFormatting.GRAY));
+                // its keys as they are bound now
+                lines.add(Component.translatable("siftec.guide.gun_menu", BuildGunClient.MENU.getTranslatedKeyMessage()).withStyle(ChatFormatting.GRAY));
+                lines.add(Component.translatable("siftec.guide.gun_keys", BuildGunClient.PLACE.getTranslatedKeyMessage(),
+                    BuildGunClient.CANCEL.getTranslatedKeyMessage(), BuildGunClient.DISMANTLE.getTranslatedKeyMessage(),
+                    BuildGunClient.PLACE.getTranslatedKeyMessage()).withStyle(ChatFormatting.GRAY));
             }
         });
     }

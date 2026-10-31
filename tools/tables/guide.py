@@ -348,10 +348,10 @@ PONDER_SHARED = {
     "node": "It stands over a resource node. Mine the node's clump away first; aimed near the node, the Build Gun snaps it on",
     "panel": "Its control panel: use it to see what the building is doing",
     "panel_filter": "Use the control panel with an item to set what it makes, and sneak-use it to clear that",
-    "cost": "Build it with the Build Gun from the %s tab: it costs %s",
+    "cost": "Build it with the Build Gun from the %s category of its build menu (Q): it costs %s",
     "unlock": "It is unlocked by %s",
-    "dismantle": "Only the Build Gun's dismantle mode (X) takes it down, giving back its whole cost and whatever is inside",
-    "vehicle_cost": "Put it down with the Build Gun from the %s tab: it costs %s",
+    "dismantle": "Only the Build Gun's dismantle mode (F, then hold left-click) takes it down, giving back its whole cost and whatever is inside",
+    "vehicle_cost": "Put it down with the Build Gun from the %s category of its build menu (Q): it costs %s",
 }
 
 # ---- Ponder tags: one per Build Gun tab, listed in the Ponder index (their icon is the Build Gun)

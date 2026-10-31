@@ -1,6 +1,7 @@
 package com.meakaandre.siftec;
 
 import com.meakaandre.siftec.blueprint.DesignerTests;
+import com.meakaandre.siftec.building.BuildGunUiTests;
 import com.meakaandre.siftec.building.BuildingTests;
 import com.meakaandre.siftec.building.BuildingsATests;
 import com.meakaandre.siftec.building.BuildingsBTests;
@@ -41,6 +42,7 @@ public final class SelfTests implements SelfTestHooks.Plugin {
                 WorldTests.register();
                 PrefabTests.register();
                 BuildingTests.register();
+                BuildGunUiTests.register();
                 BuildingsATests.register();
                 BuildingsBTests.register();
                 StyleTests.register();

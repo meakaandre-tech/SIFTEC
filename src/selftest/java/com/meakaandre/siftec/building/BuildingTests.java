@@ -68,9 +68,9 @@ public final class BuildingTests {
     }
 
     /**
-     * Server to client, from {@code /siftec worldtest guntab}: puts the gun on a tab, with a building
-     * picked or with nothing picked (an empty building). Key presses under the CI's virtual display are not reliable
-     * enough to count Tabs.
+     * Server to client, from {@code /siftec worldtest guntab}: picks a building for the gun's hologram, or nothing (an
+     * empty building); the tab is no longer used by the client. The build menu cannot be aimed at under the CI's
+     * virtual display without knowing where its cells are.
      */
     public record Tab(int category, String building) implements CustomPacketPayload {
         public static final Type<Tab> TYPE = new Type<>(Siftec.id("build_gun_tab"));
@@ -473,8 +473,10 @@ public final class BuildingTests {
     }
 
     /**
-     * What the client did with the gun: built once where it aimed, took that down, then built again after two
-     * nudges forward (W), which must be two blocks further north, and took that down too.
+     * What the client did with the gun: built once where it aimed (left click), took that down (F, left click held a
+     * second), built again after locking the hologram (H) and two nudges forward (the Up arrow), which must be two blocks
+     * further north, and took that down too; bound the Constructor to slot 3 of its first build hotbar from the build
+     * menu; and took down the three test buildings of the row ({@code worldtest gunrow}) in one mass dismantle (Ctrl).
      */
     private static int gunCheck(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
@@ -483,16 +485,27 @@ public final class BuildingTests {
         report(source, "gun uses: " + uses);
         List<BlockPos> built = new ArrayList<>();
         int dismantled = 0;
+        boolean bound = false;
         for (String u : uses) {
             String[] w = u.split(" ");
             if (w[0].equals("placed") && w.length >= 5) built.add(new BlockPos(Integer.parseInt(w[2]), Integer.parseInt(w[3]), Integer.parseInt(w[4])));
             if (w[0].equals("dismantled")) dismantled++;
+            if (u.equals("bound constructor 0 2")) bound = true;
         }
-        expect(source, "client: the gun built twice and dismantled twice", built.size() == 2 && dismantled == 2, built.size() + " built, " + dismantled + " dismantled");
+        expect(source, "client: the gun built twice (left click) and took down five (held left click; three of them at once)",
+            built.size() == 2 && dismantled == 5, built.size() + " built, " + dismantled + " dismantled");
         if (built.size() == 2) {
-            expect(source, "client: two nudges forward moved it two blocks north", built.get(1).equals(built.get(0).offset(0, 0, -2)),
+            expect(source, "client: a locked hologram nudged forward twice moved two blocks north", built.get(1).equals(built.get(0).offset(0, 0, -2)),
                 built.get(0).toShortString() + " then " + built.get(1).toShortString());
         }
+        expect(source, "client: the build menu bound the Constructor to slot 3 of the first build hotbar", bound, "");
+        ServerLevel level = source.getServer().overworld();
+        int row = 0;
+        for (int n = 0; n < 3; n++) {
+            BlockPos at = new BlockPos(GX + (n - 1) * 5, GY, GZ - 10);
+            if (BuildGun.controllerAt(level, at) != null) row++;
+        }
+        expect(source, "client: the mass dismantle took the whole row down", row == 0, row + " still standing");
         report(source, "client result: " + REPORT.totals());
         return 1;
     }
