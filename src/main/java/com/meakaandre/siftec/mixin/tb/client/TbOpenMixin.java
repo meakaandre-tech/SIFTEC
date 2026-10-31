@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * The backpack is the inventory: when the game would show the vanilla inventory (E), the backpack window opens
- * instead ({@link TbClient#openBackpackInstead}).
+ * The backpack is the inventory: when the game would show the vanilla inventory (E) in survival or adventure, the
+ * backpack window opens instead ({@link TbClient#openBackpackInstead}). Creative keeps the vanilla creative inventory.
  */
 @Mixin(Gui.class)
 public abstract class TbOpenMixin {
