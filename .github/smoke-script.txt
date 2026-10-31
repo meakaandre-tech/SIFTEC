@@ -111,7 +111,7 @@ sleep 3
 shot
 cmd siftec worldtest sathub clear
 sleep 3
-key u
+click 640 360
 sleep 3
 cmd siftec selftest prefab placed
 sleep 1
@@ -274,48 +274,84 @@ cmd siftec worldtest buildgun
 cmd siftec worldtest ready 1
 wait 600 SELFTEST client ready 1.
 sleep 1
-keydown Control_L
-sh xdotool click 5
-keyup Control_L
-sleep 3
 shot
-key u
+cmd siftec worldtest buildmenu
+wait 30 SELFTEST buildgun-client done
+key q
+sleep 2
+sh xdotool mousemove $(grep -o 'SELFTEST buildmenu search [0-9]* [0-9]*' run/logs/latest.log | tail -1 | cut -d' ' -f4,5) click 1
+sleep 1
+type constructor
+sleep 1
+key Return
+sleep 1
+sh xdotool mousemove $(grep -o 'SELFTEST buildmenu cell constructor [0-9]* [0-9]*' run/logs/latest.log | tail -1 | cut -d' ' -f5,6)
+sleep 1
+key 3
 cmd siftec worldtest gunwait 1
 wait 45 SELFTEST smoke gun uses 1.
 sleep 1
 shot
-key x
-sleep 2
+sh xdotool click 1
+sleep 3
 shot
-key u
+cmd execute in minecraft:overworld run tp @a 1100.5 181 1000.5 180 35
+sleep 2
+cmd siftec worldtest guntab production test_building
+sleep 3
+shot
+click 640 360
 cmd siftec worldtest gunwait 2
 wait 45 SELFTEST smoke gun uses 2.
-key x
-sleep 2
-key Control_L
 sleep 1
-key w
-sleep 1
-key w
+shot
+key f
 sleep 2
 shot
-key u
+sh xdotool mousedown 1; sleep 2.5; xdotool mouseup 1
 cmd siftec worldtest gunwait 3
 wait 45 SELFTEST smoke gun uses 3.
+key f
+sleep 2
+key h
+sleep 1
+key Up
+sleep 1
+key Up
+sleep 2
+shot
+click 640 360
+cmd siftec worldtest gunwait 4
+wait 45 SELFTEST smoke gun uses 4.
 sleep 1
 shot
 cmd execute in minecraft:overworld run tp @a 1100.5 181 1000.5 180 10
 cmd siftec worldtest ready 2
 wait 300 SELFTEST client ready 2.
-key x
+key f
 sleep 2
 shot
-key u
-cmd siftec worldtest gunwait 4
-wait 45 SELFTEST smoke gun uses 4.
+sh xdotool mousedown 1; sleep 2.5; xdotool mouseup 1
+cmd siftec worldtest gunwait 5
+wait 45 SELFTEST smoke gun uses 5.
+cmd siftec worldtest gunrow
+sleep 2
+keydown Control_L
+cmd siftec worldtest gunlook 0
+sleep 2
+cmd siftec worldtest gunlook 1
+sleep 2
+cmd siftec worldtest gunlook 2
+sleep 2
+keyup Control_L
+sleep 1
+shot
+sh xdotool mousedown 1; sleep 2.5; xdotool mouseup 1
+cmd siftec worldtest gunwait 8
+wait 45 SELFTEST smoke gun uses 8.
 cmd siftec worldtest buildgun check
 sleep 2
-key 9
+cmd item replace entity @a weapon.mainhand with minecraft:air
 sleep 1
 cmd time set noon
 cmd siftec worldtest buildings_a view 0

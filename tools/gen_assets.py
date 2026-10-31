@@ -678,6 +678,13 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
         if extra["prefab"] not in ("hub", "gateway", "vehicle"):
             raise SystemExit(f"building {bid}: unknown prefab {extra['prefab']!r}")
         b["prefab"] = extra["prefab"]
+    # where the build menu shows it (client/BuildMenuScreen.java)
+    menu = content.BUILD_MENU.get(bid)
+    if menu is None:
+        raise SystemExit(f"building {bid}: not in the build menu (content.BUILD_MENU)")
+    if menu[0] not in dict(content.MENU_SECTIONS) or menu[1] not in dict(content.MENU_SUBS):
+        raise SystemExit(f"building {bid}: unknown build menu place {menu!r}")
+    b["menu"] = list(menu)
     data["buildings"].append(b)
     lang[f"siftec.building.{bid}"] = bname
     if dev:
@@ -696,6 +703,18 @@ for bid, bname, tab, cost, unlock, dev, extra in content.BUILDINGS:
 _guided = {b[0] for b in content.BUILDINGS if not b[5]}
 if set(guide.BUILDING_GUIDE) - _guided:
     raise SystemExit(f"guide text for buildings that do not exist: {sorted(set(guide.BUILDING_GUIDE) - _guided)}")
+if set(content.BUILD_MENU) - {b[0] for b in content.BUILDINGS}:
+    raise SystemExit(f"build menu places for buildings that do not exist: {sorted(set(content.BUILD_MENU) - {b[0] for b in content.BUILDINGS})}")
+# the build menu's categories and subcategories, in order, and the first build hotbar of a new player
+data["build_menu"] = {"sections": [k for k, _ in content.MENU_SECTIONS], "subs": [k for k, _ in content.MENU_SUBS],
+                      "hotbar": list(content.DEFAULT_HOTBAR)}
+for k, name in content.MENU_SECTIONS:
+    lang[f"siftec.build_menu.section.{k}"] = name
+for k, name in content.MENU_SUBS:
+    lang[f"siftec.build_menu.sub.{k}"] = name
+for _bid in content.DEFAULT_HOTBAR:
+    if _bid not in content.BUILD_MENU:
+        raise SystemExit(f"default build hotbar: no building {_bid}")
 for key, text in guide.PONDER_SHARED.items():
     lang[f"siftec.ponder.shared.{key}"] = text
 for tab, (title, text) in guide.PONDER_TAGS.items():

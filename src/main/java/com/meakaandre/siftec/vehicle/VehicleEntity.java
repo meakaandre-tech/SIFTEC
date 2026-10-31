@@ -1,6 +1,5 @@
 package com.meakaandre.siftec.vehicle;
 
-import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildGunItem;
 import com.meakaandre.siftec.building.BuildingMenus;
 import com.meakaandre.siftec.building.TruckStations;
@@ -267,11 +266,8 @@ public class VehicleEntity extends Entity {
     public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
         ItemStack held = player.getItemInHand(hand);
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
-        // the Build Gun aimed at a vehicle works as it does anywhere: its dismantle mode takes the vehicle back
-        if (held.getItem() instanceof BuildGunItem) {
-            BuildGun.use(server);
-            return InteractionResult.SUCCESS;
-        }
+        // the Build Gun works through its own packets (its dismantle mode takes the vehicle back): using it here does nothing
+        if (held.getItem() instanceof BuildGunItem) return InteractionResult.SUCCESS;
         if (Vehicles.foreign(this, companyId, server)) {
             server.sendOverlayMessage(Component.translatable("siftec.vehicle.not_yours"));
             return InteractionResult.SUCCESS;

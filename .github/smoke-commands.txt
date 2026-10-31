@@ -2,6 +2,7 @@ siftec selftest setup
 siftec selftest hub
 siftec selftest prefab
 siftec selftest buildings
+siftec selftest buildgun_ui
 siftec selftest buildings_a
 siftec selftest buildings_b
 siftec selftest style
