@@ -28,7 +28,13 @@ import com.tiviacz.travelersbackpack.inventory.menu.slot.UpgradeLockableSlotItem
 import com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade;
 import com.tiviacz.travelersbackpack.util.ContainerContentsHelper;
 import com.tiviacz.travelersbackpack.util.Reference;
+import com.meakaandre.siftec.Siftec;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -75,6 +81,8 @@ import java.util.Map;
  * shift-crafting, and can once its milestone is done. (The backpack window's Cloud button is the client's to check: it
  * logs "SELFTEST tb-client" the first time the window opens, see client/CloudButton.java; the server side of what the
  * backpack pays for is {@code /siftec selftest backpackfix}.)</li>
+ * <li>{@code inventory} / {@code inventory done}: asks every client to check the screen E opened: the vanilla creative
+ * inventory in creative, the backpack window in survival (logged by the client as "SELFTEST creative-client ...").</li>
  * </ul>
  */
 public final class TravelersBackpackSelfTest {
@@ -85,10 +93,26 @@ public final class TravelersBackpackSelfTest {
 
     private static final TestReport REPORT = new TestReport("SELFTEST tb ");
 
+    /**
+     * Server to client ({@code tb inventory}): check what E opened against the player's game mode (client
+     * {@code CreativeInventoryClientTests}); with {@code done}, log the client's totals.
+     */
+    public record InventoryCheck(boolean done) implements CustomPacketPayload {
+        public static final Type<InventoryCheck> TYPE = new Type<>(Siftec.id("selftest_inventory_check"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, InventoryCheck> STREAM_CODEC = StreamCodec.of(
+            (buf, p) -> buf.writeBoolean(p.done), buf -> new InventoryCheck(buf.readBoolean()));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     private TravelersBackpackSelfTest() {
     }
 
     public static void register() {
+        PayloadTypeRegistry.clientboundPlay().register(InventoryCheck.TYPE, InventoryCheck.STREAM_CODEC);
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("tb")
@@ -107,7 +131,9 @@ public final class TravelersBackpackSelfTest {
                         .then(Commands.literal("kept").executes(context -> crateKept(context.getSource(), false)))
                         .then(Commands.literal("persisted").executes(context -> crateKept(context.getSource(), true))))
                     .then(Commands.literal("fixes").executes(context -> fixes(context.getSource())))
-                    .then(Commands.literal("fixes2").executes(context -> fixes2(context.getSource())))))));
+                    .then(Commands.literal("fixes2").executes(context -> fixes2(context.getSource())))
+                    .then(Commands.literal("inventory").executes(context -> inventoryCheck(context.getSource(), false))
+                        .then(Commands.literal("done").executes(context -> inventoryCheck(context.getSource(), true))))))));
     }
 
     private static List<ServerPlayer> players(CommandSourceStack source) {
@@ -676,6 +702,18 @@ public final class TravelersBackpackSelfTest {
         for (DeathCrateBlockEntity crate : crates.values()) if (crate != null && !crate.isEmpty()) full++;
         expect(source, afterRestart ? "after a restart the crate left alone is still there, full, with its death marker"
             : "a crate left alone stays where it is, with its death marker", full >= 1 && full == crates.size(), full + " full crates of " + crates.size() + " crate markers");
+        return 1;
+    }
+
+    // ------------------------------------------------------------------------------------------------ creative
+
+    private static int inventoryCheck(CommandSourceStack source, boolean done) {
+        int sent = 0;
+        for (ServerPlayer player : players(source)) {
+            ServerPlayNetworking.send(player, new InventoryCheck(done));
+            sent++;
+        }
+        report(source, "inventory check" + (done ? " (done)" : "") + " asked of " + sent + " players");
         return 1;
     }
 }

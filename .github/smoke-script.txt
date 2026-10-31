@@ -31,6 +31,7 @@ key e
 sleep 2
 shot
 cmd siftec selftest tb screen
+cmd siftec selftest tb inventory
 sleep 1
 key Escape
 sleep 1
@@ -687,4 +688,16 @@ sleep 12
 shot
 key F1
 cmd siftec worldtest sathub level 7
+sleep 2
+sleep 2
+cmd gamemode creative @a
+sleep 2
+key e
+sleep 3
+shot
+cmd siftec selftest tb inventory
+sleep 2
+key Escape
+sleep 1
+cmd siftec selftest tb inventory done
 sleep 2
