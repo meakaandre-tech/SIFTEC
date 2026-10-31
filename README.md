@@ -33,6 +33,24 @@ fast it regrows, which caps every miner. Every player spawns with the Build Gun,
 is the HUB (Special tab, 20 Raw Iron, given back when it is dismantled), which has a hand-cranked Craft Station (a Press
 and a Mixer over Basins) and two Biomass Burners.
 
+## The Build Gun
+
+The Build Gun works like Satisfactory 1.0's (`client/BuildGunClient.java`, `client/BuildMenuScreen.java`,
+`client/BuildGunHud.java`). Q opens the build menu: Satisfactory's categories down the left (Special, Production, Power,
+Organisation, Transport, Architecture; Logistics is Create's own belts and pipes, placed by hand), subcategory headings
+over a grid of icons six to a row, a search box, and a panel with the building's name, a turning 3D view, its
+description, its cost as have / need (missing in red), power and footprint. Only buildings the company has unlocked are
+listed. Left click picks one, right click opens its Ponder scene, and 1 to 0 over one binds it to the build hotbar shown.
+While the gun is held its ten build hotbars of ten slots replace the vanilla hotbar (Alt + scroll switches bar, 1 to 0
+picks; kept per player on the server, the first bar starting with the Power Pole Mk.1). Left click builds, right click
+cancels (with nothing picked, it puts the gun away, as scrolling does), scroll turns the hologram a quarter, Alt + R
+mirrors it, middle click picks the building aimed at, and H locks the hologram for the arrow keys and Page Up/Down to
+nudge it a block. The hologram is blue where it fits and red where it is blocked; the HUD by the crosshair shows the
+building, its cost (missing first, in red) and power, with the keys in use bottom right. F is dismantle mode: it
+highlights the building aimed at with its refund, left click held for a second takes it down, Ctrl selects up to 50 and
+G keeps only the type aimed at. Every key is under SIFTEC Build Gun in Controls; the server checks every placement and
+dismantle again.
+
 ## Companies and claims
 
 Everything a player unlocks belongs to their company: milestones, Wormhole phases, MAM research, which Build Gun
@@ -113,8 +131,8 @@ bigger Mk is built new, not upgraded in place (`blueprint/`).
 ## Vehicles
 
 The Tractor (Vehicular Transport), the Truck (Logistics Mk.4) and the Explorer (the Quartz tree's Display Systems) are
-single entities, not contraptions (`vehicle/`): the Build Gun puts one down for Satisfactory's cost from its Logistics
-tab and its dismantle mode takes it back with the cost and its cargo. They are drawn only from Create's own models and
+single entities, not contraptions (`vehicle/`): the Build Gun puts one down for Satisfactory's cost from its build menu's Transport
+category and its dismantle mode takes it back with the cost and its cargo. They are drawn only from Create's own models and
 textures (`client/VehicleRenderer.java`): casings, a seat, fluid tanks, Item Vaults, cogwheels for wheels that turn as
 they roll and, on the Truck, belts for treads that run. Use one to get in (W and S throttle, A and D steer, Space
 brakes), sneak-use it for its storage (Tractor 27 slots, Truck 54, Explorer 9), and use it with a bucket of any fuel the Fuel

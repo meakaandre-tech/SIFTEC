@@ -109,7 +109,7 @@ public final class SiftecMap {
         BUILDINGS = MapModApi.category(id("buildings"), filter("buildings"));
 
         PoiKind.Builder node = MapModApi.kind(id("node"), NODES).label(poi("node")).labeller(SiftecMap::nodeLabel)
-            .glyph(MapGlyphs.NODE, BUILDING_TINT).purity().subFilters().compassRange(NODE_RANGE).detail();
+            .glyph(MapGlyphs.NODE, BUILDING_TINT).purity().subFilters().compassRange(NODE_RANGE);
         PoiKind.Builder well = MapModApi.kind(id("well"), WELLS).label(poi("well")).labeller(SiftecMap::nodeLabel)
             .glyph(MapGlyphs.DROP, WATER_TINT).purity().subFilters().compassRange(NODE_RANGE);
         for (NodeType t : NodeType.values()) {
@@ -233,7 +233,7 @@ public final class SiftecMap {
         }
     };
 
-    /** Field Research gives the Map: terrain, the minimap and the fullscreen map together. */
+    /** Field Research gives the Map: terrain and the fullscreen map together. */
     public static final UnlockProvider UNLOCKS = new UnlockProvider() {
         @Override
         public boolean unlocked(ServerPlayer player, MapFeature feature) {

@@ -3,6 +3,7 @@ package com.meakaandre.siftec.client.ponder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.building.BuildMenu;
 import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.BuildingLogic;
 import com.meakaandre.siftec.building.BuildingTemplate;
@@ -30,7 +31,6 @@ import com.zurrtum.create.client.ponder.foundation.instruction.WorldModifyInstru
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Blocks;
@@ -162,8 +162,9 @@ public final class BuildingScenes {
         return parts.isEmpty() ? "nothing" : String.join(", ", parts);
     }
 
+    /** The build menu category it is in (client/BuildMenuScreen.java). */
     private static String tab(BuildingDef def) {
-        return Component.translatable(def.category().key()).getString();
+        return BuildMenu.sectionName(BuildMenu.place(def).section()).getString();
     }
 
     /** The cost, the unlock and how it comes down: the last lines of every scene. */

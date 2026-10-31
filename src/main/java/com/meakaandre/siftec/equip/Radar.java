@@ -59,7 +59,7 @@ public final class Radar {
         c.setChanged();
         Company company = Companies.byId(level.getServer(), c.companyId);
         if (company == null) return;
-        MapModApi.reveal(level, company.id, c.getBlockPos(), CELLS * Collectibles.CELL, true);
+        MapModApi.reveal(level, company.id, c.getBlockPos(), CELLS * Collectibles.CELL);
         // the geysers in its range, in land nobody has loaded too: the game generates the sulfur cave chunks in the
         // background and their geysers go on the map, within a capped radius (every chunk it generates stays on disk)
         String companyId = company.id;

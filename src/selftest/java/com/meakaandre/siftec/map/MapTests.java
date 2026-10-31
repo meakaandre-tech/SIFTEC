@@ -5,12 +5,11 @@ import com.meakaandre.mapmod.api.MapPoi;
 import com.meakaandre.mapmod.api.MovingPoi;
 import com.meakaandre.mapmod.api.PoiArea;
 import com.meakaandre.mapmod.api.PoiCategory;
+import com.meakaandre.mapmod.map.MapFound;
 import com.meakaandre.mapmod.map.MapGrid;
 import com.meakaandre.mapmod.map.MapMarker;
 import com.meakaandre.mapmod.map.MapPayloads;
 import com.meakaandre.mapmod.map.MapServer;
-import com.meakaandre.mapmod.map.MapTerrain;
-import com.meakaandre.mapmod.map.MapTile;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.TestQueue;
 import com.meakaandre.siftec.TestReport;
@@ -67,9 +66,9 @@ public final class MapTests {
     /** A second member for the smoke run's real player, who places a company marker for them. */
     private static final String MATE = "00000000-0000-4000-8000-00000000beef";
 
-    /** What the map's remote control does on the client: the map's screen, a filter, the minimap, a pin, a new marker. */
+    /** What the map's remote control does on the client: the map's screen, a filter, a pin, a new marker (MapMod has no minimap). */
     public enum Action {
-        OPEN, CLOSE, HIDE, SHOW, MINIMAP, PIN_MARKER, EDIT
+        OPEN, CLOSE, HIDE, SHOW, PIN_MARKER, EDIT
     }
 
     /**
@@ -201,7 +200,7 @@ public final class MapTests {
         LevelChunk chunk = level.getChunk(X >> 4, Z >> 4);
         BlockPos geyser = new BlockPos((X & ~15) + 8, level.getMinY() + 12, (Z & ~15) + 8);
         level.setBlock(geyser, Blocks.POTENT_SULFUR.defaultBlockState(), 3);
-        MapTerrain.record(level, chunk);
+        MapFound.scan(level, chunk);
         long region = MapGrid.regionOfChunk(X >> 4, Z >> 4);
         boolean found = MapModApi.foundIn(region, B).stream().anyMatch(p -> p.kind().equals(SiftecMap.GEYSER.key()) && p.x() == geyser.getX() && p.z() == geyser.getZ());
         expect(source, "a sulfur geyser in a recorded chunk is found for the map", found, "");
@@ -223,17 +222,15 @@ public final class MapTests {
             }
         }
 
-        // ---- a Radar Tower's sweep clears the company's fog and fills unloaded land with the generator's guess
+        // ---- a Radar Tower's sweep clears the company's fog
         int rx = X + 4000, rz = Z;
-        MapModApi.reveal(level, b.id, new BlockPos(rx, 80, rz), 1056, true);
+        MapModApi.reveal(level, b.id, new BlockPos(rx, 80, rz), 1056);
         boolean near = MapModApi.explored(B, (rx + 1000) >> 4, rz >> 4), beyond = MapModApi.explored(B, (rx + 1200) >> 4, rz >> 4);
         expect(source, "a Radar Tower's sweep clears the company's fog over about a kilometre", near && !beyond && MapModApi.explored(B, rx >> 4, (rz - 900) >> 4)
             && !MapModApi.explored(A, rx >> 4, rz >> 4), "");
         later(level, 200, () -> {
-            MapTile t = MapTerrain.tile(MapGrid.regionOfBlock(rx + 700, rz));
-            int px = Math.floorMod(rx + 700, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS, pz = Math.floorMod(rz, MapGrid.REGION_BLOCKS) / MapGrid.PX_BLOCKS;
-            boolean guessed = t != null && t.known(MapTile.index(px, pz));
-            expect(source, "land nobody loaded in the sweep is filled in from the world generator", guessed, "");
+            // MapMod paints terrain from what clients see (no world generator guess since its MM-6); the cleared fog stays
+            expect(source, "land nobody loaded in the sweep stays cleared for the company", MapModApi.explored(B, (rx + 700) >> 4, rz >> 4), "");
             report(source, "done (later checks): " + REPORT.totals());
         });
 
@@ -267,7 +264,7 @@ public final class MapTests {
             Companies.save(server);
             CompanyState.recompute(server);
             BlockPos at = player.blockPosition();
-            MapModApi.reveal(level, company.id, at, 1056, true);
+            MapModApi.reveal(level, company.id, at, 1056);
             MapServer.apply(server, MATE, company.id, MapPayloads.ADD, marker("Placed by a company mate", at.getX() + 60, at.getZ() - 40, true));
             MapMarker mine = marker("My marker", at.getX() - 70, at.getZ() + 30, false);
             mine.icon = 2;

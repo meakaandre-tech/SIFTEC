@@ -12598,6 +12598,10 @@
         }
       ],
       "prefab": "hub",
+      "menu": [
+        "special",
+        "progression"
+      ],
       "guide": [
         "The HUB is where it all starts: the first thing every Pioneer builds with the Build Gun.",
         "Its terminal shows the milestones, and pays for them from what you carry. Beside it, the Craft Station's hand-cranked Press and Mixer make your first parts.",
@@ -12628,6 +12632,10 @@
       ],
       "unlock": "hub_upgrade_6",
       "prefab": "gateway",
+      "menu": [
+        "special",
+        "progression"
+      ],
       "guide": [
         "The Wormhole Gateway is the colony's goal. It arrives as a bare platform with a delivery terminal and two power hookups.",
         "Each Wormhole Phase delivered at its terminal opens new HUB tiers and builds more of the ring gate.",
@@ -12647,7 +12655,11 @@
           "count": 4
         }
       ],
-      "dev": true
+      "dev": true,
+      "menu": [
+        "production",
+        "dev"
+      ]
     },
     {
       "id": "test_miner",
@@ -12664,6 +12676,10 @@
         0,
         0,
         1
+      ],
+      "menu": [
+        "production",
+        "dev"
       ]
     },
     {
@@ -12688,6 +12704,10 @@
       ],
       "logic": "portable_miner",
       "break": 40,
+      "menu": [
+        "production",
+        "miners"
+      ],
       "guide": [
         "The Portable Miner is a small drill rig for the very first ores. It needs no power at all.",
         "Set it over a resource node: it mines the node each time the ore grows back, and drops what it digs on the ground in front."
@@ -12720,6 +12740,10 @@
       "logic": "miner",
       "su": 1024,
       "break": 10,
+      "menu": [
+        "production",
+        "miners"
+      ],
       "guide": [
         "The Miner Mk.1 drills a resource node for as long as it has power, each time the ore grows back.",
         "Ore drops down a chute to the output port at the front, ready for a belt."
@@ -12761,6 +12785,10 @@
       "su": 3072,
       "break": 5,
       "fortune": 3,
+      "menu": [
+        "production",
+        "miners"
+      ],
       "guide": [
         "The Miner Mk.2 breaks the regrown ore twice as quickly as the Mk.1 and mines with Fortune III, so every node gives more."
       ]
@@ -12805,6 +12833,10 @@
       "su": 9216,
       "break": 2,
       "fortune": 5,
+      "menu": [
+        "production",
+        "miners"
+      ],
       "guide": [
         "The Miner Mk.3 is FICSIT's fastest miner: it breaks the ore five times as quickly as the Mk.1, with Fortune V. Its 45 MW takes a second motor, in the extension at the back."
       ]
@@ -12825,6 +12857,10 @@
       "unlock": "hub_upgrade_2",
       "logic": "smelter",
       "su": 819,
+      "menu": [
+        "production",
+        "smelters"
+      ],
       "guide": [
         "The Smelter melts ore into ingots. Inside, a motor drives an Encased Fan that blows through lava onto a Depot: Create's bulk blasting."
       ]
@@ -12845,6 +12881,10 @@
       "unlock": "hub_upgrade_3",
       "logic": "basin",
       "su": 819,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Constructor makes one part from one input: a Mechanical Press over a Basin, turned by its own motor."
       ]
@@ -12864,6 +12904,10 @@
       ],
       "unlock": "hub_upgrade_5",
       "logic": "storage",
+      "menu": [
+        "organisation",
+        "storage"
+      ],
       "guide": [
         "The Storage Container holds items in an Item Vault. Belt things in at the back and take them out at the front."
       ]
@@ -12883,6 +12927,10 @@
       ],
       "unlock": "logistics_mk3",
       "logic": "storage",
+      "menu": [
+        "organisation",
+        "storage"
+      ],
       "guide": [
         "The Industrial Storage Container is the bigger Storage Container: two Item Vaults side by side."
       ]
@@ -12908,6 +12956,10 @@
       "logic": "power",
       "lines": 4,
       "power": "pole",
+      "menu": [
+        "power",
+        "power_poles"
+      ],
       "guide": [
         "Power Poles carry power across the factory: each wire from its connector joins two parts of the grid. A Mk.1 takes up to 4 wires."
       ]
@@ -12933,6 +12985,10 @@
       "logic": "power",
       "lines": 7,
       "power": "pole",
+      "menu": [
+        "power",
+        "power_poles"
+      ],
       "guide": [
         "The Power Pole Mk.2 takes up to 7 wires."
       ]
@@ -12958,6 +13014,10 @@
       "logic": "power",
       "lines": 10,
       "power": "pole",
+      "menu": [
+        "power",
+        "power_poles"
+      ],
       "guide": [
         "The Power Pole Mk.3 takes up to 10 wires."
       ]
@@ -12983,6 +13043,10 @@
       "logic": "power",
       "lines": 10,
       "power": "pole",
+      "menu": [
+        "power",
+        "power_poles"
+      ],
       "guide": [
         "The Power Tower lifts the grid high above the ground and takes up to 10 wires, for long runs between distant parts of the factory."
       ]
@@ -13007,6 +13071,10 @@
       "unlock": "expanded_power_infrastructure",
       "logic": "power",
       "power": "storage",
+      "menu": [
+        "power",
+        "power_storage"
+      ],
       "guide": [
         "Power Storage keeps the power the grid does not use, and gives it back when the generators cannot keep up."
       ]
@@ -13032,6 +13100,10 @@
       "logic": "power",
       "mw": 30,
       "power": "biomass",
+      "menu": [
+        "power",
+        "generators"
+      ],
       "guide": [
         "The Biomass Burner burns leaves, wood, mycelia, Biomass and Solid Biofuel for 30 MW. Fuel goes in at the back."
       ]
@@ -13058,6 +13130,10 @@
       "mw": 75,
       "water": 45,
       "power": "coal",
+      "menu": [
+        "power",
+        "generators"
+      ],
       "guide": [
         "The Coal Generator burns coal, Compacted Coal or Petroleum Coke for 75 MW, and takes 45 m3 of water a minute to do it."
       ]
@@ -13091,6 +13167,10 @@
       "logic": "power",
       "mw": 250,
       "power": "fuel",
+      "menu": [
+        "power",
+        "generators"
+      ],
       "guide": [
         "The Fuel Generator burns Fuel, Liquid Biofuel, Turbofuel, Rocket Fuel or Ionized Fuel for 250 MW."
       ]
@@ -13129,6 +13209,10 @@
         0,
         2
       ],
+      "menu": [
+        "power",
+        "generators"
+      ],
       "guide": [
         "The Geothermal Generator stands over a geyser and gives 200 MW for free, forever. It only goes down where a geyser vents."
       ]
@@ -13163,6 +13247,10 @@
       "mw": 2500,
       "water": 240,
       "power": "nuclear",
+      "menu": [
+        "power",
+        "generators"
+      ],
       "guide": [
         "The Nuclear Power Plant gives 2,500 MW from Uranium or Plutonium Fuel Rods, and takes 240 m3 of water a minute.",
         "Every spent rod leaves nuclear waste behind, which has to go somewhere."
@@ -13201,6 +13289,10 @@
       "logic": "power",
       "mw": 500,
       "power": "augmenter",
+      "menu": [
+        "power",
+        "generators"
+      ],
       "guide": [
         "The Alien Power Augmenter adds 500 MW to its grid and boosts the grid's generators by 10%, or 30% while it is fed Alien Power Matrices."
       ]
@@ -13225,6 +13317,10 @@
       "unlock": "part_assembly",
       "logic": "basin",
       "su": 3072,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Assembler combines two inputs into one part: a Mechanical Mixer over a Basin."
       ]
@@ -13249,6 +13345,10 @@
       "unlock": "basic_steel_production",
       "logic": "basin",
       "su": 3277,
+      "menu": [
+        "production",
+        "smelters"
+      ],
       "guide": [
         "The Foundry makes steel and alloys: a Mechanical Mixer over a Basin, heated by a Blaze Burner the building keeps lit while it has power."
       ]
@@ -13277,6 +13377,10 @@
       "unlock": "oil_processing",
       "logic": "basin",
       "su": 6144,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Refinery turns crude oil into plastic, rubber, fuel and more: a heated Mixer over a Basin, with fluid ports for pipes."
       ]
@@ -13305,6 +13409,10 @@
       "unlock": "control_system_development",
       "logic": "basin",
       "su": 15360,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Blender mixes fluids and solids for the late-game chemistry: a heated Mixer over a Brass Basin, which holds four stacks of each item."
       ]
@@ -13333,6 +13441,10 @@
       "unlock": "industrial_manufacturing",
       "logic": "assembly",
       "su": 11264,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Manufacturer builds the most complex parts. The Mixer over the Brass Basin makes the recipe's Core first.",
         "Then the Core travels along a row of Depots, and a Deployer over each adds the last of one input."
@@ -13366,6 +13478,10 @@
       "unlock": "quantum_encoding",
       "logic": "assembly",
       "su": 204800,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Quantum Encoder works like the Manufacturer, with two extra steps: a Spout fills the Core with Excited Photonic Matter first, and an Item Drain takes the Dark Matter Residue off what comes out."
       ]
@@ -13390,6 +13506,10 @@
       "unlock": "fluid_packaging",
       "logic": "packager",
       "su": 2048,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Packager puts fluids into canisters and tanks, and takes them out again: a Spout over a Depot fills, and an Item Drain empties."
       ]
@@ -13420,6 +13540,10 @@
         0,
         0,
         3
+      ],
+      "menu": [
+        "production",
+        "fluid_extraction"
       ],
       "guide": [
         "The Water Extractor stands in water and pumps 120 m3 a minute into its tank. The cell under its intake has to be a water source."
@@ -13454,6 +13578,10 @@
       "rate": 4800,
       "fluid": "createdieselgenerators:crude_oil",
       "fluid_node": "oil",
+      "menu": [
+        "production",
+        "fluid_extraction"
+      ],
       "guide": [
         "The Oil Extractor stands over an oil node and pumps crude oil into its tank. Pure nodes give more, impure ones less."
       ]
@@ -13493,6 +13621,10 @@
       "logic": "pressurizer",
       "su": 30720,
       "fluid_node": "nitrogen",
+      "menu": [
+        "production",
+        "fluid_extraction"
+      ],
       "guide": [
         "The Resource Well Pressurizer stands over a nitrogen well and puts it under pressure, so the Resource Well Extractors around it can work."
       ]
@@ -13514,6 +13646,10 @@
       "logic": "well_extractor",
       "rate": 2400,
       "fluid": "siftec:nitrogen",
+      "menu": [
+        "production",
+        "fluid_extraction"
+      ],
       "guide": [
         "The Resource Well Extractor takes nitrogen gas from a well while a Resource Well Pressurizer near it is running."
       ]
@@ -13546,6 +13682,10 @@
       "unlock": "particle_enrichment",
       "logic": "processor",
       "su": 102400,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Particle Accelerator smashes particles together for the rarest materials, such as Plutonium and Nuclear Pasta. It draws a lot of power."
       ]
@@ -13574,6 +13714,10 @@
       "unlock": "matter_conversion",
       "logic": "processor",
       "su": 51200,
+      "menu": [
+        "production",
+        "manufacturers"
+      ],
       "guide": [
         "The Converter turns one resource into another with the help of SAM, and makes Ficsite, Diamonds and Time Crystals."
       ]
@@ -13593,6 +13737,10 @@
       ],
       "unlock": "hub_upgrade_1",
       "logic": "workshop",
+      "menu": [
+        "special",
+        "workshops"
+      ],
       "guide": [
         "The Equipment Workshop builds equipment by hand from the parts you carry. Use its control panel to open it."
       ]
@@ -13617,6 +13765,10 @@
       "unlock": "resource_sink_bonus_program",
       "logic": "sink",
       "su": 6144,
+      "menu": [
+        "special",
+        "awesome"
+      ],
       "guide": [
         "The AWESOME Sink destroys whatever its input port takes, and pays FICSIT Coupons for it. Use it with something in hand to sink that."
       ]
@@ -13640,6 +13792,10 @@
       ],
       "unlock": "resource_sink_bonus_program",
       "logic": "shop",
+      "menu": [
+        "special",
+        "awesome"
+      ],
       "guide": [
         "The AWESOME Shop sells cosmetics for FICSIT Coupons, such as the Customizer for painting your buildings. Use its control panel to open it."
       ]
@@ -13668,6 +13824,10 @@
       "unlock": "mam_quartz_radar_technology",
       "logic": "radar",
       "su": 6144,
+      "menu": [
+        "special",
+        "exploration"
+      ],
       "guide": [
         "The Radar Tower clears the company's map over a wide area around it while it has power."
       ]
@@ -13695,6 +13855,10 @@
       ],
       "unlock": "ficsit_blueprints",
       "logic": "designer",
+      "menu": [
+        "special",
+        "workshops"
+      ],
       "guide": [
         "The Blueprint Designer is a build floor in a frame: the 9 by 9 by 9 cube over the floor is yours to build in, and anyone inside it can fly.",
         "Click its terminal with paper to save what stands in the cube as a Blueprint; sneak-click it to clear the cube. Dismantling the Designer takes only the floor and frame: what you built inside stays where it is."
@@ -13723,6 +13887,10 @@
       ],
       "unlock": "ficsit_blueprints_mk2",
       "logic": "designer",
+      "menu": [
+        "special",
+        "workshops"
+      ],
       "guide": [
         "The Blueprint Designer Mk.2 has a 13 by 13 by 13 cube to design in. It is a new building, not an upgrade: dismantle a Mk.1 and build the Mk.2 in its place.",
         "Its terminal saves the cube with paper and clears it with a sneak-click, as the Mk.1's does."
@@ -13751,6 +13919,10 @@
       ],
       "unlock": "ficsit_blueprints_mk3",
       "logic": "designer",
+      "menu": [
+        "special",
+        "workshops"
+      ],
       "guide": [
         "The Blueprint Designer Mk.3 has a 17 by 17 by 17 cube to design in, for the biggest blueprints.",
         "Its terminal saves the cube with paper and clears it with a sneak-click; dismantling it leaves what you built inside."
@@ -13775,6 +13947,10 @@
       ],
       "unlock": "vehicular_transport",
       "logic": "truck_station",
+      "menu": [
+        "transport",
+        "stations"
+      ],
       "guide": [
         "The Truck Station loads vehicles from its two Item Vaults, or unloads them into the vaults, while they stand at the dock in front of it.",
         "Its fuel tank fills up every vehicle that docks. Its terminal switches between loading and unloading."
@@ -13799,6 +13975,10 @@
       ],
       "unlock": "vehicular_transport",
       "prefab": "vehicle",
+      "menu": [
+        "transport",
+        "vehicles"
+      ],
       "guide": [
         "The Tractor is a small, quick hauler with three rows of storage. Right-click it to drive: W and S for throttle, A and D to steer, Space to brake.",
         "It burns Fuel, Liquid Biofuel or Turbofuel: use a bucket on it, or dock it at a Truck Station. Sneak and right-click for its storage.",
@@ -13828,6 +14008,10 @@
       ],
       "unlock": "logistics_mk4",
       "prefab": "vehicle",
+      "menu": [
+        "transport",
+        "vehicles"
+      ],
       "guide": [
         "The Truck is slower than the Tractor, but carries six rows of storage. Right-click it to drive.",
         "It burns Fuel, Liquid Biofuel or Turbofuel: use a bucket on it, or dock it at a Truck Station. Sneak and right-click for its storage.",
@@ -13857,6 +14041,10 @@
       ],
       "unlock": "mam_quartz_display_systems",
       "prefab": "vehicle",
+      "menu": [
+        "transport",
+        "vehicles"
+      ],
       "guide": [
         "The Explorer is the fastest vehicle on the planet, built for scouting rather than cargo: one row of storage. Right-click it to drive.",
         "It burns Fuel, Liquid Biofuel or Turbofuel: use a bucket on it, or dock it at a Truck Station. Sneak and right-click for its storage.",
@@ -13890,6 +14078,10 @@
       ],
       "unlock": "aeronautical_engineering",
       "logic": "drone_port",
+      "menu": [
+        "transport",
+        "stations"
+      ],
       "guide": [
         "The Drone Port is a landing pad on legs with its loading terminal underneath. Use the terminal to pick which of your company's ports its drone flies to.",
         "Packages go in at the back port and fire charges at the left one; what arrives comes out of the right one. The drone takes off from the pad with everything waiting, burning fire charges for the distance, and lands on the other pad."
@@ -13910,6 +14102,10 @@
       ],
       "unlock": "base_building",
       "logic": "foundation",
+      "menu": [
+        "architecture",
+        "foundations"
+      ],
       "guide": [
         "An 8 by 8 foundation, one block thick. Foundations, walls and roofs snap to an 8-block grid so they line up.",
         "Use the Customizer on it for a material (Concrete, Grip Metal, Coated Concrete, Asphalt) or a floor pattern from the AWESOME Shop."
@@ -13930,6 +14126,10 @@
       ],
       "unlock": "base_building",
       "logic": "foundation",
+      "menu": [
+        "architecture",
+        "foundations"
+      ],
       "guide": [
         "An 8 by 8 foundation, two blocks thick, snapped to the 8-block grid.",
         "The Customizer gives it a material or a floor pattern bought in the AWESOME Shop."
@@ -13950,6 +14150,10 @@
       ],
       "unlock": "base_building",
       "logic": "foundation",
+      "menu": [
+        "architecture",
+        "foundations"
+      ],
       "guide": [
         "An 8 by 8 foundation, four blocks thick, snapped to the 8-block grid.",
         "The Customizer gives it a material or a floor pattern bought in the AWESOME Shop."
@@ -13970,6 +14174,10 @@
       ],
       "unlock": "base_building",
       "logic": "foundation",
+      "menu": [
+        "architecture",
+        "walls"
+      ],
       "guide": [
         "A wall 8 wide and 4 high, snapped to the 8-block grid.",
         "The Customizer gives it the Concrete or Steel wall material from the AWESOME Shop."
@@ -13990,6 +14198,10 @@
       ],
       "unlock": "base_building",
       "logic": "foundation",
+      "menu": [
+        "architecture",
+        "roofs"
+      ],
       "guide": [
         "A roof over 8 by 8, rising four blocks toward the back, snapped to the 8-block grid.",
         "The Customizer gives it the Tar, Metal or Glass roof material from the AWESOME Shop."
@@ -14014,6 +14226,10 @@
       ],
       "unlock": "shop:billboard_set",
       "logic": "foundation",
+      "menu": [
+        "organisation",
+        "signs"
+      ],
       "guide": [
         "A billboard 8 wide and 4 high (the AWESOME Shop's Billboard Set). Use the sign at the foot of its face to write on it.",
         "The text fills the board; dye and glow ink colour and light it, as on a sign."
@@ -14038,12 +14254,51 @@
       ],
       "unlock": "shop:billboard_set",
       "logic": "foundation",
+      "menu": [
+        "organisation",
+        "signs"
+      ],
       "guide": [
         "A billboard 16 wide and 8 high (the AWESOME Shop's Billboard Set). Use the sign at the foot of its face to write on it.",
         "The text fills the board; dye and glow ink colour and light it, as on a sign."
       ]
     }
   ],
+  "build_menu": {
+    "sections": [
+      "special",
+      "production",
+      "power",
+      "logistics",
+      "organisation",
+      "transport",
+      "architecture"
+    ],
+    "subs": [
+      "progression",
+      "workshops",
+      "awesome",
+      "exploration",
+      "miners",
+      "fluid_extraction",
+      "smelters",
+      "manufacturers",
+      "dev",
+      "power_poles",
+      "generators",
+      "power_storage",
+      "storage",
+      "signs",
+      "vehicles",
+      "stations",
+      "foundations",
+      "walls",
+      "roofs"
+    ],
+    "hotbar": [
+      "power_pole_mk1"
+    ]
+  },
   "machine_ticks": {
     "siftec:compacting/blank_circuit": 160,
     "siftec:compacting/constructor/alien_dna_capsule": 120,

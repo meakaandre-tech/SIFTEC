@@ -1071,6 +1071,55 @@ BUILDINGS = [
     ("billboard_large", "Large Billboard", "foundations", "12 Encased Industrial Beam, 20 Copper Sheet, 5 Crystal Oscillator", "shop:billboard_set", False,
      {"logic": "foundation"}),
 ]
+# The Build Gun's build menu (client/BuildMenuScreen.java), laid out like Satisfactory 1.0's: its categories down the
+# left, in this order, each with its subcategories (headings over a grid of building icons). The data tab above (the
+# "category") is the Ponder tag and stays; the menu is how the player finds a building. Logistics (belts, splitters,
+# pipes) is Create's own blocks in SIFTEC, placed by hand, so it has no Build Gun buildings yet and is left out of the menu.
+MENU_SECTIONS = (
+    ("special", "Special"), ("production", "Production"), ("power", "Power"), ("logistics", "Logistics"),
+    ("organisation", "Organisation"), ("transport", "Transport"), ("architecture", "Architecture"),
+)
+MENU_SUBS = (
+    ("progression", "HUB and Wormhole"), ("workshops", "Workshops"), ("awesome", "AWESOME"), ("exploration", "Exploration"),
+    ("miners", "Miners"), ("fluid_extraction", "Fluid Extraction"), ("smelters", "Smelters"), ("manufacturers", "Manufacturers"),
+    ("dev", "Test Buildings"),
+    ("power_poles", "Power Poles"), ("generators", "Generators"), ("power_storage", "Power Storage"),
+    ("storage", "Storage"), ("signs", "Signs"),
+    ("vehicles", "Vehicles"), ("stations", "Stations"),
+    ("foundations", "Foundations"), ("walls", "Walls"), ("roofs", "Roofs"),
+)
+# building -> (category, subcategory) in the build menu, the same as Satisfactory's where SIFTEC has the building
+BUILD_MENU = {
+    "hub": ("special", "progression"), "wormhole_gateway": ("special", "progression"),
+    "equipment_workshop": ("special", "workshops"), "blueprint_designer": ("special", "workshops"),
+    "blueprint_designer_mk2": ("special", "workshops"), "blueprint_designer_mk3": ("special", "workshops"),
+    "awesome_sink": ("special", "awesome"), "awesome_shop": ("special", "awesome"), "radar_tower": ("special", "exploration"),
+    "portable_miner": ("production", "miners"), "miner_mk1": ("production", "miners"), "miner_mk2": ("production", "miners"),
+    "miner_mk3": ("production", "miners"),
+    "water_extractor": ("production", "fluid_extraction"), "oil_extractor": ("production", "fluid_extraction"),
+    "resource_well_pressurizer": ("production", "fluid_extraction"), "resource_well_extractor": ("production", "fluid_extraction"),
+    "smelter": ("production", "smelters"), "foundry": ("production", "smelters"),
+    "constructor": ("production", "manufacturers"), "assembler": ("production", "manufacturers"),
+    "manufacturer": ("production", "manufacturers"), "packager": ("production", "manufacturers"),
+    "refinery": ("production", "manufacturers"), "blender": ("production", "manufacturers"),
+    "particle_accelerator": ("production", "manufacturers"), "converter": ("production", "manufacturers"),
+    "quantum_encoder": ("production", "manufacturers"),
+    "test_building": ("production", "dev"), "test_miner": ("production", "dev"),
+    "power_pole_mk1": ("power", "power_poles"), "power_pole_mk2": ("power", "power_poles"),
+    "power_pole_mk3": ("power", "power_poles"), "power_tower": ("power", "power_poles"),
+    "biomass_burner": ("power", "generators"), "coal_generator": ("power", "generators"), "fuel_generator": ("power", "generators"),
+    "geothermal_generator": ("power", "generators"), "nuclear_power_plant": ("power", "generators"),
+    "alien_power_augmenter": ("power", "generators"), "power_storage": ("power", "power_storage"),
+    "storage_container": ("organisation", "storage"), "industrial_storage_container": ("organisation", "storage"),
+    "billboard_small": ("organisation", "signs"), "billboard_large": ("organisation", "signs"),
+    "tractor": ("transport", "vehicles"), "truck": ("transport", "vehicles"), "explorer": ("transport", "vehicles"),
+    "truck_station": ("transport", "stations"), "drone_port": ("transport", "stations"),
+    "foundation_1m": ("architecture", "foundations"), "foundation_2m": ("architecture", "foundations"),
+    "foundation_4m": ("architecture", "foundations"), "wall_4m": ("architecture", "walls"), "roof_4m": ("architecture", "roofs"),
+}
+# What a new player's first build hotbar holds (the other nine start empty); Satisfactory starts it with the Power Pole
+# and the belts, which in SIFTEC are Create's own and placed by hand
+DEFAULT_HOTBAR = ("power_pole_mk1",)
 # The buildings whose Basin is a Brass Basin (four stacks of each item), for the recipe checkers
 BRASS_BASIN_BUILDINGS = ("manufacturer", "blender", "particle_accelerator", "converter")
 # Buildings that stand over a resource node and can only go down once its clump is mined (the miners, extractors)
