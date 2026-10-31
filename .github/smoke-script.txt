@@ -699,5 +699,7 @@ cmd siftec selftest tb inventory
 sleep 2
 key Escape
 sleep 1
+cmd siftec selftest tb creative
+sleep 2
 cmd siftec selftest tb inventory done
 sleep 2

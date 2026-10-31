@@ -34,6 +34,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -57,14 +58,15 @@ import java.util.List;
  * milestones where Satisfactory gives inventory slots). Members who were offline get theirs when they next join.</li>
  * <li>Bound: it never leaves the player's back. Unequipping, swapping and placing it are refused (mixins in
  * {@code mixin/tb}); on death it stays on, with its upgrades, while everything in it goes into the death crate
- * ({@link DeathCrates}); a backpack item that turns up in an inventory is unpacked.</li>
+ * ({@link DeathCrates}); a backpack item that turns up in an inventory is unpacked, except a creative player's, who
+ * may take backpacks from the creative tabs and place them as in vanilla.</li>
  * <li>Crafting: one upgrade slot holds a built-in 2x2 Crafting Grid (a Crafting Upgrade marked as the grid, see
  * {@link #isGrid}), which cannot be taken out. Using a Crafting Upgrade turns it into the full 3x3 grid.</li>
  * <li>Its upgrades are locked by MAM research like everything else, so a locked one cannot go into an upgrade slot,
  * and they are built at the Equipment Workshop (or by the Assembler).</li>
  * </ul>
- * E opens it in place of the vanilla inventory and its window shows the armour and offhand slots ({@link TbClient},
- * {@link TbEquipSlots}). Everything is checked once a second for every player online, and when a player joins or
+ * E opens it in place of the vanilla inventory (in creative E keeps the vanilla creative inventory) and its window
+ * shows the armour and offhand slots ({@link TbClient}, {@link TbEquipSlots}). Everything is checked once a second for every player online, and when a player joins or
  * respawns.
  */
 public final class TravelersBackpackCompat {
@@ -369,28 +371,18 @@ public final class TravelersBackpackCompat {
     // ------------------------------------------------------------------------------------------------ the rules
 
     /**
-     * Brings the player in line with the rules: a backpack item found in the inventory or on the cursor is unpacked, a
-     * player without a backpack is given one, a backpack below the company's tier is raised (one above it, from a company
-     * left behind, is lowered and its extra slots go into a crate), and a backpack without a
-     * crafting grid gets its built-in one.
+     * Brings the player in line with the rules: a backpack item found in the inventory or on the cursor is unpacked
+     * (not a creative player's), a player without a backpack is given one, a backpack below the company's tier is
+     * raised (one above it, from a company left behind, is lowered and its extra slots go into a crate), and a backpack
+     * without a crafting grid gets its built-in one.
      */
     public static void sync(ServerPlayer player) {
         if (player.isRemoved() || Companies.isFake(player)) return;
         BackpackAttachment attachment = AttachmentUtils.getAttachment(player).orElse(null);
         if (attachment == null) return;
         int want = tierFor(player);
-        Inventory inventory = player.getInventory();
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (!isBackpack(stack)) continue;
-            inventory.setItem(i, ItemStack.EMPTY);
-            stray(player, attachment, stack, want);
-        }
-        ItemStack carried = player.containerMenu.getCarried();
-        if (isBackpack(carried)) {
-            player.containerMenu.setCarried(ItemStack.EMPTY);
-            stray(player, attachment, carried, want);
-        }
+        // a creative player keeps the backpack items they take from the creative tabs, as in vanilla
+        if (!player.hasInfiniteMaterials()) unpackStrays(player, attachment, want);
         if (!attachment.hasBackpack()) {
             equip(player, attachment, newBackpack(want));
             Siftec.LOGGER.info("SIFTEC: gave {} their backpack, tier {}", player.getGameProfile().name(), want);
@@ -408,6 +400,22 @@ public final class TravelersBackpackCompat {
             lower(player, attachment, tier, want);
         }
         ensureGrid(player, attachment);
+    }
+
+    /** Every backpack item in the player's inventory or on their cursor is unpacked (or worn, if none is). */
+    private static void unpackStrays(ServerPlayer player, BackpackAttachment attachment, int want) {
+        Inventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (!isBackpack(stack)) continue;
+            inventory.setItem(i, ItemStack.EMPTY);
+            stray(player, attachment, stack, want);
+        }
+        ItemStack carried = player.containerMenu.getCarried();
+        if (isBackpack(carried)) {
+            player.containerMenu.setCarried(ItemStack.EMPTY);
+            stray(player, attachment, carried, want);
+        }
     }
 
     /**
@@ -504,6 +512,14 @@ public final class TravelersBackpackCompat {
         if (slot < 0 || slot >= ups.size() || !isGrid(ups.get(slot))) return true;
         if (player instanceof ServerPlayer server) server.sendOverlayMessage(Component.translatable("siftec.backpack.grid.locked"));
         return false;
+    }
+
+    /**
+     * May this backpack item be placed as a block (mixin/tb/TbPlaceMixin): only by a creative player, and only the
+     * stack in their hand (one from a creative tab), never the worn backpack. Everyone else never places one.
+     */
+    public static boolean mayPlace(@Nullable Player player, ItemStack stack, InteractionHand hand) {
+        return player != null && player.hasInfiniteMaterials() && stack == player.getItemInHand(hand) && stack != worn(player);
     }
 
     /** The message when the mod would take the backpack off the player's back. */
