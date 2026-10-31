@@ -54,6 +54,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.GameType;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -81,6 +82,10 @@ import java.util.Map;
  * shift-crafting, and can once its milestone is done. (The backpack window's Cloud button is the client's to check: it
  * logs "SELFTEST tb-client" the first time the window opens, see client/CloudButton.java; the server side of what the
  * backpack pays for is {@code /siftec selftest backpackfix}.)</li>
+ * <li>{@code creative}: a creative player keeps a backpack item taken from a creative tab, in the inventory and on the
+ * cursor, may place one held in hand (never the worn one), and is not stopped by the upgrade locks; the worn backpack
+ * and its contents are left as they were; back in survival the extra backpack is unpacked as before. Counted on its
+ * own, as "SELFTEST creative done: N passed, M failed".</li>
  * <li>{@code inventory} / {@code inventory done}: asks every client to check the screen E opened: the vanilla creative
  * inventory in creative, the backpack window in survival (logged by the client as "SELFTEST creative-client ...").</li>
  * </ul>
@@ -92,6 +97,7 @@ public final class TravelersBackpackSelfTest {
     private static final String PICKUP_NODE = "mam_caterium_quickwire";
 
     private static final TestReport REPORT = new TestReport("SELFTEST tb ");
+    private static final TestReport CREATIVE = new TestReport("SELFTEST creative ");
 
     /**
      * Server to client ({@code tb inventory}): check what E opened against the player's game mode (client
@@ -132,6 +138,7 @@ public final class TravelersBackpackSelfTest {
                         .then(Commands.literal("persisted").executes(context -> crateKept(context.getSource(), true))))
                     .then(Commands.literal("fixes").executes(context -> fixes(context.getSource())))
                     .then(Commands.literal("fixes2").executes(context -> fixes2(context.getSource())))
+                    .then(Commands.literal("creative").executes(context -> creative(context.getSource())))
                     .then(Commands.literal("inventory").executes(context -> inventoryCheck(context.getSource(), false))
                         .then(Commands.literal("done").executes(context -> inventoryCheck(context.getSource(), true))))))));
     }
@@ -715,5 +722,94 @@ public final class TravelersBackpackSelfTest {
         }
         report(source, "inventory check" + (done ? " (done)" : "") + " asked of " + sent + " players");
         return 1;
+    }
+
+    /**
+     * Creative is vanilla: a backpack item from a creative tab stays where the player put it (inventory and cursor), the
+     * once-a-second check leaves it there, it may be placed from the hand (the worn backpack never), and locked
+     * upgrades go in. The worn backpack and its contents do not change. Back in survival the rules are as before.
+     */
+    private static int creative(CommandSourceStack source) {
+        CREATIVE.reset();
+        for (ServerPlayer player : players(source)) {
+            CREATIVE.attempt(source, "creative " + player.getGameProfile().name(), () -> creativeChecks(source, player));
+        }
+        CREATIVE.report(source, "done: " + CREATIVE.totals());
+        return 1;
+    }
+
+    private static void creativeChecks(CommandSourceStack source, ServerPlayer player) {
+        GameType was = player.gameMode.getGameModeForPlayer();
+        Company company = Companies.of(player);
+        boolean hadPickup = company.done.contains(PICKUP_NODE);
+        player.closeContainer();
+        clearAll(player);
+        TravelersBackpackCompat.sync(player);
+        ItemStackHandler storage = TravelersBackpackCompat.storage(player);
+        if (storage == null) {
+            CREATIVE.expect(source, "a backpack is worn", false, state(player));
+            return;
+        }
+        storage.setStackInSlot(0, new ItemStack(Items.DIAMOND, 7));
+        ItemStack wornBefore = TravelersBackpackCompat.worn(player).copy();
+        int tierBefore = TravelersBackpackCompat.wornTier(player);
+        int gridBefore = TravelersBackpackCompat.gridSize(player);
+        try {
+            player.setGameMode(GameType.CREATIVE);
+            Inventory inventory = player.getInventory();
+            int slot = inventory.getFreeSlot();
+            inventory.setItem(slot, new ItemStack(ModItems.STANDARD_TRAVELERS_BACKPACK));
+            player.containerMenu.setCarried(new ItemStack(ModItems.STANDARD_TRAVELERS_BACKPACK));
+            TravelersBackpackCompat.sync(player);
+            boolean inInventory = TravelersBackpackCompat.isBackpack(inventory.getItem(slot));
+            boolean onCursor = TravelersBackpackCompat.isBackpack(player.containerMenu.getCarried());
+            CREATIVE.expect(source, "a creative player keeps a backpack item from a creative tab, in the inventory and on the cursor",
+                inInventory && onCursor, "slot " + slot + " " + inventory.getItem(slot) + ", cursor " + player.containerMenu.getCarried());
+            CREATIVE.expect(source, "in creative the worn backpack and its contents stay as they were",
+                TravelersBackpackCompat.wearing(player) && TravelersBackpackCompat.wornTier(player) == tierBefore
+                    && TravelersBackpackCompat.storage(player).getStackInSlot(0).is(Items.DIAMOND)
+                    && TravelersBackpackCompat.storage(player).getStackInSlot(0).getCount() == 7
+                    && TravelersBackpackCompat.gridSize(player) == gridBefore, state(player));
+
+            // placing: the creative player's held backpack may go down; the worn one never, and nobody else's
+            ItemStack held = new ItemStack(ModItems.STANDARD_TRAVELERS_BACKPACK);
+            player.setItemInHand(InteractionHand.MAIN_HAND, held);
+            boolean heldCreative = TravelersBackpackCompat.mayPlace(player, held, InteractionHand.MAIN_HAND);
+            boolean wornCreative = TravelersBackpackCompat.mayPlace(player, TravelersBackpackCompat.worn(player), InteractionHand.MAIN_HAND);
+            boolean noPlayer = TravelersBackpackCompat.mayPlace(null, held, InteractionHand.MAIN_HAND);
+            CREATIVE.expect(source, "a creative player may place a backpack held in hand, never the worn one (nor anything without a player)",
+                heldCreative && !wornCreative && !noPlayer, "held " + heldCreative + ", worn " + wornCreative + ", no player " + noPlayer);
+
+            // the upgrade locks never stop creative
+            company.done.remove(PICKUP_NODE);
+            ItemStack pickup = new ItemStack(ModItems.PICKUP_UPGRADE);
+            CREATIVE.expect(source, "a creative player is not stopped by an upgrade's MAM lock",
+                Locks.allowed(player, pickup) && TravelersBackpackCompat.mayUseUpgrade(player, pickup), "");
+
+            // back in survival: the same rules as always
+            player.setGameMode(GameType.SURVIVAL);
+            boolean heldSurvival = TravelersBackpackCompat.mayPlace(player, held, InteractionHand.MAIN_HAND);
+            boolean lockedSurvival = !TravelersBackpackCompat.mayUseUpgrade(player, pickup);
+            player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            TravelersBackpackCompat.sync(player);
+            boolean unpacked = !TravelersBackpackCompat.isBackpack(inventory.getItem(slot)) && !TravelersBackpackCompat.isBackpack(player.containerMenu.getCarried())
+                && inventory.countItem(ModItems.STANDARD_TRAVELERS_BACKPACK) == 0;
+            CREATIVE.expect(source, "back in survival an extra backpack is unpacked, none is placed and locks hold, as before",
+                unpacked && !heldSurvival && lockedSurvival, "unpacked " + unpacked + ", may place " + heldSurvival + ", locked " + lockedSurvival);
+            CREATIVE.expect(source, "switching back to survival leaves the worn backpack and its contents as they were",
+                TravelersBackpackCompat.wearing(player) && TravelersBackpackCompat.wornTier(player) == tierBefore
+                    && TravelersBackpackCompat.worn(player).getItem() == wornBefore.getItem()
+                    && TravelersBackpackCompat.storage(player).getStackInSlot(0).is(Items.DIAMOND)
+                    && TravelersBackpackCompat.storage(player).getStackInSlot(0).getCount() == 7
+                    && TravelersBackpackCompat.gridSize(player) == gridBefore, state(player));
+        } finally {
+            player.containerMenu.setCarried(ItemStack.EMPTY);
+            player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            if (hadPickup) company.done.add(PICKUP_NODE);
+            else company.done.remove(PICKUP_NODE);
+            Companies.save(source.getServer());
+            clearAll(player);
+            player.setGameMode(was);
+        }
     }
 }

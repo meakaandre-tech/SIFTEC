@@ -13,8 +13,8 @@ import net.minecraft.world.inventory.Slot;
 
 /**
  * The client's side of the backpack as the inventory: E opens the backpack window instead of the vanilla inventory
- * (mixin/tb/client/TbOpenMixin, on the game's screen switch), and that window draws a panel behind its armour and
- * offhand column ({@link TbEquipSlots}). The vanilla hotbar is the hotbar as always.
+ * in survival and adventure (mixin/tb/client/TbOpenMixin, on the game's screen switch; creative keeps the vanilla
+ * one), and that window draws a panel behind its armour and offhand column ({@link TbEquipSlots}). The vanilla hotbar is the hotbar as always.
  */
 public final class TbClient {
     private static final boolean LOADED = FabricLoader.getInstance().isModLoaded("travelersbackpack");
@@ -25,12 +25,14 @@ public final class TbClient {
     /**
      * Called when the game is about to show a screen: the vanilla inventory of a survival or adventure player who
      * wears their backpack is swapped for the backpack window. Returns true when it was (the vanilla one is not shown).
+     * A creative player keeps the vanilla inventory: E builds an InventoryScreen for every game mode, which turns itself
+     * into the creative one, so it is let through (the backpack's own key still opens the backpack).
      */
     public static boolean openBackpackInstead(Screen screen) {
         if (!LOADED || !(screen instanceof InventoryScreen)) return false;
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || player.isSpectator() || mc.getConnection() == null) return false;
+        if (player == null || player.isSpectator() || player.hasInfiniteMaterials() || mc.getConnection() == null) return false;
         return Tb.open(player);
     }
 
