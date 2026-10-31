@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "create_new_age",
+  "version": "1.2.1+26.3",
+  "name": "Create: New Age",
+  "description": "An addon for the Create mod that adds integration with electricity. Fabric port for Create Fly.",
+  "authors": ["Antarctic Gardens"],
+  "contributors": ["meakaandre-tech (Fabric 26.3 port)"],
+  "contact": {
+    "homepage": "https://antarcticgardens.org/",
+    "sources": "https://github.com/meakaandre-tech/Create-New-Age"
+  },
+  "license": "BSD-3-Clause",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["org.antarcticgardens.cna.CreateNewAge"],
+    "client": ["org.antarcticgardens.cna.client.CreateNewAgeClient"]
+  },
+  "mixins": ["create_new_age.mixins.json"],
+  "depends": {
+    "fabricloader": "*",
+    "fabric-api": "*",
+    "minecraft": ">=26.3- <26.4-",
+    "java": ">=25",
+    "create": "*"
+  }
+}

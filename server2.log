@@ -1,0 +1,558 @@
+Starting net.fabricmc.loader.impl.game.minecraft.BundlerClassPathCapture
+[07:58:12] [main/INFO]: Loading Minecraft 26.3 with Fabric Loader 0.19.5
+[07:58:12] [main/INFO]: Mappings not present!
+[07:58:12] [main/WARN]: Warnings were found!
+ - Mod 'Forge Config API Port' (forgeconfigapiport) 26.3.1 recommends any version of modmenu, which is missing!
+	 - You should install any version of modmenu for the optimal experience.
+ - Mod 'Mielon's The Sift' (the_sift) 1.1.2 recommends version 4.13.0 or later of lambdynlights, which is missing!
+	 - You should install version 4.13.0 or later of lambdynlights for the optimal experience.
+[07:58:12] [main/INFO]: Loading 58 mods:
+	- cgs 1.4.9+26.3
+	- create 6.0.9-1
+	- create_new_age 1.2.1+26.3
+	- createdieselgenerators 1.3.15+26.3
+	- fabric-api 0.161.0+26.3
+	   |-- fabric-advancement-api-v1 1.0.0+38c7a2d55d
+	   |-- fabric-api-base 2.0.6+fcdff87f5d
+	   |-- fabric-api-lookup-api-v1 2.0.24+3434d6d95d
+	   |-- fabric-biome-api-v1 20.0.9+74ed1ea55d
+	   |-- fabric-block-api-v1 3.1.0+0ae6f9115d
+	   |-- fabric-block-getter-api-v2 2.0.9+3434d6d95d
+	   |-- fabric-command-api-v2 3.1.2+fcdff87f5d
+	   |-- fabric-content-registries-v0 15.0.4+74ed1ea55d
+	   |-- fabric-convention-tags-v2 4.10.3+6b5b47fd5d
+	   |-- fabric-crash-report-info-v1 1.0.7+fcdff87f5d
+	   |-- fabric-creative-tab-api-v1 5.0.21+fcdff87f5d
+	   |-- fabric-data-attachment-api-v1 2.2.30+3434d6d95d
+	   |-- fabric-data-generation-api-v1 27.2.4+427eab975d
+	   |-- fabric-debug-api-v1 1.0.4+3434d6d95d
+	   |-- fabric-dimensions-v1 5.1.19+47f74c985d
+	   |-- fabric-entity-events-v1 6.0.4+3434d6d95d
+	   |-- fabric-events-interaction-v0 5.3.6+3434d6d95d
+	   |-- fabric-game-rule-api-v1 4.0.10+3434d6d95d
+	   |-- fabric-item-api-v1 14.7.0+cf6bc2db5d
+	   |-- fabric-lifecycle-events-v1 4.1.9+ffef5f675d
+	   |-- fabric-loot-api-v3 4.0.8+4068fd645d
+	   |-- fabric-menu-api-v1 2.0.27+ed66f0a35d
+	   |-- fabric-message-api-v1 7.0.10+3434d6d95d
+	   |-- fabric-networking-api-v1 6.3.8+fcdff87f5d
+	   |-- fabric-object-builder-api-v1 24.1.9+3434d6d95d
+	   |-- fabric-particles-v1 5.0.24+3434d6d95d
+	   |-- fabric-permission-api-v1 1.0.8+fcdff87f5d
+	   |-- fabric-recipe-api-v1 10.0.8+fcdff87f5d
+	   |-- fabric-registry-sync-v0 8.0.1+fcdff87f5d
+	   |-- fabric-rendering-fluids-v1 6.0.6+3434d6d95d
+	   |-- fabric-resource-conditions-api-v1 6.1.5+3434d6d95d
+	   |-- fabric-resource-loader-v0 3.3.26+4fc5413f5d
+	   |-- fabric-resource-loader-v1 3.0.4+fcdff87f5d
+	   |-- fabric-serialization-api-v1 2.0.7+74ed1ea55d
+	   |-- fabric-tag-api-v1 2.1.10+fcdff87f5d
+	   |-- fabric-transfer-api-v1 8.0.25+fcdff87f5d
+	   \-- fabric-transitive-access-wideners-v1 8.1.16+52268a0e5d
+	- fabricloader 0.19.5
+	   \-- mixinextras 0.5.5
+	- farmersdelight 26.3-3.6.27+refabricated
+	- forgeconfigapiport 26.3.1
+	   |-- com_electronwill_night-config_core 3.8.4
+	   \-- com_electronwill_night-config_toml 3.8.4
+	- geckolib 5.5.7
+	- java 25
+	- mapmod 0.1.0+26.3
+	   \-- io_airlift_aircompressor-v3 3.14
+	- minecraft 26.3
+	- ntgl 3.1.8+26.3
+	- siftec 0.1.0+26.3
+	- siftec_selftest 0.1.0+26.3
+	- the_sift 1.1.2
+	- travelersbackpack 11.4.2
+[07:58:12] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/net/fabricmc/sponge-mixin/0.17.4+mixin.0.8.7/sponge-mixin-0.17.4+mixin.0.8.7.jar Service=Knot/Fabric Env=SERVER
+[07:58:13] [main/WARN]: Error loading class: net/minecraft/client/gui/screens/recipebook/GhostSlots (java.lang.ClassNotFoundException: net/minecraft/client/gui/screens/recipebook/GhostSlots)
+[07:58:13] [main/WARN]: @Mixin target net.minecraft.client.gui.screens.recipebook.GhostSlots was not found farmersdelight.mixins.json:refabricated.GhostSlotsInvoker from mod farmersdelight
+[07:58:13] [main/WARN]: Error loading class: net/minecraft/client/gui/GuiGraphicsExtractor (java.lang.ClassNotFoundException: net/minecraft/client/gui/GuiGraphicsExtractor)
+[07:58:13] [main/WARN]: @Mixin target net.minecraft.client.gui.GuiGraphicsExtractor was not found farmersdelight.mixins.json:refabricated.GuiGraphicsExtractorAccessor from mod farmersdelight
+[07:58:13] [main/INFO]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.joml.MemUtil$MemUtilUnsafe (file:/home/runner/work/SIFTEC/SIFTEC/server/libraries/org/joml/joml/1.10.9/joml-1.10.9.jar)
+WARNING: Please consider reporting this to the maintainers of class org.joml.MemUtil$MemUtilUnsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[07:58:25] [main/INFO]: Loaded config farmersdelight-common.json
+[07:58:25] [main/INFO]: SIFTEC: Traveler's Backpack found; it is every player's inventory, raised by milestones and bound to them
+[07:58:26] [main/INFO]: The Sift initialized.
+[07:58:26] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:water for Water (Fluid Amount Required: 81000) with the ID 0
+[07:58:26] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:lava for Lava (Fluid Amount Required: 81000) with the ID 1
+[07:58:26] [main/INFO]: Registered the FluidEffect with Unique ID of travelersbackpack:potion for block.travelersbackpack.potion_still (Fluid Amount Required: 27000) with the ID 2
+[07:58:26] [main/INFO]: Registered the FluidEffect with Unique ID of minecraft:milk for Air (Fluid Amount Required: 81000) with the ID 3
+[07:58:26] [main/INFO]: Environment: Environment[discoveryUrl=https://discovery.minecraftservices.com/minecraft/client, name=PROD]
+[07:58:26] [main/INFO]: Created 13 recipes which will be injected into the game
+[07:58:29] [Worker-Main-3/INFO]: Loaded 3541 advancements
+[07:58:29] [main/INFO]: Applied 258 biome modifications to 61 of 77 new biomes in 11.37 ms
+[07:58:29] [Server thread/INFO]: SIFTEC: settings: spawn_free_radius=64, member_cooldown_hours=24
+[07:58:29] [Server thread/INFO]: Starting minecraft server version 26.3
+[07:58:29] [Server thread/INFO]: Loading properties
+[07:58:29] [Server thread/INFO]: Default game type: CREATIVE
+[07:58:29] [Server thread/INFO]: Generating keypair
+[07:58:29] [Server thread/INFO]: Starting Minecraft server on *:25565
+[07:58:30] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[07:58:30] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[07:58:30] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[07:58:30] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[07:58:30] [Server thread/INFO]: Preparing level "world"
+[07:58:31] [Server thread/INFO]: Loading 4793 persistent chunks...
+[07:58:31] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:32] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:32] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:33] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:33] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:34] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:34] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:35] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:35] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:36] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:36] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:37] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:37] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:38] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:39] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:39] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:39] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:40] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:40] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:41] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:41] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:42] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:42] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:43] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:43] [Server thread/INFO]: Preparing spawn area: 0%
+[07:58:44] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:44] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:45] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:45] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:46] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:46] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:47] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:47] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:48] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:48] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:49] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:49] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:50] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:50] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:51] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:51] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:52] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:52] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:53] [Server thread/INFO]: Preparing spawn area: 1%
+[07:58:53] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:54] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:54] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:55] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:55] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:56] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:56] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:57] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:57] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:58] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:58] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:59] [Server thread/INFO]: Preparing spawn area: 3%
+[07:58:59] [Server thread/INFO]: Preparing spawn area: 3%
+[07:59:00] [Server thread/INFO]: Preparing spawn area: 3%
+[07:59:00] [Server thread/INFO]: Preparing spawn area: 3%
+[07:59:01] [Server thread/INFO]: Preparing spawn area: 3%
+[07:59:01] [Server thread/INFO]: Preparing spawn area: 3%
+[07:59:02] [Server thread/INFO]: Preparing spawn area: 3%
+[07:59:02] [Server thread/INFO]: Preparing spawn area: 3%
+[07:59:03] [Server thread/INFO]: Preparing spawn area: 4%
+[07:59:03] [Server thread/INFO]: Preparing spawn area: 4%
+[07:59:04] [Server thread/INFO]: Preparing spawn area: 4%
+[07:59:04] [Server thread/INFO]: Preparing spawn area: 4%
+[07:59:05] [Server thread/INFO]: Preparing spawn area: 4%
+[07:59:05] [Server thread/INFO]: Preparing spawn area: 4%
+[07:59:06] [Server thread/INFO]: Preparing spawn area: 4%
+[07:59:06] [Server thread/INFO]: Preparing spawn area: 5%
+[07:59:07] [Server thread/INFO]: Preparing spawn area: 5%
+[07:59:07] [Server thread/INFO]: Preparing spawn area: 5%
+[07:59:08] [Server thread/INFO]: Preparing spawn area: 5%
+[07:59:08] [Server thread/INFO]: Preparing spawn area: 5%
+[07:59:09] [Server thread/INFO]: Preparing spawn area: 5%
+[07:59:09] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:10] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:10] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:11] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:11] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:12] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:12] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:13] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:13] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:14] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:14] [Server thread/INFO]: Preparing spawn area: 6%
+[07:59:15] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:15] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:16] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:16] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:17] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:17] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:18] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:18] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:19] [Server thread/INFO]: Preparing spawn area: 7%
+[07:59:19] [Server thread/INFO]: Preparing spawn area: 8%
+[07:59:20] [Server thread/INFO]: Preparing spawn area: 8%
+[07:59:20] [Server thread/INFO]: Preparing spawn area: 8%
+[07:59:21] [Server thread/INFO]: Preparing spawn area: 8%
+[07:59:21] [Server thread/INFO]: Preparing spawn area: 8%
+[07:59:22] [Server thread/INFO]: Preparing spawn area: 8%
+[07:59:22] [Server thread/INFO]: Preparing spawn area: 9%
+[07:59:23] [Server thread/INFO]: Preparing spawn area: 9%
+[07:59:23] [Server thread/INFO]: Preparing spawn area: 9%
+[07:59:24] [Server thread/INFO]: Preparing spawn area: 9%
+[07:59:24] [Server thread/INFO]: Preparing spawn area: 9%
+[07:59:25] [Server thread/INFO]: Preparing spawn area: 9%
+[07:59:25] [Server thread/INFO]: Preparing spawn area: 10%
+[07:59:26] [Server thread/INFO]: Preparing spawn area: 10%
+[07:59:26] [Server thread/INFO]: Preparing spawn area: 10%
+[07:59:27] [Server thread/INFO]: Preparing spawn area: 10%
+[07:59:27] [Server thread/INFO]: Preparing spawn area: 11%
+[07:59:28] [Server thread/INFO]: Preparing spawn area: 11%
+[07:59:28] [Server thread/INFO]: Preparing spawn area: 11%
+[07:59:29] [Server thread/INFO]: Preparing spawn area: 12%
+[07:59:29] [Server thread/INFO]: Preparing spawn area: 12%
+[07:59:30] [Server thread/INFO]: Preparing spawn area: 12%
+[07:59:30] [Server thread/INFO]: Preparing spawn area: 13%
+[07:59:31] [Server thread/INFO]: Preparing spawn area: 13%
+[07:59:31] [Server thread/INFO]: Preparing spawn area: 13%
+[07:59:32] [Server thread/INFO]: Preparing spawn area: 14%
+[07:59:32] [Server thread/INFO]: Preparing spawn area: 14%
+[07:59:33] [Server thread/INFO]: Preparing spawn area: 14%
+[07:59:33] [Server thread/INFO]: Preparing spawn area: 14%
+[07:59:34] [Server thread/INFO]: Preparing spawn area: 14%
+[07:59:34] [Server thread/INFO]: Preparing spawn area: 15%
+[07:59:35] [Server thread/INFO]: Preparing spawn area: 15%
+[07:59:35] [Server thread/INFO]: Preparing spawn area: 15%
+[07:59:36] [Server thread/INFO]: Preparing spawn area: 15%
+[07:59:36] [Server thread/INFO]: Preparing spawn area: 16%
+[07:59:37] [Server thread/INFO]: Preparing spawn area: 16%
+[07:59:37] [Server thread/INFO]: Preparing spawn area: 16%
+[07:59:38] [Server thread/INFO]: Preparing spawn area: 16%
+[07:59:38] [Server thread/INFO]: Preparing spawn area: 17%
+[07:59:39] [Server thread/INFO]: Preparing spawn area: 17%
+[07:59:39] [Server thread/INFO]: Preparing spawn area: 18%
+[07:59:40] [Server thread/INFO]: Preparing spawn area: 18%
+[07:59:40] [Server thread/INFO]: Preparing spawn area: 18%
+[07:59:41] [Server thread/INFO]: Preparing spawn area: 19%
+[07:59:41] [Server thread/INFO]: Preparing spawn area: 19%
+[07:59:42] [Server thread/INFO]: Preparing spawn area: 19%
+[07:59:42] [Server thread/INFO]: Preparing spawn area: 19%
+[07:59:43] [Server thread/INFO]: Preparing spawn area: 20%
+[07:59:43] [Server thread/INFO]: Preparing spawn area: 20%
+[07:59:44] [Server thread/INFO]: Preparing spawn area: 21%
+[07:59:44] [Server thread/INFO]: Preparing spawn area: 21%
+[07:59:45] [Server thread/INFO]: Preparing spawn area: 21%
+[07:59:45] [Server thread/INFO]: Preparing spawn area: 22%
+[07:59:46] [Server thread/INFO]: Preparing spawn area: 23%
+[07:59:46] [Server thread/INFO]: Preparing spawn area: 23%
+[07:59:47] [Server thread/INFO]: Preparing spawn area: 24%
+[07:59:47] [Server thread/INFO]: Preparing spawn area: 25%
+[07:59:48] [Server thread/INFO]: Preparing spawn area: 25%
+[07:59:48] [Server thread/INFO]: Preparing spawn area: 26%
+[07:59:49] [Server thread/INFO]: Preparing spawn area: 26%
+[07:59:49] [Server thread/INFO]: Preparing spawn area: 27%
+[07:59:50] [Server thread/INFO]: Preparing spawn area: 27%
+[07:59:50] [Server thread/INFO]: Preparing spawn area: 27%
+[07:59:51] [Server thread/INFO]: Preparing spawn area: 28%
+[07:59:51] [Server thread/INFO]: Preparing spawn area: 29%
+[07:59:52] [Server thread/INFO]: Preparing spawn area: 29%
+[07:59:52] [Server thread/INFO]: Preparing spawn area: 30%
+[07:59:53] [Server thread/INFO]: Preparing spawn area: 30%
+[07:59:53] [Server thread/INFO]: Preparing spawn area: 31%
+[07:59:54] [Server thread/INFO]: Preparing spawn area: 32%
+[07:59:54] [Server thread/INFO]: Preparing spawn area: 32%
+[07:59:55] [Server thread/INFO]: Preparing spawn area: 33%
+[07:59:55] [Server thread/INFO]: Preparing spawn area: 33%
+[07:59:56] [Server thread/INFO]: Preparing spawn area: 33%
+[07:59:56] [Server thread/INFO]: Preparing spawn area: 34%
+[07:59:57] [Server thread/INFO]: Preparing spawn area: 34%
+[07:59:57] [Server thread/INFO]: Preparing spawn area: 35%
+[07:59:58] [Server thread/INFO]: Preparing spawn area: 35%
+[07:59:58] [Server thread/INFO]: Preparing spawn area: 36%
+[07:59:59] [Server thread/INFO]: Preparing spawn area: 36%
+[07:59:59] [Server thread/INFO]: Preparing spawn area: 37%
+[08:00:00] [Server thread/INFO]: Preparing spawn area: 38%
+[08:00:00] [Server thread/INFO]: Preparing spawn area: 38%
+[08:00:01] [Server thread/INFO]: Preparing spawn area: 38%
+[08:00:01] [Server thread/INFO]: Preparing spawn area: 39%
+[08:00:02] [Server thread/INFO]: Preparing spawn area: 39%
+[08:00:02] [Server thread/INFO]: Preparing spawn area: 40%
+[08:00:03] [Server thread/INFO]: Preparing spawn area: 41%
+[08:00:03] [Server thread/INFO]: Preparing spawn area: 42%
+[08:00:04] [Server thread/INFO]: Preparing spawn area: 42%
+[08:00:04] [Server thread/INFO]: Preparing spawn area: 43%
+[08:00:05] [Server thread/INFO]: Preparing spawn area: 44%
+[08:00:05] [Server thread/INFO]: Preparing spawn area: 44%
+[08:00:06] [Server thread/INFO]: Preparing spawn area: 45%
+[08:00:06] [Server thread/INFO]: Preparing spawn area: 46%
+[08:00:07] [Server thread/INFO]: Preparing spawn area: 46%
+[08:00:07] [Server thread/INFO]: Preparing spawn area: 47%
+[08:00:08] [Server thread/INFO]: Preparing spawn area: 47%
+[08:00:08] [Server thread/INFO]: Preparing spawn area: 48%
+[08:00:09] [Server thread/INFO]: Preparing spawn area: 48%
+[08:00:09] [Server thread/INFO]: Preparing spawn area: 48%
+[08:00:10] [Server thread/INFO]: Preparing spawn area: 49%
+[08:00:10] [Server thread/INFO]: Preparing spawn area: 49%
+[08:00:11] [Server thread/INFO]: Preparing spawn area: 50%
+[08:00:11] [Server thread/INFO]: Preparing spawn area: 50%
+[08:00:12] [Server thread/INFO]: Preparing spawn area: 51%
+[08:00:12] [Server thread/INFO]: Preparing spawn area: 52%
+[08:00:13] [Server thread/INFO]: Preparing spawn area: 52%
+[08:00:13] [Server thread/INFO]: Preparing spawn area: 53%
+[08:00:14] [Server thread/INFO]: Preparing spawn area: 53%
+[08:00:14] [Server thread/INFO]: Preparing spawn area: 54%
+[08:00:15] [Server thread/INFO]: Preparing spawn area: 55%
+[08:00:15] [Server thread/INFO]: Preparing spawn area: 56%
+[08:00:16] [Server thread/INFO]: Preparing spawn area: 57%
+[08:00:16] [Server thread/INFO]: Preparing spawn area: 57%
+[08:00:17] [Server thread/INFO]: Preparing spawn area: 58%
+[08:00:17] [Server thread/INFO]: Preparing spawn area: 59%
+[08:00:18] [Server thread/INFO]: Preparing spawn area: 60%
+[08:00:18] [Server thread/INFO]: Preparing spawn area: 61%
+[08:00:19] [Server thread/INFO]: Preparing spawn area: 62%
+[08:00:19] [Server thread/INFO]: Preparing spawn area: 63%
+[08:00:20] [Server thread/INFO]: Preparing spawn area: 65%
+[08:00:20] [Server thread/INFO]: Preparing spawn area: 66%
+[08:00:21] [Server thread/INFO]: Preparing spawn area: 68%
+[08:00:21] [Server thread/INFO]: Preparing spawn area: 69%
+[08:00:22] [Server thread/INFO]: Preparing spawn area: 70%
+[08:00:22] [Server thread/INFO]: Preparing spawn area: 71%
+[08:00:23] [Server thread/INFO]: Preparing spawn area: 73%
+[08:00:23] [Server thread/INFO]: Preparing spawn area: 74%
+[08:00:24] [Server thread/INFO]: Preparing spawn area: 75%
+[08:00:24] [Server thread/INFO]: Preparing spawn area: 77%
+[08:00:25] [Server thread/INFO]: Preparing spawn area: 79%
+[08:00:25] [Server thread/INFO]: Preparing spawn area: 80%
+[08:00:26] [Server thread/INFO]: Preparing spawn area: 84%
+[08:00:26] [Server thread/INFO]: Preparing spawn area: 90%
+[08:00:27] [Server thread/INFO]: Time elapsed: 115348 ms
+[08:00:27] [Server thread/INFO]: Done (117.002s)! For help, type "help"
+[08:00:27] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[08:00:39] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+[08:00:39] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[08:00:39] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[08:00:40] [Server thread/INFO]: SELFTEST owner recipes: 1932 locked; create:acacia_window needs base_building; blocked before true, after unlocking false
+[08:00:40] [Server thread/INFO]: System chat: SELFTEST owner recipes: 1932 locked; create:acacia_window needs base_building; blocked before true, after unlocking false
+[08:00:40] [Server thread/INFO]: SELFTEST check Node[x=224, z=-107, type=IRON, purity=NORMAL, y=-2147483648]: core still minecraft:iron_ore, a node (iron normal)
+[08:00:40] [Server thread/INFO]: System chat: SELFTEST check Node[x=224, z=-107, type=IRON, purity=NORMAL, y=-2147483648]: core still minecraft:iron_ore, a node (iron normal)
+[08:00:40] [Server thread/INFO]: SELFTEST check Node[x=66, z=-206, type=COPPER, purity=NORMAL, y=-2147483648]: core still minecraft:copper_ore, a node (copper normal)
+[08:00:40] [Server thread/INFO]: System chat: SELFTEST check Node[x=66, z=-206, type=COPPER, purity=NORMAL, y=-2147483648]: core still minecraft:copper_ore, a node (copper normal)
+[08:00:42] [Server thread/INFO]: SELFTEST world PASS restart check bauxite at -857, 83, -658: after the restart still a node, still empty: bauxite impure, empty until 4611686018427387903, the spot minecraft:air
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST world PASS restart check bauxite at -857, 83, -658: after the restart still a node, still empty: bauxite impure, empty until 4611686018427387903, the spot minecraft:air
+[08:00:42] [Server thread/INFO]: SELFTEST prefab after restart: HUB structure true facing east level 7, parts TCS1B2DF, claim true; gateway structure true rings #...., company knows it true
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST prefab after restart: HUB structure true facing east level 7, parts TCS1B2DF, claim true; gateway structure true rings #...., company knows it true
+[08:00:42] [Server thread/INFO]: SELFTEST buildings PASS restart: still whole and listed (44 standing, 44 listed)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildings PASS restart: still whole and listed (44 standing, 44 listed)
+[08:00:42] [Server thread/INFO]: SELFTEST buildings PASS restart: still protected
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildings PASS restart: still protected
+[08:00:42] [Server thread/INFO]: SIFTEC: building test_building at 3012, 230, 2000 dismantled; 2 stacks given back
+[08:00:42] [Server thread/INFO]: SELFTEST buildings PASS restart: dismantles with refund (2 stacks back)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildings PASS restart: dismantles with refund (2 stacks back)
+[08:00:42] [Server thread/INFO]: SIFTEC: building test_building at 3003, 230, 2000 dismantled; 2 stacks given back
+[08:00:42] [Server thread/INFO]: SELFTEST buildings restart result: 3 passed, 0 failed
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildings restart result: 3 passed, 0 failed
+[08:00:42] [Server thread/INFO]: SELFTEST buildgun-ui PASS restart: a bound slot is kept over a restart (smelter)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildgun-ui PASS restart: a bound slot is kept over a restart (smelter)
+[08:00:42] [Server thread/INFO]: SELFTEST buildgun-ui PASS restart: the smoke client's Constructor in slot 3 of its first bar (bound in the build menu) is kept (3 players with bars)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildgun-ui PASS restart: the smoke client's Constructor in slot 3 of its first bar (bound in the build menu) is kept (3 players with bars)
+[08:00:42] [Server thread/INFO]: SELFTEST buildgun-ui restart result: 2 passed, 0 failed
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildgun-ui restart result: 2 passed, 0 failed
+[08:00:42] [Server thread/INFO]: SELFTEST buildings_a PASS restart: the Constructor kept its recipe filter and count (1 create:iron_sheet, 40 made)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS restart: the Constructor kept its recipe filter and count (1 create:iron_sheet, 40 made)
+[08:00:42] [Server thread/INFO]: SELFTEST buildings_a PASS restart: its New Age motor kept its speed (org.antarcticgardens.cna.content.motor.MotorBlockEntity@17bb801a)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS restart: its New Age motor kept its speed (org.antarcticgardens.cna.content.motor.MotorBlockEntity@17bb801a)
+[08:00:42] [Server thread/INFO]: SELFTEST buildings_b PASS restart: the Manufacturer and the Particle Accelerator kept their recipe filters (1 siftec:computer, 1 siftec:dark_matter_crystal)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST buildings_b PASS restart: the Manufacturer and the Particle Accelerator kept their recipe filters (1 siftec:computer, 1 siftec:dark_matter_crystal)
+[08:00:42] [Server thread/INFO]: SELFTEST power after restart: wires 135 connectors, 92 wires; generator tripped false, coal left 62 minecraft:coal; storage banked 1021440000 SU-ticks; nuclear plant waste 64 siftec:uranium_waste
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST power after restart: wires 135 connectors, 92 wires; generator tripped false, coal left 62 minecraft:coal; storage banked 1021440000 SU-ticks; nuclear plant waste 64 siftec:uranium_waste
+[08:00:42] [Server thread/INFO]: SELFTEST machines PASS after restart: the buildings are there ([biomass_burner, coal_generator, fuel_generator, nuclear_power_plant, particle_accelerator, converter])
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: the buildings are there ([biomass_burner, coal_generator, fuel_generator, nuclear_power_plant, particle_accelerator, converter])
+[08:00:42] [Server thread/INFO]: SELFTEST machines after restart: refuelled; checks in 30 s
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST machines after restart: refuelled; checks in 30 s
+[08:00:42] [Server thread/INFO]: SELFTEST nether: Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648] height 90 block Block{siftec:netherrack_patch} under Block{minecraft:nether_quartz_ore}
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST nether: Node[x=218, z=154, type=QUARTZ, purity=IMPURE, y=-2147483648] height 90 block Block{siftec:netherrack_patch} under Block{minecraft:nether_quartz_ore}
+[08:00:42] [Server thread/INFO]: SELFTEST state save after restart: OK (company 4000 collected, claims 1500, places 600; broken false/false)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST state save after restart: OK (company 4000 collected, claims 1500, places 600; broken false/false)
+[08:00:42] [Server thread/INFO]: SELFTEST state loading after restart: claimed chunks force-loaded the vanilla way 96 (claims load nothing)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST state loading after restart: claimed chunks force-loaded the vanilla way 96 (claims load nothing)
+[08:00:42] [Server thread/INFO]: SELFTEST state cleanup: removed 63 test companies
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST state cleanup: removed 63 test companies
+[08:00:42] [Server thread/INFO]: SELFTEST power chain after restart: 135 connectors, 92 wires; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST power chain after restart: 135 connectors, 92 wires; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTrimRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.common.ServerActions
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SingleItemRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SmithingTransformRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.server.network.config.SynchronizeRegistriesTask
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ServerboundSelectKnownPacks
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RemoteSlot$Synchronized
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.level.redstone.ExperimentalRedstoneWireEvaluator
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerHandshakePacketListenerImpl
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.projectile.ProjectileUtil
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.BlockItemTagAppender
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistriesDatapackGenerator
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener
+[08:00:42] [Server thread/INFO]: Force-loading class com.jesz.createdieselgenerators.world.OilChunksSavedData
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.server.commands.DebugConfigCommand
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.network.HashedStack$ActualItem
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.TransmuteRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.configuration.ConfigurationProtocols
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.server.network.ServerLoginPacketListenerImpl
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.inventory.RecipeBookType
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeProvider$1
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.gametest.framework.GameTestServer
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.BundlePacket
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.util.ParticleUtils
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.CompoundContainer
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagAppender$1
+[08:00:42] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.tags.TagsProvider
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SimpleCookingRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.SpecialRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.util.BackpackDeathHelper
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapedRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.tags.TagBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.level.ServerExplosion
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.RecipeOutput
+[08:00:42] [Server thread/INFO]: Force-loading class com.zurrtum.create.foundation.recipe.trie.RecipeTrie
+[08:00:42] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.KineticNetwork
+[08:00:42] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.DeployerHandler
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.level.block.RailState
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.server.dedicated.ServerWatchdog
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.ShapelessRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.CustomCraftingRecipeBuilder
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.item.enchantment.EnchantmentHelper
+[08:00:42] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade$2
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.advancements.packs.VanillaAdventureAdvancements
+[08:00:42] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.deployer.ManualApplicationHelper
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.BlockLootSubProvider
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket
+[08:00:42] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.kinetics.belt.transport.BeltTunnelInteractionHandler
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.game.GameProtocols
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.recipes.BrewingProvider
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.entity.boss.enderdragon.phases.AbstractDragonSittingPhase
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.registries.RegistryPatchGenerator
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.item.Item$TooltipContext$2
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.HashCache$ProviderCache
+[08:00:42] [Server thread/INFO]: Force-loading class com.tiviacz.travelersbackpack.inventory.menu.slot.ResultSlotExt
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.world.level.pathfinder.PathfindingContext
+[08:00:42] [Server thread/INFO]: Force-loading class com.zurrtum.create.content.fluids.FluidPropagator
+[08:00:42] [Server thread/INFO]: Force-loading class org.antarcticgardens.cna.content.electricity.network.ElectricalNetwork
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.DataProvider
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.data.loot.EntityLootSubProvider
+[08:00:42] [Server thread/INFO]: Force-loading class net.minecraft.network.protocol.login.ClientboundCustomQueryPacket
+[08:00:42] [Server thread/INFO]: [MixinAudit] audit finished
+[08:00:42] [Server thread/INFO]: SELFTEST always after the restart: twin A 149 rods (storage_container 149, belts 0, truck 0), constructor made 149; twin B 148 rods (storage_container 148, belts 0, truck 0)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST always after the restart: twin A 149 rods (storage_container 149, belts 0, truck 0), constructor made 149; twin B 148 rods (storage_container 148, belts 0, truck 0)
+[08:00:42] [Server thread/INFO]: SELFTEST always PASS after the restart: both twins made rods at the Constructor's rate (about 15 a minute) (149 and 148)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST always PASS after the restart: both twins made rods at the Constructor's rate (about 15 a minute) (149 and 148)
+[08:00:42] [Server thread/INFO]: SELFTEST always PASS after the restart: the unloaded twin holds the same rods as the loaded one, within one craft (149 against 148)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST always PASS after the restart: the unloaded twin holds the same rods as the loaded one, within one craft (149 against 148)
+[08:00:42] [Server thread/INFO]: SELFTEST always PASS after the restart: no chunk of twin B was loaded meanwhile, and none is loaded now (0 loads, 0 loaded now)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST always PASS after the restart: no chunk of twin B was loaded meanwhile, and none is loaded now (0 loads, 0 loaded now)
+[08:00:42] [Server thread/INFO]: SELFTEST always PASS after the restart: both Trucks drove their loops, stopping at the stations (A 66 stops, B 70)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST always PASS after the restart: both Trucks drove their loops, stopping at the stations (A 66 stops, B 70)
+[08:00:42] [Server thread/INFO]: SELFTEST always PASS after the restart: twin B is still simulated (7 buildings)
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST always PASS after the restart: twin B is still simulated (7 buildings)
+[08:00:42] [Server thread/INFO]: SELFTEST always SIFTEC factories: 35/258 simulated in 0 groups, 0 vehicles; 2.175 ms/tick (server 2.175, worker 0.000 a step); 0 snapshots, 204 catch-ups
+[08:00:42] [Server thread/INFO]: System chat: SELFTEST always SIFTEC factories: 35/258 simulated in 0 groups, 0 vehicles; 2.175 ms/tick (server 2.175, worker 0.000 a step); 0 snapshots, 204 catch-ups
+[08:00:42] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 3774ms or 75 ticks behind
+[08:00:43] [Server thread/INFO]: SIFTEC: the factory simulation read 4976 recipes (166 smelting inputs)
+[08:00:43] [Server thread/INFO]: RecipeTrie of depth 7 with 1218 nodes built with 862 variants, 670 ingredients, and 1170 recipes
+[08:00:44] [Server thread/INFO]: SIFTEC: truck 22e19722-46bc-4c1c-a3ef-0c085da404be came back into ticking land at -9019, 150, -8384
+[08:00:44] [Server thread/INFO]: SELFTEST always loaded again: twin A 149 rods (storage_container 149, belts 0, truck 0); twin B 148 rods (storage_container 148, belts 0, truck 0)
+[08:00:44] [Server thread/INFO]: System chat: SELFTEST always loaded again: twin A 149 rods (storage_container 149, belts 0, truck 0); twin B 148 rods (storage_container 148, belts 0, truck 0)
+[08:00:44] [Server thread/INFO]: SELFTEST always PASS loaded again: twin B's buildings run for real again (7 buildings)
+[08:00:44] [Server thread/INFO]: System chat: SELFTEST always PASS loaded again: twin B's buildings run for real again (7 buildings)
+[08:00:44] [Server thread/INFO]: SELFTEST always PASS loaded again: the catch-up gave twin B the same rods as twin A, within one craft (149 against 148)
+[08:00:44] [Server thread/INFO]: System chat: SELFTEST always PASS loaded again: the catch-up gave twin B the same rods as twin A, within one craft (149 against 148)
+[08:00:44] [Server thread/INFO]: SELFTEST always PASS loaded again: twin B's Truck is back in the world on its route
+[08:00:44] [Server thread/INFO]: System chat: SELFTEST always PASS loaded again: twin B's Truck is back in the world on its route
+[08:00:44] [Server thread/INFO]: SELFTEST always SIFTEC factories: 28/258 simulated in 19 groups, 1 vehicles; 3.162 ms/tick (server 2.140, worker 10.215 a step); 0 snapshots, 211 catch-ups
+[08:00:44] [Server thread/INFO]: System chat: SELFTEST always SIFTEC factories: 28/258 simulated in 19 groups, 1 vehicles; 3.162 ms/tick (server 2.140, worker 10.215 a step); 0 snapshots, 211 catch-ups
+[08:00:44] [Server thread/INFO]: SELFTEST always restart result: 8 passed, 0 failed
+[08:00:44] [Server thread/INFO]: System chat: SELFTEST always restart result: 8 passed, 0 failed
+[08:00:45] [Server thread/INFO]: SELFTEST vehicles PASS restart: the Truck, its company, its route and its stops are back (selftest_vehicles, 60 points, 2 stops)
+[08:00:45] [Server thread/INFO]: System chat: SELFTEST vehicles PASS restart: the Truck, its company, its route and its stops are back (selftest_vehicles, 60 points, 2 stops)
+[08:00:45] [Server thread/INFO]: SELFTEST vehicles PASS restart: the unloading station still unloads
+[08:00:45] [Server thread/INFO]: System chat: SELFTEST vehicles PASS restart: the unloading station still unloads
+[08:00:45] [Server thread/INFO]: SELFTEST vehicles PASS restart: its count of items moved came back (128 items)
+[08:00:45] [Server thread/INFO]: System chat: SELFTEST vehicles PASS restart: its count of items moved came back (128 items)
+[08:00:46] [Server thread/INFO]: SELFTEST buildings_a PASS restart: the Miner Mk.1 still knows its node and goes on mining (BlockPos{x=3640, y=230, z=2400}, 1608 -> 1609)
+[08:00:46] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS restart: the Miner Mk.1 still knows its node and goes on mining (BlockPos{x=3640, y=230, z=2400}, 1608 -> 1609)
+[08:00:46] [Server thread/INFO]: SELFTEST buildings_a restart result: 3 passed, 0 failed
+[08:00:46] [Server thread/INFO]: System chat: SELFTEST buildings_a restart result: 3 passed, 0 failed
+[08:00:46] [Server thread/INFO]: System chat: No Crude Oil node in range
+[08:00:47] [Server thread/INFO]: SELFTEST world PASS restart check bauxite: let go after the restart, it grew back in 40 ticks (40 for its purity) into siftec:bauxite_ore (siftec:bauxite_ore wanted)
+[08:00:47] [Server thread/INFO]: System chat: SELFTEST world PASS restart check bauxite: let go after the restart, it grew back in 40 ticks (40 for its purity) into siftec:bauxite_ore (siftec:bauxite_ore wanted)
+[08:00:47] [Server thread/INFO]: SELFTEST world restart check result: 2 passed, 0 failed
+[08:00:47] [Server thread/INFO]: System chat: SELFTEST world restart check result: 2 passed, 0 failed
+[08:00:48] [Server thread/INFO]: SELFTEST buildings_a PASS restart: the Constructor is back on its grid and its motor turns while it works (Constructor: makes Iron Sheet, 40 made, idle, drawing next to nothing (819 SU while it works), grid: 1,027 of 102,400 SU used, 101,373 SU spare)
+[08:00:48] [Server thread/INFO]: System chat: SELFTEST buildings_a PASS restart: the Constructor is back on its grid and its motor turns while it works (Constructor: makes Iron Sheet, 40 made, idle, drawing next to nothing (819 SU while it works), grid: 1,027 of 102,400 SU used, 101,373 SU spare)
+[08:00:49] [Server thread/INFO]: SELFTEST power after restart, 4 s on: constructor Constructor: right-click it with an item to pick what it makes, 0 made, idle, drawing next to nothing (819 SU while it works), grid: 1 of 15,360 SU used, 15,359 SU spare / motor 0 RPM giving 0 SU; generator Coal Generator: gives 1 SU of 15,360 SU, grid: 1 of 15,360 SU used, 15,359 SU spare; storage Power Storage: stores 14,209 SUh of 20,480 SUh, grid: 1 of 109,158 SU used, 109,157 SU spare, storage 14,209 SUh of 20,480 SUh
+[08:00:49] [Server thread/INFO]: System chat: SELFTEST power after restart, 4 s on: constructor Constructor: right-click it with an item to pick what it makes, 0 made, idle, drawing next to nothing (819 SU while it works), grid: 1 of 15,360 SU used, 15,359 SU spare / motor 0 RPM giving 0 SU; generator Coal Generator: gives 1 SU of 15,360 SU, grid: 1 of 15,360 SU used, 15,359 SU spare; storage Power Storage: stores 14,209 SUh of 20,480 SUh, grid: 1 of 109,158 SU used, 109,157 SU spare, storage 14,209 SUh of 20,480 SUh
+[08:00:49] [Server thread/INFO]: SELFTEST power chain middle unloaded true (after 0 s): [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[08:00:49] [Server thread/INFO]: System chat: SELFTEST power chain middle unloaded true (after 0 s): [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[08:00:50] [Server thread/INFO]: SELFTEST power chain after restart step 1: after the restart: far constructor powered true (motor 0 RPM giving 0 SU), branch constructor powered true (motor 0 RPM giving 0 SU); burner Biomass Burner: gives 2 SU of 6,144 SU, grid: 2 of 6,144 SU used, 6,142 SU spare; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[08:00:50] [Server thread/INFO]: System chat: SELFTEST power chain after restart step 1: after the restart: far constructor powered true (motor 0 RPM giving 0 SU), branch constructor powered true (motor 0 RPM giving 0 SU); burner Biomass Burner: gives 2 SU of 6,144 SU, grid: 2 of 6,144 SU used, 6,142 SU spare; middle [tower 1 unloaded, tower 2 unloaded, tower 3 unloaded]
+[08:00:51] [Server thread/INFO]: SIFTEC: building power_tower at 560, 200, 368 dismantled; 0 stacks given back
+[08:00:51] [Server thread/INFO]: SELFTEST power chain after restart step 1: middle tower taken down (0 stacks back)
+[08:00:51] [Server thread/INFO]: System chat: SELFTEST power chain after restart step 1: middle tower taken down (0 stacks back)
+[08:00:52] [Server thread/INFO]: SELFTEST power chain after restart step 2: a moment later: far constructor powered false (motor 0 RPM giving 0 SU), branch constructor powered false (motor 0 RPM giving 0 SU); burner Biomass Burner: gives 0 SU of 6,144 SU, grid: 0 of 6,144 SU used, 6,144 SU spare; 134 connectors, 89 wires; middle loads {98784247830=0, 98784247843=1, 98784247855=0}
+[08:00:52] [Server thread/INFO]: System chat: SELFTEST power chain after restart step 2: a moment later: far constructor powered false (motor 0 RPM giving 0 SU), branch constructor powered false (motor 0 RPM giving 0 SU); burner Biomass Burner: gives 0 SU of 6,144 SU, grid: 0 of 6,144 SU used, 6,144 SU spare; 134 connectors, 89 wires; middle loads {98784247830=0, 98784247843=1, 98784247855=0}
+[08:00:55] [Server thread/INFO]: SELFTEST vehicles PASS restart: it is still driving itself (moved 15.4)
+[08:00:55] [Server thread/INFO]: System chat: SELFTEST vehicles PASS restart: it is still driving itself (moved 15.4)
+[08:00:55] [Server thread/INFO]: SELFTEST vehicles restart done: 4 passed, 0 failed
+[08:00:55] [Server thread/INFO]: System chat: SELFTEST vehicles restart done: 4 passed, 0 failed
+[08:01:02] [Server thread/INFO]: SELFTEST buildings_b PASS restart: the Particle Accelerator is back on its grid and goes on making (120 -> 126, Particle Accelerator: makes Dark Matter Crystal, 126 made, draws 102,400 SU, grid: 227,840 of 409,600 SU used, 181,760 SU spare; basin 10 minecraft:diamond, filter 1 siftec:particle_charge_dark_matter_crystal, 1000 mB siftec:dark_matter_residue; mixer -64.0 RPM, running true 20/8, next craft in 31, its company selftest_wp9 (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 4702, 230, 2380 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_wp9; carrier 0 minecraft:air, launched 3, made 126)
+[08:01:02] [Server thread/INFO]: System chat: SELFTEST buildings_b PASS restart: the Particle Accelerator is back on its grid and goes on making (120 -> 126, Particle Accelerator: makes Dark Matter Crystal, 126 made, draws 102,400 SU, grid: 227,840 of 409,600 SU used, 181,760 SU spare; basin 10 minecraft:diamond, filter 1 siftec:particle_charge_dark_matter_crystal, 1000 mB siftec:dark_matter_residue; mixer -64.0 RPM, running true 20/8, next craft in 31, its company selftest_wp9 (matter_conversion true, quantum_encoding true), basin can go on true; fluid port 4702, 230, 2380 reaches true; crusher speed 1.28, holding null, inventory 0 minecraft:air, owner selftest_wp9; carrier 0 minecraft:air, launched 3, made 126)
+[08:01:02] [Server thread/INFO]: SELFTEST buildings_b restart result: 2 passed, 0 failed
+[08:01:02] [Server thread/INFO]: System chat: SELFTEST buildings_b restart result: 2 passed, 0 failed
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: biomass_burner kept its shape and is whole (-1221777210, Biomass Burner: gives 6,144 SU of 6,144 SU, grid: 0 of 6,144 SU used, 6,144 SU spare, storage 2,344 SUh of 20,480 SUh)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: biomass_burner kept its shape and is whole (-1221777210, Biomass Burner: gives 6,144 SU of 6,144 SU, grid: 0 of 6,144 SU used, 6,144 SU spare, storage 2,344 SUh of 20,480 SUh)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: coal_generator kept its shape and is whole (543086186, Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 1,220 SUh of 20,480 SUh)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: coal_generator kept its shape and is whole (543086186, Coal Generator: gives 15,360 SU of 15,360 SU, grid: 0 of 15,360 SU used, 15,360 SU spare, storage 1,220 SUh of 20,480 SUh)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: fuel_generator kept its shape and is whole (-52458431, Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 4,263 SUh of 61,440 SUh)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: fuel_generator kept its shape and is whole (-52458431, Fuel Generator: gives 51,200 SU of 51,200 SU, grid: 0 of 51,200 SU used, 51,200 SU spare, storage 4,263 SUh of 61,440 SUh)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: nuclear_power_plant kept its shape and is whole (-2071978777, Nuclear Power Plant: gives 20,480 SU of 512,000 SU, grid: 0 of 512,000 SU used, 512,000 SU spare, storage 1,509 SUh of 20,480 SUh)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: nuclear_power_plant kept its shape and is whole (-2071978777, Nuclear Power Plant: gives 20,480 SU of 512,000 SU, grid: 0 of 512,000 SU used, 512,000 SU spare, storage 1,509 SUh of 20,480 SUh)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: particle_accelerator kept its shape and is whole (851120276, Particle Accelerator: makes Diamond, 120 made, draws 102,400 SU, grid: 61,440 of 204,800 SU used, 143,360 SU spare)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: particle_accelerator kept its shape and is whole (851120276, Particle Accelerator: makes Diamond, 120 made, draws 102,400 SU, grid: 61,440 of 204,800 SU used, 143,360 SU spare)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: converter kept its shape and is whole (1650898002, Converter: makes Raw Iron, 46 made, draws 51,200 SU, grid: 25,088 of 102,400 SU used, 77,312 SU spare)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: converter kept its shape and is whole (1650898002, Converter: makes Raw Iron, 46 made, draws 51,200 SU, grid: 25,088 of 102,400 SU used, 77,312 SU spare)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: the Biomass Burner gives 30 MW on its machines (6144.0, wanted 6144.0 within 4%)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: the Biomass Burner gives 30 MW on its machines (6144.0, wanted 6144.0 within 4%)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: the Coal Generator gives 75 MW on its machines (15360.0, wanted 15360.0 within 4%)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: the Coal Generator gives 75 MW on its machines (15360.0, wanted 15360.0 within 4%)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: the Fuel Generator gives 250 MW on its engine (51200.0, wanted 51200.0 within 4%)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: the Fuel Generator gives 250 MW on its engine (51200.0, wanted 51200.0 within 4%)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: the Nuclear Power Plant gives 2,500 MW on its reactor (512000.0, wanted 512000.0 within 4%)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: the Nuclear Power Plant gives 2,500 MW on its reactor (512000.0, wanted 512000.0 within 4%)
+[08:01:12] [Server thread/INFO]: SELFTEST machines after restart: the Nuclear Power Plant's reactor: acceptors 0 minecraft:air 0 minecraft:air 0 minecraft:air 0 minecraft:air 0 minecraft:air 0 minecraft:air; rod fuel 396150; input 8 siftec:uranium_fuel_rod; output 0 minecraft:air; tripped false; problem ; offered 512000.0 lastGenerated 20480.0 intake 7992; boiler heat 25 supply 324.0 engines 18 maxForWater 18 maxForSize 18 perLevel 18.0; boiler heat 25 supply 324.0 engines 18 maxForWater 18 maxForSize 18 perLevel 18.0
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines after restart: the Nuclear Power Plant's reactor: acceptors 0 minecraft:air 0 minecraft:air 0 minecraft:air 0 minecraft:air 0 minecraft:air 0 minecraft:air; rod fuel 396150; input 8 siftec:uranium_fuel_rod; output 0 minecraft:air; tripped false; problem ; offered 512000.0 lastGenerated 20480.0 intake 7992; boiler heat 25 supply 324.0 engines 18 maxForWater 18 maxForSize 18 perLevel 18.0; boiler heat 25 supply 324.0 engines 18 maxForWater 18 maxForSize 18 perLevel 18.0
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: the burners burn again (3 biofuel, 8 coal)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: the burners burn again (3 biofuel, 8 coal)
+[08:01:12] [Server thread/INFO]: SELFTEST machines PASS after restart: the Particle Accelerator and the Converter make again (24 Diamonds, 168 Iron Ore)
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines PASS after restart: the Particle Accelerator and the Converter make again (24 Diamonds, 168 Iron Ore)
+[08:01:12] [Server thread/INFO]: SELFTEST machines result: 13 passed, 0 failed
+[08:01:12] [Server thread/INFO]: System chat: SELFTEST machines result: 13 passed, 0 failed
+[08:01:19] [Server thread/INFO]: SELFTEST tb PASS after a restart the crate left alone is still there, full, with its death marker (1 full crates of 1 crate markers)
+[08:01:19] [Server thread/INFO]: System chat: SELFTEST tb PASS after a restart the crate left alone is still there, full, with its death marker (1 full crates of 1 crate markers)
+[08:01:29] [Server thread/INFO]: System chat: Stopping the server
+[08:01:29] [Server thread/INFO]: Stopping server
+[08:01:29] [Server thread/INFO]: Saving players
+[08:01:29] [Server thread/INFO]: Saving worlds
+[08:01:30] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[08:01:32] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/the_sift:the_sift
+[08:01:32] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[08:01:32] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+EXIT 0

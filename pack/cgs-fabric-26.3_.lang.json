@@ -1,0 +1,125 @@
+{
+  "itemGroup.mod_items": "Create: Gunsmithing",
+
+  "info.cgs.fuel": "Right click on a weapon with a fuel item to refuel it",
+
+  "slot.cgs.attachment.engine": "Engine",
+  "slot.cgs.attachment.frame": "Frame",
+  "slot.cgs.attachment.chamber": "Chamber",
+  "slot.cgs.attachment.head": "Head",
+
+  "info.cgs.air": "Air",
+  "info.cgs.burnable": "Fuel",
+  "info.cgs.water": "Water",
+
+  "item.cgs.flintlock": "Flintlock",
+  "item.cgs.revolver": "Revolver",
+  "item.cgs.shotgun": "Shotgun",
+  "item.cgs.nailgun": "Nailgun",
+  "item.cgs.gatling": "Gatling",
+  "item.cgs.blazegun": "Blazegun",
+  "item.cgs.launcher": "Launcher",
+  "item.cgs.hammer": "Pneumatic Hammer",
+  "item.cgs.axe": "Pneumatic Axe",
+  "item.cgs.frag_grenade": "Frag Grenade",
+
+  "item.cgs.barrel": "Barrel",
+  "item.cgs.barrel_sturdy": "Sturdy Barrel",
+
+  "item.cgs.press_form_gatling": "Gatling Shell Press Form",
+  "item.cgs.press_form_revolver": "Revolver Shell Press Form",
+  "item.cgs.press_form_shotgun": "Shotgun Shell Press Form",
+
+  "item.cgs.shell_gatling": "Gatling Shell",
+  "item.cgs.shell_revolver": "Revolver Shell",
+  "item.cgs.shell_shotgun": "Shotgun Shell",
+
+  "item.cgs.round_gatling_blank": "Blank Gatling Round",
+  "item.cgs.round_gatling": "Gatling Round",
+  "item.cgs.round_gatling_piercing": "Piercing Gatling Round",
+
+  "item.cgs.round_revolver_blank": "Blank Revolver Round",
+  "item.cgs.round_revolver": "Revolver Round",
+  "item.cgs.round_revolver_piercing": "Piercing Revolver Round",
+
+  "item.cgs.round_shotgun_blank": "Blank Shotgun Round",
+  "item.cgs.round_shotgun": "Shotgun Round",
+  "item.cgs.round_shotgun_flechette": "Shotgun Flechette Round",
+  "item.cgs.round_shotgun_flechette_steel": "Shotgun Steel Flechette Round",
+  "item.cgs.round_shotgun_incendiary": "Incendiary Shotgun Round",
+
+  "item.cgs.paper_cartridge": "Paper Cartridge",
+  "item.cgs.paper_shot": "Paper Shot",
+  "item.cgs.nail": "Nail",
+  "item.cgs.nail_steel": "Steel Nail",
+  "item.cgs.rocket": "Rocket",
+  "item.cgs.rocket_small": "Small Rocket",
+  "item.cgs.spear": "Spear",
+
+  "item.cgs.lead_balls": "Lead Balls",
+  "item.cgs.tank_empty": "Fluid Container",
+  "item.cgs.tank_water": "Water Container",
+  "item.cgs.tank_lava": "Lava Container",
+
+  "item.cgs.steam_engine": "Steam Engine",
+  "item.cgs.scope": "Scope",
+  "item.cgs.stock": "Stock",
+  "item.cgs.bayonet": "Bayonet",
+  "item.cgs.big_bayonet": "Large Bayonet",
+
+  "item.cgs.flintlock_long_barrel": "Musket Barrel",
+  "item.cgs.flintlock_mortar_barrel": "Mortar Barrel",
+  "item.cgs.blunderbuss_barrel": "Blunderbuss Barrel",
+  "item.cgs.blunderbuss_barrel_long": "Long Blunderbuss Barrel",
+  "item.cgs.flintlock_chambers": "Flintlock Chambers",
+
+  "item.cgs.iron_sight": "Gatling: Iron Sight",
+  "item.cgs.gatling_drum": "Gatling: Drum Magazine",
+
+  "item.cgs.round_belt": "Revolver: Chamber Belt",
+  "item.cgs.auto_fire": "Revolver: Auto Fire",
+  "item.cgs.long_barrel": "Revolver: Long Barrel",
+
+  "item.cgs.shotgun_drum": "Shotgun: Drums",
+  "item.cgs.shotgun_pump": "Shotgun: Automatic Loader",
+  "item.cgs.shotgun_long_barrel": "Shotgun: Long Barrels",
+  "item.cgs.shotgun_spread_barrel": "Shotgun: Spreading Barrels",
+
+  "item.cgs.nailgun_splitter": "Nailgun: Splitter Barrel",
+
+  "item.cgs.potion_tank": "Potion Tank",
+
+  "item.cgs.launcher_auto": "Auto Launcher",
+  "item.cgs.ballistazooka": "Ballistazooka",
+  "item.cgs.launcher_hook": "Pneumatic Hook",
+  "item.cgs.item_launcher": "Item Launcher",
+
+  "item.cgs.hammer_chamber": "Hammer: Gun Chamber",
+  "item.cgs.hammer_stone": "Stone Hammer Head",
+  "item.cgs.hammer_iron": "Iron Hammer Head",
+  "item.cgs.hammer_diamond": "Diamond Hammer Head",
+  "item.cgs.hammer_netherite": "Netherite Hammer Head",
+  "item.cgs.axe_stone": "Stone Axe Head",
+  "item.cgs.axe_iron": "Iron Axe Head",
+  "item.cgs.axe_diamond": "Diamond Axe Head",
+  "item.cgs.axe_netherite": "Netherite Axe Head",
+
+  "item.cgs.raw_lead": "Raw Lead",
+  "item.cgs.lead_ingot": "Lead Ingot",
+  "item.cgs.lead_nugget": "Lead Nugget",
+  "item.cgs.steel_ingot": "Steel Ingot",
+  "item.cgs.steel_nugget": "Steel Nugget",
+  "item.cgs.steel_sheet": "Steel Sheet",
+  "item.cgs.guano": "Guano",
+  "item.cgs.niter": "Niter",
+  "item.cgs.sulfur": "Sulfur",
+  "item.cgs.charcoal_dust": "Charcoal Dust",
+
+  "block.cgs.lead_ore": "Lead Ore",
+  "block.cgs.deepslate_lead_ore": "Deepslate Lead Ore",
+  "block.cgs.sulfur_ore": "Sulfur Ore",
+  "block.cgs.raw_lead_block": "Block Of Raw Lead ",
+  "block.cgs.lead_block": "Block Of Lead",
+
+  "block.cgs.steel_block": "Block Of Steel"
+}
