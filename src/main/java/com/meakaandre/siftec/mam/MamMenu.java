@@ -159,9 +159,11 @@ public class MamMenu extends ChestMenu {
         return false;
     }
 
-    /** May the player start research in this tree for their company: the MAM is open to it (Field Research) and the tree found. */
+    /**
+     * May the player start research in this tree for their company: the MAM is open to it (Field Research) and the tree
+     * found, by the company itself. A creative player is not let past these, since research unlocks for the company.
+     */
     public static boolean mayResearch(ServerPlayer player, Company company, Milestones.Tree t) {
-        if (player.hasInfiniteMaterials()) return true;
         return company.has(MamBlock.FIELD_RESEARCH) && foundBy(player, company, t);
     }
 

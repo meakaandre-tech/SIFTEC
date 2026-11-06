@@ -156,7 +156,7 @@ public class ShopMenu extends ChestMenu {
         int have = coupons(player);
         for (int i = 0; i < PER_PAGE && page * PER_PAGE + i < entries.size(); i++) {
             Shop.Entry e = entries.get(page * PER_PAGE + i);
-            boolean owned = e.owned(company);
+            boolean owned = takes(player, company, e);
             List<Component> lore = new ArrayList<>();
             lore.add(Component.translatable("siftec.shop.category." + e.category().toLowerCase(Locale.ROOT).replace(' ', '_')).withStyle(ChatFormatting.DARK_GRAY));
             if (e.kind() == ShopKind.SWATCH) lore.add(Component.translatable("siftec.shop.swatches", company.swatches.size(), Shop.MAX_SWATCHES).withStyle(ChatFormatting.GRAY));
@@ -232,14 +232,20 @@ public class ShopMenu extends ChestMenu {
         return out;
     }
 
-    /** True if clicking the entry takes one of it (or says how it is used) rather than buying it: the company owns it. */
+    /**
+     * True if clicking the entry takes one of it (or says how it is used) rather than buying it: the company owns it, or
+     * the player is in creative, who has every Shop unlock already and so never buys one for the company (a swatch,
+     * which only adds to the company's palette, is still bought).
+     */
     public static boolean takes(Player player, Company company, Shop.Entry e) {
-        return e.owned(company);
+        return e.owned(company) || player.hasInfiniteMaterials() && e.kind() != ShopKind.SWATCH;
     }
 
-    /** Why the player cannot buy this entry for their company now (out of season, too few coupons), or null if they can. */
+    /**
+     * Why the player cannot buy this entry for their company now (out of season, too few coupons), or null if they can.
+     * The same for a creative player: what is bought belongs to the company, so it is never free.
+     */
     public static @Nullable Component buyRefusal(ServerPlayer player, Shop.Entry e) {
-        if (player.hasInfiniteMaterials()) return null;
         if (!e.inSeason()) return Component.translatable("siftec.shop.out_of_season", months(e.months()));
         if (player.getInventory().countItem(ModItems.FICSIT_COUPON.get()) < e.coupons()) return Component.translatable("siftec.shop.poor");
         return null;
@@ -252,9 +258,7 @@ public class ShopMenu extends ChestMenu {
             return;
         }
         Item coupon = ModItems.FICSIT_COUPON.get();
-        if (!player.hasInfiniteMaterials()) {
-            new Milestone.Cost(BuiltInRegistries.ITEM.getKey(coupon).toString(), e.coupons()).take(player.getInventory(), e.coupons());
-        }
+        new Milestone.Cost(BuiltInRegistries.ITEM.getKey(coupon).toString(), e.coupons()).take(player.getInventory(), e.coupons());
         Shop.unlock(company, e);
         Companies.tell(player.level().getServer(), company,
             Component.translatable("siftec.shop.bought", Component.translatable("siftec.shop.entry." + e.id())).withStyle(ChatFormatting.GOLD));

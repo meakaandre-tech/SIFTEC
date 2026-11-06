@@ -30,7 +30,7 @@ import java.util.Set;
  * subcategories as headings over a grid of building icons six to a row, a search box along the top (searching every
  * category), and on the right the building under the mouse: its name, a turning 3D view of it, its description, its cost
  * as have / need with what is missing in red, its power and its footprint. Only buildings the company has unlocked are
- * there. Left click picks one for the hologram, right click opens its Ponder scene, and 1 to 0 over one binds it to that
+ * there (a creative player has every one). Left click picks one for the hologram, right click opens its Ponder scene, and 1 to 0 over one binds it to that
  * slot of the build hotbar shown.
  */
 public class BuildMenuScreen extends Screen {
@@ -82,9 +82,12 @@ public class BuildMenuScreen extends Screen {
         return shown(BuildGunClient.unlocked, asCreative);
     }
 
-    /** The ids the menu lists: what the server said the company has unlocked, or everything for a creative player it has not told yet. */
+    /**
+     * The ids the menu lists: what the server said the company has unlocked, or every building for a creative player,
+     * whatever list the server sent (creative ignores unlocks).
+     */
     static Set<String> shown(Set<String> unlocked, boolean creative) {
-        if (unlocked.isEmpty() && creative) {
+        if (creative) {
             Set<String> all = new HashSet<>();
             for (BuildingDef def : Buildings.all()) all.add(def.id());
             return all;

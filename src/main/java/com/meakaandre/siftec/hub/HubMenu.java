@@ -133,9 +133,9 @@ public class HubMenu extends AbstractContainerMenu {
         return null;
     }
 
-    /** May this player go through the Wormhole Gateway to The Sift: once their company has done Wormhole Phase 5. */
+    /** May this player go through the Wormhole Gateway to The Sift: once their company has done Wormhole Phase 5, or in creative. */
     public static boolean maySift(Player player, @Nullable Company company) {
-        return company != null && company.has("phase_5");
+        return player.hasInfiniteMaterials() || company != null && company.has("phase_5");
     }
 
     public static String clock(long ticks) {
