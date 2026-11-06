@@ -1,209 +1,208 @@
 {
- "credit": "SIFTEC one-block belt: side trim, 5 px high, in the belt Mk's casing; bolts in andesite",
- "parent": "block/block",
- "textures": {
-  "0": "siftec:block/steel_casing_side",
-  "1": "create:block/andesite_casing",
-  "particle": "#0"
- },
- "elements": [
-  {
-   "name": "rail left",
-   "from": [
-    0,
-    0,
-    0
-   ],
-   "to": [
-    1.5,
-    5,
-    16
-   ],
-   "faces": {
-    "north": {
-     "texture": "#0"
-    },
-    "south": {
-     "texture": "#0"
-    },
-    "east": {
-     "texture": "#0"
-    },
-    "west": {
-     "texture": "#0"
-    },
-    "up": {
-     "texture": "#0"
-    },
-    "down": {
-     "texture": "#0"
-    }
-   }
+  "parent": "block/block",
+  "textures": {
+    "0": "siftec:block/steel_casing_side",
+    "1": "create:block/andesite_casing",
+    "particle": "#0"
   },
-  {
-   "name": "rail right",
-   "from": [
-    14.5,
-    0,
-    0
-   ],
-   "to": [
-    16,
-    5,
-    16
-   ],
-   "faces": {
-    "north": {
-     "texture": "#0"
+  "elements": [
+    {
+      "name": "rail left",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        1.5,
+        5,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#0"
+        },
+        "south": {
+          "texture": "#0"
+        },
+        "east": {
+          "texture": "#0"
+        },
+        "west": {
+          "texture": "#0"
+        },
+        "up": {
+          "texture": "#0"
+        },
+        "down": {
+          "texture": "#0"
+        }
+      }
     },
-    "south": {
-     "texture": "#0"
+    {
+      "name": "rail right",
+      "from": [
+        14.5,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        5,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#0"
+        },
+        "south": {
+          "texture": "#0"
+        },
+        "east": {
+          "texture": "#0"
+        },
+        "west": {
+          "texture": "#0"
+        },
+        "up": {
+          "texture": "#0"
+        },
+        "down": {
+          "texture": "#0"
+        }
+      }
     },
-    "east": {
-     "texture": "#0"
+    {
+      "name": "bolt",
+      "from": [
+        -0.5,
+        2,
+        3.5
+      ],
+      "to": [
+        0,
+        3,
+        4.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#1"
+        },
+        "south": {
+          "texture": "#1"
+        },
+        "east": {
+          "texture": "#1"
+        },
+        "west": {
+          "texture": "#1"
+        },
+        "up": {
+          "texture": "#1"
+        },
+        "down": {
+          "texture": "#1"
+        }
+      }
     },
-    "west": {
-     "texture": "#0"
+    {
+      "name": "bolt",
+      "from": [
+        16,
+        2,
+        3.5
+      ],
+      "to": [
+        16.5,
+        3,
+        4.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#1"
+        },
+        "south": {
+          "texture": "#1"
+        },
+        "east": {
+          "texture": "#1"
+        },
+        "west": {
+          "texture": "#1"
+        },
+        "up": {
+          "texture": "#1"
+        },
+        "down": {
+          "texture": "#1"
+        }
+      }
     },
-    "up": {
-     "texture": "#0"
+    {
+      "name": "bolt",
+      "from": [
+        -0.5,
+        2,
+        11.5
+      ],
+      "to": [
+        0,
+        3,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#1"
+        },
+        "south": {
+          "texture": "#1"
+        },
+        "east": {
+          "texture": "#1"
+        },
+        "west": {
+          "texture": "#1"
+        },
+        "up": {
+          "texture": "#1"
+        },
+        "down": {
+          "texture": "#1"
+        }
+      }
     },
-    "down": {
-     "texture": "#0"
+    {
+      "name": "bolt",
+      "from": [
+        16,
+        2,
+        11.5
+      ],
+      "to": [
+        16.5,
+        3,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#1"
+        },
+        "south": {
+          "texture": "#1"
+        },
+        "east": {
+          "texture": "#1"
+        },
+        "west": {
+          "texture": "#1"
+        },
+        "up": {
+          "texture": "#1"
+        },
+        "down": {
+          "texture": "#1"
+        }
+      }
     }
-   }
-  },
-  {
-   "name": "bolt",
-   "from": [
-    -0.5,
-    2,
-    3.5
-   ],
-   "to": [
-    0,
-    3,
-    4.5
-   ],
-   "faces": {
-    "north": {
-     "texture": "#1"
-    },
-    "south": {
-     "texture": "#1"
-    },
-    "east": {
-     "texture": "#1"
-    },
-    "west": {
-     "texture": "#1"
-    },
-    "up": {
-     "texture": "#1"
-    },
-    "down": {
-     "texture": "#1"
-    }
-   }
-  },
-  {
-   "name": "bolt",
-   "from": [
-    16,
-    2,
-    3.5
-   ],
-   "to": [
-    16.5,
-    3,
-    4.5
-   ],
-   "faces": {
-    "north": {
-     "texture": "#1"
-    },
-    "south": {
-     "texture": "#1"
-    },
-    "east": {
-     "texture": "#1"
-    },
-    "west": {
-     "texture": "#1"
-    },
-    "up": {
-     "texture": "#1"
-    },
-    "down": {
-     "texture": "#1"
-    }
-   }
-  },
-  {
-   "name": "bolt",
-   "from": [
-    -0.5,
-    2,
-    11.5
-   ],
-   "to": [
-    0,
-    3,
-    12.5
-   ],
-   "faces": {
-    "north": {
-     "texture": "#1"
-    },
-    "south": {
-     "texture": "#1"
-    },
-    "east": {
-     "texture": "#1"
-    },
-    "west": {
-     "texture": "#1"
-    },
-    "up": {
-     "texture": "#1"
-    },
-    "down": {
-     "texture": "#1"
-    }
-   }
-  },
-  {
-   "name": "bolt",
-   "from": [
-    16,
-    2,
-    11.5
-   ],
-   "to": [
-    16.5,
-    3,
-    12.5
-   ],
-   "faces": {
-    "north": {
-     "texture": "#1"
-    },
-    "south": {
-     "texture": "#1"
-    },
-    "east": {
-     "texture": "#1"
-    },
-    "west": {
-     "texture": "#1"
-    },
-    "up": {
-     "texture": "#1"
-    },
-    "down": {
-     "texture": "#1"
-    }
-   }
-  }
- ]
+  ]
 }
