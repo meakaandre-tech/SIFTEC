@@ -739,3 +739,29 @@ cmd siftec selftest tb creative
 sleep 2
 cmd siftec selftest tb inventory done
 sleep 2
+key Escape
+sleep 1
+cmd siftec worldtest beltlay client setup
+cmd gamemode creative @a
+cmd item replace entity @a weapon.mainhand with create:belt_connector
+cmd tp @a 16060.5 200 -15967.88 180 45
+sleep 4
+key u
+sleep 1
+cmd siftec worldtest beltlay client block
+cmd tp @a 16067.5 200 -15967.88 180 45
+sleep 3
+shot
+cmd siftec worldtest beltlay client clear
+sleep 3
+shot
+key u
+sleep 2
+cmd tp @a 16064 200 -15964 180 20
+sleep 4
+shot
+cmd siftec worldtest beltlay client check
+sleep 2
+cmd tp @a 16008.5 200 -15983.5 180 12
+sleep 4
+shot
