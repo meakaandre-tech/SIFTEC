@@ -91,6 +91,7 @@
     "belt.AttachmentSyncMixin",
     "belt.BeltAttachmentHostMixin",
     "belt.BeltBlockLowMixin",
+    "belt.FunnelOnBeltMixin",
     "belt.BuiltInFunnelTargetMixin",
     "belt.LevelAttachmentViewMixin",
     "belt.SmartBlockEntityAttachmentMixin",

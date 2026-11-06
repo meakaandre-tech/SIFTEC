@@ -352,9 +352,6 @@ public final class LowBeltTests {
                 BlockPos a = new BlockPos(X + 20 + 24 * k + 12 * line, Y, Z), b = a.east(7), at = a.east(3), side = at.south(), sideEnd = side.south(3);
                 belt(level, a, b, company);
                 belt(level, side, sideEnd, company);
-                // each way out ends in a chest (the tracer follows a line to an inventory)
-                level.setBlock(b.east(), Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
-                level.setBlock(sideEnd.south(), Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
                 if (builtIn) {
                     click(level, tester(level, GameType.CREATIVE, new ItemStack(items[k])), at, Direction.UP);
                 } else {
@@ -367,8 +364,8 @@ public final class LowBeltTests {
                 int[] fed = {0};
                 feeder(level, a, Direction.EAST, repeat(8, Items.IRON_INGOT), 40, 12, fed);
                 int idx = line;
-                later(level, 420, () -> counts[idx] = new int[]{fed[0], (int) stored(level, b.east(), Items.IRON_INGOT) + onBelt(level, b, Items.IRON_INGOT),
-                    (int) stored(level, sideEnd.south(), Items.IRON_INGOT) + onBelt(level, side, Items.IRON_INGOT)});
+                later(level, 420, () -> counts[idx] = new int[]{fed[0], onGround(level, b.east(), 1.5, Items.IRON_INGOT) + onBelt(level, b, Items.IRON_INGOT),
+                    onGround(level, sideEnd.south(), 1.5, Items.IRON_INGOT) + onBelt(level, side, Items.IRON_INGOT)});
             }
             String name = items[k].toString();
             boolean brass = k == 1;
@@ -469,14 +466,19 @@ public final class LowBeltTests {
         level.setBlock(bottom.below(), AllBlocks.DEPOT.defaultBlockState(), Block.UPDATE_ALL);
         belt(level, up, top, company);
         belt(level, down, bottom, company);
-        later(level, 20, () -> {
-            for (BlockPos start : new BlockPos[]{up, down}) {
-                BeltBlockEntity b = beltAt(level, start);
+        // one gold ingot on each, put on as soon as the belt has its inventory (a belt sets itself up over its first ticks)
+        boolean[] added = new boolean[2];
+        for (int t = 20; t <= 80; t += 5) later(level, t, () -> {
+            BlockPos[] starts = {up, down};
+            for (int i = 0; i < 2; i++) {
+                if (added[i]) continue;
+                BeltBlockEntity b = beltAt(level, starts[i]);
                 BeltBlockEntity c = b == null ? null : b.getControllerBE();
-                if (c == null || c.getInventory() == null) continue;
-                TransportedItemStack t = new TransportedItemStack(new ItemStack(Items.GOLD_INGOT));
-                t.beltPosition = 0.5f;
-                c.getInventory().addItem(t);
+                if (c == null || c.getInventory() == null || c.beltLength == 0) continue;
+                TransportedItemStack item = new TransportedItemStack(new ItemStack(Items.GOLD_INGOT));
+                item.beltPosition = 0.5f;
+                c.getInventory().addItem(item);
+                added[i] = true;
             }
         });
         later(level, 160, () -> {
@@ -486,7 +488,7 @@ public final class LowBeltTests {
             String how = dc == null ? "no controller" : "controller " + dc.getBlockPos().toShortString() + " facing " + dc.getBeltFacing()
                 + ", moving " + dc.getMovementFacing() + " at " + dc.getDirectionAwareBeltMovementSpeed() + ", length " + dc.beltLength;
             expect(source, "vertical: a vertical belt lowers an item into the Depot below its foot", lowered == 1, "in the Depot " + lowered + ", on the belt "
-                + onBelt(level, down, null) + ", loose " + onGround(level, down.below(2), 5, Items.GOLD_INGOT) + "; " + how);
+                + onBelt(level, down, null) + ", put on " + added[1] + ", loose " + onGround(level, down.below(2), 5, Items.GOLD_INGOT) + "; " + how);
         });
         // a flat belt running into the foot of a vertical one: its items go up
         BlockPos foot = new BlockPos(X + 78, Y, Z), head = foot.above(4), from = foot.west(4), to = foot.west();
@@ -587,7 +589,11 @@ public final class LowBeltTests {
             String[] seen = new String[2];
             for (int line = 0; line < 2; line++) {
                 BlockPos s = new BlockPos(X + 20 + 12 * line, Y, Z);
+                // a Depot at each way out for the moment of the trace (the tracer follows a line to an inventory)
+                BlockPos[] outs = {s.east(8), s.east(3).south(5)};
+                for (BlockPos o : outs) level.setBlock(o, AllBlocks.DEPOT.defaultBlockState(), Block.UPDATE_ALL);
                 List<Tracer.End> ends = Tracer.items(level, s.west(), Direction.EAST);
+                for (BlockPos o : outs) level.setBlock(o, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                 List<String> rel = new ArrayList<>();
                 for (Tracer.End e : ends) rel.add(e.at().subtract(s).toShortString() + " x" + String.format(Locale.ROOT, "%.3f", e.share()));
                 rel.sort(String::compareTo);
