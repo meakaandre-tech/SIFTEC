@@ -1,7 +1,7 @@
 {
   "parent": "block/block",
   "textures": {
-    "0": "siftec:block/steel_casing_side",
+    "0": "create:block/industrial_iron_block",
     "1": "create:block/andesite_casing",
     "particle": "#0"
   },

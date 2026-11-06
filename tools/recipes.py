@@ -199,7 +199,7 @@ def sequence(base, out, steps, loops, name=None, n=1, transitional=None):
         if step == "press":
             seq.append({"type": "create:pressing", "ingredient": "$ingredient", "results": ["$result"]})
         elif step == "cut":
-            seq.append({"type": "create:cutting", "ingredient": "$ingredient", "results": ["$result"]})
+            seq.append({"type": "create:cutting", "ingredient": "$ingredient", "processing_time": 100, "results": ["$result"]})
         elif isinstance(step, tuple):
             # the Spout's recipe has one result, not a list
             seq.append({"type": "create:filling", "ingredient": "$ingredient", "fluid_ingredient": fl_in(step[1], step[2]), "result": "$result"})
@@ -486,12 +486,27 @@ def carried_over():
     compact("blank_circuit", items=["#c:stones", "#c:dusts/redstone", "#c:ingots/iron", "minecraft:quartz"], fluids=[("diesel", 100)],
             results=[("create_new_age:blank_circuit", 4)], heated=True)
     under(None)
-    # Steel Casing: steel on a stripped log, by hand or by Deployer, like Create's own casings
+    # Steel Casing: one Steel Ingot on a stripped log or stripped wood, like Create's own casings (the item application
+    # is its only recipe; a Deployer runs it as Create's Deployers run every item application)
     for wood in ("stripped_logs", "stripped_woods"):
         add("item_application", "steel_casing_from_" + wood, {"type": "create:item_application", "target": "#c:" + wood, "ingredient": item("Steel Ingot"),
             "results": [{"id": "siftec:steel_casing"}]})
-        add("deploying", "steel_casing_from_" + wood, {"type": "create:deploying", "target": "#c:" + wood, "ingredient": item("Steel Ingot"),
-            "results": [{"id": "siftec:steel_casing"}]})
+    # Create: New Age's Heat Casing is zinc on industrial iron; industrial iron is the Steel Casing now (its own recipe is in
+    # REMOVED)
+    add("item_application", "heat_casing", {"type": "create:item_application", "target": "siftec:steel_casing", "ingredient": "create:zinc_ingot",
+        "results": [{"id": "create_new_age:heat_casing"}]})
+    # SIFTEC's steel, as Gunsmithing's steel was made in the pack (tables.content.REPLACED): the Foundry's Steel Ingot is
+    # pressed into a Steel Sheet, and nine Steel Nuggets are a Steel Ingot (and back); there is no steel block
+    under("basic_steel_production")
+    press("siftec:steel_ingot", "siftec:steel_sheet", name="steel_sheet")
+    shaped("siftec:steel_ingot", ["NNN", "NNN", "NNN"], {"N": "siftec:steel_nugget"}, name="steel_ingot_from_nuggets")
+    hand("siftec:steel_nugget", [(1, "siftec:steel_ingot")], 9, name="steel_nugget")
+    # the steel windows are Create's industrial iron windows, made the same way from Steel Casing
+    shaped("siftec:steel_window", [" # ", "#X#"], {"#": "siftec:steel_casing", "X": "#c:glass_blocks/colorless"}, 2, name="steel_window")
+    shaped("siftec:steel_window_pane", ["###", "###"], {"#": "siftec:steel_window"}, 16, name="steel_window_pane")
+    under(None)
+    # Gunsmithing's steel nails, half-built on SIFTEC's Steel Nugget (its own recipe half-builds them on its steel nugget)
+    sequence("#c:nuggets/steel", "cgs:nail_steel", ["cut", "press"], 1, name="steel_nail", n=6, transitional="siftec:steel_nugget")
     # Block of Sulfur (vanilla's sulfur block) packs four Gunsmithing sulfur
     shaped("minecraft:sulfur", ["SS", "SS"], {"S": "Sulfur"}, name="block_of_sulfur")
     hand("Sulfur", [(1, "minecraft:sulfur")], 4, name="sulfur_from_block")

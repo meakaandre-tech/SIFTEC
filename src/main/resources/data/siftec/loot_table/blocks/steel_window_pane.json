@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "siftec:steel_window_pane"
+        }
+      ],
+      "rolls": 1,
+      "condition": "minecraft:tool/can_silk_touch"
+    }
+  ],
+  "random_sequence": "siftec:blocks/steel_window_pane"
+}

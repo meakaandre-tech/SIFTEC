@@ -21,6 +21,7 @@ import com.meakaandre.siftec.command.FoodTests;
 import com.meakaandre.siftec.command.LogisticsTests;
 import com.meakaandre.siftec.command.NodeTests;
 import com.meakaandre.siftec.command.OwnershipFixTests;
+import com.meakaandre.siftec.command.SteelTests;
 import com.meakaandre.siftec.command.PolishTests;
 import com.meakaandre.siftec.command.PowerFixTests;
 import com.meakaandre.siftec.command.ProgressionTests;
@@ -77,6 +78,7 @@ public final class SelfTests implements SelfTestHooks.Plugin {
                 ExploitTests.register();
                 DesignerTests.register();
                 QualityFixTests.register();
+                SteelTests.register();
                 CreativeUnlockTests.register();
             }
             case SIMULATION -> AlwaysTests.register();

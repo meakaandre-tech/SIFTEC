@@ -46,7 +46,8 @@ import java.util.TreeSet;
  * <ul>
  * <li>{@code selftest style}: every block in every building template is a real block with every property it names
  * applied (a typo would quietly turn into air or a default state), every building carries the style's materials
- * (orange, dark industrial iron and half-block trim), and the HUB's bevels read as stairs.</li>
+ * (orange, dark Steel Casing and half-block trim), no building has a block of Create's industrial iron (SIFTEC's steel
+ * replaces it), and the HUB's bevels read as stairs.</li>
  * <li>{@code worldtest style setup}: every Build Gun building (not the vehicles) and the MAM put down on a white floor,
  * four rows of them facing south (a compact block, so its chunks load in one go without the client timing out), the miners on nodes, the extractors on their wells, the Water Extractor in a pool and
  * the Geothermal Generator over a geyser.</li>
@@ -113,15 +114,24 @@ public final class StyleTests {
             REPORT.expect(source, def.id() + ": every block in its template is a real block with its properties", bad.isEmpty() && entries > 0,
                 bad.isEmpty() ? entries + " palette entries" : String.join("; ", bad));
 
-            // the style's materials (not the Foundations tab's pieces, the poles or the smallest rigs)
+            // no Create industrial iron anywhere in it: SIFTEC's Steel Casing and steel windows took its place
             BuildingTemplate t = BuildingTemplate.of(def);
+            if (t != null) {
+                Set<String> iron = new TreeSet<>();
+                for (BuildingTemplate.Cell cell : t.members) {
+                    String id = BuiltInRegistries.BLOCK.getKey(cell.state().getBlock()).toString();
+                    if (id.startsWith("create:industrial_iron")) iron.add(id);
+                }
+                REPORT.expect(source, def.id() + ": no Create industrial iron in its template", iron.isEmpty(), iron.isEmpty() ? "" : String.join(", ", iron));
+            }
+            // the style's materials (not the Foundations tab's pieces, the poles or the smallest rigs)
             if (t == null || def.logic() == Logic.FOUNDATION || def.power() == PowerRole.POLE || t.members.size() < 30) continue;
             Set<String> blocks = new TreeSet<>();
             for (BuildingTemplate.Cell cell : t.members) blocks.add(BuiltInRegistries.BLOCK.getKey(cell.state().getBlock()).toString());
-            boolean orange = blocks.contains("minecraft:orange_concrete"), dark = blocks.contains("create:industrial_iron_block");
+            boolean orange = blocks.contains("minecraft:orange_concrete"), dark = blocks.contains("siftec:steel_casing");
             boolean half = blocks.stream().anyMatch(b -> b.endsWith("_stairs") || b.endsWith("_slab") || b.endsWith("_trapdoor"));
-            REPORT.expect(source, def.id() + ": built in the style's orange, dark industrial iron and half-block trim", orange && dark && half,
-                "orange " + orange + ", industrial iron " + dark + ", half blocks " + half);
+            REPORT.expect(source, def.id() + ": built in the style's orange, dark Steel Casing and half-block trim", orange && dark && half,
+                "orange " + orange + ", steel casing " + dark + ", half blocks " + half);
         }
         // the HUB's roof bevels are dark stairs at every level from the start
         Template hub = Templates.hub();

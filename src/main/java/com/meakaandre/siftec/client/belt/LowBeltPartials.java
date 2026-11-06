@@ -7,7 +7,7 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 /** The one-block belt's own models: the side trim in each Mk's material, and the rounded end cap. */
 public final class LowBeltPartials {
     public static final PartialModel RAIL_ANDESITE = of("rail_andesite"), RAIL_COPPER = of("rail_copper"), RAIL_BRASS = of("rail_brass"),
-    /** Placeholder until SIFTEC steel's own texture is merged: the steel casing texture main already has. */
+    /** Mk.6: the Steel Casing's own side. */
     RAIL_STEEL = of("rail_steel"), CAP = of("cap");
 
     private LowBeltPartials() {
