@@ -786,6 +786,35 @@ public final class TravelersBackpackSelfTest {
             CREATIVE.expect(source, "a creative player is not stopped by an upgrade's MAM lock",
                 Locks.allowed(player, pickup) && TravelersBackpackCompat.mayUseUpgrade(player, pickup), "");
 
+            // the backpack's tier: a creative player in a company that has done nothing wears the top tier, and a free
+            // upgrade slot of the real window takes an upgrade the company has not researched; survival keeps the
+            // company's tier
+            int top = TravelersBackpackCompat.TIER_TOKENS.size() - 1;
+            List<String> done = new ArrayList<>(company.done);
+            int creativeTier, survivalTier, helperTier;
+            Boolean slotTakes;
+            company.done.clear();
+            try {
+                TravelersBackpackCompat.sync(player);
+                creativeTier = TravelersBackpackCompat.wornTier(player);
+                helperTier = TravelersBackpackCompat.tierFor(player, new Company());
+                player.closeContainer();
+                BackpackContainer.openBackpack(player, TravelersBackpackCompat.worn(player), Reference.WEARABLE_SCREEN_ID);
+                slotTakes = freeUpgradeSlotTakes(player, pickup);
+                player.closeContainer();
+                player.setGameMode(GameType.SURVIVAL);
+                survivalTier = TravelersBackpackCompat.tierFor(player, new Company());
+                player.setGameMode(GameType.CREATIVE);
+            } finally {
+                company.done.addAll(done);
+            }
+            TravelersBackpackCompat.sync(player);
+            CREATIVE.expect(source, "a creative player in a company that has done nothing wears the top tier backpack",
+                creativeTier == top && helperTier == top, "worn " + creativeTier + ", for the company " + helperTier + ", top " + top);
+            CREATIVE.expect(source, "a creative player's free upgrade slot takes an upgrade the company has not researched",
+                Boolean.TRUE.equals(slotTakes), "slot takes " + slotTakes);
+            CREATIVE.expect(source, "a survival player of a company that has done nothing still wears Leather", survivalTier == 0, "tier " + survivalTier);
+
             // back in survival: the same rules as always
             player.setGameMode(GameType.SURVIVAL);
             boolean heldSurvival = TravelersBackpackCompat.mayPlace(player, held, InteractionHand.MAIN_HAND);
@@ -796,8 +825,9 @@ public final class TravelersBackpackSelfTest {
                 && inventory.countItem(ModItems.STANDARD_TRAVELERS_BACKPACK) == 0;
             CREATIVE.expect(source, "back in survival an extra backpack is unpacked, none is placed and locks hold, as before",
                 unpacked && !heldSurvival && lockedSurvival, "unpacked " + unpacked + ", may place " + heldSurvival + ", locked " + lockedSurvival);
-            CREATIVE.expect(source, "switching back to survival leaves the worn backpack and its contents as they were",
-                TravelersBackpackCompat.wearing(player) && TravelersBackpackCompat.wornTier(player) == tierBefore
+            // (the tier before was a creative player's, the top one; survival wears the company's)
+            CREATIVE.expect(source, "switching back to survival puts the worn backpack back at the company's tier, its contents as they were",
+                TravelersBackpackCompat.wearing(player) && TravelersBackpackCompat.wornTier(player) == TravelersBackpackCompat.tierFor(Companies.find(player))
                     && TravelersBackpackCompat.worn(player).getItem() == wornBefore.getItem()
                     && TravelersBackpackCompat.storage(player).getStackInSlot(0).is(Items.DIAMOND)
                     && TravelersBackpackCompat.storage(player).getStackInSlot(0).getCount() == 7

@@ -143,8 +143,14 @@ public final class TravelersBackpackCompat {
         return tier;
     }
 
+    /** The tier the player's backpack has: their company's (a creative player's, the top one). */
     public static int tierFor(ServerPlayer player) {
-        return tierFor(Companies.find(player));
+        return tierFor(player, Companies.find(player));
+    }
+
+    /** The tier a player of this company wears: the company's, or the top tier for a creative player (creative ignores unlocks). */
+    public static int tierFor(ServerPlayer player, @Nullable Company company) {
+        return player.hasInfiniteMaterials() ? TIER_TOKENS.size() - 1 : tierFor(company);
     }
 
     /** The milestone that raises the backpack to this tier, or null (Leather, or a tier nothing raises it to). */

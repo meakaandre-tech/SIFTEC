@@ -4,10 +4,12 @@
   "package": "com.meakaandre.siftec.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "BeltConnectorShaftlessMixin",
     "BeltInventoryAccessor",
     "BeltNoShaftMixin",
     "BeltProcessingMixin",
     "BeltSelfMovingMixin",
+    "BeltShaftlessEndMixin",
     "BeltSpeedMixin",
     "BlockDisplayInvoker",
     "BlueprintRecipeMixin",
@@ -89,6 +91,7 @@
     "VehiclePickMixin"
   ],
   "client": [
+    "client.BeltConnectorPreviewMixin",
     "client.BeltNoPulleyMixin",
     "client.BeltVisualNoPulleyMixin",
     "client.BuildGunScrollMixin",

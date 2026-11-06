@@ -57,9 +57,9 @@ public final class BuildMenuClientTests {
             List<String> locked = ids(BuildMenu.visible(some, "miner"));
             expect(count, "a locked building stays hidden from the search (Miner Mk.1)", locked.isEmpty(), locked.toString());
 
-            // the real screen, with only these unlocked
+            // the real screen, with only these unlocked, as a survival player sees it (a creative player sees everything)
             BuildGunClient.unlocked = new HashSet<>(some);
-            BuildMenuScreen screen = new BuildMenuScreen();
+            BuildMenuScreen screen = new BuildMenuScreen(false);
             mc.gui.setScreen(screen);
             Set<String> sections = new HashSet<>(screen.sections());
             expect(count, "the screen lists only the categories with something unlocked (Special, Production, Power)",
