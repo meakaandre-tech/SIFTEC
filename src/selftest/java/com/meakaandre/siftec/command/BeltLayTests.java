@@ -10,6 +10,7 @@ import com.meakaandre.siftec.building.BuildingDef;
 import com.meakaandre.siftec.building.ControllerBlockEntity;
 import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.building.PortBlock;
+import com.meakaandre.siftec.building.PortBlockEntity;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.hub.Locks;
@@ -375,12 +376,20 @@ public final class BeltLayTests {
             if (feed(level, start, along, new ItemStack(Items.COPPER_INGOT))) fed[0]++;
         });
         ControllerBlockEntity building = c;
+        BlockPos portAt = in;
+        Direction portOut = out;
         later(level, 360, () -> {
             long got = 0;
-            Storage<ItemVariant> inside = ItemStorage.SIDED.find(level, building.getBlockPos(), null);
+            // a port feeds the cell inside the building it serves (the Storage Container's store), not the controller
+            BlockPos into = level.getBlockEntity(portAt) instanceof PortBlockEntity pe && pe.target != null ? pe.target : building.getBlockPos();
+            Storage<ItemVariant> inside = ItemStorage.SIDED.find(level, into, portOut);
             if (inside != null) for (StorageView<ItemVariant> v : inside) if (!v.isResourceBlank() && v.getResource().isOf(Items.COPPER_INGOT)) got += v.getAmount();
             int ground = dropped(level, around(start, end), Items.COPPER_INGOT);
-            expect(source, "port: the shaftless belt feeds the building's port (4 copper ingots in)", fed[0] == 4 && got == 4, "fed " + fed[0] + ", in the building " + got + ", on the ground " + ground);
+            int onBelt = 0;
+            BeltBlockEntity b = beltAt(level, start);
+            BeltBlockEntity ctrl = b == null ? null : b.getControllerBE();
+            if (ctrl != null && ctrl.getInventory() != null) for (TransportedItemStack t : ctrl.getInventory().getTransportedItems()) if (t.stack.is(Items.COPPER_INGOT)) onBelt += t.stack.getCount();
+            expect(source, "port: the shaftless belt feeds the building's port (4 copper ingots in)", fed[0] == 4 && got == 4, "fed " + fed[0] + ", in the building " + got + " (at " + into.toShortString() + "), on the belt " + onBelt + ", on the ground " + ground);
         });
     }
 
