@@ -12,6 +12,7 @@ import com.meakaandre.siftec.building.Placement;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.company.Company;
 import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.hub.Locks;
 import com.meakaandre.siftec.hub.Milestone;
 import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
@@ -124,7 +125,7 @@ public final class BeltLayTests {
         return out;
     }
 
-    /** The test company (the tester is its owner), made afresh with the second belt tier done; its belt speed. */
+    /** The test company (the tester is its owner), made afresh with the second belt tier and the belt item unlocked; its belt speed. */
     private static int company(ServerLevel level) {
         List<String> tokens = beltTokens();
         String token = tokens.size() > 1 ? tokens.get(1) : tokens.isEmpty() ? "belt:0" : tokens.getFirst();
@@ -135,6 +136,9 @@ public final class BeltLayTests {
         c.members.add(TESTER.toString());
         c.owner = TESTER.toString();
         for (Milestone m : Milestones.all()) if (m.tokens().contains(token)) c.done.add(m.id());
+        // and the milestone that unlocks the belt item itself, or survival is refused it (SIFTEC's locks)
+        Milestone unlock = Locks.lockOf(AllItems.BELT_CONNECTOR);
+        if (unlock != null) c.done.add(unlock.id());
         data.companies().put(COMPANY, c);
         data.setDirty();
         return SelfMovingBelts.itemsPerMinute(c);
