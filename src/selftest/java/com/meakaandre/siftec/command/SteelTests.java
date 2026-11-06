@@ -561,12 +561,15 @@ public final class SteelTests {
         int framed = 0;
         for (int i = 0; i < items.length; i++) {
             ItemFrame frame = new ItemFrame(level, new BlockPos(X - 1 + i, Y + 2, Z - 2), Direction.SOUTH);
-            frame.setItem(new ItemStack(item(items[i])));
-            if (level.addFreshEntity(frame)) framed++;
+            if (!level.addFreshEntity(frame)) continue;
+            // the item goes in once the frame is in the world, so it is sent with the frame
+            frame.setItem(new ItemStack(item(items[i])), false);
         }
+        for (ItemFrame frame : level.getEntitiesOfClass(ItemFrame.class, new net.minecraft.world.phys.AABB(X - 6, Y, Z - 4, X + 6, Y + 5, Z)))
+            if (!frame.isRemoved() && List.of(items).contains(id(frame.getItem().getItem()))) framed++;
         REPORT.reset();
         expect(source, "showroom: the steel blocks and the three steel items are on show", framed == 3
-            && level.getBlockState(pos.set(X - 4, Y, Z - 2)).is(block("siftec:steel_casing")), framed + " frames");
+            && level.getBlockState(pos.set(X - 4, Y, Z - 2)).is(block("siftec:steel_casing")), framed + " frames holding a steel item");
         REPORT.report(source, "showroom done: " + REPORT.totals());
         return 1;
     }
