@@ -28,7 +28,6 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -555,21 +554,23 @@ public final class SteelTests {
         level.setBlock(pos.set(X - 4, Y + 1, Z - 2), block("siftec:steel_casing").defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(pos.set(X - 3, Y + 1, Z - 2), block("siftec:steel_window").defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(pos.set(X + 3, Y, Z - 2), Blocks.STRIPPED_OAK_LOG.defaultBlockState(), Block.UPDATE_ALL);
-        // the three items, framed at eye height on the wall
-        for (net.minecraft.world.entity.Entity e : level.getEntitiesOfClass(ItemFrame.class, new net.minecraft.world.phys.AABB(X - 6, Y, Z - 4, X + 6, Y + 5, Z))) e.discard();
+        // the three items, held up at eye height in front of the wall (item displays: the client drew frames empty)
+        for (net.minecraft.world.entity.Entity e : level.getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+            new net.minecraft.world.phys.AABB(X - 6, Y, Z - 4, X + 6, Y + 5, Z))) e.discard();
         String[] items = {"siftec:steel_ingot", "siftec:steel_sheet", "siftec:steel_nugget"};
+        CommandSourceStack quiet = source.getServer().createCommandSourceStack().withSuppressedOutput().withLevel(level);
+        for (int i = 0; i < items.length; i++)
+            source.getServer().getCommands().performPrefixedCommand(quiet, String.format(java.util.Locale.ROOT,
+                "summon minecraft:item_display %.1f %d.5 %d.6 {item:{id:\"%s\",count:1},Tags:[\"siftec_steel\"],"
+                    + "transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.8f,0.8f,0.8f]}}",
+                X - 0.5 + i, Y + 2, Z - 3, items[i]));
         int framed = 0;
-        for (int i = 0; i < items.length; i++) {
-            ItemFrame frame = new ItemFrame(level, new BlockPos(X - 1 + i, Y + 2, Z - 2), Direction.SOUTH);
-            if (!level.addFreshEntity(frame)) continue;
-            // the item goes in once the frame is in the world, so it is sent with the frame
-            frame.setItem(new ItemStack(item(items[i])), false);
-        }
-        for (ItemFrame frame : level.getEntitiesOfClass(ItemFrame.class, new net.minecraft.world.phys.AABB(X - 6, Y, Z - 4, X + 6, Y + 5, Z)))
-            if (!frame.isRemoved() && List.of(items).contains(id(frame.getItem().getItem()))) framed++;
+        for (net.minecraft.world.entity.Display.ItemDisplay shown : level.getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+            new net.minecraft.world.phys.AABB(X - 6, Y, Z - 4, X + 6, Y + 5, Z)))
+            if (shown.entityTags().contains("siftec_steel")) framed++;
         REPORT.reset();
         expect(source, "showroom: the steel blocks and the three steel items are on show", framed == 3
-            && level.getBlockState(pos.set(X - 4, Y, Z - 2)).is(block("siftec:steel_casing")), framed + " frames holding a steel item");
+            && level.getBlockState(pos.set(X - 4, Y, Z - 2)).is(block("siftec:steel_casing")), framed + " steel items on show");
         REPORT.report(source, "showroom done: " + REPORT.totals());
         return 1;
     }
