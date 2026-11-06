@@ -1,8 +1,7 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube_column",
   "textures": {
-    "top": "siftec:block/steel_casing_top",
-    "side": "siftec:block/steel_casing_side",
-    "bottom": "siftec:block/steel_casing_side"
+    "end": "create:block/industrial_iron_block_top",
+    "side": "create:block/industrial_iron_block"
   }
 }

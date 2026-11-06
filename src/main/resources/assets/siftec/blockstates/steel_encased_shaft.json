@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "siftec:block/steel_encased_shaft/block_x"
+    },
+    "axis=y": {
+      "model": "siftec:block/steel_encased_shaft/block"
+    },
+    "axis=z": {
+      "model": "siftec:block/steel_encased_shaft/block_z"
+    }
+  }
+}

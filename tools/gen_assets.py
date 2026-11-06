@@ -121,9 +121,98 @@ write_tag("create", "item", "pressurized_air_sources", ["siftec:elytra_backpack"
 for fid, (fname, tint) in PRESERVE_ICONS.items():
     lang[f"item.siftec.{fid}"] = fname
     flat_item(fid, "minecraft:item/honey_bottle" if fid == "mead" else "minecraft:item/potion", tint)
+# ---- SIFTEC's steel blocks (tables.content.REPLACED): the Steel Casing is Create's industrial iron block, the steel
+# windows Create's industrial iron windows (Create's own models; the client gives them Create's connected glass), and
+# the steel-encased shaft and cogwheels Create's encased ones in Steel Casing, with steel trim (tools/steel_art.py)
 single_blockstate("steel_casing")
-block_model("steel_casing", cube_all("create:block/railway_casing"))
+block_model("steel_casing", {"parent": "minecraft:block/cube_column",
+                             "textures": {"end": "create:block/industrial_iron_block_top", "side": "create:block/industrial_iron_block"}})
 item_def("steel_casing", "siftec:block/steel_casing")
+single_blockstate("steel_window", "create:block/industrial_iron_window")
+item_def("steel_window", "create:block/industrial_iron_window")
+_pane = "create:block/industrial_iron_window_pane_"
+write(f"{A}/blockstates/steel_window_pane.json", {"multipart": [
+    {"apply": {"model": _pane + "post"}},
+    {"apply": {"model": _pane + "side"}, "when": {"north": "true"}}, {"apply": {"model": _pane + "noside"}, "when": {"north": "false"}},
+    {"apply": {"model": _pane + "side_alt"}, "when": {"south": "true"}}, {"apply": {"model": _pane + "noside_alt", "y": 90}, "when": {"south": "false"}},
+    {"apply": {"model": _pane + "side_alt", "y": 90}, "when": {"west": "true"}}, {"apply": {"model": _pane + "noside", "y": 270}, "when": {"west": "false"}},
+    {"apply": {"model": _pane + "side", "y": 90}, "when": {"east": "true"}}, {"apply": {"model": _pane + "noside_alt"}, "when": {"east": "false"}}]})
+item_def("steel_window_pane", "create:item/industrial_iron_window_pane")
+for _w in ("steel_window", "steel_window_pane"):
+    # like Create's windows: only Silk Touch takes one back
+    write(f"{D}/loot_table/blocks/{_w}.json", {"type": "minecraft:block", "pools": [{"entries": [{"type": "minecraft:item", "name": f"siftec:{_w}"}],
+          "rolls": 1, "condition": "minecraft:tool/can_silk_touch"}], "random_sequence": f"siftec:blocks/{_w}"})
+_ST = "siftec:block/steel_"
+_steel_trim = {"casing": "create:block/industrial_iron_block", "border_1": _ST + "encased_border_1", "border_2": _ST + "encased_border_2",
+               "gearbox": _ST + "gearbox", "cog_side": _ST + "encased_cogwheel_window", "cog_side_3": _ST + "encased_cogwheel_window_3",
+               "large_side": _ST + "encased_large_cogwheel_window", "log": "minecraft:block/stripped_dark_oak_log_top"}
+
+
+def _obj(parent, obj, **textures):
+    m = {"parent": parent} if parent else {}
+    if textures:
+        m["textures"] = textures
+    m.update({"loader": "neoforge:obj", "flip_v": True, "automatic_culling": False, "emissive_ambient": False, "model": f"create:models/block/{obj}.obj"})
+    return m
+
+
+T = _steel_trim
+block_model("steel_encased_shaft/textures", {"parent": "block/block", "textures": {"0": T["border_1"], "1": T["border_2"], "2": T["gearbox"],
+                                                                                    "3": T["casing"], "particle": "#3"}})
+for _v in ("block", "block_x", "block_z"):
+    block_model(f"steel_encased_shaft/{_v}", _obj("siftec:block/steel_encased_shaft/textures", f"encased_shaft/{_v}"))
+block_model("steel_encased_shaft/item", _obj("siftec:block/steel_encased_shaft/textures", "encased_shaft/item",
+                                             **{"4": "create:block/axis", "5": "create:block/axis_top"}))
+blockstate("steel_encased_shaft", {"axis=x": {"model": "siftec:block/steel_encased_shaft/block_x"},
+                                   "axis=y": {"model": "siftec:block/steel_encased_shaft/block"},
+                                   "axis=z": {"model": "siftec:block/steel_encased_shaft/block_z"}})
+item_def("steel_encased_shaft", "siftec:block/steel_encased_shaft/item")
+block_model("steel_encased_cogwheel/textures", {"textures": {"0": T["casing"], "1": T["border_1"], "2": T["cog_side"], "3": T["log"],
+                                                             "4": T["border_2"], "5": T["gearbox"], "particle": "#0"}})
+for _v, _o in (("block", "block"), ("block_top", "block_top"), ("block_bottom", "block_bottom"), ("block_top_bottom", "block_top_bottom")):
+    block_model(f"steel_encased_cogwheel/{_v}", _obj("siftec:block/steel_encased_cogwheel/textures", f"encased_cogwheel/{_o}"))
+block_model("steel_encased_cogwheel/item", _obj("block/block", "encased_cogwheel/item", **{
+    "0": T["casing"], "1": T["border_1"], "2": T["cog_side"], "3": T["log"], "4": "create:block/cogwheel_1", "5": "create:block/cogwheel_2",
+    "particle": "#0"}))
+item_def("steel_encased_cogwheel", "siftec:block/steel_encased_cogwheel/item")
+block_model("steel_encased_large_cogwheel/textures", {"textures": {"stripped_spruce_log_top": T["log"], "casing": T["casing"],
+    "side_1": T["cog_side_3"], "side_2": T["large_side"], "encased_border_1": T["border_1"], "encased_border_2": T["border_2"],
+    "gearbox": T["gearbox"], "particle": "#casing"}})
+# the large cogwheel's casings are plain cubes in Create (no obj): its halves, top and bottom, as Create draws them
+_half = lambda y0, y1, uv, top, bottom: {"from": [0, y0, 0], "to": [16, y1, 16], "faces": {
+    **{d: {"uv": uv, "texture": "#side_1", "cullface": d} for d in ("north", "east", "south", "west")},
+    "up": {"uv": [0, 0, 16, 16], "texture": top, **({"cullface": "up"} if top == "#casing" else {})},
+    "down": {"uv": [0, 0, 16, 16], "texture": bottom, **({"cullface": "down"} if bottom == "#casing" else {})}}}
+_LOW, _HIGH = _half(0, 6, [0, 10, 16, 16], "#stripped_spruce_log_top", "#casing"), _half(10, 16, [0, 0, 16, 6], "#casing", "#stripped_spruce_log_top")
+for _v in ("block", "block_top", "block_bottom", "block_top_bottom"):
+    # a shaft out of the top or bottom shows through the casing there, as in Create
+    block_model(f"steel_encased_large_cogwheel/{_v}", {"parent": "siftec:block/steel_encased_large_cogwheel/textures", "elements": [_LOW, _HIGH]}
+                if _v == "block" else _obj("siftec:block/steel_encased_large_cogwheel/textures", f"encased_large_cogwheel/{_v}"))
+block_model("steel_encased_large_cogwheel/item", _obj("create:block/large_wheels", "encased_large_cogwheel/item", **{
+    "stripped_spruce_log_top": T["log"], "casing": T["casing"], "side_1": T["cog_side_3"], "large_cogwheel": "create:block/large_cogwheel",
+    "particle": "#casing"}))
+item_def("steel_encased_large_cogwheel", "siftec:block/steel_encased_large_cogwheel/item")
+for _cog in ("steel_encased_cogwheel", "steel_encased_large_cogwheel"):
+    blockstate(_cog, {f"axis={a},bottom_shaft={b},top_shaft={t}": {
+        "model": f"siftec:block/{_cog}/block" + ("_top_bottom" if b == "true" and t == "true" else "_bottom" if b == "true" else "_top" if t == "true" else ""),
+        **({"x": 90, "y": 90} if a == "x" else {"x": 90, "y": 180} if a == "z" else {})}
+        for a in ("x", "y", "z") for b in ("false", "true") for t in ("false", "true")})
+# an encased shaft or cogwheel broken gives back what was encased, as Create's do
+for _enc, _drop in (("steel_encased_shaft", "create:shaft"), ("steel_encased_cogwheel", "create:cogwheel"),
+                    ("steel_encased_large_cogwheel", "create:large_cogwheel")):
+    write(f"{D}/loot_table/blocks/{_enc}.json", {"type": "minecraft:block", "pools": [{"entries": [{"type": "minecraft:item", "name": _drop}],
+          "rolls": 1, "condition": {"type": "minecraft:survives_explosion"}}], "random_sequence": f"siftec:blocks/{_enc}"})
+# Create's casing tags, glass and pane tags, and the common steel tags (Gunsmithing's steel is taken out of them in code:
+# compat/Replaced.java), so every recipe that takes steel by its tag takes SIFTEC's
+write_tag("create", "block", "casing", ["siftec:steel_casing"])
+write_tag("create", "item", "casing", ["siftec:steel_casing"])
+write_tag("create", "block", "wrench_pickup", ["siftec:steel_casing"])
+write_tag("minecraft", "block", "impermeable", ["siftec:steel_window"])
+write_tag("c", "block", "glass_panes", ["siftec:steel_window_pane"])
+write_tag("c", "item", "glass_panes", ["siftec:steel_window_pane"])
+for _tag, _id in (("ingots/steel", "steel_ingot"), ("plates/steel", "steel_sheet"), ("nuggets/steel", "steel_nugget")):
+    write_tag("c", "item", _tag, ["siftec:" + _id])
+    write_tag("c", "item", _tag.split("/")[0], ["siftec:" + _id])
 # the Speed Governor borrows the Gearshift's model until it has its own
 blockstate("speed_governor", {
     "axis=x": {"model": "create:block/gearshift/block", "x": 90, "y": 90}, "axis=y": {"model": "create:block/gearshift/block"},
@@ -147,6 +236,8 @@ write_tag("minecraft", "block", "beds", ["siftec:hub_bed"])
 
 # ---- parts, milestones and phases: one file the mod reads at start-up
 data = {"parts": [], "milestones": [], "phases": [], "disabled": content.DISABLED}
+# what replaces Gunsmithing's steel and Create's industrial iron, and how many of it (compat/Replaced.java)
+data["replaced"] = {old: {"id": new, "count": n} for old, (new, n) in content.REPLACED.items()}
 for i in content.DISABLED:
     check(i, "disabled")
 for pid, name, tex, tint in content.PARTS:

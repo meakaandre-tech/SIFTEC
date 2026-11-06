@@ -156,7 +156,8 @@ TURNS = FRONTED - {"crash_site_block", "hub_engine"}
 DROPS_ITSELF = ("steel_casing", "main_portal", "satellite_portal", "landing_pad", "claim_marker", "resource_well_extractor", "dimensional_depot",
                 "speed_governor")
 # the pickaxe is the right tool for the machines (and SIFTEC's ores and the decorations, added by gen_assets.py)
-PICKAXE = ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing",
+PICKAXE = ["siftec:resource_well_extractor", "siftec:dimensional_depot", "siftec:speed_governor", "siftec:landing_pad", "siftec:steel_casing", "siftec:steel_window", "siftec:steel_window_pane",
+           "siftec:steel_encased_shaft", "siftec:steel_encased_cogwheel", "siftec:steel_encased_large_cogwheel",
            "siftec:blueprint_designer", "siftec:blueprint_designer_mk2", "siftec:blueprint_designer_mk3", "siftec:drone_port", "siftec:main_portal",
            "siftec:satellite_portal", "siftec:mam", "siftec:claim_marker", "siftec:hub", "siftec:wormhole_gateway"]
 

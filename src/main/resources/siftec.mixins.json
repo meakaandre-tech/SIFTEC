@@ -83,6 +83,10 @@
     "SiftEntryMixin",
     "SlotMixin",
     "SmartTankMixin",
+    "steel.ChuteSteelMixin", "steel.ItemDropSteelMixin",
+    "steel.SteelEncasedTypeMixin",
+    "steel.TagEntryAccessor",
+    "steel.TagStripMixin",
     "TunnelMixin",
     "VehiclePickMixin"
   ],

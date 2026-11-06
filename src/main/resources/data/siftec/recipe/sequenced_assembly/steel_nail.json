@@ -1,0 +1,37 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
+  "type": "create:sequenced_assembly",
+  "ingredient": "#c:nuggets/steel",
+  "transitional_item": {
+    "id": "siftec:steel_nugget"
+  },
+  "result": {
+    "id": "cgs:nail_steel",
+    "count": 6
+  },
+  "loops": 1,
+  "sequence": [
+    {
+      "type": "create:cutting",
+      "ingredient": "$ingredient",
+      "processing_time": 100,
+      "results": [
+        "$result"
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredient": "$ingredient",
+      "results": [
+        "$result"
+      ]
+    }
+  ]
+}

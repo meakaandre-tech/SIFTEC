@@ -329,7 +329,7 @@ public final class ExplorationTests {
         Paint paint = new Paint("blue", "red", "painted", "brass");
         expect(source, "Customizer paint: orange panels take the primary colour, dark grey the secondary, light grey the casing skin; a finish changes the material",
             paint.look(block("minecraft:orange_concrete").defaultBlockState(), false).is(block("minecraft:blue_concrete"))
-                && paint.look(block("create:industrial_iron_block").defaultBlockState(), false).is(block("minecraft:red_concrete"))
+                && paint.look(block("siftec:steel_casing").defaultBlockState(), false).is(block("minecraft:red_concrete"))
                 && paint.look(Blocks.IRON_BLOCK.defaultBlockState(), false).is(block("create:brass_casing"))
                 && paint.withFinish("copper").look(block("minecraft:orange_concrete").defaultBlockState(), false).is(block("minecraft:waxed_copper_block"))
                 && Paint.NONE.look(block("minecraft:orange_concrete").defaultBlockState(), false).is(block("minecraft:orange_concrete"))

@@ -33,6 +33,15 @@
       "id": "smart_plating"
     },
     {
+      "id": "steel_ingot"
+    },
+    {
+      "id": "steel_sheet"
+    },
+    {
+      "id": "steel_nugget"
+    },
+    {
       "id": "steel_beam"
     },
     {
@@ -1047,9 +1056,6 @@
         "create:tiled_glass_pane",
         "create:ornate_iron_window",
         "create:ornate_iron_window_pane",
-        "create:industrial_iron_block",
-        "create:industrial_iron_window",
-        "create:industrial_iron_window_pane",
         "create:weathered_iron_block",
         "create:weathered_iron_window",
         "create:weathered_iron_window_pane",
@@ -1768,9 +1774,16 @@
       "seconds": 480,
       "items": [
         "create:mechanical_mixer",
-        "cgs:steel_ingot",
+        "siftec:steel_sheet",
+        "siftec:steel_nugget",
         "siftec:steel_casing",
+        "siftec:steel_window",
+        "siftec:steel_window_pane",
+        "siftec:steel_encased_shaft",
+        "siftec:steel_encased_cogwheel",
+        "siftec:steel_encased_large_cogwheel",
         "siftec:steel_beam",
+        "siftec:steel_ingot",
         "siftec:steel_pipe",
         "siftec:versatile_framework",
         "cgs:steel_nugget",
@@ -2957,6 +2970,13 @@
     "create:schematic_and_quill",
     "create:schematic",
     "farmersdelight:wheat_dough",
+    "cgs:steel_ingot",
+    "cgs:steel_sheet",
+    "cgs:steel_nugget",
+    "cgs:steel_block",
+    "create:industrial_iron_block",
+    "create:industrial_iron_window",
+    "create:industrial_iron_window_pane",
     "travelersbackpack:bat",
     "travelersbackpack:bee",
     "travelersbackpack:blaze",
@@ -3031,6 +3051,36 @@
     "create_new_age:solid_corium",
     "create_new_age:incomplete_enchanted_golden_apple"
   ],
+  "replaced": {
+    "cgs:steel_ingot": {
+      "id": "siftec:steel_ingot",
+      "count": 1
+    },
+    "cgs:steel_sheet": {
+      "id": "siftec:steel_sheet",
+      "count": 1
+    },
+    "cgs:steel_nugget": {
+      "id": "siftec:steel_nugget",
+      "count": 1
+    },
+    "cgs:steel_block": {
+      "id": "siftec:steel_ingot",
+      "count": 9
+    },
+    "create:industrial_iron_block": {
+      "id": "siftec:steel_casing",
+      "count": 1
+    },
+    "create:industrial_iron_window": {
+      "id": "siftec:steel_window",
+      "count": 1
+    },
+    "create:industrial_iron_window_pane": {
+      "id": "siftec:steel_window_pane",
+      "count": 1
+    }
+  },
   "trees": [
     {
       "id": "megafauna",
@@ -5364,7 +5414,7 @@
           "count": 10
         },
         {
-          "item": "cgs:steel_ingot",
+          "item": "siftec:steel_ingot",
           "count": 100
         },
         {
@@ -6543,7 +6593,7 @@
     "siftec:solid_biofuel": 48,
     "siftec:stator": 240,
     "siftec:steel_beam": 64,
-    "cgs:steel_ingot": 8,
+    "siftec:steel_ingot": 8,
     "siftec:steel_pipe": 24,
     "siftec:stun_rebar": 186,
     "cgs:sulfur": 11,
@@ -7388,7 +7438,7 @@
   ],
   "finishes": {
     "painted": "minecraft:{colour}_concrete",
-    "unpainted": "create:industrial_iron_block",
+    "unpainted": "siftec:steel_casing",
     "copper": "minecraft:waxed_copper_block",
     "chrome": "minecraft:iron_block",
     "carbon_steel": "minecraft:netherite_block",
@@ -7979,7 +8029,7 @@
     "grip_metal": {
       "kind": "foundation",
       "blocks": {
-        "minecraft:light_gray_concrete": "create:industrial_iron_block",
+        "minecraft:light_gray_concrete": "siftec:steel_casing",
         "minecraft:gray_concrete": "minecraft:iron_block"
       }
     },
@@ -8006,7 +8056,7 @@
     "steel_wall": {
       "kind": "wall",
       "blocks": {
-        "minecraft:white_concrete": "create:industrial_iron_block"
+        "minecraft:white_concrete": "siftec:steel_casing"
       }
     },
     "tar_roof": {
@@ -8453,9 +8503,14 @@
     "siftec:deploying/toxic_shot": "control_system_development",
     "siftec:compacting/blank_circuit": "expanded_power_infrastructure",
     "siftec:item_application/steel_casing_from_stripped_logs": "basic_steel_production",
-    "siftec:deploying/steel_casing_from_stripped_logs": "basic_steel_production",
     "siftec:item_application/steel_casing_from_stripped_woods": "basic_steel_production",
-    "siftec:deploying/steel_casing_from_stripped_woods": "basic_steel_production",
+    "siftec:item_application/heat_casing": "coal_power",
+    "siftec:pressing/steel_sheet": "basic_steel_production",
+    "siftec:crafting/steel_ingot_from_nuggets": "basic_steel_production",
+    "siftec:crafting/steel_nugget": "basic_steel_production",
+    "siftec:crafting/steel_window": "basic_steel_production",
+    "siftec:crafting/steel_window_pane": "basic_steel_production",
+    "seq:nail_steel": "basic_steel_production",
     "siftec:compacting/constructor/hatcher_protein": "mam_megafauna_creeper_research",
     "siftec:compacting/constructor/hog_protein": "mam_megafauna_zombie_research",
     "siftec:compacting/constructor/spitter_protein": "mam_megafauna_skeleton_research",
@@ -11067,6 +11122,19 @@
     "farmersdelight:bread_from_smoking",
     "create:pressing/iron_ingot",
     "create:pressing/copper_ingot",
+    "cgs:pressing/steel_ingot",
+    "cgs:steel_ingot_from_steel_nugget",
+    "cgs:steel_nugget",
+    "cgs:steel_block_from_steel_ingot",
+    "cgs:steel_ingot",
+    "cgs:sequenced_assembly/steel_nail",
+    "create:industrial_iron_block_from_ingots_iron_stonecutting",
+    "create:industrial_iron_window",
+    "create:industrial_iron_window_pane",
+    "create:splashing/industrial_iron_block",
+    "create:splashing/industrial_iron_window",
+    "create:splashing/industrial_iron_window_pane",
+    "create_new_age:item_application/heat_casing",
     "travelersbackpack:crafting_upgrade",
     "travelersbackpack:tanks_upgrade",
     "travelersbackpack:backpack_tank",
