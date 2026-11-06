@@ -388,7 +388,7 @@ public final class BeltLayTests {
             int onBelt = 0;
             BeltBlockEntity b = beltAt(level, start);
             BeltBlockEntity ctrl = b == null ? null : b.getControllerBE();
-            if (ctrl != null && ctrl.getInventory() != null) for (TransportedItemStack t : ctrl.getInventory().getTransportedItems()) if (t.stack.is(Items.COPPER_INGOT)) onBelt += t.stack.getCount();
+            if (ctrl != null && ctrl.getInventory() != null) for (TransportedItemStack riding : ctrl.getInventory().getTransportedItems()) if (riding.stack.is(Items.COPPER_INGOT)) onBelt += riding.stack.getCount();
             expect(source, "port: the shaftless belt feeds the building's port (4 copper ingots in)", fed[0] == 4 && got == 4, "fed " + fed[0] + ", in the building " + got + " (at " + into.toShortString() + "), on the belt " + onBelt + ", on the ground " + ground);
         });
     }
