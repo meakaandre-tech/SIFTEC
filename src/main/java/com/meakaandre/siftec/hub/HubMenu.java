@@ -133,6 +133,11 @@ public class HubMenu extends AbstractContainerMenu {
         return null;
     }
 
+    /** May this player go through the Wormhole Gateway to The Sift: once their company has done Wormhole Phase 5, or in creative. */
+    public static boolean maySift(Player player, @Nullable Company company) {
+        return player.hasInfiniteMaterials() || company != null && company.has("phase_5");
+    }
+
     public static String clock(long ticks) {
         long seconds = (ticks + 19) / 20;
         return seconds / SECONDS_PER_MINUTE + ":" + (seconds % SECONDS_PER_MINUTE < TWO_DIGITS ? "0" : "")
@@ -171,7 +176,7 @@ public class HubMenu extends AbstractContainerMenu {
                 }
             }
             case SIFT -> {
-                if (!gateway || !company.has("phase_5")) return false;
+                if (!gateway || !maySift(player, company)) return false;
                 player.closeContainer();
                 SiftGate.enter(player);
                 return true;

@@ -29,6 +29,8 @@ import com.meakaandre.siftec.registry.ModBlocks;
 import com.meakaandre.siftec.sim.SimVehicles;
 import com.meakaandre.siftec.vehicle.VehicleKind;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -46,6 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * SIFTEC on MapMod's map (com.meakaandre.mapmod.api): a company is a map group, Field Research unlocks terrain, the
@@ -140,6 +143,9 @@ public final class SiftecMap {
 
         MapModApi.setGroups(GROUPS);
         MapModApi.setUnlocks(UNLOCKS);
+        // the Map follows a change of game mode at once (creative has it), as it follows the company's unlocks
+        ServerTickEvents.END_SERVER_TICK.register(SiftecMap::watchCreative);
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> CREATIVE.remove(handler.getPlayer().getUUID()));
         MapModApi.addSource(NODE_SOURCE, NodePois.SOURCE);
         MapModApi.addChunkScanner(GEYSER_SCANNER, (level, chunk) -> {
             List<FoundPoi> out = new ArrayList<>();
@@ -233,11 +239,11 @@ public final class SiftecMap {
         }
     };
 
-    /** Field Research gives the Map: terrain and the fullscreen map together. */
+    /** Field Research gives the Map: terrain and the fullscreen map together. A creative player always has it. */
     public static final UnlockProvider UNLOCKS = new UnlockProvider() {
         @Override
         public boolean unlocked(ServerPlayer player, MapFeature feature) {
-            return MapLock.open(Companies.find(player));
+            return player.hasInfiniteMaterials() || MapLock.open(Companies.find(player));
         }
 
         @Override
@@ -245,6 +251,18 @@ public final class SiftecMap {
             return "siftec.map.locked";
         }
     };
+
+    /** Whether each online player was in creative when last looked at. */
+    private static final Map<UUID, Boolean> CREATIVE = new ConcurrentHashMap<>();
+
+    /** Tells MapMod again what a player has unlocked when they go into or out of creative. */
+    private static void watchCreative(MinecraftServer server) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            boolean creative = player.hasInfiniteMaterials();
+            Boolean before = CREATIVE.put(player.getUUID(), creative);
+            if (before != null && before != creative) MapModApi.unlocksChanged(player);
+        }
+    }
 
     // ------------------------------------------------------------------------------------------------ vehicles
 

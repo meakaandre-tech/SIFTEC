@@ -172,7 +172,7 @@ public class HubScreen extends AbstractContainerScreen<HubMenu> {
                 addRenderableWidget(b);
             }
         }
-        if (view.gateway && view.done.contains("phase_5")) {
+        if (view.gateway && (view.done.contains("phase_5") || minecraft != null && minecraft.player != null && minecraft.player.hasInfiniteMaterials())) {
             addRenderableWidget(Button.builder(Component.translatable("siftec.sift.enter"), btn -> send(HubMenu.SIFT, null))
                 .bounds(left + W - 96, top + H - 24, 90, 18).build());
         }

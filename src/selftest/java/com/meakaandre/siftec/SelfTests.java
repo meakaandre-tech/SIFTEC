@@ -14,6 +14,7 @@ import com.meakaandre.siftec.command.BackpackFixTests;
 import com.meakaandre.siftec.command.BeltLayTests;
 import com.meakaandre.siftec.command.BuildingFixTests;
 import com.meakaandre.siftec.command.CoreTests;
+import com.meakaandre.siftec.command.CreativeUnlockTests;
 import com.meakaandre.siftec.command.DataFixTests;
 import com.meakaandre.siftec.command.ExplorationTests;
 import com.meakaandre.siftec.command.FoodTests;
@@ -74,6 +75,7 @@ public final class SelfTests implements SelfTestHooks.Plugin {
                 ExploitTests.register();
                 DesignerTests.register();
                 QualityFixTests.register();
+                CreativeUnlockTests.register();
             }
             case SIMULATION -> AlwaysTests.register();
             case LATE -> PolishTests.register();
