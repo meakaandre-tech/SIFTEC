@@ -441,6 +441,7 @@ cmd siftec worldtest map close
 sleep 2
 cmd time set noon
 cmd gamemode survival @a
+sleep 3
 cmd siftec selftest tb crate setup
 sleep 1
 key e

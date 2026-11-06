@@ -825,8 +825,9 @@ public final class TravelersBackpackSelfTest {
                 && inventory.countItem(ModItems.STANDARD_TRAVELERS_BACKPACK) == 0;
             CREATIVE.expect(source, "back in survival an extra backpack is unpacked, none is placed and locks hold, as before",
                 unpacked && !heldSurvival && lockedSurvival, "unpacked " + unpacked + ", may place " + heldSurvival + ", locked " + lockedSurvival);
-            CREATIVE.expect(source, "switching back to survival leaves the worn backpack and its contents as they were",
-                TravelersBackpackCompat.wearing(player) && TravelersBackpackCompat.wornTier(player) == tierBefore
+            // (the tier before was a creative player's, the top one; survival wears the company's)
+            CREATIVE.expect(source, "switching back to survival puts the worn backpack back at the company's tier, its contents as they were",
+                TravelersBackpackCompat.wearing(player) && TravelersBackpackCompat.wornTier(player) == TravelersBackpackCompat.tierFor(Companies.find(player))
                     && TravelersBackpackCompat.worn(player).getItem() == wornBefore.getItem()
                     && TravelersBackpackCompat.storage(player).getStackInSlot(0).is(Items.DIAMOND)
                     && TravelersBackpackCompat.storage(player).getStackInSlot(0).getCount() == 7
