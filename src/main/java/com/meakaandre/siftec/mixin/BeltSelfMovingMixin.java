@@ -48,8 +48,7 @@ public abstract class BeltSelfMovingMixin implements SelfMovingBelts.Holder {
         if (clientPacket) view.putFloat("SiftecSelfSpeed", siftec$selfSpeed);
     }
 
-    // HEAD, not TAIL: Create's read returns early unless the casing or cover changed, so at TAIL clients missed the speed
-    @Inject(method = "read", at = @At("HEAD"))
+    @Inject(method = "read", at = @At("TAIL"))
     private void siftec$readSelfSpeed(ValueInput view, boolean clientPacket, CallbackInfo ci) {
         if (clientPacket) siftec$selfSpeed = view.getFloatOr("SiftecSelfSpeed", 0);
     }
