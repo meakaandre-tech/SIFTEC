@@ -386,7 +386,7 @@ public final class BuildingsBTests {
         Placement fo = at("foundry", x, Z);
         put(level, source, company, fo);
         ControllerBlockEntity fc = controller(level, fo);
-        if (fc != null) BuildingLogic.setFilter(level, fc, new ItemStack(item("cgs:steel_ingot")));
+        if (fc != null) BuildingLogic.setFilter(level, fc, new ItemStack(item("siftec:steel_ingot")));
         beltInto(level, fo, new int[]{-1, 0, 8}, new ItemStack(Items.RAW_IRON), 3, 1200, 128);
         beltInto(level, fo, new int[]{1, 0, 8}, new ItemStack(Items.COAL), 3, 1200, 128);
         BlockPos foChest = chestAt(level, fo, new int[]{0, 0, 0});
@@ -594,9 +594,9 @@ public final class BuildingsBTests {
         }
         later(level, WARMUP + 2 * MINUTE + 20, () -> {
             expect(source, "the output ports put each building's goods into a chest", count(level, asmChest, item("siftec:reinforced_iron_plate")) > 0
-                    && count(level, foChest, item("cgs:steel_ingot")) > 0 && count(level, reChest, item("siftec:plastic")) > 0 && count(level, blChest, item("siftec:battery")) > 0
+                    && count(level, foChest, item("siftec:steel_ingot")) > 0 && count(level, reChest, item("siftec:plastic")) > 0 && count(level, blChest, item("siftec:battery")) > 0
                     && count(level, paChest, item("siftec:dark_matter_crystal")) > 0 && count(level, coChest, item("siftec:time_crystal")) > 0,
-                "assembler " + count(level, asmChest, item("siftec:reinforced_iron_plate")) + ", foundry " + count(level, foChest, item("cgs:steel_ingot"))
+                "assembler " + count(level, asmChest, item("siftec:reinforced_iron_plate")) + ", foundry " + count(level, foChest, item("siftec:steel_ingot"))
                     + ", refinery " + count(level, reChest, item("siftec:plastic")) + ", blender " + count(level, blChest, item("siftec:battery")) + ", accelerator "
                     + count(level, paChest, item("siftec:dark_matter_crystal")) + ", converter " + count(level, coChest, item("siftec:time_crystal")));
             expect(source, "the fluid outputs give what the recipes leave: Heavy Oil Residue, Water and Dark Matter Residue", hor[0] > 0 && water[0] > 0 && dmr[0] > 0,
