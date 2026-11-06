@@ -23,6 +23,7 @@ siftec selftest buildingfix
 siftec selftest quality
 siftec selftest machines
 siftec selftest beltlay
+siftec selftest lowbelts
 siftec selftest state setup
 siftec selftest state check
 siftec worldtest nodes 2000
