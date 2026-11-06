@@ -461,7 +461,7 @@ public final class LowBeltTests {
      */
     private static void vertical(CommandSourceStack source, ServerLevel level, String company) {
         BlockPos up = new BlockPos(X + 70, Y, Z), top = up.above(4);
-        BlockPos down = new BlockPos(X + 74, Y + 5, Z), bottom = down.below(4);
+        BlockPos down = new BlockPos(X + 66, Y + 5, Z), bottom = down.below(4);
         level.setBlock(top.above(), AllBlocks.DEPOT.defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(bottom.below(), AllBlocks.DEPOT.defaultBlockState(), Block.UPDATE_ALL);
         belt(level, up, top, company);
@@ -481,27 +481,6 @@ public final class LowBeltTests {
                 added[i] = true;
             }
         });
-        // where the lowered ingot is, every 10 ticks (a log line, not a check)
-        for (int t = 30; t <= 150; t += 10) {
-            int at = t;
-            later(level, t, () -> {
-                BeltBlockEntity b = beltAt(level, down), c = b == null ? null : b.getControllerBE();
-                StringBuilder where = new StringBuilder();
-                if (c != null && c.getInventory() != null) for (TransportedItemStack i : c.getInventory().getTransportedItems()) where.append(i.stack).append('@').append(i.beltPosition).append(' ');
-                String next = "";
-                if (c != null) {
-                    BlockPos n = com.zurrtum.create.content.kinetics.belt.BeltHelper.getPositionForOffset(c, c.beltLength);
-                    next = ", end hands to " + n.toShortString() + " " + level.getBlockState(n);
-                }
-                StringBuilder anywhere = new StringBuilder();
-                for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(down).inflate(30)))
-                    if (e.getItem().is(Items.GOLD_INGOT)) anywhere.append(e.blockPosition().toShortString()).append(' ');
-                String depot = level.getBlockEntity(bottom.below()) instanceof com.zurrtum.create.content.logistics.depot.DepotBlockEntity d
-                    ? String.valueOf(d.getHeldItem()) : "no depot";
-                report(source, "vertical trace t" + at + ": on the belt [" + where + "], Depot " + stored(level, bottom.below(), Items.GOLD_INGOT)
-                    + " (" + depot + "), loose " + onGround(level, down.below(2), 8, Items.GOLD_INGOT) + ", gold items at [" + anywhere + "]" + next);
-            });
-        }
         later(level, 160, () -> {
             long lifted = stored(level, top.above(), Items.GOLD_INGOT), lowered = stored(level, bottom.below(), Items.GOLD_INGOT);
             expect(source, "vertical: a vertical belt lifts an item into the Depot above its top", lifted == 1, "in the Depot " + lifted + ", on the belt " + onBelt(level, up, null));
@@ -633,7 +612,7 @@ public final class LowBeltTests {
         ServerLevel level = source.getServer().overworld();
         for (int t = 0; t < 200; t += 10) {
             later(level, t, () -> {
-                for (BlockPos start : new BlockPos[]{new BlockPos(X + 70, Y, Z), new BlockPos(X + 74, Y + 5, Z)}) {
+                for (BlockPos start : new BlockPos[]{new BlockPos(X + 70, Y, Z), new BlockPos(X + 66, Y + 5, Z)}) {
                     BeltBlockEntity b = beltAt(level, start);
                     BeltBlockEntity c = b == null ? null : b.getControllerBE();
                     if (c == null || c.getInventory() == null || !c.getInventory().canInsertAt(0)) continue;
