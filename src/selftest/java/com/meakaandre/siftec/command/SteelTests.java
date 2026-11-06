@@ -554,23 +554,20 @@ public final class SteelTests {
         level.setBlock(pos.set(X - 4, Y + 1, Z - 2), block("siftec:steel_casing").defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(pos.set(X - 3, Y + 1, Z - 2), block("siftec:steel_window").defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(pos.set(X + 3, Y, Z - 2), Blocks.STRIPPED_OAK_LOG.defaultBlockState(), Block.UPDATE_ALL);
-        // the three items, held up at eye height in front of the wall (item displays: the client drew frames empty)
+        // the three items, held up just in front of the wall (item displays: the client drew frames empty); a command run
+        // inside this one waits for it to finish, so made() counts them
         for (net.minecraft.world.entity.Entity e : level.getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
             new net.minecraft.world.phys.AABB(X - 6, Y, Z - 4, X + 6, Y + 5, Z))) e.discard();
         String[] items = {"siftec:steel_ingot", "siftec:steel_sheet", "siftec:steel_nugget"};
         CommandSourceStack quiet = source.getServer().createCommandSourceStack().withSuppressedOutput().withLevel(level);
         for (int i = 0; i < items.length; i++)
             source.getServer().getCommands().performPrefixedCommand(quiet, String.format(java.util.Locale.ROOT,
-                "summon minecraft:item_display %.1f %d.5 %d.6 {item:{id:\"%s\",count:1},Tags:[\"siftec_steel\"],"
+                "summon minecraft:item_display %.1f %d.5 %d.1 {item:{id:\"%s\",count:1},Tags:[\"siftec_steel\"],"
                     + "transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.8f,0.8f,0.8f]}}",
-                X - 0.5 + i, Y + 2, Z - 3, items[i]));
-        int framed = 0;
-        for (net.minecraft.world.entity.Display.ItemDisplay shown : level.getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
-            new net.minecraft.world.phys.AABB(X - 6, Y, Z - 4, X + 6, Y + 5, Z)))
-            if (shown.entityTags().contains("siftec_steel")) framed++;
+                X - 0.5 + i, Y + 2, Z - 2, items[i]));
         REPORT.reset();
-        expect(source, "showroom: the steel blocks and the three steel items are on show", framed == 3
-            && level.getBlockState(pos.set(X - 4, Y, Z - 2)).is(block("siftec:steel_casing")), framed + " steel items on show");
+        expect(source, "showroom: the steel blocks are on show", level.getBlockState(pos.set(X - 4, Y, Z - 2)).is(block("siftec:steel_casing")),
+            id(level.getBlockState(pos).getBlock()));
         REPORT.report(source, "showroom done: " + REPORT.totals());
         return 1;
     }
@@ -595,6 +592,11 @@ public final class SteelTests {
         REPORT.reset();
         String now = id(level.getBlockState(new BlockPos(X + 3, Y, Z - 2)).getBlock());
         expect(source, "client: the player's right click with a Steel Ingot turned the stripped log into Steel Casing", "siftec:steel_casing".equals(now), now);
+        int shown = 0;
+        for (net.minecraft.world.entity.Display.ItemDisplay display : level.getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+            new net.minecraft.world.phys.AABB(X - 6, Y, Z - 4, X + 6, Y + 5, Z)))
+            if (display.entityTags().contains("siftec_steel")) shown++;
+        expect(source, "client: the three steel items were on show in the pictures", shown == 3, shown + " steel items on show");
         REPORT.report(source, "client done: " + REPORT.totals());
         return 1;
     }
