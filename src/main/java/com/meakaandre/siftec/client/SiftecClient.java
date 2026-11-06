@@ -1,10 +1,6 @@
 package com.meakaandre.siftec.client;
 
 import com.meakaandre.siftec.SelfTestHooks;
-import com.meakaandre.siftec.registry.ModBlocks;
-import com.zurrtum.create.client.AllCTBehaviours;
-import com.zurrtum.create.client.AllModels;
-import com.zurrtum.create.client.infrastructure.model.CTModel;
 import com.meakaandre.siftec.client.ponder.Guide;
 import com.meakaandre.siftec.equip.JetFuelPayload;
 import com.meakaandre.siftec.fluid.FluidEntry;
@@ -52,9 +48,6 @@ public class SiftecClient implements ClientModInitializer {
         BlockEntityRendererRegistry.register(ModBlockEntities.GOVERNOR.get(), split);
         // the AWESOME Shop's signs and billboards, and the cosmetics drawn on players and blocks
         BlockEntityRendererRegistry.register(ModBlockEntities.SHOP_SIGN.get(), ShopSignRenderer::new);
-        // the steel windows join up like Create's industrial iron windows, whose models and connected glass they use
-        AllModels.register(ModBlocks.STEEL_WINDOW.get(), CTModel.of(AllCTBehaviours.INDUSTRIAL_IRON_WINDOW));
-        AllModels.register(ModBlocks.STEEL_WINDOW_PANE.get(), CTModel.of(AllCTBehaviours.INDUSTRIAL_IRON_WINDOW_PANE));
         CosmeticsClient.register();
         // custom fluids borrow water's textures and are told apart by colour
         for (FluidEntry fluid : ModFluids.ALL.values()) {

@@ -9,8 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * How a Build Gun building is painted with the Customizer (AWESOME Sink and Shop tab). Buildings are built of orange
- * panels (the primary colour), dark grey Steel Casing (the secondary colour; Create's industrial iron look) and light grey
- * iron (the casing); paint
+ * panels (the primary colour), dark grey industrial iron (the secondary colour) and light grey iron (the casing); paint
  * swaps those for the swatch's colours, the finish's material and the casing skin. A Foundations-tab building takes a
  * material instead (its top and body, a wall's panels, a roof's tiles) and a foundation a floor pattern on its top.
  * Everything else (glass, hazard stripes, the machines inside) stays as built. Saved on the controller as
@@ -94,7 +93,7 @@ public record Paint(String primary, String secondary, String finish, String skin
             if (b == block("minecraft:orange_concrete")) {
                 String finishBlock = Shop.finishes().getOrDefault(finish, "minecraft:{colour}_concrete");
                 out = block(finishBlock.replace("{colour}", primary));
-            } else if (b == block("siftec:steel_casing")) {
+            } else if (b == block("create:industrial_iron_block")) {
                 out = secondary.equals(INDUSTRIAL) ? b : concrete(secondary);
             } else if (b == Blocks.IRON_BLOCK && !skin.isEmpty()) {
                 String skinBlock = storage ? Shop.storageSkins().getOrDefault(skin, Shop.skins().get(skin)) : Shop.skins().get(skin);

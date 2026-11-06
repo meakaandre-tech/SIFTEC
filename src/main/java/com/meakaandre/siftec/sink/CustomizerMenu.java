@@ -150,7 +150,7 @@ public class CustomizerMenu extends ChestMenu {
     }
 
     private static Item concrete(String dye) {
-        return dye.equals("industrial") ? item("siftec:steel_casing") : item("minecraft:" + dye + "_concrete");
+        return dye.equals("industrial") ? item("create:industrial_iron_block") : item("minecraft:" + dye + "_concrete");
     }
 
     private static Component colour(String dye) {

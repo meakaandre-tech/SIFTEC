@@ -25,13 +25,6 @@ REMOVED = [
     "farmersdelight:bread_from_smoking",
     # an ingot pressed flat would be Iron or Copper Sheet without the Constructor: only the Constructor makes them
     "create:pressing/iron_ingot", "create:pressing/copper_ingot",
-    # Gunsmithing's steel is SIFTEC's (content.REPLACED): its own steel recipes go, SIFTEC's make SIFTEC's steel, and its
-    # nails are half-built on SIFTEC's nugget (recipes.carried_over()); there is no steel block
-    "cgs:pressing/steel_ingot", "cgs:steel_ingot_from_steel_nugget", "cgs:steel_nugget", "cgs:steel_block_from_steel_ingot",
-    "cgs:steel_ingot", "cgs:sequenced_assembly/steel_nail",
-    # Create's industrial iron is SIFTEC's Steel Casing and steel windows (SIFTEC's window recipes are Create's own)
-    "create:industrial_iron_block_from_ingots_iron_stonecutting", "create:industrial_iron_window", "create:industrial_iron_window_pane",
-    "create:splashing/industrial_iron_block", "create:splashing/industrial_iron_window", "create:splashing/industrial_iron_window_pane",
 ]
 
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked. Equipment and the
@@ -110,6 +103,6 @@ SOURCES = {"createdieselgenerators:crude_oil": ["siftec:building/oil_extractor"]
            "createdieselgenerators:diesel": ["createdieselgenerators:distillation_controller", "createdieselgenerators:crude_oil"],
            "createdieselgenerators:biodiesel": ["siftec:solid_biofuel", "siftec:recipe/mixing/refinery/liquid_biofuel"],
            "siftec:nitrogen": ["siftec:building/resource_well_extractor"], "siftec:sam": ["siftec:building/portable_miner"], "siftec:raw_bauxite": ["siftec:building/portable_miner"],
-           "#c:ingots/steel": ["siftec:steel_ingot"], "#c:plates/steel": ["siftec:steel_sheet"], "#c:nuggets/steel": ["siftec:steel_nugget"]}
+           "#c:ingots/steel": ["cgs:steel_ingot"]}
 for _ore in ("iron", "copper", "zinc", "gold"):
     SOURCES[f"create:crushed_raw_{_ore}"] = [C + "crushing_wheel"]

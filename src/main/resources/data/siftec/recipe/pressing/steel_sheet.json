@@ -1,9 +1,0 @@
-{
-  "type": "create:pressing",
-  "ingredient": "siftec:steel_ingot",
-  "results": [
-    {
-      "id": "siftec:steel_sheet"
-    }
-  ]
-}

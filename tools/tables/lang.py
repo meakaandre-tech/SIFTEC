@@ -196,9 +196,7 @@ LANG = {
     "siftec.season.bonus": "Seasoned with nether wart: one more effect at random",
     # ---- loose blocks and items
     "item.siftec.toxic_shot": "Toxic Shot",
-    "block.siftec.steel_casing": "Steel Casing", "block.siftec.steel_window": "Steel Window", "block.siftec.steel_window_pane": "Steel Window Pane",
-    "block.siftec.steel_encased_shaft": "Steel Encased Shaft", "block.siftec.steel_encased_cogwheel": "Steel Encased Cogwheel",
-    "block.siftec.steel_encased_large_cogwheel": "Steel Encased Large Cogwheel",
+    "block.siftec.steel_casing": "Steel Casing",
     # ---- locks
     "siftec.lock.alt": "Locked: an alternate recipe from a Hard Drive (%s)",
     "siftec.lock.disabled": "Switched off in this pack",

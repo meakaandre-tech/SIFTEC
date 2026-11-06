@@ -1,0 +1,10 @@
+{
+  "type": "create:deploying",
+  "target": "#c:stripped_logs",
+  "ingredient": "#c:ingots/steel",
+  "results": [
+    {
+      "id": "siftec:steel_casing"
+    }
+  ]
+}

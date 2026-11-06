@@ -110,7 +110,7 @@ COUPON_FIRST, COUPON_FIRST_COST, COUPON_LAST, COUPON_CAP = 3, 500, 3000, 2495012
 # can be taken all year.
 SWATCH_MAX = 18
 # finish id -> (name, the block the primary-colour panels become; "{colour}" is the swatch's primary colour)
-FINISHES = {"painted": ("Painted", "minecraft:{colour}_concrete"), "unpainted": ("Unpainted", "siftec:steel_casing"),
+FINISHES = {"painted": ("Painted", "minecraft:{colour}_concrete"), "unpainted": ("Unpainted", "create:industrial_iron_block"),
             "copper": ("Copper", "minecraft:waxed_copper_block"), "chrome": ("Chrome", "minecraft:iron_block"),
             "carbon_steel": ("Carbon Steel", "minecraft:netherite_block"), "caterium": ("Caterium", "create:brass_block")}
 # casing skin id -> (name, the block a building's light grey panels become)
@@ -218,11 +218,11 @@ FOUNDATION_TOP, FOUNDATION_BODY = "minecraft:light_gray_concrete", "minecraft:gr
 WALL_BODY, ROOF_BODY = "minecraft:white_concrete", "minecraft:orange_terracotta"
 MATERIALS = {
     "concrete": ("Concrete", "foundation", {FOUNDATION_TOP: "minecraft:smooth_stone", FOUNDATION_BODY: "minecraft:stone"}),
-    "grip_metal": ("Grip Metal", "foundation", {FOUNDATION_TOP: "siftec:steel_casing", FOUNDATION_BODY: "minecraft:iron_block"}),
+    "grip_metal": ("Grip Metal", "foundation", {FOUNDATION_TOP: "create:industrial_iron_block", FOUNDATION_BODY: "minecraft:iron_block"}),
     "coated_concrete": ("Coated Concrete", "foundation", {FOUNDATION_TOP: "minecraft:white_concrete", FOUNDATION_BODY: "minecraft:light_gray_concrete"}),
     "asphalt": ("Asphalt", "foundation", {FOUNDATION_TOP: "minecraft:polished_blackstone", FOUNDATION_BODY: "minecraft:blackstone"}),
     "concrete_wall": ("Concrete Wall", "wall", {WALL_BODY: "minecraft:smooth_stone"}),
-    "steel_wall": ("Steel Wall", "wall", {WALL_BODY: "siftec:steel_casing"}),
+    "steel_wall": ("Steel Wall", "wall", {WALL_BODY: "create:industrial_iron_block"}),
     "tar_roof": ("Tar Roof", "roof", {ROOF_BODY: "minecraft:black_terracotta"}),
     "metal_roof": ("Metal Roof", "roof", {ROOF_BODY: "minecraft:iron_block"}),
     "glass_roof": ("Glass Roof", "roof", {ROOF_BODY: "minecraft:glass"}),

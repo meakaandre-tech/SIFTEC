@@ -35,11 +35,6 @@ import com.meakaandre.siftec.prefab.PrefabItem;
 import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.prefab.StorageBoxBlock;
 import com.meakaandre.siftec.sink.DecorBlock;
-import com.zurrtum.create.content.decoration.encasing.CasingBlock;
-import com.zurrtum.create.content.decoration.palettes.ConnectedGlassPaneBlock;
-import com.zurrtum.create.content.decoration.palettes.WindowBlock;
-import com.zurrtum.create.content.kinetics.simpleRelays.encased.EncasedCogwheelBlock;
-import com.zurrtum.create.content.kinetics.simpleRelays.encased.EncasedShaftBlock;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -51,7 +46,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -210,28 +204,7 @@ public class ModBlocks {
         properties -> new DesignerBlock(DESIGNER_MK2_REACH, properties), () -> machine().noLootTable());
     public static final Supplier<DesignerBlock> BLUEPRINT_DESIGNER_MK3 = blockOnly("blueprint_designer_mk3",
         properties -> new DesignerBlock(DESIGNER_MK3_REACH, properties), () -> machine().noLootTable());
-    /**
-     * SIFTEC's steel blocks (compat/Replaced.java): the Steel Casing is a Create casing in Create's industrial iron
-     * look, put on a stripped log or stripped wood with a Steel Ingot (one ingot a casing); it encases shafts, cogwheels
-     * and chutes as Create's casings do (compat/SteelCasing.java). The steel windows are Create's industrial iron windows.
-     */
-    public static final Supplier<CasingBlock> STEEL_CASING = block("steel_casing", CasingBlock::new,
-        () -> BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.COLOR_GRAY).sound(SoundType.NETHERITE_BLOCK));
-    public static final Supplier<WindowBlock> STEEL_WINDOW = block("steel_window", WindowBlock::new,
-        () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).isValidSpawn(Blocks::never).isRedstoneConductor(Blocks::never)
-            .isSuffocating(Blocks::never).isViewBlocking((state, level, pos, box) -> false).mapColor(MapColor.COLOR_GRAY));
-    public static final Supplier<ConnectedGlassPaneBlock> STEEL_WINDOW_PANE = block("steel_window_pane", ConnectedGlassPaneBlock::new,
-        () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS_PANE).mapColor(MapColor.COLOR_GRAY));
-    public static final Supplier<EncasedShaftBlock> STEEL_ENCASED_SHAFT = block("steel_encased_shaft",
-        properties -> new EncasedShaftBlock(properties, STEEL_CASING.get()), ModBlocks::encased);
-    public static final Supplier<EncasedCogwheelBlock> STEEL_ENCASED_COGWHEEL = block("steel_encased_cogwheel",
-        properties -> new EncasedCogwheelBlock(properties, false, STEEL_CASING.get()), ModBlocks::encased);
-    public static final Supplier<EncasedCogwheelBlock> STEEL_ENCASED_LARGE_COGWHEEL = block("steel_encased_large_cogwheel",
-        properties -> new EncasedCogwheelBlock(properties, true, STEEL_CASING.get()), ModBlocks::encased);
-
-    private static BlockBehaviour.Properties encased() {
-        return BlockBehaviour.Properties.ofFullCopy(Blocks.ANDESITE).mapColor(MapColor.COLOR_GRAY);
-    }
+    public static final Supplier<Block> STEEL_CASING = block("steel_casing", Block::new, () -> BlockBehaviour.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL));
 
     public static final Supplier<MamBlock> MAM = block("mam", MamBlock::new, ModBlocks::machine);
 

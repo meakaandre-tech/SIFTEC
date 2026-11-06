@@ -1,7 +1,6 @@
 package com.meakaandre.siftec.mixin;
 
 import com.meakaandre.siftec.building.Buildings;
-import com.meakaandre.siftec.compat.Replaced;
 import com.meakaandre.siftec.compat.SiftGate;
 import com.meakaandre.siftec.owner.Ownership;
 import net.minecraft.core.BlockPos;
@@ -12,22 +11,12 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /** Every block entity that appears during a player's click gets that player's company as its owner; block changes reach the buildings. */
 @Mixin(LevelChunk.class)
 public abstract class LevelChunkMixin {
-    /**
-     * A block SIFTEC replaces (Create's industrial iron, compat/Replaced.java) is never placed: its steel one goes in its
-     * place, whatever puts it there (a command, another mod, a saved structure).
-     */
-    @ModifyVariable(method = "setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), argsOnly = true)
-    private BlockState siftec$replaced(BlockState state) {
-        return Replaced.block(state);
-    }
-
     /** The Sift's portal never forms in the Overworld, the Nether or the End: the Ancient City frame stays dead. */
     @Inject(method = "setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
     private void siftec$noSiftPortal(BlockPos pos, BlockState state, int flags,

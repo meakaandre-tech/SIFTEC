@@ -133,16 +133,16 @@ def test_miner():
 
 
 # ---- the Build Gun's buildings, in the style of Polartt's Satisfactory-in-Minecraft builds (design/building-style.md has
-# the style list taken from the reference shots). Dark framed panels (SIFTEC's Steel Casing, Create's industrial iron look) are the body, light framed
+# the style list taken from the reference shots). Dark framed panels (Create's industrial iron) are the body, light framed
 # panels (iron blocks) the bands, flat orange the big masses (hoods, shoulders, pilasters), framed glass shows the Create
 # machines inside; half-block edges come from dark stairs and slabs, light slabs and iron trapdoors, with metal girders,
-# steel windows as vents, copper ladders and iron bars as the small kit. Yellow and black hazard stripes mark
+# industrial iron windows as vents, copper ladders and iron bars as the small kit. Yellow and black hazard stripes mark
 # feet, posts and bumpers, and each building stands on a light grey pad with L-shaped hazard marks at its corners. Belts
 # and pipes attach at the ports, at ground level: outputs on the front, inputs on the back, as Satisfactory's machines
-# have them. A building's paint (building/Paint.java) recolours its orange, its Steel Casing and its iron blocks.
-ORANGE, DARK, LIGHT, GLASS = "minecraft:orange_concrete", "siftec:steel_casing", "minecraft:iron_block", "create:framed_glass"
+# have them. A building's paint (building/Paint.java) recolours its orange, its industrial iron and its iron blocks.
+ORANGE, DARK, LIGHT, GLASS = "minecraft:orange_concrete", "create:industrial_iron_block", "minecraft:iron_block", "create:framed_glass"
 YELLOW, BLACK, PAD = "minecraft:yellow_concrete", "minecraft:black_concrete", "minecraft:light_gray_concrete"
-VENT = "siftec:steel_window"
+VENT = "create:industrial_iron_window"
 BRASS = "create:brass_casing"
 AIR = "minecraft:air"
 CONTROLLER = "siftec:building_controller[facing=south]"

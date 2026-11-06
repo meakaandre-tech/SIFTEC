@@ -1,4 +1,12 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "cgs"
+      ]
+    }
+  ],
   "type": "create:mixing",
   "heat_requirement": "heated",
   "ingredients": [
@@ -11,7 +19,7 @@
   ],
   "results": [
     {
-      "id": "siftec:steel_ingot",
+      "id": "cgs:steel_ingot",
       "count": 3
     }
   ],
