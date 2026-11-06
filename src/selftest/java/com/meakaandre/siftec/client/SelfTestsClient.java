@@ -14,6 +14,7 @@ public final class SelfTestsClient implements SelfTestHooks.Plugin {
         MapClientTests.register();
         BuildGunClientTests.register();
         BuildMenuClientTests.register();
+        CreativeUnlockClientTests.register();
         ReadyClientTests.register();
         if (FabricLoader.getInstance().isModLoaded("travelersbackpack")) {
             CloudButtonTests.register();

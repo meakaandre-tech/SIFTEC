@@ -441,6 +441,7 @@ cmd siftec worldtest map close
 sleep 2
 cmd time set noon
 cmd gamemode survival @a
+sleep 3
 cmd siftec selftest tb crate setup
 sleep 1
 key e
@@ -739,3 +740,12 @@ cmd siftec selftest tb creative
 sleep 2
 cmd siftec selftest tb inventory done
 sleep 2
+cmd siftec selftest creativeunlocks
+sleep 3
+cmd siftec selftest creativeunlocks menu
+wait 30 SELFTEST creative-unlocks-client checked
+sleep 3
+shot
+cmd siftec selftest creativeunlocks menu done
+wait 30 SELFTEST creative-unlocks-client done
+sleep 1
