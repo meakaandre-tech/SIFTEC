@@ -481,6 +481,17 @@ public final class LowBeltTests {
                 added[i] = true;
             }
         });
+        // where the lowered ingot is, every 10 ticks (a log line, not a check)
+        for (int t = 30; t <= 150; t += 10) {
+            int at = t;
+            later(level, t, () -> {
+                BeltBlockEntity b = beltAt(level, down), c = b == null ? null : b.getControllerBE();
+                StringBuilder where = new StringBuilder();
+                if (c != null && c.getInventory() != null) for (TransportedItemStack i : c.getInventory().getTransportedItems()) where.append(i.stack).append('@').append(i.beltPosition).append(' ');
+                report(source, "vertical trace t" + at + ": on the belt [" + where + "], Depot " + stored(level, bottom.below(), Items.GOLD_INGOT)
+                    + ", loose " + onGround(level, down.below(2), 8, Items.GOLD_INGOT));
+            });
+        }
         later(level, 160, () -> {
             long lifted = stored(level, top.above(), Items.GOLD_INGOT), lowered = stored(level, bottom.below(), Items.GOLD_INGOT);
             expect(source, "vertical: a vertical belt lifts an item into the Depot above its top", lifted == 1, "in the Depot " + lifted + ", on the belt " + onBelt(level, up, null));
@@ -589,9 +600,9 @@ public final class LowBeltTests {
             String[] seen = new String[2];
             for (int line = 0; line < 2; line++) {
                 BlockPos s = new BlockPos(X + 20 + 12 * line, Y, Z);
-                // a Depot at each way out for the moment of the trace (the tracer follows a line to an inventory)
+                // a barrel at each way out for the moment of the trace (the tracer follows a line to an inventory)
                 BlockPos[] outs = {s.east(8), s.east(3).south(5)};
-                for (BlockPos o : outs) level.setBlock(o, AllBlocks.DEPOT.defaultBlockState(), Block.UPDATE_ALL);
+                for (BlockPos o : outs) level.setBlock(o, Blocks.BARREL.defaultBlockState(), Block.UPDATE_ALL);
                 List<Tracer.End> ends = Tracer.items(level, s.west(), Direction.EAST);
                 for (BlockPos o : outs) level.setBlock(o, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                 List<String> rel = new ArrayList<>();
