@@ -794,7 +794,7 @@ cmd tp @a 16008.5 200 -15983.5 180 12
 sleep 4
 shot
 cmd siftec worldtest lowbelts feed
-cmd tp @a 17032 203 -16976 180 38
+cmd tp @a 17032 202 -16984 180 20
 sleep 5
 shot
 cmd tp @a 17003.5 200 -16955.5 180 17
