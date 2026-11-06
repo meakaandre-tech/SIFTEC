@@ -34,6 +34,10 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -193,14 +197,15 @@ public final class BeltLayTests {
         return n;
     }
 
-    /** A whole belt from a to b: every cell a belt block, a start and an end part, of one belt of that length. */
+    /**
+     * A whole belt from a to b: every cell a belt block, a start and an end part, the slope given. (Create sets each
+     * block's controller and length on the belt's first tick, so those are not looked at here.)
+     */
     private static boolean whole(ServerLevel level, BlockPos a, BlockPos b, BeltSlope slope) {
         List<BlockPos> cells = cells(a, b);
         if (belts(level, cells) != cells.size()) return false;
         BlockState first = level.getBlockState(a), last = level.getBlockState(b);
-        BeltBlockEntity start = beltAt(level, a);
-        return first.getValue(BeltBlock.PART) == BeltPart.START && last.getValue(BeltBlock.PART) == BeltPart.END
-            && first.getValue(BeltBlock.SLOPE) == slope && start != null && start.isController() && start.beltLength == cells.size();
+        return first.getValue(BeltBlock.PART) == BeltPart.START && last.getValue(BeltBlock.PART) == BeltPart.END && first.getValue(BeltBlock.SLOPE) == slope;
     }
 
     private static String describe(ServerLevel level, BlockPos a, BlockPos b) {
@@ -371,10 +376,11 @@ public final class BeltLayTests {
         });
         ControllerBlockEntity building = c;
         later(level, 360, () -> {
-            int got = 0;
-            for (int i = 0; i < building.input.getContainerSize(); i++) if (building.input.getItem(i).is(Items.COPPER_INGOT)) got += building.input.getItem(i).getCount();
-            for (int i = 0; i < building.output.getContainerSize(); i++) if (building.output.getItem(i).is(Items.COPPER_INGOT)) got += building.output.getItem(i).getCount();
-            expect(source, "port: the shaftless belt feeds the building's port (4 copper ingots in)", fed[0] == 4 && got == 4, "fed " + fed[0] + ", in the building " + got);
+            long got = 0;
+            Storage<ItemVariant> inside = ItemStorage.SIDED.find(level, building.getBlockPos(), null);
+            if (inside != null) for (StorageView<ItemVariant> v : inside) if (!v.isResourceBlank() && v.getResource().isOf(Items.COPPER_INGOT)) got += v.getAmount();
+            int ground = dropped(level, around(start, end), Items.COPPER_INGOT);
+            expect(source, "port: the shaftless belt feeds the building's port (4 copper ingots in)", fed[0] == 4 && got == 4, "fed " + fed[0] + ", in the building " + got + ", on the ground " + ground);
         });
     }
 
@@ -497,8 +503,11 @@ public final class BeltLayTests {
         REPORT.reset();
         expect(source, "restart: the shaftless flat belt is still there, whole", whole(level, FLAT_A, FLAT_B, BeltSlope.HORIZONTAL), describe(level, FLAT_A, FLAT_B));
         expect(source, "restart: its ends still have no pulley", noPulleys(level, FLAT_A, FLAT_B), "");
-        Company c = CompanyData.get(level.getServer()).byId(COMPANY);
-        int perMinute = SelfMovingBelts.itemsPerMinute(c);
+        // the test company again (a later suite may have cleared test companies before the restart); the belt keeps its owner
+        int perMinute = company(level);
+        BeltBlockEntity flat = beltAt(level, FLAT_A);
+        expect(source, "restart: the belt still belongs to the company that laid it", flat != null && COMPANY.equals(flat.getAttached(Ownership.OWNER)),
+            flat == null ? "no belt" : String.valueOf(flat.getAttached(Ownership.OWNER)));
         speed(source, level, "restart: the shaftless flat belt", FLAT_A, Direction.EAST, perMinute);
         later(level, 80, () -> report(source, "restart done: " + REPORT.totals()));
         return 1;

@@ -40,7 +40,8 @@ public abstract class BeltShaftlessEndMixin implements ShaftlessBelts.End {
         if (siftec$noShaft) view.putBoolean("SiftecNoShaft", true);
     }
 
-    @Inject(method = "read", at = @At("TAIL"))
+    // HEAD, not TAIL: Create's read returns early for a load from disk, so code at its last return never runs there
+    @Inject(method = "read", at = @At("HEAD"))
     private void siftec$readNoShaft(ValueInput view, boolean clientPacket, CallbackInfo ci) {
         siftec$noShaft = view.getBooleanOr("SiftecNoShaft", false);
     }
