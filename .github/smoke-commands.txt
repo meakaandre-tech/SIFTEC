@@ -22,6 +22,7 @@ siftec selftest powerfix
 siftec selftest buildingfix
 siftec selftest quality
 siftec selftest machines
+siftec selftest steel
 siftec selftest state setup
 siftec selftest state check
 siftec worldtest nodes 2000

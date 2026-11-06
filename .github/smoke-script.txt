@@ -739,3 +739,23 @@ cmd siftec selftest tb creative
 sleep 2
 cmd siftec selftest tb inventory done
 sleep 2
+cmd siftec worldtest steel setup
+wait 60 SELFTEST steel showroom done:
+cmd clear @a
+cmd give @a siftec:steel_ingot 16
+cmd give @a siftec:steel_sheet 16
+cmd give @a siftec:steel_nugget 16
+cmd give @a siftec:steel_casing 16
+cmd give @a siftec:steel_window 16
+cmd give @a siftec:steel_window_pane 16
+cmd tp @a 23000.5 200 23003.5 180 14
+sleep 6
+shot
+cmd siftec worldtest steel aim
+sleep 4
+shot
+key u
+sleep 3
+shot
+cmd siftec worldtest steel made
+sleep 2
