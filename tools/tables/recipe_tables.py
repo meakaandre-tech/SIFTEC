@@ -32,6 +32,7 @@ REMOVED = [
     # Create's industrial iron is SIFTEC's Steel Casing and steel windows (SIFTEC's window recipes are Create's own)
     "create:industrial_iron_block_from_ingots_iron_stonecutting", "create:industrial_iron_window", "create:industrial_iron_window_pane",
     "create:splashing/industrial_iron_block", "create:splashing/industrial_iron_window", "create:splashing/industrial_iron_window_pane",
+    "create_new_age:item_application/heat_casing",              # zinc on industrial iron; recipes.py puts it on Steel Casing
 ]
 
 # What the Equipment Workshop builds: (item id, cost). It only offers what the company has unlocked. Equipment and the

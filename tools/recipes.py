@@ -491,6 +491,10 @@ def carried_over():
     for wood in ("stripped_logs", "stripped_woods"):
         add("item_application", "steel_casing_from_" + wood, {"type": "create:item_application", "target": "#c:" + wood, "ingredient": item("Steel Ingot"),
             "results": [{"id": "siftec:steel_casing"}]})
+    # Create: New Age's Heat Casing is zinc on industrial iron; industrial iron is the Steel Casing now (its own recipe is in
+    # REMOVED)
+    add("item_application", "heat_casing", {"type": "create:item_application", "target": "siftec:steel_casing", "ingredient": "create:zinc_ingot",
+        "results": [{"id": "create_new_age:heat_casing"}]})
     # SIFTEC's steel, as Gunsmithing's steel was made in the pack (tables.content.REPLACED): the Foundry's Steel Ingot is
     # pressed into a Steel Sheet, and nine Steel Nuggets are a Steel Ingot (and back); there is no steel block
     under("basic_steel_production")

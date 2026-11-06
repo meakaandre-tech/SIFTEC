@@ -1,0 +1,10 @@
+{
+  "type": "create:item_application",
+  "target": "siftec:steel_casing",
+  "ingredient": "create:zinc_ingot",
+  "results": [
+    {
+      "id": "create_new_age:heat_casing"
+    }
+  ]
+}

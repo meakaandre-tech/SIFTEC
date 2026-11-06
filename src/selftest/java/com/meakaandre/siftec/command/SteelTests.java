@@ -88,7 +88,7 @@ public final class SteelTests {
         "cgs:steel_block_from_steel_ingot", "cgs:steel_ingot", "cgs:sequenced_assembly/steel_nail", "cgs:mixing/steel_ingot",
         "create:industrial_iron_block_from_ingots_iron_stonecutting", "create:industrial_iron_window", "create:industrial_iron_window_pane",
         "create:splashing/industrial_iron_block", "create:splashing/industrial_iron_window", "create:splashing/industrial_iron_window_pane",
-        "siftec:deploying/steel_casing_from_stripped_logs", "siftec:deploying/steel_casing_from_stripped_woods");
+        "siftec:deploying/steel_casing_from_stripped_logs", "siftec:deploying/steel_casing_from_stripped_woods", "create_new_age:item_application/heat_casing");
 
     /** The ids SIFTEC replaces (tools/tables/content.py REPLACED). */
     private static final List<String> OLD_IDS = List.of("cgs:steel_ingot", "cgs:steel_sheet", "cgs:steel_nugget", "cgs:steel_block",
@@ -224,7 +224,7 @@ public final class SteelTests {
         String[][] want = {{"siftec:mixing/foundry/steel_ingot", "siftec:steel_ingot"}, {"siftec:pressing/steel_sheet", "siftec:steel_sheet"},
             {"siftec:crafting/steel_ingot_from_nuggets", "siftec:steel_ingot"}, {"siftec:crafting/steel_nugget", "siftec:steel_nugget"},
             {"siftec:crafting/steel_window", "siftec:steel_window"}, {"siftec:crafting/steel_window_pane", "siftec:steel_window_pane"},
-            {"siftec:sequenced_assembly/steel_nail", "cgs:nail_steel"}};
+            {"siftec:sequenced_assembly/steel_nail", "cgs:nail_steel"}, {"siftec:item_application/heat_casing", "create_new_age:heat_casing"}};
         List<String> wrong = new ArrayList<>();
         for (String[] w : want) {
             RecipeHolder<?> holder = recipe(server, w[0]);
@@ -239,7 +239,7 @@ public final class SteelTests {
             }
             if (holder == null || !body.contains("\"" + w[1] + "\"")) wrong.add(w[0] + (holder == null ? " not loaded" : " does not make " + w[1]));
         }
-        expect(source, "SIFTEC's steel is made as Gunsmithing's was (Foundry ingot, pressed sheet, nine nuggets an ingot and back), its windows from Steel Casing, Gunsmithing's nails on its nugget",
+        expect(source, "SIFTEC's steel is made as Gunsmithing's was (Foundry ingot, pressed sheet, nine nuggets an ingot and back), its windows from Steel Casing, Gunsmithing's nails on its nugget, New Age's Heat Casing on Steel Casing",
             wrong.isEmpty(), wrong.isEmpty() ? want.length + " recipes" : String.join("; ", wrong));
     }
 
