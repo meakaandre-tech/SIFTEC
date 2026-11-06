@@ -90,7 +90,8 @@ public final class LowBeltTests {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("lowbelts").executes(LowBeltTests::run)
-                    .then(Commands.literal("restart").executes(LowBeltTests::restart))))));
+                    .then(Commands.literal("restart").executes(LowBeltTests::restart))))
+                .then(Commands.literal("worldtest").then(Commands.literal("lowbelts").then(Commands.literal("feed").executes(c -> feedForShots(c.getSource())))))));
     }
 
     // ------------------------------------------------------------------------------------------------ reaching the new code
@@ -583,6 +584,35 @@ public final class LowBeltTests {
             expect(source, "sim: the tracer reads a built-in andesite tunnel as Create's stacked one", seen[0].equals(seen[1]) && !seen[0].equals("[]"),
                 "built in " + seen[0] + ", stacked " + seen[1]);
         });
+    }
+
+    /**
+     * For the smoke script's screenshots: keeps items going onto the test lines for ten seconds (the vertical belts, the
+     * tunnel and funnel lines, the Basin line and the Mk belts), so the shots show belts carrying them.
+     */
+    private static int feedForShots(CommandSourceStack source) {
+        ServerLevel level = source.getServer().overworld();
+        for (int t = 0; t < 200; t += 10) {
+            later(level, t, () -> {
+                for (BlockPos start : new BlockPos[]{new BlockPos(X + 70, Y, Z), new BlockPos(X + 74, Y + 5, Z)}) {
+                    BeltBlockEntity b = beltAt(level, start);
+                    BeltBlockEntity c = b == null ? null : b.getControllerBE();
+                    if (c == null || c.getInventory() == null || !c.getInventory().canInsertAt(0)) continue;
+                    TransportedItemStack s = new TransportedItemStack(new ItemStack(Items.GOLD_INGOT));
+                    s.beltPosition = 0.5f;
+                    c.getInventory().addItem(s);
+                }
+                List<BlockPos> starts = new ArrayList<>(List.of(BASIN_A, new BlockPos(X + 78 - 4, Y, Z)));
+                for (int k = 0; k < 2; k++) for (int line = 0; line < 2; line++) {
+                    starts.add(new BlockPos(X + 20 + 24 * k + 12 * line, Y, Z));
+                    starts.add(new BlockPos(X + 20 + 24 * k + 12 * line, Y, Z + 12));
+                }
+                for (int i = 0; i < 6; i++) starts.add(new BlockPos(X + 70, Y, Z + 20 + 2 * i));
+                for (BlockPos start : starts) feed(level, start, Direction.EAST, new ItemStack(Items.IRON_INGOT));
+            });
+        }
+        report(source, "feeding the lines for the screenshots");
+        return 1;
     }
 
     // ------------------------------------------------------------------------------------------------ after a restart
