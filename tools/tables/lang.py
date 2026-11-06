@@ -529,6 +529,9 @@ LANG = {
     "siftec.hubui.status_locked": "%s  |  Freighter back in %s",
     "siftec.lock.item": "Locked: needs %s",
     "siftec.lock.unknown": "Locked: your company has not unlocked this yet",
+    # ---- one-block belts: what the goggles show on a belt
+    "siftec.belt.goggles": "Belt Mk.%s: %s items a minute",
+    "siftec.belt.goggles.still": "Belt: not moving (no Logistics milestone yet)",
     "siftec.milestone.disabled": "nothing: it is switched off in this pack",
     "siftec.company.info": "%s: %s",
     "siftec.company.renamed": "Company renamed to %s",

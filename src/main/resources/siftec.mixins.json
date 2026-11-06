@@ -110,7 +110,8 @@
     "belt.client.FlapPacketViewMixin",
     "belt.client.BeltRenderStateLowMixin",
     "belt.client.BeltRendererLowMixin",
-    "belt.client.BeltVisualLowMixin"
+    "belt.client.BeltVisualLowMixin",
+    "belt.client.BeltGogglesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

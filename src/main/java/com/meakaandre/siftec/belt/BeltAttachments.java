@@ -16,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -401,7 +402,7 @@ public final class BeltAttachments {
         List<ItemStack> drops = Block.getDrops(state, server, slot(belt), a);
         ((Host) belt).siftec$attachment(null);
         for (ItemStack drop : drops) {
-            if (player != null && !player.hasInfiniteMaterials()) player.getInventory().placeItemBackInInventory(drop);
+            if (player != null && !player.hasInfiniteMaterials()) player.getInventory().placeItemBackInInventory(drop, Prediction.SERVER_ONLY);
             else if (player == null) Block.popResource(level, pos, drop);
         }
         // what the attachment held (a filter, a brass tunnel's stack) drops as Create drops it, on the belt block

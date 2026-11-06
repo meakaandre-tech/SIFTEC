@@ -39,7 +39,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -494,7 +494,7 @@ public final class LowBeltTests {
     private static void riding(CommandSourceStack source, ServerLevel level, String company) {
         BlockPos a = new BlockPos(X + 70, Y, Z + 12), b = a.east(10);
         belt(level, a, b, company);
-        ArmorStand stand = EntityType.ARMOR_STAND.create(level, EntitySpawnReason.COMMAND);
+        ArmorStand stand = EntityTypes.ARMOR_STAND.create(level, EntitySpawnReason.COMMAND);
         if (stand == null) {
             expect(source, "riding: an armor stand can be made", false, "");
             return;
