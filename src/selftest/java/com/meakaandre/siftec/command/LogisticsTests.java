@@ -381,6 +381,9 @@ public final class LogisticsTests {
         int[] fed = {0};
         later(level, 40, () -> {
             BlockState tunnel = level.getBlockState(mid.above());
+            // a tunnel put on a belt clips into it (one-block belts): read the built-in one
+            BlockState builtIn = com.meakaandre.siftec.sim.LowBeltTests.Probe.attached(level, mid);
+            if (builtIn != null) tunnel = builtIn;
             expect(source, "the splitting tunnel is a junction", tunnel.is(AllBlocks.ANDESITE_TUNNEL) && BeltTunnelBlock.isJunction(tunnel), tunnel.toString());
             feeder(level, main, Direction.EAST, new ItemStack(Items.COPPER_INGOT), 12, 30, fed);
         });

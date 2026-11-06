@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
@@ -330,7 +331,13 @@ public final class BeltAttachments {
         if (!takes(belt.getBlockState())) return InteractionResult.FAIL;
         // one attachment per belt block; never a stacked one above it
         if (of(belt) != null) return InteractionResult.FAIL;
-        BlockState state = placement(stack, level, pos, player, hand, hit);
+        BlockState state;
+        try {
+            state = placement(stack, level, pos, player, hand, hit);
+        } catch (RuntimeException e) {
+            com.meakaandre.siftec.Siftec.LOGGER.warn("SIFTEC: could not clip {} into the belt at {}", stack, pos, e);
+            return InteractionResult.FAIL;
+        }
         if (state == null) return InteractionResult.FAIL;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         SmartBlockEntity a = make(belt, state);
@@ -348,7 +355,10 @@ public final class BeltAttachments {
         if (stack.getItem() instanceof FunnelItem item && item.getBlock() instanceof FunnelBlock funnel) {
             // a funnel faces the side clicked, or the clicking player when the top was clicked (as Create places one)
             Direction facing = hit.getDirection().getAxis().isHorizontal() ? hit.getDirection() : player.getDirection().getOpposite();
-            BlockState belt = funnel.getEquivalentBeltFunnel(level, slot, funnel.defaultBlockState());
+            BlockState base = funnel.defaultBlockState();
+            // Create's funnel item turns a funnel facing this way into its belt funnel (the default faces down, which has none)
+            if (base.hasProperty(BlockStateProperties.FACING)) base = base.setValue(BlockStateProperties.FACING, facing);
+            BlockState belt = funnel.getEquivalentBeltFunnel(level, slot, base);
             if (!(belt.getBlock() instanceof BeltFunnelBlock)) return null;
             BlockState state = belt.setValue(BeltFunnelBlock.HORIZONTAL_FACING, facing)
                 .setValue(BeltFunnelBlock.SHAPE, BeltFunnelBlock.getShapeForPosition(level, slot, facing, !player.isShiftKeyDown()));

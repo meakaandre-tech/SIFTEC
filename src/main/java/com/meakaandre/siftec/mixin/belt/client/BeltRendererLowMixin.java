@@ -43,6 +43,20 @@ public abstract class BeltRendererLowMixin {
         ((LowBeltRender.State) state).siftec$low(LowBeltRender.extract(be, partialTicks, camera));
     }
 
+    /**
+     * Every belt block now gets here (for its rails and attachment), but only a controller with its inventory carries
+     * items: Create's own check for that is skipped under Flywheel, which drew only controllers.
+     */
+    @Inject(method = "extractRenderState(Lcom/zurrtum/create/content/kinetics/belt/BeltBlockEntity;Lcom/zurrtum/create/client/content/kinetics/belt/BeltRenderer$BeltRenderState;FLnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V",
+        at = @At(value = "INVOKE", target = "Lcom/zurrtum/create/content/kinetics/belt/BeltBlockEntity;getInventory()Lcom/zurrtum/create/content/kinetics/belt/transport/BeltInventory;"), cancellable = true)
+    private void siftec$itemsOnlyOnController(BeltBlockEntity be, BeltRenderer.BeltRenderState state, float partialTicks, Vec3 camera,
+                                              ModelFeatureRenderer.CrumblingOverlay crumbling, CallbackInfo ci) {
+        if (!be.isController() || be.beltLength == 0 || be.getInventory() == null) {
+            state.items = null;
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "extractRenderState(Lcom/zurrtum/create/content/kinetics/belt/BeltBlockEntity;Lcom/zurrtum/create/client/content/kinetics/belt/BeltRenderer$BeltRenderState;FLnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V",
         at = @At("RETURN"))
     private void siftec$itemsLow(BeltBlockEntity be, BeltRenderer.BeltRenderState state, float partialTicks, Vec3 camera,

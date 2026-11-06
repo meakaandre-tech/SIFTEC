@@ -100,7 +100,7 @@ public final class LowBeltTests {
      * The one-block belt's code, reached by name: these selftests also run against a build without it (to show what it
      * changes), where every attachment reads as none.
      */
-    static final class Probe {
+    public static final class Probe {
         private static @Nullable Object call(String owner, String name, Class<?>[] types, Object... args) {
             try {
                 Method m = Class.forName("com.meakaandre.siftec.belt." + owner).getMethod(name, types);
@@ -111,7 +111,7 @@ public final class LowBeltTests {
         }
 
         /** The belt block's built-in funnel or tunnel, or null. */
-        static @Nullable BlockState attached(ServerLevel level, BlockPos pos) {
+        public static @Nullable BlockState attached(ServerLevel level, BlockPos pos) {
             return level.getBlockEntity(pos) instanceof BeltBlockEntity belt
                 ? (BlockState) call("BeltAttachments", "stateOf", new Class<?>[]{BeltBlockEntity.class}, belt) : null;
         }
@@ -173,6 +173,11 @@ public final class LowBeltTests {
         if (tester) {
             c.members.add(TESTER.toString());
             c.owner = TESTER.toString();
+            // the milestones that unlock the funnels and tunnels, or survival is refused them (SIFTEC's locks)
+            for (Item item : new Item[]{AllItems.ANDESITE_TUNNEL, AllItems.BRASS_TUNNEL, AllItems.ANDESITE_FUNNEL, AllItems.BRASS_FUNNEL}) {
+                Milestone unlock = com.meakaandre.siftec.hub.Locks.lockOf(item);
+                if (unlock != null) c.done.add(unlock.id());
+            }
         }
         for (Milestone m : Milestones.all()) if (m.tokens().contains(token)) c.done.add(m.id());
         data.companies().put(id, c);
@@ -347,6 +352,9 @@ public final class LowBeltTests {
                 BlockPos a = new BlockPos(X + 20 + 24 * k + 12 * line, Y, Z), b = a.east(7), at = a.east(3), side = at.south(), sideEnd = side.south(3);
                 belt(level, a, b, company);
                 belt(level, side, sideEnd, company);
+                // each way out ends in a chest (the tracer follows a line to an inventory)
+                level.setBlock(b.east(), Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
+                level.setBlock(sideEnd.south(), Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
                 if (builtIn) {
                     click(level, tester(level, GameType.CREATIVE, new ItemStack(items[k])), at, Direction.UP);
                 } else {
@@ -359,8 +367,8 @@ public final class LowBeltTests {
                 int[] fed = {0};
                 feeder(level, a, Direction.EAST, repeat(8, Items.IRON_INGOT), 40, 12, fed);
                 int idx = line;
-                later(level, 420, () -> counts[idx] = new int[]{fed[0], onGround(level, b.east(), 1.5, Items.IRON_INGOT) + onBelt(level, b, Items.IRON_INGOT),
-                    onGround(level, sideEnd.south(), 1.5, Items.IRON_INGOT) + onBelt(level, side, Items.IRON_INGOT)});
+                later(level, 420, () -> counts[idx] = new int[]{fed[0], (int) stored(level, b.east(), Items.IRON_INGOT) + onBelt(level, b, Items.IRON_INGOT),
+                    (int) stored(level, sideEnd.south(), Items.IRON_INGOT) + onBelt(level, side, Items.IRON_INGOT)});
             }
             String name = items[k].toString();
             boolean brass = k == 1;
@@ -474,7 +482,11 @@ public final class LowBeltTests {
         later(level, 160, () -> {
             long lifted = stored(level, top.above(), Items.GOLD_INGOT), lowered = stored(level, bottom.below(), Items.GOLD_INGOT);
             expect(source, "vertical: a vertical belt lifts an item into the Depot above its top", lifted == 1, "in the Depot " + lifted + ", on the belt " + onBelt(level, up, null));
-            expect(source, "vertical: a vertical belt lowers an item into the Depot below its foot", lowered == 1, "in the Depot " + lowered + ", on the belt " + onBelt(level, down, null));
+            BeltBlockEntity db = beltAt(level, down), dc = db == null ? null : db.getControllerBE();
+            String how = dc == null ? "no controller" : "controller " + dc.getBlockPos().toShortString() + " facing " + dc.getBeltFacing()
+                + ", moving " + dc.getMovementFacing() + " at " + dc.getDirectionAwareBeltMovementSpeed() + ", length " + dc.beltLength;
+            expect(source, "vertical: a vertical belt lowers an item into the Depot below its foot", lowered == 1, "in the Depot " + lowered + ", on the belt "
+                + onBelt(level, down, null) + ", loose " + onGround(level, down.below(2), 5, Items.GOLD_INGOT) + "; " + how);
         });
         // a flat belt running into the foot of a vertical one: its items go up
         BlockPos foot = new BlockPos(X + 78, Y, Z), head = foot.above(4), from = foot.west(4), to = foot.west();
