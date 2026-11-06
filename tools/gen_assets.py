@@ -539,6 +539,24 @@ _sift = os.path.join(ROOT, "assets", "the_sift")
 write(f"{_sift}/blockstates/ichor.json", {"variants": {"": {"model": "the_sift:block/ichor"}}})
 write(f"{_sift}/models/block/ichor.json", {"textures": {"particle": "minecraft:block/water_still"}})
 
+# The one-block belt's own models (client/belt/LowBeltPartials): the side trim, 5 px high, in each belt Mk's casing
+# (andesite Mk.1-2, copper Mk.3-4, brass Mk.5, steel Mk.6), andesite bolt heads along it, and the rounded andesite end
+# cap where the band wraps under. Made running south along a flat belt; the belt renderer turns them to the belt.
+def _belt_box(name, frm, to, tex="#0"):
+    return {"name": name, "from": frm, "to": to, "faces": {d: {"texture": tex} for d in ("north", "south", "east", "west", "up", "down")}}
+
+
+# Mk.6's steel trim is the Steel Casing's own side (SIFTEC steel)
+for _mat, _tex in (("andesite", "create:block/andesite_casing"), ("copper", "create:block/copper_casing"),
+                   ("brass", "create:block/brass_casing"), ("steel", "create:block/industrial_iron_block")):
+    _els = [_belt_box("rail left", [0, 0, 0], [1.5, 5, 16]), _belt_box("rail right", [14.5, 0, 0], [16, 5, 16])]
+    for _z in (3.5, 11.5):
+        _els += [_belt_box("bolt", [-0.5, 2, _z], [0, 3, _z + 1], "#1"), _belt_box("bolt", [16, 2, _z], [16.5, 3, _z + 1], "#1")]
+    block_model(f"belt/rail_{_mat}", {"parent": "block/block", "textures": {"0": _tex, "1": "create:block/andesite_casing", "particle": "#0"},
+                                      "elements": _els})
+block_model("belt/cap", {"parent": "block/block", "textures": {"0": "create:block/andesite_casing", "particle": "#0"}, "elements": [
+    _belt_box("cap", [0, 0, 1], [16, 5, 3]), _belt_box("cap round", [0, 1, 0], [16, 4, 1]), _belt_box("cap top", [0.5, 5, 1.5], [15.5, 5.5, 2.5])]})
+
 # ---- recipes
 built = recipes.build()
 shutil.rmtree(f"{D}/recipe", ignore_errors=True)

@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.client;
 
 import com.meakaandre.siftec.SelfTestHooks;
+import com.meakaandre.siftec.client.belt.LowBeltPartials;
 import com.meakaandre.siftec.registry.ModBlocks;
 import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.AllModels;
@@ -40,6 +41,8 @@ import net.minecraft.resources.Identifier;
 public class SiftecClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        // the one-block belt's models are declared before the game resolves its models
+        LowBeltPartials.init();
         // machines with a shaft through them, turning with the network
         BlockEntityRendererProvider<KineticBlockEntity, SingleKineticRenderState> shaft = ShaftRenderer::new;
         BlockEntityRendererRegistry.register(ModBlockEntities.EXTRACTOR.get(), shaft);

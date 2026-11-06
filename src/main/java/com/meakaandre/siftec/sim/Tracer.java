@@ -1,6 +1,7 @@
 package com.meakaandre.siftec.sim;
 
 import com.meakaandre.siftec.Siftec;
+import com.meakaandre.siftec.belt.BeltAttachments;
 import com.meakaandre.siftec.building.BuildingIndex;
 import com.meakaandre.siftec.building.PortBlock;
 import com.meakaandre.siftec.building.PortBlockEntity;
@@ -11,6 +12,7 @@ import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
+import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlock;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
@@ -116,7 +118,15 @@ final class Tracer {
             if (!level.isLoaded(seg)) return;
             seen.add(seg.immutable());
             travelled++;
-            if (level.getBlockState(seg.above()).getBlock() instanceof BeltTunnelBlock) {
+            BlockState attached = Chunks.blockEntity(level, seg) instanceof BeltBlockEntity here ? BeltAttachments.stateOf(here) : null;
+            // a built-in funnel that takes items off the belt here sends them into the block beside it: the line ends there
+            if (attached != null && attached.getBlock() instanceof BeltFunnelBlock && attached.getValue(BeltFunnelBlock.SHAPE) != BeltFunnelBlock.Shape.PUSHING
+                && attached.getValue(BeltFunnelBlock.HORIZONTAL_FACING) != moving) {
+                Direction into = attached.getValue(BeltFunnelBlock.HORIZONTAL_FACING).getOpposite();
+                walk(level, seg.relative(into), into, r, delay + (long) Math.ceil(travelled / perTick), cap + travelled * 2L, share, ends, seen, depth + 1);
+                return;
+            }
+            if (attached != null && attached.getBlock() instanceof BeltTunnelBlock || level.getBlockState(seg.above()).getBlock() instanceof BeltTunnelBlock) {
                 List<Direction> sides = new ArrayList<>();
                 for (Direction side : new Direction[]{moving.getClockWise(), moving.getCounterClockWise()}) {
                     BlockPos next = seg.relative(side);
