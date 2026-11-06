@@ -47,12 +47,13 @@ public abstract class BeltRendererLowMixin {
         at = @At("RETURN"))
     private void siftec$itemsLow(BeltBlockEntity be, BeltRenderer.BeltRenderState state, float partialTicks, Vec3 camera,
                                  ModelFeatureRenderer.CrumblingOverlay crumbling, CallbackInfo ci) {
-        if (state.items == null || state.beltStartOffset == null || state.blockState == null) return;
-        Vec3 start = LowBeltRender.itemStart(state.blockState, state.beltStartOffset);
+        if (state.items == null || state.beltStartOffset == null) return;
+        // the render state's own block state is Create's private field: the belt's is the same
+        Vec3 start = LowBeltRender.itemStart(be.getBlockState(), state.beltStartOffset);
         if (start == null) return;
         state.beltStartOffset = start;
-        if (state.blockState.getValue(BeltBlock.SLOPE) == BeltSlope.VERTICAL) {
-            boolean up = state.blockState.getValue(BeltBlock.HORIZONTAL_FACING).getAxisDirection() == Direction.AxisDirection.POSITIVE;
+        if (be.getBlockState().getValue(BeltBlock.SLOPE) == BeltSlope.VERTICAL) {
+            boolean up = be.getBlockState().getValue(BeltBlock.HORIZONTAL_FACING).getAxisDirection() == Direction.AxisDirection.POSITIVE;
             state.directionVec = new Vec3i(0, up ? 1 : -1, 0);
         }
     }

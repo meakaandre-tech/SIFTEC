@@ -18,11 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(value = BlockEntityBehaviour.class, remap = false)
 public abstract class AttachmentBehaviourMixin {
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Inject(method = "get(Lnet/minecraft/world/level/block/entity/BlockEntity;Lcom/zurrtum/create/foundation/blockEntity/behaviour/BehaviourType;)Lcom/zurrtum/create/api/behaviour/BlockEntityBehaviour;",
         at = @At("RETURN"), cancellable = true)
     private static void siftec$attachmentBehaviour(BlockEntity be, BehaviourType<?> type, CallbackInfoReturnable<BlockEntityBehaviour<?>> cir) {
         if (cir.getReturnValue() != null || !(be instanceof BeltBlockEntity belt)) return;
         SmartBlockEntity a = BeltAttachments.of(belt);
-        if (a != null) cir.setReturnValue(a.getBehaviour(type));
+        if (a != null) cir.setReturnValue((BlockEntityBehaviour<?>) a.getBehaviour((BehaviourType) type));
     }
 }
