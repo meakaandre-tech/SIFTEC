@@ -13,7 +13,7 @@ from tables.assets import FRONTED
 OUT = os.path.join(ASSETS, "textures")
 
 BLOCK_SHEETS = {
-    "blocks_base.png": "hub wormhole_gateway mam - - - claim_marker dimensional_depot steel_casing "
+    "blocks_base.png": "hub wormhole_gateway mam - - - claim_marker dimensional_depot - "
                        "drone_port landing_pad main_portal satellite_portal blueprint_designer blueprint_designer_mk3",
     "blocks_machines.png": "- - - - resource_well_extractor - - - "
                            "hub_engine - - - - - -",

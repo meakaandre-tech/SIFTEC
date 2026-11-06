@@ -10,7 +10,7 @@ ALIAS = {
     "Iron Ingot": "minecraft:iron_ingot", "Copper Ingot": "minecraft:copper_ingot",
     "Iron Sheet": "create:iron_sheet", "Copper Sheet": "create:copper_sheet",
     "Coal": "minecraft:coal",
-    "Steel Ingot": "cgs:steel_ingot", "Sulfur": "cgs:sulfur",
+    "Sulfur": "cgs:sulfur",
     "Brass Ingot": "create:brass_ingot", "Brass Sheet": "create:brass_sheet",
     "Electron Tube": "create:electron_tube", "Precision Mechanism": "create:precision_mechanism",
     "Diamond": "minecraft:diamond", "Nether Quartz": "minecraft:quartz",
@@ -106,6 +106,9 @@ PARTS = [
     ("rotor", "Rotor", "create:item/propeller", None), ("modular_frame", "Modular Frame", "minecraft:item/item_frame", None),
     ("smart_plating", "Smart Plating", S, 0xF0C060),
     # tiers 3-4
+    # SIFTEC's own steel, in Create's industrial iron palette (tools/steel_art.py); it replaces Create: Gunsmithing's
+    # steel everywhere in the pack (REPLACED below), and the Sheet and Nugget are what Gunsmithing's guns and ammo take
+    ("steel_ingot", "Steel Ingot", I, None), ("steel_sheet", "Steel Sheet", S, None), ("steel_nugget", "Steel Nugget", NUG, None),
     ("steel_beam", "Steel Beam", I, 0x70747C), ("steel_pipe", "Steel Pipe", ROD, 0x70747C),
     ("versatile_framework", "Versatile Framework", "minecraft:item/item_frame", 0xF0A050),
     ("encased_industrial_beam", "Encased Industrial Beam", I, 0xA8A8A0), ("stator", "Stator", "create:item/belt_connector", None),
@@ -256,7 +259,9 @@ MILESTONES = [
      [C + "cart_assembler", C + "portable_storage_interface", C + "minecart_coupling"], ["backpack:gold"]),
     (3, "basic_steel_production", "Basic Steel Production",
      "Foundry (Mechanical Mixer); Steel Ingot, Steel Beam, Steel Pipe and Versatile Framework",
-     [C + "mechanical_mixer", "cgs:steel_ingot", "siftec:steel_casing"], []),
+     [C + "mechanical_mixer", "siftec:steel_ingot", "siftec:steel_sheet", "siftec:steel_nugget", "siftec:steel_casing",
+      "siftec:steel_window", "siftec:steel_window_pane", "siftec:steel_encased_shaft", "siftec:steel_encased_cogwheel",
+      "siftec:steel_encased_large_cogwheel"], []),
     (3, "enhanced_asset_security", "Enhanced Asset Security", "Xeno-Basher (Pneumatic Hammer) and the melee weapons", ["cgs:hammer"], []),
 
     # Tier 4
@@ -387,6 +392,16 @@ MILESTONES = [(t, mid, name, sat_cost(_by_sat[mid][1]), _mmss(_by_sat[mid][2]), 
 DISABLED = [C + "water_wheel", C + "large_water_wheel", C + "blaze_cake", C + "blaze_cake_base", C + "creative_blaze_cake",
             "the_sift:sift_portal", "the_sift:sift_rift", C + "rotation_speed_controller", C + "schematic_table", C + "schematicannon", C + "empty_schematic", C + "schematic_and_quill",
             C + "schematic", "farmersdelight:wheat_dough"]   # Create's dough replaces Farmer's Delight's
+
+# Replaced for good by SIFTEC's own blocks and items (old id -> new id, how many): switched off like DISABLED, out of the
+# creative tabs and JEI, out of every recipe and tag, and any that still turns up (an old chest, a mod's loot, a
+# placed block) becomes the new one (compat/Replaced.java). Create: Gunsmithing's steel is SIFTEC's steel (its steel
+# block nine ingots, as there is no steel block); Create's industrial iron is SIFTEC's Steel Casing and steel windows.
+REPLACED = {"cgs:steel_ingot": ("siftec:steel_ingot", 1), "cgs:steel_sheet": ("siftec:steel_sheet", 1),
+            "cgs:steel_nugget": ("siftec:steel_nugget", 1), "cgs:steel_block": ("siftec:steel_ingot", 9),
+            C + "industrial_iron_block": ("siftec:steel_casing", 1), C + "industrial_iron_window": ("siftec:steel_window", 1),
+            C + "industrial_iron_window_pane": ("siftec:steel_window_pane", 1)}
+DISABLED += list(REPLACED)
 
 # Wormhole phases, delivered at the Wormhole Gateway. Phase n opens the tiers listed.
 PHASES = [
@@ -829,7 +844,6 @@ MORE_LOCKS = {
                       C + "framed_glass", C + "framed_glass_pane", C + "framed_glass_door", C + "framed_glass_trapdoor",
                       C + "horizontal_framed_glass", C + "horizontal_framed_glass_pane", C + "vertical_framed_glass", C + "vertical_framed_glass_pane",
                       C + "tiled_glass", C + "tiled_glass_pane", C + "ornate_iron_window", C + "ornate_iron_window_pane",
-                      C + "industrial_iron_block", C + "industrial_iron_window", C + "industrial_iron_window_pane",
                       C + "weathered_iron_block", C + "weathered_iron_window", C + "weathered_iron_window_pane",
                       DG + "andesite_girder", DG + "chip_wood_block", DG + "chip_wood_slab", DG + "chip_wood_stairs", DG + "chip_wood_beam"]
                      + [f"{C}{w}_window{p}" for w in WOODS for p in ("", "_pane")] + [f"{C}{c}_seat" for c in COLOURS]

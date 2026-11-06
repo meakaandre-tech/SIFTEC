@@ -285,7 +285,7 @@ public final class SteelTests {
             new ItemStack(item("cgs:steel_sheet"))));
         var made = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, siftec, level);
         var notMade = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, old, level);
-        String got = made.map(h -> id(h.value().assemble(siftec).getItem())).orElse("nothing");
+        String got = made.map(h -> h.id().identifier().toString()).orElse("nothing");
         expect(source, "a Gunsmithing Spread Barrel is crafted from SIFTEC's Steel Sheets, and not from Gunsmithing's", "cgs:shotgun_spread_barrel".equals(got)
             && notMade.isEmpty(), "SIFTEC steel makes " + got + ", Gunsmithing steel makes " + notMade.map(h -> h.id().identifier().toString()).orElse("nothing"));
         // the ammo: Gunsmithing's piercing rounds and nails take steel nuggets by their tag

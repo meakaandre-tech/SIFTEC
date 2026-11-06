@@ -1,5 +1,7 @@
 package com.meakaandre.siftec;
 
+import com.meakaandre.siftec.compat.Replaced;
+import com.meakaandre.siftec.compat.SteelCasing;
 import com.meakaandre.siftec.building.BuildGun;
 import com.meakaandre.siftec.building.BuildingPower;
 import com.meakaandre.siftec.building.Buildings;
@@ -62,6 +64,9 @@ public class Siftec implements ModInitializer {
         HubMenu.register();
         ModFluids.register();
         ModTab.register();
+        // SIFTEC's steel in place of Gunsmithing's steel and Create's industrial iron, and its casing's behaviours
+        SteelCasing.register();
+        Replaced.register();
         NodePlacer.register();
         AncientCities.register();
         MapLock.register();
