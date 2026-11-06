@@ -213,7 +213,7 @@ public class ShopMenu extends ChestMenu {
         Shop.Entry e = entries.get(index);
         Company company = company();
         if (company == null || !stillValid(player)) return;
-        if (e.owned(company)) {
+        if (takes(player, company, e)) {
             take(company, e);
         } else {
             buy(company, e);
@@ -232,17 +232,27 @@ public class ShopMenu extends ChestMenu {
         return out;
     }
 
+    /** True if clicking the entry takes one of it (or says how it is used) rather than buying it: the company owns it. */
+    public static boolean takes(Player player, Company company, Shop.Entry e) {
+        return e.owned(company);
+    }
+
+    /** Why the player cannot buy this entry for their company now (out of season, too few coupons), or null if they can. */
+    public static @Nullable Component buyRefusal(ServerPlayer player, Shop.Entry e) {
+        if (player.hasInfiniteMaterials()) return null;
+        if (!e.inSeason()) return Component.translatable("siftec.shop.out_of_season", months(e.months()));
+        if (player.getInventory().countItem(ModItems.FICSIT_COUPON.get()) < e.coupons()) return Component.translatable("siftec.shop.poor");
+        return null;
+    }
+
     private void buy(Company company, Shop.Entry e) {
-        if (!e.inSeason() && !player.hasInfiniteMaterials()) {
-            player.sendOverlayMessage(Component.translatable("siftec.shop.out_of_season", months(e.months())));
+        Component refused = buyRefusal(player, e);
+        if (refused != null) {
+            player.sendOverlayMessage(refused);
             return;
         }
         Item coupon = ModItems.FICSIT_COUPON.get();
         if (!player.hasInfiniteMaterials()) {
-            if (player.getInventory().countItem(coupon) < e.coupons()) {
-                player.sendOverlayMessage(Component.translatable("siftec.shop.poor"));
-                return;
-            }
             new Milestone.Cost(BuiltInRegistries.ITEM.getKey(coupon).toString(), e.coupons()).take(player.getInventory(), e.coupons());
         }
         Shop.unlock(company, e);

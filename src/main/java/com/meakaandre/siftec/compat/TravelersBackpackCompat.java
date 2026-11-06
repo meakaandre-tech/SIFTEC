@@ -143,8 +143,14 @@ public final class TravelersBackpackCompat {
         return tier;
     }
 
+    /** The tier the player's backpack has: their company's. */
     public static int tierFor(ServerPlayer player) {
-        return tierFor(Companies.find(player));
+        return tierFor(player, Companies.find(player));
+    }
+
+    /** The tier a player of this company wears. */
+    public static int tierFor(ServerPlayer player, @Nullable Company company) {
+        return tierFor(company);
     }
 
     /** The milestone that raises the backpack to this tier, or null (Leather, or a tier nothing raises it to). */

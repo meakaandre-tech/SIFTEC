@@ -142,7 +142,12 @@ public class MamMenu extends ChestMenu {
      * or had one of its starting items brought to the MAM (which starts it for good).
      */
     private boolean found(Milestones.Tree t) {
-        if (player.hasInfiniteMaterials() || company.trees.contains(t.id())) return true;
+        return player.hasInfiniteMaterials() || foundBy(player, company, t);
+    }
+
+    /** {@link #found} by the company itself: a creative player's window shows every tree, but finds none for it. */
+    static boolean foundBy(ServerPlayer player, Company company, Milestones.Tree t) {
+        if (company.trees.contains(t.id())) return true;
         for (Milestone m : t.nodes()) if (company.has(m.id()) || company.research.equals(m.id())) return true;
         for (String trigger : t.triggers()) {
             if (new Milestone.Cost(trigger, 1).carried(player.getInventory()) > 0) {
@@ -152,6 +157,12 @@ public class MamMenu extends ChestMenu {
             }
         }
         return false;
+    }
+
+    /** May the player start research in this tree for their company: the MAM is open to it (Field Research) and the tree found. */
+    public static boolean mayResearch(ServerPlayer player, Company company, Milestones.Tree t) {
+        if (player.hasInfiniteMaterials()) return true;
+        return company.has(MamBlock.FIELD_RESEARCH) && foundBy(player, company, t);
     }
 
     /** The items that start a tree, by name: "rotten flesh, bone, spider eye or gunpowder". */
@@ -289,7 +300,7 @@ public class MamMenu extends ChestMenu {
         MinecraftServer server = player.level().getServer();
         if (company.has(m.id()) || company.research.equals(m.id())) return;
         // the MAM opens only after Field Research (MamBlock); checked again here for a window opened some other way
-        if (!player.hasInfiniteMaterials() && !company.has(MamBlock.FIELD_RESEARCH)) return;
+        if (!mayResearch(player, company, trees.get(tree))) return;
         Milestone blocker = Milestones.blocker(company, m);
         if (blocker != null) {
             player.sendOverlayMessage(Component.translatable("siftec.hub.needs", blocker.name()));

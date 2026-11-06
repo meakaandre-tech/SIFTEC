@@ -56,8 +56,17 @@ public class BuildMenuScreen extends Screen {
     private Component flash = Component.empty();
     private long flashUntil;
 
+    /** The game mode the menu lists for: null for the player's own, or creative (true) or not, for the selftests. */
+    private final @Nullable Boolean creative;
+
     public BuildMenuScreen() {
+        this(null);
+    }
+
+    /** The menu as a creative player (true) or anyone else (false) sees it, whatever the player's own game mode. */
+    BuildMenuScreen(@Nullable Boolean creative) {
         super(Component.translatable("siftec.build_menu.title"));
+        this.creative = creative;
     }
 
     @Override
@@ -67,14 +76,20 @@ public class BuildMenuScreen extends Screen {
 
     // ------------------------------------------------------------------------------------------------ what it shows
 
-    /** The ids the player may build: what the server said is unlocked, or everything for a creative player it has not told yet. */
-    private Set<String> unlocked() {
-        if (BuildGunClient.unlocked.isEmpty() && minecraft.player != null && minecraft.player.hasInfiniteMaterials()) {
+    /** The ids the menu lists: {@link #shown} for the player's game mode. */
+    Set<String> unlocked() {
+        boolean asCreative = creative != null ? creative : minecraft != null && minecraft.player != null && minecraft.player.hasInfiniteMaterials();
+        return shown(BuildGunClient.unlocked, asCreative);
+    }
+
+    /** The ids the menu lists: what the server said the company has unlocked, or everything for a creative player it has not told yet. */
+    static Set<String> shown(Set<String> unlocked, boolean creative) {
+        if (unlocked.isEmpty() && creative) {
             Set<String> all = new HashSet<>();
             for (BuildingDef def : Buildings.all()) all.add(def.id());
             return all;
         }
-        return BuildGunClient.unlocked;
+        return unlocked;
     }
 
     private String query() {
