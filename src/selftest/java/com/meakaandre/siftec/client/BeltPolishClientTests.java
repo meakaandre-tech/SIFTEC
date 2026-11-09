@@ -105,6 +105,7 @@ public final class BeltPolishClientTests {
             switch (probe.action()) {
                 case "vertical" -> vertical();
                 case "sloped" -> sloped();
+                case "flat" -> flat();
                 case "frames" -> frames();
                 case "ponder" -> ponder();
                 case "ponderopen" -> ponderOpen(probe.arg());
@@ -208,7 +209,8 @@ public final class BeltPolishClientTests {
             int w = image.getWidth(), h = image.getHeight(), x0 = w / 4, x1 = 3 * w / 4;
             int[] count = new int[h];
             for (int y = 0; y < h; y++) {
-                int bg = image.getPixel(6, y);
+                // the room's white is most of every row (walls and floor are shaded differently): each row's own median
+                int bg = medianColour(image, y, x0, x1);
                 for (int x = x0; x < x1; x++) if (differs(image.getPixel(x, y), bg, 40)) count[y]++;
             }
             List<int[]> segs = segments(count, 8);
@@ -223,6 +225,22 @@ public final class BeltPolishClientTests {
             }
             log("vertical checked");
         }));
+    }
+
+    /** The median colour, channel by channel, of a row's pixels from x0 to x1. */
+    private static int medianColour(NativeImage image, int y, int x0, int x1) {
+        int n = x1 - x0;
+        int[] rr = new int[n], gg = new int[n], bb = new int[n];
+        for (int x = x0; x < x1; x++) {
+            int p = image.getPixel(x, y);
+            rr[x - x0] = r(p);
+            gg[x - x0] = g(p);
+            bb[x - x0] = b(p);
+        }
+        Arrays.sort(rr);
+        Arrays.sort(gg);
+        Arrays.sort(bb);
+        return 0xff000000 | rr[n / 2] << 16 | gg[n / 2] << 8 | bb[n / 2];
     }
 
     /** Runs of rows with something in them, at least {@code least} rows high (small gaps bridged), top first. */
@@ -298,6 +316,50 @@ public final class BeltPolishClientTests {
                 ok && caps == 2 && sloped > 0, (lookOf == null ? "no look in this build; " : "") + cells);
         }
         log("sloped checked");
+    }
+
+    /**
+     * The Mk.1 to Mk.6 flat belts: every block draws its Mk's side trim (not only the block Create's renderer runs for),
+     * the end blocks a cap, and no belt block hides the ground's face under it.
+     */
+    private static void flat() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return;
+        String[] trims = {"ANDESITE", "ANDESITE", "COPPER", "COPPER", "BRASS", "STEEL"};
+        Method lookOf = null;
+        try {
+            lookOf = Class.forName("com.meakaandre.siftec.client.belt.LowBeltRender").getMethod("look", BeltBlockEntity.class);
+        } catch (ReflectiveOperationException e) {
+            Siftec.LOGGER.debug("no LowBeltRender.look", e);
+        }
+        for (int mk = 1; mk <= 6; mk++) {
+            BlockPos a = BeltPolishTests.MK_ROW.south(BeltPolishTests.MK_GAP * (mk - 1));
+            List<String> cells = new ArrayList<>();
+            boolean ok = lookOf != null;
+            for (int i = 0; i < BeltPolishTests.MK_LENGTH; i++) {
+                BlockPos at = a.east(i);
+                if (!(mc.level.getBlockEntity(at) instanceof BeltBlockEntity be)) {
+                    ok = false;
+                    cells.add(i + ": no belt");
+                    continue;
+                }
+                boolean hides = !be.getBlockState().getOcclusionShape().isEmpty();
+                Map<String, Object> look = lookOf == null ? Map.of() : record(invoke(lookOf, be));
+                String trim = String.valueOf(look.get("trim"));
+                boolean cap = Boolean.TRUE.equals(look.get("cap")), end = i == 0 || i == BeltPolishTests.MK_LENGTH - 1;
+                ok &= trims[mk - 1].equals(trim) && cap == end && !hides;
+                cells.add(i + ": trim " + trim + (cap ? " cap" : "") + (hides ? " hides the ground" : ""));
+            }
+            expect("flat: every block of a Mk." + mk + " belt draws " + trims[mk - 1] + " side trim, caps at its ends, and none hides the ground under it",
+                ok, (lookOf == null ? "no look in this build; " : "") + cells);
+        }
+        // which belt blocks Create's renderer runs for (in view: the six belts)
+        then(0, RenderProbe::start);
+        then(3, () -> {
+            RenderProbe.stop();
+            log("probe: " + RenderProbe.summary().getLast());
+            log("flat checked");
+        });
     }
 
     private static @Nullable Object invoke(Method m, Object arg) {
@@ -403,7 +465,24 @@ public final class BeltPolishClientTests {
                 expect("frames: the picture shows the " + name + "'s item", changed >= 0.12,
                     String.format(Locale.ROOT, "%.0f%% of the middle differs from %s; middle %s, wall %s", changed * 100, against, mean(at), hex(wall[0])));
             }
-            log("frames checked");
+            // where an item is lost on its way to the screen: a few frames of the render probe, looking at the diamond's frame
+            double x = w.getX() + 0.5;
+            then(0, () -> look(x, eyeY, eyeZ, 180, 0));
+            then(20, RenderProbe::start);
+            then(3, () -> {
+                RenderProbe.stop();
+                for (String line : RenderProbe.summary()) log("probe: " + line);
+                log("graphics preset " + mc.options.graphicsPreset().get() + ", improved transparency " + mc.options.improvedTransparency().get());
+                // and the same picture with improved transparency the other way round
+                mc.options.improvedTransparency().set(!mc.options.improvedTransparency().get());
+            });
+            then(40, () -> picture(image -> {
+                int[] at = box(image, image.getWidth() / 2, image.getHeight() / 2, 24);
+                log(String.format(Locale.ROOT, "probe: with improved transparency %s the diamond's frame differs %.0f%% from the empty one",
+                    mc.options.improvedTransparency().get(), changed(at, empty, 40) * 100));
+                mc.options.improvedTransparency().set(!mc.options.improvedTransparency().get());
+            }));
+            then(20, () -> log("frames checked"));
         });
     }
 

@@ -1,0 +1,9 @@
+{
+  "type": "create:splashing",
+  "ingredient": "siftec:steel_casing",
+  "results": [
+    {
+      "id": "create:weathered_iron_block"
+    }
+  ]
+}

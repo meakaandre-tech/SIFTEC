@@ -91,6 +91,9 @@ public final class BeltPolishTests {
     /** The sloped belts: one for each belt Mk, three blocks up and along, rising east, three blocks apart in z. */
     public static final BlockPos SLOPES = new BlockPos(X + 80, Y, Z);
     public static final int SLOPE_RUN = 3, SLOPE_GAP = 3;
+    /** The lowbelts suite's Mk.1 to Mk.6 belts: six blocks long, east from here, two blocks apart in z. */
+    public static final BlockPos MK_ROW = new BlockPos(LowBeltTests.X + 70, LowBeltTests.Y, LowBeltTests.Z + 20);
+    public static final int MK_LENGTH = 6, MK_GAP = 2;
     /** The Depot the Encased Fan washes the steel on; fan and motor west of it, water on both sides. */
     static final BlockPos SPLASH = new BlockPos(X + 120, Y, Z);
     /** The loaded-against-simulated twins: A here, B {@link #SIM_B} blocks south. */
@@ -231,16 +234,21 @@ public final class BeltPolishTests {
                     + "transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.8f,0.8f,0.8f]}}",
                 x, Y + FRAME_HEIGHT + 0.5, FRAMES.getZ() + 1.5, id(shown[i]), TAG));
         }
-        ItemEntity loose = new ItemEntity(level, FRAMES.getX() + FRAME_STEP * 5 + 0.5, Y + FRAME_HEIGHT + 0.3, FRAMES.getZ() + 1.5, new ItemStack(Items.DIAMOND));
+        // an item entity is drawn about a quarter block above where it is: level with the camera's eye at the frames
+        ItemEntity loose = new ItemEntity(level, FRAMES.getX() + FRAME_STEP * 5 + 0.5, Y + FRAME_HEIGHT + 0.25, FRAMES.getZ() + 1.5, new ItemStack(Items.DIAMOND));
         loose.setNoGravity(true);
         loose.setDeltaMovement(0, 0, 0);
         loose.setNeverPickUp();
         loose.setUnlimitedLifetime();
         loose.addTag(TAG);
         level.addFreshEntity(loose);
-        int displays = level.getEntitiesOfClass(Display.ItemDisplay.class, new AABB(x0, Y, FRAMES.getZ(), x1, Y + 6, FRAMES.getZ() + 3)).size();
-        REPORT.expect(source, "site: three item frames (two holding items), two item displays and a loose diamond in front of the white wall",
-            frames == 3 && displays == 2, frames + " frames, " + displays + " displays");
+        int made = frames;
+        // the summons run once this command is done
+        later(level, 5, () -> {
+            int displays = level.getEntitiesOfClass(Display.ItemDisplay.class, new AABB(x0, Y, FRAMES.getZ(), x1, Y + 6, FRAMES.getZ() + 3)).size();
+            REPORT.expect(source, "site: three item frames (two holding items), two item displays and a loose diamond in front of the white wall",
+                made == 3 && displays == 2, made + " frames, " + displays + " displays");
+        });
     }
 
     /** One sloped belt for each belt Mk, owned by a company with that Mk, rising three blocks east. */
@@ -306,22 +314,24 @@ public final class BeltPolishTests {
         ServerLevel level = server.overworld();
         server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), "time set noon");
         int lx = LowBeltTests.X, lz = LowBeltTests.Z;
-        // the placing lines (andesite tunnel, brass tunnel, andesite funnel, brass funnel at x+2, three apart in z); low
-        // eyes, a little south of each line, looking north-west at the attachment
+        // the placing lines (andesite tunnel, brass tunnel, andesite funnel, brass funnel at x+2, three apart in z): the eye
+        // just above the 5 px rails, two blocks south of the line, straight at the attachment
         double[] eye = switch (name) {
-            case "andesite_tunnel" -> new double[]{lx + 3.6, Y + 0.55, lz + 1.9, 150, 12};
-            case "brass_tunnel" -> new double[]{lx + 3.6, Y + 0.55, lz + 4.9, 150, 12};
-            case "andesite_funnel" -> new double[]{lx + 3.6, Y + 0.55, lz + 7.9, 150, 12};
-            case "brass_funnel" -> new double[]{lx + 3.6, Y + 0.55, lz + 10.9, 150, 12};
-            // the Basin line under its ceiling: from the south, at the funnel and the Basin
-            case "basin" -> new double[]{lx + 4.2, Y + 0.6, lz + 42.6, 160, 10};
+            case "andesite_tunnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 2.4, 180, 8};
+            case "brass_tunnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 5.4, 180, 8};
+            case "andesite_funnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 8.4, 180, 8};
+            case "brass_funnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 11.4, 180, 8};
+            // the Basin line under its ceiling: from the south, at its funnel and the Basin, its tunnel to the left
+            case "basin" -> new double[]{lx + 6.0, Y + 0.55, lz + 42.6, 160, 6};
             // the vertical belt from the side (the client's own check looks the same way)
             case "vertical" -> verticalEye(level.getBlockState(VERTICAL));
-            case "sloped" -> new double[]{SLOPES.getX() + 1.5, Y + 0.9, SLOPES.getZ() + 2.4, 150, 6};
+            case "sloped" -> new double[]{SLOPES.getX() + 2.0, Y + 1.6, SLOPES.getZ() + 2.4, 180, 12};
             // the Mk.1 to Mk.6 belts (x+70..75, z+20..30 in steps of two), low from their south-west corner
             case "mkrow" -> new double[]{lx + 68.2, Y + 0.6, lz + 32.0, 205, 8};
             case "frames" -> new double[]{FRAMES.getX() + 5.5, Y + FRAME_HEIGHT + 0.5, FRAMES.getZ() + 6.5, 180, 0};
             case "splash" -> new double[]{SPLASH.getX() - 0.5, Y + 1.6, SPLASH.getZ() + 3.2, 180, 22};
+            // the loaded twin of the loaded-against-simulated count: above its three chests, looking down at the line
+            case "simline" -> simEye();
             default -> null;
         };
         if (eye == null) {
@@ -348,6 +358,17 @@ public final class BeltPolishTests {
     }
 
     // ------------------------------------------------------------------------------------------------ loaded against simulated
+
+    /** Above the loaded twin's line, between its three chests, looking down at it. */
+    private static double[] simEye() {
+        if (TWINS.isEmpty() || TWINS.getFirst().chests().size() < 3) return new double[]{SIM_X + 0.5, Y + 6, SIM_Z + 8, 180, 40};
+        double x = 0, z = 0;
+        for (BlockPos c : TWINS.getFirst().chests()) {
+            x += c.getX() + 0.5;
+            z += c.getZ() + 0.5;
+        }
+        return new double[]{x / 3, Y + 7, z / 3 + 5, 180, 50};
+    }
 
     /** One twin: its Storage Container and the three chests at the ends of its line (straight on, left, right). */
     private record Twin(String name, BlockPos origin, @Nullable ControllerBlockEntity source, List<BlockPos> chests) {

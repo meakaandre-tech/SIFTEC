@@ -813,6 +813,8 @@ shot
 cmd siftec worldtest beltpolish view mkrow
 sleep 3
 shot
+cmd siftec selftest beltpolish client flat
+wait 30 SELFTEST beltpolish-client flat checked
 cmd siftec worldtest beltpolish view vertical
 sleep 5
 cmd siftec selftest beltpolish client vertical
@@ -832,6 +834,9 @@ sleep 3
 shot
 cmd siftec worldtest beltpolish view splash
 sleep 4
+shot
+cmd siftec worldtest beltpolish view simline
+sleep 6
 shot
 cmd siftec selftest beltpolish client ponder
 wait 180 SELFTEST beltpolish-client ponder checked

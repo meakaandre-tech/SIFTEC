@@ -1,0 +1,9 @@
+{
+  "type": "create:splashing",
+  "ingredient": "siftec:steel_window_pane",
+  "results": [
+    {
+      "id": "create:weathered_iron_window_pane"
+    }
+  ]
+}
