@@ -395,6 +395,7 @@ public final class BeltPolishClientTests {
                     + ", its renderer runs for the controller " + drawn + ", look " + look);
         }
         VisualizationManager manager = VisualizationManager.get(mc.level);
+        log("lines: the crosshair is on " + (mc.hitResult instanceof net.minecraft.world.phys.BlockHitResult hit ? mc.level.getBlockState(hit.getBlockPos()) + " at " + hit.getBlockPos().subtract(BeltPolishTests.PLACING).toShortString() : String.valueOf(mc.hitResult == null ? null : mc.hitResult.getType())));
         log("lines: Flywheel block entity visuals " + (manager == null ? "none (no visualization)" : manager.blockEntities().visualCount()));
         log("lines checked");
     }

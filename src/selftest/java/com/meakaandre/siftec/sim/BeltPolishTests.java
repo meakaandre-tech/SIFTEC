@@ -1,5 +1,10 @@
 package com.meakaandre.siftec.sim;
 
+import com.meakaandre.siftec.company.Company;
+import com.meakaandre.siftec.company.CompanyData;
+import com.meakaandre.siftec.hub.Milestone;
+import com.meakaandre.siftec.hub.Milestones;
+import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.Siftec;
 import com.meakaandre.siftec.TestQueue;
 import com.meakaandre.siftec.TestReport;
@@ -50,6 +55,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -299,6 +305,15 @@ public final class BeltPolishTests {
         level.setBlock(SPLASH.west(), Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL);
         level.setBlock(SPLASH.west(2), AllBlocks.ENCASED_FAN.defaultBlockState().setValue(DirectionalKineticBlock.FACING, Direction.EAST), Block.UPDATE_ALL);
         level.setBlock(SPLASH.west(3), AllBlocks.CREATIVE_MOTOR.defaultBlockState().setValue(DirectionalKineticBlock.FACING, Direction.EAST), Block.UPDATE_ALL);
+        // the fan and the Depot belong to a company that has every milestone (weathered iron is locked behind steel)
+        CompanyData data = CompanyData.get(level.getServer());
+        Company owner = new Company();
+        owner.id = owner.name = "selftest_splash";
+        for (Milestone m : Milestones.all()) owner.done.add(m.id());
+        data.companies().put(owner.id, owner);
+        data.setDirty();
+        for (BlockPos at : new BlockPos[]{SPLASH, SPLASH.west(2), SPLASH.west(3)})
+            if (level.getBlockEntity(at) instanceof BlockEntity be) be.setAttached(Ownership.OWNER, owner.id);
         if (level.getBlockEntity(SPLASH) instanceof DepotBlockEntity depot) {
             depot.depotBehaviour.setHeldItem(new TransportedItemStack(new ItemStack(item("siftec:steel_casing"))));
             depot.notifyUpdate();
@@ -326,6 +341,8 @@ public final class BeltPolishTests {
             case "brass_tunnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 5.4, 180, 8};
             case "andesite_funnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 8.4, 180, 8};
             case "brass_funnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 11.4, 180, 8};
+            // the same spot, the crosshair off the funnel (to the right of it, over the belt)
+            case "brass_funnel_aside" -> new double[]{lx + 2.5, Y + 0.6, lz + 11.4, 160, 8};
             // the Basin line under its ceiling: from the south, at its funnel and the Basin, its tunnel to the left
             case "basin" -> new double[]{lx + 6.0, Y + 0.55, lz + 42.6, 160, 6};
             // the vertical belt from the side (the client's own check looks the same way)

@@ -810,6 +810,9 @@ cmd siftec selftest beltpolish client lines
 wait 30 SELFTEST beltpolish-client lines checked
 sleep 2
 shot
+cmd siftec worldtest beltpolish view brass_funnel_aside
+sleep 5
+shot
 cmd siftec worldtest lowbelts feed
 cmd siftec worldtest beltpolish view basin
 sleep 4
