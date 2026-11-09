@@ -94,6 +94,8 @@ public final class BeltPolishTests {
     /** The lowbelts suite's Mk.1 to Mk.6 belts: six blocks long, east from here, two blocks apart in z. */
     public static final BlockPos MK_ROW = new BlockPos(LowBeltTests.X + 70, LowBeltTests.Y, LowBeltTests.Z + 20);
     public static final int MK_LENGTH = 6, MK_GAP = 2;
+    /** The first of the four placing lines (andesite tunnel, brass tunnel, andesite funnel, brass funnel; three apart in z), each attachment two blocks in. */
+    public static final BlockPos PLACING = new BlockPos(LowBeltTests.X, LowBeltTests.Y, LowBeltTests.Z);
     /** The Depot the Encased Fan washes the steel on; fan and motor west of it, water on both sides. */
     static final BlockPos SPLASH = new BlockPos(X + 120, Y, Z);
     /** The loaded-against-simulated twins: A here, B {@link #SIM_B} blocks south. */
@@ -282,7 +284,9 @@ public final class BeltPolishTests {
             REPORT.expect(source, "weathered: splashing " + p[0] + " makes " + p[1],
                 out != null && out.size() == 1 && out.getFirst().is(item(p[1])) && out.getFirst().getCount() == 1, got);
         }
-        // a real fan: creative motor, fan blowing east, water, the Depot, water again (a pulling fan washes it too)
+        // a real fan: creative motor, fan blowing east, water, the Depot, water again (a pulling fan washes it too); its
+        // chunks forced, as no player is near to keep the fan and the Depot ticking
+        forced(level, SPLASH, true);
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int x = -4; x <= 3; x++)
             for (int z = -1; z <= 1; z++) {
@@ -303,6 +307,7 @@ public final class BeltPolishTests {
             ItemStack now = level.getBlockEntity(SPLASH) instanceof DepotBlockEntity d ? d.depotBehaviour.getHeldItemStack() : ItemStack.EMPTY;
             REPORT.expect(source, "weathered: a Steel Casing on a Depot in front of an Encased Fan blowing through water turns into weathered iron",
                 now.is(item("create:weathered_iron_block")), now.isEmpty() ? "the Depot is empty" : now.getCount() + " " + id(now.getItem()));
+            forced(level, SPLASH, false);
         });
     }
 

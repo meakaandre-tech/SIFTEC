@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -87,7 +88,7 @@ public final class LowBeltRender {
     }
 
     /** What one belt block draws besides Create's band (for the selftests): its trim, whether it has a cap, and the box all of it fills, in the block's own space. */
-    public record Look(@Nullable String trim, boolean cap, float[] min, float[] max) {
+    public record Look(@Nullable String trim, boolean cap, float[] min, float[] max, @Nullable String attachment) {
     }
 
     private LowBeltRender() {
@@ -283,7 +284,7 @@ public final class LowBeltRender {
 
     /**
      * What this belt block draws besides Create's band, as it is drawn: the trim's material, whether it has an end cap,
-     * and the box every vertex of its trim and cap fills in the block's own space (0 to 1 is inside the block). Null for
+     * and the box every vertex of its trim and cap fills in the block's own space (0 to 1 is inside the block), and the built-in funnel or tunnel it draws. Null for
      * a belt block that draws nothing of its own (encased, sideways).
      */
     public static @Nullable Look look(BeltBlockEntity be) {
@@ -297,7 +298,9 @@ public final class LowBeltRender {
             float[] min = {Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE}, max = {-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE};
             bounds(p, p.railsModel, false, min, max);
             bounds(p, p.capModel, p.capTurned, min, max);
-            return new Look(p.trim == null ? null : p.trim.name(), p.capModel != null, min, max);
+            SmartBlockEntity a = BeltAttachments.of(be);
+            String attachment = p.block == null || a == null ? null : BuiltInRegistries.BLOCK.getKey(a.getBlockState().getBlock()).toString();
+            return new Look(p.trim == null ? null : p.trim.name(), p.capModel != null, min, max, attachment);
         }
         return null;
     }

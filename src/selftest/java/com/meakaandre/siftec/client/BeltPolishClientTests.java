@@ -5,9 +5,13 @@ import com.meakaandre.siftec.sim.BeltPolishTests;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.catnip.gui.ScreenOpener;
+import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
+import com.zurrtum.create.client.vanillin.VanillaVisuals;
+import com.zurrtum.create.client.vanillin.config.Configurator;
+import com.zurrtum.create.client.vanillin.config.VisualConfigValue;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltSlope;
@@ -17,6 +21,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.ItemDisplayEntityRenderState;
 import net.minecraft.client.renderer.entity.state.ItemFrameRenderState;
@@ -26,6 +32,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -47,6 +54,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 
@@ -106,6 +114,7 @@ public final class BeltPolishClientTests {
                 case "vertical" -> vertical();
                 case "sloped" -> sloped();
                 case "flat" -> flat();
+                case "lines" -> lines();
                 case "frames" -> frames();
                 case "ponder" -> ponder();
                 case "ponderopen" -> ponderOpen(probe.arg());
@@ -206,7 +215,8 @@ public final class BeltPolishClientTests {
         double[] eye = BeltPolishTests.verticalEye(belt);
         then(0, () -> look(eye[0], eye[1], eye[2], (float) eye[3], (float) eye[4]));
         then(40, () -> picture(image -> {
-            int w = image.getWidth(), h = image.getHeight(), x0 = w / 4, x1 = 3 * w / 4;
+            // the middle quarter of the picture: the belt and the block, on the back wall, the floor and the sky (the side walls' edges stay out)
+            int w = image.getWidth(), h = image.getHeight(), x0 = 3 * w / 8, x1 = 5 * w / 8;
             int[] count = new int[h];
             for (int y = 0; y < h; y++) {
                 // the room's white is most of every row (walls and floor are shaded differently): each row's own median
@@ -353,13 +363,39 @@ public final class BeltPolishClientTests {
             expect("flat: every block of a Mk." + mk + " belt draws " + trims[mk - 1] + " side trim, caps at its ends, and none hides the ground under it",
                 ok, (lookOf == null ? "no look in this build; " : "") + cells);
         }
-        // which belt blocks Create's renderer runs for (in view: the six belts)
-        then(0, RenderProbe::start);
-        then(3, () -> {
-            RenderProbe.stop();
-            log("probe: " + RenderProbe.summary().getLast());
-            log("flat checked");
-        });
+        log("flat checked");
+    }
+
+    /**
+     * The four placing lines (andesite tunnel, brass tunnel, andesite funnel, brass funnel), checked from where their
+     * pictures are taken: the attachment block draws its trim and its built-in funnel or tunnel.
+     */
+    private static void lines() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return;
+        Method lookOf = null;
+        try {
+            lookOf = Class.forName("com.meakaandre.siftec.client.belt.LowBeltRender").getMethod("look", BeltBlockEntity.class);
+        } catch (ReflectiveOperationException e) {
+            Siftec.LOGGER.debug("no LowBeltRender.look", e);
+        }
+        // the four placing lines: the attachment block draws the trim and its built-in funnel or tunnel
+        String[] attached = {"create:andesite_tunnel", "create:brass_tunnel", "create:andesite_belt_funnel", "create:brass_belt_funnel"};
+        for (int i = 0; i < attached.length; i++) {
+            BlockPos at = BeltPolishTests.PLACING.south(3 * i).east(2);
+            BeltBlockEntity be = mc.level.getBlockEntity(at) instanceof BeltBlockEntity b ? b : null;
+            Map<String, Object> look = lookOf == null || be == null ? Map.of() : record(invoke(lookOf, be));
+            BeltBlockEntity controller = be == null ? null : be.getControllerBE();
+            BlockEntityRenderer<BeltBlockEntity, BlockEntityRenderState> renderer = controller == null ? null : mc.getBlockEntityRenderDispatcher().getRenderer(controller);
+            boolean drawn = renderer != null && renderer.shouldRender(controller, mc.gameRenderer.mainCamera().position());
+            expect("lines: the " + attached[i] + " line's attachment block draws its trim and the built-in " + attached[i],
+                lookOf != null && look.get("trim") != null && attached[i].equals(look.get("attachment")),
+                (be == null ? "no belt" : be.getBlockState() + ", controller " + (controller == null ? "none" : controller.getBlockPos().subtract(at).toShortString()))
+                    + ", its renderer runs for the controller " + drawn + ", look " + look);
+        }
+        VisualizationManager manager = VisualizationManager.get(mc.level);
+        log("lines: Flywheel block entity visuals " + (manager == null ? "none (no visualization)" : manager.blockEntities().visualCount()));
+        log("lines checked");
     }
 
     private static @Nullable Object invoke(Method m, Object arg) {
@@ -401,14 +437,6 @@ public final class BeltPolishClientTests {
         BlockPos w = BeltPolishTests.FRAMES;
         double eyeY = w.getY() + BeltPolishTests.FRAME_HEIGHT + 0.5, eyeZ = w.getZ() + 1 + 2.5;
         String[] names = BeltPolishTests.FRAME_TARGETS;
-        // the mixins in the game that touch what draws an item frame's or item display's item (what the log needs if one is missing)
-        for (String cls : new String[]{"net.minecraft.client.renderer.entity.ItemFrameRenderer", "net.minecraft.client.renderer.entity.DisplayRenderer",
-            "net.minecraft.client.renderer.entity.DisplayRenderer$ItemDisplayRenderer", "net.minecraft.client.renderer.entity.EntityRenderer",
-            "net.minecraft.client.renderer.entity.EntityRenderDispatcher", "net.minecraft.client.renderer.entity.ItemEntityRenderer",
-            "net.minecraft.client.renderer.item.ItemModelResolver", "net.minecraft.client.renderer.item.ItemStackRenderState",
-            "net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState", "net.minecraft.client.renderer.LevelRenderer",
-            "net.minecraft.client.renderer.SubmitNodeStorage", "net.minecraft.client.renderer.feature.ItemFeatureRenderer"})
-            log("mixins in " + cls + ": " + mixins(cls));
         // what the client has
         for (int i = 0; i < names.length; i++) {
             double x = w.getX() + BeltPolishTests.FRAME_STEP * i + 0.5;
@@ -433,9 +461,32 @@ public final class BeltPolishClientTests {
                 state.getClass().getSimpleName() + ", item " + (empty ? "empty" : "model " + box2) + ", renderer " + mc.getEntityRenderDispatcher().getRenderer(e).getClass().getName()
                     + ", hidden by NTGL " + ntglHidden(state) + ", light " + state.lightCoords);
         }
-        // a picture straight at each
-        Map<String, int[]> boxes = new LinkedHashMap<>();
+        // a picture straight at each: first as the game draws them, then with Create Fly's Vanillin (which draws item frames
+        // and item displays itself, instanced) turned off for them, so that Minecraft's own renderers draw them
+        Map<String, int[]> asIs = new LinkedHashMap<>(), vanilla = new LinkedHashMap<>();
         int[] wall = new int[1];
+        pictures(names, eyeY, eyeZ, asIs, wall);
+        then(1, () -> vanillin(mc, false));
+        pictures(names, eyeY, eyeZ, vanilla, wall);
+        then(1, () -> {
+            vanillin(mc, true);
+            log("finding: as the game draws them (Vanillin on) " + shown(names, asIs, wall[0]));
+            log("finding: drawn by Minecraft's own renderers (Vanillin off for them) " + shown(names, vanilla, wall[0]));
+            int[] empty = vanilla.get("frame empty");
+            for (String name : names) {
+                if (name.equals("frame empty")) continue;
+                double changed = changed(name, vanilla, empty, wall[0]);
+                expect("frames: with Minecraft's own renderers, the picture shows the " + name + "'s item", changed >= 0.12,
+                    String.format(Locale.ROOT, "%.0f%% of the middle differs from %s; middle %s, wall %s", changed * 100,
+                        name.startsWith("frame") ? "the empty frame" : "the bare wall", mean(vanilla.get(name)), hex(wall[0])));
+            }
+            log("frames checked");
+        });
+    }
+
+    /** One picture straight at each target, the middle of each kept by name (and the wall above the first). */
+    private static void pictures(String[] names, double eyeY, double eyeZ, Map<String, int[]> boxes, int[] wall) {
+        BlockPos w = BeltPolishTests.FRAMES;
         for (int i = 0; i < names.length; i++) {
             String name = names[i];
             double x = w.getX() + BeltPolishTests.FRAME_STEP * i + 0.5;
@@ -446,44 +497,42 @@ public final class BeltPolishClientTests {
                 wall[0] = image.getPixel(cx, cy - 150);
             }));
         }
-        then(1, () -> {
-            int[] empty = boxes.get("frame empty");
-            for (String name : names) {
-                if (name.equals("frame empty")) continue;
-                int[] at = boxes.get(name);
-                double changed;
-                String against;
-                if (name.startsWith("frame")) {
-                    changed = changed(at, empty, 40);
-                    against = "the empty frame";
-                } else {
-                    int[] bare = new int[at == null ? 0 : at.length];
-                    Arrays.fill(bare, wall[0]);
-                    changed = changed(at, bare, 40);
-                    against = "the bare wall";
-                }
-                expect("frames: the picture shows the " + name + "'s item", changed >= 0.12,
-                    String.format(Locale.ROOT, "%.0f%% of the middle differs from %s; middle %s, wall %s", changed * 100, against, mean(at), hex(wall[0])));
+    }
+
+    /** How much of the middle of a target's picture differs from the empty frame's (frames) or the bare wall (the rest). */
+    private static double changed(String name, Map<String, int[]> boxes, int @Nullable [] empty, int wall) {
+        int[] at = boxes.get(name);
+        if (name.startsWith("frame")) return changed(at, empty, 40);
+        int[] bare = new int[at == null ? 0 : at.length];
+        Arrays.fill(bare, wall);
+        return changed(at, bare, 40);
+    }
+
+    private static String shown(String[] names, Map<String, int[]> boxes, int wall) {
+        List<String> out = new ArrayList<>();
+        for (String name : names)
+            if (!name.equals("frame empty")) out.add(String.format(Locale.ROOT, "%s %.0f%%", name, changed(name, boxes, boxes.get("frame empty"), wall) * 100));
+        return "the middle of each picture differs from the empty frame or bare wall: " + out;
+    }
+
+    /**
+     * Create Fly's Vanillin visuals for item frames, glow item frames and item displays on or off (its config's default, or
+     * disabled), and every such entity in the level re-added so the change shows at once.
+     */
+    private static void vanillin(Minecraft mc, boolean on) {
+        if (mc.level == null) return;
+        Set<EntityType<?>> types = Set.of(EntityType.ITEM_FRAME, EntityType.GLOW_ITEM_FRAME, EntityType.ITEM_DISPLAY);
+        for (EntityType<?> type : types) {
+            Configurator.ConfiguredEntity<?> c = VanillaVisuals.CONFIGURATOR.entities.get(type);
+            if (c != null) c.set(on ? VisualConfigValue.DEFAULT : VisualConfigValue.DISABLE, List.of());
+        }
+        VisualizationManager manager = VisualizationManager.get(mc.level);
+        if (manager == null) return;
+        for (Entity e : mc.level.entitiesForRendering())
+            if (types.contains(e.getType())) {
+                manager.entities().queueRemove(e);
+                if (on) manager.entities().queueAdd(e);
             }
-            // where an item is lost on its way to the screen: a few frames of the render probe, looking at the diamond's frame
-            double x = w.getX() + 0.5;
-            then(0, () -> look(x, eyeY, eyeZ, 180, 0));
-            then(20, RenderProbe::start);
-            then(3, () -> {
-                RenderProbe.stop();
-                for (String line : RenderProbe.summary()) log("probe: " + line);
-                log("graphics preset " + mc.options.graphicsPreset().get() + ", improved transparency " + mc.options.improvedTransparency().get());
-                // and the same picture with improved transparency the other way round
-                mc.options.improvedTransparency().set(!mc.options.improvedTransparency().get());
-            });
-            then(40, () -> picture(image -> {
-                int[] at = box(image, image.getWidth() / 2, image.getHeight() / 2, 24);
-                log(String.format(Locale.ROOT, "probe: with improved transparency %s the diamond's frame differs %.0f%% from the empty one",
-                    mc.options.improvedTransparency().get(), changed(at, empty, 40) * 100));
-                mc.options.improvedTransparency().set(!mc.options.improvedTransparency().get());
-            }));
-            then(20, () -> log("frames checked"));
-        });
     }
 
     /** A box of pixels round (cx, cy), half-size {@code r}. */

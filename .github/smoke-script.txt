@@ -804,7 +804,11 @@ cmd siftec worldtest beltpolish view andesite_funnel
 sleep 3
 shot
 cmd siftec worldtest beltpolish view brass_funnel
-sleep 3
+sleep 5
+shot
+cmd siftec selftest beltpolish client lines
+wait 30 SELFTEST beltpolish-client lines checked
+sleep 2
 shot
 cmd siftec worldtest lowbelts feed
 cmd siftec worldtest beltpolish view basin

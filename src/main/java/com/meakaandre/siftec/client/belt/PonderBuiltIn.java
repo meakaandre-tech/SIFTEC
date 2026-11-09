@@ -8,6 +8,7 @@ import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Create's Ponder scenes for funnels, tunnels and belts keep their funnels and tunnels where Create puts them, in the
@@ -28,6 +29,16 @@ public final class PonderBuiltIn {
     public static BlockState drawn(Level level, BlockPos pos, BlockState state) {
         if (!(level instanceof PonderLevel) || !state.is(AllBlocks.BELT) || !state.getValue(BeltBlock.CASING)) return state;
         return BeltAttachments.fits(level.getBlockState(pos.above())) && carries(state) ? state.setValue(BeltBlock.CASING, false) : state;
+    }
+
+    /**
+     * Where a Ponder text or input window points: a point in a funnel's or tunnel's cell drawn built in (above its lower
+     * face, up to and on its top face) moves down a block with it.
+     */
+    public static Vec3 anchor(Level level, Vec3 point) {
+        if (!(level instanceof PonderLevel)) return point;
+        BlockPos cell = BlockPos.containing(point.x, point.y - 1e-4, point.z);
+        return lowered(level, cell) ? point.subtract(0, 1, 0) : point;
     }
 
     /** A belt block that takes a funnel or tunnel built in, its casing aside: flat or sloped. */
