@@ -394,41 +394,18 @@ public final class BeltPolishClientTests {
                 (be == null ? "no belt" : be.getBlockState() + ", controller " + (controller == null ? "none" : controller.getBlockPos().subtract(at).toShortString()))
                     + ", its renderer runs for the controller " + drawn + ", look " + look);
         }
-        VisualizationManager manager = VisualizationManager.get(mc.level);
-        // the brass funnel line's controller as the renderer extracts it from here (with the real camera): what its funnel holds
-        if (mc.level.getBlockEntity(BeltPolishTests.PLACING.south(9)) instanceof BeltBlockEntity c) {
-            try {
-                Object parts = com.meakaandre.siftec.client.belt.LowBeltRender.extract(c, 1, mc.gameRenderer.mainCamera().position());
-                log("lines: the brass funnel line extracted from the camera: " + fields(parts, 3));
-            } catch (RuntimeException e) {
-                Siftec.LOGGER.error(P + "lines: extracting the brass funnel line threw", e);
-                log("lines: extracting the brass funnel line from the camera threw " + e);
-            }
+        // the line under the stacked-funnel check is never fed: its controller still hands the game something to draw
+        // (Create fills in the render state's block entity only for a belt carrying items)
+        if (mc.level.getBlockEntity(BeltPolishTests.PLACING.south(12)) instanceof BeltBlockEntity line && line.getControllerBE() != null) {
+            BeltBlockEntity empty = line.getControllerBE();
+            BlockEntityRenderer<BeltBlockEntity, BlockEntityRenderState> renderer = mc.getBlockEntityRenderDispatcher().getRenderer(empty);
+            BlockEntityRenderState state = renderer == null ? null : renderer.createRenderState();
+            if (state != null) renderer.extractRenderState(empty, state, 1, mc.gameRenderer.mainCamera().position(), null);
+            int items = empty.getInventory() == null ? -1 : empty.getInventory().getTransportedItems().size();
+            expect("lines: an empty belt's controller is drawn (its trim, caps and built-in funnels)", state != null && state.blockEntityType != null && items == 0,
+                "items on it " + items + ", render state " + (state == null ? "none" : "block entity " + state.blockEntityType + " at " + state.blockPos));
         }
-        log("lines: the crosshair is on " + (mc.hitResult instanceof net.minecraft.world.phys.BlockHitResult hit ? mc.level.getBlockState(hit.getBlockPos()) + " at " + hit.getBlockPos().subtract(BeltPolishTests.PLACING).toShortString() : String.valueOf(mc.hitResult == null ? null : mc.hitResult.getType())));
-        log("lines: Flywheel block entity visuals " + (manager == null ? "none (no visualization)" : manager.blockEntities().visualCount()));
         log("lines checked");
-    }
-
-    /** An object's non-null fields, a few levels deep (for the log). */
-    private static String fields(@Nullable Object o, int depth) {
-        if (o == null) return "null";
-        if (depth == 0 || o instanceof CharSequence || o instanceof Number || o instanceof Boolean || o instanceof Enum<?> || o.getClass().isArray())
-            return o.getClass().isArray() ? o.getClass().getSimpleName() : String.valueOf(o);
-        if (o instanceof java.util.Collection<?> list) return list.stream().map(e -> fields(e, depth - 1)).toList().toString();
-        List<String> out = new ArrayList<>();
-        for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
-                if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
-                try {
-                    f.setAccessible(true);
-                    Object v = f.get(o);
-                    if (v != null) out.add(f.getName() + "=" + (v.getClass().getName().startsWith("com.meakaandre") || v instanceof java.util.Collection<?> || v.getClass().getName().contains("RenderState") ? fields(v, depth - 1) : v.getClass().getSimpleName()));
-                } catch (ReflectiveOperationException | RuntimeException e) {
-                    out.add(f.getName() + "=?");
-                }
-            }
-        return o.getClass().getSimpleName() + out;
     }
 
     private static @Nullable Object invoke(Method m, Object arg) {

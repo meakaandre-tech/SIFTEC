@@ -341,10 +341,6 @@ public final class BeltPolishTests {
             case "brass_tunnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 5.4, 180, 8};
             case "andesite_funnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 8.4, 180, 8};
             case "brass_funnel" -> new double[]{lx + 2.5, Y + 0.6, lz + 11.4, 180, 8};
-            // the same spot, the crosshair off the funnel (to the right of it, over the belt)
-            case "brass_funnel_aside" -> new double[]{lx + 2.5, Y + 0.6, lz + 11.4, 160, 8};
-            // the four lines from further off (out of the brass funnel's filter range)
-            case "lines_far" -> new double[]{lx + 2.5, Y + 1.2, lz + 17.4, 180, 8};
             // the Basin line under its ceiling: from the south, at its funnel and the Basin, its tunnel to the left
             case "basin" -> new double[]{lx + 6.0, Y + 0.55, lz + 42.6, 160, 6};
             // the vertical belt from the side (the client's own check looks the same way)

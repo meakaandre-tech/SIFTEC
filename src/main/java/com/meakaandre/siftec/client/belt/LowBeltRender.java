@@ -69,6 +69,11 @@ public final class LowBeltRender {
         Direction facing = Direction.SOUTH;
         boolean squeeze;
         final List<Decor> decor = new ArrayList<>();
+
+        /** True if this block draws trim, caps or attachments (a controller's, for every block of its belt). */
+        public boolean draws() {
+            return !decor.isEmpty();
+        }
     }
 
     /** One belt block's trim, cap and built-in attachment, at its offset from the controller. */

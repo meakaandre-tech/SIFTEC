@@ -3,6 +3,7 @@ package com.meakaandre.siftec.mixin.belt.client;
 import com.meakaandre.siftec.client.belt.LowBeltRender;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.content.kinetics.belt.BeltRenderer;
+import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltSlope;
@@ -40,7 +41,11 @@ public abstract class BeltRendererLowMixin {
         at = @At("HEAD"))
     private void siftec$extractLow(BeltBlockEntity be, BeltRenderer.BeltRenderState state, float partialTicks, Vec3 camera,
                                    ModelFeatureRenderer.CrumblingOverlay crumbling, CallbackInfo ci) {
-        ((LowBeltRender.State) state).siftec$low(LowBeltRender.extract(be, partialTicks, camera));
+        LowBeltRender.Parts parts = LowBeltRender.extract(be, partialTicks, camera);
+        ((LowBeltRender.State) state).siftec$low(parts);
+        // under Flywheel Create fills in the state's block entity only for a belt carrying items: an empty belt's
+        // controller would submit nothing, its trim, caps and built-in funnels and tunnels with it
+        if (parts != null && parts.draws() && be.getLevel() != null) SmartBlockEntityRenderer.extractBase(be.getLevel(), be, state, crumbling);
     }
 
     /**
