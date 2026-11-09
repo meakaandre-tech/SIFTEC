@@ -1,0 +1,169 @@
+kitchen recipes: 78 locked to mam_nutrients_automated_cooking
+alternates: 105 ; with nothing required: []
+assembly recipes: 53 ; packager recipes: 24
+recipes locked to a milestone: 548 of the pack's 557; also 37 sequenced assembly steps and 1 other mods' recipes
+checkers: reachability 202/202 parts, 48/48 milestones, 5/5 phases, 92/92 MAM nodes; automatability 209/209; conflicts 0; first reached: brass_ingot Tier 4, brass_blend Tier 4, blank_circuit Tier 5
+  note: brass basin: mixing/manufacturer/heavy_modular_frame_core holds 119 screw in its Brass Basin
+  note: brass basin: mixing/manufacturer/singularity_cell_core holds 199 stones, 99 iron_sheet in its Brass Basin
+  note: brass basin: mixing/manufacturer/heavy_flexible_frame_core holds 103 screw in its Brass Basin
+  note: brass basin: mixing/manufacturer/uranium_fuel_unit_core holds 99 encased_uranium_cell in its Brass Basin
+  note: brass basin: mixing/blender/biochemical_sculptor holds 80 ficsite_trigon in its Brass Basin
+  note: brass basin: mixing/particle_accelerator/nuclear_pasta holds 200 copper_powder in its Brass Basin
+  note: brass basin: mixing/particle_accelerator/plutonium_pellet holds 100 non_fissile_uranium in its Brass Basin
+  note: brass basin: mixing/particle_accelerator/instant_plutonium_cell holds 150 non_fissile_uranium in its Brass Basin
+  note: alternate overlap: mixing/assembler/reinforced_iron_plate, mixing/assembler/bolted_iron_plate (only for a company that picked the alternate)
+  note: alternate overlap: mixing/refinery/fuel, mixing/refinery/heavy_oil_residue, mixing/refinery/polymer_resin (only for a company that picked the alternate)
+total 27836
+-rw-r--r-- 1 runner runner 21140042 Nov  9 06:42 create-fly-26.3.jar
+-rw-r--r-- 1 runner runner  1031418 Nov  9 06:42 create-new-age-26.3.jar
+-rw-r--r-- 1 runner runner  3500335 Nov  9 06:42 createdieselgenerators-26.3.jar
+-rw-r--r-- 1 runner runner  2825625 Nov  9 06:42 mapmod-26.3.jar
+all Fabric versions of travelersbackpack:
+  y1lpIqJS 26.3-11.4.3 ['26.3'] 2026-11-02
+  PagAM0A0 26.2-11.3.4 ['26.2'] 2026-11-02
+  YQ2jBwbk 1.21.11-10.11.12 ['1.21.11'] 2026-11-02
+  q2nboqiM 1.21.1-10.1.40 ['1.21.1'] 2026-11-02
+  pVY90LdR 1.20.1-9.1.56 ['1.20.1'] 2026-11-02
+  nkLEWUqE 26.1.2-11.2.12 ['26.1.1', '26.1.2'] 2026-11-02
+  GKDRZQKz 26.3-11.4.2 ['26.3'] 2026-10-27
+  SmhjfeWr 26.3-11.4.1 ['26.3'] 2026-09-29
+  I6Fg8UrJ 26.2-11.3.3 ['26.2'] 2026-09-29
+  NUbnGgy9 26.1.2-11.2.11 ['26.1.1', '26.1.2'] 2026-09-29
+  5rC23dXQ 26.3-11.4.0 ['26.3'] 2026-09-24
+  jp51VM8M 26.2-11.3.2 ['26.2'] 2026-09-01
+  7ltEXeO3 1.21.11-10.11.11 ['1.21.11'] 2026-09-01
+  Ah1lkxJY 26.1.2-11.2.10 ['26.1.1', '26.1.2'] 2026-09-01
+  npKsvQvE 1.21.1-10.1.39 ['1.21.1'] 2026-08-29
+  G60CBuLj 1.20.1-9.1.55 ['1.20.1'] 2026-08-29
+  LfmQsEdR 1.21.11-10.11.10 ['1.21.11'] 2026-08-03
+  mjQY8slD 26.2-11.3.1 ['26.2'] 2026-07-28
+  5I4utX2T 1.21.1-10.1.38 ['1.21.1'] 2026-07-28
+  ZgfhEJnC 26.1.2-11.2.9 ['26.1.1', '26.1.2'] 2026-07-28
+  NXJGtmmW 1.21.1-10.1.37 ['1.21.1'] 2026-07-22
+  5H4yAyuO 1.20.1-9.1.54 ['1.20.1'] 2026-07-22
+  8zYSDRGA 26.2-11.3.0 ['26.2'] 2026-07-17
+  YDNzgBWY 26.1.2-11.2.8 ['26.1.1', '26.1.2'] 2026-07-17
+  onVoNuy1 26.1.2-11.2.7 ['26.1.1', '26.1.2'] 2026-05-31
+  fTwokW7g 1.20.1-9.1.53 ['1.20.1'] 2026-05-27
+  ODmeRFc0 1.21.1-10.1.36 ['1.21.1'] 2026-05-20
+  Q6rEigkb 26.1.2-11.2.6 ['26.1.1', '26.1.2'] 2026-05-11
+  CoCSwzdR 26.1.2-11.2.5 ['26.1.1', '26.1.2'] 2026-05-09
+  ZP0ddKyI 26.1.2-11.2.4 ['26.1.1', '26.1.2'] 2026-05-05
+  FVGa8X6z 26.1.2-11.2.3 ['26.1.1', '26.1.2'] 2026-05-04
+  RfI8MfzH 1.21.1-10.1.35 ['1.21.1'] 2026-05-04
+  q2caASeP 1.20.1-9.1.52 ['1.20.1'] 2026-05-04
+  BgyhpzMJ 26.1.2-11.2.2 ['26.1.1', '26.1.2'] 2026-04-26
+  lGcINzRB 26.1.2-11.2.1 ['26.1.1', '26.1.2'] 2026-04-16
+  RKAxLV5H 26.1.2-11.2.0 ['26.1.1', '26.1.2'] 2026-04-15
+  G9VMJl43 26.1.1-11.1.0 ['26.1.1', '26.1.2'] 2026-04-08
+  XbEGJQSG 1.21.11-10.11.9 ['1.21.11'] 2026-03-28
+  D3V21Ir2 1.21.11-10.11.8 ['1.21.11'] 2026-03-27
+  3nT2UR2a 1.21.11-10.11.7 ['1.21.11'] 2026-03-26
+travelersbackpack: 26.3-11.4.3 for 26.3 https://cdn.modrinth.com/data/rlloIFEV/versions/y1lpIqJS/travelersbackpack-fabric-26.3-11.4.3.jar
+  dependency optional: project yn9u3ypm version None
+  dependency optional: project 5aaWibi9 version None
+  dependency optional: project SaCpeal4 version None
+  dependency optional: project HnD1GX6e version None
+  dependency optional: project DMu0oBKf version None
+  dependency optional: project tagwiZkJ version None
+  dependency optional: project jtmvUHXj version None
+  dependency optional: project yBW8D80W version None
+  dependency optional: project u6dRKJwZ version None
+  dependency optional: project fRiHVvU7 version None
+  dependency optional: project nfn13YXA version None
+  dependency optional: project vRYk0bv7 version None
+  dependency required: project ohNO6lps version None
+  forge-config-api-port: 26.3.1 for 26.3 https://cdn.modrinth.com/data/ohNO6lps/versions/JpKvrr9J/ForgeConfigAPIPort-v26.3.1-mc26.3.x-Fabric.jar
+    dependency required: project P7dR8mSH version None
+    fabric-api: the build's own (gradle.properties) is used
+    dependency optional: project mOgUt4GM version None
+  dependency required: project P7dR8mSH version None
+libs/tb/compile:
+total 2084
+-rw-r--r-- 1 runner runner  609574 Nov  9 06:42 forge-config-api-port.jar
+-rw-r--r-- 1 runner runner 1522739 Nov  9 06:42 travelersbackpack.jar
+
+libs/tb/runtime:
+total 2084
+-rw-r--r-- 1 runner runner  609574 Nov  9 06:42 forge-config-api-port.jar
+-rw-r--r-- 1 runner runner 1522739 Nov  9 06:42 travelersbackpack.jar
+fabric api: https://cdn.modrinth.com/data/P7dR8mSH/versions/bNnaTiuM/fabric-api-0.161.0%2B26.3.jar
+releases of creategunmod:
+   fabric-26.3-latest https://github.com/meakaandre-tech/CreateGunMod/releases/download/fabric-26.3-latest/cgs-fabric-26.3.jar
+   fabric-26.2-latest https://github.com/meakaandre-tech/CreateGunMod/releases/download/fabric-26.2-latest/cgs-fabric-26.2.jar
+releases of create-diesel-generators:
+   fabric-26.3-latest https://github.com/meakaandre-tech/Create-Diesel-Generators/releases/download/fabric-26.3-latest/createdieselgenerators-fabric-26.3.jar
+   fabric-26.2-latest https://github.com/meakaandre-tech/Create-Diesel-Generators/releases/download/fabric-26.2-latest/createdieselgenerators-fabric-26.2.jar
+releases of Create-Fly:
+   pack-26.3-latest https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3-6.0.9-1.jar
+   pack-26.3-latest https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
+   pack-26.2-latest https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.2-latest/create-fly-26.2-6.0.9-1.jar
+   pack-26.2-latest https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.2-latest/create-fly-26.2.jar
+modrinth search for The Sift:
+   mielons-the-sift | Mielon's The Sift 2.0 | Mielon | ['1.20.1', '1.21.1', '26.2', '26.3']
+   mc-stargate | Stargate: Wellspring, a The Sift Dimension | Wroud | ['26.3-pre-3', '26.3-rc-1', '26.3-rc-2', '26.3-rc-3']
+   mielons-the-sift-rus | Mielon's The Sift RUS | Tovasha | ['1.20.1', '1.21.1', '26.2', '26.3']
+   mielons-the-sift-translation-zh-tw | Mielon's The Sift 中文翻譯 | FenghuangAcid | ['1.20.1', '1.21.1', '26.2', '26.3']
+   the-sift-plugin | The Sift Plugin | _Cor3y_ | ['26.2']
+   the-sift-replace | The Sift Replace | RalTu | ['24w14potato']
+   create-sifting | Create Sifting | oierbravo | ['1.19.4', '1.20', '1.20.1', '1.21.1']
+   sculk-depths | Sculk Depths | warior456 | ['1.20.3', '1.20.4', '1.21', '1.21.1']
+modrinth:mielons-the-sift -> https://cdn.modrinth.com/data/j0IfTxBq/versions/mFSG4o4I/mielon%27s-the-sift-2.0.2-mc26.3-fabric.jar
+  needs {'version_id': 'rylKnJ4M', 'project_id': 'yBW8D80W', 'file_name': None, 'dependency_type': 'optional'}
+  needs {'version_id': None, 'project_id': 'P7dR8mSH', 'file_name': None, 'dependency_type': 'required'}
+  needs {'version_id': 'uGEFXLKA', 'project_id': '8BmcQJ2H', 'file_name': None, 'dependency_type': 'required'}
+total 124808
+-rw-r--r-- 1 runner runner  3486296 Nov  9 06:42 FarmersDelight-26.3-3.6.27%2Brefabricated.jar
+-rw-r--r-- 1 runner runner  1779949 Nov  9 06:42 cgs-fabric-26.3.jar
+-rw-r--r-- 1 runner runner 21140042 Nov  9 06:42 create-fly-26.3.jar
+-rw-r--r-- 1 runner runner  1031418 Nov  9 06:42 create-new-age-26.3.jar
+-rw-r--r-- 1 runner runner  3500335 Nov  9 06:42 createdieselgenerators-fabric-26.3.jar
+-rw-r--r-- 1 runner runner  2620967 Nov  9 06:42 fabric-api.jar
+-rw-r--r-- 1 runner runner   609574 Nov  9 06:42 forge-config-api-port.jar
+-rw-r--r-- 1 runner runner  1191230 Nov  9 06:42 geckolib-fabric-26.3-5.5.7.jar
+-rw-r--r-- 1 runner runner  2825625 Nov  9 06:42 mapmod-26.3.jar
+-rw-r--r-- 1 runner runner 81257583 Nov  9 06:42 mielon%27s-the-sift-2.0.2-mc26.3-fabric.jar
+-rw-r--r-- 1 runner runner  3810197 Nov  9 06:42 ntgl-fabric-26.3.jar
+-rw-r--r-- 1 runner runner  2226470 Nov  9 06:42 siftec-0.1.0+26.3.jar
+-rw-r--r-- 1 runner runner   776082 Nov  9 06:42 siftec-selftest-0.1.0+26.3.jar
+-rw-r--r-- 1 runner runner  1522739 Nov  9 06:42 travelersbackpack.jar
+waited 1s for: SELFTEST always result:
+total 119312
+-rw-r--r-- 1 runner runner  3486296 Nov  9 07:00 FarmersDelight-26.3-3.6.27%2Brefabricated.jar
+-rw-r--r-- 1 runner runner  1779949 Nov  9 07:00 cgs-fabric-26.3.jar
+-rw-r--r-- 1 runner runner 21140042 Nov  9 07:00 create-fly-26.3.jar
+-rw-r--r-- 1 runner runner  1031418 Nov  9 07:00 create-new-age-26.3.jar
+-rw-r--r-- 1 runner runner  3500335 Nov  9 07:00 createdieselgenerators-fabric-26.3.jar
+-rw-r--r-- 1 runner runner   609574 Nov  9 07:00 forge-config-api-port.jar
+-rw-r--r-- 1 runner runner  1191230 Nov  9 07:00 geckolib-fabric-26.3-5.5.7.jar
+-rw-r--r-- 1 runner runner  2825625 Nov  9 07:00 mapmod-26.3.jar
+-rw-r--r-- 1 runner runner 81257583 Nov  9 07:00 mielon%27s-the-sift-2.0.2-mc26.3-fabric.jar
+-rw-r--r-- 1 runner runner  3810197 Nov  9 07:00 ntgl-fabric-26.3.jar
+-rw-r--r-- 1 runner runner  1522739 Nov  9 07:00 travelersbackpack.jar
+waited 4s for: SELFTEST client ready 0.
+waited 3s for: SELFTEST client ready 1.
+waited 2s for: SELFTEST buildgun-client done
+sh: xdotool mousemove $(grep -o 'SELFTEST buildmenu search [0-9]* [0-9]*' run/logs/latest.log | tail -1 | cut -d' ' -f4,5) click 1
+sh: xdotool mousemove $(grep -o 'SELFTEST buildmenu cell constructor [0-9]* [0-9]*' run/logs/latest.log | tail -1 | cut -d' ' -f5,6)
+waited 2s for: SELFTEST smoke gun uses 1.
+sh: xdotool click 1
+waited 2s for: SELFTEST smoke gun uses 2.
+sh: xdotool mousedown 1; sleep 2.5; xdotool mouseup 1
+waited 2s for: SELFTEST smoke gun uses 3.
+waited 2s for: SELFTEST smoke gun uses 4.
+waited 2s for: SELFTEST client ready 2.
+sh: xdotool mousedown 1; sleep 2.5; xdotool mouseup 1
+waited 2s for: SELFTEST smoke gun uses 5.
+sh: xdotool mousedown 1; sleep 2.5; xdotool mouseup 1
+waited 2s for: SELFTEST smoke gun uses 8.
+waited 17s for: SELFTEST style showroom result:
+waited 2s for: SELFTEST steel showroom done:
+waited 2s for: SELFTEST creative-unlocks-client checked
+waited 2s for: SELFTEST creative-unlocks-client done
+waited 2s for: SELFTEST beltpolish-client lines checked
+waited 2s for: SELFTEST beltpolish-client flat checked
+waited 4s for: SELFTEST beltpolish-client vertical checked
+waited 2s for: SELFTEST beltpolish-client sloped checked
+waited 23s for: SELFTEST beltpolish-client frames checked
+waited 3s for: SELFTEST beltpolish-client ponder checked
+waited 2s for: SELFTEST beltpolish-client done:
