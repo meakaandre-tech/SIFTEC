@@ -1,0 +1,12 @@
+net.minecraft.client.renderer.entity.ItemFrameRenderer
+net.minecraft.client.renderer.entity.ItemEntityRenderer
+net.minecraft.client.renderer.entity.DisplayRenderer$ItemDisplayRenderer
+net.minecraft.client.renderer.entity.EntityRenderDispatcher
+net.minecraft.client.renderer.item.ItemStackRenderState
+net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState
+net.minecraft.client.renderer.feature.ItemFeatureRenderer
+net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+net.minecraft.client.renderer.SubmitNodeCollection
+net.minecraft.client.renderer.SubmitNodeStorage
+net.minecraft.client.renderer.LevelRenderer
+net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher
