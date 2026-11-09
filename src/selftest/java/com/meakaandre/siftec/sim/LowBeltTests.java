@@ -72,7 +72,7 @@ import java.util.UUID;
  * tunnel and funnel as it reads Create's. Every check prints "SELFTEST lowbelts"; failures say FAIL.
  */
 public final class LowBeltTests {
-    private static final int X = 17000, Y = 200, Z = -17000;
+    static final int X = 17000, Y = 200, Z = -17000;
     private static final UUID TESTER = UUID.fromString("10b4e175-be17-4a1d-9000-0000000010b1");
     private static final String COMPANY = "selftest_lowbelts";
     /** The Basin line under the ceiling: its start, its end (with the funnel), the Basin, and the brass tunnel's block. */
@@ -157,7 +157,7 @@ public final class LowBeltTests {
         REPORT.expect(source, what, ok, detail);
     }
 
-    private static List<String> beltTokens() {
+    static List<String> beltTokens() {
         List<String> out = new ArrayList<>();
         for (Milestone m : Milestones.all()) for (String t : m.tokens()) if (t.startsWith("belt:") && !out.contains(t)) out.add(t);
         out.sort((a, b) -> Integer.compare(Integer.parseInt(a.substring(5)), Integer.parseInt(b.substring(5))));
@@ -165,7 +165,7 @@ public final class LowBeltTests {
     }
 
     /** A test company (made afresh) that has done the milestones carrying this belt token; the tester owns the main one. */
-    private static String company(ServerLevel level, String id, String token, boolean tester) {
+    static String company(ServerLevel level, String id, String token, boolean tester) {
         CompanyData data = CompanyData.get(level.getServer());
         Company c = new Company();
         c.id = id;
@@ -185,7 +185,7 @@ public final class LowBeltTests {
         return id;
     }
 
-    private static FakePlayer tester(ServerLevel level, GameType mode, ItemStack held) {
+    static FakePlayer tester(ServerLevel level, GameType mode, ItemStack held) {
         FakePlayer p = FakePlayer.get(level, new GameProfile(TESTER, "selftest_lowbelts"));
         p.getInventory().clearContent();
         p.setShiftKeyDown(false);
@@ -195,7 +195,7 @@ public final class LowBeltTests {
         return p;
     }
 
-    private static InteractionResult click(ServerLevel level, FakePlayer p, BlockPos block, Direction face) {
+    static InteractionResult click(ServerLevel level, FakePlayer p, BlockPos block, Direction face) {
         for (int i = 0; i < 6; i++) p.getCooldowns().tick();
         p.setPos(block.getX() + 0.5, block.getY() + 1, block.getZ() - 1.5);
         Vec3 hit = Vec3.atCenterOf(block).add(face.getStepX() * 0.5, face.getStepY() * 0.5, face.getStepZ() * 0.5);
@@ -203,7 +203,7 @@ public final class LowBeltTests {
     }
 
     /** A shaftless belt from a to b, owned by a company (so it runs at that company's milestone speed). */
-    private static void belt(ServerLevel level, BlockPos a, BlockPos b, String company) {
+    static void belt(ServerLevel level, BlockPos a, BlockPos b, String company) {
         Direction.Axis axis = ShaftlessBelts.axis(level, a, b, Direction.NORTH);
         if (axis == null) return;
         ShaftlessBelts.lay(level, a, b, axis);
@@ -217,11 +217,11 @@ public final class LowBeltTests {
         }
     }
 
-    private static @Nullable BeltBlockEntity beltAt(ServerLevel level, BlockPos pos) {
+    static @Nullable BeltBlockEntity beltAt(ServerLevel level, BlockPos pos) {
         return level.getBlockEntity(pos) instanceof BeltBlockEntity b ? b : null;
     }
 
-    private static boolean feed(ServerLevel level, BlockPos start, Direction along, ItemStack one) {
+    static boolean feed(ServerLevel level, BlockPos start, Direction along, ItemStack one) {
         DirectBeltInputBehaviour in = BlockEntityBehaviour.get(level, start, DirectBeltInputBehaviour.TYPE);
         if (in == null || !in.canInsertFromSide(along)) return false;
         return in.handleInsertion(one.copy(), along, false).isEmpty();
@@ -251,7 +251,7 @@ public final class LowBeltTests {
         return n;
     }
 
-    private static long stored(ServerLevel level, BlockPos pos, Item item) {
+    static long stored(ServerLevel level, BlockPos pos, Item item) {
         if (level.getBlockEntity(pos) instanceof BasinBlockEntity basin) {
             long n = 0;
             for (int i = 0; i < basin.itemCapability.getContainerSize(); i++) if (basin.itemCapability.getItem(i).is(item)) n += basin.itemCapability.getItem(i).getCount();
@@ -267,7 +267,7 @@ public final class LowBeltTests {
         return state == null ? "none" : state.toString();
     }
 
-    private static List<Item> repeat(int n, Item... items) {
+    static List<Item> repeat(int n, Item... items) {
         List<Item> out = new ArrayList<>();
         for (int i = 0; i < n; i++) out.addAll(List.of(items));
         return out;
@@ -626,6 +626,8 @@ public final class LowBeltTests {
                     starts.add(new BlockPos(X + 20 + 24 * k + 12 * line, Y, Z + 12));
                 }
                 for (int i = 0; i < 6; i++) starts.add(new BlockPos(X + 70, Y, Z + 20 + 2 * i));
+                // the four placing lines, one attachment each (the attachment screenshots)
+                for (int i = 0; i < 4; i++) starts.add(new BlockPos(X, Y, Z + 3 * i));
                 for (BlockPos start : starts) feed(level, start, Direction.EAST, new ItemStack(Items.IRON_INGOT));
             });
         }

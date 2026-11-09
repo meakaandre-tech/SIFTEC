@@ -25,6 +25,8 @@ siftec selftest machines
 siftec selftest steel
 siftec selftest beltlay
 siftec selftest lowbelts
+siftec selftest beltpolish
+siftec selftest lowbelts sim
 siftec selftest state setup
 siftec selftest state check
 siftec worldtest nodes 2000

@@ -794,16 +794,58 @@ cmd tp @a 16008.5 200 -15983.5 180 12
 sleep 4
 shot
 cmd siftec worldtest lowbelts feed
-cmd tp @a 17032 202 -16984 180 20
+cmd siftec worldtest beltpolish view andesite_tunnel
 sleep 5
 shot
-cmd tp @a 17003.5 200 -16955.5 180 17
-sleep 4
+cmd siftec worldtest beltpolish view brass_tunnel
+sleep 3
+shot
+cmd siftec worldtest beltpolish view andesite_funnel
+sleep 3
+shot
+cmd siftec worldtest beltpolish view brass_funnel
+sleep 3
 shot
 cmd siftec worldtest lowbelts feed
-cmd tp @a 17072.5 200 -16992.5 180 -12
-sleep 5
-shot
-cmd tp @a 17072.5 200 -16965.5 180 25
+cmd siftec worldtest beltpolish view basin
 sleep 4
 shot
+cmd siftec worldtest beltpolish view mkrow
+sleep 3
+shot
+cmd siftec worldtest beltpolish view vertical
+sleep 5
+cmd siftec selftest beltpolish client vertical
+wait 90 SELFTEST beltpolish-client vertical checked
+shot
+cmd siftec worldtest beltpolish view sloped
+sleep 5
+cmd siftec selftest beltpolish client sloped
+wait 30 SELFTEST beltpolish-client sloped checked
+shot
+cmd siftec worldtest beltpolish view frames
+sleep 5
+cmd siftec selftest beltpolish client frames
+wait 180 SELFTEST beltpolish-client frames checked
+cmd siftec worldtest beltpolish view frames
+sleep 3
+shot
+cmd siftec worldtest beltpolish view splash
+sleep 4
+shot
+cmd siftec selftest beltpolish client ponder
+wait 180 SELFTEST beltpolish-client ponder checked
+cmd siftec worldtest beltpolish ponder 0 120 create:andesite_funnel
+sleep 6
+shot
+cmd siftec worldtest beltpolish ponder 0 160 create:brass_tunnel
+sleep 6
+shot
+cmd siftec worldtest beltpolish ponder 0 200 create:belt_connector
+sleep 6
+shot
+cmd siftec worldtest beltpolish ponder close
+sleep 1
+cmd siftec selftest beltpolish client done
+wait 20 SELFTEST beltpolish-client done:
+cmd gamemode creative @a

@@ -16,6 +16,7 @@ public final class SelfTestsClient implements SelfTestHooks.Plugin {
         BuildMenuClientTests.register();
         CreativeUnlockClientTests.register();
         ReadyClientTests.register();
+        BeltPolishClientTests.register();
         if (FabricLoader.getInstance().isModLoaded("travelersbackpack")) {
             CloudButtonTests.register();
             CreativeInventoryClientTests.register();
