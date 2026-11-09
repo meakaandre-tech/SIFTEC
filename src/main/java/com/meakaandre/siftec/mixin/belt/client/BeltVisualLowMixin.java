@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.meakaandre.siftec.belt.BeltShapesLow;
 import com.meakaandre.siftec.client.belt.LowBeltRender;
+import com.meakaandre.siftec.client.belt.PonderBuiltIn;
 import com.zurrtum.create.client.content.kinetics.belt.BeltVisual;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
@@ -32,7 +33,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class BeltVisualLowMixin {
     @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/zurrtum/create/client/flywheel/lib/model/Models;chunkPartial(Lcom/zurrtum/create/client/flywheel/lib/model/baked/PartialModel;)Lcom/zurrtum/create/client/flywheel/api/model/Model;"))
     private Model siftec$squeezed(PartialModel partial, Operation<Model> original, @Local(argsOnly = true) BeltBlockEntity be) {
-        return siftec$model(partial, be.getBlockState());
+        // a Ponder scene's belt under a funnel or tunnel is drawn without its casing (PonderBuiltIn)
+        return siftec$model(partial, be.getLevel() == null ? be.getBlockState() : PonderBuiltIn.drawn(be.getLevel(), be.getBlockPos(), be.getBlockState()));
     }
 
     /** Every belt block is drawn by the belt renderer as well (its trim, caps and attachment), not only the belt's first. */

@@ -209,7 +209,8 @@ write_tag("create", "item", "casing", ["siftec:steel_casing"])
 write_tag("create", "block", "wrench_pickup", ["siftec:steel_casing"])
 write_tag("minecraft", "block", "impermeable", ["siftec:steel_window"])
 write_tag("c", "block", "glass_panes", ["siftec:steel_window_pane"])
-write_tag("c", "item", "glass_panes", ["siftec:steel_window_pane"])
+# not the item tag: Create washes every #c:glass_panes item back to a plain Glass Pane, and the steel pane washes into
+# weathered iron instead (as Create's industrial iron pane did, whose own recipe came first)
 for _tag, _id in (("ingots/steel", "steel_ingot"), ("plates/steel", "steel_sheet"), ("nuggets/steel", "steel_nugget")):
     write_tag("c", "item", _tag, ["siftec:" + _id])
     write_tag("c", "item", _tag.split("/")[0], ["siftec:" + _id])
@@ -556,6 +557,36 @@ for _mat, _tex in (("andesite", "create:block/andesite_casing"), ("copper", "cre
                                       "elements": _els})
 block_model("belt/cap", {"parent": "block/block", "textures": {"0": "create:block/andesite_casing", "particle": "#0"}, "elements": [
     _belt_box("cap", [0, 0, 1], [16, 5, 3]), _belt_box("cap round", [0, 1, 0], [16, 4, 1]), _belt_box("cap top", [0.5, 5, 1.5], [15.5, 5.5, 2.5])]})
+
+
+# A sloped belt keeps Create's own band; its trim and caps are made in the model space of Create's diagonal belt pieces
+# (diagonal_start, _middle and _end), so the belt renderer turns them exactly as Create turns the band. The trim is a
+# 5 px plate along each side of the band's middle (on the cell's diagonal, turned 45 degrees like Create's band), ending
+# short of the cell's corners so it stays inside the cell; the end pieces run flat from the middle to the face where
+# the band wraps round, as Create's end pieces do, and the cap closes that face.
+def _slope_plates(z0, z1, flat=None):
+    rot = {"angle": 45, "axis": "x", "origin": [8, 8, 8]}
+    out = []
+    for x0, x1 in ((0, 1.5), (14.5, 16)):
+        out.append({**_belt_box("trim", [x0, 5.5, z0], [x1, 10.5, z1]), "rotation": rot})
+        if flat:
+            out.append(_belt_box("trim flat", [x0, 5.5, flat[0]], [x1, 10.5, flat[1]]))
+    return out
+
+
+for _mat, _tex in (("andesite", "create:block/andesite_casing"), ("copper", "create:block/copper_casing"),
+                   ("brass", "create:block/brass_casing"), ("steel", "create:block/industrial_iron_block")):
+    _t = {"0": _tex, "particle": "#0"}
+    block_model(f"belt/slope_{_mat}", {"parent": "block/block", "textures": _t, "elements": _slope_plates(-0.5, 16.5)})
+    # Create's diagonal_start wraps at +z (flat from the middle to it, the slope on the -z side); _end the other way
+    block_model(f"belt/slope_start_{_mat}", {"parent": "block/block", "textures": _t, "elements": _slope_plates(-0.5, 8, (8, 16))})
+    block_model(f"belt/slope_end_{_mat}", {"parent": "block/block", "textures": _t, "elements": _slope_plates(8, 16.5, (0, 8))})
+block_model("belt/slope_cap_start", {"parent": "block/block", "textures": {"0": "create:block/andesite_casing", "particle": "#0"}, "elements": [
+    _belt_box("cap", [0, 3.5, 13.5], [16, 12.5, 15.5]), _belt_box("cap round", [0, 4.5, 15.5], [16, 11.5, 16]),
+    _belt_box("cap top", [0.5, 12.5, 14], [15.5, 13, 15])]})
+block_model("belt/slope_cap_end", {"parent": "block/block", "textures": {"0": "create:block/andesite_casing", "particle": "#0"}, "elements": [
+    _belt_box("cap", [0, 3.5, 0.5], [16, 12.5, 2.5]), _belt_box("cap round", [0, 4.5, 0], [16, 11.5, 0.5]),
+    _belt_box("cap top", [0.5, 12.5, 1], [15.5, 13, 2])]})
 
 # ---- recipes
 built = recipes.build()

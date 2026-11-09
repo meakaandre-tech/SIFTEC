@@ -101,7 +101,7 @@
     "belt.SmartBlockEntityAttachmentMixin",
     "belt.WrenchAttachmentMixin",
     "belt.BeltVerticalCarryMixin",
-    "belt.BeltVerticalPositionMixin"
+    "belt.BeltVerticalPositionMixin", "belt.BeltOcclusionMixin"
   ],
   "client": [
     "client.BeltConnectorPreviewMixin",
@@ -116,7 +116,7 @@
     "belt.client.BeltRenderStateLowMixin",
     "belt.client.BeltRendererLowMixin",
     "belt.client.BeltVisualLowMixin",
-    "belt.client.BeltGogglesMixin"
+    "belt.client.BeltGogglesMixin", "belt.client.PonderBuiltInMixin", "belt.client.PonderOverlayMixin"
   ],
   "injectors": {
     "defaultRequire": 1

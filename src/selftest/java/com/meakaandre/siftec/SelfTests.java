@@ -34,6 +34,7 @@ import com.meakaandre.siftec.map.MapTests;
 import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.prefab.PrefabTests;
 import com.meakaandre.siftec.sim.AlwaysTests;
+import com.meakaandre.siftec.sim.BeltPolishTests;
 import com.meakaandre.siftec.sim.LowBeltTests;
 import com.meakaandre.siftec.vehicle.VehicleTests;
 
@@ -56,6 +57,7 @@ public final class SelfTests implements SelfTestHooks.Plugin {
                 LogisticsTests.register();
                 BeltLayTests.register();
                 LowBeltTests.register();
+                BeltPolishTests.register();
                 ProgressionTests.register();
                 ExplorationTests.register();
                 FoodTests.register();

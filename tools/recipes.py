@@ -504,6 +504,10 @@ def carried_over():
     # the steel windows are Create's industrial iron windows, made the same way from Steel Casing
     shaped("siftec:steel_window", [" # ", "#X#"], {"#": "siftec:steel_casing", "X": "#c:glass_blocks/colorless"}, 2, name="steel_window")
     shaped("siftec:steel_window_pane", ["###", "###"], {"#": "siftec:steel_window"}, 16, name="steel_window_pane")
+    # weathered iron: Create washes its industrial iron into it, and the Steel Casing and steel windows are that iron now
+    for block, weathered in (("siftec:steel_casing", "create:weathered_iron_block"), ("siftec:steel_window", "create:weathered_iron_window"),
+                             ("siftec:steel_window_pane", "create:weathered_iron_window_pane")):
+        simple("splashing", block, weathered)
     under(None)
     # Gunsmithing's steel nails, half-built on SIFTEC's Steel Nugget (its own recipe half-builds them on its steel nugget)
     sequence("#c:nuggets/steel", "cgs:nail_steel", ["cut", "press"], 1, name="steel_nail", n=6, transitional="siftec:steel_nugget")
