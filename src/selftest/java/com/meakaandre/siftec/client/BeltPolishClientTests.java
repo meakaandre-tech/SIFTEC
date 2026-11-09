@@ -33,6 +33,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -521,7 +522,7 @@ public final class BeltPolishClientTests {
      */
     private static void vanillin(Minecraft mc, boolean on) {
         if (mc.level == null) return;
-        Set<EntityType<?>> types = Set.of(EntityType.ITEM_FRAME, EntityType.GLOW_ITEM_FRAME, EntityType.ITEM_DISPLAY);
+        Set<EntityType<?>> types = Set.of(EntityTypes.ITEM_FRAME, EntityTypes.GLOW_ITEM_FRAME, EntityTypes.ITEM_DISPLAY);
         for (EntityType<?> type : types) {
             Configurator.ConfiguredEntity<?> c = VanillaVisuals.CONFIGURATOR.entities.get(type);
             if (c != null) c.set(on ? VisualConfigValue.DEFAULT : VisualConfigValue.DISABLE, List.of());
