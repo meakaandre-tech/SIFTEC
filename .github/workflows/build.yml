@@ -28,12 +28,14 @@ jobs:
         run: |
           # tools/gen_assets.py writes src/main/resources and runs tools/check_recipes.py (reachability,
           # automatability, conflicts); it stops on a checker error, and the committed files must be what it writes
-          (cd /tmp && python3 -I -B "$GITHUB_WORKSPACE/tools/gen_assets.py")
+          exec > >(tee -a /tmp/setup.log) 2>&1
+          (cd /tmp && python3 -I -B "$GITHUB_WORKSPACE/tools/gen_assets.py" | tail -20)
           git status --porcelain
           test -z "$(git status --porcelain)"
       - name: Download Create Fly
         shell: bash
         run: |
+          exec > >(tee -a /tmp/setup.log) 2>&1
           mkdir -p libs
           curl -fsSL -o libs/create-fly-26.3.jar https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
           # Create: New Age (power: wires, connectors, motors, the reactor), the fork's fabric-26.3 build
@@ -48,6 +50,7 @@ jobs:
         run: |
           # the pack's inventory: SIFTEC compiles its compat against it (libs/tb/compile), and the smoke server and
           # client load the builds made for this game version (libs/tb/runtime)
+          exec > >(tee -a /tmp/setup.log) 2>&1
           mc=$(grep '^minecraft_version' gradle.properties | sed 's/.*= *//')
           python3 .github/fetch-tb.py "$mc" libs/tb /tmp/ci
           ls -l libs/tb/compile libs/tb/runtime
@@ -146,7 +149,8 @@ jobs:
           if [ -f .github/smoke-test ] && ls build/libs/*.jar >/dev/null 2>&1; then
             exec > >(tee /tmp/ci/smoke.txt) 2>&1
             root=$PWD
-            mc=$(grep '^minecraft_version' gradle.properties | sed 's/.*= *//')
+            exec > >(tee -a /tmp/setup.log) 2>&1
+          mc=$(grep '^minecraft_version' gradle.properties | sed 's/.*= *//')
             loader=$(grep '^loader_version' gradle.properties | sed 's/.*= *//')
             fapi=$(grep '^fabric_version' gradle.properties | sed 's/.*= *//')
             mkdir -p server/mods && cd server
@@ -327,6 +331,7 @@ jobs:
           mkdir -p /tmp/ci && cp build.log /tmp/ci/build.log || echo "no log" > /tmp/ci/build.log
           sed -i "s#${GITHUB_WORKSPACE}/##g" /tmp/ci/build.log
           ls -l build/libs > /tmp/ci/jars.txt 2>&1 || true
+          cp /tmp/setup.log /tmp/ci/setup.log 2>/dev/null || true
           echo "${GITHUB_SHA}" > /tmp/ci/commit.txt
           # the job's state so far (the smoke step may fail without failing the job: read its logs too)
           echo "${{ job.status }}" > /tmp/ci/status.txt
