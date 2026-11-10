@@ -74,7 +74,7 @@ import java.util.Map;
  * refused, the grid stays in, an extra backpack is unpacked, a locked upgrade does not fit, payments see it;</li>
  * <li>{@code craft grid} / {@code craft full}: the 2x2 grid makes a crafting table and has no room for a chest; a
  * Crafting Upgrade makes it 3x3, which makes the chest (each leaves its window open for a screenshot);</li>
- * <li>{@code crate settle}: waits until every backpack reads back at its company's tier, then logs "crate settled".
+ * <li>{@code crate settle}: waits until every backpack reads back at its company's tier, then logs "crate settled";</li>
  * <li>{@code crate setup} / {@code crate check}: things in known slots before dying; after respawning, a Death Crate
  * marked on the map holds them and one click puts every one back in its slot;</li>
  * <li>{@code crate keep} / {@code crate kept} / {@code crate persisted}: a crate left alone stays, through a restart;</li>
