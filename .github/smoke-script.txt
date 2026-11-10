@@ -834,6 +834,9 @@ wait 180 SELFTEST beltpolish-client frames checked
 cmd siftec worldtest beltpolish view frames
 sleep 3
 shot
+cmd tp @a 17043.5 200.9 -16996.5 180 0
+sleep 4
+shot
 cmd siftec worldtest beltpolish view splash
 sleep 4
 shot
