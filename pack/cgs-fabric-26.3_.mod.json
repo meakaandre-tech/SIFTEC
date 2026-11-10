@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "cgs",
+  "version": "1.4.9+26.3",
+  "name": "Create: Gunsmithing",
+  "description": "Adds steampunk weapons to the Create mod. Fabric port for Create Fly and NTGL.",
+  "authors": ["Jetug", "Dayton", "melox"],
+  "contact": {
+    "sources": "https://github.com/meakaandre-tech/creategunmod"
+  },
+  "license": "GPL-3.0",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.nukateam.cgs.Gunsmithing"],
+    "client": ["com.nukateam.cgs.client.CgsClient"]
+  },
+  "depends": {
+    "fabricloader": "*",
+    "fabric-api": "*",
+    "minecraft": ">=26.3- <26.4-",
+    "java": ">=25",
+    "ntgl": "*",
+    "create": "*",
+    "geckolib": ">=5.5.7"
+  }
+}
