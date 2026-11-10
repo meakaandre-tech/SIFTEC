@@ -9,9 +9,8 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
-import com.zurrtum.create.client.vanillin.VanillaVisuals;
-import com.zurrtum.create.client.vanillin.config.Configurator;
-import com.zurrtum.create.client.vanillin.config.VisualConfigValue;
+import com.zurrtum.create.client.vanillin.visuals.ItemDisplayVisual;
+import com.zurrtum.create.client.vanillin.visuals.ItemFrameVisual;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltSlope;
@@ -32,8 +31,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -55,7 +52,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 
@@ -69,8 +65,8 @@ import java.util.function.Consumer;
  * <li>{@code sloped}: every sloped belt of the test site draws the side trim of its Mk and caps at its ends, everything
  * inside its own cells.</li>
  * <li>{@code frames}: item frames and item displays on a white wall: the client has their items, their render states hold
- * them, and the picture shows them (an empty frame and the bare wall to compare with). Logs which mixins touch the
- * renderers involved, to say where a missing item is lost.</li>
+ * them, Create Fly's Vanillin (as shipped) takes each frame and display, and the picture shows the items (an empty
+ * frame and the bare wall to compare with).</li>
  * <li>{@code ponder}: Create's Ponder scenes for funnels, tunnels and belts draw each funnel or tunnel standing on a belt
  * as built into the belt's block.</li>
  * </ul>
@@ -471,24 +467,29 @@ public final class BeltPolishClientTests {
                 state.getClass().getSimpleName() + ", item " + (empty ? "empty" : "model " + box2) + ", renderer " + mc.getEntityRenderDispatcher().getRenderer(e).getClass().getName()
                     + ", hidden by NTGL " + ntglHidden(state) + ", light " + state.lightCoords);
         }
-        // a picture straight at each: first as the game draws them, then with Create Fly's Vanillin (which draws item frames
-        // and item displays itself, instanced) turned off for them, so that Minecraft's own renderers draw them
-        Map<String, int[]> asIs = new LinkedHashMap<>(), vanilla = new LinkedHashMap<>();
+        // Create Fly's Vanillin, as shipped, draws the frames and displays itself (instanced): each must be one it takes
+        boolean flywheel = VisualizationManager.get(mc.level) != null;
+        for (int i = 0; i < names.length; i++) {
+            if (names[i].endsWith("empty") || names[i].startsWith("item entity")) continue;
+            double x = w.getX() + BeltPolishTests.FRAME_STEP * i + 0.5;
+            AABB box = new AABB(x - 0.6, eyeY - 1.2, w.getZ(), x + 0.6, eyeY + 1, w.getZ() + 2.2);
+            Entity e = null;
+            for (Entity f : mc.level.getEntities((Entity) null, box, f -> f instanceof ItemFrame || f instanceof Display.ItemDisplay)) e = f;
+            boolean drawn = e instanceof ItemFrame f ? ItemFrameVisual.shouldVisualize(f) : e instanceof Display.ItemDisplay d && ItemDisplayVisual.shouldVisualize(d);
+            expect("frames: Vanillin draws the " + names[i], flywheel && drawn, "visualization " + (flywheel ? "on" : "off") + ", " + (e == null ? "no entity" : e.getType()) + " taken " + drawn);
+        }
+        // a picture straight at each, as the game draws them
+        Map<String, int[]> asIs = new LinkedHashMap<>();
         int[] wall = new int[1];
         pictures(names, eyeY, eyeZ, asIs, wall);
-        then(1, () -> vanillin(mc, false));
-        pictures(names, eyeY, eyeZ, vanilla, wall);
         then(1, () -> {
-            vanillin(mc, true);
-            log("finding: as the game draws them (Vanillin on) " + shown(names, asIs, wall[0]));
-            log("finding: drawn by Minecraft's own renderers (Vanillin off for them) " + shown(names, vanilla, wall[0]));
-            int[] empty = vanilla.get("frame empty");
+            int[] empty = asIs.get("frame empty");
             for (String name : names) {
                 if (name.equals("frame empty")) continue;
-                double changed = changed(name, vanilla, empty, wall[0]);
-                expect("frames: with Minecraft's own renderers, the picture shows the " + name + "'s item", changed >= 0.12,
+                double changed = changed(name, asIs, empty, wall[0]);
+                expect("frames: the picture shows the " + name + "'s item", changed >= 0.12,
                     String.format(Locale.ROOT, "%.0f%% of the middle differs from %s; middle %s, wall %s", changed * 100,
-                        name.startsWith("frame") ? "the empty frame" : "the bare wall", mean(vanilla.get(name)), hex(wall[0])));
+                        name.startsWith("frame") ? "the empty frame" : "the bare wall", mean(asIs.get(name)), hex(wall[0])));
             }
             log("frames checked");
         });
@@ -516,33 +517,6 @@ public final class BeltPolishClientTests {
         int[] bare = new int[at == null ? 0 : at.length];
         Arrays.fill(bare, wall);
         return changed(at, bare, 40);
-    }
-
-    private static String shown(String[] names, Map<String, int[]> boxes, int wall) {
-        List<String> out = new ArrayList<>();
-        for (String name : names)
-            if (!name.equals("frame empty")) out.add(String.format(Locale.ROOT, "%s %.0f%%", name, changed(name, boxes, boxes.get("frame empty"), wall) * 100));
-        return "the middle of each picture differs from the empty frame or bare wall: " + out;
-    }
-
-    /**
-     * Create Fly's Vanillin visuals for item frames, glow item frames and item displays on or off (its config's default, or
-     * disabled), and every such entity in the level re-added so the change shows at once.
-     */
-    private static void vanillin(Minecraft mc, boolean on) {
-        if (mc.level == null) return;
-        Set<EntityType<?>> types = Set.of(EntityTypes.ITEM_FRAME, EntityTypes.GLOW_ITEM_FRAME, EntityTypes.ITEM_DISPLAY);
-        for (EntityType<?> type : types) {
-            Configurator.ConfiguredEntity<?> c = VanillaVisuals.CONFIGURATOR.entities.get(type);
-            if (c != null) c.set(on ? VisualConfigValue.DEFAULT : VisualConfigValue.DISABLE, List.of());
-        }
-        VisualizationManager manager = VisualizationManager.get(mc.level);
-        if (manager == null) return;
-        for (Entity e : mc.level.entitiesForRendering())
-            if (types.contains(e.getType())) {
-                manager.entities().queueRemove(e);
-                if (on) manager.entities().queueAdd(e);
-            }
     }
 
     /** A box of pixels round (cx, cy), half-size {@code r}. */

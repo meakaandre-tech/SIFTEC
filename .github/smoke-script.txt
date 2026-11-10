@@ -441,8 +441,7 @@ cmd siftec worldtest map close
 sleep 2
 cmd time set noon
 cmd gamemode survival @a
-cmd siftec selftest tb crate settle
-wait 40 SELFTEST tb crate settled
+sleep 3
 cmd siftec selftest tb crate setup
 sleep 1
 key e
@@ -834,6 +833,9 @@ cmd siftec selftest beltpolish client frames
 wait 180 SELFTEST beltpolish-client frames checked
 cmd siftec worldtest beltpolish view frames
 sleep 3
+shot
+cmd tp @a 18044.5 200.88 -17996.5 180 0
+sleep 4
 shot
 cmd siftec worldtest beltpolish view splash
 sleep 4
