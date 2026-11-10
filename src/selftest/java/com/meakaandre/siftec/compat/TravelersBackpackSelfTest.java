@@ -29,6 +29,7 @@ import com.tiviacz.travelersbackpack.inventory.upgrades.crafting.CraftingUpgrade
 import com.tiviacz.travelersbackpack.util.ContainerContentsHelper;
 import com.tiviacz.travelersbackpack.util.Reference;
 import com.meakaandre.siftec.Siftec;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -56,6 +57,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.GameType;
 
+import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -72,6 +74,7 @@ import java.util.Map;
  * refused, the grid stays in, an extra backpack is unpacked, a locked upgrade does not fit, payments see it;</li>
  * <li>{@code craft grid} / {@code craft full}: the 2x2 grid makes a crafting table and has no room for a chest; a
  * Crafting Upgrade makes it 3x3, which makes the chest (each leaves its window open for a screenshot);</li>
+ * <li>{@code crate settle}: waits until every backpack reads back at its company's tier, then logs "crate settled";</li>
  * <li>{@code crate setup} / {@code crate check}: things in known slots before dying; after respawning, a Death Crate
  * marked on the map holds them and one click puts every one back in its slot;</li>
  * <li>{@code crate keep} / {@code crate kept} / {@code crate persisted}: a crate left alone stays, through a restart;</li>
@@ -119,6 +122,7 @@ public final class TravelersBackpackSelfTest {
 
     public static void register() {
         PayloadTypeRegistry.clientboundPlay().register(InventoryCheck.TYPE, InventoryCheck.STREAM_CODEC);
+        ServerTickEvents.END_SERVER_TICK.register(TravelersBackpackSelfTest::settleTick);
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
             Commands.literal("siftec").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("selftest").then(Commands.literal("tb")
@@ -131,6 +135,7 @@ public final class TravelersBackpackSelfTest {
                         .then(Commands.literal("grid").executes(context -> craftGrid(context.getSource())))
                         .then(Commands.literal("full").executes(context -> craftFull(context.getSource()))))
                     .then(Commands.literal("crate")
+                        .then(Commands.literal("settle").executes(context -> crateSettle(context.getSource())))
                         .then(Commands.literal("setup").executes(context -> crateSetup(context.getSource())))
                         .then(Commands.literal("check").executes(context -> crateCheck(context.getSource())))
                         .then(Commands.literal("keep").executes(context -> crateKeep(context.getSource())))
@@ -420,10 +425,51 @@ public final class TravelersBackpackSelfTest {
         return ((long) where << 32) | (slot & 0xffffffffL);
     }
 
+    /** How long {@code crate settle} waits for the backpacks to reach their company's tier: 30 s. */
+    private static final int SETTLE_TICKS = 600;
+    /** The source of a {@code crate settle} still waiting, and the ticks it has left. */
+    private static @Nullable CommandSourceStack settling;
+    private static int settleLeft;
+
+    /** True once the player's worn backpack reads back at their company's tier, out of creative. */
+    private static boolean settled(ServerPlayer player) {
+        return !player.hasInfiniteMaterials() && TravelersBackpackCompat.wearing(player)
+            && TravelersBackpackCompat.wornTier(player) == TravelersBackpackCompat.tierFor(player);
+    }
+
+    /**
+     * {@code crate settle}: waits, tick by tick, until every player's worn backpack reads back at their company's tier
+     * (after creative it is lowered on the backpack sync), then logs "SELFTEST tb crate settled", for the smoke script
+     * to wait for before {@code crate setup} fills the backpack. Giving up after {@link #SETTLE_TICKS} is a FAIL.
+     */
+    private static int crateSettle(CommandSourceStack source) {
+        settling = source;
+        settleLeft = SETTLE_TICKS;
+        return 1;
+    }
+
+    private static void settleTick(MinecraftServer server) {
+        CommandSourceStack source = settling;
+        if (source == null) return;
+        List<ServerPlayer> players = List.copyOf(server.getPlayerList().getPlayers());
+        boolean all = !players.isEmpty() && players.stream().allMatch(TravelersBackpackSelfTest::settled);
+        if (!all && --settleLeft > 0) return;
+        settling = null;
+        if (!all) {
+            StringBuilder states = new StringBuilder();
+            for (ServerPlayer p : players) states.append(p.getGameProfile().name()).append(": ").append(state(p)).append(", company tier ").append(TravelersBackpackCompat.tierFor(p)).append("; ");
+            REPORT.expect(source, "crate settle: every backpack reaches its company's tier", false, states.toString());
+        }
+        report(source, "crate settled after " + (SETTLE_TICKS - settleLeft) + " ticks" + (all ? "" : " (gave up)"));
+    }
+
     private static int crateSetup(CommandSourceStack source) {
         PUT.clear();
         for (ServerPlayer player : players(source)) {
             player.closeContainer();
+            int company = TravelersBackpackCompat.tierFor(player);
+            REPORT.expect(source, "crate setup: the backpack is at the company's tier before it is filled", settled(player),
+                state(player) + ", company tier " + company);
             clearAll(player);
             Inventory inventory = player.getInventory();
             put(inventory, DeathCrateBlockEntity.INVENTORY, 0, new ItemStack(Items.IRON_INGOT, 5));
