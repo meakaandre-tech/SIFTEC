@@ -278,7 +278,9 @@ downloads the latest 26.3 releases of the meakaandre-tech forks). The built jar 
 The CI (`.github/workflows/build.yml`) builds on every push to `main`, starts a dedicated server with the
 pack's mods and the self-test jar, runs the self-tests in `.github/smoke-commands*.txt` (`/siftec selftest ...`),
 joins it with a client (`./gradlew runSelftestClient`), publishes the logs to the `ci-logs` branch and the jar as the
-`latest` release.
+`latest` release. `ci-logs` keeps each of the last 10 runs in `runs/<run id>/` (the top level is the newest run,
+`runs.txt` lists them), and the last step prints the run's one test count from `.github/ci-totals.sh`:
+`TOTALS: PASS n, FAIL n | suites n: n passed, n failed`.
 
 ## Where the data comes from
 
