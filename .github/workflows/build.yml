@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "vanillin-frames"]
   workflow_dispatch:
 
 permissions:
@@ -35,13 +35,13 @@ jobs:
         shell: bash
         run: |
           mkdir -p libs
-          curl -fsSL -o libs/create-fly-26.3.jar https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
+          curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 -o libs/create-fly-26.3.jar https://github.com/meakaandre-tech/Create-Fly/releases/download/pack-26.3-latest/create-fly-26.3.jar
           # Create: New Age (power: wires, connectors, motors, the reactor), the fork's fabric-26.3 build
-          curl -fsSL -o libs/create-new-age-26.3.jar https://github.com/meakaandre-tech/Create-New-Age/releases/download/fabric-26.3-latest/create-new-age-fabric-26.3.jar
+          curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 -o libs/create-new-age-26.3.jar https://github.com/meakaandre-tech/Create-New-Age/releases/download/fabric-26.3-latest/create-new-age-fabric-26.3.jar
           # Create: Diesel Generators (the Fuel Generator's engine), the fork's fabric-26.3 build
-          curl -fsSL -o libs/createdieselgenerators-26.3.jar https://github.com/meakaandre-tech/Create-Diesel-Generators/releases/download/fabric-26.3-latest/createdieselgenerators-fabric-26.3.jar
+          curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 -o libs/createdieselgenerators-26.3.jar https://github.com/meakaandre-tech/Create-Diesel-Generators/releases/download/fabric-26.3-latest/createdieselgenerators-fabric-26.3.jar
           # MapMod: the map (compass, minimap, fullscreen map), which SIFTEC fills through its API
-          curl -fsSL -o libs/mapmod-26.3.jar https://github.com/meakaandre-tech/MapMod/releases/download/latest/mapmod-26.3.jar
+          curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 -o libs/mapmod-26.3.jar https://github.com/meakaandre-tech/MapMod/releases/download/latest/mapmod-26.3.jar
           ls -l libs
       - name: Download Traveler's Backpack and its dependencies
         shell: bash
@@ -105,7 +105,7 @@ jobs:
             # same dump for an older (unobfuscated) game version named in the file, straight from the official client jar
             old=$(head -1 .github/dump-bytecode-old)
             vurl=$(curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | python3 -c "import json,sys; print([v['url'] for v in json.load(sys.stdin)['versions'] if v['id']=='$old'][0])")
-            curl -fsSL -o /tmp/old-client.jar "$(curl -fsSL "$vurl" | python3 -c "import json,sys; print(json.load(sys.stdin)['downloads']['client']['url'])")"
+            curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 -o /tmp/old-client.jar "$(curl -fsSL "$vurl" | python3 -c "import json,sys; print(json.load(sys.stdin)['downloads']['client']['url'])")"
             unzip -Z1 /tmp/old-client.jar | grep '\.class$' | sed 's/\.class$//' | sort -u | sed 's#/#.#g' | grep -E '^(net\.minecraft|com\.mojang)' | grep -v 'package-info\|module-info' > /tmp/old-classes.txt
             (xargs -a /tmp/old-classes.txt -n 300 javap -p -s -c -cp /tmp/old-client.jar 2>/dev/null || true) | gzip -9 > /tmp/ci/bytecode-old.txt.gz
           fi
@@ -151,10 +151,10 @@ jobs:
             fapi=$(grep '^fabric_version' gradle.properties | sed 's/.*= *//')
             mkdir -p server/mods && cd server
             inst=$(curl -fsSL https://meta.fabricmc.net/v2/versions/installer | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['version'])")
-            curl -fsSL -o server.jar "https://meta.fabricmc.net/v2/versions/loader/$mc/$loader/$inst/server/jar"
+            curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 -o server.jar "https://meta.fabricmc.net/v2/versions/loader/$mc/$loader/$inst/server/jar"
             fapiurl=$(curl -fsSL "https://api.modrinth.com/v2/project/fabric-api/version" | python3 -c "import json,sys; v=[x for x in json.load(sys.stdin) if x['version_number']=='$fapi']; print(v[0]['files'][0]['url'])")
             echo "fabric api: $fapiurl"
-            if [ ! -f $root/.github/smoke-no-fabric-api ]; then curl -fsSL -o mods/fabric-api.jar "$fapiurl"; fi
+            if [ ! -f $root/.github/smoke-no-fabric-api ]; then curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 -o mods/fabric-api.jar "$fapiurl"; fi
             cp ../libs/create-fly-26.3.jar mods/
             cp ../libs/create-new-age-26.3.jar mods/
             cp ../libs/mapmod-26.3.jar mods/
@@ -175,7 +175,7 @@ jobs:
                     echo "$url -> $found"
                     url=$(echo "$found" | head -1);;
                 esac
-                case "$url" in http*) curl -fsSL -o "mods/$(basename "$url")" "$url" || echo "could not fetch $url";; esac
+                case "$url" in http*) curl -fsSL --retry 8 --retry-all-errors --retry-delay 20 -o "mods/$(basename "$url")" "$url" || echo "could not fetch $url";; esac
               done < $root/.github/smoke-pack-mods
             fi
             # what is inside the pack's other mods: ids to write recipes against, and worldgen to switch off
@@ -307,11 +307,11 @@ jobs:
           ls -l build/libs > /tmp/ci/jars.txt 2>&1 || true
           echo "${GITHUB_SHA}" > /tmp/ci/commit.txt
           cd /tmp/ci
-          git init -q -b ci-logs
+          git init -q -b ci-logs-vanillin-frames
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git add -A && git commit -q -m "Build log for ${GITHUB_SHA}"
-          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-logs-vanillin-frames
       - name: Upload jars
         if: success()
         uses: actions/upload-artifact@v4
@@ -321,7 +321,7 @@ jobs:
             build/libs/*.jar
             !build/libs/siftec-selftest-*.jar
       - name: Publish the jar as a release
-        if: success()
+        if: success() && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
