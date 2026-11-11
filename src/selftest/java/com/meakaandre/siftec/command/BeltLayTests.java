@@ -581,9 +581,9 @@ public final class BeltLayTests {
             case "straight" -> new double[]{X + 3.5, Y + 1.8, Z + 3.5, 180, 25};
             case "sloped" -> new double[]{X + 2.5, Y + 3.5, Z + 12.5, 180, 15};
             case "funnel" -> new double[]{X + 34.5, Y + 2.2, Z + 44.5, 190, 25};
-            // the port check's Storage Container from the west: the belt and funnel at its back port on the left, the
-            // ones at its front port on the right
-            case "port" -> new double[]{X + 22.5, Y + 4.2, Z + 19.5, 270, 22};
+            // the port check's Storage Container from its front left and above: the funnel on its output port and the belt
+            // leaving it in front, the input belt and its funnel behind
+            case "port" -> new double[]{X + 25.5, Y + 6.5, Z + 25.5, 225, 32};
             default -> null;
         };
         if (eye == null) {

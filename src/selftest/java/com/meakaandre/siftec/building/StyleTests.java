@@ -296,8 +296,8 @@ public final class StyleTests {
             box = rowBox(Integer.parseInt(id.substring(3)));
             if (box != null) {
                 double width = box[3], midX = box[0] + 0.5, front = box[2] + 1;
-                double dist = Math.max(20, width * 0.55), pitch = 18;
-                double camY = box[1] + dist * Math.sin(Math.toRadians(pitch)) + 2;
+                double dist = Math.max(18, width * 0.38), pitch = 12;
+                double camY = box[1] + box[5] * 0.4 + dist * Math.sin(Math.toRadians(pitch));
                 double camZ = front + dist * Math.cos(Math.toRadians(pitch));
                 player.getAbilities().mayfly = true;
                 player.getAbilities().flying = true;
