@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:buried_treasure",
+  "biomes": [
+    "the_sift:siftslate_caves"
+  ],
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}

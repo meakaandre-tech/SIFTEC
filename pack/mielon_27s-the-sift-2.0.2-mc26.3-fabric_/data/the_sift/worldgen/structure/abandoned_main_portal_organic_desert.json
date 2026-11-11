@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:buried_treasure",
+  "biomes": [
+    "the_sift:organic_desert"
+  ],
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}
