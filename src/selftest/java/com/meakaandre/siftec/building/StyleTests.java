@@ -45,9 +45,9 @@ import java.util.TreeSet;
  * showroom the screenshots of each building are taken in.
  * <ul>
  * <li>{@code selftest style}: every block in every building template is a real block with every property it names
- * applied (a typo would quietly turn into air or a default state), every building carries the style's materials
- * (orange, dark Steel Casing and half-block trim), no building has a block of Create's industrial iron (SIFTEC's steel
- * replaces it), and the HUB's bevels read as stairs.</li>
+ * applied (a typo would quietly turn into air or a default state), every building has the plain look (a Steel Casing
+ * frame, no glass), no building has a block of Create's industrial iron (SIFTEC's steel replaces it), and the HUB has
+ * no glass either.</li>
  * <li>{@code worldtest style setup}: every Build Gun building (not the vehicles) and the MAM put down on a white floor,
  * four rows of them facing south (a compact block, so its chunks load in one go without the client timing out), the miners on nodes, the extractors on their wells, the Water Extractor in a pool and
  * the Geothermal Generator over a geyser.</li>
@@ -59,7 +59,7 @@ import java.util.TreeSet;
 public final class StyleTests {
     private static final TestReport REPORT = new TestReport("SELFTEST style ");
     private static final TestReport SHOWROOM = new TestReport("SELFTEST style showroom ");
-    private static final int SX = 3000, SY = 140, SZ = 3000, GAP = 16, ROW_GAP = 70, PER_ROW = 12;
+    private static final int SX = 3000, SY = 140, SZ = 3000, GAP = 6, ROW_GAP = 70, PER_ROW = 12;
     /** Where each showroom building stands: its anchor (the middle of its front edge), width, depth and height. */
     private static final Map<String, int[]> PLACED = new LinkedHashMap<>();
 
@@ -124,23 +124,25 @@ public final class StyleTests {
                 }
                 REPORT.expect(source, def.id() + ": no Create industrial iron in its template", iron.isEmpty(), iron.isEmpty() ? "" : String.join(", ", iron));
             }
-            // the style's materials (not the Foundations tab's pieces, the poles or the smallest rigs)
+            // the plain look: a Steel Casing frame and no glass (not the Foundations tab's pieces, the poles or the smallest rigs)
             if (t == null || def.logic() == Logic.FOUNDATION || def.power() == PowerRole.POLE || t.members.size() < 30) continue;
             Set<String> blocks = new TreeSet<>();
             for (BuildingTemplate.Cell cell : t.members) blocks.add(BuiltInRegistries.BLOCK.getKey(cell.state().getBlock()).toString());
-            boolean orange = blocks.contains("minecraft:orange_concrete"), dark = blocks.contains("siftec:steel_casing");
-            boolean half = blocks.stream().anyMatch(b -> b.endsWith("_stairs") || b.endsWith("_slab") || b.endsWith("_trapdoor"));
-            REPORT.expect(source, def.id() + ": built in the style's orange, dark Steel Casing and half-block trim", orange && dark && half,
-                "orange " + orange + ", steel casing " + dark + ", half blocks " + half);
+            boolean dark = blocks.contains("siftec:steel_casing");
+            List<String> glass = blocks.stream().filter(b -> b.contains("glass")).toList();
+            REPORT.expect(source, def.id() + ": the plain look, a Steel Casing frame and no glass", dark && glass.isEmpty(),
+                "steel casing " + dark + (glass.isEmpty() ? "" : ", glass " + String.join(", ", glass)));
         }
-        // the HUB's roof bevels are dark stairs at every level from the start
+        // the HUB is plain too: no glass at any level
         Template hub = Templates.hub();
-        int stairs = 0;
+        Set<String> hubGlass = new TreeSet<>();
         for (long key : hub.keys()) {
-            BlockState at = hub.at(key, 0);
-            if (at != null && BuiltInRegistries.BLOCK.getKey(at.getBlock()).toString().equals("create:polished_cut_deepslate_stairs")) stairs++;
+            for (int level = 0; level <= hub.maxLevel; level++) {
+                BlockState at = hub.at(key, level);
+                if (at != null && BuiltInRegistries.BLOCK.getKey(at.getBlock()).toString().contains("glass")) hubGlass.add(BuiltInRegistries.BLOCK.getKey(at.getBlock()).toString());
+            }
         }
-        REPORT.expect(source, "HUB: its roof's edge is bevelled in dark stairs", stairs > 20, stairs + " stairs at level 0");
+        REPORT.expect(source, "HUB: the plain look, no glass", hubGlass.isEmpty(), String.join(", ", hubGlass));
         REPORT.report(source, "result: " + REPORT.totals());
         return 1;
     }
@@ -249,6 +251,19 @@ public final class StyleTests {
             }
     }
 
+    /** The showroom's row n (0 nearest the camera's side) as one box: its middle x, y, front z, width, depth, height. */
+    private static int @org.jspecify.annotations.Nullable [] rowBox(int row) {
+        int z = SZ - row * ROW_GAP, x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, d = 0, h = 0;
+        for (int[] b : PLACED.values()) {
+            if (b[2] != z) continue;
+            x0 = Math.min(x0, b[0] - b[3] / 2);
+            x1 = Math.max(x1, b[0] + b[3] / 2);
+            d = Math.max(d, b[4]);
+            h = Math.max(h, b[5]);
+        }
+        return x0 > x1 ? null : new int[]{(x0 + x1) / 2, SY, z, x1 - x0 + 1, d, h};
+    }
+
     private static void node(ServerLevel level, NodeType type, BlockPos at) {
         NodeLook look = NodeLook.of(type);
         level.setBlock(at.below(), look.patchStone(), Block.UPDATE_ALL);
@@ -276,6 +291,21 @@ public final class StyleTests {
             Template t = gateway ? Templates.gateway() : Templates.hub();
             // the structures' frames run from minX to maxX across, the anchor on the front edge's middle
             box = new int[]{a.getX() + (t.minX + t.maxX) / 2, a.getY(), a.getZ(), t.width(), t.length(), t.height()};
+        } else if (id.startsWith("row")) {
+            // a whole row of the showroom, from straight in front: every building side by side, as built
+            box = rowBox(Integer.parseInt(id.substring(3)));
+            if (box != null) {
+                double width = box[3], midX = box[0] + 0.5, front = box[2] + 1;
+                double dist = Math.max(20, width * 0.55), pitch = 18;
+                double camY = box[1] + dist * Math.sin(Math.toRadians(pitch)) + 2;
+                double camZ = front + dist * Math.cos(Math.toRadians(pitch));
+                player.getAbilities().mayfly = true;
+                player.getAbilities().flying = true;
+                player.onUpdateAbilities();
+                player.teleportTo(level, midX, camY, camZ, Set.of(), 180f, (float) pitch, true);
+                SHOWROOM.report(source, "look " + id + ": camera at " + Math.round(midX) + ", " + Math.round(camY) + ", " + Math.round(camZ));
+                return 1;
+            }
         } else {
             box = PLACED.get(id);
         }

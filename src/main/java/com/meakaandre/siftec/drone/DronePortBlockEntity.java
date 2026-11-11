@@ -44,7 +44,7 @@ public class DronePortBlockEntity extends BlockEntity {
     /** Ticks the drone takes to climb off its pad, and to come down onto the other: half of GROUND_TICKS each. */
     private static final int CLIMB_TICKS = GROUND_TICKS / 2;
     /** The landing pad's deck is this far over the terminal, straight up (tools/structures.py, drone_port). */
-    public static final int PAD_DY = 10;
+    public static final int PAD_DY = 5;
     /** The most fire charges one trip takes: the one stack the port's fuel slot holds. */
     private static final int MAX_CHARGES = 64;
 

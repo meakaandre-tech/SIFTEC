@@ -375,9 +375,9 @@ public final class BuildingsBTests {
         put(level, source, company, asm);
         ControllerBlockEntity ac = controller(level, asm);
         if (ac != null) BuildingLogic.setFilter(level, ac, new ItemStack(item("siftec:reinforced_iron_plate")));
-        beltInto(level, asm, new int[]{-1, 0, 10}, new ItemStack(item("create:iron_sheet")), 8, 400, 64);
-        beltInto(level, asm, new int[]{1, 0, 10}, new ItemStack(item("siftec:screw")), 4, 800, 64);
-        BlockPos asmChest = chestAt(level, asm, new int[]{0, 0, 0});
+        beltInto(level, asm, new int[]{-1, 1, 6}, new ItemStack(item("create:iron_sheet")), 8, 400, 64);
+        beltInto(level, asm, new int[]{1, 1, 6}, new ItemStack(item("siftec:screw")), 4, 800, 64);
+        BlockPos asmChest = chestAt(level, asm, new int[]{0, 1, 0});
         power(level, source, asm, 1, powered);
         measures.add(new Measure("Assembler: 5 Reinforced Iron Plate a minute (12 s each)", () -> made(ac), 4, 6, 1));
 
@@ -387,9 +387,9 @@ public final class BuildingsBTests {
         put(level, source, company, fo);
         ControllerBlockEntity fc = controller(level, fo);
         if (fc != null) BuildingLogic.setFilter(level, fc, new ItemStack(item("siftec:steel_ingot")));
-        beltInto(level, fo, new int[]{-1, 0, 8}, new ItemStack(Items.RAW_IRON), 3, 1200, 128);
-        beltInto(level, fo, new int[]{1, 0, 8}, new ItemStack(Items.COAL), 3, 1200, 128);
-        BlockPos foChest = chestAt(level, fo, new int[]{0, 0, 0});
+        beltInto(level, fo, new int[]{-1, 1, 4}, new ItemStack(Items.RAW_IRON), 3, 1200, 128);
+        beltInto(level, fo, new int[]{1, 1, 4}, new ItemStack(Items.COAL), 3, 1200, 128);
+        BlockPos foChest = chestAt(level, fo, new int[]{0, 1, 0});
         power(level, source, fo, 1, powered);
         measures.add(new Measure("Foundry: 15 Steel Ingot recipes a minute (4 s each)", () -> made(fc), 13, 16, 1));
 
@@ -399,9 +399,9 @@ public final class BuildingsBTests {
         put(level, source, company, re);
         ControllerBlockEntity rc = controller(level, re);
         if (rc != null) BuildingLogic.setFilter(level, rc, new ItemStack(item("siftec:plastic")));
-        pipeInto(level, re, new int[]{3, 0, 12}, fluid("createdieselgenerators:crude_oil"), 3);
+        pipeInto(level, re, new int[]{2, 0, 6}, fluid("createdieselgenerators:crude_oil"), 3);
         long[] hor = pipeOut(level, re, new int[]{1, 0, 0}, fluid("siftec:heavy_oil_residue"));
-        BlockPos reChest = chestAt(level, re, new int[]{-1, 0, 0});
+        BlockPos reChest = chestAt(level, re, new int[]{-1, 1, 0});
         power(level, source, re, 1, powered);
         measures.add(new Measure("Refinery: 10 Plastic recipes a minute (6 s each)", () -> made(rc), 9, 11, 1));
 
@@ -412,11 +412,11 @@ public final class BuildingsBTests {
         put(level, source, company, bl);
         ControllerBlockEntity bc = controller(level, bl);
         if (bc != null) BuildingLogic.setFilter(level, bc, new ItemStack(item("siftec:battery")));
-        beltInto(level, bl, new int[]{-3, 0, 10}, new ItemStack(item("siftec:aluminum_casing")), 2, 1200, 64);
-        pipeInto(level, bl, new int[]{1, 0, 10}, fluid("siftec:sulfuric_acid"), 4);
-        pipeInto(level, bl, new int[]{3, 0, 10}, fluid("siftec:alumina_solution"), 4);
+        beltInto(level, bl, new int[]{-3, 1, 6}, new ItemStack(item("siftec:aluminum_casing")), 2, 1200, 64);
+        pipeInto(level, bl, new int[]{1, 0, 6}, fluid("siftec:sulfuric_acid"), 4);
+        pipeInto(level, bl, new int[]{3, 0, 6}, fluid("siftec:alumina_solution"), 4);
         long[] water = pipeOut(level, bl, new int[]{1, 0, 0}, fluid("minecraft:water"));
-        BlockPos blChest = chestAt(level, bl, new int[]{-1, 0, 0});
+        BlockPos blChest = chestAt(level, bl, new int[]{-1, 1, 0});
         power(level, source, bl, 1, powered);
         measures.add(new Measure("Blender: 20 Batteries a minute (3 s each)", () -> made(bc), 17, 21, 1));
 
@@ -427,10 +427,10 @@ public final class BuildingsBTests {
         put(level, source, company, ma);
         ControllerBlockEntity mc = controller(level, ma);
         if (mc != null) BuildingLogic.setFilter(level, mc, new ItemStack(item("siftec:computer")));
-        beltInto(level, ma, new int[]{-3, 0, 14}, new ItemStack(item("siftec:circuit_board")), 10, 400, 64);
-        beltInto(level, ma, new int[]{-1, 0, 14}, new ItemStack(item("siftec:cable")), 6, 600, 64);
-        beltInto(level, ma, new int[]{1, 0, 14}, new ItemStack(item("siftec:plastic")), 3, 1200, 64);
-        BlockPos maChest = chestAt(level, ma, new int[]{0, 0, 0});
+        beltInto(level, ma, new int[]{-3, 1, 10}, new ItemStack(item("siftec:circuit_board")), 10, 400, 64);
+        beltInto(level, ma, new int[]{-1, 1, 10}, new ItemStack(item("siftec:cable")), 6, 600, 64);
+        beltInto(level, ma, new int[]{1, 1, 10}, new ItemStack(item("siftec:plastic")), 3, 1200, 64);
+        BlockPos maChest = chestAt(level, ma, new int[]{0, 1, 0});
         power(level, source, ma, 1, powered);
         measures.add(new Measure("Manufacturer: 5 Computers in two minutes (24 s each)", () -> made(mc), 4, 6, 2));
 
@@ -441,12 +441,12 @@ public final class BuildingsBTests {
         put(level, source, company, qe);
         ControllerBlockEntity qc = controller(level, qe);
         if (qc != null) BuildingLogic.setFilter(level, qc, new ItemStack(item("siftec:superposition_oscillator")));
-        beltInto(level, qe, new int[]{-3, 0, 18}, new ItemStack(item("siftec:dark_matter_crystal")), 6, 600, 64);
-        beltInto(level, qe, new int[]{-1, 0, 18}, new ItemStack(item("siftec:crystal_oscillator")), 30, 120, 64);
-        beltInto(level, qe, new int[]{1, 0, 18}, new ItemStack(item("siftec:alclad_aluminum_sheet")), 4, 900, 64);
-        pipeInto(level, qe, new int[]{3, 0, 18}, fluid("siftec:excited_photonic_matter"), 6);
+        beltInto(level, qe, new int[]{-3, 1, 14}, new ItemStack(item("siftec:dark_matter_crystal")), 6, 600, 64);
+        beltInto(level, qe, new int[]{-1, 1, 14}, new ItemStack(item("siftec:crystal_oscillator")), 30, 120, 64);
+        beltInto(level, qe, new int[]{1, 1, 14}, new ItemStack(item("siftec:alclad_aluminum_sheet")), 4, 900, 64);
+        pipeInto(level, qe, new int[]{3, 0, 14}, fluid("siftec:excited_photonic_matter"), 6);
         long[] dmr = pipeOut(level, qe, new int[]{1, 0, 0}, fluid("siftec:dark_matter_residue"));
-        BlockPos qeChest = chestAt(level, qe, new int[]{-1, 0, 0});
+        BlockPos qeChest = chestAt(level, qe, new int[]{-1, 1, 0});
         power(level, source, qe, 2, powered);
         measures.add(new Measure("Quantum Encoder: 5 Superposition Oscillators a minute (12 s each)", () -> made(qc), 4, 6, 1));
 
@@ -455,9 +455,9 @@ public final class BuildingsBTests {
         Placement pk = at("packager", x, Z);
         put(level, source, company, pk);
         ControllerBlockEntity pc = controller(level, pk);
-        beltInto(level, pk, new int[]{-1, 0, 6}, new ItemStack(item("siftec:empty_canister")), 15, 200, 64);
-        pipeInto(level, pk, new int[]{1, 0, 6}, fluid("minecraft:water"), 3);
-        BlockPos pkChest = chestAt(level, pk, new int[]{-1, 0, 0});
+        beltInto(level, pk, new int[]{-1, 1, 4}, new ItemStack(item("siftec:empty_canister")), 15, 200, 64);
+        pipeInto(level, pk, new int[]{1, 0, 4}, fluid("minecraft:water"), 3);
+        BlockPos pkChest = chestAt(level, pk, new int[]{-1, 1, 0});
         long[] unpacked = pipeOut(level, pk, new int[]{1, 0, 0}, fluid("minecraft:water"));
         power(level, source, pk, 1, powered);
         measures.add(new Measure("Packager: 60 Packaged Water a minute (1 s each)", () -> count(level, pkChest, item("siftec:packaged_water")), 50, 62, 1));
@@ -514,9 +514,9 @@ public final class BuildingsBTests {
         put(level, source, company, pa);
         ControllerBlockEntity pac = controller(level, pa);
         if (pac != null) BuildingLogic.setFilter(level, pac, new ItemStack(item("siftec:dark_matter_crystal")));
-        beltInto(level, pa, new int[]{-2, 0, 20}, new ItemStack(Items.DIAMOND), 20, 120, 64);
-        pipeInto(level, pa, new int[]{2, 0, 20}, fluid("siftec:dark_matter_residue"), 8);
-        BlockPos paChest = chestAt(level, pa, new int[]{0, 0, 0});
+        beltInto(level, pa, new int[]{-2, 1, 10}, new ItemStack(Items.DIAMOND), 20, 120, 64);
+        pipeInto(level, pa, new int[]{2, 0, 10}, fluid("siftec:dark_matter_residue"), 8);
+        BlockPos paChest = chestAt(level, pa, new int[]{0, 1, 0});
         // Dark Matter Crystal draws up to 1,500 MW at the top of its cycle
         power(level, source, pa, 4, powered);
         measures.add(new Measure("Particle Accelerator: 30 Dark Matter Crystals a minute (2 s each)", () -> made(pac), 27, 31, 1));
@@ -527,14 +527,14 @@ public final class BuildingsBTests {
         put(level, source, company, co);
         ControllerBlockEntity cc = controller(level, co);
         if (cc != null) BuildingLogic.setFilter(level, cc, new ItemStack(item("siftec:time_crystal")));
-        beltInto(level, co, new int[]{-1, 0, 8}, new ItemStack(Items.DIAMOND), 30, 100, 64);
-        BlockPos coChest = chestAt(level, co, new int[]{-1, 0, 0});
+        beltInto(level, co, new int[]{-1, 1, 6}, new ItemStack(Items.DIAMOND), 30, 100, 64);
+        BlockPos coChest = chestAt(level, co, new int[]{-1, 1, 0});
         power(level, source, co, 1, powered);
         measures.add(new Measure("Converter: 6 Time Crystals a minute (10 s each)", () -> made(cc), 5, 7, 1));
 
         // ---- the Brass Basin holds four stacks of an item: 200 Screws go into the Manufacturer's through its port
         later(level, 20, () -> {
-            BlockPos port = ma.at(3, 0, 14);
+            BlockPos port = ma.at(3, 1, 10);
             Storage<ItemVariant> into = ItemStorage.SIDED.find(level, port, level.getBlockState(port).getValue(PortBlock.FACING));
             long in = 0;
             if (into != null) {
@@ -639,7 +639,7 @@ public final class BuildingsBTests {
         // the state selftest clears the test companies just after a restart; the buildings' machines run their company's
         // unlocked recipes only, so the company is made again (with its milestones) once that has run
         later(level, 100, () -> company(level));
-        BlockPos diamondsIn = pa.at(-2, 0, 20);
+        BlockPos diamondsIn = pa.at(-2, 1, 10);
         var port = ItemStorage.SIDED.find(level, diamondsIn, level.getBlockState(diamondsIn).hasProperty(PortBlock.FACING)
             ? level.getBlockState(diamondsIn).getValue(PortBlock.FACING) : null);
         if (port != null) {
@@ -648,7 +648,7 @@ public final class BuildingsBTests {
                 tx.commit();
             }
         }
-        pipeInto(level, pa, new int[]{2, 0, 20}, fluid("siftec:dark_matter_residue"), 8);
+        pipeInto(level, pa, new int[]{2, 0, 10}, fluid("siftec:dark_matter_residue"), 8);
         later(level, 400, () -> {
             ControllerBlockEntity p2 = controller(level, pa);
             expect(source, "restart: the Particle Accelerator is back on its grid and goes on making", p2 != null && p2.powered && p2.made > before,

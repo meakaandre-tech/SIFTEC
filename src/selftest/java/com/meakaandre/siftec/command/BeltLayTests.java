@@ -81,7 +81,7 @@ import java.util.UUID;
  * <p>
  * The client part ({@code /siftec worldtest beltlay client ...}) gets a spot ready for the smoke script, which lays a
  * belt with the real client's clicks and photographs the preview line, then checks what it laid.
- * {@code /siftec worldtest beltlay view <straight|sloped|funnel>} puts the player at a screenshot spot at noon.
+ * {@code /siftec worldtest beltlay view <straight|sloped|funnel|port>} puts the player at a screenshot spot at noon.
  */
 public final class BeltLayTests {
     private static final int X = 16000, Y = 200, Z = -16000;
@@ -95,6 +95,8 @@ public final class BeltLayTests {
     /** The funnel line: a flat belt east from here, a chest one block up beside its far end, Create's funnel on the chest. */
     private static final BlockPos FUNNEL_A = new BlockPos(X + 30, Y, Z + 40), FUNNEL_B = FUNNEL_A.east(5),
         FUNNEL_CHEST = FUNNEL_B.east().above(), FUNNEL_AT = FUNNEL_B.above();
+    /** The port check's Storage Container, its belts and funnels. */
+    private static final BlockPos PORT_ANCHOR = new BlockPos(X + 30, Y, Z + 20);
 
     private static final TestQueue LATER = new TestQueue();
     private static final TestReport REPORT = new TestReport("SELFTEST beltlay ");
@@ -351,7 +353,12 @@ public final class BeltLayTests {
             m + "; " + describe(level, s, e));
     }
 
-    /** A shaftless belt up to a Storage Container's input port: what goes on it ends up in the building. */
+    /**
+     * A building's ports with a belt on the ground and Create's own funnels, the way a player hooks one up: a Storage
+     * Container, a belt laid by two clicks on the ground up to under its input port (one block over the pad) with a funnel
+     * clicked onto the port's face, and a belt laid away from under its output port with a funnel clicked onto that one.
+     * The input funnel takes the belt's items into the building; the output funnel pulls them out onto the other belt.
+     */
     private static void port(CommandSourceStack source, ServerLevel level) {
         BuildingDef def = Buildings.def("storage_container");
         BuildingTemplate t = def == null ? null : BuildingTemplate.of(def);
@@ -359,49 +366,69 @@ public final class BeltLayTests {
             expect(source, "port: the Storage Container exists", false, "");
             return;
         }
-        Placement placement = new Placement(def, new BlockPos(X + 30, Y, Z + 20), Direction.NORTH, false);
+        Placement placement = new Placement(def, PORT_ANCHOR, Direction.NORTH, false);
         Company owner = CompanyData.get(level.getServer()).byId(COMPANY);
         Buildings.Check check = Buildings.place(level, placement, owner, null, true);
         ControllerBlockEntity c = level.getBlockEntity(placement.at(t.controller)) instanceof ControllerBlockEntity ce ? ce : null;
-        BlockPos in = null;
+        BlockPos in = null, outPort = null;
         for (BuildingTemplate.Cell cell : t.members) {
-            if (cell.state().getBlock() instanceof PortBlock && cell.state().getValue(PortBlock.KIND) == PortBlock.Kind.ITEM_IN) {
-                in = placement.at(cell);
-                break;
-            }
+            if (!(cell.state().getBlock() instanceof PortBlock)) continue;
+            if (cell.state().getValue(PortBlock.KIND) == PortBlock.Kind.ITEM_IN) in = placement.at(cell);
+            if (cell.state().getValue(PortBlock.KIND) == PortBlock.Kind.ITEM_OUT) outPort = placement.at(cell);
         }
-        BlockState portState = in == null ? Blocks.AIR.defaultBlockState() : level.getBlockState(in);
-        if (!check.ok() || c == null || in == null || !portState.hasProperty(PortBlock.FACING) || portState.getValue(PortBlock.FACING).getAxis().isVertical()) {
-            expect(source, "port: the Storage Container goes down with a side input port", false, check.message().getString() + ", port " + portState);
+        BlockState inState = in == null ? Blocks.AIR.defaultBlockState() : level.getBlockState(in);
+        BlockState outState = outPort == null ? Blocks.AIR.defaultBlockState() : level.getBlockState(outPort);
+        if (!check.ok() || c == null || in == null || outPort == null || !inState.hasProperty(PortBlock.FACING) || !outState.hasProperty(PortBlock.FACING)) {
+            expect(source, "port: the Storage Container goes down with an item input and an item output", false, check.message().getString() + ", ports " + inState + " / " + outState);
             return;
         }
-        Direction out = portState.getValue(PortBlock.FACING), along = out.getOpposite();
-        BlockPos start = in.relative(out, 6), end = in.relative(out, 1);
-        for (BlockPos p : new BlockPos[]{start, end}) if (level.getBlockState(p.below()).isAir()) level.setBlock(p.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
+        expect(source, "port: its item ports stand one block over the pad", in.getY() == PORT_ANCHOR.getY() + 1 && outPort.getY() == PORT_ANCHOR.getY() + 1,
+            "in at " + in.toShortString() + ", out at " + outPort.toShortString() + ", pad at y " + PORT_ANCHOR.getY());
+        Direction out = inState.getValue(PortBlock.FACING), along = out.getOpposite();
+        // the input: a belt on the ground from six blocks out up to the block under the funnel's spot
+        BlockPos start = in.relative(out, 6).below(), end = in.relative(out, 1).below();
         FakePlayer p = tester(level, GameType.CREATIVE, 1);
         InteractionResult r = layOnGround(level, p, start, end);
-        expect(source, "port: two clicks lay a shaftless belt up to the Storage Container's input port",
+        expect(source, "port: two clicks lay a belt on the ground up to under the Storage Container's input port",
             r.consumesAction() && whole(level, start, end, BeltSlope.HORIZONTAL) && level.getBlockState(start).getValue(BeltBlock.HORIZONTAL_FACING) == along,
             r + "; " + describe(level, start, end));
+        p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(AllItems.ANDESITE_FUNNEL));
+        InteractionResult fi = click(level, p, in, out);
+        BlockState inFunnel = level.getBlockState(in.relative(out));
+        expect(source, "port: a funnel clicked on the input port's face is Create's belt funnel on the belt's end",
+            fi.consumesAction() && inFunnel.getBlock() instanceof BeltFunnelBlock && level.getBlockState(end).is(AllBlocks.BELT), fi + "; " + inFunnel);
+        // the output: a belt on the ground from under the funnel's spot away from the building, and a funnel on the port
+        Direction outDir = outState.getValue(PortBlock.FACING);
+        BlockPos oStart = outPort.relative(outDir, 1).below(), oEnd = outPort.relative(outDir, 6).below();
+        p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(AllItems.BELT_CONNECTOR));
+        InteractionResult ro = layOnGround(level, p, oStart, oEnd);
+        p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(AllItems.ANDESITE_FUNNEL));
+        InteractionResult fo = click(level, p, outPort, outDir);
+        BlockState outFunnel = level.getBlockState(outPort.relative(outDir));
+        expect(source, "port: a belt laid away from under the output port, and a funnel clicked on the port's face over it",
+            ro.consumesAction() && whole(level, oStart, oEnd, BeltSlope.HORIZONTAL) && fo.consumesAction() && outFunnel.getBlock() instanceof BeltFunnelBlock,
+            ro + ", " + fo + "; " + outFunnel + "; " + describe(level, oStart, oEnd));
         int[] fed = {0};
         for (int i = 0; i < 4; i++) later(level, 40 + 20 * i, () -> {
             if (feed(level, start, along, new ItemStack(Items.COPPER_INGOT))) fed[0]++;
         });
-        ControllerBlockEntity building = c;
         BlockPos portAt = in;
         Direction portOut = out;
         later(level, 360, () -> {
             long got = 0;
-            // a port feeds the cell inside the building it serves (the Storage Container's store), not the controller
-            BlockPos into = level.getBlockEntity(portAt) instanceof PortBlockEntity pe && pe.target != null ? pe.target : building.getBlockPos();
+            BlockPos into = level.getBlockEntity(portAt) instanceof PortBlockEntity pe && pe.target != null ? pe.target : c.getBlockPos();
             Storage<ItemVariant> inside = ItemStorage.SIDED.find(level, into, portOut);
             if (inside != null) for (StorageView<ItemVariant> v : inside) if (!v.isResourceBlank() && v.getResource().isOf(Items.COPPER_INGOT)) got += v.getAmount();
-            int ground = dropped(level, around(start, end), Items.COPPER_INGOT);
-            int onBelt = 0;
-            BeltBlockEntity b = beltAt(level, start);
+            int inGround = dropped(level, around(start, end), Items.COPPER_INGOT);
+            int onOut = 0;
+            BeltBlockEntity b = beltAt(level, oStart);
             BeltBlockEntity ctrl = b == null ? null : b.getControllerBE();
-            if (ctrl != null && ctrl.getInventory() != null) for (TransportedItemStack riding : ctrl.getInventory().getTransportedItems()) if (riding.stack.is(Items.COPPER_INGOT)) onBelt += riding.stack.getCount();
-            expect(source, "port: the shaftless belt feeds the building's port (4 copper ingots in)", fed[0] == 4 && got == 4, "fed " + fed[0] + ", in the building " + got + " (at " + into.toShortString() + "), on the belt " + onBelt + ", on the ground " + ground);
+            if (ctrl != null && ctrl.getInventory() != null) for (TransportedItemStack riding : ctrl.getInventory().getTransportedItems()) if (riding.stack.is(Items.COPPER_INGOT)) onOut += riding.stack.getCount();
+            int outGround = dropped(level, around(oStart, oEnd.relative(outDir, 2)), Items.COPPER_INGOT);
+            long through = onOut + outGround;
+            expect(source, "port: the belt and funnel feed the input port, and the output funnel pulls them back out onto its belt (4 copper ingots)",
+                fed[0] == 4 && inGround == 0 && got + through == 4 && through > 0,
+                "fed " + fed[0] + ", in the building " + got + ", on the out belt " + onOut + ", off its end " + outGround + ", dropped at the input " + inGround);
         });
     }
 
@@ -554,6 +581,9 @@ public final class BeltLayTests {
             case "straight" -> new double[]{X + 3.5, Y + 1.8, Z + 3.5, 180, 25};
             case "sloped" -> new double[]{X + 2.5, Y + 3.5, Z + 12.5, 180, 15};
             case "funnel" -> new double[]{X + 34.5, Y + 2.2, Z + 44.5, 190, 25};
+            // the port check's Storage Container from the west: the belt and funnel at its back port on the left, the
+            // ones at its front port on the right
+            case "port" -> new double[]{X + 22.5, Y + 4.2, Z + 19.5, 270, 22};
             default -> null;
         };
         if (eye == null) {

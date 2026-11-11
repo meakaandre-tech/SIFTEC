@@ -724,6 +724,18 @@ shot
 cmd siftec worldtest style look mam
 sleep 12
 shot
+cmd siftec worldtest style look row0
+sleep 16
+shot
+cmd siftec worldtest style look row1
+sleep 16
+shot
+cmd siftec worldtest style look row2
+sleep 16
+shot
+cmd siftec worldtest style look row3
+sleep 16
+shot
 key F1
 cmd siftec worldtest sathub level 7
 sleep 2
@@ -801,6 +813,9 @@ cmd siftec worldtest beltlay view sloped
 sleep 3
 shot
 cmd siftec worldtest beltlay view funnel
+sleep 3
+shot
+cmd siftec worldtest beltlay view port
 sleep 3
 shot
 cmd siftec worldtest frames view

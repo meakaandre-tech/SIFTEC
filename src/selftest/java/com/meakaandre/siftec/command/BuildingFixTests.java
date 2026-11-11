@@ -252,7 +252,7 @@ public final class BuildingFixTests {
         // funnels and hoppers (BuildingProtection.sealed) reach a building's ports only, never its machines from outside
         ControllerBlockEntity con = place(source, level, company, "constructor", new BlockPos(X + 4, Y, Z + 40));
         BlockPos basin = con == null ? null : BuildingLogic.cell(con, create("basin"));
-        BlockPos conPort = con == null || con.placement() == null ? null : con.placement().at(0, 0, 0);
+        BlockPos conPort = con == null || con.placement() == null ? null : con.placement().at(0, 1, 0);
         BlockPos press = con == null ? null : BuildingLogic.cell(con, create("mechanical_press"));
         BlockPos outside = conPort == null ? null : conPort.relative(Direction.SOUTH, 2);
         expect(source, "8: from outside, only a building's ports can be reached; its own machines may reach each other",

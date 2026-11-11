@@ -235,7 +235,7 @@ public final class VehicleTests {
         Placement pa = new Placement(stationDef, new BlockPos(X, Y, Z), Direction.NORTH, false);
         Placement pb = new Placement(stationDef, new BlockPos(X + GAP, Y, Z), Direction.NORTH, false);
         Buildings.Check ca = Buildings.place(level, pa, company, null, true), cb = Buildings.place(level, pb, company, null, true);
-        ControllerBlockEntity a = BuildGun.controllerAt(level, pa.at(0, 1, 1)), b = BuildGun.controllerAt(level, pb.at(0, 1, 1));
+        ControllerBlockEntity a = BuildGun.controllerAt(level, pa.at(0, 1, 0)), b = BuildGun.controllerAt(level, pb.at(0, 1, 0));
         expect(source, "two Truck Stations go down", ca.ok() && cb.ok() && a != null && b != null, ca.message().getString() + " / " + cb.message().getString());
         if (a == null || b == null) return;
         a.unload = false;
@@ -349,7 +349,7 @@ public final class VehicleTests {
                 }
                 return;
             }
-            ControllerBlockEntity b = BuildGun.controllerAt(level, new Placement(Buildings.def("truck_station"), new BlockPos(X + GAP, Y, Z), Direction.NORTH, false).at(0, 1, 1));
+            ControllerBlockEntity b = BuildGun.controllerAt(level, new Placement(Buildings.def("truck_station"), new BlockPos(X + GAP, Y, Z), Direction.NORTH, false).at(0, 1, 0));
             expect(source, "restart: the Truck, its company, its route and its stops are back", truck.companyId.equals(COMPANY) && truck.route.size() >= 20
                 && truck.stopStation.size() == 2, truck.companyId + ", " + truck.route.size() + " points, " + truck.stopStation.size() + " stops");
             expect(source, "restart: the unloading station still unloads", b != null && b.unload, "");

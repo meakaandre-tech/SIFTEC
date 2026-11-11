@@ -1036,7 +1036,7 @@ BUILDINGS = [
     # Extractor stands in water over its intake cell, the Oil Extractor over an oil node, the Resource Well Pressurizer
     # over a nitrogen well, and Resource Well Extractors near a running Pressurizer take the well's nitrogen
     ("water_extractor", "Water Extractor", "production", BUILD_COSTS["Water Extractor"], "coal_power", False,
-     {"logic": "extractor", "su": round(20 * MW), "fluid": "minecraft:water", "rate": 120 * MB_PER_M3, "intake": (0, 0, 3)}),
+     {"logic": "extractor", "su": round(20 * MW), "fluid": "minecraft:water", "rate": 120 * MB_PER_M3, "intake": (0, 0, 2)}),
     ("oil_extractor", "Oil Extractor", "production", BUILD_COSTS["Oil Extractor"], "oil_processing", False,
      {"logic": "extractor", "su": round(40 * MW), "fluid": "createdieselgenerators:crude_oil", "rate": 120 * MB_PER_M3, "node": (0, 0, 2), "fluid_node": "oil"}),
     ("resource_well_pressurizer", "Resource Well Pressurizer", "production", BUILD_COSTS["Resource Well Pressurizer"], "advanced_aluminum_production", False,
