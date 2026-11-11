@@ -406,7 +406,9 @@ public final class MachineTests {
 
     // ------------------------------------------------------------------------------------------------ where things stand
 
-    private static final BlockPos BIOMASS = new BlockPos(X, Y, Z), COAL = new BlockPos(X + 24, Y, Z), DIESEL = new BlockPos(X + 48, Y, Z),
+    // the Coal Generator stands inside one chunk (x 9025 to 9031): across a chunk edge, its shaft line came back from a restart
+    // with the shaft over the edge still (Create keeps kinetics apart across an unloaded edge while the world loads)
+    private static final BlockPos BIOMASS = new BlockPos(X, Y, Z), COAL = new BlockPos(X + 28, Y, Z), DIESEL = new BlockPos(X + 48, Y, Z),
         TURBO = new BlockPos(X + 72, Y, Z), NUCLEAR = new BlockPos(X + 110, Y, Z), ACCELERATOR = new BlockPos(X + 160, Y, Z),
         CONVERTER = new BlockPos(X + 200, Y, Z), RESIDUE = new BlockPos(X + 230, Y, Z), REPAIR = new BlockPos(X + 260, Y, Z);
     private static final int GEO_Z = Z + 70;
