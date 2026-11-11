@@ -19,6 +19,7 @@ import com.meakaandre.siftec.hub.Milestones;
 import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.tweak.SelfMovingBelts;
 import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllDataComponents;
@@ -31,6 +32,7 @@ import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
+import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -43,6 +45,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -64,6 +68,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -76,6 +81,7 @@ import java.util.UUID;
  * <p>
  * The client part ({@code /siftec worldtest beltlay client ...}) gets a spot ready for the smoke script, which lays a
  * belt with the real client's clicks and photographs the preview line, then checks what it laid.
+ * {@code /siftec worldtest beltlay view <straight|sloped|funnel>} puts the player at a screenshot spot at noon.
  */
 public final class BeltLayTests {
     private static final int X = 16000, Y = 200, Z = -16000;
@@ -86,6 +92,9 @@ public final class BeltLayTests {
     private static final BlockPos FLAT_A = new BlockPos(X, Y, Z), FLAT_B = new BlockPos(X + 7, Y, Z);
     /** The client part's belt: first end, last end, and the block put in its way for the red preview. */
     public static final BlockPos CLIENT_A = new BlockPos(X + 60, Y, Z + 30), CLIENT_B = CLIENT_A.east(7), CLIENT_BLOCK = CLIENT_A.east(3);
+    /** The funnel line: a flat belt east from here, a chest one block up beside its far end, Create's funnel on the chest. */
+    private static final BlockPos FUNNEL_A = new BlockPos(X + 30, Y, Z + 40), FUNNEL_B = FUNNEL_A.east(5),
+        FUNNEL_CHEST = FUNNEL_B.east().above(), FUNNEL_AT = FUNNEL_B.above();
 
     private static final TestQueue LATER = new TestQueue();
     private static final TestReport REPORT = new TestReport("SELFTEST beltlay ");
@@ -105,7 +114,9 @@ public final class BeltLayTests {
                     .then(Commands.literal("setup").executes(c -> clientSetup(c.getSource())))
                     .then(Commands.literal("block").executes(c -> clientBlock(c.getSource(), true)))
                     .then(Commands.literal("clear").executes(c -> clientBlock(c.getSource(), false)))
-                    .then(Commands.literal("check").executes(c -> clientCheck(c.getSource()))))))));
+                    .then(Commands.literal("check").executes(c -> clientCheck(c.getSource()))))
+                    .then(Commands.literal("view").then(Commands.argument("name", StringArgumentType.word())
+                        .executes(c -> view(c.getSource(), StringArgumentType.getString(c, "name")))))))));
     }
 
     // ------------------------------------------------------------------------------------------------ helpers
@@ -285,6 +296,7 @@ public final class BeltLayTests {
         REPORT.attempt(source, "cost", () -> cost(source, level));
         REPORT.attempt(source, "refusals", () -> refusals(source, level));
         REPORT.attempt(source, "old way", () -> oldWay(source, level));
+        REPORT.attempt(source, "funnel", () -> funnel(source, level));
         later(level, 400, () -> report(source, "done: " + REPORT.totals()));
         report(source, "test site ready; the checks report over the next twenty seconds");
         return 1;
@@ -502,6 +514,59 @@ public final class BeltLayTests {
             expect(source, "old way: breaking an end gives the belt item and that end's shaft, and the far shaft stands again",
                 broke && belts == 1 && shafts == 1 && level.getBlockState(b).is(AllBlocks.SHAFT), "dropped " + belts + " belt items, " + shafts + " shafts; far end " + level.getBlockState(b));
         });
+    }
+
+    /**
+     * A flat belt ending under a funnel placed the normal Create way (a click on a chest's face, one block up beside the
+     * belt's end): the funnel is Create's belt funnel above the belt, and items on the belt end up in the chest.
+     */
+    private static void funnel(CommandSourceStack source, ServerLevel level) {
+        FakePlayer p = tester(level, GameType.CREATIVE, 1);
+        InteractionResult laid = layOnGround(level, p, FUNNEL_A, FUNNEL_B);
+        expect(source, "funnel: a flat belt is laid for the funnel line", laid.consumesAction() && whole(level, FUNNEL_A, FUNNEL_B, BeltSlope.HORIZONTAL),
+            laid + "; " + describe(level, FUNNEL_A, FUNNEL_B));
+        level.setBlock(FUNNEL_CHEST.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(FUNNEL_CHEST, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
+        p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(AllItems.ANDESITE_FUNNEL));
+        InteractionResult placed = click(level, p, FUNNEL_CHEST, Direction.WEST);
+        BlockState f = level.getBlockState(FUNNEL_AT);
+        expect(source, "funnel: a funnel put on the chest's face stands above the belt's end as Create's belt funnel, the belt block untouched",
+            placed.consumesAction() && f.getBlock() instanceof BeltFunnelBlock && level.getBlockState(FUNNEL_B).is(AllBlocks.BELT), placed + "; " + f + " over " + level.getBlockState(FUNNEL_B));
+        later(level, 40, () -> feed(level, FUNNEL_A, Direction.EAST, new ItemStack(Items.IRON_INGOT, 4)));
+        later(level, 240, () -> {
+            Storage<ItemVariant> chest = ItemStorage.SIDED.find(level, FUNNEL_CHEST, Direction.WEST);
+            long n = 0;
+            if (chest != null) for (StorageView<ItemVariant> v : chest) if (v.getResource().isOf(Items.IRON_INGOT)) n += v.getAmount();
+            expect(source, "funnel: 4 iron ingots on the belt end up in the chest through the funnel", n == 4,
+                (chest == null ? "no chest storage" : n + " in the chest") + ", " + dropped(level, around(FUNNEL_A, FUNNEL_CHEST), Items.IRON_INGOT) + " dropped");
+        });
+    }
+
+    // ------------------------------------------------------------------------------------------------ screenshot spots
+
+    /** The player (in spectator) at a screenshot spot at noon: the straight belt, the sloped belt or the funnel line. */
+    private static int view(CommandSourceStack source, String name) {
+        MinecraftServer server = source.getServer();
+        ServerLevel level = server.overworld();
+        server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), "time set noon");
+        // eye x, y, z, yaw, pitch; yaw 180 looks north (-z)
+        double[] eye = switch (name) {
+            case "straight" -> new double[]{X + 3.5, Y + 1.8, Z + 3.5, 180, 25};
+            case "sloped" -> new double[]{X + 2.5, Y + 3.5, Z + 12.5, 180, 15};
+            case "funnel" -> new double[]{X + 34.5, Y + 2.2, Z + 44.5, 190, 25};
+            default -> null;
+        };
+        if (eye == null) {
+            source.sendFailure(Component.literal("no view " + name));
+            return 0;
+        }
+        for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+            if (p instanceof FakePlayer) continue;
+            if (p.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) p.setGameMode(GameType.SPECTATOR);
+            p.teleportTo(level, eye[0], eye[1] - p.getEyeHeight(), eye[2], Set.of(), (float) eye[3], (float) eye[4], true);
+        }
+        source.sendSuccess(() -> Component.literal("SELFTEST beltlay view " + name), false);
+        return 1;
     }
 
     // ------------------------------------------------------------------------------------------------ after a restart

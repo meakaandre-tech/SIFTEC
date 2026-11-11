@@ -798,8 +798,6 @@
   "siftec.backpack.lowered": "Your company's backpacks are %s: yours is %s slots again",
   "siftec.backpack.lowered_crate": "What lay in the backpack slots you no longer have is in a crate at %s %s %s",
   "siftec.backpack.tier": "Your backpack grew to %s: %s slots",
-  "siftec.belt.goggles": "Belt Mk.%s: %s items a minute",
-  "siftec.belt.goggles.still": "Belt: not moving (no Logistics milestone yet)",
   "siftec.blueprint.blank": "This blueprint is blank",
   "siftec.blueprint.blocked": "Something is in the way at x %s, y %s, z %s",
   "siftec.blueprint.built": "Built %s blocks",

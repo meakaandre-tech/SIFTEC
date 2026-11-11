@@ -15,6 +15,5 @@ siftec worldtest powerchain restart
 siftec selftest vehicles restart
 siftec selftest always restart
 siftec selftest beltlay restart
-siftec selftest lowbelts restart
 #sleep 40
 siftec selftest tb crate persisted
