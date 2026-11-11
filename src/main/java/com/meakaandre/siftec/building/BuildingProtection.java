@@ -3,10 +3,16 @@ package com.meakaandre.siftec.building;
 import com.meakaandre.siftec.blueprint.DesignerBlockEntity;
 import com.meakaandre.siftec.claim.Claims;
 import com.meakaandre.siftec.company.Companies;
+import com.meakaandre.siftec.drone.DronePortBlock;
 import com.meakaandre.siftec.equip.Ziplines;
 import com.meakaandre.siftec.hub.HubBlock;
 import com.meakaandre.siftec.util.Chunks;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.AllRecipeSets;
+import com.zurrtum.create.content.kinetics.crank.HandCrankBlock;
+import com.zurrtum.create.content.kinetics.crank.ValveHandleBlock;
+import com.zurrtum.create.content.processing.basin.BasinBlock;
+import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlock;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
@@ -16,11 +22,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeAccess;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.phys.AABB;
 import org.antarcticgardens.cna.content.electricity.connector.AbstractElectricalConnector;
+import org.antarcticgardens.cna.content.electricity.wire.ElectricWireItem;
 import org.jspecify.annotations.Nullable;
 
 /** What keeps a building whole: no mining, wrenching or changing its blocks by hand, and the checks the mixins ask. */
@@ -43,9 +56,12 @@ public final class BuildingProtection {
             }
             return false;
         });
-        // nor scraped, stripped or waxed: that would change the block and bring the building down
+        // nor scraped, stripped or waxed: that would change the block and bring the building down (an axe, shovel or hoe
+        // does nothing to a crank, lever or sign, so those still work with one in hand; wax would seal a sign for good)
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
-            if (level.isClientSide() || !changesBlock(player.getItemInHand(hand))) return InteractionResult.PASS;
+            ItemStack stack = player.getItemInHand(hand);
+            if (level.isClientSide() || !changesBlock(stack)) return InteractionResult.PASS;
+            if (!stack.is(Items.HONEYCOMB) && clickable(level, hit.getBlockPos(), player, stack)) return InteractionResult.PASS;
             if (!shellChangeRefused(level, player, hit.getBlockPos())) return InteractionResult.PASS;
             Claims.resync(player, level, hit.getBlockPos(), hit.getDirection());
             return InteractionResult.FAIL;
@@ -101,10 +117,57 @@ public final class BuildingProtection {
      * changes only with the Build Gun and the Customizer. The controller and the ports are left to their own use.
      */
     public static boolean shellChangeRefused(Level level, @Nullable Player player, BlockPos pos) {
-        BlockPos controller = BuildingIndex.controllerOf(level, pos);
-        if (controller == null || pos.equals(controller) || level.getBlockState(pos).getBlock() instanceof PortBlock) return false;
+        BlockPos controller = shellOf(level, pos);
+        if (controller == null) return false;
         tellPart(player, level, controller);
         return true;
+    }
+
+    /**
+     * True (and the player told why) if a right click on a block of a building is refused before the block or the item
+     * in hand acts (from {@code ManualApplicationMixin}, Create's hook that runs ahead of both). A building's blocks are
+     * not used by hand, except the parts meant to be clicked ({@link #clickable}), which work as they do anywhere; even
+     * those take no casing or other item application, which would change the block. The controller and the ports are
+     * left to their own use.
+     */
+    public static boolean useRefused(Level level, @Nullable Player player, ItemStack held, BlockPos pos) {
+        BlockPos controller = shellOf(level, pos);
+        if (controller == null) return false;
+        if (clickable(level, pos, player, held) && !applies(level, held, pos)) return false;
+        tellPart(player, level, controller);
+        return true;
+    }
+
+    /** The controller of the building a block is a shell or machine block of (not its controller or a port), or null. */
+    private static @Nullable BlockPos shellOf(Level level, BlockPos pos) {
+        BlockPos controller = BuildingIndex.controllerOf(level, pos);
+        if (controller == null || pos.equals(controller) || level.getBlockState(pos).getBlock() instanceof PortBlock) return null;
+        return controller;
+    }
+
+    /**
+     * True if this block of a building is a part a player is meant to click, with this in hand: a hand crank or valve
+     * handle (turned as Create turns it; no dye on a valve handle, which would make it another block), a lever, an
+     * analog lever or a button, a billboard's sign (written on, coloured with dye or glow ink), the Drone Port's loading
+     * terminal, a building's wire connector with a wire, and the HUB Craft Station's Basins (emptied by hand). Sneaking
+     * with something in hand skips the block's own use for the item's (building against it), so that stays refused.
+     */
+    public static boolean clickable(Level level, BlockPos pos, @Nullable Player player, ItemStack held) {
+        if (level.getBlockEntity(pos) instanceof AbstractElectricalConnector) return held.getItem() instanceof ElectricWireItem;
+        if (player != null && player.isSecondaryUseActive() && !held.isEmpty()) return false;
+        Block block = level.getBlockState(pos).getBlock();
+        if (block instanceof ValveHandleBlock && held.getItem() instanceof DyeItem) return false;
+        if (block instanceof HandCrankBlock || block instanceof LeverBlock || block instanceof AnalogLeverBlock || block instanceof ButtonBlock
+            || block instanceof SignBlock || block instanceof DronePortBlock) return true;
+        return block instanceof BasinBlock && SpecialBuildings.craftStation(level, pos);
+    }
+
+    /** True if Create's item application (a casing put on by hand) has a recipe for this item on this block. */
+    static boolean applies(Level level, ItemStack held, BlockPos pos) {
+        if (held.isEmpty()) return false;
+        RecipeAccess recipes = level.recipeAccess();
+        return recipes.propertySet(AllRecipeSets.ITEM_APPLICATION_TARGET).test(level.getBlockState(pos).getBlock().asItem().getDefaultInstance())
+            && recipes.propertySet(AllRecipeSets.ITEM_APPLICATION_INGREDIENT).test(held);
     }
 
     /** Items whose use on a block changes that block (an axe strips or scrapes, honeycomb waxes, a shovel or hoe turns soil). */
