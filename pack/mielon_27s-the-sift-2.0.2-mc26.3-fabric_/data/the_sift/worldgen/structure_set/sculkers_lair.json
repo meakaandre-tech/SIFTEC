@@ -1,0 +1,15 @@
+{
+  "structures": [
+    {
+      "structure": "the_sift:sculkers_lair",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 48,
+    "separation": 24,
+    "spread_type": "linear",
+    "salt": 196728431
+  }
+}
