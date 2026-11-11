@@ -88,20 +88,7 @@
     "steel.TagEntryAccessor",
     "steel.TagStripMixin",
     "TunnelMixin",
-    "VehiclePickMixin",
-    "belt.AttachmentBehaviourMixin",
-    "belt.AttachmentChangedMixin",
-    "belt.AttachmentDropsMixin",
-    "belt.AttachmentSyncMixin",
-    "belt.BeltAttachmentHostMixin",
-    "belt.BeltBlockLowMixin",
-    "belt.FunnelOnBeltMixin",
-    "belt.BuiltInFunnelTargetMixin",
-    "belt.LevelAttachmentViewMixin",
-    "belt.SmartBlockEntityAttachmentMixin",
-    "belt.WrenchAttachmentMixin",
-    "belt.BeltVerticalCarryMixin",
-    "belt.BeltVerticalPositionMixin", "belt.BeltOcclusionMixin"
+    "VehiclePickMixin"
   ],
   "client": [
     "client.BeltConnectorPreviewMixin",
@@ -111,12 +98,7 @@
     "client.DebugEntriesInvoker",
     "client.ContainerScreenAccessor",
     "client.ScreenInvoker",
-    "client.PlayerEmoteMixin",
-    "belt.client.FlapPacketViewMixin",
-    "belt.client.BeltRenderStateLowMixin",
-    "belt.client.BeltRendererLowMixin",
-    "belt.client.BeltVisualLowMixin",
-    "belt.client.BeltGogglesMixin", "belt.client.PonderBuiltInMixin", "belt.client.PonderOverlayMixin"
+    "client.PlayerEmoteMixin"
   ],
   "injectors": {
     "defaultRequire": 1

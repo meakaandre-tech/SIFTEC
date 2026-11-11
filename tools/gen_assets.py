@@ -540,54 +540,6 @@ _sift = os.path.join(ROOT, "assets", "the_sift")
 write(f"{_sift}/blockstates/ichor.json", {"variants": {"": {"model": "the_sift:block/ichor"}}})
 write(f"{_sift}/models/block/ichor.json", {"textures": {"particle": "minecraft:block/water_still"}})
 
-# The one-block belt's own models (client/belt/LowBeltPartials): the side trim, 5 px high, in each belt Mk's casing
-# (andesite Mk.1-2, copper Mk.3-4, brass Mk.5, steel Mk.6), andesite bolt heads along it, and the rounded andesite end
-# cap where the band wraps under. Made running south along a flat belt; the belt renderer turns them to the belt.
-def _belt_box(name, frm, to, tex="#0"):
-    return {"name": name, "from": frm, "to": to, "faces": {d: {"texture": tex} for d in ("north", "south", "east", "west", "up", "down")}}
-
-
-# Mk.6's steel trim is the Steel Casing's own side (SIFTEC steel)
-for _mat, _tex in (("andesite", "create:block/andesite_casing"), ("copper", "create:block/copper_casing"),
-                   ("brass", "create:block/brass_casing"), ("steel", "create:block/industrial_iron_block")):
-    _els = [_belt_box("rail left", [0, 0, 0], [1.5, 5, 16]), _belt_box("rail right", [14.5, 0, 0], [16, 5, 16])]
-    for _z in (3.5, 11.5):
-        _els += [_belt_box("bolt", [-0.5, 2, _z], [0, 3, _z + 1], "#1"), _belt_box("bolt", [16, 2, _z], [16.5, 3, _z + 1], "#1")]
-    block_model(f"belt/rail_{_mat}", {"parent": "block/block", "textures": {"0": _tex, "1": "create:block/andesite_casing", "particle": "#0"},
-                                      "elements": _els})
-block_model("belt/cap", {"parent": "block/block", "textures": {"0": "create:block/andesite_casing", "particle": "#0"}, "elements": [
-    _belt_box("cap", [0, 0, 1], [16, 5, 3]), _belt_box("cap round", [0, 1, 0], [16, 4, 1]), _belt_box("cap top", [0.5, 5, 1.5], [15.5, 5.5, 2.5])]})
-
-
-# A sloped belt keeps Create's own band; its trim and caps are made in the model space of Create's diagonal belt pieces
-# (diagonal_start, _middle and _end), so the belt renderer turns them exactly as Create turns the band. The trim is a
-# 5 px plate along each side of the band's middle (on the cell's diagonal, turned 45 degrees like Create's band), ending
-# short of the cell's corners so it stays inside the cell; the end pieces run flat from the middle to the face where
-# the band wraps round, as Create's end pieces do, and the cap closes that face.
-def _slope_plates(z0, z1, flat=None):
-    rot = {"angle": 45, "axis": "x", "origin": [8, 8, 8]}
-    out = []
-    for x0, x1 in ((0, 1.5), (14.5, 16)):
-        out.append({**_belt_box("trim", [x0, 5.5, z0], [x1, 10.5, z1]), "rotation": rot})
-        if flat:
-            out.append(_belt_box("trim flat", [x0, 5.5, flat[0]], [x1, 10.5, flat[1]]))
-    return out
-
-
-for _mat, _tex in (("andesite", "create:block/andesite_casing"), ("copper", "create:block/copper_casing"),
-                   ("brass", "create:block/brass_casing"), ("steel", "create:block/industrial_iron_block")):
-    _t = {"0": _tex, "particle": "#0"}
-    block_model(f"belt/slope_{_mat}", {"parent": "block/block", "textures": _t, "elements": _slope_plates(-0.5, 16.5)})
-    # Create's diagonal_start wraps at +z (flat from the middle to it, the slope on the -z side); _end the other way
-    block_model(f"belt/slope_start_{_mat}", {"parent": "block/block", "textures": _t, "elements": _slope_plates(-0.5, 8, (8, 16))})
-    block_model(f"belt/slope_end_{_mat}", {"parent": "block/block", "textures": _t, "elements": _slope_plates(8, 16.5, (0, 8))})
-block_model("belt/slope_cap_start", {"parent": "block/block", "textures": {"0": "create:block/andesite_casing", "particle": "#0"}, "elements": [
-    _belt_box("cap", [0, 3.5, 13.5], [16, 12.5, 15.5]), _belt_box("cap round", [0, 4.5, 15.5], [16, 11.5, 16]),
-    _belt_box("cap top", [0.5, 12.5, 14], [15.5, 13, 15])]})
-block_model("belt/slope_cap_end", {"parent": "block/block", "textures": {"0": "create:block/andesite_casing", "particle": "#0"}, "elements": [
-    _belt_box("cap", [0, 3.5, 0.5], [16, 12.5, 2.5]), _belt_box("cap round", [0, 4.5, 0], [16, 11.5, 0.5]),
-    _belt_box("cap top", [0.5, 12.5, 1], [15.5, 13, 2])]})
-
 # ---- recipes
 built = recipes.build()
 shutil.rmtree(f"{D}/recipe", ignore_errors=True)

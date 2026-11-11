@@ -794,69 +794,28 @@ sleep 2
 cmd tp @a 16008.5 200 -15983.5 180 12
 sleep 4
 shot
-cmd siftec worldtest lowbelts feed
-cmd siftec worldtest beltpolish view andesite_tunnel
-sleep 5
-shot
-cmd siftec worldtest beltpolish view brass_tunnel
-sleep 3
-shot
-cmd siftec worldtest beltpolish view andesite_funnel
-sleep 3
-shot
-cmd siftec worldtest beltpolish view brass_funnel
-sleep 5
-shot
-cmd siftec selftest beltpolish client lines
-wait 30 SELFTEST beltpolish-client lines checked
-cmd siftec worldtest lowbelts feed
-cmd siftec worldtest beltpolish view basin
+cmd siftec worldtest beltlay view straight
 sleep 4
 shot
-cmd siftec worldtest beltpolish view mkrow
+cmd siftec worldtest beltlay view sloped
 sleep 3
 shot
-cmd siftec selftest beltpolish client flat
-wait 30 SELFTEST beltpolish-client flat checked
-cmd siftec worldtest beltpolish view vertical
-sleep 5
-cmd siftec selftest beltpolish client vertical
-wait 90 SELFTEST beltpolish-client vertical checked
+cmd siftec worldtest beltlay view funnel
+sleep 3
 shot
-cmd siftec worldtest beltpolish view sloped
+cmd siftec worldtest frames view
 sleep 5
-cmd siftec selftest beltpolish client sloped
-wait 30 SELFTEST beltpolish-client sloped checked
-shot
-cmd siftec worldtest beltpolish view frames
-sleep 5
-cmd siftec selftest beltpolish client frames
-wait 180 SELFTEST beltpolish-client frames checked
-cmd siftec worldtest beltpolish view frames
+cmd siftec selftest frames client frames
+wait 180 SELFTEST frames-client frames checked
+cmd siftec worldtest frames view
 sleep 3
 shot
 cmd tp @a 18044.5 200.88 -17996.5 180 0
 sleep 4
 shot
-cmd siftec worldtest beltpolish view splash
+cmd siftec worldtest weathered view
 sleep 4
 shot
-cmd siftec worldtest beltpolish view simline
-sleep 6
-shot
-cmd siftec selftest beltpolish client ponder
-wait 180 SELFTEST beltpolish-client ponder checked
-cmd siftec worldtest beltpolish ponder 0 120 create:andesite_funnel
-sleep 6
-shot
-cmd siftec worldtest beltpolish ponder 0 160 create:brass_tunnel
-sleep 6
-shot
-cmd siftec worldtest beltpolish ponder 0 200 create:belt_connector
-sleep 6
-shot
-cmd siftec worldtest beltpolish ponder close
-sleep 1
-cmd siftec selftest beltpolish client done
-wait 20 SELFTEST beltpolish-client done:
+cmd siftec selftest frames client done
+wait 20 SELFTEST frames-client done:
 cmd gamemode creative @a

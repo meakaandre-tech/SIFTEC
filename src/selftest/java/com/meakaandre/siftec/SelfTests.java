@@ -18,6 +18,7 @@ import com.meakaandre.siftec.command.CreativeUnlockTests;
 import com.meakaandre.siftec.command.DataFixTests;
 import com.meakaandre.siftec.command.ExplorationTests;
 import com.meakaandre.siftec.command.FoodTests;
+import com.meakaandre.siftec.command.FramesTests;
 import com.meakaandre.siftec.command.LogisticsTests;
 import com.meakaandre.siftec.command.NodeTests;
 import com.meakaandre.siftec.command.OwnershipFixTests;
@@ -27,6 +28,7 @@ import com.meakaandre.siftec.command.PowerFixTests;
 import com.meakaandre.siftec.command.ProgressionTests;
 import com.meakaandre.siftec.command.QualityFixTests;
 import com.meakaandre.siftec.command.ReviewFixTests;
+import com.meakaandre.siftec.command.WeatheredIronTests;
 import com.meakaandre.siftec.command.WorldTests;
 import com.meakaandre.siftec.compat.TravelersBackpackSelfTest;
 import com.meakaandre.siftec.guide.GuideTests;
@@ -34,8 +36,6 @@ import com.meakaandre.siftec.map.MapTests;
 import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.prefab.PrefabTests;
 import com.meakaandre.siftec.sim.AlwaysTests;
-import com.meakaandre.siftec.sim.BeltPolishTests;
-import com.meakaandre.siftec.sim.LowBeltTests;
 import com.meakaandre.siftec.vehicle.VehicleTests;
 
 /** The selftest mod's server side: registers every {@code /siftec selftest} and {@code worldtest} suite at its stage. */
@@ -56,8 +56,8 @@ public final class SelfTests implements SelfTestHooks.Plugin {
                 NodeTests.register();
                 LogisticsTests.register();
                 BeltLayTests.register();
-                LowBeltTests.register();
-                BeltPolishTests.register();
+                FramesTests.register();
+                WeatheredIronTests.register();
                 ProgressionTests.register();
                 ExplorationTests.register();
                 FoodTests.register();
