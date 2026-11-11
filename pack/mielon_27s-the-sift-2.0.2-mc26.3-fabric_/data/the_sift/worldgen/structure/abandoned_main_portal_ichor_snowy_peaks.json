@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:buried_treasure",
+  "biomes": [
+    "the_sift:ichor_snowy_peaks"
+  ],
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}

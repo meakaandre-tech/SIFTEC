@@ -1,0 +1,40 @@
+{
+  "type": "the_sift:sculkers_lair",
+  "biomes": "#the_sift:has_structure/sculkers_lair",
+  "step": "underground_structures",
+  "terrain_adaptation": "encapsulate",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "creature": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "ambient": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "axolotls": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "water_creature": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "water_ambient": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "underground_water_creature": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "misc": {
+      "bounding_box": "piece",
+      "spawns": []
+    }
+  }
+}
