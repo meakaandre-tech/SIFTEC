@@ -1,0 +1,22 @@
+{
+  "structures": [
+    {
+      "structure": "the_sift:abandoned_camp_coral",
+      "weight": 1
+    },
+    {
+      "structure": "the_sift:abandoned_camp_wastes",
+      "weight": 1
+    },
+    {
+      "structure": "the_sift:abandoned_camp_overgrown",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 26,
+    "separation": 7,
+    "salt": 91231127
+  }
+}

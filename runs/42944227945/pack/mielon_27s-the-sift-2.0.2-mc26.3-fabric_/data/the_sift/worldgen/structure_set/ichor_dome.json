@@ -1,0 +1,22 @@
+{
+  "structures": [
+    {
+      "structure": "the_sift:ichor_dome_coral",
+      "weight": 1
+    },
+    {
+      "structure": "the_sift:ichor_dome_overgrown",
+      "weight": 1
+    },
+    {
+      "structure": "the_sift:ichor_dome_organic_desert",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 30,
+    "separation": 9,
+    "salt": 175391481
+  }
+}
