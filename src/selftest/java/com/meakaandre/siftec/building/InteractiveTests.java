@@ -8,6 +8,7 @@ import com.meakaandre.siftec.company.CompanyData;
 import com.meakaandre.siftec.drone.DronePortBlockEntity;
 import com.meakaandre.siftec.hub.HubBlockEntity;
 import com.meakaandre.siftec.hub.Milestones;
+import com.meakaandre.siftec.owner.Ownership;
 import com.meakaandre.siftec.power.PowerTests;
 import com.meakaandre.siftec.prefab.Prefabs;
 import com.meakaandre.siftec.prefab.Templates;
@@ -41,6 +42,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,7 +66,7 @@ import java.util.UUID;
  * sneaking); empties a Craft Station Basin by hand; cannot encase its cogwheel; takes the HUB down with the Build Gun,
  * which removes the cranks and gives no crank back. Then a billboard's sign opens for writing, the Drone Port's terminal
  * takes a drone by hand, a wire is strung between two Power Poles by clicking their connectors, and a Constructor's Basin
- * is still not emptied by hand. Prints "SELFTEST interactive ..." and "... done: N passed, M failed".</li>
+ * is still not emptied by hand, and a refused click leaves nobody acting for what is placed next. Prints "SELFTEST interactive ..." and "... done: N passed, M failed".</li>
  * </ul>
  */
 public final class InteractiveTests {
@@ -111,8 +113,8 @@ public final class InteractiveTests {
         player.setGameMode(GameType.SURVIVAL);
         player.getInventory().clearContent();
         player.setShiftKeyDown(false);
-        BuildingTests.platform(level, X - 20, Z - 30, X + 20, Z + 10, Y, 30);
-        BuildingTests.platform(level, X - 30, Z + 20, X + 40, Z + 80, Y, 30);
+        BuildingTests.platform(level, X - 30, Z - 45, X + 30, Z + 45, Y, 32);
+        BuildingTests.platform(level, X - 30, Z + 75, X + 40, Z + 140, Y, 30);
         REPORT.attempt(source, "the HUB's hand cranks", () -> hub(source, level, company, player));
         REPORT.attempt(source, "the other buildings' clickable parts", () -> others(source, level, company, player));
         later(level, 80, () -> REPORT.report(source, "done: " + REPORT.totals()));
@@ -259,7 +261,7 @@ public final class InteractiveTests {
 
     private static void others(CommandSourceStack source, ServerLevel level, Company company, FakePlayer player) {
         // a billboard's sign: written on by hand, standing in front of it
-        ControllerBlockEntity board = place(source, level, company, "billboard_small", new BlockPos(X - 20, Y, Z + 40));
+        ControllerBlockEntity board = place(source, level, company, "billboard_small", new BlockPos(X - 20, Y, Z + 100));
         BlockPos sign = BuildingLogic.cell(board, ModBlocks.BILLBOARD_SMALL_SIGN.get());
         if (sign != null) {
             Direction front = level.getBlockState(sign).getValue(HorizontalDirectionalBlock.FACING);
@@ -275,7 +277,7 @@ public final class InteractiveTests {
         }
 
         // the Drone Port's loading terminal takes a drone by hand
-        ControllerBlockEntity dock = place(source, level, company, "drone_port", new BlockPos(X + 10, Y, Z + 50));
+        ControllerBlockEntity dock = place(source, level, company, "drone_port", new BlockPos(X + 10, Y, Z + 110));
         if (dock != null && SpecialBuildings.droneTerminal(level, dock) instanceof DronePortBlockEntity port) {
             port.hasDrone = false;
             BlockPos terminal = port.getBlockPos();
@@ -288,12 +290,12 @@ public final class InteractiveTests {
         }
 
         // a wire strung by hand between two Power Poles, clicking their connectors
-        ControllerBlockEntity pa = PowerTests.build(level, source, "power_pole_mk1", new BlockPos(X - 20, Y, Z + 70), Direction.SOUTH);
-        ControllerBlockEntity pb = PowerTests.build(level, source, "power_pole_mk1", new BlockPos(X - 12, Y, Z + 70), Direction.SOUTH);
+        ControllerBlockEntity pa = PowerTests.build(level, source, "power_pole_mk1", new BlockPos(X - 20, Y, Z + 130), Direction.SOUTH);
+        ControllerBlockEntity pb = PowerTests.build(level, source, "power_pole_mk1", new BlockPos(X - 12, Y, Z + 130), Direction.SOUTH);
         AbstractElectricalConnector ca = PowerTests.connector(level, pa), cb = PowerTests.connector(level, pb);
         if (ca != null && cb != null) {
             for (AbstractElectricalConnector c : List.of(ca, cb)) if (c.getNetwork() == null) c.setNetwork(new ElectricalNetwork(c));
-            player.setPos(X - 16 + 0.5, Y, Z + 72.5);
+            player.setPos(X - 16 + 0.5, Y, Z + 132.5);
             ItemStack wire = new ItemStack(item("create_new_age:copper_wire"), 4);
             InteractionResult first = click(player, ca.getBlockPos(), wire);
             InteractionResult second = click(player, cb.getBlockPos(), wire);
@@ -305,7 +307,7 @@ public final class InteractiveTests {
         for (ControllerBlockEntity c : new ControllerBlockEntity[]{pa, pb}) if (c != null) Buildings.dismantle(level, c);
 
         // a sealed building's own machines are still not used by hand: a Constructor's Basin keeps what it holds
-        ControllerBlockEntity con = place(source, level, company, "constructor", new BlockPos(X + 30, Y, Z + 40));
+        ControllerBlockEntity con = place(source, level, company, "constructor", new BlockPos(X + 30, Y, Z + 100));
         BlockPos basin = BuildingLogic.cell(con, block("create:basin"));
         if (basin != null) {
             player.getInventory().clearContent();
@@ -314,6 +316,12 @@ public final class InteractiveTests {
             InteractionResult r = click(player, basin, ItemStack.EMPTY);
             int taken = player.getInventory().countItem(Items.IRON_INGOT);
             expect(source, "Constructor: its Basin is not emptied by hand (a building is fed and emptied at its ports)", taken == 0, r + ", " + taken + " taken");
+            // a click cut short (refused here, by Create's hook) leaves nobody acting: a block put down next is nobody's
+            BlockPos chest = new BlockPos(X + 38, Y, Z + 130);
+            level.setBlock(chest, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
+            String owner = level.getBlockEntity(chest) == null ? "no chest" : level.getBlockEntity(chest).getAttached(Ownership.OWNER);
+            expect(source, "after a refused click the player is no longer acting: a chest put down next has no owner", owner == null, "owner " + owner);
+            level.setBlock(chest, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         } else {
             expect(source, "Constructor: it goes down with its Basin", false, con == null ? "not placed" : "no basin");
         }
