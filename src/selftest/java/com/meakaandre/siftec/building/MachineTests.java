@@ -376,6 +376,30 @@ public final class MachineTests {
         return at != null && level.getBlockEntity(at) instanceof EngineControl e ? e.siftec$fuel().getAmount() : -1;
     }
 
+    /** A steam generator's boilers, intake, shafts and coils as they stand, for a report. */
+    private static String boilerState(ServerLevel level, ControllerBlockEntity c) {
+        StringBuilder b = new StringBuilder();
+        for (FluidTankBlockEntity t : Generators.boilers(level, c)) {
+            b.append("boiler at ").append(t.getBlockPos().toShortString()).append(": engines ").append(t.boiler.attachedEngines)
+                .append(", heat ").append(t.boiler.activeHeat).append(", water ").append(mb(ProductionLogic.mbAt(level, t.getBlockPos(), Fluids.WATER))).append(" mB; ");
+        }
+        BlockPos intake = Generators.intake(c);
+        b.append("intake ").append(intake == null ? "none" : mb(ProductionLogic.mbAt(level, intake, Fluids.WATER)) + " mB");
+        for (String id : new String[]{"create:powered_shaft", "create:shaft", "create_new_age:generator_coil"}) {
+            for (BlockPos pos : BuildingLogic.cells(c, block(id))) {
+                b.append("; ").append(id.substring(id.indexOf(':') + 1)).append(' ').append(pos.toShortString()).append(' ')
+                    .append(level.getBlockEntity(pos) instanceof KineticBlockEntity k ? k.getSpeed() + " RPM" : "no BE");
+            }
+        }
+        if (Generators.boilers(level, c).isEmpty()) {
+            for (BlockPos pos : BuildingLogic.cells(c, block("create:fluid_tank"))) {
+                b.append("; tank ").append(pos.toShortString()).append(level.getBlockEntity(pos) instanceof FluidTankBlockEntity t && t.getControllerBE() != null
+                    ? " controller " + t.getControllerBE().getBlockPos().toShortString() + " engines " + t.getControllerBE().boiler.attachedEngines : " no controller");
+            }
+        }
+        return b.toString();
+    }
+
     private static long mb(long droplets) {
         return droplets / (FluidConstants.BUCKET / 1000);
     }
@@ -871,6 +895,7 @@ public final class MachineTests {
             }
             near(source, "after restart: the Biomass Burner gives 30 MW on its machines", offered(level, bio), su(30), 0.04);
             near(source, "after restart: the Coal Generator gives 75 MW on its machines", offered(level, coal), su(75), 0.04);
+            report(source, "after restart: the Coal Generator's machines: " + boilerState(level, coal));
             near(source, "after restart: the Fuel Generator gives 250 MW on its engine", offered(level, diesel), su(250), 0.04);
             near(source, "after restart: the Nuclear Power Plant gives 2,500 MW on its reactor", offered(level, nuke), su(2500), 0.04);
             report(source, "after restart: the Nuclear Power Plant's reactor: " + reactorState(level, nuke));

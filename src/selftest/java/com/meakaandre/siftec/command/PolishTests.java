@@ -472,7 +472,7 @@ public final class PolishTests {
             expect(source, "10: the HUB has its first Biomass Burner", false, "");
             return;
         }
-        BlockPos blaze = burner.part(1, 1, 5), engine = burner.part(1, 5, 4), coil = burner.part(-1, 5, 2), brushes = burner.part(-2, 5, 2);
+        BlockPos blaze = burner.part(1, 1, 5), engine = burner.part(1, 3, 4), coil = burner.part(-1, 3, 2), brushes = burner.part(-2, 3, 2);
         expect(source, "10: behind each HUB burner stand a Blaze Burner under a boiler, a Steam Engine, a generator coil and carbon brushes",
             level.getBlockState(blaze).is(block("create:blaze_burner")) && level.getBlockState(engine).is(block("create:steam_engine"))
                 && level.getBlockState(coil).is(block("create_new_age:generator_coil")) && level.getBlockState(brushes).is(block("create_new_age:carbon_brushes")),

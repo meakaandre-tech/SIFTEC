@@ -237,7 +237,7 @@ public final class BuildingFixTests {
             });
         }
         // its input port still reaches the controller
-        BlockPos portAt = p.at(0, 0, BuildingTemplate.of(p.def()).depth - 1);
+        BlockPos portAt = p.at(0, 1, BuildingTemplate.of(p.def()).depth - 1);
         BlockState ps = level.getBlockState(portAt);
         Storage<ItemVariant> port = ps.getBlock() instanceof PortBlock ? ItemStorage.SIDED.find(level, portAt, ps.getValue(PortBlock.FACING)) : null;
         long in = 0;
