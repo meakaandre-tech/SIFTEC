@@ -381,7 +381,7 @@ public final class ExplorationTests {
                 "wired " + wired + ", sink " + (s != null && s.powered) + ", radar " + (r != null && r.powered));
             // ten Iron Sheets in at the Sink's input port, as a belt would put them
             if (s != null && s.placement() != null) {
-                BlockPos port = s.placement().at(0, 0, 4);
+                BlockPos port = s.placement().at(0, 1, 4);
                 BlockState ps = level.getBlockState(port);
                 var storage = ItemStorage.SIDED.find(level, port, ps.hasProperty(PortBlock.FACING) ? ps.getValue(PortBlock.FACING) : null);
                 if (storage != null) {
@@ -396,7 +396,7 @@ public final class ExplorationTests {
                 expect(source, "the Sink destroys what its input port takes and pays the company: 10 Iron Sheets for 60 points",
                     company.points - before == 60 && s2 != null && s2.made >= 10, (company.points - before) + " points");
                 expect(source, "the powered Radar Tower has swept its range", r2 != null && r2.lastSweep > 0, "");
-                boolean painted = sh != null && sh.placement() != null && level.getBlockState(sh.placement().at(0, 4, 0)).is(block("minecraft:lime_concrete"));
+                boolean painted = sh != null && sh.placement() != null && level.getBlockState(sh.placement().at(0, 3, 0)).is(block("minecraft:lime_concrete"));
                 expect(source, "the Customizer's paint holds: the Shop's orange roof is lime and the building still stands", painted && sh.paint.equals("lime/black/painted/"),
                     sh == null ? "no Shop" : sh.paint + ", roof " + (sh.placement() == null ? "-" : level.getBlockState(sh.placement().at(0, 4, 0)).toString()));
                 report(source, "result: " + REPORT.totals());

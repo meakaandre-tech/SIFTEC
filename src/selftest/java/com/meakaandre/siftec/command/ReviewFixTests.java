@@ -482,7 +482,7 @@ public final class ReviewFixTests {
         if (stationDef == null || tractorDef == null) return;
         Placement sp = new Placement(stationDef, new BlockPos(X + 70, Y, Z + 30), Direction.NORTH, false);
         Buildings.Check placed = Buildings.place(level, sp, company, null, true);
-        ControllerBlockEntity station = BuildGun.controllerAt(level, sp.at(0, 1, 1));
+        ControllerBlockEntity station = BuildGun.controllerAt(level, sp.at(0, 1, 0));
         Vec3 dock = station == null ? null : TruckStations.dock(station);
         VehicleEntity tractor = Vehicles.spawn(level, new Placement(tractorDef, new BlockPos(X + 90, Y, Z + 30), Direction.EAST, false), company, List.of());
         if (!placed.ok() || station == null || dock == null || tractor == null) {
@@ -500,7 +500,7 @@ public final class ReviewFixTests {
                 kept && off < 1.5 && tractor.getY() >= Y - 2, "removed " + tractor.isRemoved() + ", at " + tractor.blockPosition().toShortString() + ", dock "
                     + BlockPos.containing(dock).toShortString());
             tractor.discard();
-            List<ItemStack> refund = BuildGun.controllerAt(level, sp.at(0, 1, 1)) instanceof ControllerBlockEntity c ? Buildings.dismantle(level, c) : List.of();
+            List<ItemStack> refund = BuildGun.controllerAt(level, sp.at(0, 1, 0)) instanceof ControllerBlockEntity c ? Buildings.dismantle(level, c) : List.of();
             Siftec.LOGGER.info("SIFTEC: selftest fixes took the station down ({} stacks)", refund.size());
         });
         // one that never stopped at a station goes to its company's HUB
@@ -550,7 +550,7 @@ public final class ReviewFixTests {
         for (int i = 0; i < 2; i++) {
             Placement p = new Placement(def, new BlockPos(X + 20 + 26 * i, Y, Z + 40), Direction.NORTH, false);
             Buildings.Check placed = Buildings.place(level, p, company, null, true);
-            ControllerBlockEntity c = BuildGun.controllerAt(level, p.at(0, 1, 1));
+            ControllerBlockEntity c = BuildGun.controllerAt(level, p.at(0, 1, 0));
             BlockPos tank = c == null ? null : BuildingLogic.cell(c, create("fluid_tank"));
             Storage<FluidVariant> storage = tank == null ? null : FluidStorage.SIDED.find(level, tank, null);
             if (!placed.ok() || c == null || storage == null) {

@@ -329,13 +329,13 @@ public final class BuildingsATests {
         put(level, source, company, con);
         ControllerBlockEntity cc = controller(level, con);
         if (cc != null) BuildingLogic.setFilter(level, cc, new ItemStack(item("create:iron_sheet")));
-        // the input port is in the back row of the pad: the belt comes in from five blocks behind it
+        // the input port is one block over the back row of the pad: a belt at its height comes in from five blocks behind it
         int conBack = BuildingTemplate.of(con.def()).depth - 1;
-        BlockPos conIn = con.at(0, 0, conBack + 5), conInEnd = con.at(0, 0, conBack + 1), conOut = con.at(0, 0, -1), conOutEnd = con.at(0, 0, -6);
+        BlockPos conIn = con.at(0, 1, conBack + 5), conInEnd = con.at(0, 1, conBack + 1), conOut = con.at(0, 1, -1), conOutEnd = con.at(0, 1, -6);
         belt(level, conIn, conInEnd);
         belt(level, conOut, conOutEnd);
         // a belt ends into a Basin as into a Depot, and a Basin holds nine stacks
-        level.setBlock(con.at(0, 0, -7), block("create:basin").defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(con.at(0, 1, -7), block("create:basin").defaultBlockState(), Block.UPDATE_ALL);
         feeder(level, conIn, Direction.SOUTH, new ItemStack(Items.IRON_INGOT), 6, 120);
         BlockPos basin = BuildingLogic.cell(cc, block("create:basin"));
         expect(source, "the Constructor's Basin takes its filter", basin != null && level.getBlockEntity(basin) instanceof BasinBlockEntity b
@@ -345,10 +345,10 @@ public final class BuildingsATests {
         Placement sm = at("smelter", X + 20, Z);
         put(level, source, company, sm);
         int smBack = BuildingTemplate.of(sm.def()).depth - 1;
-        BlockPos smIn = sm.at(0, 0, smBack + 5), smInEnd = sm.at(0, 0, smBack + 1), smOut = sm.at(0, 0, -1), smOutEnd = sm.at(0, 0, -6);
+        BlockPos smIn = sm.at(0, 1, smBack + 5), smInEnd = sm.at(0, 1, smBack + 1), smOut = sm.at(0, 1, -1), smOutEnd = sm.at(0, 1, -6);
         belt(level, smIn, smInEnd);
         belt(level, smOut, smOutEnd);
-        level.setBlock(sm.at(0, 0, -7), block("create:basin").defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(sm.at(0, 1, -7), block("create:basin").defaultBlockState(), Block.UPDATE_ALL);
         feeder(level, smIn, Direction.SOUTH, new ItemStack(Items.RAW_IRON), 4, 200);
 
         // ---- miners on hand-made nodes, each aimed a little off and snapped onto its node; their ore goes into a chest
@@ -365,7 +365,7 @@ public final class BuildingsATests {
             int[] cell = snapped.def().nodeCell();
             expect(source, miners[i][0] + " snaps onto the node it is aimed near", snapped.at(cell[0], cell[1], cell[2]).equals(n), snapped.anchor().toShortString());
             put(level, source, company, snapped);
-            level.setBlock(snapped.at(0, 0, -1), Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
+            level.setBlock(snapped.at(0, 1, -1), Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
             minerSpots.add(snapped);
         }
         // a node building off any node is refused
@@ -400,9 +400,9 @@ public final class BuildingsATests {
         // ---- Storage Containers: a belt into the back of one; its front port fills a chest
         Placement st = at("storage_container", X + 105, Z);
         put(level, source, company, st);
-        BlockPos stIn = st.at(0, 0, 9), stInEnd = st.at(0, 0, 5);
+        BlockPos stIn = st.at(0, 1, 6), stInEnd = st.at(0, 1, 3);
         belt(level, stIn, stInEnd);
-        BlockPos stChest = st.at(0, 0, -1);
+        BlockPos stChest = st.at(0, 1, -1);
         level.setBlock(stChest, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
         feeder(level, stIn, Direction.SOUTH, new ItemStack(Items.COBBLESTONE), 3, 30);
         Placement ist = at("industrial_storage_container", X + 115, Z);
@@ -434,10 +434,10 @@ public final class BuildingsATests {
         for (int t = 100; t <= WARMUP + MINUTE; t += 200) {
             final int at = t;
             later(level, t, () -> report(source, "at " + at + ": constructor " + made(level, con) + " made, basin " + count(level, basin, Items.IRON_INGOT) + " ingots "
-                + count(level, basin, item("create:iron_sheet")) + " plates, in belt " + beltState(level, conIn, Items.IRON_INGOT) + ", out port pushed " + pushed(level, con.at(0, 0, 0))
-                + ", out belt " + beltState(level, conOut, item("create:iron_sheet")) + ", end " + count(level, con.at(0, 0, -7), item("create:iron_sheet"))
+                + count(level, basin, item("create:iron_sheet")) + " plates, in belt " + beltState(level, conIn, Items.IRON_INGOT) + ", out port pushed " + pushed(level, con.at(0, 1, 0))
+                + ", out belt " + beltState(level, conOut, item("create:iron_sheet")) + ", end " + count(level, con.at(0, 1, -7), item("create:iron_sheet"))
                 + ", on the ground " + ground(level, conOutEnd, item("create:iron_sheet")) + " | smelter " + made(level, sm) + " made, out port pushed "
-                + pushed(level, sm.at(0, 0, 0)) + ", out belt " + beltState(level, smOut, Items.IRON_INGOT) + ", end " + count(level, sm.at(0, 0, -7), Items.IRON_INGOT)
+                + pushed(level, sm.at(0, 1, 0)) + ", out belt " + beltState(level, smOut, Items.IRON_INGOT) + ", end " + count(level, sm.at(0, 1, -7), Items.IRON_INGOT)
                 + ", on the ground " + ground(level, smOutEnd, Items.IRON_INGOT) + " | storage in belt " + beltState(level, stIn, Items.COBBLESTONE)));
         }
 
@@ -461,11 +461,11 @@ public final class BuildingsATests {
         later(level, WARMUP + MINUTE, () -> {
             long crafts = made(level, con) - start[0];
             expect(source, "Constructor: 10 Iron Plate recipes a minute (6 s each)", crafts >= 9 && crafts <= 11, crafts + " recipes");
-            long plates = count(level, con.at(0, 0, -7), item("create:iron_sheet")) + onBelt(level, conOut, item("create:iron_sheet"));
+            long plates = count(level, con.at(0, 1, -7), item("create:iron_sheet")) + onBelt(level, conOut, item("create:iron_sheet"));
             expect(source, "Constructor: its plates come out on the belt at the front", plates >= 16, plates + " plates on the belt and in the Basin at its end");
             long ingots = made(level, sm) - start[1];
             expect(source, "Smelter: 30 Iron Ingot a minute (2 s each)", ingots >= 26 && ingots <= 34, ingots + " ingots");
-            long chest = count(level, sm.at(0, 0, -7), Items.IRON_INGOT) + onBelt(level, smOut, Items.IRON_INGOT);
+            long chest = count(level, sm.at(0, 1, -7), Items.IRON_INGOT) + onBelt(level, smOut, Items.IRON_INGOT);
             expect(source, "Smelter: its ingots come out on the belt at the front", chest >= 20, chest + " on the belt and in the Basin at its end");
             counting[0] = false;
             for (int i = 0; i < 3; i++) {
@@ -488,7 +488,7 @@ public final class BuildingsATests {
                 Block oreBlock = ((NodeType) miners[i][1]) == NodeType.IRON ? Blocks.IRON_ORE : Blocks.COPPER_ORE;
                 expect(source, miners[i][0] + ": the node is still there (its ore block " + BuiltInRegistries.BLOCK.getKey(oreBlock) + ", or air growing back) and its ore reaches the chest",
                     nodeNow != null && (nodeNow.is(oreBlock) || nodeNow.isAir()) && NodeSites.isSite(level, mc.node)
-                        && count(level, p.at(0, 0, -1), ((NodeType) miners[i][1]) == NodeType.IRON ? Items.RAW_IRON : Items.RAW_COPPER) > 0,
+                        && count(level, p.at(0, 1, -1), ((NodeType) miners[i][1]) == NodeType.IRON ? Items.RAW_IRON : Items.RAW_COPPER) > 0,
                     mc == null ? "no controller" : String.valueOf(nodeNow));
             }
             long dug = made(level, pm) - start[5], dugItems = mined(level, pm) - startItems[3];
@@ -711,7 +711,7 @@ public final class BuildingsATests {
         long before = mc == null ? -1 : mc.made;
         // its chest fills at 60 ore a minute however long the server ran before the restart: emptied, so it has room to
         // go on; then the check waits for its chunk to tick and for it to mine, rather than a fixed time
-        if (level.getBlockEntity(mk1.at(0, 0, -1)) instanceof Container chest) chest.clearContent();
+        if (level.getBlockEntity(mk1.at(0, 1, -1)) instanceof Container chest) chest.clearContent();
         LATER.when(level.getGameTime(), () -> {
             ControllerBlockEntity m = controller(level, mk1);
             return m != null && level.shouldTickBlocksAt(m.getBlockPos()) && m.made > before;

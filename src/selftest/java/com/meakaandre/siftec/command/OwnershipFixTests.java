@@ -261,7 +261,7 @@ public final class OwnershipFixTests {
         if (stationDef == null || tractorDef == null) return;
         Placement sp = new Placement(stationDef, new BlockPos(X + 20, Y, Z + 30), Direction.NORTH, false);
         Buildings.Check placed = Buildings.place(level, sp, old, null, true);
-        ControllerBlockEntity station = BuildGun.controllerAt(level, sp.at(0, 1, 1));
+        ControllerBlockEntity station = BuildGun.controllerAt(level, sp.at(0, 1, 0));
         VehicleEntity mine = Vehicles.spawn(level, new Placement(tractorDef, new BlockPos(X + 40, Y, Z + 30), Direction.EAST, false), target, List.of());
         VehicleEntity oldTractor = Vehicles.spawn(level, new Placement(tractorDef, new BlockPos(X + 40, Y, Z + 36), Direction.EAST, false), old, List.of());
         if (!placed.ok() || station == null || mine == null || oldTractor == null) {
@@ -300,7 +300,7 @@ public final class OwnershipFixTests {
         if (stationDef == null || tractorDef == null) return;
         Placement sp = new Placement(stationDef, new BlockPos(X + 60, Y, Z + 30), Direction.NORTH, false);
         Buildings.Check placed = Buildings.place(level, sp, a, null, true);
-        ControllerBlockEntity station = BuildGun.controllerAt(level, sp.at(0, 1, 1));
+        ControllerBlockEntity station = BuildGun.controllerAt(level, sp.at(0, 1, 0));
         VehicleEntity ours = Vehicles.spawn(level, new Placement(tractorDef, new BlockPos(X + 50, Y, Z + 40), Direction.EAST, false), a, List.of());
         VehicleEntity theirs = Vehicles.spawn(level, new Placement(tractorDef, new BlockPos(X + 50, Y, Z + 46), Direction.EAST, false), b, List.of());
         if (!placed.ok() || station == null || ours == null || theirs == null) {

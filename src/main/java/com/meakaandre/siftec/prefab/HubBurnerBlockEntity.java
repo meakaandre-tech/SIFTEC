@@ -45,18 +45,18 @@ public class HubBurnerBlockEntity extends BlockEntity implements PowerMember {
      * from the front wall, and which of {@link #MACHINE_STATES} stands there.
      */
     public static final int[][] MACHINE = {
-        {1, 1, 5, 0}, {1, 2, 5, 1}, {1, 3, 5, 1}, {1, 4, 5, 1}, {1, 5, 5, 1}, {1, 5, 4, 2}, {1, 5, 3, 9}, {1, 5, 2, 3}, {0, 5, 2, 4},
-        {-1, 5, 2, 5},
+        {1, 1, 5, 0}, {1, 2, 5, 1}, {1, 3, 5, 1}, {1, 4, 5, 1}, {1, 5, 5, 1}, {1, 3, 4, 2}, {1, 3, 3, 9}, {1, 3, 2, 3}, {0, 3, 2, 4},
+        {-1, 3, 2, 5},
         // the coil's ring: its four netherite magnets, the rest iron
-        {-1, 3, 2, 6}, {-1, 7, 2, 6}, {-1, 5, 0, 6}, {-1, 5, 4, 6},
-        {-1, 3, 1, 7}, {-1, 3, 3, 7}, {-1, 7, 1, 7}, {-1, 7, 3, 7}, {-1, 4, 0, 7}, {-1, 6, 0, 7}, {-1, 4, 4, 7}, {-1, 6, 4, 7},
-        {-2, 5, 2, 8}};
+        {-1, 1, 2, 6}, {-1, 5, 2, 6}, {-1, 3, 0, 6}, {-1, 3, 4, 6},
+        {-1, 1, 1, 7}, {-1, 1, 3, 7}, {-1, 5, 1, 7}, {-1, 5, 3, 7}, {-1, 2, 0, 7}, {-1, 4, 0, 7}, {-1, 2, 4, 7}, {-1, 4, 4, 7},
+        {-2, 3, 2, 8}};
     public static final String[] MACHINE_STATES = {
         "create:blaze_burner[blaze=smouldering,facing=south]", "create:fluid_tank[bottom=true,shape=window,top=true]",
         "create:steam_engine[face=wall,facing=south,waterlogged=false]", "create:powered_shaft[axis=x]", "create:shaft[axis=x]",
         "create_new_age:generator_coil[axis=x]", "create_new_age:netherite_magnet", "minecraft:iron_block", "create_new_age:carbon_brushes[facing=east]",
         "minecraft:air"};
-    private static final int[] BLAZE = {1, 1, 5}, TANK = {1, 2, 5}, BRUSHES = {-2, 5, 2};
+    private static final int[] BLAZE = {1, 1, 5}, TANK = {1, 2, 5}, BRUSHES = {-2, 3, 2};
 
     public final SimpleContainer fuel = new SimpleContainer(1) {
         @Override

@@ -32,8 +32,11 @@ import java.util.List;
  * A port in the world: the cell inside the building it feeds or drains ({@code target}) and its controller. Only its
  * outward face takes or gives anything, and only the kind it is (items or fluids, in or out).
  * <p>
- * An item input takes items a belt carries into it (a belt ends at it as at a Depot); an item output pushes one item
- * a tick from its target onto a belt, Depot or chute in front of it, or into an inventory there.
+ * An item port stands one block over the building's pad: a belt on the ground ends under the block in front of it and
+ * Create's own funnel goes on the port's face, sitting on that belt's end, as a funnel feeds a chest from a belt (the
+ * funnel reaches the port's item storage through its outward face). An item input also takes items a belt at its own
+ * height carries into it (as at a Depot); an item output also pushes one item a tick from its target onto a belt, Depot
+ * or chute in front of it, or into an inventory there.
  */
 public class PortBlockEntity extends SmartBlockEntity {
     public @Nullable BlockPos target;

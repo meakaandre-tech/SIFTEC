@@ -53,7 +53,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -194,38 +193,38 @@ public final class AlwaysTests {
         }
 
         BlockPos constructor() {
-            return new BlockPos(ox + 7, Y + 1, z0());
+            return new BlockPos(ox + 7, Y, z0());
         }
 
         BlockPos smelter() {
-            return new BlockPos(ox + 20, Y + 1, z0());
+            return new BlockPos(ox + 24, Y, z0());
         }
 
         BlockPos miner() {
-            return new BlockPos(ox + 33, Y + 1, z0());
+            return new BlockPos(ox + 33, Y, z0());
         }
 
         BlockPos node() {
-            return new BlockPos(ox + 35, Y + 1, z0());
+            return new BlockPos(ox + 35, Y, z0());
         }
 
         BlockPos storage() {
-            return new BlockPos(ox - 31, Y + 1, oz - 3);
+            return new BlockPos(ox - 29, Y, oz - 3);
         }
 
         BlockPos burner() {
-            return new BlockPos(ox + 20, Y + 1, oz - 16);
+            return new BlockPos(ox + 20, Y, oz - 16);
         }
 
         BlockPos pole() {
-            return new BlockPos(ox + 14, Y + 1, oz - 9);
+            return new BlockPos(ox + 14, Y, oz - 9);
         }
 
         /** The belts, from where they start to where they end (moving west). */
         List<BlockPos[]> belts() {
             int z = z0();
             return List.of(new BlockPos[]{new BlockPos(ox + 32, Y + 1, z), new BlockPos(ox + 29, Y + 1, z)},
-                new BlockPos[]{new BlockPos(ox + 19, Y + 1, z), new BlockPos(ox + 16, Y + 1, z)},
+                new BlockPos[]{new BlockPos(ox + 23, Y + 1, z), new BlockPos(ox + 12, Y + 1, z)},
                 new BlockPos[]{new BlockPos(ox + 6, Y + 1, z), new BlockPos(ox + 3, Y + 1, z)},
                 new BlockPos[]{new BlockPos(ox - 23, Y + 1, oz - 3), new BlockPos(ox - 26, Y + 1, oz - 3)});
         }
@@ -283,10 +282,7 @@ public final class AlwaysTests {
 
     private static void build(ServerLevel level, CommandSourceStack source, Twin t) {
         BuildingTests.platform(level, t.x0(), t.z0Area(), t.x1(), t.z1Area(), Y, 14);
-        // the buildings stand a block higher, on stone, so their ports meet the stations' ports at one height
-        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        for (int x = t.ox + 3; x <= t.ox + 42; x++) for (int z = t.oz - 24; z <= t.oz + 1; z++) level.setBlock(pos.set(x, Y, z), Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
-        for (int x = t.ox - 33; x <= t.ox - 23; x++) for (int z = t.oz - 6; z <= t.oz - 1; z++) level.setBlock(pos.set(x, Y, z), Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        // every building stands on the ground: their item ports and the stations' are all one block over it, where the belts run
         // the iron node the miner goes on
         NodeLook look = NodeLook.of(NodeType.IRON);
         level.setBlock(t.node().below(), look.patchStone(), Block.UPDATE_ALL);

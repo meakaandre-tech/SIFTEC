@@ -362,7 +362,7 @@ public final class PolishTests {
         expect(source, "7: its terminal is the company's, on the company's list of ports, part of the building",
             a.companyId.equals(c.id) && listed && controller != null, "company " + a.companyId + ", listed " + listed);
         Vec3 pad = a.pad();
-        expect(source, "7: the landing pad is ten blocks over the terminal, and it is the deck",
+        expect(source, "7: the landing pad is five blocks over the terminal, and it is the deck",
             pad.y == home.getY() + DronePortBlockEntity.PAD_DY && !level.getBlockState(BlockPos.containing(pad.x, pad.y - 1, pad.z)).isAir(),
             "pad at " + pad + ", under it " + level.getBlockState(BlockPos.containing(pad.x, pad.y - 1, pad.z)));
         // the ports: packages at the back, fire charges at the left, arrivals out at the right
@@ -370,7 +370,7 @@ public final class PolishTests {
         Placement p = ctrl == null ? null : ctrl.placement();
         long packagesIn = 0, chargesIn = 0, arrivalsOut = 0;
         if (p != null) {
-            Storage<ItemVariant> back = portStorage(level, p.at(0, 0, 18)), left = portStorage(level, p.at(-6, 0, 11)), right = portStorage(level, p.at(6, 0, 11));
+            Storage<ItemVariant> back = portStorage(level, p.at(0, 1, 8)), left = portStorage(level, p.at(-4, 1, 4)), right = portStorage(level, p.at(4, 1, 4));
             ItemStack parcel = PackageItem.containing(List.of(new ItemStack(Items.IRON_INGOT, 4)));
             try (Transaction tx = Transaction.openOuter()) {
                 if (back != null) packagesIn = back.insert(ItemVariant.of(parcel), 1, tx);
@@ -472,7 +472,7 @@ public final class PolishTests {
             expect(source, "10: the HUB has its first Biomass Burner", false, "");
             return;
         }
-        BlockPos blaze = burner.part(1, 1, 5), engine = burner.part(1, 5, 4), coil = burner.part(-1, 5, 2), brushes = burner.part(-2, 5, 2);
+        BlockPos blaze = burner.part(1, 1, 5), engine = burner.part(1, 3, 4), coil = burner.part(-1, 3, 2), brushes = burner.part(-2, 3, 2);
         expect(source, "10: behind each HUB burner stand a Blaze Burner under a boiler, a Steam Engine, a generator coil and carbon brushes",
             level.getBlockState(blaze).is(block("create:blaze_burner")) && level.getBlockState(engine).is(block("create:steam_engine"))
                 && level.getBlockState(coil).is(block("create_new_age:generator_coil")) && level.getBlockState(brushes).is(block("create_new_age:carbon_brushes")),
