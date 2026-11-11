@@ -26,6 +26,7 @@ siftec selftest steel
 siftec selftest beltlay
 siftec selftest frames
 siftec selftest weathered
+siftec selftest interactive
 siftec selftest state setup
 siftec selftest state check
 siftec worldtest nodes 2000

@@ -60,7 +60,10 @@ anything, and dispensers, open-ended pipes and contraptions putting their blocks
 across another company's claim. A company's building is dismantled only by its own members, wherever it stands; one
 nobody owns comes down only for players the land lets build there. Creative players skip claims, unlocks and costs.
 Only the Build Gun takes a building down: no hand, wrench, Deployer (but the building's own), drill, piston, contraption,
-explosion, Wither or Blueprint Designer's sneak-clear takes one of its blocks. The same holds for the HUB and the Wormhole Gateway. A block of its shell lost anyway (a command, another mod)
+explosion, Wither or Blueprint Designer's sneak-clear takes one of its blocks. The same holds for the HUB and the Wormhole Gateway. A building's blocks are not used by hand either, except the parts meant to be clicked
+(`BuildingProtection.clickable`), which work as they do anywhere but still cannot be broken, wrenched or cased: hand
+cranks and valve handles, levers and buttons, a billboard's sign, the Drone Port's loading terminal, a connector with a
+wire, and the HUB Craft Station's Basins. A block of its shell lost anyway (a command, another mod)
 brings the building down with its refund and contents, but gives nothing back for itself; one of its machines lost that
 way is put back from the building's shape. Dismantled, a building's tanks
 come back as packaged fluid (1 m3 a package; other fluids as full buckets).
